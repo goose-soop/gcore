@@ -41,7 +41,6 @@ final class TypeAdapterRuntimeTypeWrapper<T> extends TypeAdapter<T> {
     return delegate.read(in);
   }
 
-  @SuppressWarnings({"rawtypes"})
   @Override
   public void write(JsonWriter out, T value) throws IOException {
     // Order of preference for choosing type adapters

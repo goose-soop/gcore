@@ -117,7 +117,7 @@ public final class ReflectiveTypeAdapterFactory implements TypeAdapterFactory {
 
     final TypeAdapter<?> typeAdapter = mapped;
     return new ReflectiveTypeAdapterFactory.BoundField(name, serialize, deserialize) {
-      @SuppressWarnings("rawtypes") // the type adapter and field type always agree
+       // the type adapter and field type always agree
       @Override void write(JsonWriter writer, Object value)
           throws IOException, IllegalAccessException {
         Object fieldValue = field.get(value);

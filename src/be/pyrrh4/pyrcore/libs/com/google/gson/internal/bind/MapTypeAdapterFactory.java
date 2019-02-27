@@ -127,7 +127,7 @@ public final class MapTypeAdapterFactory implements TypeAdapterFactory {
     TypeAdapter<?> valueAdapter = gson.getAdapter(TypeToken.get(keyAndValueTypes[1]));
     ObjectConstructor<T> constructor = constructorConstructor.get(typeToken);
 
-    @SuppressWarnings("rawtypes")
+    
     // we don't define a type parameter for the key or value types
     TypeAdapter<T> result = new Adapter(gson, keyAndValueTypes[0], keyAdapter,
         keyAndValueTypes[1], valueAdapter, constructor);

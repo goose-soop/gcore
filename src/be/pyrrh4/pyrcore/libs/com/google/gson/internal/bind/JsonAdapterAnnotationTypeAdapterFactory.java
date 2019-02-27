@@ -49,7 +49,7 @@ public final class JsonAdapterAnnotationTypeAdapterFactory implements TypeAdapte
     return (TypeAdapter<T>) getTypeAdapter(constructorConstructor, gson, targetType, annotation);
   }
 
-  @SuppressWarnings("rawtypes") // Casts guarded by conditionals.
+   // Casts guarded by conditionals.
   TypeAdapter<?> getTypeAdapter(ConstructorConstructor constructorConstructor, Gson gson,
       TypeToken<?> type, JsonAdapter annotation) {
     Object instance = constructorConstructor.get(TypeToken.get(annotation.value())).construct();

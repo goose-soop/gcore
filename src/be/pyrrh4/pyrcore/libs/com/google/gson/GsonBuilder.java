@@ -466,7 +466,7 @@ public final class GsonBuilder {
    * {@link InstanceCreator}, {@link JsonSerializer}, and a {@link JsonDeserializer} interfaces.
    * @return a reference to this {@code GsonBuilder} object to fulfill the "Builder" pattern
    */
-  @SuppressWarnings("rawtypes")
+  
   public GsonBuilder registerTypeAdapter(Type type, Object typeAdapter) {
     $Gson$Preconditions.checkArgument(typeAdapter instanceof JsonSerializer<?>
         || typeAdapter instanceof JsonDeserializer<?>
@@ -512,7 +512,7 @@ public final class GsonBuilder {
    * @return a reference to this {@code GsonBuilder} object to fulfill the "Builder" pattern
    * @since 1.7
    */
-  @SuppressWarnings("rawtypes")
+  
   public GsonBuilder registerTypeHierarchyAdapter(Class<?> baseType, Object typeAdapter) {
     $Gson$Preconditions.checkArgument(typeAdapter instanceof JsonSerializer<?>
         || typeAdapter instanceof JsonDeserializer<?>
@@ -571,7 +571,7 @@ public final class GsonBuilder {
         serializeSpecialFloatingPointValues, longSerializationPolicy, factories);
   }
 
-  @SuppressWarnings("rawtypes")
+  
   private void addTypeAdaptersForDate(String datePattern, int dateStyle, int timeStyle,
       List<TypeAdapterFactory> factories) {
     DefaultDateTypeAdapter dateTypeAdapter;

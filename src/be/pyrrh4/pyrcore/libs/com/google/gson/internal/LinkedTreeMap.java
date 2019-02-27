@@ -36,7 +36,7 @@ import java.util.Set;
  * <p>This implementation was derived from Android 4.1's TreeMap class.
  */
 public final class LinkedTreeMap<K, V> extends AbstractMap<K, V> implements Serializable {
-  @SuppressWarnings("rawtypes") // to avoid Comparable<Comparable<Comparable<...>>>
+   // to avoid Comparable<Comparable<Comparable<...>>>
   private static final Comparator<Comparable> NATURAL_ORDER = new Comparator<Comparable>() {
     public int compare(Comparable a, Comparable b) {
       return a.compareTo(b);
@@ -67,7 +67,7 @@ public final class LinkedTreeMap<K, V> extends AbstractMap<K, V> implements Seri
    * @param comparator the comparator to order elements with, or {@code null} to
    *     use the natural ordering.
    */
-  @SuppressWarnings("rawtypes") // unsafe! if comparator is null, this assumes K is comparable
+   // unsafe! if comparator is null, this assumes K is comparable
   public LinkedTreeMap(Comparator<? super K> comparator) {
     this.comparator = comparator != null
         ? comparator
@@ -477,7 +477,7 @@ public final class LinkedTreeMap<K, V> extends AbstractMap<K, V> implements Seri
       return oldValue;
     }
 
-    @SuppressWarnings("rawtypes")
+    
     @Override public boolean equals(Object o) {
       if (o instanceof Entry) {
         Entry other = (Entry) o;

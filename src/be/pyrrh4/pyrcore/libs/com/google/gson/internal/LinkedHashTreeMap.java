@@ -38,7 +38,7 @@ import java.util.Set;
  * LinkedHashMap classes.
  */
 public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements Serializable {
-  @SuppressWarnings("rawtypes") // to avoid Comparable<Comparable<Comparable<...>>>
+   // to avoid Comparable<Comparable<Comparable<...>>>
   private static final Comparator<Comparable> NATURAL_ORDER = new Comparator<Comparable>() {
     public int compare(Comparable a, Comparable b) {
       return a.compareTo(b);
@@ -68,7 +68,7 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
    * @param comparator the comparator to order elements with, or {@code null} to
    *     use the natural ordering.
    */
-  @SuppressWarnings("rawtypes") // unsafe! if comparator is null, this assumes K is comparable
+   // unsafe! if comparator is null, this assumes K is comparable
   public LinkedHashTreeMap(Comparator<? super K> comparator) {
     this.comparator = comparator != null
         ? comparator
@@ -508,7 +508,7 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
       return oldValue;
     }
 
-    @SuppressWarnings("rawtypes")
+    
     @Override public boolean equals(Object o) {
       if (o instanceof Entry) {
         Entry other = (Entry) o;

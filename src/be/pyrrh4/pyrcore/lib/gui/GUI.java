@@ -316,7 +316,7 @@ public class GUI implements Listener {
 		String invName = name + (index > 0 ? " - " + (index + 1) : "");
 		if (invName.length() > 32) {
 			int startIndex = invName.length() - 29;
-			if (startIndex > 0 && invName.charAt(startIndex - 1) == 'ยง') startIndex++;
+			if (startIndex > 0 && invName.charAt(startIndex - 1) == 'ง') startIndex++;
 			invName = "..." + invName.substring(startIndex, invName.length());
 		}
 		if (invName.length() > 32) {

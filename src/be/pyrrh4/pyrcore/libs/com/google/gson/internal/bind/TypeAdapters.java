@@ -65,7 +65,7 @@ public final class TypeAdapters {
     throw new UnsupportedOperationException();
   }
 
-  @SuppressWarnings("rawtypes")
+  
   public static final TypeAdapter<Class> CLASS = new TypeAdapter<Class>() {
     @Override
     public void write(JsonWriter out, Class value) throws IOException {
@@ -805,7 +805,6 @@ public final class TypeAdapters {
   }
 
   public static final TypeAdapterFactory ENUM_FACTORY = new TypeAdapterFactory() {
-    @SuppressWarnings({"rawtypes"})
     @Override public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
       Class<? super T> rawType = typeToken.getRawType();
       if (!Enum.class.isAssignableFrom(rawType) || rawType == Enum.class) {

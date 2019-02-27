@@ -1,0 +1,32 @@
+#----------------------------------------------------------------------------------------------------
+# Configuration file for PyrCore
+#----------------------------------------------------------------------------------------------------
+
+# Data management (affects only PyrCore)
+data:
+  # Back end (JSON, MYSQL) (default JSON)
+  # If you enable MySQL on another plugin requiring PyrCore, you should definitely enable it here as well
+  backend: JSON
+  # Synchronization delay (in seconds) (disabled with -1, by default)
+  # If this is enabled, the plugin will check the stored data (json/mysql), and if there's new/different data, cached data will be overriden here
+  sync_delay: -1
+  # MySQL identifiers (if backend is MYSQL)
+#  mysql:
+#    host: mysql.myserver.com
+#    name: mydatabase
+#    user: username
+#    pass: pwd
+
+# Locale lang (affects all plugins)
+locale_lang: en_US
+
+# Enable update notifications ? (affects all plugins)
+# Set this option to 'true' is recommended ! If you disable this, you'll not be able to get the latest updates/bug fixes notifications.
+update_check: true
+
+# Show debug console messages (basically more information, you shouldn't disable it) (affects all plugins)
+show_debug: true
+
+# Allow custom materials to be loaded
+# If this is set to true, basically no check will be made for material validity when it comes to loading one, so make sure that you know what you're doing
+allow_custom_materials: false

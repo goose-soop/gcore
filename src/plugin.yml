@@ -1,0 +1,21 @@
+﻿# Display
+name: PyrCore
+author: PYRRH4
+description: 'Core for PYRRH4''s plugins'
+website: www.pyrrh4.be
+# Techy
+version: 6.4.0
+api-version: 1.13
+main: be.pyrrh4.pyrcore.PyrCore
+softdepend: [Vault,PlaceholderAPI,Multiverse-Core]
+# Commands
+commands:
+  pyrcore:
+    aliases: [pyr]
+    description: 'PYRRH4''s (PyrCore) plugins command'
+# Permission
+permissions:
+  pyr.core.admin:
+    default: op
+  pyr.core.reload:
+    default: op

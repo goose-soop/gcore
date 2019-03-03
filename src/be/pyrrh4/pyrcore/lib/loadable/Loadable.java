@@ -31,6 +31,7 @@ import be.pyrrh4.pyrcore.lib.loadable.setting.SettingWorld;
 import be.pyrrh4.pyrcore.lib.material.Mat;
 import be.pyrrh4.pyrcore.lib.util.Utils;
 
+@Deprecated
 public abstract class Loadable<T> implements Comparable<Loadable<?>> {
 
 	// fields

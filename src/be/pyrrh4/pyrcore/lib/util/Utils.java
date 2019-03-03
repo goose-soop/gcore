@@ -2174,6 +2174,8 @@ public class Utils {
 	public static final Comparator<Object> objectSorter = new Comparator<Object>() {
 		@Override
 		public int compare(Object o1, Object o2) {
+			if (o1 == null) return o2 == null ? 0 : -1;
+			if (o2 == null) return 1;// o1 can't be null here
 			return String.CASE_INSENSITIVE_ORDER.compare(fourDigitsNumber(o1.toString()), fourDigitsNumber(o2.toString()));
 		}
 	};
@@ -2190,6 +2192,8 @@ public class Utils {
 	public static final Comparator<PotionEffectType> effectSorter = new Comparator<PotionEffectType>() {
 		@Override
 		public int compare(PotionEffectType o1, PotionEffectType o2) {
+			if (o1 == null) return o2 == null ? 0 : -1;
+			if (o2 == null) return 1;// o1 can't be null here
 			return String.CASE_INSENSITIVE_ORDER.compare(o1.getName(), o2.getName());
 		}
 	};

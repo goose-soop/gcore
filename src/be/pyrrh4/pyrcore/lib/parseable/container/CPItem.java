@@ -313,25 +313,7 @@ public class CPItem extends ContainerParseable {
 
 	@Override
 	public CPItem clone() {
-		// clone
-		CPItem clone = (CPItem) super.clone();
-		// clone properties
-		clone.slot = slot.clone();
-		clone.chance = chance.clone();
-		clone.maxAmount = maxAmount.clone();
-		clone.enabled = enabled.clone();
-		clone.type = type.clone();
-		clone.durability = durability.clone();
-		clone.unbreakable = unbreakable.clone();
-		clone.amount = amount.clone();
-		clone.name = name.clone();
-		clone.lore = lore.clone();
-		clone.enchants = enchants.clone();
-		clone.nbt = nbt.clone();
-		clone.mustHaveInHand = mustHaveInHand.clone();
-		clone.removeAfterAction = removeAfterAction.clone();
-		// success
-		return clone;
+		return (CPItem) super.clone();
 	}
 
 }

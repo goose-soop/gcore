@@ -4,7 +4,7 @@ author: PYRRH4
 description: 'Core for PYRRH4''s plugins'
 website: www.pyrrh4.be
 # Techy
-version: 6.4.0
+version: 6.4.1
 api-version: 1.13
 main: be.pyrrh4.pyrcore.PyrCore
 softdepend: [Vault,PlaceholderAPI,Multiverse-Core]

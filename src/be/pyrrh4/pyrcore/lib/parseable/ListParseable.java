@@ -245,6 +245,7 @@ public abstract class ListParseable<T extends Parseable> extends Parseable {
 		ListParseable<T> clone = (ListParseable<T>) super.clone();
 		// clone properties
 		clone.elementTypeName = elementTypeName;
+		clone.idCase = idCase;
 		for (String elementId : elements.keySet()) {
 			clone.elements.put(elementId, (T) elements.get(elementId).clone());
 		}

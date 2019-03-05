@@ -89,14 +89,7 @@ public class CPSound extends ContainerParseable {
 
 	@Override
 	public CPSound clone() {
-		// clone
-		CPSound clone = (CPSound) super.clone();
-		// clone properties
-		clone.type = type.clone();
-		clone.volume = volume.clone();
-		clone.pitch = pitch.clone();
-		// success
-		return clone;
+		return (CPSound) super.clone();
 	}
 
 }

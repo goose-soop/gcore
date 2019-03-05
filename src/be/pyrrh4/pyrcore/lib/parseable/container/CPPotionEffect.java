@@ -75,14 +75,7 @@ public class CPPotionEffect extends ContainerParseable {
 
 	@Override
 	public CPPotionEffect clone() {
-		// clone
-		CPPotionEffect clone = (CPPotionEffect) super.clone();
-		// clone properties
-		clone.type = type.clone();
-		clone.level = level.clone();
-		clone.duration = duration.clone();
-		// success
-		return clone;
+		return (CPPotionEffect) super.clone();
 	}
 
 }

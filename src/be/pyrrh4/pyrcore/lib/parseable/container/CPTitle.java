@@ -84,16 +84,7 @@ public class CPTitle extends ContainerParseable {
 
 	@Override
 	public CPTitle clone() {
-		// clone
-		CPTitle clone = (CPTitle) super.clone();
-		// clone properties
-		clone.title = title.clone();
-		clone.subtitle = subtitle.clone();
-		clone.fadeIn = fadeIn.clone();
-		clone.duration = duration.clone();
-		clone.fadeOut = fadeOut.clone();
-		// success
-		return clone;
+		return (CPTitle) super.clone();
 	}
 
 }

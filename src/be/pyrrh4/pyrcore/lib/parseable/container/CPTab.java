@@ -53,13 +53,7 @@ public class CPTab extends ContainerParseable {
 
 	@Override
 	public CPTab clone() {
-		// clone
-		CPTab clone = (CPTab) super.clone();
-		// clone properties
-		clone.header = header.clone();
-		clone.footer = footer.clone();
-		// success
-		return clone;
+		return (CPTab) super.clone();
 	}
 
 }

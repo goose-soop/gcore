@@ -70,13 +70,7 @@ public class CPBlock extends ContainerParseable {
 
 	@Override
 	public CPBlock clone() {
-		// clone
-		CPBlock clone = (CPBlock) super.clone();
-		// clone properties
-		clone.type = type.clone();
-		clone.amount = amount.clone();
-		// success
-		return clone;
+		return (CPBlock) super.clone();
 	}
 
 }

@@ -44,6 +44,9 @@ public abstract class EditorGUI extends GUI {
 	public static Mat ICON_ATTRIBUTE = Mat.REDSTONE;
 	public static Mat ICON_ENUM = Mat.ENDER_CHEST;
 	public static Mat ICON_POTION = Mat.SPLASH_POTION;
+	public static Mat ICON_GOTO = Mat.POWERED_RAIL;
+	public static Mat ICON_LOCATION = Mat.RAIL;
+	public static Mat ICON_WORLD = Mat.END_PORTAL_FRAME;
 
 	// max lines
 	public static int MAX_DESCRIPTION_LINES = 22;

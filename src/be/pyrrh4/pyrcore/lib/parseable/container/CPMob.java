@@ -99,14 +99,7 @@ public class CPMob extends ContainerParseable {
 
 	@Override
 	public CPMob clone() {
-		// clone
-		CPMob clone = (CPMob) super.clone();
-		// clone properties
-		clone.type = type.clone();
-		clone.name = name.clone();
-		clone.amount = amount.clone();
-		// success
-		return clone;
+		return (CPMob) super.clone();
 	}
 
 }

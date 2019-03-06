@@ -21,6 +21,10 @@ public class LPItem extends ListParseable<CPItem> {
 	}
 
 	// methods
+	public boolean contains(Player player, Player parser) {
+		return contains(player.getInventory(), parser);
+	}
+
 	public boolean contains(Inventory inventory, Player parser) {
 		for (CPItem item : getElements().values()) {
 			ItemData it = item.getParsedValue(parser);

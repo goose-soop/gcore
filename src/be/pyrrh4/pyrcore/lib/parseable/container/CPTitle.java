@@ -68,7 +68,7 @@ public class CPTitle extends ContainerParseable {
 	}
 
 	// methods
-	public Title getParser(Player parser) {
+	public Title getParsed(Player parser) {
 		String title = getTitle(parser);
 		String subtitle = getSubtitle(parser);
 		Integer fadeIn = getFadeIn(parser);

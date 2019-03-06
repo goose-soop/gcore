@@ -150,16 +150,21 @@ public class Utils {
 		}
 		return ServerVersion.UNSUPPORTED;
 	}
+	
+	public static ServerVersion getHighestServerVersion() {
+		ServerVersion[] versions = ServerVersion.values();
+		return versions[versions.length - 1];
+	}
 
 	public static ServerImplementation getServerImplementation() {
 		try {
 			Class.forName("com.destroystokyo.paper.PaperConfig");
 			return ServerImplementation.PAPERSPIGOT;
-		} catch (Exception ignored) {}
+		} catch (Throwable ignored) {}
 		try {
 			Class.forName("org.spigotmc.SpigotConfig");
 			return ServerImplementation.SPIGOT;
-		} catch (Exception ignored) {}
+		} catch (Throwable ignored) {}
 		return ServerImplementation.CRAFTBUKKIT;
 	}
 

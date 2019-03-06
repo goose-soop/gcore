@@ -40,7 +40,7 @@ public class CPTab extends ContainerParseable {
 	}
 
 	// methods
-	public Tab getParser(Player parser) {
+	public Tab getParsed(Player parser) {
 		String header = getHeader(parser);
 		String footer = getFooter(parser);
 		return header != null && footer != null ? new Tab(header, footer) : null;

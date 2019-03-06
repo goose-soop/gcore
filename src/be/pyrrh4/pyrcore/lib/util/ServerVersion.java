@@ -40,6 +40,7 @@ public enum ServerVersion {
 
 	// current
 	public static final ServerVersion CURRENT = Utils.getServerVersion();
+	public static final ServerVersion HIGHEST = Utils.getHighestServerVersion();
 
 	// bases
 	private String name;

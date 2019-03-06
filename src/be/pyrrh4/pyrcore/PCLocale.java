@@ -555,18 +555,11 @@ public class PCLocale {
 			);
 
 	// editor : block setting
-	public static final Text GUI_GENERIC_EDITOR_BLOCK_TYPELORE = new Text(
-			"GUI_GENERIC_EDITOR_BLOCK_TYPELORE", file,
+	public static final Text GUI_GENERIC_EDITOR_BLOCKTYPELORE = new Text(
+			"GUI_GENERIC_EDITOR_BLOCKTYPELORE", file,
 			"en_US", Utils.asList("&7Type of block"),
 			"fr_FR", Utils.asList("&7Type de bloc"),
 			"it_IT", Utils.asList("&7Tipo di blocco")
-			);
-
-	public static final Text GUI_GENERIC_EDITOR_BLOCK_AMOUNTLORE = new Text(
-			"GUI_GENERIC_EDITOR_BLOCK_AMOUNTLORE", file,
-			"en_US", Utils.asList("&7Blocks amount"),
-			"fr_FR", Utils.asList("&7Nombre de blocs"),
-			"it_IT", Utils.asList("&7Numero di blocchi")
 			);
 
 	// editor : mob setting

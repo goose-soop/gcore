@@ -25,6 +25,11 @@ public class PPEnumList<T extends Enum<T>> extends PrimitiveParseable<List<T>> {
 		this.enumClass = enumClass;
 	}
 
+	// get
+	public Class<T> getEnumClass() {
+		return enumClass;
+	}
+
 	// parse
 	@Override
 	public List<T> parseValue(List<String> value, Player parsing) throws Throwable {

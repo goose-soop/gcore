@@ -20,8 +20,8 @@ import be.pyrrh4.pyrcore.lib.util.Utils;
 public abstract class ContainerParseable extends Parseable {
 
 	// base
-	private String typeName;
-	private Map<String, Parseable> components = new HashMap<String, Parseable>();// LOWER CASE KEY
+	protected String typeName;
+	protected Map<String, Parseable> components = new HashMap<String, Parseable>();// LOWER CASE KEY
 
 	protected ContainerParseable() {// used to clone object
 		super();
@@ -203,6 +203,16 @@ public abstract class ContainerParseable extends Parseable {
 		}
 		// success
 		return clone;
+	}
+
+	@Override
+	public <T extends Parseable> T cloneAs(Class<T> clazz) {
+		ContainerParseable clone = (ContainerParseable) super.cloneAs(clazz);
+		clone.typeName = typeName;
+		for (String componentId : components.keySet()) {
+			clone.components.put(componentId, components.get(componentId).clone());
+		}
+		return (T) clone;
 	}
 
 }

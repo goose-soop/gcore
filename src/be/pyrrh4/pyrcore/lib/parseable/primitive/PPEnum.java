@@ -6,11 +6,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 
 import be.pyrrh4.pyrcore.PCLocale;
-import be.pyrrh4.pyrcore.lib.parseable.editor.EditorItem;
 import be.pyrrh4.pyrcore.lib.material.Mat;
 import be.pyrrh4.pyrcore.lib.parseable.Parseable;
 import be.pyrrh4.pyrcore.lib.parseable.PrimitiveParseable;
 import be.pyrrh4.pyrcore.lib.parseable.editor.EditorGUI;
+import be.pyrrh4.pyrcore.lib.parseable.editor.EditorItem;
 import be.pyrrh4.pyrcore.lib.parseable.editor.ModifCallback;
 import be.pyrrh4.pyrcore.lib.util.Utils;
 
@@ -22,6 +22,11 @@ public class PPEnum<T extends Enum<T>> extends PrimitiveParseable<T> {
 	public PPEnum(String id, Parseable parent, String defaultValue, Class<T> enumClass, String typeName, boolean mandatory, int editorSlot, Mat editorIcon, List<String> editorDescription) {
 		super(id, parent, Utils.asList(defaultValue), typeName, mandatory, editorSlot, editorIcon, editorDescription);
 		this.enumClass = enumClass;
+	}
+
+	// get
+	public Class<T> getEnumClass() {
+		return enumClass;
 	}
 
 	// parse

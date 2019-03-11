@@ -51,6 +51,7 @@ public abstract class EditorGUI extends GUI {
 	public static Mat ICON_COOLDOWN = Mat.SNOW_BLOCK;
 	public static Mat ICON_BRANCH = Mat.RAIL;
 	public static Mat ICON_OBJECT = Mat.CHEST_MINECART;
+	public static Mat ICON_QUEST = Mat.DIAMOND_AXE;
 
 	// max lines
 	public static int MAX_DESCRIPTION_LINES = 22;

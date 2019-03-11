@@ -20,12 +20,12 @@ public abstract class Parseable implements Comparable<Parseable>, Cloneable {
 	public static final int MAX_DESCRIPTION_DEPTH = 2;
 
 	// base
-	private String id;
-	private Parseable parent;
-	private boolean mandatory;
-	private int editorSlot;
-	private Mat editorIcon;
-	private List<String> editorDescription;
+	protected String id;
+	protected Parseable parent;
+	protected boolean mandatory;
+	protected int editorSlot;
+	protected Mat editorIcon;
+	protected List<String> editorDescription;
 	private DataLink lastData;
 
 	public Parseable(String id, Parseable parent, boolean mandatory, int editorSlot, Mat editorIcon, List<String> editorDescription) {
@@ -97,11 +97,15 @@ public abstract class Parseable implements Comparable<Parseable>, Cloneable {
 
 	@Override
 	public Parseable clone() {
+		return cloneAs(getClass());
+	}
+
+	public <T extends Parseable> T cloneAs(Class<T> clazz) {
 		try {
 			// new object
-			Constructor<? extends Parseable> constructor = getClass().getConstructor();
+			Constructor<T> constructor = clazz.getConstructor();
 			constructor.setAccessible(true);
-			Parseable clone = constructor.newInstance();
+			T clone = constructor.newInstance();
 			// clone properties
 			clone.id = id;
 			clone.parent = parent;

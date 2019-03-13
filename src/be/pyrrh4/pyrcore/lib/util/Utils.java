@@ -1876,7 +1876,7 @@ public class Utils {
 		while (size < contentSize && size <= 54) {
 			size += 9;
 		}
-		return size;
+		return size > 54 ? 54 : size;
 	}
 
 	/**

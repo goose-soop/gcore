@@ -138,7 +138,7 @@ public abstract class ContainerParseable extends Parseable {
 	}
 
 	@Override
-	public void fillEditor(final EditorGUI gui, Player player, final ModifCallback onModif) {
+	protected void fillEditor(final EditorGUI gui, Player player, final ModifCallback onModif) {
 		// add components items
 		for (final Parseable component : components.values()) {
 			gui.setRegularItem(new EditorItem(component.getId(), component.getEditorSlot(), component.getEditorIcon(), "§6" + component.getId(), component.getEditorDescription()) {// TODO : (same for list) instead of getEditorDescription, describe children as well

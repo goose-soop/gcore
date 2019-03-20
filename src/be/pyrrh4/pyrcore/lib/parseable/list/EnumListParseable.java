@@ -43,7 +43,7 @@ public abstract class EnumListParseable<T extends Parseable, E extends Enum<E>> 
 
 	// editor
 	@Override
-	public void fillEditor(final EditorGUI gui, Player player, final ModifCallback onModif) {
+	protected void fillEditor(final EditorGUI gui, Player player, final ModifCallback onModif) {
 		// delete wrapper
 		final Wrapper<Boolean> delete = new Wrapper<Boolean>(false);
 		// add elements items
@@ -61,24 +61,8 @@ public abstract class EnumListParseable<T extends Parseable, E extends Enum<E>> 
 						gui.open(player);
 						return;
 					}
-					// create element GUI
-					String name = Utils.getNewInventoryName(gui.getName(), element.getId());
-					EditorGUI sub = new EditorGUI(element.getLastData().getPlugin(), gui, name, element.getEditorSize(), element.getEditorMaxRegularSlot()) {
-						private EditorGUI subThis = this;
-						@Override
-						protected void fill() {
-							element.fillEditor(subThis, player, onModif);
-						}
-					};
-					// back item
-					sub.setPersistentItem(new EditorItem("control_item_back", getEditorBackSlot(), Mat.ARROW, PCLocale.GUI_GENERIC_EDITORITEMBACK.getLine(), null) {
-						@Override
-						protected void onClick(final Player player, final ClickType clickType, final int pageIndex) {
-							gui.open(player);
-						}
-					});
-					// open it
-					sub.open(player);
+					// create and open element GUI
+					element.createEditor(gui, player, onModif).open(player);
 					return;
 				}
 			});

@@ -6,10 +6,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 
+import be.pyrrh4.pyrcore.PCLocale;
 import be.pyrrh4.pyrcore.lib.material.Mat;
 import be.pyrrh4.pyrcore.lib.parseable.data.DataLink;
 import be.pyrrh4.pyrcore.lib.parseable.editor.EditorGUI;
+import be.pyrrh4.pyrcore.lib.parseable.editor.EditorItem;
 import be.pyrrh4.pyrcore.lib.parseable.editor.ModifCallback;
 import be.pyrrh4.pyrcore.lib.util.Pair;
 import be.pyrrh4.pyrcore.lib.util.Utils;
@@ -74,10 +77,28 @@ public abstract class Parseable implements Comparable<Parseable>, Cloneable {
 	public abstract void save(DataLink data);
 
 	// editor
+	public EditorGUI createEditor(final EditorGUI parent, final Player player, final ModifCallback onModif) {
+		if (getLastData() == null || getLastData().getPlugin() == null) return null;
+		return new EditorGUI(getLastData().getPlugin(), parent, getId(), getEditorSize(), getEditorMaxRegularSlot()) {
+			@Override
+			protected void fill() {
+				fillEditor(this, player, onModif);
+				if (parent != null) {
+					setPersistentItem(new EditorItem("control_item_back", getEditorBackSlot(), Mat.ARROW, PCLocale.GUI_GENERIC_EDITORITEMBACK.getLine(), null) {
+						@Override
+						protected void onClick(final Player player, final ClickType clickType, final int pageIndex) {
+							parent.open(player);
+						}
+					});
+				}
+			}
+		};
+	}
+
 	public abstract int getEditorSize();
 	public abstract int getEditorMaxRegularSlot();
 	public abstract int getEditorBackSlot();
-	public abstract void fillEditor(EditorGUI gui, Player player, ModifCallback onModif);
+	protected abstract void fillEditor(EditorGUI gui, Player player, ModifCallback onModif);
 	public abstract List<String> describe(int depth);
 
 	// misc

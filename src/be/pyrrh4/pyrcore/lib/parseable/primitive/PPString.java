@@ -26,7 +26,7 @@ public class PPString extends PrimitiveParseable<String> {
 
 	// editor
 	@Override
-	public void fillEditor(final EditorGUI gui, Player player, final ModifCallback onModif) {
+	protected void fillEditor(final EditorGUI gui, Player player, final ModifCallback onModif) {
 		// current, raw and delete
 		EditorGUI.fillItemCurrent(gui, player, this, 0, onModif);
 		EditorGUI.fillItemRaw(gui, player, this, 3, onModif);

@@ -37,7 +37,7 @@ public class PPEnum<T extends Enum<T>> extends PrimitiveParseable<T> {
 
 	// editor
 	@Override
-	public void fillEditor(final EditorGUI gui, Player player, final ModifCallback onModif) {
+	protected void fillEditor(final EditorGUI gui, Player player, final ModifCallback onModif) {
 		// current, raw and delete
 		EditorGUI.fillItemCurrent(gui, player, this, 0, onModif);
 		EditorGUI.fillItemRaw(gui, player, this, 3, onModif);

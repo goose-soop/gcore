@@ -31,7 +31,7 @@ public class PPStringList extends PrimitiveParseable<List<String>> {
 
 	// editor
 	@Override
-	public void fillEditor(final EditorGUI gui, Player player, final ModifCallback onModif) {
+	protected void fillEditor(final EditorGUI gui, Player player, final ModifCallback onModif) {
 		// current and delete
 		EditorGUI.fillItemCurrent(gui, player, this, 20, onModif);
 		EditorGUI.fillItemDelete(gui, player, this, 24, onModif);

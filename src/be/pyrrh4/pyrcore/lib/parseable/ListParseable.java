@@ -143,7 +143,7 @@ public abstract class ListParseable<T extends Parseable> extends Parseable {
 	}
 
 	@Override
-	public void fillEditor(final EditorGUI gui, Player player, final ModifCallback onModif) {
+	protected void fillEditor(final EditorGUI gui, Player player, final ModifCallback onModif) {
 		// delete wrapper
 		final Wrapper<Boolean> delete = new Wrapper<Boolean>(false);
 		// add elements items

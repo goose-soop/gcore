@@ -236,8 +236,6 @@ public class PyrCore extends PyrPlugin {
 			}
 			this.dataManager = new PCDataManager(backend);
 			dataManager.enable();
-		} else {
-			dataManager.synchronize();
 		}
 
 		// auto update

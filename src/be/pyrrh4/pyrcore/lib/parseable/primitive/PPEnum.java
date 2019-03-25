@@ -1,7 +1,9 @@
 package be.pyrrh4.pyrcore.lib.parseable.primitive;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 
@@ -51,7 +53,9 @@ public class PPEnum<T extends Enum<T>> extends PrimitiveParseable<T> {
 					@Override
 					protected void fill() {
 						// add values
+						boolean mobs = enumClass.equals(EntityType.class);
 						for (final T val : enumClass.getEnumConstants()) {
+							if (mobs && !mobTypes.contains(val)) continue;// invalid mob
 							final String valName = val.name();
 							setRegularItem(new EditorItem("value_" + valName, -1, Mat.ENDER_CHEST, "§6" + valName, null) {
 								@Override
@@ -111,6 +115,18 @@ public class PPEnum<T extends Enum<T>> extends PrimitiveParseable<T> {
 		clone.enumClass = enumClass;
 		// success
 		return clone;
+	}
+
+	// mob types
+	private static final List<EntityType> mobTypes = new ArrayList<EntityType>();
+
+	static {
+		List<String> ok = Utils.asList("ARMOR_STAND", "BAT", "BLAZE", "BOAT", "CAVE_SPIDER", "CHICKEN", "COD", "COW", "CREEPER", "DOLPHIN", "DONKEY", "ELDER_GUARDIAN", "ENDER_CRYSTAL", "ENDER_DRAGON", "ENDERMAN", "ENDERMITE", "EVOKER", "EXPERIENCE_ORB", "GHAST", "GIANT", "GUARDIAN", "HORSE", "HUSK", "ILLUSIONER", "IRON_GOLEM", "LLAMA", "MAGMA_CUBE", "MINECART", "MINECART_CHEST", "MINECART_COMMAND", "MINECART_FURNACE", "MINECART_HOPPER", "MINECART_MOB_SPAWNER", "MINECART_TNT", "MULE", "MUSHROOM_COW", "OCELOT", "PARROT", "PHANTOM", "PIG", "PIG_ZOMBIE", "PLAYER", "POLAR_BEAR", "PRIMED_TNT", "PUFFERFISH", "RABBIT", "SALMON", "SHEEP", "SHULKER", "SILVERFISH", "SKELETON", "SKELETON_HORSE", "SLIME", "SNOWMAN", "SPIDER", "SQUID", "STRAY", "THROWN_EXP_BOTTLE", "TROPICAL_FISH", "TURTLE", "VEX", "VILLAGER", "VINDICATOR", "WITCH", "WITHER", "WITHER_SKELETON", "WOLF", "ZOMBIE", "ZOMBIE_HORSE", "ZOMBIE_VILLAGER");
+		for (EntityType type : EntityType.values()) {
+			if (ok.contains(type.toString())) {
+				mobTypes.add(type);
+			}
+		}
 	}
 
 }

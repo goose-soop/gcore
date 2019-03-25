@@ -178,6 +178,7 @@ public class PyrCore extends PyrPlugin {
 
 	@Override
 	protected boolean preEnable() {
+		// FIXME v5 : convert here, remove old 6.0.0 convertion thing below
 		// move the pre 6.0.0 folder to old and start data conversion
 		if (new File(getDataFolder() + "/data/data").exists()) {
 			// move to old

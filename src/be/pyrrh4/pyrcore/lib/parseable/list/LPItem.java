@@ -35,16 +35,18 @@ public class LPItem extends ListParseable<CPItem> {
 		return true;
 	}
 
-	public void take(Player player, Player parser) {
-		take(player.getInventory(), parser);
+	public void take(Player player, Player parser, boolean afterAction) {
+		take(player.getInventory(), parser, afterAction);
 		player.updateInventory();
 	}
 
-	public void take(Inventory inventory, Player parser) {
+	public void take(Inventory inventory, Player parser, boolean afterAction) {
 		for (CPItem item : getElements().values()) {
 			ItemData it = item.getParsedValue(parser);
 			if (it != null) {
-				it.remove(inventory);
+				if (item.getRemoveAfterAction(parser) ? afterAction : true) {
+					it.remove(inventory);
+				}
 			}
 		}
 	}

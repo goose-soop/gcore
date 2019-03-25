@@ -17,18 +17,11 @@ import be.pyrrh4.pyrcore.lib.util.Utils;
 
 public abstract class Compat {
 
-	// ------------------------------------------------------------
-	// Instance
-	// ------------------------------------------------------------
-
+	// instance
 	public static final Compat INSTANCE = Utils.createCompat();
 
 	public void init() {
 	}
-
-	// ------------------------------------------------------------
-	// Abstract
-	// ------------------------------------------------------------
 
 	// optional
 	public void sendTitle(Player player, String title, String subtitle, int fadeIn, int duration, int fadeOut) {}
@@ -56,12 +49,10 @@ public abstract class Compat {
 	public void setScoreboardTeamNameTags(Team team, String prefix, String suffix) {}
 	public abstract Enchantment getEnchantment(String raw);
 
-	// ------------------------------------------------------------
-	// PotionData
-	// ------------------------------------------------------------
-
-	public static class PotionData
-	{
+	// potion data
+	public static class PotionData {
+		
+		// base
 		private PotionType type;
 		private int level;
 		private boolean extended, splash;
@@ -73,6 +64,7 @@ public abstract class Compat {
 			this.splash = splash;
 		}
 
+		// get
 		public PotionType getType() {
 			return type;
 		}
@@ -88,6 +80,7 @@ public abstract class Compat {
 		public boolean isSplash() {
 			return splash;
 		}
+		
 	}
 
 }

@@ -1,18 +1,18 @@
 ﻿# Display
 name: PyrCore
-author: PYRRH4
-description: 'Core for PYRRH4''s plugins'
-website: www.pyrrh4.be
+author: GuillaumeVDN
+description: 'Core for GuillaumeVDN''s plugins'
+website: www.guillaumevdn.com
 # Techy
 version: 6.4.1
 api-version: 1.13
 main: be.pyrrh4.pyrcore.PyrCore
-softdepend: [Vault,PlaceholderAPI,Multiverse-Core]
+softdepend: [Vault,PlaceholderAPI,Multiverse-Core,ProtocolLib]
 # Commands
 commands:
   pyrcore:
     aliases: [pyr]
-    description: 'PYRRH4''s (PyrCore) plugins command'
+    description: 'PyrCore plugins command'
 # Permission
 permissions:
   pyr.core.admin:

@@ -97,6 +97,7 @@ import be.pyrrh4.pyrcore.lib.messenger.Text;
 import be.pyrrh4.pyrcore.lib.messenger.Title;
 import be.pyrrh4.pyrcore.lib.util.BungeeMessagingAPI.BungeeOutMessage;
 import be.pyrrh4.pyrcore.lib.versioncompat.Compat;
+import be.pyrrh4.pyrcore.lib.versioncompat.npc.NpcProtocols;
 import be.pyrrh4.pyrcore.lib.versioncompat.particle.ParticleManager;
 import be.pyrrh4.pyrcore.lib.versioncompat.sound.Sound;
 import be.pyrrh4.pyrcore.libs.com.google.gson.Gson;
@@ -150,7 +151,7 @@ public class Utils {
 		}
 		return ServerVersion.UNSUPPORTED;
 	}
-	
+
 	public static ServerVersion getHighestServerVersion() {
 		ServerVersion[] versions = ServerVersion.values();
 		return versions[versions.length - 1];
@@ -175,7 +176,7 @@ public class Utils {
 	public static Compat createCompat() {
 		try {
 			Compat compat = ServerVersion.CURRENT.getCompatClass().newInstance();
-			PyrCore.inst().debug("Creating compatibility for version " + ServerVersion.CURRENT.getName());
+			PyrCore.inst().debug("Created compatibility for version " + ServerVersion.CURRENT.getName());
 			return compat;
 		} catch (Throwable exception) {
 			exception.printStackTrace();
@@ -184,10 +185,28 @@ public class Utils {
 		}
 	}
 
+	public static NpcProtocols createNPCProtocols() {
+		// no protocol lib
+		if (getPlugin("ProtocolLib") == null) {
+			PyrCore.inst().debug("Could not find ProtocolLib to create npc protocols compatibility for version " + ServerVersion.CURRENT.getName());
+			return null;
+		}
+		// attempt to create protocols
+		try {
+			NpcProtocols protocols = ServerVersion.CURRENT.getNpcProtocolsClass().newInstance();
+			PyrCore.inst().debug("Created npc protocols compatibility for version " + ServerVersion.CURRENT.getName());
+			return protocols;
+		} catch (Throwable exception) {
+			exception.printStackTrace();
+			PyrCore.inst().error("Could not initialize npc protocols compatibility for version " + ServerVersion.CURRENT.getName());
+			return null;
+		}
+	}
+
 	public static ParticleManager createParticleManagerCompat() {
 		try {
 			ParticleManager compat = ServerVersion.CURRENT.getParticleCompatClass().newInstance();
-			PyrCore.inst().debug("Creating particle manager compatibility for version " + ServerVersion.CURRENT.getName());
+			PyrCore.inst().debug("Created particle manager compatibility for version " + ServerVersion.CURRENT.getName());
 			return compat;
 		} catch (InstantiationException | IllegalAccessException exception) {
 			exception.printStackTrace();

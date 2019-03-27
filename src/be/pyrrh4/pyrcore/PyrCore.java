@@ -26,6 +26,8 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
+import org.bukkit.event.server.PluginDisableEvent;
+import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -53,6 +55,7 @@ import be.pyrrh4.pyrcore.lib.event.PlayerFireBlockEvent;
 import be.pyrrh4.pyrcore.lib.event.PlayerKillEvent;
 import be.pyrrh4.pyrcore.lib.event.PlayerSpawnedMobEvent;
 import be.pyrrh4.pyrcore.lib.material.Mat;
+import be.pyrrh4.pyrcore.lib.npc.NpcManager;
 import be.pyrrh4.pyrcore.lib.util.BucketType;
 import be.pyrrh4.pyrcore.lib.util.ServerImplementation;
 import be.pyrrh4.pyrcore.lib.util.ServerVersion;
@@ -62,6 +65,7 @@ import be.pyrrh4.pyrcore.lib.util.input.ChatInput;
 import be.pyrrh4.pyrcore.lib.util.input.ItemInput;
 import be.pyrrh4.pyrcore.lib.util.input.LocationInput;
 import be.pyrrh4.pyrcore.lib.versioncompat.Compat;
+import be.pyrrh4.pyrcore.lib.versioncompat.npc.NpcProtocols;
 import be.pyrrh4.pyrcore.libs.com.google.gson.Gson;
 import be.pyrrh4.pyrcore.libs.org.apache.commons.io.FileUtils;
 
@@ -98,6 +102,7 @@ public class PyrCore extends PyrPlugin {
 	private boolean updateCheck = true;
 
 	// misc
+	private NpcManager npcManager = null;
 	private VaultIntegration vaultIntegration = null;
 	private Map<Player, ChatInput> chatInputs = new HashMap<Player, ChatInput>();
 	private Map<Player, LocationInput> locationInputs = new HashMap<Player, LocationInput>();
@@ -118,6 +123,10 @@ public class PyrCore extends PyrPlugin {
 
 	public boolean updateCheck() {
 		return updateCheck;
+	}
+
+	public NpcManager getNpcManager() {
+		return npcManager;
 	}
 
 	public VaultIntegration getVaultIntegration() {
@@ -268,6 +277,15 @@ public class PyrCore extends PyrPlugin {
 		// vault integration
 		registerPluginIntegration("Vault", VaultIntegration.class);
 
+		// npc manager
+		try {
+			if (NpcProtocols.INSTANCE != null && Utils.getPlugin("ProtocolLib") != null) {
+				(npcManager = new NpcManager()).enable();
+				debug("Enabled NPC manager with ProtocolLib");
+			}
+		} catch (Throwable ignored) {}
+		if (npcManager == null) debug("Couldn't enable NPC manager with ProtocolLib");
+
 		// reload inner (mainly settings)
 		innerReload();
 
@@ -297,6 +315,12 @@ public class PyrCore extends PyrPlugin {
 
 	@Override
 	protected void disable() {
+		// npc manager
+		if (npcManager != null) {
+			npcManager.disable();
+			npcManager = null;
+			debug("Disabled NPC manager with ProtocolLib");
+		}
 		// disable all other plugins
 		for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
 			if (plugin.isEnabled() && plugin.getDescription().getDepend().contains("PyrCore")) {
@@ -306,6 +330,31 @@ public class PyrCore extends PyrPlugin {
 					exception.printStackTrace();
 					error("Couldn't disable plugin " + plugin.getName());
 				}
+			}
+		}
+	}
+
+	// ------------------------------------------------------------
+	// ProtocolLib
+	// ------------------------------------------------------------
+
+	@EventHandler
+	public void event(PluginDisableEvent event) {
+		if (event.getPlugin().getName().equalsIgnoreCase("ProtocolLib")) {
+			if (npcManager != null) {
+				npcManager.disable();
+				npcManager = null;
+				debug("Disabled NPC manager with ProtocolLib");
+			}
+		}
+	}
+
+	@EventHandler
+	public void event(PluginEnableEvent event) {
+		if (event.getPlugin().getName().equalsIgnoreCase("ProtocolLib")) {
+			if (npcManager == null) {
+				(npcManager = new NpcManager()).enable();
+				debug("Enabled NPC manager with ProtocolLib");
 			}
 		}
 	}

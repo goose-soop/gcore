@@ -8,7 +8,7 @@ import org.bukkit.Location;
 import be.pyrrh4.pyrcore.lib.gui.ItemData;
 import be.pyrrh4.pyrcore.lib.npc.NpcStatus;
 
-public class UserNpcData {
+public class ModifiedNpcData {
 
 	// base
 	private final int id;
@@ -20,7 +20,7 @@ public class UserNpcData {
 	private Set<NpcStatus> status = null;
 	private ItemData[] items = null;
 
-	public UserNpcData(int id, boolean shown) {
+	public ModifiedNpcData(int id, boolean shown) {
 		this.id = id;
 		this.shown = shown;
 	}

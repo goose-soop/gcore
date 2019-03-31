@@ -63,7 +63,7 @@ public class MessageTarget
 		}
 		// UserInfo
 		else if (target instanceof UserInfo) {
-			Player player = ((UserInfo) target).getPlayer();
+			Player player = ((UserInfo) target).toPlayer();
 			if (player != null) {
 				player.sendMessage(message);
 			}
@@ -114,7 +114,7 @@ public class MessageTarget
 		}
 		// UserInfo
 		else if (target instanceof UserInfo) {
-			Player player = ((UserInfo) target).getPlayer();
+			Player player = ((UserInfo) target).toPlayer();
 			if (player != null) {
 				for (String msg : message) {
 					player.sendMessage(msg);

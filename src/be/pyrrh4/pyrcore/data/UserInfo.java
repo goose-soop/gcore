@@ -46,11 +46,11 @@ public class UserInfo {
 		return profile;
 	}
 
-	public OfflinePlayer getOfflinePlayer() {
+	public OfflinePlayer toOfflinePlayer() {
 		return Utils.getOfflinePlayer(uuid);
 	}
 
-	public Player getPlayer() {
+	public Player toPlayer() {
 		return Utils.getPlayer(uuid);
 	}
 
@@ -60,7 +60,7 @@ public class UserInfo {
 
 	// methods
 	public void sendMessage(String message) {
-		Player player = getPlayer();
+		Player player = toPlayer();
 		if (player != null) {
 			player.sendMessage(message);
 		}
@@ -81,7 +81,7 @@ public class UserInfo {
 	}
 
 	public String toStringName() {
-		return getOfflinePlayer().getName() + "_" + profile;
+		return toOfflinePlayer().getName() + "_" + profile;
 	}
 
 	// methods
@@ -89,7 +89,7 @@ public class UserInfo {
 		List<Player> result = new ArrayList<Player>();
 		for (UserInfo user : users) {
 			if (user.isCurrentProfile()) {
-				Player player = user.getPlayer();
+				Player player = user.toPlayer();
 				if (player != null) {
 					result.add(player);
 				}
@@ -102,7 +102,7 @@ public class UserInfo {
 		List<String> result = new ArrayList<String>();
 		for (UserInfo user : users) {
 			if (user.isCurrentProfile()) {
-				OfflinePlayer player = user.getOfflinePlayer();
+				OfflinePlayer player = user.toOfflinePlayer();
 				if (player != null) {
 					result.add(player.getName());
 				}

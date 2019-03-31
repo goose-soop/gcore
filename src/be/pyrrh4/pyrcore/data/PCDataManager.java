@@ -2,6 +2,8 @@ package be.pyrrh4.pyrcore.data;
 
 import java.util.HashMap;
 
+import org.bukkit.Bukkit;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
 import be.pyrrh4.pyrcore.PyrCore;
@@ -17,6 +19,7 @@ public class PCDataManager extends DataManager implements Listener {
 	private DataProfileBoard dataProfiles = null;
 	private StatisticsBoard statistics = null;
 	private NpcSkinBoard npcSkins = null;
+	private UserBoard userBoard = null;
 
 	public PCDataManager(BackEnd backend) {
 		super(PyrCore.inst(), backend);
@@ -35,16 +38,20 @@ public class PCDataManager extends DataManager implements Listener {
 		return npcSkins;
 	}
 
+	public UserBoard getUsers() {
+		return userBoard;
+	}
+
 	// methods
 	@Override
 	protected void innerEnable() {
 		// data profiles
-		this.dataProfiles = new DataProfileBoard();
+		dataProfiles = new DataProfileBoard();
 		dataProfiles.initAsync(new Callback() { @Override public void callback() {
 			dataProfiles.pullAsync();
 		}});
 		// statistics
-		this.statistics = new StatisticsBoard();
+		statistics = new StatisticsBoard();
 		statistics.initAsync(new Callback() { @Override public void callback() {
 			statistics.pullAsync();
 		}});
@@ -68,6 +75,9 @@ public class PCDataManager extends DataManager implements Listener {
 				});
 			}
 		} catch (Throwable ignored) {}
+		// users
+		Bukkit.getPluginManager().registerEvents(userBoard = new UserBoard(), getPlugin());
+		userBoard.pullOnline();
 	}
 
 	@Override
@@ -75,6 +85,7 @@ public class PCDataManager extends DataManager implements Listener {
 		dataProfiles.pullAsync();
 		statistics.pullAsync();
 		if (npcSkins != null) npcSkins.pullAsync(null);
+		userBoard.pullOnline();
 	}
 
 	@Override
@@ -82,13 +93,16 @@ public class PCDataManager extends DataManager implements Listener {
 		dataProfiles.clearAll();
 		statistics.clearAll();
 		if (npcSkins != null) npcSkins.clearAll();
+		userBoard.deleteAsync();
 	}
 
 	@Override
 	protected void innerDisable() {
-		this.dataProfiles = null;
-		this.statistics = null;
-		this.npcSkins = null;
+		dataProfiles = null;
+		statistics = null;
+		npcSkins = null;
+		HandlerList.unregisterAll(userBoard);
+		userBoard = null;
 	}
 
 }

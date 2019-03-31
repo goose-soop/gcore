@@ -84,7 +84,7 @@ import org.bukkit.util.Vector;
 
 import be.pyrrh4.pyrcore.PCLocale;
 import be.pyrrh4.pyrcore.PyrCore;
-import be.pyrrh4.pyrcore.data.PCUser;
+import be.pyrrh4.pyrcore.data.UserInfo;
 import be.pyrrh4.pyrcore.lib.Logger;
 import be.pyrrh4.pyrcore.lib.Logger.Level;
 import be.pyrrh4.pyrcore.lib.Perm;
@@ -113,7 +113,7 @@ import be.pyrrh4.pyrcore.libs.com.google.gson.adapter.AdapterItemStack;
 import be.pyrrh4.pyrcore.libs.com.google.gson.adapter.AdapterLocation;
 import be.pyrrh4.pyrcore.libs.com.google.gson.adapter.AdapterMat;
 import be.pyrrh4.pyrcore.libs.com.google.gson.adapter.AdapterMaterial;
-import be.pyrrh4.pyrcore.libs.com.google.gson.adapter.AdapterPCUser;
+import be.pyrrh4.pyrcore.libs.com.google.gson.adapter.AdapterUserInfo;
 import be.pyrrh4.pyrcore.libs.com.google.gson.adapter.AdapterPlugin;
 import be.pyrrh4.pyrcore.libs.com.google.gson.adapter.AdapterPotionEffectType;
 import be.pyrrh4.pyrcore.libs.com.google.gson.adapter.AdapterSound;
@@ -286,7 +286,7 @@ public class Utils {
 				.registerTypeAdapter(World.class, new AdapterWorld())
 				.registerTypeAdapter(Inventory.class, new AdapterInventory())
 				.registerTypeAdapter(Plugin.class, new AdapterPlugin())
-				.registerTypeAdapter(PCUser.class, new AdapterPCUser())
+				.registerTypeAdapter(UserInfo.class, new AdapterUserInfo())
 				.enableComplexMapKeySerialization()
 				.disableInnerClassSerialization()
 				.serializeSpecialFloatingPointValues();

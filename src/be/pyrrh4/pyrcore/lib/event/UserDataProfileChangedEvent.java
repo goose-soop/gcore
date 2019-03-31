@@ -3,7 +3,7 @@ package be.pyrrh4.pyrcore.lib.event;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-import be.pyrrh4.pyrcore.data.PCUser;
+import be.pyrrh4.pyrcore.data.UserInfo;
 
 /**
  * Triggered when the data profile of an user was changed
@@ -11,15 +11,15 @@ import be.pyrrh4.pyrcore.data.PCUser;
 public class UserDataProfileChangedEvent extends Event {
 
 	// base
-	private PCUser user;
+	private UserInfo user;
 	private String previousProfile;
 
-	public UserDataProfileChangedEvent(PCUser user, String previousProfile) {
+	public UserDataProfileChangedEvent(UserInfo user, String previousProfile) {
 		this.user = user;
 		this.previousProfile = previousProfile;
 	}
 
-	public PCUser getUser() {
+	public UserInfo getUser() {
 		return user;
 	}
 

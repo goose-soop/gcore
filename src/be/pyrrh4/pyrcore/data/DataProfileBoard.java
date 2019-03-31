@@ -17,12 +17,12 @@ import be.pyrrh4.pyrcore.lib.data.mysql.Query;
 import be.pyrrh4.pyrcore.lib.event.UserDataProfileChangedEvent;
 import be.pyrrh4.pyrcore.lib.util.Utils;
 
-public class DataProfiles extends DataSingleton {
+public class DataProfileBoard extends DataSingleton {
 
 	// base
 	private Map<UUID, String> profiles = new HashMap<UUID, String>();
 
-	public DataProfiles() {
+	public DataProfileBoard() {
 	}
 
 	public Map<UUID, String> getAll() {
@@ -47,7 +47,7 @@ public class DataProfiles extends DataSingleton {
 		// save
 		pushAsync(player.toString(), profile);
 		// event
-		Bukkit.getPluginManager().callEvent(new UserDataProfileChangedEvent(new PCUser(player, profile), previousProfile));
+		Bukkit.getPluginManager().callEvent(new UserDataProfileChangedEvent(new UserInfo(player, profile), previousProfile));
 	}
 
 	// data

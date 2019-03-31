@@ -14,12 +14,12 @@ import be.pyrrh4.pyrcore.lib.data.DataSingleton;
 import be.pyrrh4.pyrcore.lib.data.mysql.Query;
 import be.pyrrh4.pyrcore.lib.util.Utils;
 
-public class Statistics extends DataSingleton {
+public class StatisticsBoard extends DataSingleton {
 
 	// base
 	private Map<String, Map<String, Integer>> stats = new HashMap<String, Map<String, Integer>>();
 
-	public Statistics() {
+	public StatisticsBoard() {
 	}
 
 	public Set<String> getAll() {

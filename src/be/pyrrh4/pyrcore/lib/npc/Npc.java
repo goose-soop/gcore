@@ -26,7 +26,7 @@ public class Npc {
 
 	// base
 	private final Player player;
-	private final int entityId;
+	private final int id;
 	private String name;
 	private UUID skin;
 	private Location location;
@@ -35,13 +35,21 @@ public class Npc {
 	private ItemData[] items = new ItemData[6];
 	private boolean spawned = false;
 
-	public Npc(final Player player, final int entityId, String name, UUID skin, Location location, double targetDistance) {
+	public Npc(final Player player, final int id, String name, UUID skin, Location location, double targetDistance, Set<NpcStatus> status, ItemData[] items) {
 		this.player = player;
-		this.entityId = entityId;
+		this.id = id;
 		this.name = name;
 		this.skin = skin;
 		this.location = location;
 		this.targetDistance = targetDistance;
+		if (status != null) this.status.addAll(status);
+		if (items != null) {
+			for (int i = 0; i < 6; ++i) {
+				if (items.length >= i) {
+					this.items[i] = items[i];
+				}
+			}
+		}
 	}
 
 	// get
@@ -49,8 +57,12 @@ public class Npc {
 		return player;
 	}
 
+	public int getId() {
+		return id;
+	}
+
 	public int getEntityId() {
-		return entityId;
+		return NpcProtocols.ENTITY_ID_BASE + id;
 	}
 
 	public String getName() {
@@ -87,21 +99,32 @@ public class Npc {
 	}
 
 	// methods
-	/** @return true if the NPC was removed due to the update */
-	public boolean update() {
-		// invalid world/location
-		double distance = Utils.distance(location, player.getLocation());
-		if (distance < 0d || distance > 50d) {
-			return despawn();// eventually despawn
+	/** @return the update result */
+	public UpdateResult update() {
+		// invalid world/location, must despawn
+		Double distance = null;
+		if (!spawned) {
+			distance = Utils.distance(location, player.getLocation());
+			if (distance < 0d || distance > 50d) {
+				return despawn() ? UpdateResult.DESPAWNED : UpdateResult.NONE;// eventually despawn
+			}
 		}
 		// eventually spawn
-		spawn();
+		boolean justSpawned = false;
+		if (spawn()) {
+			justSpawned = true;
+		}
 		// eventually target player
-		if (targetDistance > 0d && distance <= targetDistance) {
+		if (targetDistance > 0d && (distance == null ? distance = Utils.distance(location, player.getLocation()) : distance) <= targetDistance) {
 			target(player.getEyeLocation());
+			return justSpawned ? UpdateResult.SPAWNED : UpdateResult.TARGETED_PLAYER;
 		}
 		// success
-		return false;
+		return justSpawned ? UpdateResult.SPAWNED : UpdateResult.NONE;
+	}
+
+	public static enum UpdateResult {
+		SPAWNED, DESPAWNED, TARGETED_PLAYER, NONE;
 	}
 
 	// methods : spawn/despawn
@@ -112,7 +135,7 @@ public class Npc {
 			return false;
 		}
 		// spawn
-		NpcProtocols.INSTANCE.spawn(player, entityId, name, location, skin);
+		NpcProtocols.INSTANCE.spawn(player, getEntityId(), name, location, skin);
 		spawned = true;
 		// update status and equipment
 		updateStatus();
@@ -130,7 +153,7 @@ public class Npc {
 			return false;
 		}
 		// despawn
-		NpcProtocols.INSTANCE.remove(player, entityId);
+		NpcProtocols.INSTANCE.remove(player, getEntityId());
 		spawned = false;
 		// event
 		Bukkit.getPluginManager().callEvent(new NpcDespawnEvent(this));
@@ -149,7 +172,7 @@ public class Npc {
 			return;
 		}
 		// target
-		NpcProtocols.INSTANCE.sendTarget(player, entityId, yaw, pitch);
+		NpcProtocols.INSTANCE.sendTarget(player, getEntityId(), yaw, pitch);
 	}
 
 	public void teleport(Location location) {
@@ -158,7 +181,7 @@ public class Npc {
 		this.location = location;
 		// update player
 		if (spawned) {// already spawned
-			NpcProtocols.INSTANCE.teleport(player, entityId, location);
+			NpcProtocols.INSTANCE.teleport(player, getEntityId(), location);
 		} else {// spawn
 			spawn();
 		}
@@ -171,11 +194,11 @@ public class Npc {
 		Location newLocation = location.add(x, y, z);
 		double distance = Utils.distance(location, newLocation);
 		if (distance > 8d) {
-			PyrCore.inst().error("Couldn't move NPC " + entityId + " (" + name + ") for " + player.getName() + " with deltas " + Utils.round(x) + "," + Utils.round(y) + "," + Utils.round(z) + " because it's too far away (8 blocks max)");
+			PyrCore.inst().error("Couldn't move NPC " + id + " (" + name + ") for " + player.getName() + " with deltas " + Utils.round(x) + "," + Utils.round(y) + "," + Utils.round(z) + " because it's too far away (8 blocks max)");
 			return;
 		}
 		// move
-		NpcProtocols.INSTANCE.relativeMove(player, entityId, location, newLocation);
+		NpcProtocols.INSTANCE.relativeMove(player, getEntityId(), location, newLocation);
 		// set location
 		location = newLocation;
 	}
@@ -184,7 +207,7 @@ public class Npc {
 	private void updateStatus() {
 		// update status
 		Map<Integer, Object> map = Utils.asMap(0, NpcStatus.getMasked(status.toArray(new NpcStatus[status.size()])));
-		NpcProtocols.INSTANCE.sendMetadata(player, NpcProtocols.INSTANCE.createMetadata(map), entityId);
+		NpcProtocols.INSTANCE.sendMetadata(player, NpcProtocols.INSTANCE.createMetadata(map), getEntityId());
 	}
 
 	public void setStatus(NpcStatus... status) {
@@ -223,7 +246,7 @@ public class Npc {
 			array[i] = item != null && !item.getType().isAir() ? item.getItemStack() : null;
 		}
 		// update inventory
-		NpcProtocols.INSTANCE.sendInventory(player, entityId, array);
+		NpcProtocols.INSTANCE.sendInventory(player, getEntityId(), array);
 	}
 
 	// methods : misc

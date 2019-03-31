@@ -30,3 +30,6 @@ show_debug: true
 # Allow custom materials to be loaded
 # If this is set to true, basically no check will be made for material validity when it comes to loading one, so make sure that you know what you're doing
 allow_custom_materials: false
+
+# NPC update delay (in ticks)
+npc_update_delay: 5

@@ -20,6 +20,7 @@ import com.comphenix.protocol.events.PacketListener;
 import com.comphenix.protocol.injector.GamePhase;
 
 import be.pyrrh4.pyrcore.PyrCore;
+import be.pyrrh4.pyrcore.lib.event.NpcAttackEvent;
 import be.pyrrh4.pyrcore.lib.event.NpcInteractEvent;
 import be.pyrrh4.pyrcore.lib.versioncompat.npc.NpcProtocols;
 
@@ -54,8 +55,9 @@ public class NpcPacketListener implements PacketListener {
 				return;
 			}
 			// not a known npc
+			int npcId = NpcProtocols.ENTITY_ID_BASE - entityId;
 			Npc npc = null;
-			if (PyrCore.inst().getNpcManager() == null || (npc = PyrCore.inst().getNpcManager().getNpc(player, entityId)) == null) {
+			if (PyrCore.inst().getNpcManager() == null || (npc = PyrCore.inst().getNpcManager().getNpc(player, npcId)) == null) {
 				return;
 			}
 			// get action
@@ -86,7 +88,11 @@ public class NpcPacketListener implements PacketListener {
 				lastInteract = entityId;
 			}
 			// event
-			Bukkit.getPluginManager().callEvent(new NpcInteractEvent(npc, action));
+			if (action.equals(NpcAction.INTERACT)) {
+				Bukkit.getPluginManager().callEvent(new NpcInteractEvent(npc));
+			} else if (action.equals(NpcAction.ATTACK)) {
+				Bukkit.getPluginManager().callEvent(new NpcAttackEvent(npc));
+			}
 		}
 	}
 

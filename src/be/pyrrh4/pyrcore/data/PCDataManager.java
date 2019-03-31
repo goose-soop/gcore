@@ -14,24 +14,24 @@ import be.pyrrh4.pyrcore.lib.versioncompat.npc.NpcProtocols;
 public class PCDataManager extends DataManager implements Listener {
 
 	// base
-	private DataProfiles dataProfiles = null;
-	private Statistics statistics = null;
-	private NpcSkins npcSkins = null;
+	private DataProfileBoard dataProfiles = null;
+	private StatisticsBoard statistics = null;
+	private NpcSkinBoard npcSkins = null;
 
 	public PCDataManager(BackEnd backend) {
 		super(PyrCore.inst(), backend);
 	}
 
 	// get
-	public DataProfiles getDataProfiles() {
+	public DataProfileBoard getDataProfiles() {
 		return dataProfiles;
 	}
 
-	public Statistics getStatistics() {
+	public StatisticsBoard getStatistics() {
 		return statistics;
 	}
 
-	public NpcSkins getNpcSkins() {
+	public NpcSkinBoard getNpcSkins() {
 		return npcSkins;
 	}
 
@@ -39,19 +39,19 @@ public class PCDataManager extends DataManager implements Listener {
 	@Override
 	protected void innerEnable() {
 		// data profiles
-		this.dataProfiles = new DataProfiles();
+		this.dataProfiles = new DataProfileBoard();
 		dataProfiles.initAsync(new Callback() { @Override public void callback() {
 			dataProfiles.pullAsync();
 		}});
 		// statistics
-		this.statistics = new Statistics();
+		this.statistics = new StatisticsBoard();
 		statistics.initAsync(new Callback() { @Override public void callback() {
 			statistics.pullAsync();
 		}});
 		// skins
 		try {
 			if (NpcProtocols.INSTANCE != null && Utils.getPlugin("ProtocolLib") != null) {
-				this.npcSkins = new NpcSkins();
+				this.npcSkins = new NpcSkinBoard();
 				npcSkins.pullAsync(new Callback() {
 					@Override
 					public void callback() {

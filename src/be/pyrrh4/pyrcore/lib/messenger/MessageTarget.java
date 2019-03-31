@@ -8,7 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import be.pyrrh4.pyrcore.data.PCUser;
+import be.pyrrh4.pyrcore.data.UserInfo;
 import be.pyrrh4.pyrcore.lib.Logger;
 import be.pyrrh4.pyrcore.lib.Logger.Level;
 import be.pyrrh4.pyrcore.lib.util.Utils;
@@ -61,9 +61,9 @@ public class MessageTarget
 				player.sendMessage(message);
 			}
 		}
-		// PCUser
-		else if (target instanceof PCUser) {
-			Player player = ((PCUser) target).getPlayer();
+		// UserInfo
+		else if (target instanceof UserInfo) {
+			Player player = ((UserInfo) target).getPlayer();
 			if (player != null) {
 				player.sendMessage(message);
 			}
@@ -112,9 +112,9 @@ public class MessageTarget
 				}
 			}
 		}
-		// PCUser
-		else if (target instanceof PCUser) {
-			Player player = ((PCUser) target).getPlayer();
+		// UserInfo
+		else if (target instanceof UserInfo) {
+			Player player = ((UserInfo) target).getPlayer();
 			if (player != null) {
 				for (String msg : message) {
 					player.sendMessage(msg);

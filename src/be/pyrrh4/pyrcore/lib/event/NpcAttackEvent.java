@@ -4,10 +4,10 @@ import org.bukkit.event.HandlerList;
 
 import be.pyrrh4.pyrcore.lib.npc.Npc;
 
-public class NpcInteractEvent extends NpcEvent {
+public class NpcAttackEvent extends NpcEvent {
 
 	// base
-	public NpcInteractEvent(Npc npc) {
+	public NpcAttackEvent(Npc npc) {
 		super(npc);
 	}
 

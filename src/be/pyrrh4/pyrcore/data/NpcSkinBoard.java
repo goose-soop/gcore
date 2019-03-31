@@ -12,12 +12,12 @@ import be.pyrrh4.pyrcore.lib.data.DataSingletonDisk;
 import be.pyrrh4.pyrcore.lib.npc.SkinData;
 import be.pyrrh4.pyrcore.lib.util.Utils;
 
-public class NpcSkins extends DataSingletonDisk {
+public class NpcSkinBoard extends DataSingletonDisk {
 
 	// base
 	private Map<UUID, SkinData> skins = new HashMap<UUID, SkinData>();
 
-	public NpcSkins() {
+	public NpcSkinBoard() {
 	}
 
 	public Map<UUID, SkinData> getAll() {

@@ -605,6 +605,49 @@ public class PCLocale {
 			"it_IT", Utils.asList("&7Durata dell'effetto (in tick, 1 sec = 20 ticks)")
 			);
 
+	// editor : npc
+	public static final Text GUI_GENERIC_EDITOR_NPC_SHOWLORE = new Text(
+			"GUI_GENERIC_EDITOR_NPC_SHOWLORE", file,
+			"en_US", Utils.asList("&7Should the NPC be shown by default"),
+			"fr_FR", Utils.asList("&7Est-ce que le NPC doit être montré par défaut")
+			);
+
+	public static final Text GUI_GENERIC_EDITOR_NPC_NAMELORE = new Text(
+			"GUI_GENERIC_EDITOR_NPC_NAMELORE", file,
+			"en_US", Utils.asList("&7Name of the NPC"),
+			"fr_FR", Utils.asList("&7Nom du NPC")
+			);
+
+	public static final Text GUI_GENERIC_EDITOR_NPC_SKINLORE = new Text(
+			"GUI_GENERIC_EDITOR_NPC_SKINLORE", file,
+			"en_US", Utils.asList("&7UUID of a player from whom the skin", "&7 will be used by this NPC"),
+			"fr_FR", Utils.asList("&7UUID d'un joueur dont le skin sera", "&7 utilisé par ce NPC")
+			);
+
+	public static final Text GUI_GENERIC_EDITOR_NPC_LOCATIONLORE = new Text(
+			"GUI_GENERIC_EDITOR_NPC_LOCATIONLORE", file,
+			"en_US", Utils.asList("&7Default location of the NPC"),
+			"fr_FR", Utils.asList("&7Emplacement par défaut du NPC")
+			);
+
+	public static final Text GUI_GENERIC_EDITOR_NPC_TARGEDISTANCELORE = new Text(
+			"GUI_GENERIC_EDITOR_NPC_TARGEDISTANCELORE", file,
+			"en_US", Utils.asList("&7Distance under which the NPC will", "&7 look at the player when close"),
+			"fr_FR", Utils.asList("&7Distance à laquelle le NPC regardera", "&7 le joueur s'il en est proche")
+			);
+
+	public static final Text GUI_GENERIC_EDITOR_NPC_STATUSLORE = new Text(
+			"GUI_GENERIC_EDITOR_NPC_STATUSLORE", file,
+			"en_US", Utils.asList("&7List of status of the NPC"),
+			"fr_FR", Utils.asList("&7Liste de status du NPC")
+			);
+
+	public static final Text GUI_GENERIC_EDITOR_NPC_STUFFLORE = new Text(
+			"GUI_GENERIC_EDITOR_NPC_STUFFLORE", file,
+			"en_US", Utils.asList("&7Stuff by default of the NPC"),
+			"fr_FR", Utils.asList("&7Équipement par défaut du NPC")
+			);
+
 	// editor : sound setting
 	public static final Text GUI_GENERIC_EDITOR_SOUND_TYPELORE = new Text(
 			"GUI_GENERIC_EDITOR_SOUND_TYPELORE", file,

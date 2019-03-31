@@ -14,25 +14,25 @@ import be.pyrrh4.pyrcore.lib.util.Utils;
 /**
  * Represents a PyrCore user with a data profile - this is not cached and should not be cached except if you want to store a specific profile.
  */
-public class PCUser {
+public class UserInfo {
 
 	// base
 	private UUID uuid;
 	private String profile;
 
-	public PCUser(OfflinePlayer player) {
+	public UserInfo(OfflinePlayer player) {
 		this(player.getUniqueId());
 	}
 
-	public PCUser(UUID uuid) {
+	public UserInfo(UUID uuid) {
 		this(uuid, PyrCore.inst().getData().getDataProfiles().get(uuid));
 	}
 
-	public PCUser(Player player, String profile) {
+	public UserInfo(Player player, String profile) {
 		this(player.getUniqueId(), profile);
 	}
 
-	public PCUser(UUID uuid, String profile) {
+	public UserInfo(UUID uuid, String profile) {
 		this.uuid = uuid;
 		this.profile = profile;
 	}
@@ -68,10 +68,10 @@ public class PCUser {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (!(Utils.instanceOf(obj, PCUser.class))) {
+		if (!(Utils.instanceOf(obj, UserInfo.class))) {
 			return false;
 		}
-		PCUser other = (PCUser) obj;
+		UserInfo other = (UserInfo) obj;
 		return uuid.equals(other.uuid) && profile.equals(other.profile);
 	}
 
@@ -85,9 +85,9 @@ public class PCUser {
 	}
 
 	// methods
-	public static List<Player> getOnlinePlayers(Collection<PCUser> users) {
+	public static List<Player> getOnlinePlayers(Collection<UserInfo> users) {
 		List<Player> result = new ArrayList<Player>();
-		for (PCUser user : users) {
+		for (UserInfo user : users) {
 			if (user.isCurrentProfile()) {
 				Player player = user.getPlayer();
 				if (player != null) {
@@ -98,9 +98,9 @@ public class PCUser {
 		return result;
 	}
 
-	public static List<String> getPlayerNames(Collection<PCUser> users) {
+	public static List<String> getPlayerNames(Collection<UserInfo> users) {
 		List<String> result = new ArrayList<String>();
-		for (PCUser user : users) {
+		for (UserInfo user : users) {
 			if (user.isCurrentProfile()) {
 				OfflinePlayer player = user.getOfflinePlayer();
 				if (player != null) {
@@ -111,17 +111,17 @@ public class PCUser {
 		return result;
 	}
 
-	public static List<PCUser> getUsers(Collection<Player> players) {
-		List<PCUser> result = new ArrayList<PCUser>();
+	public static List<UserInfo> getUsers(Collection<Player> players) {
+		List<UserInfo> result = new ArrayList<UserInfo>();
 		for (Player player : players) {
-			result.add(new PCUser(player));
+			result.add(new UserInfo(player));
 		}
 		return result;
 	}
 
-	public static PCUser fromString(String pcUserRaw) {
+	public static UserInfo fromString(String pcUserRaw) {
 		String[] split = pcUserRaw.split("_");
-		return new PCUser(UUID.fromString(split[0]), split[1]);
+		return new UserInfo(UUID.fromString(split[0]), split[1]);
 	}
 
 }

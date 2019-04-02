@@ -126,7 +126,6 @@ public class UserBoard extends DataBoard<PCUser> implements Listener {
 
 	@Override
 	protected final void jsonPull() {
-		// FIXME v5 : now you can (do that everywhere, also for mysql) ; ensure it works as well in data manager, when we call pullAsync
 		throw new UnsupportedOperationException();// can't pull the whole user board
 	}
 

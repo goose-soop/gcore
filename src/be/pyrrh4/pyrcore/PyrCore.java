@@ -306,6 +306,7 @@ public class PyrCore extends PyrPlugin {
 		// other commands
 		root.addChild(new CommandPlugins());
 		root.addChild(new CommandSetuserprofile());
+		//root.addChild(new CommandPathfindingTest());
 		return true;
 	}
 

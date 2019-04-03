@@ -16,9 +16,13 @@ import org.bukkit.util.Vector;
 
 import be.pyrrh4.pyrcore.PyrCore;
 import be.pyrrh4.pyrcore.lib.event.NpcDespawnEvent;
+import be.pyrrh4.pyrcore.lib.event.NpcMoveEvent;
 import be.pyrrh4.pyrcore.lib.event.NpcSpawnEvent;
 import be.pyrrh4.pyrcore.lib.event.NpcTeleportEvent;
 import be.pyrrh4.pyrcore.lib.gui.ItemData;
+import be.pyrrh4.pyrcore.lib.npc.navigation.Navigator;
+import be.pyrrh4.pyrcore.lib.npc.navigation.PathfindingNavigator;
+import be.pyrrh4.pyrcore.lib.npc.navigation.Point;
 import be.pyrrh4.pyrcore.lib.util.Utils;
 import be.pyrrh4.pyrcore.lib.versioncompat.npc.NpcProtocols;
 
@@ -34,6 +38,7 @@ public class Npc {
 	private Set<NpcStatus> status = new HashSet<NpcStatus>();
 	private ItemData[] items = new ItemData[6];
 	private boolean spawned = false;
+	private Navigator navigator = null;
 
 	public Npc(final Player player, final int id, String name, UUID skin, Location location, double targetDistance, Set<NpcStatus> status, ItemData[] items) {
 		this.player = player;
@@ -91,6 +96,10 @@ public class Npc {
 
 	public boolean isSpawned() {
 		return spawned;
+	}
+
+	public Navigator getNavigator() {
+		return navigator;
 	}
 
 	// set
@@ -175,7 +184,34 @@ public class Npc {
 		NpcProtocols.INSTANCE.sendTarget(player, getEntityId(), yaw, pitch);
 	}
 
+	public void move(Location location) {
+		// not in the same world
+		if (!location.getWorld().equals(this.location.getWorld())) {
+			return;
+		}
+		// too far away, teleport
+		Location previous = this.location;
+		if (Utils.distance(previous, location) > 8d) {
+			teleport(location);
+			return;
+		}
+		// set location
+		this.location = location;
+		// update player
+		if (spawned) {// already spawned
+			NpcProtocols.INSTANCE.relativeMove(player, getEntityId(), previous, location);
+		} else {// spawn
+			spawn();
+		}
+		// event
+		Bukkit.getPluginManager().callEvent(new NpcMoveEvent(this, previous));
+	}
+
 	public void teleport(Location location) {
+		// not in the same world
+		if (!location.getWorld().equals(this.location.getWorld())) {
+			return;
+		}
 		// set location
 		Location previous = this.location;
 		this.location = location;
@@ -189,18 +225,40 @@ public class Npc {
 		Bukkit.getPluginManager().callEvent(new NpcTeleportEvent(this, previous));
 	}
 
-	public void relativeMove(double x, double y, double z) {
-		// update
-		Location newLocation = location.add(x, y, z);
-		double distance = Utils.distance(location, newLocation);
-		if (distance > 8d) {
-			PyrCore.inst().error("Couldn't move NPC " + id + " (" + name + ") for " + player.getName() + " with deltas " + Utils.round(x) + "," + Utils.round(y) + "," + Utils.round(z) + " because it's too far away (8 blocks max)");
+	public void navigate(final Location target) {
+		// not in the same world
+		if (!target.getWorld().equals(location.getWorld())) {
 			return;
 		}
-		// move
-		NpcProtocols.INSTANCE.relativeMove(player, getEntityId(), location, newLocation);
-		// set location
-		location = newLocation;
+		// stop current navigation
+		if (navigator != null) {
+			navigator.stop();
+		}
+		// start new one
+		navigator = new PathfindingNavigator(location.getWorld(), new Point(location), new Point(target), 1, 50, 1, 1, 2L) {// FIXME v5 : customize these parameters in config
+			@Override
+			protected void onStep(Point step) {// move npc
+				move(step.toLocation(getWorld()));
+			}
+			@Override
+			protected void onFail() {// teleport npc
+				PyrCore.inst().error("Navigation for NPC " + getId() + " from " + getStart().toString() + " to " + getTarget().toString() + " failed, teleporting to target (for player " + player.getName() + ")");
+				teleport(target);
+			}
+			@Override
+			protected void onSuccess() {
+				PyrCore.inst().debug("Navigation for NPC " + getId() + " from " + getStart().toString() + " to " + getTarget().toString() + " succeeded (for player " + player.getName() + ")");
+			}
+		};
+	}
+
+	public void navigate(Navigator navigator) {
+		// stop current navigation
+		if (this.navigator != null) {
+			this.navigator.stop();
+		}
+		// start navigation
+		(this.navigator = navigator).start();
 	}
 
 	// methods : status

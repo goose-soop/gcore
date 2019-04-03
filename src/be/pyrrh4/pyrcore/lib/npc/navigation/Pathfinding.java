@@ -11,6 +11,7 @@ import java.util.Set;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import be.pyrrh4.pyrcore.PyrCore;
 import be.pyrrh4.pyrcore.lib.material.Mat;
@@ -28,6 +29,7 @@ public abstract class Pathfinding {
 
 	// processing
 	private State state = State.WAITING;
+	private BukkitTask task = null;
 	private Set<Point> toExplore = null;
 	private Set<Point> available = null;
 	private Map<Point, Double> distances = null;
@@ -100,12 +102,12 @@ public abstract class Pathfinding {
 		distances = Utils.asMap(start, start.distance(target));
 		deadEnds = new HashSet<Point>();
 		paths = new HashMap<List<Point>, Double>();
-		if (!isMatTraversable(Mat.from(world.getBlockAt(target.x, target.y, target.z)))) {
+		if (!isMatTraversable(Mat.from(world.getBlockAt(target.getX(), target.getY(), target.getZ())))) {
 			targetTolerance = 3d;
 		}
 		// start exploring
 		state = State.EXPLORING;
-		new BukkitRunnable() {
+		task = new BukkitRunnable() {
 			@Override
 			public void run() {
 				// explore
@@ -153,6 +155,18 @@ public abstract class Pathfinding {
 		}.runTaskTimerAsynchronously(PyrCore.inst(), 0L, 1L);
 	}
 
+	public void stop() {
+		// invalid state
+		if (!(state.equals(State.EXPLORING) || state.equals(State.OPTIMIZING))) {
+			return;
+		}
+		// stop
+		state = State.DONE;
+		if (task != null) {
+			task.cancel();
+		}
+	}
+
 	/**
 	 * @return 0 if still exploring, 1 if failed, 2 if success
 	 */
@@ -177,7 +191,7 @@ public abstract class Pathfinding {
 				Pair<List<Point>, Double> closestPath = null;
 				for (Pair<Integer, Integer> offset : relativesOffsets) {
 					// get valid relative
-					Point availableRelative = getAvailableForMoving(new Point(explore.x + offset.getA(), explore.y, explore.z + offset.getB()));
+					Point availableRelative = getAvailableForMoving(new Point(explore.getX() + offset.getA(), explore.getY(), explore.getZ() + offset.getB()));
 					if (availableRelative == null) continue;
 					// find all paths that contains that relative
 					Map<List<Point>, Double> containing = new HashMap<List<Point>, Double>();
@@ -211,7 +225,7 @@ public abstract class Pathfinding {
 			// get points around
 			for (Pair<Integer, Integer> offset : relativesOffsets) {
 				// known dead end
-				Point relative = new Point(explore.x + offset.getA(), explore.y, explore.z + offset.getB());
+				Point relative = new Point(explore.getX() + offset.getA(), explore.getY(), explore.getZ() + offset.getB());
 				if (deadEnds.contains(relative)) {
 					continue;
 				}
@@ -272,19 +286,19 @@ public abstract class Pathfinding {
 
 	private Point getAvailableForMoving(Point point) {
 		// not free
-		if (!isMatTraversable(Mat.from(world.getBlockAt(point.x, point.y, point.z)))) {
+		if (!isMatTraversable(Mat.from(world.getBlockAt(point.getX(), point.getY(), point.getZ())))) {
 			Point available = getFirstTraversableUp(point);
 			// no available block to jump on, or too high, or it's a fence
-			if (available == null || available.y - point.y > yToleranceUp) {
+			if (available == null || available.getY() - point.getY() > yToleranceUp) {
 				return null;
 			}
 			// there's a fence below the target block
-			Mat bmat = Mat.from(world.getBlockAt(available.x, available.y - 1, available.z));
+			Mat bmat = Mat.from(world.getBlockAt(available.getX(), available.getY() - 1, available.getZ()));
 			if (bmat.toString().contains("FENCE") || bmat.equals(Mat.COBBLESTONE_WALL) || bmat.equals(Mat.MOSSY_COBBLESTONE_WALL)) {
 				return null;
 			}
 			// not enough space above the target block to pass or jump up
-			if (!isMatTraversable(Mat.from(world.getBlockAt(available.x, available.y + 1, available.z))) || !isMatTraversable(Mat.from(world.getBlockAt(available.x, available.y + 2, available.z)))) {
+			if (!isMatTraversable(Mat.from(world.getBlockAt(available.getX(), available.getY() + 1, available.getZ()))) || !isMatTraversable(Mat.from(world.getBlockAt(available.getX(), available.getY() + 2, available.getZ())))) {
 				return null;
 			}
 			// good for jumping up
@@ -293,12 +307,12 @@ public abstract class Pathfinding {
 		// free
 		else {
 			// not enough heigh above the target block to pass or jump down
-			if (!isMatTraversable(Mat.from(world.getBlockAt(point.x, point.y + 1, point.z)))) {
+			if (!isMatTraversable(Mat.from(world.getBlockAt(point.getX(), point.getY() + 1, point.getZ())))) {
 				return null;
 			}
 			Point available = getLastTraversableDown(point);
 			// no available block to pass or jump on, or too low
-			if (available == null || point.y - available.y > yToleranceDown) {
+			if (available == null || point.getY() - available.getY() > yToleranceDown) {
 				return null;
 			}
 			// good for passing or jumping down
@@ -307,22 +321,22 @@ public abstract class Pathfinding {
 	}
 
 	private Point getLastTraversableDown(Point point) {
-		int y = point.y;
+		int y = point.getY();
 		while (y-- > 0) {// -- so we check the argument on first iteration
-			Block block = world.getBlockAt(point.x, y, point.z);
+			Block block = world.getBlockAt(point.getX(), y, point.getZ());
 			if (!isMatTraversable(Mat.from(block))) {
-				return new Point(point.x, y + 1, point.z);
+				return new Point(point.getX(), y + 1, point.getZ());
 			}
 		}
 		return null;
 	}
 
 	private Point getFirstTraversableUp(Point point) {
-		int y = point.y;
+		int y = point.getY();
 		while (y++ < 255) {// ++ so we check the argument on first iteration
-			Block block = world.getBlockAt(point.x, y, point.z);
+			Block block = world.getBlockAt(point.getX(), y, point.getZ());
 			if (isMatTraversable(Mat.from(block))) {
-				return new Point(point.x, y, point.z);
+				return new Point(point.getX(), y, point.getZ());
 			}
 		}
 		return null;

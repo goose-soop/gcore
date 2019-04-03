@@ -19,6 +19,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import be.pyrrh4.pyrcore.PyrCore;
 import be.pyrrh4.pyrcore.lib.data.DataBoard;
+import be.pyrrh4.pyrcore.lib.data.DataManager.Callback;
 import be.pyrrh4.pyrcore.lib.data.mysql.Query;
 import be.pyrrh4.pyrcore.lib.event.UserDataProfileChangedEvent;
 import be.pyrrh4.pyrcore.lib.util.Utils;
@@ -63,7 +64,7 @@ public class UserBoard extends DataBoard<PCUser> implements Listener {
 	 * Loads an user, overwriting the current cached data if any is present.
 	 * @param info the user info
 	 */
-	public void loadUser(UserInfo info) {
+	public void loadUser(UserInfo info, Callback callback) {
 		// get user or add to cache
 		PCUser user;
 		if (cache.containsKey(info)) {
@@ -72,7 +73,7 @@ public class UserBoard extends DataBoard<PCUser> implements Listener {
 			cache.put(info, user = new PCUser(info));
 		}
 		// pull user
-		user.pullAsync(null);
+		user.pullAsync(callback);
 	}
 
 	/**

@@ -1,15 +1,48 @@
 package be.pyrrh4.pyrcore.lib.npc.navigation;
 
+import org.bukkit.Location;
+import org.bukkit.World;
+
 import be.pyrrh4.pyrcore.lib.util.Utils;
 
 public class Point {
 
 	// base
-	public int x, y, z;
+	private int x, y, z;
 
 	public Point(int x, int y, int z) {
 		this.x = x;
 		this.y = y;
+		this.z = z;
+	}
+
+	public Point(Location location) {
+		this(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+	}
+
+	// get
+	public int getX() {
+		return x;
+	}
+
+	public int getY() {
+		return y;
+	}
+
+	public int getZ() {
+		return z;
+	}
+
+	// set
+	public void setX(int x) {
+		this.x = x;
+	}
+
+	public void setY(int y) {
+		this.y = y;
+	}
+
+	public void setZ(int z) {
 		this.z = z;
 	}
 
@@ -21,6 +54,11 @@ public class Point {
 		return Math.sqrt(offx * offx + offy * offy + offz * offz);
 	}
 
+	public Location toLocation(World world) {
+		return new Location(world, x, y, z);
+	}
+
+	// overriden
 	@Override
 	public String toString() {
 		return "(" + x + "," + y + "," + z + ")";

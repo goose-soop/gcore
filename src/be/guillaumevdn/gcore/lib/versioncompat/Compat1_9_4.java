@@ -1,0 +1,184 @@
+package be.guillaumevdn.gcore.lib.versioncompat;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.List;
+
+import org.apache.commons.codec.binary.Base64;
+import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.PotionType;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Score;
+import org.bukkit.scoreboard.Team;
+
+import be.guillaumevdn.gcore.lib.material.Mat;
+import be.guillaumevdn.gcore.lib.util.Utils;
+
+public class Compat1_9_4 extends Compat {
+
+	@Override
+	public void sendTitle(Player player, String title, String subtitle, int fadeIn, int duration, int fadeOut) {
+		if (subtitle != null || title != null) {
+			net.minecraft.server.v1_9_R2.PlayerConnection connection = ((org.bukkit.craftbukkit.v1_9_R2.entity.CraftPlayer) player).getHandle().playerConnection;
+			net.minecraft.server.v1_9_R2.PacketPlayOutTitle packetPlayOutTimes = new net.minecraft.server.v1_9_R2.PacketPlayOutTitle(
+					net.minecraft.server.v1_9_R2.PacketPlayOutTitle.EnumTitleAction.TIMES, null, fadeIn, duration, fadeOut);
+
+			connection.sendPacket(packetPlayOutTimes);
+
+			if (subtitle != null) {
+				net.minecraft.server.v1_9_R2.IChatBaseComponent titleSub = net.minecraft.server.v1_9_R2.IChatBaseComponent.ChatSerializer.a("{\"text\": \"" + subtitle + "\"}");
+				net.minecraft.server.v1_9_R2.PacketPlayOutTitle packetPlayOutSubTitle = new net.minecraft.server.v1_9_R2.PacketPlayOutTitle(
+						net.minecraft.server.v1_9_R2.PacketPlayOutTitle.EnumTitleAction.SUBTITLE, titleSub);
+				connection.sendPacket(packetPlayOutSubTitle);
+			}
+
+			if (title != null) {
+				net.minecraft.server.v1_9_R2.IChatBaseComponent titleMain = net.minecraft.server.v1_9_R2.IChatBaseComponent.ChatSerializer.a("{\"text\": \"" + title + "\"}");
+				net.minecraft.server.v1_9_R2.PacketPlayOutTitle packetPlayOutTitle = new net.minecraft.server.v1_9_R2.PacketPlayOutTitle(
+						net.minecraft.server.v1_9_R2.PacketPlayOutTitle.EnumTitleAction.TITLE, titleMain);
+				connection.sendPacket(packetPlayOutTitle);
+			}
+		}
+	}
+
+	@Override
+	public void sendActionBar(Player player, String message) {
+		net.minecraft.server.v1_9_R2.IChatBaseComponent actionbar = net.minecraft.server.v1_9_R2.IChatBaseComponent.ChatSerializer.a("{\"text\": \"" + message + "\"}");
+		net.minecraft.server.v1_9_R2.PacketPlayOutChat actionbarPacket = new net.minecraft.server.v1_9_R2.PacketPlayOutChat(actionbar, (byte)2);
+		((org.bukkit.craftbukkit.v1_9_R2.entity.CraftPlayer) player).getHandle().playerConnection.sendPacket(actionbarPacket);
+	}
+
+	@Override
+	public void changeTab(Player player, String head, String foot) {
+		net.minecraft.server.v1_9_R2.IChatBaseComponent header = net.minecraft.server.v1_9_R2.IChatBaseComponent.ChatSerializer.a("{\"text\": \"" + head + "\"}");
+		net.minecraft.server.v1_9_R2.IChatBaseComponent footer = net.minecraft.server.v1_9_R2.IChatBaseComponent.ChatSerializer.a("{\"text\": \"" + foot + "\"}");
+		net.minecraft.server.v1_9_R2.PacketPlayOutPlayerListHeaderFooter packet = new net.minecraft.server.v1_9_R2.PacketPlayOutPlayerListHeaderFooter();
+
+		try {
+			Field headerField = packet.getClass().getDeclaredField("a");
+			headerField.setAccessible(true);
+			headerField.set(packet, header);
+			headerField.setAccessible(!headerField.isAccessible());
+
+			Field footerField = packet.getClass().getDeclaredField("b");
+			footerField.setAccessible(true);
+			footerField.set(packet, footer);
+			footerField.setAccessible(!footerField.isAccessible());
+
+			((org.bukkit.craftbukkit.v1_9_R2.entity.CraftPlayer) player).getHandle().playerConnection.sendPacket(packet);
+		} catch (SecurityException | NoSuchFieldException | IllegalArgumentException | IllegalAccessException exception) {
+			exception.printStackTrace();
+		}
+	}
+
+	private final List<ItemFlag> itemFlags = Utils.asList(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_UNBREAKABLE);
+
+	@Override
+	public ItemMeta addItemFlags(ItemMeta meta) {
+		for (ItemFlag flag : itemFlags) {
+			meta.addItemFlags(flag);	
+		}
+		return meta;
+	}
+
+	@Override
+	public Mat getArmorStandHelmetType(Entity armorStand) {
+		return armorStand instanceof ArmorStand ? Mat.from(((ArmorStand) armorStand).getHelmet().getType()) : null;
+	}
+
+	@Override
+	public Score getScore(Objective objective, String name) {
+		return objective.getScore(name);
+	}
+
+	@Override
+	public ItemStack buildPotion(PotionType type, int level, boolean extended, boolean splash) {
+		ItemStack item = new ItemStack(splash ? Material.SPLASH_POTION : Material.POTION);
+		PotionMeta meta = (PotionMeta) item.getItemMeta();
+		meta.setBasePotionData(new org.bukkit.potion.PotionData(type, extended, level == 2));
+		item.setItemMeta(meta);
+		return item;
+	}
+
+	@Override
+	public PotionData getPotionData(ItemStack item) {
+		if (!item.getType().toString().contains("POTION")) {
+			return null;
+		}
+		PotionMeta meta = (PotionMeta) item.getItemMeta();
+		return new PotionData(meta.getBasePotionData().getType(), meta.getBasePotionData().isUpgraded() ? 2 : 1, meta.getBasePotionData().isExtended(), item.getType().equals(Material.SPLASH_POTION));
+	}
+
+	// https://bukkit.org/threads/serializing-a-nbt-tag.404362/
+	// https://stackoverflow.com/questions/1536054/how-to-convert-byte-array-to-string-and-vice-versa
+	// https://www.spigotmc.org/threads/help-help-needed-with-adding-nbt-tags-to-items.230498/
+
+	@Override
+	public String serializeNbt(Object nbt) throws IOException {
+		if (Utils.instanceOf(nbt, net.minecraft.server.v1_9_R2.NBTTagCompound.class)) {
+			// convert to byte array
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			net.minecraft.server.v1_9_R2.NBTCompressedStreamTools.a((net.minecraft.server.v1_9_R2.NBTTagCompound) nbt, baos);
+			// return base64 string
+			return Base64.encodeBase64String(baos.toByteArray());
+		}
+		return null;
+	}
+
+	@Override
+	public Object unserializeNbt(String serialized) throws IOException {
+		if (serialized != null) {
+			// get the byte array
+			byte[] ba = Base64.decodeBase64(serialized);
+			// convert to nbt
+			ByteArrayInputStream bais = new ByteArrayInputStream(ba);
+			return net.minecraft.server.v1_9_R2.NBTCompressedStreamTools.a(bais);
+		}
+		return null;
+	}
+
+	@Override
+	public Object getNbt(ItemStack item) {
+		if (item != null) {
+			net.minecraft.server.v1_9_R2.ItemStack itemNms = org.bukkit.craftbukkit.v1_9_R2.inventory.CraftItemStack.asNMSCopy(item);
+			if (itemNms.hasTag() && !itemNms.getTag().isEmpty()) {
+				return itemNms.getTag();
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public ItemStack setNbt(ItemStack item, Object nbt) {
+		if (item != null) {
+			net.minecraft.server.v1_9_R2.ItemStack itemNms = org.bukkit.craftbukkit.v1_9_R2.inventory.CraftItemStack.asNMSCopy(item);
+			itemNms.setTag((net.minecraft.server.v1_9_R2.NBTTagCompound) (nbt == null ? null : nbt));
+			// return item
+			return org.bukkit.craftbukkit.v1_9_R2.inventory.CraftItemStack.asBukkitCopy(itemNms);
+		}
+		return null;
+	}
+
+	@Override
+	public void setScoreboardTeamNameTags(Team team, String prefix, String suffix) {
+		team.setPrefix(prefix);
+		team.setSuffix(suffix);
+		team.setNameTagVisibility(org.bukkit.scoreboard.NameTagVisibility.ALWAYS);
+	}
+
+	@Override
+	public Enchantment getEnchantment(String raw) {
+		return Utils.isInteger(raw) ? Enchantment.getById(Integer.parseInt(raw)) : Enchantment.getByName(raw.toUpperCase());
+	}
+
+}

@@ -1,11 +1,11 @@
 #----------------------------------------------------------------------------------------------------
-# Configuration file for PyrCore
+# Configuration file for GCore
 #----------------------------------------------------------------------------------------------------
 
-# Data management (affects only PyrCore)
+# Data management (affects only GCore)
 data:
   # Back end (JSON, MYSQL) (default JSON)
-  # If you enable MySQL on another plugin requiring PyrCore, you should definitely enable it here as well
+  # If you enable MySQL on another plugin requiring GCore, you should definitely enable it here as well
   backend: JSON
   # Synchronization delay (in seconds) (disabled with -1, by default)
   # If this is enabled, the plugin will check the stored data (json/mysql), and if there's new/different data, cached data will be overriden here

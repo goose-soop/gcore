@@ -1,0 +1,125 @@
+package be.guillaumevdn.gcore.lib.parseable.list;
+
+import java.util.List;
+
+import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
+
+import be.guillaumevdn.gcore.GLocale;
+import be.guillaumevdn.gcore.lib.material.Mat;
+import be.guillaumevdn.gcore.lib.parseable.ListParseable;
+import be.guillaumevdn.gcore.lib.parseable.Parseable;
+import be.guillaumevdn.gcore.lib.parseable.editor.EditorGUI;
+import be.guillaumevdn.gcore.lib.parseable.editor.EditorItem;
+import be.guillaumevdn.gcore.lib.parseable.editor.ModifCallback;
+import be.guillaumevdn.gcore.lib.util.Utils;
+import be.guillaumevdn.gcore.lib.util.Wrapper;
+
+public abstract class EnumListParseable<T extends Parseable, E extends Enum<E>> extends ListParseable<T> {
+
+	// base
+	private boolean allowDefaultCase;
+	private Class<E> enumClass;
+
+	public EnumListParseable(String id, Parseable parent, boolean allowDefaultCase, Class<E> enumClass, String typeName, boolean mandatory, int editorSlot, Mat editorIcon, List<String> editorDescription) {
+		super(id, parent, typeName, CaseType.UPPER, mandatory, editorSlot, editorIcon, editorDescription);
+		this.allowDefaultCase = allowDefaultCase;
+		this.enumClass = enumClass;
+	}
+
+	// get
+	public boolean isAllowDefaultCase() {
+		return allowDefaultCase;
+	}
+
+	public Class<E> getEnumClass() {
+		return enumClass;
+	}
+
+	public T getValue(String key) {
+		T elem = getElement(key);
+		return elem != null ? elem : (allowDefaultCase ? getElement("DEFAULT") : null);
+	}
+
+	// editor
+	@Override
+	protected void fillEditor(final EditorGUI gui, Player player, final ModifCallback onModif) {
+		// delete wrapper
+		final Wrapper<Boolean> delete = new Wrapper<Boolean>(false);
+		// add elements items
+		for (final Parseable element : getElements().values()) {
+			gui.setRegularItem(new EditorItem(element.getId(), element.getEditorSlot(), element.getEditorIcon(), "§6" + element.getId(), element.getEditorDescription()) {
+				@Override
+				public void onClick(final Player player, final ClickType clickType, final int pageIndex) {
+					// eventually delete
+					if (delete.getValue()) {
+						delete.setValue(Boolean.FALSE);
+						// delete and callback
+						getElements().remove(element.getId());
+						onModif.callback(gui, player);
+						// re-fill and open
+						gui.open(player);
+						return;
+					}
+					// create and open element GUI
+					element.createEditor(gui, player, onModif).open(player);
+					return;
+				}
+			});
+		}
+		// new item
+		gui.setPersistentItem(new EditorItem("control_item_new", 49, Mat.BLAZE_ROD, GLocale.GUI_GENERIC_EDITORITEMADD.getLine(), null) {
+			@Override
+			protected void onClick(final Player player, final ClickType clickType, final int pageIndex) {
+				// selection gui
+				EditorGUI sub = new EditorGUI(getLastData().getPlugin(), gui, Utils.getNewInventoryName(gui.getName(), "Select"), 54, 44) {
+					@Override
+					protected void fill() {
+						// add default value
+						if (allowDefaultCase && !getElements().containsKey("DEFAULT")) {
+							fill("DEFAULT", Mat.NETHER_STAR);
+						}
+						// add regular values
+						for (E val : enumClass.getEnumConstants()) {
+							if (!getElements().containsKey(val.name())) {
+								fill(val.name(), EditorGUI.ICON_ENUM);
+							}
+						}
+						// back item
+						setPersistentItem(new EditorItem("control_item_back", 52, Mat.ARROW, GLocale.GUI_GENERIC_EDITORITEMBACK.getLine(), null) {
+							@Override
+							protected void onClick(final Player player, final ClickType clickType, final int pageIndex) {
+								gui.open(player);
+							}
+						});
+					}
+					private void fill(final String valName, Mat icon) {
+						setRegularItem(new EditorItem("value_" + valName, -1, icon, "§6" + valName, null) {
+							@Override
+							protected void onClick(final Player player, final ClickType clickType, final int pageIndex) {
+								if (getElements().containsKey(valName)) {
+									GLocale.MSG_GENERIC_DUPLICATEELEMENT.send(player, "{id}", valName);
+								} else {
+									createElement(valName);
+									onModif.callback(gui, player);
+								}
+								gui.open(player);// re-fill and open
+							}
+						});
+					}
+				};
+				// open it
+				sub.open(player);
+			}
+		});
+		// delete item
+		gui.setPersistentItem(new EditorItem("control_item_delete", 46, Mat.TNT_MINECART, GLocale.GUI_GENERIC_EDITORITEMDELETE.getLine(), GLocale.GUI_GENERIC_EDITORITEMDELETELORE.getLines()) {
+			@Override
+			protected void onClick(final Player player, final ClickType clickType, final int pageIndex) {
+				delete.setValue(Boolean.TRUE);
+				GLocale.MSG_GENERIC_DELETEELEMENT.send(player);
+			}
+		});
+	}
+
+}

@@ -1,21 +1,20 @@
 ﻿# Display
-name: PyrCore
+name: GCore
 author: GuillaumeVDN
 description: 'Core for GuillaumeVDN''s plugins'
 website: www.guillaumevdn.com
 # Techy
 version: 7.0.0
 api-version: 1.13
-main: be.pyrrh4.pyrcore.PyrCore
+main: be.guillaumevdn.gcore.GCore
 softdepend: [Vault,PlaceholderAPI,Multiverse-Core,ProtocolLib]
 # Commands
 commands:
-  pyrcore:
-    aliases: [pyr]
-    description: 'PyrCore plugins command'
+  gcore:
+    description: 'GCore plugins command'
 # Permission
 permissions:
-  pyr.core.admin:
+  gcore.admin:
     default: op
-  pyr.core.reload:
+  gcore.reload:
     default: op

@@ -1,6 +1,6 @@
 package be.guillaumevdn.gcore.lib.npc;
 
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -230,9 +230,13 @@ public class Npc {
 	}
 
 	public void setStatus(NpcStatus... status) {
+		setStatus(Utils.asList(status));
+	}
+
+	public void setStatus(Collection<NpcStatus> status) {
 		// replace status
 		this.status.clear();
-		this.status.addAll(Arrays.asList(status));
+		this.status.addAll(status);
 		// update player
 		if (spawned) {// already spawned
 			updateStatus();
@@ -246,9 +250,25 @@ public class Npc {
 	 * @param slot the item slot (0 to 5)
 	 * @param item the item stack
 	 */
-	public void setItem(int slot, ItemStack item) {
+	public void setItem(int slot, ItemData item) {
 		// set item
-		this.items[slot] = item != null ? new ItemData(null, item) : null;
+		this.items[slot] = item;
+		// refresh player
+		if (spawned) {// already spawned
+			updateEquipment();
+		} else {// spawn
+			spawn();
+		}
+	}
+
+	/**
+	 * @param items an array of items (size 6)
+	 */
+	public void setItems(ItemData[] items) {
+		// set item
+		for (int i = 0; i < 6; ++i) {
+			this.items[i] = items[i];
+		}
 		// refresh player
 		if (spawned) {// already spawned
 			updateEquipment();

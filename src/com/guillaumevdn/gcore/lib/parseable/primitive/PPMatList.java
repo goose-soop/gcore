@@ -8,6 +8,7 @@ import org.bukkit.event.inventory.ClickType;
 
 import com.guillaumevdn.gcore.GLocale;
 import com.guillaumevdn.gcore.lib.material.Mat;
+import com.guillaumevdn.gcore.lib.parseable.ParseResult;
 import com.guillaumevdn.gcore.lib.parseable.Parseable;
 import com.guillaumevdn.gcore.lib.parseable.PrimitiveParseable;
 import com.guillaumevdn.gcore.lib.parseable.editor.EditorGUI;
@@ -24,19 +25,21 @@ public class PPMatList extends PrimitiveParseable<List<Mat>> {
 
 	// parse
 	@Override
-	public List<Mat> parseValue(List<String> value, Player parsing) throws Throwable {
-		if (!value.isEmpty()) {
-			List<Mat> result = new ArrayList<Mat>();
-			for (String val : value) {
-				Mat parsed = Mat.from(val, 0);
-				if (parsed != null) {
-					result.add(parsed);
-				} else {
-					getLastData().log("invalid primitive setting of type " + getTypeName() + " (couldn't parse element " + val + " for " + parsing.getName() + ")");
-				}
+	public ParseResult<List<Mat>> parseValue(List<String> value, Player parsing) throws Throwable {
+		if (value.isEmpty()) {
+			return new ParseResult<List<Mat>>(new ArrayList<Mat>());
+		}
+		List<Mat> result = new ArrayList<Mat>();
+		for (String val : value) {
+			Mat parsed = Mat.from(val, 0);
+			if (parsed != null) {
+				result.add(parsed);
+			} else {
+				getLastData().log("couldn't parse element " + val + " for " + parsing.getName());
+				return null;
 			}
 		}
-		return null;
+		return new ParseResult<List<Mat>>(result);
 	}
 
 	// editor

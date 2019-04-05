@@ -7,6 +7,7 @@ import org.bukkit.event.inventory.ClickType;
 
 import com.guillaumevdn.gcore.GLocale;
 import com.guillaumevdn.gcore.lib.material.Mat;
+import com.guillaumevdn.gcore.lib.parseable.ParseResult;
 import com.guillaumevdn.gcore.lib.parseable.Parseable;
 import com.guillaumevdn.gcore.lib.parseable.PrimitiveParseable;
 import com.guillaumevdn.gcore.lib.parseable.editor.EditorGUI;
@@ -20,7 +21,7 @@ public class PPInteger extends PrimitiveParseable<Integer> {
 	private Integer min, max;
 
 	public PPInteger(String id, Parseable parent, String defaultValue, Integer min, Integer max, boolean mandatory, int editorSlot, Mat editorIcon, List<String> editorDescription) {
-		super(id, parent, Utils.asList(defaultValue), "decimal number", mandatory, editorSlot, editorIcon, editorDescription);
+		super(id, parent, Utils.asList(defaultValue), "number", mandatory, editorSlot, editorIcon, editorDescription);
 		this.min = min;
 		this.max = max;
 	}
@@ -36,9 +37,12 @@ public class PPInteger extends PrimitiveParseable<Integer> {
 
 	// parse
 	@Override
-	public Integer parseValue(List<String> value, Player parsing) throws Throwable {
-		Integer parsed = !value.isEmpty() ? parse(value.get(0)) : null;
-		return parsed != null ? ((min != null && parsed < min) || (max != null && parsed > max) ? null : parsed) : null;
+	public ParseResult<Integer> parseValue(List<String> value, Player parsing) throws Throwable {
+		if (value.isEmpty()) {
+			return new ParseResult<Integer>(null);
+		}
+		Integer parsed = parse(value.get(0));
+		return parsed != null ? ((min != null && parsed < min) || (max != null && parsed > max) ? null : new ParseResult<Integer>(parsed)) : null;
 	}
 
 	public static Integer parse(String raw) {

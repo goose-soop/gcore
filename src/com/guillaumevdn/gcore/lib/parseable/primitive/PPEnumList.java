@@ -8,6 +8,7 @@ import org.bukkit.event.inventory.ClickType;
 
 import com.guillaumevdn.gcore.GLocale;
 import com.guillaumevdn.gcore.lib.material.Mat;
+import com.guillaumevdn.gcore.lib.parseable.ParseResult;
 import com.guillaumevdn.gcore.lib.parseable.Parseable;
 import com.guillaumevdn.gcore.lib.parseable.PrimitiveParseable;
 import com.guillaumevdn.gcore.lib.parseable.editor.EditorGUI;
@@ -32,19 +33,21 @@ public class PPEnumList<T extends Enum<T>> extends PrimitiveParseable<List<T>> {
 
 	// parse
 	@Override
-	public List<T> parseValue(List<String> value, Player parsing) throws Throwable {
-		if (!value.isEmpty()) {
-			List<T> result = new ArrayList<T>();
-			for (String val : value) {
-				T parsed = Utils.valueOfOrNull(enumClass, val);
-				if (parsed != null) {
-					result.add(parsed);
-				} else {
-					getLastData().log("invalid primitive setting of type " + getTypeName() + " (couldn't parse element " + val + " for " + parsing.getName() + ")");
-				}
+	public ParseResult<List<T>> parseValue(List<String> value, Player parsing) throws Throwable {
+		if (value.isEmpty()) {
+			return new ParseResult<List<T>>(new ArrayList<T>());
+		}
+		List<T> result = new ArrayList<T>();
+		for (String val : value) {
+			T parsed = Utils.valueOfOrNull(enumClass, val);
+			if (parsed != null) {
+				result.add(parsed);
+			} else {
+				getLastData().log("couldn't parse element " + val + " for " + parsing.getName());
+				return null;
 			}
 		}
-		return null;
+		return new ParseResult<List<T>>(result);
 	}
 
 	// editor

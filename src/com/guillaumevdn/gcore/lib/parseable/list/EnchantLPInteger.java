@@ -5,9 +5,8 @@ import java.util.List;
 import org.bukkit.entity.Player;
 
 import com.guillaumevdn.gcore.lib.material.Mat;
+import com.guillaumevdn.gcore.lib.parseable.ConfigData;
 import com.guillaumevdn.gcore.lib.parseable.Parseable;
-import com.guillaumevdn.gcore.lib.parseable.data.DataLink;
-import com.guillaumevdn.gcore.lib.parseable.data.RegularDataLink;
 import com.guillaumevdn.gcore.lib.parseable.primitive.PPInteger;
 
 public class EnchantLPInteger extends EnchantListParseable<PPInteger> {
@@ -33,16 +32,7 @@ public class EnchantLPInteger extends EnchantListParseable<PPInteger> {
 	@Override
 	public PPInteger createElement(String elementId) {
 		// create data
-		DataLink data;
-		if (getLastData() instanceof RegularDataLink) {
-			RegularDataLink compact = (RegularDataLink) getLastData();
-			data = new RegularDataLink(null, compact.getPlugin(), compact.getSuperId(), compact.getConfig(), compact.getPath() + "." + elementId);
-		} else if (getLastData() instanceof RegularDataLink) {
-			RegularDataLink compact = (RegularDataLink) getLastData();
-			data = new RegularDataLink(null, compact.getPlugin(), compact.getSuperId(), compact.getConfig(), compact.getPath() + "." + elementId);
-		} else {
-			return null;
-		}
+		ConfigData data = new ConfigData(getLastData().getPlugin(), getLastData().getSuperId(), getLastData().getConfig(), getLastData().getPath().isEmpty() ? elementId : getLastData().getPath() + "." + elementId);
 		// create
 		PPInteger element = new PPInteger(elementId.toLowerCase(), this, defaultValue, min, max, false, -1, getEditorIcon(), getEditorDescription());
 		data.setComponent(element);
@@ -52,7 +42,7 @@ public class EnchantLPInteger extends EnchantListParseable<PPInteger> {
 	}
 
 	@Override
-	public PPInteger loadElement(String elementId, DataLink data) {
+	public PPInteger loadElement(String elementId, ConfigData data) {
 		// create
 		PPInteger element = new PPInteger(elementId.toLowerCase(), this, defaultValue, min, max, false, -1, getEditorIcon(), getEditorDescription());
 		data.setComponent(element);

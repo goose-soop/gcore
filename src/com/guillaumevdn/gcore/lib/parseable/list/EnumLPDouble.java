@@ -7,9 +7,8 @@ import java.util.Map;
 import org.bukkit.entity.Player;
 
 import com.guillaumevdn.gcore.lib.material.Mat;
+import com.guillaumevdn.gcore.lib.parseable.ConfigData;
 import com.guillaumevdn.gcore.lib.parseable.Parseable;
-import com.guillaumevdn.gcore.lib.parseable.data.DataLink;
-import com.guillaumevdn.gcore.lib.parseable.data.RegularDataLink;
 import com.guillaumevdn.gcore.lib.parseable.primitive.PPDouble;
 import com.guillaumevdn.gcore.lib.util.Utils;
 
@@ -45,16 +44,7 @@ public class EnumLPDouble<E extends Enum<E>> extends EnumListParseable<PPDouble,
 	@Override
 	public PPDouble createElement(String elementId) {
 		// create data
-		DataLink data;
-		if (getLastData() instanceof RegularDataLink) {
-			RegularDataLink compact = (RegularDataLink) getLastData();
-			data = new RegularDataLink(null, compact.getPlugin(), compact.getSuperId(), compact.getConfig(), compact.getPath() + "." + elementId);
-		} else if (getLastData() instanceof RegularDataLink) {
-			RegularDataLink compact = (RegularDataLink) getLastData();
-			data = new RegularDataLink(null, compact.getPlugin(), compact.getSuperId(), compact.getConfig(), compact.getPath() + "." + elementId);
-		} else {
-			return null;
-		}
+		ConfigData data = new ConfigData(getLastData().getPlugin(), getLastData().getSuperId(), getLastData().getConfig(), getLastData().getPath().isEmpty() ? elementId : getLastData().getPath() + "." + elementId);
 		// create
 		PPDouble element = new PPDouble(elementId.toLowerCase(), this, defaultValue, min, max, false, -1, getEditorIcon(), getEditorDescription());
 		data.setComponent(element);
@@ -64,7 +54,7 @@ public class EnumLPDouble<E extends Enum<E>> extends EnumListParseable<PPDouble,
 	}
 
 	@Override
-	public PPDouble loadElement(String elementId, DataLink data) {
+	public PPDouble loadElement(String elementId, ConfigData data) {
 		// create
 		PPDouble element = new PPDouble(elementId.toLowerCase(), this, defaultValue, min, max, false, -1, getEditorIcon(), getEditorDescription());
 		data.setComponent(element);

@@ -9,6 +9,7 @@ import org.bukkit.event.inventory.ClickType;
 import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.GLocale;
 import com.guillaumevdn.gcore.lib.material.Mat;
+import com.guillaumevdn.gcore.lib.parseable.ParseResult;
 import com.guillaumevdn.gcore.lib.parseable.Parseable;
 import com.guillaumevdn.gcore.lib.parseable.PrimitiveParseable;
 import com.guillaumevdn.gcore.lib.parseable.editor.EditorGUI;
@@ -26,8 +27,12 @@ public class PPLocation extends PrimitiveParseable<Location> {
 
 	// parse
 	@Override
-	public Location parseValue(List<String> value, Player parsing) throws Throwable {
-		return !value.isEmpty() ? Utils.unserializeWXYZLocation(value.get(0)) : null;
+	public ParseResult<Location> parseValue(List<String> value, Player parsing) throws Throwable {
+		if (value.isEmpty()) {
+			return new ParseResult<Location>(null);
+		}
+		Location result = Utils.unserializeWXYZLocation(value.get(0));
+		return result != null ? new ParseResult<Location>(result) : null;
 	}
 
 	// editor

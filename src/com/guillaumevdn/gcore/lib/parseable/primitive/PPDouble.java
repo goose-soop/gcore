@@ -7,6 +7,7 @@ import org.bukkit.event.inventory.ClickType;
 
 import com.guillaumevdn.gcore.GLocale;
 import com.guillaumevdn.gcore.lib.material.Mat;
+import com.guillaumevdn.gcore.lib.parseable.ParseResult;
 import com.guillaumevdn.gcore.lib.parseable.Parseable;
 import com.guillaumevdn.gcore.lib.parseable.PrimitiveParseable;
 import com.guillaumevdn.gcore.lib.parseable.editor.EditorGUI;
@@ -27,11 +28,14 @@ public class PPDouble extends PrimitiveParseable<Double> {
 
 	// parse
 	@Override
-	public Double parseValue(List<String> value, Player parsing) throws Throwable {
-		Double parsed = !value.isEmpty() ? parse(value.get(0)) : null;
-		return parsed != null ? ((min != null && parsed < min) || (max != null && parsed > max) ? null : parsed) : null;
+	public ParseResult<Double> parseValue(List<String> value, Player parsing) throws Throwable {
+		if (value.isEmpty()) {
+			return new ParseResult<Double>(null);
+		}
+		Double parsed = parse(value.get(0));
+		return parsed != null ? ((min != null && parsed < min) || (max != null && parsed > max) ? null : new ParseResult<Double>(parsed)) : null;
 	}
-	
+
 	public static Double parse(String raw) {
 		return Utils.calculateExpression(raw);
 	}

@@ -3,9 +3,8 @@ package com.guillaumevdn.gcore.lib.parseable.list;
 import java.util.List;
 
 import com.guillaumevdn.gcore.lib.material.Mat;
+import com.guillaumevdn.gcore.lib.parseable.ConfigData;
 import com.guillaumevdn.gcore.lib.parseable.Parseable;
-import com.guillaumevdn.gcore.lib.parseable.data.DataLink;
-import com.guillaumevdn.gcore.lib.parseable.data.RegularDataLink;
 
 public class MatLPMatLPInteger extends MatListParseable<MatLPInteger> {
 
@@ -26,16 +25,7 @@ public class MatLPMatLPInteger extends MatListParseable<MatLPInteger> {
 	@Override
 	public MatLPInteger createElement(String elementId) {
 		// create data
-		DataLink data;
-		if (getLastData() instanceof RegularDataLink) {
-			RegularDataLink compact = (RegularDataLink) getLastData();
-			data = new RegularDataLink(null, compact.getPlugin(), compact.getSuperId(), compact.getConfig(), compact.getPath() + "." + elementId);
-		} else if (getLastData() instanceof RegularDataLink) {
-			RegularDataLink compact = (RegularDataLink) getLastData();
-			data = new RegularDataLink(null, compact.getPlugin(), compact.getSuperId(), compact.getConfig(), compact.getPath() + "." + elementId);
-		} else {
-			return null;
-		}
+		ConfigData data = new ConfigData(getLastData().getPlugin(), getLastData().getSuperId(), getLastData().getConfig(), getLastData().getPath().isEmpty() ? elementId : getLastData().getPath() + "." + elementId);
 		// create
 		MatLPInteger element = new MatLPInteger(elementId.toLowerCase(), this, typeAllowDefault, defaultValue, min, max, false, -1, getEditorIcon(), getEditorDescription());
 		data.setComponent(element);
@@ -45,7 +35,7 @@ public class MatLPMatLPInteger extends MatListParseable<MatLPInteger> {
 	}
 
 	@Override
-	public MatLPInteger loadElement(String elementId, DataLink data) {
+	public MatLPInteger loadElement(String elementId, ConfigData data) {
 		// create
 		MatLPInteger element = new MatLPInteger(elementId.toLowerCase(), this, typeAllowDefault, defaultValue, min, max, false, -1, getEditorIcon(), getEditorDescription());
 		data.setComponent(element);

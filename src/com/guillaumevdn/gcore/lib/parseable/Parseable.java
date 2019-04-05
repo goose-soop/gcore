@@ -10,7 +10,6 @@ import org.bukkit.event.inventory.ClickType;
 
 import com.guillaumevdn.gcore.GLocale;
 import com.guillaumevdn.gcore.lib.material.Mat;
-import com.guillaumevdn.gcore.lib.parseable.data.DataLink;
 import com.guillaumevdn.gcore.lib.parseable.editor.EditorGUI;
 import com.guillaumevdn.gcore.lib.parseable.editor.EditorItem;
 import com.guillaumevdn.gcore.lib.parseable.editor.ModifCallback;
@@ -29,7 +28,7 @@ public abstract class Parseable implements Comparable<Parseable>, Cloneable {
 	protected int editorSlot;
 	protected Mat editorIcon;
 	protected List<String> editorDescription;
-	private DataLink lastData;
+	private ConfigData lastData;
 
 	public Parseable(String id, Parseable parent, boolean mandatory, int editorSlot, Mat editorIcon, List<String> editorDescription) {
 		this.id = id;
@@ -64,17 +63,18 @@ public abstract class Parseable implements Comparable<Parseable>, Cloneable {
 		return editorDescription;
 	}
 
-	public DataLink getLastData() {
+	public ConfigData getLastData() {
 		return lastData;
 	}
 
-	public void setLastData(DataLink lastData) {
+	public void setLastData(ConfigData lastData) {
 		this.lastData = lastData;
 	}
 
 	// load and save
-	public abstract void load(DataLink data);
-	public abstract void save(DataLink data);
+	public abstract boolean hasErrors();
+	public abstract void load(ConfigData data);
+	public abstract void save(ConfigData data);
 
 	// editor
 	public EditorGUI createEditor(final EditorGUI parent, final Player player, final ModifCallback onModif) {

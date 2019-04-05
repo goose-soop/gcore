@@ -10,9 +10,6 @@ import org.bukkit.event.inventory.ClickType;
 import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.GLocale;
 import com.guillaumevdn.gcore.lib.material.Mat;
-import com.guillaumevdn.gcore.lib.parseable.data.CompactDataLink;
-import com.guillaumevdn.gcore.lib.parseable.data.DataLink;
-import com.guillaumevdn.gcore.lib.parseable.data.RegularDataLink;
 import com.guillaumevdn.gcore.lib.parseable.editor.EditorGUI;
 import com.guillaumevdn.gcore.lib.parseable.editor.EditorItem;
 import com.guillaumevdn.gcore.lib.parseable.editor.ModifCallback;
@@ -64,67 +61,49 @@ public abstract class ListParseable<T extends Parseable> extends Parseable {
 
 	// load and save
 	@Override
-	public void load(DataLink data) {
-		// set last data
-		setLastData(data);
-		// compact data
-		if (data instanceof CompactDataLink) {
-			CompactDataLink compactData = (CompactDataLink) data;
-			// parent has parameters
-			if (getParent() != null && Utils.instanceOf(getParent().getLastData(), CompactDataLink.class) && ((CompactDataLink) getParent().getLastData()).contains()) {
-				CompactDataLink parent = (CompactDataLink) getParent().getLastData();
-				compactData.setContains(parent.getParameters().containsKey(getId()));
-				if (compactData.contains()) {// decode parameters and load elements
-					compactData.setParameters(getCompactArguments(compactData.getParameters().get(getId()), compactData.getDepth() - 1));
-					for (String elementId : compactData.getParameters().keySet()) {
-						loadElement(elementId, new CompactDataLink(null, compactData.getPlugin(), compactData.getSuperId(), compactData.getConfig(), compactData.getPath() + "." + elementId));
-					}
-				} else if (isMandatory()) {
-					data.log("missing mandatory list of type " + getElementTypeName());
-				}
-			}
-			// parent has no parameters
-			else {
-				compactData.setContains(compactData.getConfig().contains(compactData.getPath()) && !compactData.getConfig().isConfigurationSection(compactData.getPath()));
-				if (compactData.contains()) {
-					compactData.setParameters(getCompactArguments(compactData.getConfig().getString(compactData.getPath(), null), compactData.getDepth() - 1));
-					for (String elementId : compactData.getParameters().keySet()) {
-						loadElement(elementId, new CompactDataLink(null, compactData.getPlugin(), compactData.getSuperId(), compactData.getConfig(), compactData.getPath() + "." + elementId));
-					}
-				} else if (isMandatory()) {
-					data.log("missing mandatory list of type " + getElementTypeName());
-				}
+	public boolean hasErrors() {
+		if (getLastData() != null && getLastData().getLastError() != null) {
+			return true;
+		}
+		for (Parseable element : elements.values()) {
+			if (element.hasErrors()) {
+				return true;
 			}
 		}
-		// regular data
-		else if (data instanceof RegularDataLink) {
-			RegularDataLink regularData = (RegularDataLink) data;
-			regularData.setContains(regularData.getConfig().contains(regularData.getPath()));
-			if (regularData.contains()) {
-				for (String elementId : regularData.getConfig().getKeysForSection(regularData.getPath(), false)) {
-					loadElement(elementId, new RegularDataLink(null, regularData.getPlugin(), regularData.getSuperId(), regularData.getConfig(), regularData.getPath() + "." + elementId));
-				}
-			} else if (isMandatory()) {
-				data.log("missing mandatory list of type " + getElementTypeName());
+		return false;
+	}
+
+	@Override
+	public void load(ConfigData data) {
+		if (data == null) return;
+		// link
+		setLastData(data);
+		data.setComponent(this);
+		// load
+		data.setContains(data.getConfig().contains(data.getPath()));
+		if (data.contains()) {
+			for (String elementId : data.getConfig().getKeysForSection(data.getPath(), false)) {
+				loadElement(elementId, new ConfigData(data.getPlugin(), data.getSuperId(), data.getConfig(), data.getPath().isEmpty() ? elementId : data.getPath() + "." + elementId));
 			}
+		} else if (isMandatory()) {
+			data.log("missing setting (must be a list of " + elementTypeName + ")");
 		}
 	}
 
-	public abstract T loadElement(String elementId, DataLink data);
+	public abstract T loadElement(String elementId, ConfigData data);
 
 	@Override
-	public void save(DataLink data) {
-		// set last data
+	public void save(ConfigData data) {
+		if (data == null) return;
+		// link
 		setLastData(data);
-		// save elements one by one
-		if (data instanceof RegularDataLink) {
-			RegularDataLink regularData = (RegularDataLink) data;
-			regularData.getConfig().set(regularData.getPath(), null);
-			for (Parseable element : elements.values()) {
-				element.save(new RegularDataLink(this, regularData.getPlugin(), regularData.getSuperId(), regularData.getConfig(), regularData.getPath() + "." + element.getId()));
-			}
-			regularData.setContains(regularData.getConfig().contains(regularData.getPath()));
+		data.setComponent(this);
+		// save
+		data.getConfig().set(data.getPath(), null);
+		for (Parseable element : elements.values()) {
+			element.save(new ConfigData(data.getPlugin(), data.getSuperId(), data.getConfig(), data.getPath().isEmpty() ? element.getId() : data.getPath() + "." + element.getId()));
 		}
+		data.setContains(data.getConfig().contains(data.getPath()));
 	}
 
 	// editor

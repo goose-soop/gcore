@@ -7,6 +7,7 @@ import org.bukkit.event.inventory.ClickType;
 
 import com.guillaumevdn.gcore.GLocale;
 import com.guillaumevdn.gcore.lib.material.Mat;
+import com.guillaumevdn.gcore.lib.parseable.ParseResult;
 import com.guillaumevdn.gcore.lib.parseable.Parseable;
 import com.guillaumevdn.gcore.lib.parseable.PrimitiveParseable;
 import com.guillaumevdn.gcore.lib.parseable.editor.EditorGUI;
@@ -23,8 +24,11 @@ public class PPBoolean extends PrimitiveParseable<Boolean> {
 
 	// parse
 	@Override
-	public Boolean parseValue(List<String> value, Player parsing) throws Throwable {
-		return !value.isEmpty() ? Boolean.valueOf(value.get(0)) : null;
+	public ParseResult<Boolean> parseValue(List<String> value, Player parsing) throws Throwable {
+		if (value.isEmpty()) {
+			return new ParseResult<Boolean>(null);
+		}
+		return new ParseResult<Boolean>(Boolean.valueOf(value.get(0)));
 	}
 
 	// editor

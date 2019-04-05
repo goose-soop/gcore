@@ -7,11 +7,10 @@ import org.bukkit.inventory.Inventory;
 
 import com.guillaumevdn.gcore.lib.gui.ItemData;
 import com.guillaumevdn.gcore.lib.material.Mat;
+import com.guillaumevdn.gcore.lib.parseable.ConfigData;
 import com.guillaumevdn.gcore.lib.parseable.ListParseable;
 import com.guillaumevdn.gcore.lib.parseable.Parseable;
 import com.guillaumevdn.gcore.lib.parseable.container.CPItem;
-import com.guillaumevdn.gcore.lib.parseable.data.DataLink;
-import com.guillaumevdn.gcore.lib.parseable.data.RegularDataLink;
 
 public class LPItem extends ListParseable<CPItem> {
 
@@ -55,16 +54,7 @@ public class LPItem extends ListParseable<CPItem> {
 	@Override
 	public CPItem createElement(String elementId) {
 		// create data
-		DataLink data;
-		if (getLastData() instanceof RegularDataLink) {
-			RegularDataLink compact = (RegularDataLink) getLastData();
-			data = new RegularDataLink(null, compact.getPlugin(), compact.getSuperId(), compact.getConfig(), compact.getPath() + "." + elementId);
-		} else if (getLastData() instanceof RegularDataLink) {
-			RegularDataLink compact = (RegularDataLink) getLastData();
-			data = new RegularDataLink(null, compact.getPlugin(), compact.getSuperId(), compact.getConfig(), compact.getPath() + "." + elementId);
-		} else {
-			return null;
-		}
+		ConfigData data = new ConfigData(getLastData().getPlugin(), getLastData().getSuperId(), getLastData().getConfig(), getLastData().getPath().isEmpty() ? elementId : getLastData().getPath() + "." + elementId);
 		// create
 		CPItem element = new CPItem(elementId.toLowerCase(), this, false, -1, getEditorIcon(), getEditorDescription());
 		data.setComponent(element);
@@ -74,7 +64,7 @@ public class LPItem extends ListParseable<CPItem> {
 	}
 
 	@Override
-	public CPItem loadElement(String elementId, DataLink data) {
+	public CPItem loadElement(String elementId, ConfigData data) {
 		// create
 		CPItem element = new CPItem(elementId.toLowerCase(), this, false, -1, getEditorIcon(), getEditorDescription());
 		data.setComponent(element);

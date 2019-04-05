@@ -7,6 +7,7 @@ import org.bukkit.event.inventory.ClickType;
 
 import com.guillaumevdn.gcore.GLocale;
 import com.guillaumevdn.gcore.lib.material.Mat;
+import com.guillaumevdn.gcore.lib.parseable.ParseResult;
 import com.guillaumevdn.gcore.lib.parseable.Parseable;
 import com.guillaumevdn.gcore.lib.parseable.PrimitiveParseable;
 import com.guillaumevdn.gcore.lib.parseable.editor.EditorGUI;
@@ -27,9 +28,12 @@ public class PPFloat extends PrimitiveParseable<Float> {
 
 	// parse
 	@Override
-	public Float parseValue(List<String> value, Player parsing) throws Throwable {
-		Float parsed = !value.isEmpty() ? (float) Utils.calculateExpression(value.get(0)) : null;
-		return parsed != null ? ((min != null && parsed < min) || (max != null && parsed > max) ? null : parsed) : null;
+	public ParseResult<Float> parseValue(List<String> value, Player parsing) throws Throwable {
+		if (value.isEmpty()) {
+			return new ParseResult<Float>(null);
+		}
+		Float parsed = (float) Utils.calculateExpression(value.get(0));
+		return parsed != null ? ((min != null && parsed < min) || (max != null && parsed > max) ? null : new ParseResult<Float>(parsed)) : null;
 	}
 
 	// editor

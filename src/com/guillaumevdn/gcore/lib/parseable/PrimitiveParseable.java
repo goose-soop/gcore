@@ -7,9 +7,6 @@ import java.util.List;
 import org.bukkit.entity.Player;
 
 import com.guillaumevdn.gcore.lib.material.Mat;
-import com.guillaumevdn.gcore.lib.parseable.data.CompactDataLink;
-import com.guillaumevdn.gcore.lib.parseable.data.DataLink;
-import com.guillaumevdn.gcore.lib.parseable.data.RegularDataLink;
 import com.guillaumevdn.gcore.lib.parseable.placeholder.PlaceholderParser;
 import com.guillaumevdn.gcore.lib.util.Utils;
 
@@ -49,15 +46,12 @@ public abstract class PrimitiveParseable<T> extends Parseable {
 		if (value != null) {
 			for (int lineIndex = 0; lineIndex < value.size(); ++lineIndex) {
 				String line = value.get(lineIndex);
-				searchChar:
-					for (char valueChar : line.toCharArray()) {
-						for (char indicator : parseIndicators) {
-							if (valueChar == indicator) {
-								parseableIndexes.add(lineIndex);
-								break searchChar;
-							}
-						}
+				for (char valueChar : line.toCharArray()) {
+					if (parseIndicators.contains(valueChar)) {
+						parseableIndexes.add(lineIndex);
+						break;
 					}
+				}
 			}
 		}
 	}
@@ -90,22 +84,27 @@ public abstract class PrimitiveParseable<T> extends Parseable {
 		// parse
 		try {
 			// parse value
-			T parsedValue = parseValue(parsedRaw, parser);
+			ParseResult<T> parsedValue = parseValue(parsedRaw, parser);
 			if (parsedValue != null) {// success
 				if (parser == null || parseableIndexes.isEmpty()) {// save cache if player is null or shouldn't parse
 					cache = new Cache();
-					cache.value = parsedValue;
+					cache.value = parsedValue.getParsed();
 				}
-				return parsedValue;// return parsed value
+				return parsedValue.getParsed();// return parsed value
 			}
+			// failed to parse
 		}
 		// couldn't parse
 		catch (Throwable exception) {
-			getLastData().log("invalid primitive setting of type " + typeName + " (" + exception.getMessage() + ")");
+			if (getLastData() != null) {
+				getLastData().log("invalid primitive setting (must be a " + typeName + ") (" + exception.getMessage() + ")");
+			}
 			return null;
 		}
 		// unknown
-		getLastData().log("invalid primitive setting of type " + typeName);
+		if (getLastData() != null) {
+			getLastData().log("invalid primitive setting (must be a " + typeName + ")");
+		}
 		return null;
 	}
 
@@ -122,76 +121,58 @@ public abstract class PrimitiveParseable<T> extends Parseable {
 		return PlaceholderParser.parseAll(parser, string);
 	}
 
-	public abstract T parseValue(List<String> value, Player parser) throws Throwable;
+	/**
+	 * @param value the value to parse
+	 * @param parser the parsing player (might be null)
+	 * @return the parsed value, or null if couldn't parse (if the value was parsed but just empty, null shouldn't be returned)
+	 * @throws Throwable
+	 */
+	public abstract ParseResult<T> parseValue(List<String> value, Player parser) throws Throwable;
 
 	// load and save
 	@Override
-	public void load(DataLink data) {
-		// set last data
-		setLastData(data);
-		// compact data
-		if (data instanceof CompactDataLink) {
-			// config
-			CompactDataLink compactData = (CompactDataLink) data;
-			CompactDataLink parentData = getParent() != null && Utils.instanceOf(getParent().getLastData(), CompactDataLink.class) ? (CompactDataLink) getParent().getLastData() : null;
-			if (parentData == null || parentData.getParameters() == null || !parentData.getParameters().containsKey(getId())) {
-				value = null;
-				if (isMandatory()) {
-					data.log("missing mandatory primitive setting of type " + typeName);
-				}
-				return;
-			}
-			compactData.setContains(true);
-			// reset
-			if (value != null) {
-				value.clear();
-			} else {
-				value = Utils.emptyList();
-			}
-			// set
-			value.addAll(Utils.split(PRIMITIVE_COMPACT_LIST_SEPARATOR, Utils.format(String.valueOf(parentData.getParameters().get(getId()))), true));
-		}
-		// regular data
-		else if (data instanceof RegularDataLink) {
-			// config
-			RegularDataLink regularData = (RegularDataLink) data;
-			if (regularData.getConfig() == null || !regularData.getConfig().contains(regularData.getPath())) {
-				value = null;
-				if (isMandatory()) {
-					data.log("missing mandatory primitive setting of type " + typeName);
-				}
-				return;
-			}
-			regularData.setContains(true);
-			// reset
-			if (value != null) {
-				value.clear();
-			} else {
-				value = Utils.emptyList();
-			}
-			// set
-			Object load = regularData.getConfig().getObject(regularData.getPath(), null);
-			if (load instanceof Collection<?>) {
-				for (Object object : (Collection<?>) load) {
-					value.add(Utils.format(String.valueOf(object)));
-				}
-			} else {
-				value.addAll(Utils.split(PRIMITIVE_COMPACT_LIST_SEPARATOR, Utils.format(String.valueOf(load)), true));
-			}
-		}
+	public boolean hasErrors() {
+		return getLastData() != null && getLastData().getLastError() != null;
 	}
 
 	@Override
-	public void save(DataLink data) {
-		// set last data
+	public void load(ConfigData data) {
+		if (data == null) return;
+		// link
 		setLastData(data);
-		data.setContains(true);
-		// set config value
-		if (data instanceof RegularDataLink) {
-			RegularDataLink regularData = (RegularDataLink) data;
-			regularData.getConfig().set(regularData.getPath(), value == null || value.isEmpty() || (!isMandatory() && Utils.equals(value, defaultValue)) ? null : (value.size() == 1 ? value.get(0) : value));
-			regularData.setContains(regularData.getConfig().contains(regularData.getPath()));
+		data.setComponent(this);
+		// doesn't contain
+		data.setContains(data.getConfig().contains(data.getPath()));
+		if (!data.contains()) {
+			setValue(null);
+			if (isMandatory()) {
+				data.log("missing primitive setting (must be a " + typeName + ")");
+			}
+			return;
 		}
+		data.setContains(true);
+		// set
+		List<String> value = new ArrayList<String>();
+		Object load = data.getConfig().getObject(data.getPath(), null);
+		if (load instanceof Collection<?>) {
+			for (Object object : (Collection<?>) load) {
+				value.add(Utils.format(String.valueOf(object)));
+			}
+		} else {
+			value.addAll(Utils.split(PRIMITIVE_COMPACT_LIST_SEPARATOR, Utils.format(String.valueOf(load)), true));
+		}
+		setValue(value);
+	}
+
+	@Override
+	public void save(ConfigData data) {
+		if (data == null) return;
+		// link
+		setLastData(data);
+		data.setComponent(this);
+		// save
+		data.getConfig().set(data.getPath(), value == null || value.isEmpty() || (!isMandatory() && Utils.equals(value, defaultValue)) ? null : (value.size() == 1 ? value.get(0) : value));
+		data.setContains(data.getConfig().contains(data.getPath()));
 	}
 
 	// editor

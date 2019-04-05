@@ -5,6 +5,7 @@ import java.util.List;
 import org.bukkit.entity.Player;
 
 import com.guillaumevdn.gcore.lib.material.Mat;
+import com.guillaumevdn.gcore.lib.parseable.ParseResult;
 import com.guillaumevdn.gcore.lib.parseable.Parseable;
 import com.guillaumevdn.gcore.lib.parseable.PrimitiveParseable;
 import com.guillaumevdn.gcore.lib.parseable.editor.EditorGUI;
@@ -20,8 +21,11 @@ public class PPString extends PrimitiveParseable<String> {
 
 	// parse
 	@Override
-	public String parseValue(List<String> value, Player parsing) throws Throwable {
-		return !value.isEmpty() ? value.get(0) : null;
+	public ParseResult<String> parseValue(List<String> value, Player parsing) throws Throwable {
+		if (value.isEmpty()) {
+			return new ParseResult<String>(null);
+		}
+		return new ParseResult<String>(value.get(0));
 	}
 
 	// editor

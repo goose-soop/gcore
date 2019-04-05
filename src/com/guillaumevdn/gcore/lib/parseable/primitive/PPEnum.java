@@ -9,6 +9,7 @@ import org.bukkit.event.inventory.ClickType;
 
 import com.guillaumevdn.gcore.GLocale;
 import com.guillaumevdn.gcore.lib.material.Mat;
+import com.guillaumevdn.gcore.lib.parseable.ParseResult;
 import com.guillaumevdn.gcore.lib.parseable.Parseable;
 import com.guillaumevdn.gcore.lib.parseable.PrimitiveParseable;
 import com.guillaumevdn.gcore.lib.parseable.editor.EditorGUI;
@@ -33,8 +34,12 @@ public class PPEnum<T extends Enum<T>> extends PrimitiveParseable<T> {
 
 	// parse
 	@Override
-	public T parseValue(List<String> value, Player parsing) throws Throwable {
-		return !value.isEmpty() ? Utils.valueOfOrNull(enumClass, value.get(0)) : null;
+	public ParseResult<T> parseValue(List<String> value, Player parsing) throws Throwable {
+		if (value.isEmpty()) {
+			return new ParseResult<T>(null);
+		}
+		T result = Utils.valueOfOrNull(enumClass, value.get(0));
+		return result != null ? new ParseResult<T>(result) : null;
 	}
 
 	// editor

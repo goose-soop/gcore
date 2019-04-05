@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 
 import com.guillaumevdn.gcore.lib.Perm;
 import com.guillaumevdn.gcore.lib.material.Mat;
+import com.guillaumevdn.gcore.lib.parseable.ParseResult;
 import com.guillaumevdn.gcore.lib.parseable.Parseable;
 import com.guillaumevdn.gcore.lib.parseable.PrimitiveParseable;
 import com.guillaumevdn.gcore.lib.parseable.editor.EditorGUI;
@@ -21,8 +22,11 @@ public class PPPerm extends PrimitiveParseable<Perm> {
 
 	// parse
 	@Override
-	public Perm parseValue(List<String> value, Player parsing) throws Throwable {
-		return !value.isEmpty() ? new Perm(null, value.get(0), false) : null;
+	public ParseResult<Perm> parseValue(List<String> value, Player parsing) throws Throwable {
+		if (value.isEmpty()) {
+			return new ParseResult<Perm>(null);
+		}
+		return new ParseResult<Perm>(new Perm(null, value.get(0), false));
 	}
 
 	// editor

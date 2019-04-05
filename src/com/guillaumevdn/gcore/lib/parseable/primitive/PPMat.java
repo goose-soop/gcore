@@ -7,6 +7,7 @@ import org.bukkit.event.inventory.ClickType;
 
 import com.guillaumevdn.gcore.GLocale;
 import com.guillaumevdn.gcore.lib.material.Mat;
+import com.guillaumevdn.gcore.lib.parseable.ParseResult;
 import com.guillaumevdn.gcore.lib.parseable.Parseable;
 import com.guillaumevdn.gcore.lib.parseable.PrimitiveParseable;
 import com.guillaumevdn.gcore.lib.parseable.editor.EditorGUI;
@@ -23,8 +24,12 @@ public class PPMat extends PrimitiveParseable<Mat> {
 
 	// parse
 	@Override
-	public Mat parseValue(List<String> value, Player parsing) throws Throwable {
-		return !value.isEmpty() ? Mat.from(value.get(0), 0) : null;
+	public ParseResult<Mat> parseValue(List<String> value, Player parsing) throws Throwable {
+		if (value.isEmpty()) {
+			return new ParseResult<Mat>(null);
+		}
+		Mat result = Mat.from(value.get(0), 0);
+		return result != null ? new ParseResult<Mat>(result) : null;
 	}
 
 	// editor

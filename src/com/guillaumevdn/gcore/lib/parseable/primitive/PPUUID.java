@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.bukkit.entity.Player;
 
 import com.guillaumevdn.gcore.lib.material.Mat;
+import com.guillaumevdn.gcore.lib.parseable.ParseResult;
 import com.guillaumevdn.gcore.lib.parseable.Parseable;
 import com.guillaumevdn.gcore.lib.parseable.PrimitiveParseable;
 import com.guillaumevdn.gcore.lib.parseable.editor.EditorGUI;
@@ -21,8 +22,12 @@ public class PPUUID extends PrimitiveParseable<UUID> {
 
 	// parse
 	@Override
-	public UUID parseValue(List<String> value, Player parsing) throws Throwable {
-		return !value.isEmpty() ? UUID.fromString(value.get(0)) : null;
+	public ParseResult<UUID> parseValue(List<String> value, Player parsing) throws Throwable {
+		if (value.isEmpty()) {
+			return new ParseResult<UUID>(null);
+		}
+		UUID result = UUID.fromString(value.get(0));
+		return result != null ? new ParseResult<UUID>(result) : null;
 	}
 
 	// editor

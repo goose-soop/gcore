@@ -19,7 +19,7 @@ public class PPMat extends PrimitiveParseable<Mat> {
 
 	// base
 	public PPMat(String id, Parseable parent, String defaultValue, boolean mandatory, int editorSlot, Mat editorIcon, List<String> editorDescription) {
-		super(id, parent, Utils.asList(defaultValue), "GCore material", mandatory, editorSlot, editorIcon, editorDescription);
+		super(id, parent, defaultValue == null ? null : Utils.asList(defaultValue), "GCore material", mandatory, editorSlot, editorIcon, editorDescription);
 	}
 
 	// parse

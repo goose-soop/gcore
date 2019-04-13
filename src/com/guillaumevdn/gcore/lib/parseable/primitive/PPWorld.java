@@ -21,7 +21,7 @@ public class PPWorld extends PrimitiveParseable<World> {
 
 	// base
 	public PPWorld(String id, Parseable parent, String defaultValue, boolean mandatory, int editorSlot, Mat editorIcon, List<String> editorDescription) {
-		super(id, parent, Utils.asList(defaultValue), "world", mandatory, editorSlot, editorIcon, editorDescription);
+		super(id, parent, defaultValue == null ? null : Utils.asList(defaultValue), "world", mandatory, editorSlot, editorIcon, editorDescription);
 	}
 
 	// parse

@@ -464,15 +464,15 @@ public class GLocale {
 
 	public static final Text GUI_GENERIC_EDITORTEXTLINELORE = new Text(
 			"GUI_GENERIC_EDITORTEXTLINELORE", file,
-			"en_US", Utils.asList("&7Edit the raw value (it will be parsed", "&7 for a player when needed)", "{placeholders}", "&7Change colors with &{code}", "", "&a&lLeft-click to edit", "&a&lRight-click to delete"),
-			"fr_FR", Utils.asList("&7Éditer la valeur brute (elle sera convertie pour un joueur quand nécessaire)", "{placeholders}", "&7Change colors with &{code}", "", "&a&lClic gauche pour éditer", "&a&lClic droit pour supprimer"),
-			"it_IT", Utils.asList("&7Modifica il valore originale (sarà analizzato ", "&7per un giocatore quando sarà necessario)", "{placeholders}", "&7Cambia il colore con &{code}", "", "&a&lTasto sinistro per modificare", "&a&lTasto destro per eliminare", "", "&a&l", "", "&5Valore obbligatorio: &d{value_mandatory}", "&5Tipo di valore: &d{value_type}", "", "&5Valore attuale:", "&d{value_current")
+			"en_US", Utils.asList("&e{current}", "", "&7Edit the raw value (it will be parsed", "&7 for a player when needed)", "", "{placeholders}", "&7Change colors with &{code}", "", "&a&lLeft-click to edit", "&a&lRight-click to delete"),
+			"fr_FR", Utils.asList("&e{current}", "", "&7Éditer la valeur brute (elle sera convertie pour un joueur quand nécessaire)", "", "{placeholders}", "&7Change colors with &{code}", "", "&a&lClic gauche pour éditer", "&a&lClic droit pour supprimer"),
+			"it_IT", Utils.asList("&e{current}", "", "&7Modifica il valore originale (sarà analizzato ", "&7per un giocatore quando sarà necessario)", "{placeholders}", "", "&7Cambia il colore con &{code}", "", "&a&lTasto sinistro per modificare", "&a&lTasto destro per eliminare", "", "&a&l", "", "&5Valore obbligatorio: &d{value_mandatory}", "&5Tipo di valore: &d{value_type}", "", "&5Valore attuale:", "&d{value_current")
 			);
 
 	public static final Text GUI_GENERIC_EDITORLISTELEMENTLORE = new Text(
 			"GUI_GENERIC_EDITORLISTELEMENTLORE", file,
-			"en_US", Utils.asList("&a&lLeft-click to edit", "&a&lRight-click to delete"),
-			"fr_FR", Utils.asList("&a&lClic gauche pour éditer", "&a&lClic droit pour supprimer")
+			"en_US", Utils.asList("&e{current}", "", "&a&lLeft-click to edit", "&a&lRight-click to delete"),
+			"fr_FR", Utils.asList("&e{current}", "", "&a&lClic gauche pour éditer", "&a&lClic droit pour supprimer")
 			);
 
 	public static final Text GUI_GENERIC_EDITORBOOLEANTOGGLE = new Text(

@@ -66,6 +66,7 @@ import com.guillaumevdn.gcore.lib.versioncompat.Compat;
 import com.guillaumevdn.gcore.lib.versioncompat.npc.NpcProtocols;
 import com.guillaumevdn.gcore.libs.com.google.gson.Gson;
 
+// FIXME v5 - test all new features (npc, pools, ... ?)
 public class GCore extends GPlugin {
 
 	// ------------------------------------------------------------

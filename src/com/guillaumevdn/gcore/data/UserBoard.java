@@ -87,7 +87,9 @@ public class UserBoard extends DataBoard<PCUser> implements Listener {
 			// despawn npcs if online
 			Player player = info.toPlayer();
 			if (player != null) {
-				GCore.inst().getNpcManager().removeNpcs(player);
+				if (GCore.inst().getNpcManager() != null) {
+					GCore.inst().getNpcManager().removeNpcs(player);
+				}
 			}
 		}
 	}

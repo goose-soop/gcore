@@ -21,7 +21,7 @@ public class PPDouble extends PrimitiveParseable<Double> {
 	private Double min, max;
 
 	public PPDouble(String id, Parseable parent, String defaultValue, Double min, Double max, boolean mandatory, int editorSlot, Mat editorIcon, List<String> editorDescription) {
-		super(id, parent, Utils.asList(defaultValue), "decimal number", mandatory, editorSlot, editorIcon, editorDescription);
+		super(id, parent, defaultValue == null ? null : Utils.asList(defaultValue), "decimal number", mandatory, editorSlot, editorIcon, editorDescription);
 		this.min = min;
 		this.max = max;
 	}

@@ -23,7 +23,7 @@ public class PPEnum<T extends Enum<T>> extends PrimitiveParseable<T> {
 	private Class<T> enumClass;
 
 	public PPEnum(String id, Parseable parent, String defaultValue, Class<T> enumClass, String typeName, boolean mandatory, int editorSlot, Mat editorIcon, List<String> editorDescription) {
-		super(id, parent, Utils.asList(defaultValue), typeName, mandatory, editorSlot, editorIcon, editorDescription);
+		super(id, parent, defaultValue == null ? null : Utils.asList(defaultValue), typeName, mandatory, editorSlot, editorIcon, editorDescription);
 		this.enumClass = enumClass;
 	}
 

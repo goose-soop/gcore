@@ -20,7 +20,7 @@ public class PPEnchantment extends PrimitiveParseable<Enchantment> {
 
 	// base
 	public PPEnchantment(String id, Parseable parent, String defaultValue, boolean mandatory, int editorSlot, Mat editorIcon, List<String> editorDescription) {
-		super(id, parent, Utils.asList(defaultValue), "enchantment type", mandatory, editorSlot, editorIcon, editorDescription);
+		super(id, parent, defaultValue == null ? null : Utils.asList(defaultValue), "enchantment type", mandatory, editorSlot, editorIcon, editorDescription);
 	}
 
 	// parse

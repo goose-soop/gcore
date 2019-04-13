@@ -57,6 +57,7 @@ public abstract class EditorGUI extends GUI {
 
 	// max lines
 	public static int MAX_DESCRIPTION_LINES = 22;
+	public static int MAX_DESCRIPTION_DEPTH = 2;
 
 	// base
 	private EditorGUI parent;
@@ -124,7 +125,7 @@ public abstract class EditorGUI extends GUI {
 		List<String> currentLore = Utils.emptyList();
 		int i = 0;
 		for (String line : Utils.separateSentences(GLocale.GUI_GENERIC_EDITORCURRENTLORE.getLines("{description}", editorDescription, "{type}", typeName, "{mandatory}", mandatory ? "&cyes" : "&ano", "{current}", currentValue), 50, " ")) {
-			if (++i == EditorGUI.MAX_DESCRIPTION_LINES) {
+			if (++i >= EditorGUI.MAX_DESCRIPTION_LINES) {
 				currentLore.add(" §8...");
 				break;
 			}

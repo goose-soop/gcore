@@ -60,20 +60,20 @@ public class PPEnumList<T extends Enum<T>> extends PrimitiveParseable<List<T>> {
 		if (getValue() != null) {
 			for (int i = 0; i < getValue().size(); ++i) {
 				final String line = getValue().get(i);
-				final int index = ++i;
-				gui.setRegularItem(new EditorItem("line_" + index, -1, Mat.PAPER, "§6" + (index + 1), GLocale.GUI_GENERIC_EDITORLISTELEMENTLORE.getLines()) {
+				final int index = i;
+				gui.setRegularItem(new EditorItem("line_" + index, -1, Mat.PAPER, "§6" + (index + 1), GLocale.GUI_GENERIC_EDITORLISTELEMENTLORE.getLines("{current}", line)) {
 					@Override
 					protected void onClick(final Player player, final ClickType clickType, final int pageIndex) {
 						// edit
 						if (clickType.isLeftClick()) {
 							// create sub GUI
-							String name = Utils.getNewInventoryName(gui.getName(), "" + index);
+							String name = Utils.getNewInventoryName(gui.getName(), "" + (index + 1));
 							EditorGUI sub = new EditorGUI(getLastData().getPlugin(), gui, name, 9, 7) {
 								private EditorGUI subThis = this;
 								@Override
 								protected void fill() {
 									// current, raw and delete
-									EditorGUI.fillItemCurrent(subThis, player, "" + index, Utils.asList(line), null, getTypeName(), isMandatory(), getEditorIcon(), 0, onModif);
+									EditorGUI.fillItemCurrent(subThis, player, "" + (index + 1), Utils.asList(line), null, getTypeName(), isMandatory(), getEditorIcon(), 0, onModif);
 									EditorGUI.fillItemRaw(subThis, player, 3, onModif, new RawChangeCallback() {
 										@Override
 										public void callback(EditorGUI from, Player player, String value) {
@@ -150,10 +150,11 @@ public class PPEnumList<T extends Enum<T>> extends PrimitiveParseable<List<T>> {
 			@Override
 			protected void onClick(Player player, ClickType clickType, int pageIndex) {
 				// add value
+				T newValue = enumClass.getEnumConstants().length == 0 ? null : enumClass.getEnumConstants()[0];
 				if (getValue() == null) {
-					setValue(Utils.asList(Mat.GRASS_BLOCK.getModernName()));
+					setValue(Utils.asList(newValue == null ? "NO_VALUE" : newValue.name()));
 				} else {
-					getValue().add(Mat.GRASS_BLOCK.getModernName());
+					getValue().add(newValue == null ? "NO_VALUE" : newValue.name());
 				}
 				onModif.callback(gui, player);
 				// re-fill and open

@@ -1,5 +1,6 @@
 package com.guillaumevdn.gcore.lib.parseable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -100,7 +101,7 @@ public abstract class ListParseable<T extends Parseable> extends Parseable {
 		data.setComponent(this);
 		// save
 		data.getConfig().set(data.getPath(), null);
-		for (Parseable element : elements.values()) {
+		for (Parseable element : Utils.asSortedList(elements.values())) {
 			element.save(new ConfigData(data.getPlugin(), data.getSuperId(), data.getConfig(), data.getPath().isEmpty() ? element.getId() : data.getPath() + "." + element.getId()));
 		}
 		data.setContains(data.getConfig().contains(data.getPath()));
@@ -111,11 +112,12 @@ public abstract class ListParseable<T extends Parseable> extends Parseable {
 	public List<String> describe(int depth) {
 		String spaces = Utils.copyString(" ", depth + 1);
 		List<String> desc = Utils.asList(spaces + "§6> " + getId() + " :");
-		for (Parseable element : elements.values()) {
-			if (depth == MAX_DESCRIPTION_DEPTH) {
-				desc.add(spaces + " §6> " + getId() + " : §8...");
+		for (Parseable element : Utils.asSortedList(elements.values())) {
+			List<String> sub = element.describe(depth + 1);
+			if (depth + 1 == EditorGUI.MAX_DESCRIPTION_DEPTH && sub.size() > 1) {// max depth reached, and sub description is more than one line
+				desc.add(spaces + " §6> " + element.getId() + " : §8...");
 			} else {
-				desc.addAll(element.describe(depth + 1));
+				desc.addAll(sub);
 			}
 		}
 		return desc;
@@ -126,8 +128,15 @@ public abstract class ListParseable<T extends Parseable> extends Parseable {
 		// delete wrapper
 		final Wrapper<Boolean> delete = new Wrapper<Boolean>(false);
 		// add elements items
-		for (final Parseable element : elements.values()) {
-			gui.setRegularItem(new EditorItem(element.getId(), element.getEditorSlot(), element.getEditorIcon(), "§6" + element.getId(), element.getEditorDescription()) {
+		for (final Parseable element : Utils.asSortedList(elements.values())) {
+			List<String> lore = new ArrayList<String>(), desc = element.getEditorDescription();
+			if (desc != null) {
+				for (String line : desc) {
+					lore.add(line);
+					if (lore.size() >= EditorGUI.MAX_DESCRIPTION_LINES) break;
+				}
+			}
+			gui.setRegularItem(new EditorItem(element.getId(), element.getEditorSlot(), element.getEditorIcon(), "§6" + element.getId(), lore) {
 				@Override
 				public void onClick(final Player player, final ClickType clickType, final int pageIndex) {
 					// eventually delete
@@ -146,16 +155,17 @@ public abstract class ListParseable<T extends Parseable> extends Parseable {
 						private EditorGUI subThis = this;
 						@Override
 						protected void fill() {
+							// back item
+							subThis.setPersistentItem(new EditorItem("control_item_back", element.getEditorBackSlot(), Mat.ARROW, GLocale.GUI_GENERIC_EDITORITEMBACK.getLine(), null) {
+								@Override
+								protected void onClick(final Player player, final ClickType clickType, final int pageIndex) {
+									gui.open(player);
+								}
+							});
+							// fill
 							element.fillEditor(subThis, player, onModif);
 						}
 					};
-					// back item
-					sub.setPersistentItem(new EditorItem("control_item_back", getEditorBackSlot(), Mat.ARROW, GLocale.GUI_GENERIC_EDITORITEMBACK.getLine(), null) {
-						@Override
-						protected void onClick(final Player player, final ClickType clickType, final int pageIndex) {
-							gui.open(player);
-						}
-					});
 					// open it
 					sub.open(player);
 					return;

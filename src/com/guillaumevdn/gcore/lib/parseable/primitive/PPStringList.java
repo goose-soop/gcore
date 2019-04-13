@@ -14,6 +14,7 @@ import com.guillaumevdn.gcore.lib.parseable.PrimitiveParseable;
 import com.guillaumevdn.gcore.lib.parseable.editor.EditorGUI;
 import com.guillaumevdn.gcore.lib.parseable.editor.EditorItem;
 import com.guillaumevdn.gcore.lib.parseable.editor.ModifCallback;
+import com.guillaumevdn.gcore.lib.parseable.placeholder.PlaceholderParser;
 import com.guillaumevdn.gcore.lib.util.Utils;
 import com.guillaumevdn.gcore.lib.util.input.ChatInput;
 
@@ -40,7 +41,7 @@ public class PPStringList extends PrimitiveParseable<List<String>> {
 		if (getValue() != null) {
 			for (int i = 0; i < getValue().size(); ++i) {
 				final int index = i;
-				gui.setRegularItem(new EditorItem("line_" + index, -1, Mat.PAPER, "§6" + (index + 1), GLocale.GUI_GENERIC_EDITORTEXTLINELORE.getLines()) {
+				gui.setRegularItem(new EditorItem("line_" + index, -1, Mat.PAPER, "§6" + (index + 1), GLocale.GUI_GENERIC_EDITORTEXTLINELORE.getLines("{current}", getValue().get(index), "{placeholders}", PlaceholderParser.describeAll())) {
 					@Override
 					protected void onClick(Player player, ClickType clickType, int pageIndex) {
 						// edit

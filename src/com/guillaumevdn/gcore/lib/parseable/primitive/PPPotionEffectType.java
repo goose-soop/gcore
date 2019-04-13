@@ -20,7 +20,7 @@ public class PPPotionEffectType extends PrimitiveParseable<PotionEffectType> {
 
 	// base
 	public PPPotionEffectType(String id, Parseable parent, String defaultValue, boolean mandatory, int editorSlot, Mat editorIcon, List<String> editorDescription) {
-		super(id, parent, Utils.asList(defaultValue), "potion effect type", mandatory, editorSlot, editorIcon, editorDescription);
+		super(id, parent, defaultValue == null ? null : Utils.asList(defaultValue), "potion effect type", mandatory, editorSlot, editorIcon, editorDescription);
 	}
 
 	// parse

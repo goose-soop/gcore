@@ -1,5 +1,8 @@
 package com.guillaumevdn.gcore.lib.parseable.editor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 
@@ -67,7 +70,14 @@ public abstract class EditorSelectionGUI<T> extends EditorGUI {
 
 	public void addItem(final T element, Mat icon, String id, String name, int slot) {
 		// add item
-		setRegularItem(new EditorItem(id, slot, icon, name, element instanceof Parseable ? ((Parseable) element).describe(0) : null) {
+		List<String> lore = new ArrayList<String>(), desc =  element instanceof Parseable ? ((Parseable) element).describe(0) : null;
+		if (desc != null) {
+			for (String line : desc) {
+				lore.add(line);
+				if (lore.size() >= EditorGUI.MAX_DESCRIPTION_LINES) break;
+			}
+		}
+		setRegularItem(new EditorItem(id, slot, icon, name, lore) {
 			@Override
 			protected void onClick(Player player, ClickType clickType, int pageIndex) {
 				// delete model

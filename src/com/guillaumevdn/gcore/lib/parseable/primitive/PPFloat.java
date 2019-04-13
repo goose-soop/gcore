@@ -21,7 +21,7 @@ public class PPFloat extends PrimitiveParseable<Float> {
 	private Float min, max;
 
 	public PPFloat(String id, Parseable parent, String defaultValue, Float min, Float max, boolean mandatory, int editorSlot, Mat editorIcon, List<String> editorDescription) {
-		super(id, parent, Utils.asList(defaultValue), "decimal number", mandatory, editorSlot, editorIcon, editorDescription);
+		super(id, parent, defaultValue == null ? null : Utils.asList(defaultValue), "decimal number", mandatory, editorSlot, editorIcon, editorDescription);
 		this.min = min;
 		this.max = max;
 	}

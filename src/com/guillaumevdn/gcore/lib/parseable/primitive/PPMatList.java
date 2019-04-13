@@ -52,20 +52,20 @@ public class PPMatList extends PrimitiveParseable<List<Mat>> {
 		if (getValue() != null) {
 			for (int i = 0; i < getValue().size(); ++i) {
 				final String line = getValue().get(i);
-				final int index = ++i;
-				gui.setRegularItem(new EditorItem("line_" + index, -1, Mat.PAPER, "§6" + (index + 1), GLocale.GUI_GENERIC_EDITORLISTELEMENTLORE.getLines()) {
+				final int index = i;
+				gui.setRegularItem(new EditorItem("line_" + index, -1, Mat.PAPER, "§6" + (index + 1), GLocale.GUI_GENERIC_EDITORLISTELEMENTLORE.getLines("{current}", line)) {
 					@Override
 					protected void onClick(final Player player, final ClickType clickType, final int pageIndex) {
 						// edit
 						if (clickType.isLeftClick()) {
 							// create sub GUI
-							String name = Utils.getNewInventoryName(gui.getName(), "" + index);
+							String name = Utils.getNewInventoryName(gui.getName(), "" + (index + 1));
 							EditorGUI sub = new EditorGUI(getLastData().getPlugin(), gui, name, 9, 7) {
 								private EditorGUI subThis = this;
 								@Override
 								protected void fill() {
 									// current, raw and delete
-									EditorGUI.fillItemCurrent(subThis, player, "" + index, Utils.asList(line), null, "GCore material", isMandatory(), getEditorIcon(), 0, onModif);
+									EditorGUI.fillItemCurrent(subThis, player, "" + (index + 1), Utils.asList(line), null, "GCore material", isMandatory(), getEditorIcon(), 0, onModif);
 									EditorGUI.fillItemRaw(subThis, player, 3, onModif, new RawChangeCallback() {
 										@Override
 										public void callback(EditorGUI from, Player player, String value) {

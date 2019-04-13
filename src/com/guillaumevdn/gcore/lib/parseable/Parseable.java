@@ -18,9 +18,6 @@ import com.guillaumevdn.gcore.lib.util.Utils;
 
 public abstract class Parseable implements Comparable<Parseable>, Cloneable {
 
-	// limit
-	public static final int MAX_DESCRIPTION_DEPTH = 2;
-
 	// base
 	protected String id;
 	protected Parseable parent;
@@ -79,7 +76,7 @@ public abstract class Parseable implements Comparable<Parseable>, Cloneable {
 	// editor
 	public EditorGUI createEditor(final EditorGUI parent, final Player player, final ModifCallback onModif) {
 		if (getLastData() == null || getLastData().getPlugin() == null) return null;
-		return new EditorGUI(getLastData().getPlugin(), parent, getId(), getEditorSize(), getEditorMaxRegularSlot()) {
+		return new EditorGUI(getLastData().getPlugin(), parent, parent != null ? Utils.getNewInventoryName(parent.getName(), getId()) : getId(), getEditorSize(), getEditorMaxRegularSlot()) {
 			@Override
 			protected void fill() {
 				fillEditor(this, player, onModif);

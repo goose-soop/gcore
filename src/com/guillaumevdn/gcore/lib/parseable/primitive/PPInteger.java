@@ -21,7 +21,7 @@ public class PPInteger extends PrimitiveParseable<Integer> {
 	private Integer min, max;
 
 	public PPInteger(String id, Parseable parent, String defaultValue, Integer min, Integer max, boolean mandatory, int editorSlot, Mat editorIcon, List<String> editorDescription) {
-		super(id, parent, Utils.asList(defaultValue), "number", mandatory, editorSlot, editorIcon, editorDescription);
+		super(id, parent, defaultValue == null ? null : Utils.asList(defaultValue), "number", mandatory, editorSlot, editorIcon, editorDescription);
 		this.min = min;
 		this.max = max;
 	}

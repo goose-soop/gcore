@@ -553,7 +553,55 @@ public class GLocale {
 			"fr_FR", "&6Sélectionner le type",
 			"it_IT", Utils.asList("&6Seleziona il tipo")
 			);
+	
+	// editor : date
+	public static final Text GUI_GENERIC_EDITOR_YEARLORE = new Text(
+			"GUI_GENERIC_EDITOR_YEARLORE", file,
+			"en_US", Utils.asList("&7Year"),
+			"fr_FR", Utils.asList("&7Année")
+			);
 
+	public static final Text GUI_GENERIC_EDITOR_MONTHLORE = new Text(
+			"GUI_GENERIC_EDITOR_MONTHLORE", file,
+			"en_US", Utils.asList("&7Month"),
+			"fr_FR", Utils.asList("&7Mois")
+			);
+
+	public static final Text GUI_GENERIC_EDITOR_DAYLORE = new Text(
+			"GUI_GENERIC_EDITOR_DAYLORE", file,
+			"en_US", Utils.asList("&7Day of week"),
+			"fr_FR", Utils.asList("&7Jour de la semaine")
+			);
+
+	public static final Text GUI_GENERIC_EDITOR_HOURLORE = new Text(
+			"GUI_GENERIC_EDITOR_HOURLORE", file,
+			"en_US", Utils.asList("&7Hour"),
+			"fr_FR", Utils.asList("&7Heure")
+			);
+
+	public static final Text GUI_GENERIC_EDITOR_MINUTELORE = new Text(
+			"GUI_GENERIC_EDITOR_MINUTELORE", file,
+			"en_US", Utils.asList("&7Minute")
+			);
+
+	public static final Text GUI_GENERIC_EDITOR_WEEKTIMEFRAMESTARTLORE = new Text(
+			"GUI_GENERIC_EDITOR_WEEKTIMEFRAMESTARTLORE", file,
+			"en_US", Utils.asList("&7Start of time frame in week"),
+			"fr_FR", Utils.asList("&7Début de période dans la semaine")
+			);
+
+	public static final Text GUI_GENERIC_EDITOR_WEEKTIMEFRAMEENDLORE = new Text(
+			"GUI_GENERIC_EDITOR_WEEKTIMEFRAMEENDLORE", file,
+			"en_US", Utils.asList("&7End of time frame in week"),
+			"fr_FR", Utils.asList("&7Fin de période dans la semaine")
+			);
+
+	public static final Text GUI_GENERIC_EDITOR_CUTDELAYLORE = new Text(
+			"GUI_GENERIC_EDITOR_CUTDELAYLORE", file,
+			"en_US", Utils.asList("&7If this setting is specified, the time frame", "&7 will be split into smaller parts"),
+			"fr_FR", Utils.asList("&7Si ce paramètre est spécifié, la période sera", "&7 divisée en plus petites parties")
+			);
+	
 	// editor : block setting
 	public static final Text GUI_GENERIC_EDITOR_BLOCKTYPELORE = new Text(
 			"GUI_GENERIC_EDITOR_BLOCKTYPELORE", file,
@@ -583,6 +631,19 @@ public class GLocale {
 			"fr_FR", Utils.asList("&7Nombre de mobs")
 			);
 
+	// editor : enchantment setting
+	public static final Text GUI_GENERIC_EDITOR_ENCHANTMENT_TYPELORE = new Text(
+			"GUI_GENERIC_EDITOR_ENCHANTMENT_TYPELORE", file,
+			"en_US", Utils.asList("&7Type of enchantment"),
+			"fr_FR", Utils.asList("&7Type d'enchantement")
+			);
+
+	public static final Text GUI_GENERIC_EDITOR_ENCHANTMENT_LEVELLORE = new Text(
+			"GUI_GENERIC_EDITOR_ENCHANTMENT_LEVELLORE", file,
+			"en_US", Utils.asList("&7Level of enchantment"),
+			"fr_FR", Utils.asList("&7Niveau d'enchantement")
+			);
+
 	// editor : potion effect setting
 	public static final Text GUI_GENERIC_EDITOR_POTIONEFFECT_TYPELORE = new Text(
 			"GUI_GENERIC_EDITOR_POTIONEFFECT_TYPELORE", file,
@@ -591,11 +652,10 @@ public class GLocale {
 			"it_IT", Utils.asList("&7Tipo d'effetto")
 			);
 
-	public static final Text GUI_GENERIC_EDITOR_POTIONEFFECT_LEVELLORE = new Text(
-			"GUI_GENERIC_EDITOR_POTIONEFFECT_LEVELLORE", file,
-			"en_US", Utils.asList("&7Level of effect (starting at 1)"),
-			"fr_FR", Utils.asList("&7Niveau de l'effet (commançant à 1)"),
-			"it_IT", Utils.asList("&7Livello dell'effetto (comincia da 1)")
+	public static final Text GUI_GENERIC_EDITOR_POTIONEFFECT_AMPLIFIERLORE = new Text(
+			"GUI_GENERIC_EDITOR_POTIONEFFECT_AMPLIFIERLORE", file,
+			"en_US", Utils.asList("&7Amplifier of effect"),
+			"fr_FR", Utils.asList("&7Amplificateur d'effet")
 			);
 
 	public static final Text GUI_GENERIC_EDITOR_POTIONEFFECT_DURATIONLORE = new Text(
@@ -794,9 +854,15 @@ public class GLocale {
 
 	public static final Text GUI_GENERIC_EDITOR_ITEM_ENCHANTSLORE = new Text(
 			"GUI_GENERIC_EDITOR_ITEM_ENCHANTSLORE", file,
-			"en_US", Utils.asList("&7List of item enchants", "&7Line format : &6{enchantment},{level}"),
-			"fr_FR", Utils.asList("&7Liste des enchantements de l'item", "&7Format de ligne : &6{enchantement},{niveau}"),
-			"it_IT", Utils.asList("&7Lista di incantesimi dell'oggetto", "&7Formato linee: &6{enchantement},{niveau}")
+			"en_US", Utils.asList("&7List of item enchants"),
+			"fr_FR", Utils.asList("&7Liste des enchantements de l'item"),
+			"it_IT", Utils.asList("&7Lista di incantesimi dell'oggetto")
+			);
+
+	public static final Text GUI_GENERIC_EDITOR_ITEM_EFFECTSLORE = new Text(
+			"GUI_GENERIC_EDITOR_ITEM_EFFECTSLORE", file,
+			"en_US", Utils.asList("&7List of item effects"),
+			"fr_FR", Utils.asList("&7Liste des effets de l'item")
 			);
 
 	public static final Text GUI_GENERIC_EDITOR_ITEM_NBTLORE = new Text(

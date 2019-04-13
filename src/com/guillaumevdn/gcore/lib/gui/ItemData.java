@@ -1,5 +1,6 @@
 package com.guillaumevdn.gcore.lib.gui;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.PotionEffect;
 
 import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.lib.material.Mat;
@@ -27,12 +30,12 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 	private int slot = -1;
 	private double chance = -1D;
 	private int maxAmount = 0;
-	private boolean slotless = false;
 	private boolean hideFlags = false;
 
 	// fields : item
 	private Mat type = Mat.AIR;
 	private int amount = 1;
+	private List<PotionEffect> effects = new ArrayList<PotionEffect>();
 	private Map<Enchantment, Integer> enchants = new HashMap<Enchantment, Integer>();
 	private String name = null;
 	private List<String> lore = null;
@@ -42,7 +45,7 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 
 	// bases
 	public ItemData(String id) {
-		this(id, -1, Mat.AIR, (short) 0, 1, null, null, null);
+		this(id, -1, Mat.AIR, (short) 0, 1, null, null, null, null);
 	}
 
 	public ItemData(String id, int slot, double chance, ItemStack item) {
@@ -56,6 +59,10 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 		setMaxAmount(maxAmount);
 	}
 
+	public ItemData(ItemStack item) {
+		this(null, item);
+	}
+
 	public ItemData(String id, ItemStack item) {
 		this(id, -1, item);
 	}
@@ -65,7 +72,8 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 				item == null ? (short) 0 : item.getDurability(),
 						item == null ? 1 : item.getAmount(), item == null || !item.hasItemMeta() || !item.getItemMeta().hasDisplayName() ? null : item.getItemMeta().getDisplayName(),
 								item == null || !item.hasItemMeta() || !item.getItemMeta().hasLore() ? null : Utils.asList(item.getItemMeta().getLore()),
-										item == null ? null : Utils.asMapCopy(item.getEnchantments()));
+										item == null || !item.hasItemMeta() || !(item.getItemMeta() instanceof PotionMeta) ? null : Utils.asList(((PotionMeta) item.getItemMeta()).getCustomEffects()),
+												item == null ? null : Utils.asMapCopy(item.getEnchantments()));
 		this.build = item;
 		try {
 			this.customNbt = Compat.INSTANCE.getNbt(item);
@@ -75,24 +83,27 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 	}
 
 	public ItemData(Mat type, int amount, String name, List<String> lore) {
-		this(UUID.randomUUID().toString().split("-")[0], -1, type, 0, amount, name, lore, null);
+		this(UUID.randomUUID().toString().split("-")[0], -1, type, 0, amount, name, lore, null, null);
 	}
 
 	public ItemData(String id, int slot, Mat type, int amount, String name, List<String> lore) {
-		this(id, slot, type, 0, amount, name, lore, null);
+		this(id, slot, type, 0, amount, name, lore, null, null);
 	}
 
 	public ItemData(String id, int slot, Mat type, int durability, int amount, String name, List<String> lore) {
-		this(id, slot, type, durability, amount, name, lore, null);
+		this(id, slot, type, durability, amount, name, lore, null, null);
 	}
 
-	public ItemData(String id, int slot, Mat type, int durability, int amount, String name, List<String> lore, Map<Enchantment, Integer> enchants) {
+	public ItemData(String id, int slot, Mat type, int durability, int amount, String name, List<String> lore, List<PotionEffect> effects, Map<Enchantment, Integer> enchants) {
 		this.id = id;
 		this.slot = slot;
 		this.type = type.getDurability() != (int) durability ? Mat.from(type.getModernName(), durability) : type;
 		this.amount = amount;
 		this.name = name == null || name.isEmpty() ? null : Utils.format(name);
 		this.lore = lore == null || lore.isEmpty() ? null : Utils.format(lore);
+		if (effects != null) {
+			this.effects.addAll(effects);
+		}
 		if (enchants != null) {
 			this.enchants.putAll(enchants);
 		}
@@ -140,14 +151,6 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 		this.maxAmount = maxAmount;
 	}
 
-	public boolean isSlotless() {
-		return slotless;
-	}
-
-	public void setSlotless(boolean slotless) {
-		this.slotless = slotless;
-	}
-
 	public boolean isHideFlags() {
 		return hideFlags;
 	}
@@ -175,12 +178,30 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 		if (build != null) rebuildItem(true);
 	}
 
+	public List<PotionEffect> getEffects() {
+		return effects;
+	}
+
+	public void addPotionEffect(PotionEffect effect) {
+		effects.add(effect);
+		if (build != null) rebuildItem(true);
+	}
+
+	public void removePotionEffect(PotionEffect effect) {
+		effects.remove(effect);
+		if (build != null) rebuildItem(true);
+	}
+
 	public Map<Enchantment, Integer> getEnchants() {
 		return enchants;
 	}
 
 	public void setEnchant(Enchantment enchant, int level) {
-		enchants.put(enchant, level);
+		if (level <= 0) {
+			enchants.remove(enchant);
+		} else {
+			enchants.put(enchant, level);
+		}
 		if (build != null) rebuildItem(true);
 	}
 
@@ -279,6 +300,14 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 				// flags
 				if (hideFlags) {
 					meta = Compat.INSTANCE.addItemFlags(meta);
+				}
+				// effects
+				if (!effects.isEmpty() && meta instanceof PotionMeta) {
+					PotionMeta potion = (PotionMeta) meta;
+					potion.clearCustomEffects();
+					for (PotionEffect effect : effects) {
+						potion.addCustomEffect(effect, true);// FIXME v5 : what is that boolean :thinking:
+					}
 				}
 				// set meta
 				build.setItemMeta(meta);
@@ -401,12 +430,12 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 		if (item == build || (checkAmount ? item.equals(build) : item.isSimilar(build))) {
 			return true;
 		}
-		// type
-		if (!type.isMat(item)) {
+		// amount : before type check, whatever that is, if the amount isn't the same - spares a few checks in Mat
+		if (checkAmount && item.getAmount() != amount) {
 			return false;
 		}
-		// amount
-		if (checkAmount && item.getAmount() != amount) {
+		// type
+		if (!type.isMat(item)) {
 			return false;
 		}
 		// enchants
@@ -418,6 +447,31 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 			if (enchants.get(enchant) != itemEnchants.get(enchant)) {
 				return false;
 			}
+		}
+		// effects
+		if (!effects.isEmpty()) {
+			// not a potion holder
+			PotionMeta potion = item.hasItemMeta() && item.getItemMeta() instanceof PotionMeta ? (PotionMeta) item.getItemMeta() : null;
+			if (potion == null) {
+				return false;
+			}
+			// check effects
+			if (effects.size() != potion.getCustomEffects().size()) {
+				return false;
+			}
+			for (PotionEffect potionEffect : potion.getCustomEffects()) {
+				boolean has = false;
+				for (PotionEffect effect : effects) {
+					if (potionEffect.equals(effect)) {
+						has = true;
+						break;
+					}
+				}
+				if (!has) {
+					return false;
+				}
+			}
+			// all effects are good
 		}
 		// name
 		if (name != null && !(item.hasItemMeta() && item.getItemMeta().hasDisplayName() && item.getItemMeta().getDisplayName().equals(name))) {
@@ -440,34 +494,111 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 	}
 
 	// misc
-	/**
-	 * @param object the object to check
-	 * @return true if the id of this item is the same as the object's id (if the argument is an ItemData object)
-	 */
-	@Override
-	public boolean equals(Object object) {
-		if (object == null || !object.getClass().equals(getClass())) {
-			return false;
-		}
-		ItemData other = (ItemData) object;
-		if (other == this) {
-			return true;
-		}
-		return Utils.equals(id, other.id);// id might be null
-	}
-
 	@Override
 	public int compareTo(ItemData other) {
 		return Integer.compare(slot, other.slot);
 	}
 
 	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + amount;
+		long temp;
+		temp = Double.doubleToLongBits(chance);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		result = prime * result + ((customNbt == null) ? 0 : customNbt.hashCode());
+		result = prime * result + ((effects == null) ? 0 : effects.hashCode());
+		result = prime * result + (enabled ? 1231 : 1237);
+		result = prime * result + ((enchants == null) ? 0 : enchants.hashCode());
+		result = prime * result + (hideFlags ? 1231 : 1237);
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((lore == null) ? 0 : lore.hashCode());
+		result = prime * result + maxAmount;
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + slot;
+		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		result = prime * result + (unbreakable ? 1231 : 1237);
+		return result;
+	}
+
+	/**
+	 * Assuming both objects are ItemData, there's a special check about the IDs here :
+	 * <br>- If one of the IDs is null but the other one isn't, this method returns false
+	 * <br>- If both IDs are equal, this method returns true
+	 * <br>- If both IDs are null, this method returns true if all fields are equals
+	 * @param obj the object to check
+	 * @return true if this object equals to the argument
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ItemData other = (ItemData) obj;
+		// id check
+		if ((id == null && other.getId() != null) || (id != null && other.getId() == null) || (id != null && other.getId() != null && !id.equals(other.getId()))) {
+			return false;
+		}
+		// regular check
+		if (amount != other.amount)
+			return false;
+		if (Double.doubleToLongBits(chance) != Double.doubleToLongBits(other.chance))
+			return false;
+		if (customNbt == null) {
+			if (other.customNbt != null)
+				return false;
+		} else if (!customNbt.equals(other.customNbt))
+			return false;
+		if (effects == null) {
+			if (other.effects != null)
+				return false;
+		} else if (!effects.equals(other.effects))
+			return false;
+		if (enabled != other.enabled)
+			return false;
+		if (enchants == null) {
+			if (other.enchants != null)
+				return false;
+		} else if (!enchants.equals(other.enchants))
+			return false;
+		if (hideFlags != other.hideFlags)
+			return false;
+		if (lore == null) {
+			if (other.lore != null)
+				return false;
+		} else if (!lore.equals(other.lore))
+			return false;
+		if (maxAmount != other.maxAmount)
+			return false;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		if (slot != other.slot)
+			return false;
+		if (type == null) {
+			if (other.type != null)
+				return false;
+		} else if (!type.equals(other.type))
+			return false;
+		if (unbreakable != other.unbreakable)
+			return false;
+		return true;
+	}
+
+	@Override
 	public ItemData clone() {
-		ItemData clone = new ItemData(id, slot, type, type.getDurability(), amount, name, lore == null ? null : Utils.asList(lore), Utils.asMapCopy(enchants));
+		ItemData clone = new ItemData(id, slot, type, type.getDurability(), amount, name, lore == null ? null : Utils.asList(lore), Utils.asList(effects), Utils.asMapCopy(enchants));
 		clone.enabled = enabled;
+		clone.maxAmount = maxAmount;
 		clone.chance = chance;
-		clone.slotless = slotless;
 		clone.unbreakable = unbreakable;
+		clone.hideFlags = hideFlags;
 		clone.customNbt = customNbt;
 		clone.build = build == null ? null : build.clone();
 		return clone;
@@ -481,8 +612,8 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 
 	@Override
 	public String toString() {
-		return "ItemData{id=" + id + ",enabled=" + enabled + ",slot=" + slot + ",slotless=" + slotless + ",chance=" + chance + ",type=" + type + ",amount=" + amount
-				+ ",enchants=" + enchants.toString() + ",name=" + name + ",lore=" + (lore == null ? "null" : Utils.asString(lore)) + ",nbt=" + !(customNbt == null) + ",unbreakable=" + unbreakable + "}";
+		return "ItemData{id=" + id + ",enabled=" + enabled + ",slot=" + slot + ",chance=" + chance + ",type=" + type + ",amount=" + amount + ",maxAmount=" + maxAmount + ",effects=" + effects.toString()
+		+ ",enchants=" + enchants.toString() + ",name=" + name + ",lore=" + (lore == null ? "null" : Utils.asString(lore)) + ",nbt=" + !(customNbt == null) + ",unbreakable=" + unbreakable + "}";
 	}
 
 }

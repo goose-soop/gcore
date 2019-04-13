@@ -19,7 +19,7 @@ public class CPPotionEffect extends ContainerParseable {
 
 	// base
 	private PPPotionEffectType type = addComponent(new PPPotionEffectType("type", this, null, false, 0, EditorGUI.ICON_BLOCK, GLocale.GUI_GENERIC_EDITOR_POTIONEFFECT_TYPELORE.getLines()));
-	private PPInteger level = addComponent(new PPInteger("level", this, "0", 0, Integer.MAX_VALUE, false, 1, EditorGUI.ICON_NUMBER_LEVEL, GLocale.GUI_GENERIC_EDITOR_POTIONEFFECT_LEVELLORE.getLines()));
+	private PPInteger amplifier = addComponent(new PPInteger("amplifier", this, "0", 0, 1, false, 1, EditorGUI.ICON_NUMBER_LEVEL, GLocale.GUI_GENERIC_EDITOR_POTIONEFFECT_AMPLIFIERLORE.getLines()));
 	private PPInteger duration = addComponent(new PPInteger("duration", this, "0", 0, Integer.MAX_VALUE, false, 2, EditorGUI.ICON_NUMBER, GLocale.GUI_GENERIC_EDITOR_POTIONEFFECT_DURATIONLORE.getLines()));
 
 	public CPPotionEffect(String id, Parseable parent, boolean mandatory, int editorSlot, Mat editorIcon, List<String> editorDescription) {
@@ -35,14 +35,14 @@ public class CPPotionEffect extends ContainerParseable {
 		return type.getParsedValue(parser);
 	}
 
-	public PPInteger getLevel() {
-		return level;
+	public PPInteger getAmplifier() {
+		return amplifier;
 	}
-
-	public Integer getLevel(Player parser) {
-		return level.getParsedValue(parser);
+	
+	public Integer getAmplifier(Player parser) {
+		return amplifier.getParsedValue(parser);
 	}
-
+	
 	public PPInteger getDuration() {
 		return duration;
 	}
@@ -50,14 +50,19 @@ public class CPPotionEffect extends ContainerParseable {
 	public Integer getDuration(Player parser) {
 		return duration.getParsedValue(parser);
 	}
+	
+	public PotionEffect getParsedValue(Player parser) {
+		PotionEffectType type = getType(parser);
+		Integer amplifier = getAmplifier(parser);
+		Integer duration = getDuration(parser);
+		return type != null && amplifier != null && duration != null ? new PotionEffect(type, duration, amplifier) : null;
+	}
 
 	// methods
 	public void give(LivingEntity entity, Player parser) {
-		PotionEffectType type = getType(parser);
-		int level = getLevel(parser);
-		int duration = getDuration(parser);
-		if (type != null && duration > 0) {
-			entity.addPotionEffect(new PotionEffect(type, duration, level == 0 ? level : level - 1));
+		PotionEffect effect = getParsedValue(parser);
+		if (effect != null) {
+			entity.addPotionEffect(effect);
 		}
 	}
 

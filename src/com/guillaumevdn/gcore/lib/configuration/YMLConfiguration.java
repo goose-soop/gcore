@@ -24,6 +24,9 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.Potion;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 
 import com.guillaumevdn.gcore.GCore;
@@ -36,7 +39,6 @@ import com.guillaumevdn.gcore.lib.messenger.Tab;
 import com.guillaumevdn.gcore.lib.messenger.Title;
 import com.guillaumevdn.gcore.lib.util.Utils;
 import com.guillaumevdn.gcore.lib.versioncompat.Compat;
-import com.guillaumevdn.gcore.lib.versioncompat.Compat.PotionData;
 
 /**
  * Represents a YML configuration file.
@@ -574,10 +576,13 @@ public class YMLConfiguration {
 			if (contains(path + ".potion")) {
 				List<String> raw = Utils.split(",", getString(path + ".potion", null), false);
 				PotionType type = Utils.valueOfOrNull(PotionType.class, raw.get(0));
-				int level = Utils.isInteger(raw.get(1)) ? Integer.parseInt(raw.get(1)) : 0;
+				int level = Utils.isInteger(raw.get(1)) ? Integer.parseInt(raw.get(1)) : 1;
 				boolean extended = Boolean.parseBoolean(raw.get(2));
 				boolean splash = Boolean.parseBoolean(raw.get(3));
-				ItemStack it = Compat.INSTANCE.buildPotion(type, level, extended, splash);
+				Potion potion = new Potion(type, level);
+				if (extended) potion.extend();
+				if (splash) potion.splash();
+				ItemStack it = potion.toItemStack(1);
 				item.setType(Mat.from(it.getType(), it.getDurability()));
 			}
 			/*// enchanted book
@@ -614,6 +619,18 @@ public class YMLConfiguration {
 					Enchantment ench = Compat.INSTANCE.getEnchantment(raw[0]);
 					int level = Integer.parseInt(raw[1]);
 					item.setEnchant(ench, level);
+				} catch (Throwable ignored) {}
+			}
+
+			// effects
+			List<String> effects = getList(path + ".effects", Utils.emptyList());
+			for (String effect : effects) {
+				try {
+					String[] raw = effect.split(",");
+					PotionEffectType type = Utils.potionEffectTypeOrNull(raw[0]);
+					int amplifier = Integer.parseInt(raw[1]);// FIXME v5 : test all of this potion thing, check amplifier, etc
+					int duration = Integer.parseInt(raw[2]);
+					item.addPotionEffect(new PotionEffect(type, duration, amplifier));
 				} catch (Throwable ignored) {}
 			}
 
@@ -757,22 +774,14 @@ public class YMLConfiguration {
 		if (saveId && item.getId() != null && !item.getId().isEmpty()) set(path + ".id", item.getId());
 		if (item.getSlot() >= 0) set(path + ".slot", item.getSlot());
 		if (item.getChance() >= 0) set(path + ".chance", item.getChance());
-		// potion
-		PotionData potion = Compat.INSTANCE.getPotionData(item.getItemStack());
-		if (potion != null) {
-			String potionString = potion.getType().toString() + "," + potion.getLevel() + "," + potion.isExtended() + "," + potion.isSplash();
-			set(path + ".potion", potionString);
+		// item (potion damage is saved in durability)
+		String type = item.getType().toString();
+		if (type.contains(":") || type.contains("(")) {
+			GCore.inst().warning("Exported mat '" + type + "'. Name '" + item.getType().getModernName() + ", legacy " + item.getType().getLegacyName() + "', toString() '" + item.getType().toString() + "', material '" + (item.getType().exists() ? "null" : String.valueOf(item.getType().getCurrentMaterial())) + "'. Please notify the developer with /gcore support");
 		}
-		// basic item
-		else {
-			String type = item.getType().toString();
-			if (type.contains(":") || type.contains("(")) {
-				GCore.inst().warning("Exported mat '" + type + "'. Name '" + item.getType().getModernName() + ", legacy " + item.getType().getLegacyName() + "', toString() '" + item.getType().toString() + "', material '" + (item.getType().exists() ? "null" : String.valueOf(item.getType().getCurrentMaterial())) + "'. Please notify the developer with /gcore support");
-			}
-			set(path + ".type", type);
-			if (item.getType().getDurability() != (short) 0) set(path + ".durability", (int) item.getType().getDurability());
-			if (item.isUnbreakable()) set(path + ".unbreakable", true);
-		}
+		set(path + ".type", type);
+		if (item.getType().getDurability() != (short) 0) set(path + ".durability", (int) item.getType().getDurability());
+		if (item.isUnbreakable()) set(path + ".unbreakable", true);
 		// amount
 		set(path + ".amount", item.getAmount());
 		// meta

@@ -7,7 +7,6 @@ import java.lang.reflect.Field;
 import java.util.List;
 
 import org.apache.commons.codec.binary.Base64;
-import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
@@ -15,8 +14,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.potion.PotionType;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Team;
@@ -99,24 +96,6 @@ public class Compat1_12 extends Compat {
 	@Override
 	public Score getScore(Objective objective, String name) {
 		return objective.getScore(name);
-	}
-
-	@Override
-	public ItemStack buildPotion(PotionType type, int level, boolean extended, boolean splash) {
-		ItemStack item = new ItemStack(splash ? Material.SPLASH_POTION : Material.POTION);
-		PotionMeta meta = (PotionMeta) item.getItemMeta();
-		meta.setBasePotionData(new org.bukkit.potion.PotionData(type, extended, level == 2));
-		item.setItemMeta(meta);
-		return item;
-	}
-
-	@Override
-	public PotionData getPotionData(ItemStack item) {
-		if (!item.getType().toString().contains("POTION")) {
-			return null;
-		}
-		PotionMeta meta = (PotionMeta) item.getItemMeta();
-		return new PotionData(meta.getBasePotionData().getType(), meta.getBasePotionData().isUpgraded() ? 2 : 1, meta.getBasePotionData().isExtended(), item.getType().equals(Material.SPLASH_POTION));
 	}
 
 	// https://bukkit.org/threads/serializing-a-nbt-tag.404362/

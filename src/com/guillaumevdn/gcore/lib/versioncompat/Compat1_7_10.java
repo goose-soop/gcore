@@ -8,8 +8,6 @@ import org.apache.commons.codec.binary.Base64;
 import org.bukkit.Bukkit;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.Potion;
-import org.bukkit.potion.PotionType;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Team;
@@ -21,24 +19,6 @@ public class Compat1_7_10 extends Compat {
 	@Override
 	public Score getScore(Objective objective, String name) {
 		return objective.getScore(Bukkit.getOfflinePlayer(name));
-	}
-
-	@Override
-	public ItemStack buildPotion(PotionType type, int level, boolean extended, boolean splash) {
-		Potion potion = new Potion(type, level, splash);
-		potion.setHasExtendedDuration(extended);
-		ItemStack item = potion.toItemStack(1);
-		return item;
-	}
-
-	@Override
-	public PotionData getPotionData(ItemStack item) {
-		try {
-			Potion potion = Potion.fromItemStack(item);
-			return new PotionData(potion.getType(), potion.getLevel(), potion.hasExtendedDuration(), potion.isSplash());
-		} catch (Throwable ignored) {
-			return null;
-		}
 	}
 
 	// https://bukkit.org/threads/serializing-a-nbt-tag.404362/

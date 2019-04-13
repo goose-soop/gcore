@@ -25,6 +25,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -2447,8 +2448,17 @@ public class Utils {
 	// Time
 	// ------------------------------------------------------------
 
-	public static long getMillisSince(long oldTime)
-	{
+	// https://stackoverflow.com/a/46604975
+	public static int getDaysInMonth(int calendarMonth, int calendarYear) {
+		Calendar calendar = Calendar.getInstance();
+		calendar.set(Calendar.YEAR, calendarYear);
+		calendar.set(Calendar.MONTH, calendarMonth++);// FIXME v5 : is year the actual year ?
+		return calendarMonth == 2 ? 
+				28 + (calendarYear % 4 == 0 ? 1:0) - (calendarYear % 100 == 0 ? (calendarYear % 400 == 0 ? 0 : 1) : 0)
+				: 31 - (calendarMonth-1) % 7 % 2;
+	}
+
+	public static long getMillisSince(long oldTime) {
 		if (oldTime == 0L) {
 			return -1L;
 		} else {

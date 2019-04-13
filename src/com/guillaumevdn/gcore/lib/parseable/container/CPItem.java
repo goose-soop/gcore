@@ -12,6 +12,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
 
 import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.GLocale;
@@ -20,6 +21,8 @@ import com.guillaumevdn.gcore.lib.material.Mat;
 import com.guillaumevdn.gcore.lib.parseable.ContainerParseable;
 import com.guillaumevdn.gcore.lib.parseable.Parseable;
 import com.guillaumevdn.gcore.lib.parseable.editor.EditorGUI;
+import com.guillaumevdn.gcore.lib.parseable.list.LPEnchantment;
+import com.guillaumevdn.gcore.lib.parseable.list.LPPotionEffect;
 import com.guillaumevdn.gcore.lib.parseable.primitive.PPBoolean;
 import com.guillaumevdn.gcore.lib.parseable.primitive.PPDouble;
 import com.guillaumevdn.gcore.lib.parseable.primitive.PPInteger;
@@ -38,13 +41,14 @@ public class CPItem extends ContainerParseable {
 	private PPInteger maxAmount = addComponent(new PPInteger("max_amount", this, "0", 0, Integer.MAX_VALUE, false, 4, EditorGUI.ICON_NUMBER, GLocale.GUI_GENERIC_EDITOR_ITEM_MAXAMOUNTLORE.getLines()));
 	private PPString name = addComponent(new PPString("name", this, null, false, 5, EditorGUI.ICON_STRING, GLocale.GUI_GENERIC_EDITOR_ITEM_NAMELORE.getLines()));
 	private PPStringList lore = addComponent(new PPStringList("lore", this, null, false, 6, EditorGUI.ICON_STRING_LIST, GLocale.GUI_GENERIC_EDITOR_ITEM_LORELORE.getLines()));
-	/* TODO : make this a LPEnchantment */ private PPStringList enchants = addComponent(new PPStringList("enchants", this, null, false, 7, EditorGUI.ICON_ENCHANTMENT, GLocale.GUI_GENERIC_EDITOR_ITEM_ENCHANTSLORE.getLines()));
-	private PPString nbt = addComponent(new PPString("nbt", this, null, false, 8, EditorGUI.ICON_NBT, GLocale.GUI_GENERIC_EDITOR_ITEM_NBTLORE.getLines()));
-	private PPBoolean enabled = addComponent(new PPBoolean("enabled", this, "true", false, 9, EditorGUI.ICON_BOOLEAN, GLocale.GUI_GENERIC_EDITOR_ITEM_ENABLEDLORE.getLines()));
-	private PPInteger slot = addComponent(new PPInteger("slot", this, "-1", -1, 54, false, 10, EditorGUI.ICON_NUMBER, GLocale.GUI_GENERIC_EDITOR_ITEM_SLOTLORE.getLines()));
-	private PPDouble chance = addComponent(new PPDouble("chance", this, "0", -1d, 100d, false, 11, EditorGUI.ICON_NUMBER, GLocale.GUI_GENERIC_EDITOR_ITEM_CHANCELORE.getLines()));
-	private PPBoolean mustHaveInHand = addComponent(new PPBoolean("must_have_in_hand", this, "false", false, 12, EditorGUI.ICON_BOOLEAN, GLocale.GUI_GENERIC_EDITOR_ITEM_MUSTHAVEINHANDLORE.getLines()));
-	private PPBoolean removeAfterAction = addComponent(new PPBoolean("remove_after_action", this, "false", false, 13, EditorGUI.ICON_BOOLEAN, GLocale.GUI_GENERIC_EDITOR_ITEM_REMOVEAFTERACTIONLORE.getLines()));
+	private LPEnchantment enchants = addComponent(new LPEnchantment("enchants", this, false, 7, EditorGUI.ICON_ENCHANTMENT, GLocale.GUI_GENERIC_EDITOR_ITEM_ENCHANTSLORE.getLines()));
+	private LPPotionEffect effects = addComponent(new LPPotionEffect("effects", this, false, 8, EditorGUI.ICON_POTION, GLocale.GUI_GENERIC_EDITOR_ITEM_EFFECTSLORE.getLines()));
+	private PPString nbt = addComponent(new PPString("nbt", this, null, false, 9, EditorGUI.ICON_NBT, GLocale.GUI_GENERIC_EDITOR_ITEM_NBTLORE.getLines()));
+	private PPBoolean enabled = addComponent(new PPBoolean("enabled", this, "true", false, 10, EditorGUI.ICON_BOOLEAN, GLocale.GUI_GENERIC_EDITOR_ITEM_ENABLEDLORE.getLines()));
+	private PPInteger slot = addComponent(new PPInteger("slot", this, "-1", -1, 54, false, 11, EditorGUI.ICON_NUMBER, GLocale.GUI_GENERIC_EDITOR_ITEM_SLOTLORE.getLines()));
+	private PPDouble chance = addComponent(new PPDouble("chance", this, "0", -1d, 100d, false, 12, EditorGUI.ICON_NUMBER, GLocale.GUI_GENERIC_EDITOR_ITEM_CHANCELORE.getLines()));
+	private PPBoolean mustHaveInHand = addComponent(new PPBoolean("must_have_in_hand", this, "false", false, 13, EditorGUI.ICON_BOOLEAN, GLocale.GUI_GENERIC_EDITOR_ITEM_MUSTHAVEINHANDLORE.getLines()));
+	private PPBoolean removeAfterAction = addComponent(new PPBoolean("remove_after_action", this, "false", false, 14, EditorGUI.ICON_BOOLEAN, GLocale.GUI_GENERIC_EDITOR_ITEM_REMOVEAFTERACTIONLORE.getLines()));
 
 	public CPItem(String id, Parseable parent, boolean mandatory, int editorSlot, Mat editorIcon, List<String> editorDescription) {
 		super(id, parent, "item", mandatory, editorSlot, editorIcon, editorDescription);
@@ -131,12 +135,12 @@ public class CPItem extends ContainerParseable {
 		return lore.getParsedValue(parser);
 	}
 
-	public PPStringList getEnchants() {
+	public LPEnchantment getEnchants() {
 		return enchants;
 	}
 
-	public List<String> getEnchants(Player parser) {
-		return enchants.getParsedValue(parser);
+	public LPPotionEffect getEffects() {
+		return effects;
 	}
 
 	public PPString getNbt() {
@@ -186,15 +190,19 @@ public class CPItem extends ContainerParseable {
 			item.setLore(getLore(parser));
 
 			// enchants
-			List<String> enchants = getEnchants(parser);
-			if (enchants != null) {
-				for (String enchant : enchants) {
-					try {
-						String[] raw = enchant.split(",");
-						Enchantment ench = Compat.INSTANCE.getEnchantment(raw[0]);
-						int level = Integer.parseInt(raw[1]);
-						item.setEnchant(ench, level);
-					} catch (Throwable ignored) {}
+			for (CPEnchantment enchant : enchants.getElements().values()) {
+				Enchantment type = enchant.getType(parser);
+				Integer level = enchant.getLevel(parser);
+				if (type != null && level != null) {
+					item.setEnchant(type, level);
+				}
+			}
+
+			// effects
+			for (CPPotionEffect effect : effects.getElements().values()) {
+				PotionEffect parsed = effect.getParsedValue(parser);
+				if (parsed != null) {
+					item.getEffects().add(parsed);
 				}
 			}
 
@@ -215,6 +223,7 @@ public class CPItem extends ContainerParseable {
 			}
 
 			// return
+			// FIXME v5 : don't cache if name/lore contain placeholders
 			cache.put(parser != null ? parser.getUniqueId() : null, item);
 		}
 		return cache.get(parser != null ? parser.getUniqueId() : null);

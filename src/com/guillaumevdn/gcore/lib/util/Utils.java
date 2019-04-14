@@ -88,8 +88,8 @@ import com.guillaumevdn.gcore.GLocale;
 import com.guillaumevdn.gcore.data.UserInfo;
 import com.guillaumevdn.gcore.lib.GPlugin;
 import com.guillaumevdn.gcore.lib.Logger;
-import com.guillaumevdn.gcore.lib.Perm;
 import com.guillaumevdn.gcore.lib.Logger.Level;
+import com.guillaumevdn.gcore.lib.Perm;
 import com.guillaumevdn.gcore.lib.material.Mat;
 import com.guillaumevdn.gcore.lib.messenger.Messenger;
 import com.guillaumevdn.gcore.lib.messenger.Replacer;
@@ -2452,7 +2452,7 @@ public class Utils {
 	public static int getDaysInMonth(int calendarMonth, int calendarYear) {
 		Calendar calendar = Calendar.getInstance();
 		calendar.set(Calendar.YEAR, calendarYear);
-		calendar.set(Calendar.MONTH, calendarMonth++);// FIXME v5 : is year the actual year ?
+		calendar.set(Calendar.MONTH, calendarMonth++);
 		return calendarMonth == 2 ? 
 				28 + (calendarYear % 4 == 0 ? 1:0) - (calendarYear % 100 == 0 ? (calendarYear % 400 == 0 ? 0 : 1) : 0)
 				: 31 - (calendarMonth-1) % 7 % 2;

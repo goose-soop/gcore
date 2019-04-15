@@ -9,6 +9,7 @@ import java.util.UUID;
 import com.comphenix.protocol.wrappers.WrappedSignedProperty;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
+import com.guillaumevdn.gcore.GCore;
 
 public class SkinData {
 
@@ -46,10 +47,7 @@ public class SkinData {
 		}
 		name = (String) skinPropandName[0];
 		// set data
-		setSkinData((Multimap<String, WrappedSignedProperty>) skinPropandName[1]);
-	}
-
-	private void setSkinData(Multimap<String, WrappedSignedProperty> multimap) {
+		Multimap<String, WrappedSignedProperty> multimap = (Multimap<String, WrappedSignedProperty>) skinPropandName[1];
 		if (multimap == null || !multimap.containsKey("textures")) {
 			skinData = null;
 			return;
@@ -60,6 +58,10 @@ public class SkinData {
 			return;
 		}
 		skinData = new WrappedProperty(wrappedSignedProperty.getName(), wrappedSignedProperty.getValue(), wrappedSignedProperty.getSignature());
+		// push
+		GCore.inst().getData().getNpcSkins().set(uuid, this);
+		// log
+		GCore.inst().debug("Refreshed NPC skin " + uuid);
 	}
 
 	public Multimap<String, WrappedSignedProperty> getSkinData() {

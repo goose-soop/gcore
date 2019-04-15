@@ -1,13 +1,15 @@
 package com.guillaumevdn.gcore.lib.npc.navigation;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.data.ModifiedNpcData;
-import com.guillaumevdn.gcore.data.PCUser;
+import com.guillaumevdn.gcore.data.GUser;
 import com.guillaumevdn.gcore.data.UserInfo;
 import com.guillaumevdn.gcore.lib.npc.Npc;
 import com.guillaumevdn.gcore.lib.npc.NpcData;
@@ -41,6 +43,26 @@ public class GroupNavigator extends PathfindingNavigator {
 
 	public Collection<UserInfo> getAllUsers() {
 		return allUsers;
+	}
+
+	@Override
+	public List<Npc> getAffected() {
+		List<Npc> npcs = new ArrayList<Npc>();
+		for (UserInfo info : allUsers) {
+			Player player = info.toPlayer();
+			if (player != null) {
+				Npc npc = GCore.inst().getNpcManager().getNpc(player, npcId);
+				if (npc != null) {
+					npcs.add(npc);
+				} else if (GCore.inst().getNpcManager().spawnNpc(player, npcId, npcData, null)) {
+					npc = GCore.inst().getNpcManager().getNpc(player, npcId);
+					if (npc != null) {
+						npcs.add(npc);
+					}
+				}
+			}
+		}
+		return npcs;
 	}
 
 	// methods
@@ -80,8 +102,8 @@ public class GroupNavigator extends PathfindingNavigator {
 	}
 
 	@Override
-	protected void onStep(Point step) {
-		move(step.toLocation(getWorld()));
+	protected void onStep(Location step) {
+		move(step);
 	}
 
 	@Override
@@ -91,16 +113,8 @@ public class GroupNavigator extends PathfindingNavigator {
 
 	// utils
 	private void move(Location location) {
-		for (UserInfo info : allUsers) {
-			// attempt to spawn and move/teleport
-			Player player = info.toPlayer();
-			if (player != null) {
-				GCore.inst().getNpcManager().spawnNpc(player, npcId, npcData, null);
-				Npc npc = GCore.inst().getNpcManager().getNpc(player, npcId);
-				if (npc != null) {
-					npc.move(location);
-				}
-			}
+		for (Npc npc : getAffected()) {
+			npc.move(location, npc.getLocation().getY() == location.getY());
 		}
 	}
 
@@ -108,7 +122,7 @@ public class GroupNavigator extends PathfindingNavigator {
 		for (UserInfo info : allUsers) {
 			new PCUserOperator(info) {
 				@Override
-				protected void process(PCUser user) {
+				protected void process(GUser user) {
 					ModifiedNpcData modif = user.getNpc(npcId);
 					if (modif == null) modif = new ModifiedNpcData(npcId, true);
 					modif.setLocation(location);

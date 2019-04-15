@@ -26,7 +26,7 @@ import com.guillaumevdn.gcore.lib.versioncompat.npc.NpcProtocols;
 public class NpcPacketListener implements PacketListener {
 
 	// base
-	private int lastInteract = -1;
+	private long lastInteract = 0L;
 
 	// overriden
 	@Override
@@ -48,13 +48,13 @@ public class NpcPacketListener implements PacketListener {
 	public void onPacketReceiving(PacketEvent packetEvent) {
 		PacketContainer packet = packetEvent.getPacket();
 		Player player = packetEvent.getPlayer();
-		if (packet.getType().equals((Object) PacketType.Play.Client.USE_ENTITY)) {
+		if (packet.getType().equals(PacketType.Play.Client.USE_ENTITY)) {
 			int entityId = (int) packet.getIntegers().read(0);
 			if (entityId < NpcProtocols.ENTITY_ID_BASE) {
 				return;
 			}
 			// not a known npc
-			int npcId = NpcProtocols.ENTITY_ID_BASE - entityId;
+			int npcId = entityId - NpcProtocols.ENTITY_ID_BASE;
 			Npc npc = null;
 			if (GCore.inst().getNpcManager() == null || (npc = GCore.inst().getNpcManager().getNpc(player, npcId)) == null) {
 				return;
@@ -79,13 +79,10 @@ public class NpcPacketListener implements PacketListener {
 				return;
 			}
 			// last interact (already interacted)
-			if (lastInteract == entityId) {
-				lastInteract = -1;
+			if (System.currentTimeMillis() - lastInteract < 50L) {
 				return;
 			}
-			if (action.equals(NpcAction.INTERACT)) {
-				lastInteract = entityId;
-			}
+			lastInteract = System.currentTimeMillis();
 			// event
 			if (action.equals(NpcAction.INTERACT)) {
 				Bukkit.getPluginManager().callEvent(new NpcInteractEvent(npc));

@@ -38,7 +38,7 @@ import com.guillaumevdn.gcore.commands.CommandItemNbt;
 import com.guillaumevdn.gcore.commands.CommandItemSetdura;
 import com.guillaumevdn.gcore.commands.CommandPlugins;
 import com.guillaumevdn.gcore.commands.CommandSetuserprofile;
-import com.guillaumevdn.gcore.data.PCDataManager;
+import com.guillaumevdn.gcore.data.GDataManager;
 import com.guillaumevdn.gcore.lib.GPlugin;
 import com.guillaumevdn.gcore.lib.UpdateCheck;
 import com.guillaumevdn.gcore.lib.command.CommandArgument;
@@ -151,7 +151,7 @@ public class GCore extends GPlugin {
 	// Data and configuration
 	// ------------------------------------------------------------
 
-	private PCDataManager dataManager = null;
+	private GDataManager dataManager = null;
 	private YMLConfiguration configuration = null;
 
 	private boolean allowCustomMaterials = false;
@@ -161,7 +161,7 @@ public class GCore extends GPlugin {
 		return configuration;
 	}
 
-	public PCDataManager getData() {
+	public GDataManager getData() {
 		return dataManager;
 	}
 
@@ -219,8 +219,25 @@ public class GCore extends GPlugin {
 			if (backend == null) {
 				backend = BackEnd.JSON;
 			}
-			this.dataManager = new PCDataManager(backend);
+			this.dataManager = new GDataManager(backend);
 			dataManager.enable();
+		}
+
+		// npc manager
+		if (npcManager == null) {
+			boolean hasProtocols = false;
+			try {
+				hasProtocols = NpcProtocols.INSTANCE != null;
+			} catch (Throwable ignored) {}
+			try {
+				if (hasProtocols && Utils.getPlugin("ProtocolLib") != null) {
+					(npcManager = new NpcManager()).enable();
+					success("Enabled NPC manager with ProtocolLib");
+				}
+			} catch (Throwable exception) {
+				exception.printStackTrace();
+			}
+			if (npcManager == null) debug("Couldn't enable NPC manager with ProtocolLib");
 		}
 
 		// auto update
@@ -251,15 +268,6 @@ public class GCore extends GPlugin {
 
 		// vault integration
 		registerPluginIntegration("Vault", VaultIntegration.class);
-
-		// npc manager
-		try {
-			if (NpcProtocols.INSTANCE != null && Utils.getPlugin("ProtocolLib") != null) {
-				(npcManager = new NpcManager()).enable();
-				debug("Enabled NPC manager with ProtocolLib");
-			}
-		} catch (Throwable ignored) {}
-		if (npcManager == null) debug("Couldn't enable NPC manager with ProtocolLib");
 
 		// reload inner (mainly settings)
 		innerReload();

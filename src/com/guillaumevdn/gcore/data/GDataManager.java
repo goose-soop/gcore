@@ -1,6 +1,8 @@
 package com.guillaumevdn.gcore.data;
 
 import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
@@ -13,15 +15,16 @@ import com.guillaumevdn.gcore.lib.npc.SkinData;
 import com.guillaumevdn.gcore.lib.util.Utils;
 import com.guillaumevdn.gcore.lib.versioncompat.npc.NpcProtocols;
 
-public class PCDataManager extends DataManager implements Listener {
+public class GDataManager extends DataManager implements Listener {
 
 	// base
 	private DataProfileBoard dataProfiles = null;
 	private StatisticsBoard statistics = null;
 	private NpcSkinBoard npcSkins = null;
+	private boolean mojangStatus = false, initializedNpcSkins = false;
 	private UserBoard userBoard = null;
 
-	public PCDataManager(BackEnd backend) {
+	public GDataManager(BackEnd backend) {
 		super(GCore.inst(), backend);
 	}
 
@@ -40,6 +43,14 @@ public class PCDataManager extends DataManager implements Listener {
 
 	public UserBoard getUsers() {
 		return userBoard;
+	}
+
+	public boolean getMojangStatus() {
+		return mojangStatus;
+	}
+
+	public boolean initializedNpcSkins() {
+		return initializedNpcSkins;
 	}
 
 	// methods
@@ -62,22 +73,37 @@ public class PCDataManager extends DataManager implements Listener {
 				npcSkins.pullAsync(new Callback() {
 					@Override
 					public void callback() {
+						// loaded
+						initializedNpcSkins = true;
 						// refresh skins
 						HashMap<String, Boolean> mojangStatus = MojangsterAPI.getMojangStatus();
-						if (mojangStatus.get("textures.minecraft.net") && mojangStatus.get("api.mojang.com") && mojangStatus.get("sessionserver.mojang.com") && mojangStatus.get("auth.mojang.com")) {
+						if (GDataManager.this.mojangStatus = (getStatus(mojangStatus, "textures.minecraft.net") && getStatus(mojangStatus, "api.mojang.com") && getStatus(mojangStatus, "sessionserver.mojang.com") && getStatus(mojangStatus, "authserver.mojang.com"))) {
+							// refresh loaded skins
 							for (SkinData skin : npcSkins.getAll().values()) {
 								skin.refresh();
 							}
+							// refresh and add new ones
+							for (UUID skin : GCore.inst().getNpcManager().getLoadSkinLater()) {
+								new SkinData(skin).refresh();// will be put it in the npc skins board
+							}
+							GCore.inst().getNpcManager().getLoadSkinLater().clear();
 						} else {
-							GCore.inst().error("Couldn't refresh skins (Mojang servers seems to be down)");
+							GCore.inst().error("Couldn't refresh npc skins (Mojang servers seems to be down)");
 						}
 					}
 				});
 			}
-		} catch (Throwable ignored) {}
+		} catch (Throwable exception) {
+			exception.printStackTrace();
+			GCore.inst().error("An error occured while initializing npc skins board (see above)");
+		}
 		// users
 		Bukkit.getPluginManager().registerEvents(userBoard = new UserBoard(), getPlugin());
 		userBoard.pullOnline();
+	}
+
+	private boolean getStatus(Map<String, Boolean> status, String id) {
+		return status.containsKey(id) && status.get(id);
 	}
 
 	@Override

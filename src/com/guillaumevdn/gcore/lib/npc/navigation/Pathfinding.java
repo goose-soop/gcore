@@ -2,12 +2,14 @@ package com.guillaumevdn.gcore.lib.npc.navigation;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -90,7 +92,7 @@ public abstract class Pathfinding {
 
 	// abstract methods
 	protected abstract void onFail();
-	protected abstract void onSuccess(List<Point> path);
+	protected abstract void onSuccess(List<Point> blocksPath, List<Location> smoothPath);
 
 	// methods
 	public void start() {
@@ -107,16 +109,29 @@ public abstract class Pathfinding {
 		// start exploring
 		state = State.EXPLORING;
 		task = new BukkitRunnable() {
+			private long started = System.currentTimeMillis();
 			@Override
 			public void run() {
 				// explore
 				if (state.equals(State.EXPLORING)) {
-					int result = explore();
-					if (result == 1) {// failed
+					int result;
+					if (System.currentTimeMillis() - started > 10000L) {// eventually stop because it's been too long : max 10 seconds of searching
+						result = 1;
+					} else {// or explore
+						try {
+							result = explore();
+						} catch (ConcurrentModificationException ignored) {
+							result = 0;
+						}
+					}
+					// failed
+					if (result == 1) {
 						cancel();
 						onFail();
 						return;
-					} else if (result == 2) {// success
+					}
+					// success
+					else if (result == 2) {
 						// initialize optimization
 						state = State.OPTIMIZING;
 					}
@@ -136,10 +151,51 @@ public abstract class Pathfinding {
 					while (!sortedPaths.isEmpty() && shortest == null) {
 						shortest = getShortestPath(++targetTolerance);
 					}
+					// smoother the path
+					List<Location> smooth = new ArrayList<Location>();
+					for (int i = 0; i < shortest.size(); ++i) {
+						Location current = shortest.get(i).toLocation(world).add(0.5d, 0d, 0.5d);
+						smooth.add(current);
+						// add step between this and next
+						if (i + 1 < shortest.size()) {
+							// same y
+							Location next = shortest.get(i + 1).toLocation(getWorld()).add(0.5d, 0d, 0.5d);
+							if (current.getY() == next.getY()) {
+								// add step in between the two blocks
+								double x = (current.getX() + next.getX()) / 2d;
+								double z = (current.getZ() + next.getZ()) / 2d;
+								smooth.add(new Location(getWorld(), x, current.getY(), z));
+							}
+							// jumping up
+							else if (current.getY() < next.getY()) {
+								// add steps for every difference block
+								double diff = next.getY() - current.getY();
+								for (double d = 0.5d; d <= diff; d += 0.5d) {
+									smooth.add(new Location(getWorld(), current.getX(), current.getY() + d, current.getZ()));
+								}
+								// add step in between the two blocks
+								double x = (current.getX() + next.getX()) / 2d;
+								double z = (current.getZ() + next.getZ()) / 2d;
+								smooth.add(new Location(getWorld(), x, current.getY() + diff, z));
+							}
+							// jumping down
+							else if (next.getY() < current.getY()) {
+								// add step in between the two blocks
+								double x = (current.getX() + next.getX()) / 2d;
+								double z = (current.getZ() + next.getZ()) / 2d;
+								smooth.add(new Location(getWorld(), x, current.getY(), z));
+								// add steps for every difference block
+								double diff = current.getY() - next.getY();
+								for (double d = 0.5d; d <= diff; d += 0.5d) {
+									smooth.add(new Location(getWorld(), next.getX(), current.getY() - d, next.getZ()));
+								}
+							}
+						}
+					}
 					// done
 					state = State.DONE;
 					cancel();
-					onSuccess(shortest);
+					onSuccess(shortest, smooth);
 					return;
 				}
 			}
@@ -297,7 +353,7 @@ public abstract class Pathfinding {
 		// not free
 		if (!isMatTraversable(Mat.from(world.getBlockAt(point.getX(), point.getY(), point.getZ())))) {
 			Point available = getFirstTraversableUp(point);
-			// no available block to jump on, or too high, or it's a fence
+			// no available block to jump on, or too high
 			if (available == null || available.getY() - point.getY() > yToleranceUp) {
 				return null;
 			}
@@ -329,6 +385,41 @@ public abstract class Pathfinding {
 		}
 	}
 
+	// TODO : this is not optimized at all, huge lags - find out why
+	/*private Point getLastTraversableDown(Point point) {
+		// check from current
+		Integer lastY = null, y = point.getY();
+		while (y > 0) {
+			Block block = world.getBlockAt(point.getX(), y, point.getZ());
+			if (isMatTraversable(Mat.from(block))) {
+				lastY = y--;
+			} else {
+				break;
+			}
+		}
+		// eventually found one
+		return lastY != null ? new Point(point.getX(), lastY, point.getZ()) : null;
+	}
+
+	private Point getFirstTraversableUp(Point point) {
+		// check from current
+		Integer lastY = null, y = point.getY();
+		while (y < 255) {
+			Block block = world.getBlockAt(point.getX(), y, point.getZ());
+			if (isMatTraversable(Mat.from(block))) {
+				lastY = y--;
+			} else {
+				if (lastY != null) {// already found one, break
+					break;
+				} else {
+					y--;
+				}
+			}
+		}
+		// eventually found one
+		return lastY != null ? new Point(point.getX(), lastY, point.getZ()) : null;
+	}*/
+
 	private Point getLastTraversableDown(Point point) {
 		int y = point.getY();
 		while (y-- > 0) {// -- so we check the argument on first iteration
@@ -351,11 +442,13 @@ public abstract class Pathfinding {
 		return null;
 	}
 
+
 	private static final List<String> TRAVERSABLE = Utils.asList("SAPLING", "RAIL", "GRASS", "BUSH", "DANDELION", "ORCHID", "BLUET", "TULIP", "DAISY", "MUSHROOM", "TORCH", "WHEAT", "SIGN", "LEVER", "PLATE", "PATH", "DOOR", "BUTTON", "CANE", "REPEATER", "COMPARATOR", "TRAPDOOR", "STEM", "VINE", "GATE", "LILY_PAD", "WART", "PORTAL", "TRIPWIRE", "CARROTS", "POTATOES", "CARPET", "FLOWER", "LILAC", "FERN", "BUSH", "BANNER", "PEONY", "END_GATEWAY");
 	private static final List<Mat> TRAVERSABLE_EXCEPTIONS = Utils.asList(Mat.GRASS_BLOCK, Mat.GRASS_PATH, Mat.REDSTONE_BLOCK, Mat.REDSTONE_LAMP);
 
 	private boolean isMatTraversable(Mat mat) {
 		if (mat.isAir()) return true;
+		if (mat.getCurrentMaterial().isBlock()) return false;
 		String smat = mat.getModernName();
 		for (String trav : TRAVERSABLE) {
 			if (smat.contains(trav)) {

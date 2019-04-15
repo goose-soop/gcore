@@ -65,15 +65,6 @@ public class Point {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (Utils.instanceOf(obj, Point.class)) {
-			Point other = (Point) obj;
-			return other.x == x && other.y == y && other.z == z;
-		}
-		return false;
-	}
-
-	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
@@ -81,6 +72,15 @@ public class Point {
 		result = prime * result + y;
 		result = prime * result + z;
 		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (Utils.instanceOf(obj, Point.class)) {
+			Point other = (Point) obj;
+			return other.x == x && other.y == y && other.z == z;
+		}
+		return false;
 	}
 
 }

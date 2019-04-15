@@ -217,18 +217,31 @@ public enum Sound {
 	VILLAGER_YES("VILLAGER_YES", "ENTITY_VILLAGER_YES"),
 	UI_TOAST_CHALLENGE_COMPLETE(null, "UI_TOAST_CHALLENGE_COMPLETE"),
 	UI_TOAST_IN(null, "UI_TOAST_IN"),
-	UI_TOAST_OUT(null, "UI_TOAST_OUT")
+	UI_TOAST_OUT(null, "UI_TOAST_OUT"),
+	ITEM_BUCKET_EMPTY(null, null, "ITEM_BUCKET_EMPTY"),
+	ITEM_BUCKET_EMPTY_FISH(null, null, "ITEM_BUCKET_EMPTY_FISH"),
+	ITEM_BUCKET_EMPTY_LAVA(null, null, "ITEM_BUCKET_EMPTY_LAVA"),
+	ITEM_BUCKET_FILL(null, null, "ITEM_BUCKET_FILL"),
+	ITEM_BUCKET_FILL_FISH(null, null, "ITEM_BUCKET_FILL_FISH"),
+	ITEM_BUCKET_FILL_LAVA(null, null, "ITEM_BUCKET_FILL_LAVA"),
+	ITEM_FLINTANDSTEEL_USE(null, null, "ITEM_FLINTANDSTEEL_USE"),
+	BLOCK_FIRE_EXTINGUISH(null, null, "BLOCK_FIRE_EXTINGUISH")
 	;
 
 	// ------------------------------------------------------------
 	// Fields and constructor
 	// ------------------------------------------------------------
 
-	private final String name_1_8, name_1_9;
+	private final String name_1_8, name_1_9, name_1_13;
 
 	private Sound(String n18, String n19) {
+		this(n18, n19, null);
+	}
+	
+	private Sound(String n18, String n19, String n113) {
 		this.name_1_8 = n18;
 		this.name_1_9 = n19;
+		this.name_1_13 = n113;
 	}
 
 	// ------------------------------------------------------------
@@ -238,8 +251,10 @@ public enum Sound {
 	public String getName() {
 		if (ServerVersion.CURRENT.isOrLess(ServerVersion.MC_1_8)) {
 			return name_1_8;
-		} else {
+		} else if (name_1_13 == null || ServerVersion.CURRENT.isLessThan(ServerVersion.MC_1_13)) {
 			return name_1_9;
+		} else {
+			return name_1_13;
 		}
 	}
 

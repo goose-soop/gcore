@@ -306,7 +306,7 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 					PotionMeta potion = (PotionMeta) meta;
 					potion.clearCustomEffects();
 					for (PotionEffect effect : effects) {
-						potion.addCustomEffect(effect, true);// FIXME v5 : what is that boolean :thinking:
+						potion.addCustomEffect(effect, true);
 					}
 				}
 				// set meta

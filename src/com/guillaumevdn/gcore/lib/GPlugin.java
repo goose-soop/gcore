@@ -207,18 +207,18 @@ public abstract class GPlugin extends JavaPlugin implements Listener {
 	public <T extends PluginIntegration> boolean registerPluginIntegration(String pluginName, Class<T> integrationClass, ServerVersion minVersion, ServerVersion maxVersion) {
 		// min version
 		if (minVersion != null && ServerVersion.CURRENT.isLessThan(minVersion)) {
-			debug("Not using " + pluginName + " integration (minimum required version is " + minVersion.getName() + ")");
+			debug("Not integrating " + pluginName + " (minimum required version is " + minVersion.getName() + ")");
 			return false;
 		}
 		// max version
 		if (maxVersion != null && ServerVersion.CURRENT.isGreaterThan(maxVersion)) {
-			debug("Not using " + pluginName + " integration (maximum allowed version is " + maxVersion.getName() + ")");
+			debug("Not integrating " + pluginName + " (maximum allowed version is " + maxVersion.getName() + ")");
 			return false;
 		}
 		// not installed
 		Plugin plugin = Utils.getPlugin(pluginName);
 		if (plugin == null) {
-			debug("Not using " + pluginName + " integration (not installed)");
+			debug("Not integrating " + pluginName + " (not installed)");
 			return false;
 		}
 		// register
@@ -230,7 +230,7 @@ public abstract class GPlugin extends JavaPlugin implements Listener {
 		// register to attempt when it's activated
 		catch (Throwable exception) {
 			exception.printStackTrace();
-			warning("Couldn't enable " + pluginName + " integration, a new attempt will be made when it's enabled/reloaded");
+			warning("Couldn't integrate " + pluginName + ", a new attempt will be made when it's enabled/reloaded");
 			if (getName().equals("QuestCreator")) warning("If this causes quests to not load on plugin activation, try to enable the delayed activation in config.yml");
 			awaitingPluginIntegration.put(pluginName, integrationClass);
 		}
@@ -252,7 +252,7 @@ public abstract class GPlugin extends JavaPlugin implements Listener {
 		PluginIntegration integration = integrationClass.getConstructor(String.class).newInstance(pluginName);
 		integration.enable();
 		pluginIntegration.add(integration);
-		success("Enabled " + pluginName + " integration");
+		success("Integrated " + pluginName);
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)

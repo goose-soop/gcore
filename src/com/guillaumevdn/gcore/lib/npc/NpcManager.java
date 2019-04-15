@@ -23,8 +23,8 @@ import org.bukkit.scheduler.BukkitTask;
 
 import com.comphenix.protocol.ProtocolLibrary;
 import com.guillaumevdn.gcore.GCore;
+import com.guillaumevdn.gcore.data.GUser;
 import com.guillaumevdn.gcore.data.ModifiedNpcData;
-import com.guillaumevdn.gcore.data.PCUser;
 import com.guillaumevdn.gcore.lib.gui.ItemData;
 import com.guillaumevdn.gcore.lib.npc.navigation.Navigator;
 import com.guillaumevdn.gcore.lib.util.Utils;
@@ -36,6 +36,7 @@ public class NpcManager implements Listener {
 	private NpcPacketListener packetListener = null;
 	private Map<Player, Map<Integer, Npc>> npcs = new HashMap<Player, Map<Integer, Npc>>();
 	private List<Navigator> navigators = new ArrayList<Navigator>();
+	private List<UUID> loadSkinLater = new ArrayList<UUID>();
 
 	// get
 	public Npc getNpc(Player player, int id) {
@@ -51,6 +52,16 @@ public class NpcManager implements Listener {
 		return Collections.unmodifiableList(navigators);
 	}
 
+	public List<Navigator> getNavigators(Npc npc) {
+		List<Navigator> result = new ArrayList<Navigator>();
+		for (Navigator navigator : navigators) {
+			if (navigator.getAffected().contains(npc)) {
+				result.add(navigator);
+			}
+		}
+		return result;
+	}
+
 	public void addNavigator(Navigator navigator) {
 		navigators.add(navigator);
 	}
@@ -59,14 +70,26 @@ public class NpcManager implements Listener {
 		navigators.remove(navigator);
 	}
 
+	public List<UUID> getLoadSkinLater() {
+		return loadSkinLater;
+	}
+
+	public void loadSkinLater(UUID skin) {
+		if (GCore.inst().getData().initializedNpcSkins()) {
+			if (GCore.inst().getData().getMojangStatus()) {
+				new SkinData(skin).refresh();// will be put it in the npc skins board
+			}
+		} else if (!loadSkinLater.contains(skin)) {
+			loadSkinLater.add(skin);
+		}
+	}
+
 	// methods
 	public void addNpc(Player player, Npc npc) {
-		if (!npcs.containsKey(player)) {
-			Map<Integer, Npc> playerNpcs = npcs.get(player);
-			if (playerNpcs == null) npcs.put(player, playerNpcs = new HashMap<Integer, Npc>());
-			playerNpcs.put(npc.getId(), npc);
-			npc.spawn();
-		}
+		Map<Integer, Npc> playerNpcs = npcs.get(player);
+		if (playerNpcs == null) npcs.put(player, playerNpcs = new HashMap<Integer, Npc>());
+		playerNpcs.put(npc.getId(), npc);
+		npc.spawn();
 	}
 
 	public void removeNpc(Player player, Npc npc) {
@@ -104,7 +127,7 @@ public class NpcManager implements Listener {
 			return false;
 		}
 		// not shown
-		PCUser user = PCUser.get(player);
+		GUser user = GUser.get(player);
 		ModifiedNpcData userNpcData = user.getNpc(id);
 		if ((userNpcData != null && !userNpcData.isShown()) || !npcData.getShown(player)) {
 			return false;
@@ -132,10 +155,8 @@ public class NpcManager implements Listener {
 				else if (i == 5) items[i] = npcData.getHelmet(player);
 			}
 		}
-		// create npc
-		Npc npc = new Npc(player, id, name, skin, location, targetDistance, status, items);
-		npc.spawn();
-		addNpc(player, npc);
+		// create npc and spawn it
+		addNpc(player, new Npc(player, id, name, skin, location, targetDistance, status, items));
 		// spawn
 		return true;
 	}
@@ -153,7 +174,7 @@ public class NpcManager implements Listener {
 					}
 				}
 			}
-		}.runTaskTimer(GCore.inst(), 300L, delay);
+		}.runTaskTimer(GCore.inst(), 100L, delay);
 		// listeners
 		Bukkit.getPluginManager().registerEvents(this, GCore.inst());
 		ProtocolLibrary.getProtocolManager().addPacketListener(packetListener = new NpcPacketListener());
@@ -179,8 +200,10 @@ public class NpcManager implements Listener {
 		npcs.clear();
 		// listeners
 		HandlerList.unregisterAll(this);
-		ProtocolLibrary.getProtocolManager().removePacketListener(packetListener);
-		packetListener = null;
+		if (packetListener != null) {
+			ProtocolLibrary.getProtocolManager().removePacketListener(packetListener);
+			packetListener = null;
+		}
 	}
 
 	// events

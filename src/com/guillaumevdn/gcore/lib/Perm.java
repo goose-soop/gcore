@@ -3,8 +3,6 @@ package com.guillaumevdn.gcore.lib;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 
-import com.guillaumevdn.gcore.GCore;
-
 public class Perm {
 
 	// base
@@ -19,7 +17,7 @@ public class Perm {
 		this.parent = parent;
 		this.name = name;
 		if (log && !name.isEmpty()) {
-			GCore.inst().debug("Loaded permission " + name);
+			//GCore.inst().debug("Loaded permission " + name);
 		}
 	}
 

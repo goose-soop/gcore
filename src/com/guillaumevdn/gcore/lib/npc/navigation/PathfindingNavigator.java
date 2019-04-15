@@ -2,6 +2,7 @@ package com.guillaumevdn.gcore.lib.npc.navigation;
 
 import java.util.List;
 
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -22,8 +23,8 @@ public abstract class PathfindingNavigator implements Navigator {
 	private Pathfinding pathfinding = null;
 	private BukkitTask task = null;
 	private Integer index = null;
-	private List<Point> path = null;
-	private Point currentStep = null;
+	private List<Location> path = null;
+	private Location currentStep = null;
 
 	// constructor
 	public PathfindingNavigator(World world, Point start, Point target, int pathfindingStep, int pathfindingSpeed, int yToleranceUp, int yToleranceDown, double targetDistanceTolerance, long ticksPerStep) {
@@ -55,12 +56,12 @@ public abstract class PathfindingNavigator implements Navigator {
 	}
 
 	@Override
-	public List<Point> getPath() {
+	public List<Location> getPath() {
 		return path;
 	}
 
 	@Override
-	public Point getCurrentStep() {
+	public Location getCurrentStep() {
 		return currentStep;
 	}
 
@@ -80,7 +81,7 @@ public abstract class PathfindingNavigator implements Navigator {
 	}
 
 	// abstract methods
-	protected abstract void onStep(Point step);
+	protected abstract void onStep(Location step);
 	protected abstract void onFail();
 	protected abstract void onSuccess();
 
@@ -102,10 +103,11 @@ public abstract class PathfindingNavigator implements Navigator {
 				PathfindingNavigator.this.onFail();
 			}
 			@Override
-			protected void onSuccess(final List<Point> path) {
+			protected void onSuccess(List<Point> blocksPath, List<Location> smoothPath) {
+				// start travelling
 				state = PathfindingNavigator.State.TRAVELLING;
 				index = -1;
-				PathfindingNavigator.this.path = path;
+				path = smoothPath;
 				task = new BukkitRunnable() {
 					@Override
 					public void run() {

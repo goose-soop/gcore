@@ -24,18 +24,18 @@ import com.guillaumevdn.gcore.lib.data.mysql.Query;
 import com.guillaumevdn.gcore.lib.event.UserDataProfileChangedEvent;
 import com.guillaumevdn.gcore.lib.util.Utils;
 
-public class UserBoard extends DataBoard<PCUser> implements Listener {
+public class UserBoard extends DataBoard<GUser> implements Listener {
 
 	// fields
-	private Map<UserInfo, PCUser> cache = new HashMap<UserInfo, PCUser>();
+	private Map<UserInfo, GUser> cache = new HashMap<UserInfo, GUser>();
 
 	// get
-	public Map<UserInfo, PCUser> getCache() {
+	public Map<UserInfo, GUser> getCache() {
 		return Collections.unmodifiableMap(cache);
 	}
 
 	@Override
-	public PCUser getElement(Object param) {
+	public GUser getElement(Object param) {
 		if (param instanceof OfflinePlayer) {
 			return cache.get(new UserInfo((OfflinePlayer) param));
 		} else if (param instanceof UUID) {
@@ -49,11 +49,11 @@ public class UserBoard extends DataBoard<PCUser> implements Listener {
 	// methods
 	public void pullOnline() {
 		// get users
-		final List<PCUser> toPull = new ArrayList<PCUser>();
+		final List<GUser> toPull = new ArrayList<GUser>();
 		for (Player pl : Utils.getOnlinePlayers()) {
 			UserInfo info = new UserInfo(pl);
-			PCUser user = cache.get(info);
-			if (user == null) cache.put(info, user = new PCUser(info));// add to cache
+			GUser user = cache.get(info);
+			if (user == null) cache.put(info, user = new GUser(info));// add to cache
 			toPull.add(user);// add to pull list
 		}
 		// pull users
@@ -66,11 +66,11 @@ public class UserBoard extends DataBoard<PCUser> implements Listener {
 	 */
 	public void loadUser(UserInfo info, Callback callback) {
 		// get user or add to cache
-		PCUser user;
+		GUser user;
 		if (cache.containsKey(info)) {
 			user = cache.get(info);
 		} else {
-			cache.put(info, user = new PCUser(info));
+			cache.put(info, user = new GUser(info));
 		}
 		// pull user
 		user.pullAsync(callback);
@@ -82,7 +82,7 @@ public class UserBoard extends DataBoard<PCUser> implements Listener {
 	 */
 	public void unloadUser(UserInfo info) {
 		// loaded
-		PCUser user = cache.remove(info);
+		GUser user = cache.remove(info);
 		if (user != null) {
 			// despawn npcs if online
 			Player player = info.toPlayer();
@@ -118,12 +118,12 @@ public class UserBoard extends DataBoard<PCUser> implements Listener {
 
 	// data
 	@Override
-	public PCDataManager getDataManager() {
+	public GDataManager getDataManager() {
 		return GCore.inst().getData();
 	}
 
 	@Override
-	protected final File getJsonFile(PCUser element) {
+	protected final File getJsonFile(GUser element) {
 		return new File(GCore.inst().getUserDataRootFolder() + "/" + element.getDataId() + "/gcore_user.json");
 	}
 

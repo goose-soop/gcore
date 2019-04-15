@@ -12,6 +12,7 @@ public class NpcEvent extends PlayerEvent {
 
 	public NpcEvent(Npc npc) {
 		super(npc.getPlayer());
+		this.npc = npc;
 	}
 
 	// get

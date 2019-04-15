@@ -43,7 +43,7 @@ public class MojangsterAPI {
 	public static HashMap<String, Boolean> getMojangStatus() {
 		final HashMap<String, Boolean> hashMap = new HashMap<String, Boolean>();
 		try {
-			final InputStream inputStream = ((HttpURLConnection)makeConnection(new URL("http://status.mojang.com/check"))).getInputStream();
+			final InputStream inputStream = ((HttpURLConnection) makeConnection(new URL("http://status.mojang.com/check"))).getInputStream();
 			try {
 				final JSONArray jsonArray = (JSONArray)new JSONParser().parse(readAll(new BufferedReader(new InputStreamReader(inputStream, Charset.forName("UTF-8")))));
 				for (int i = 0; i < jsonArray.size(); ++i) {

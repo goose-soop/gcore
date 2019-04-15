@@ -12,10 +12,10 @@ import com.guillaumevdn.gcore.lib.data.DataElement;
 import com.guillaumevdn.gcore.lib.data.mysql.Query;
 import com.guillaumevdn.gcore.lib.util.Utils;
 
-public class PCUser extends DataElement {
+public class GUser extends DataElement {
 
 	// static get
-	public static PCUser get(Object param) {
+	public static GUser get(Object param) {
 		return GCore.inst().getData().getUsers().getElement(param);
 	}
 
@@ -23,7 +23,7 @@ public class PCUser extends DataElement {
 	private UserInfo user;
 	private Map<Integer, ModifiedNpcData> npcs = new HashMap<Integer, ModifiedNpcData>();
 
-	PCUser(UserInfo user) {
+	GUser(UserInfo user) {
 		this.user = user;
 	}
 
@@ -82,7 +82,7 @@ public class PCUser extends DataElement {
 
 	private static final class JsonData {
 		private final Map<Integer, ModifiedNpcData> npcs;
-		private JsonData(PCUser user) {
+		private JsonData(GUser user) {
 			this.npcs = user.npcs;
 		}
 	}

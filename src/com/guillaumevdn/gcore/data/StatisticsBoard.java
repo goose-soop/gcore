@@ -75,7 +75,7 @@ public class StatisticsBoard extends DataSingleton {
 
 	// data
 	@Override
-	public PCDataManager getDataManager() {
+	public GDataManager getDataManager() {
 		return GCore.inst().getData();
 	}
 

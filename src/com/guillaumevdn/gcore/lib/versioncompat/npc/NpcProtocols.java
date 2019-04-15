@@ -13,6 +13,9 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.utility.MinecraftReflection;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.guillaumevdn.gcore.lib.util.Utils;
@@ -20,9 +23,9 @@ import com.guillaumevdn.gcore.lib.util.Utils;
 public abstract class NpcProtocols {
 
 	// static base
-	/** Can be null if ProtocolLib isn't installed */
+	/** Can be null if ProtocolLib isn't installed or if there's no support for this Minecraft version */
 	public static final NpcProtocols INSTANCE = Utils.createNPCProtocols();
-	public static final int ENTITY_ID_BASE = 694000;
+	public static final int ENTITY_ID_BASE = 302300;
 
 	public void init() {
 	}
@@ -38,14 +41,30 @@ public abstract class NpcProtocols {
 	public abstract void sendInventory(Player player, int entityId, ItemStack... items);
 
 	// position
-	public abstract void sendTarget(Player player, int entityId, double yaw, double pitch);
-	public abstract void relativeMove(Player player, int entityId, Location location, Location location2);
+	public final void sendTarget(Player player, int entityId, double yaw, double pitch) {
+		// create look packet
+		byte yawAngle = (byte) (yaw * 256d / 360d);
+		byte pitchAngle = (byte) (pitch * 256d / 360d);
+		PacketContainer lookPacket = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.ENTITY_LOOK);
+		lookPacket.getIntegers().write(0, entityId);
+		lookPacket.getBytes().write(0, yawAngle);
+		lookPacket.getBytes().write(1, pitchAngle);
+		// create rotation packet
+		PacketContainer rotationPacket = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.ENTITY_HEAD_ROTATION);
+		rotationPacket.getIntegers().write(0, entityId);
+		rotationPacket.getBytes().write(0, yawAngle);
+		// send packets
+		sendPacket(player, lookPacket);
+		sendPacket(player, rotationPacket);
+	}
+
+	public abstract void relativeMove(Player player, int entityId, Location previous, Location location, boolean onGround);
 	public abstract void teleport(Player player, int entityId, Location location);
 	public abstract void remove(Player player, int entityId);
 	public abstract WrappedDataWatcher spawn(Player player, int entityId, String name, Location location, UUID skinData);
 
 	// text
-	public Object createNMStext(String str) {
+	public final Object createNMSText(String str) {
 		if (str == null || str.length() == 0) {
 			return null;
 		}
@@ -56,6 +75,15 @@ public abstract class NpcProtocols {
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
+		}
+	}
+
+	// send packet
+	public final void sendPacket(Player player, PacketContainer packet) {
+		try {
+			ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet);
+		} catch (Exception exception) {
+			exception.printStackTrace();
 		}
 	}
 

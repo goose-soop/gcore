@@ -12,14 +12,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Vector;
 
+import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.lib.event.NpcDespawnEvent;
 import com.guillaumevdn.gcore.lib.event.NpcMoveEvent;
 import com.guillaumevdn.gcore.lib.event.NpcSpawnEvent;
 import com.guillaumevdn.gcore.lib.event.NpcTeleportEvent;
 import com.guillaumevdn.gcore.lib.gui.ItemData;
-import com.guillaumevdn.gcore.lib.npc.navigation.Navigator;
+import com.guillaumevdn.gcore.lib.util.Pair;
 import com.guillaumevdn.gcore.lib.util.Utils;
 import com.guillaumevdn.gcore.lib.versioncompat.npc.NpcProtocols;
 
@@ -35,7 +35,6 @@ public class Npc {
 	private Set<NpcStatus> status = new HashSet<NpcStatus>();
 	private ItemData[] items = new ItemData[6];
 	private boolean spawned = false;
-	private Navigator navigator = null;
 
 	public Npc(final Player player, final int id, String name, UUID skin, Location location, double targetDistance, Set<NpcStatus> status, ItemData[] items) {
 		this.player = player;
@@ -95,10 +94,6 @@ public class Npc {
 		return spawned;
 	}
 
-	public Navigator getNavigator() {
-		return navigator;
-	}
-
 	// set
 	public void setTargetDistance(double targetDistance) {
 		this.targetDistance = targetDistance;
@@ -108,20 +103,17 @@ public class Npc {
 	/** @return the update result */
 	public UpdateResult update() {
 		// invalid world/location, must despawn
-		Double distance = null;
-		if (!spawned) {
-			distance = Utils.distance(location, player.getLocation());
-			if (distance < 0d || distance > 50d) {
-				return despawn() ? UpdateResult.DESPAWNED : UpdateResult.NONE;// eventually despawn
-			}
+		Double distance = Utils.distance(location, player.getLocation());
+		if (distance < 0d || distance > 50d) {
+			return despawn() ? UpdateResult.DESPAWNED : UpdateResult.NONE;// eventually despawn
 		}
 		// eventually spawn
 		boolean justSpawned = false;
 		if (spawn()) {
 			justSpawned = true;
 		}
-		// eventually target player
-		if (targetDistance > 0d && (distance == null ? distance = Utils.distance(location, player.getLocation()) : distance) <= targetDistance) {
+		// eventually target player if not in any navigator
+		if (targetDistance > 0d && distance <= targetDistance && GCore.inst().getNpcManager().getNavigators(this).isEmpty()) {
 			target(player.getEyeLocation());
 			return justSpawned ? UpdateResult.SPAWNED : UpdateResult.TARGETED_PLAYER;
 		}
@@ -168,20 +160,36 @@ public class Npc {
 	}
 
 	// methods : location
+	// https://wiki.vg/Protocol#Player_Look
 	public void target(Location target) {
-		target(getLocalAngle(new Vector(target.getX(), 0d, location.getZ()), target.toVector()), location.getPitch());
+		Pair<Float, Float> look = getTargetLook(location.clone().add(0d, 1.8d, 0d), target);
+		target(look.getA(), look.getB());
 	}
 
-	public void target(double yaw, double pitch) {
+	public static Pair<Float, Float> getTargetLook(Location location, Location target) {
+		double x0 = location.getX(), y0 = location.getY(), z0 = location.getZ();
+		double x = target.getX(), y = target.getY(), z = target.getZ();
+		double dx = x - x0;
+		double dy = y - y0;
+		double dz = z - z0;
+		double r = Math.sqrt(dx * dx + dy * dy + dz * dz);
+		double yaw = -Math.atan2(dx, dz) / Math.PI * 180d;
+		if (yaw < 0) yaw = 360d + yaw;
+		double pitch = -Math.asin(dy / r) / Math.PI * 180d;
+		return new Pair<Float, Float>((float) yaw, (float) pitch);
+	}
+
+	public void target(float yaw, float pitch) {
 		// not spawned
 		if (!spawned) {
 			return;
 		}
 		// target
+		location = new Location(location.getWorld(), location.getX(), location.getY(), location.getZ(), yaw, pitch);
 		NpcProtocols.INSTANCE.sendTarget(player, getEntityId(), yaw, pitch);
 	}
 
-	public void move(Location location) {
+	public void move(Location location, boolean onGround) {
 		// not in the same world
 		if (!location.getWorld().equals(this.location.getWorld())) {
 			return;
@@ -196,7 +204,7 @@ public class Npc {
 		this.location = location;
 		// update player
 		if (spawned) {// already spawned
-			NpcProtocols.INSTANCE.relativeMove(player, getEntityId(), previous, location);
+			NpcProtocols.INSTANCE.relativeMove(player, getEntityId(), previous, location, onGround);
 		} else {// spawn
 			spawn();
 		}
@@ -303,10 +311,22 @@ public class Npc {
 		spawn();
 	}
 
-	// utils
-	private float getLocalAngle(Vector vector, Vector vector2) {
-		float n = (float) Math.toDegrees(Math.atan2(vector2.getZ() - vector.getZ(), vector2.getX() - vector.getX())) - 90.0f;
-		return n < 0.0f ? n + 360.0f : n;
+	// equals
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + id;
+		result = prime * result + player.getUniqueId().hashCode();
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (!(obj instanceof Npc)) return false;
+		Npc other = (Npc) obj;
+		return other.id == id && other.player.getUniqueId().equals(player.getUniqueId());
 	}
 
 }

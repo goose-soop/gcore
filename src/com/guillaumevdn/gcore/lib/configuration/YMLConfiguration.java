@@ -628,7 +628,7 @@ public class YMLConfiguration {
 				try {
 					String[] raw = effect.split(",");
 					PotionEffectType type = Utils.potionEffectTypeOrNull(raw[0]);
-					int amplifier = Integer.parseInt(raw[1]);// FIXME v5 : test all of this potion thing, check amplifier, etc
+					int amplifier = Integer.parseInt(raw[1]);// FIXME v5 : test all of this potion thing, check amplifier, etc + test the damn arrow effect thing
 					int duration = Integer.parseInt(raw[2]);
 					item.addPotionEffect(new PotionEffect(type, duration, amplifier));
 				} catch (Throwable ignored) {}

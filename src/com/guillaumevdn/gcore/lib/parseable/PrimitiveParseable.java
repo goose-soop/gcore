@@ -12,8 +12,19 @@ import com.guillaumevdn.gcore.lib.util.Utils;
 
 public abstract class PrimitiveParseable<T> extends Parseable {
 
-	// compact list separator
+	// static
 	public static final String PRIMITIVE_COMPACT_LIST_SEPARATOR = ",,";
+	public static final List<Character> PARSE_INDICATORS = Utils.asList('{', '%');
+
+	public static boolean isParseable(String string) {
+		if (string == null) return false;
+		for (char c : string.toCharArray()) {
+			if (PARSE_INDICATORS.contains(c)) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	// base
 	private String typeName;
@@ -38,19 +49,18 @@ public abstract class PrimitiveParseable<T> extends Parseable {
 	public List<String> getValue() {
 		return value;
 	}
+	
+	public List<Integer> getParseableIndexes() {
+		return parseableIndexes;
+	}
 
-	private static final List<Character> parseIndicators = Utils.asList('{', '%');
 	public void setValue(List<String> value) {
 		if (this.value != null) parseableIndexes.clear();
 		this.value = value;
 		if (value != null) {
 			for (int lineIndex = 0; lineIndex < value.size(); ++lineIndex) {
-				String line = value.get(lineIndex);
-				for (char valueChar : line.toCharArray()) {
-					if (parseIndicators.contains(valueChar)) {
-						parseableIndexes.add(lineIndex);
-						break;
-					}
+				if (isParseable(value.get(lineIndex))) {
+					parseableIndexes.add(lineIndex);
 				}
 			}
 		}

@@ -20,6 +20,7 @@ import com.guillaumevdn.gcore.lib.gui.ItemData;
 import com.guillaumevdn.gcore.lib.material.Mat;
 import com.guillaumevdn.gcore.lib.parseable.ContainerParseable;
 import com.guillaumevdn.gcore.lib.parseable.Parseable;
+import com.guillaumevdn.gcore.lib.parseable.PrimitiveParseable;
 import com.guillaumevdn.gcore.lib.parseable.editor.EditorGUI;
 import com.guillaumevdn.gcore.lib.parseable.list.LPEnchantment;
 import com.guillaumevdn.gcore.lib.parseable.list.LPPotionEffect;
@@ -185,9 +186,22 @@ public class CPItem extends ContainerParseable {
 			// amount
 			item.setAmount(getAmount(parser));
 
-			// meta
-			item.setName(getName(parser));
-			item.setLore(getLore(parser));
+			// parse meta
+			String name = getName(parser);
+			List<String> lore = getLore(parser);
+			boolean metaPlaceholders = PrimitiveParseable.isParseable(name);
+			if (!metaPlaceholders && lore != null) {
+				for (String line : lore) {
+					if (PrimitiveParseable.isParseable(line)) {
+						metaPlaceholders = true;
+						break;
+					}
+				}
+			}
+
+			// set meta
+			item.setName(name);
+			item.setLore(lore);
 
 			// enchants
 			for (CPEnchantment enchant : enchants.getElements().values()) {
@@ -222,10 +236,15 @@ public class CPItem extends ContainerParseable {
 				item.setUnbreakable(true);
 			}
 
+			// cache if name/lore don't contain placeholders
+			if (!metaPlaceholders) {
+				cache.put(parser != null ? parser.getUniqueId() : null, item);
+			}
+
 			// return
-			// FIXME v5 : don't cache if name/lore contain placeholders
-			cache.put(parser != null ? parser.getUniqueId() : null, item);
+			return item;
 		}
+		// eventually return content of cache
 		return cache.get(parser != null ? parser.getUniqueId() : null);
 	}
 

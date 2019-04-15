@@ -32,4 +32,4 @@ show_debug: true
 allow_custom_materials: false
 
 # NPC update delay (in ticks)
-npc_update_delay: 5
+npc_update_delay: 2

@@ -23,13 +23,16 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.comphenix.protocol.wrappers.WrappedGameProfile;
 import com.guillaumevdn.gcore.GCore;
+import com.guillaumevdn.gcore.lib.npc.Npc;
 import com.guillaumevdn.gcore.lib.npc.SkinData;
+import com.guillaumevdn.gcore.lib.util.Pair;
 import com.guillaumevdn.gcore.lib.util.Utils;
 import com.mojang.authlib.GameProfile;
 
 import net.minecraft.server.v1_12_R1.EnumGamemode;
 import net.minecraft.server.v1_12_R1.EnumItemSlot;
 import net.minecraft.server.v1_12_R1.IChatBaseComponent;
+import net.minecraft.server.v1_12_R1.PacketPlayOutPlayerInfo;
 import net.minecraft.server.v1_12_R1.PacketPlayOutPlayerInfo.EnumPlayerInfoAction;
 import net.minecraft.server.v1_12_R1.PacketPlayOutPlayerInfo.PlayerInfoData;
 
@@ -82,9 +85,9 @@ public class NpcProtocols1_12 extends NpcProtocols {
 	public Object createPlayerInfo(Object gameProfile, GameMode gameMode, int entityId, String name) {
 		Object nmsGameMode = getNMSGameMode(GameMode.SURVIVAL);
 		try {
-			Constructor declaredConstructor = PlayerInfoData.class.getDeclaredConstructor(PlayerInfoData.class, GameProfile.class, Integer.TYPE, nmsGameMode.getClass(), IChatBaseComponent.class);
+			Constructor declaredConstructor = PlayerInfoData.class.getDeclaredConstructor(PacketPlayOutPlayerInfo.class, GameProfile.class, Integer.TYPE, nmsGameMode.getClass(), IChatBaseComponent.class);
 			declaredConstructor.setAccessible(true);
-			return declaredConstructor.newInstance(null, gameProfile, entityId, nmsGameMode, createNMStext(name));
+			return declaredConstructor.newInstance(null, gameProfile, entityId, nmsGameMode, createNMSText(name));
 		} catch (Throwable exception) {
 			exception.printStackTrace();
 			return null;
@@ -133,31 +136,21 @@ public class NpcProtocols1_12 extends NpcProtocols {
 
 	// location
 	@Override
-	public void sendTarget(Player player, int entityId, double yaw, double pitch) {
-		// create look packet
-		PacketContainer lookPacket = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.ENTITY_LOOK);
-		lookPacket.getIntegers().write(0, entityId);
-		lookPacket.getBytes().write(0, (byte) (yaw * 256.0 / 360.0));
-		// create rotation packet
-		PacketContainer rotationPacket = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.ENTITY_HEAD_ROTATION);
-		rotationPacket.getIntegers().write(0, entityId);
-		rotationPacket.getBytes().write(0, (byte) (pitch * 256.0 / 360.0));
-		// send packets
-		sendPacket(player, lookPacket);
-		sendPacket(player, rotationPacket);
-	}
-
-	@Override
-	public void relativeMove(Player player, int entityId, Location previous, Location location) {
+	public void relativeMove(Player player, int entityId, Location previous, Location location, boolean onGround) {
 		// create packet
 		PacketContainer packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.REL_ENTITY_MOVE);
 		packet.getIntegers().write(0, entityId);
 		packet.getIntegers().write(1, (int) ((location.getX() * 32.0 - previous.getX() * 32.0) * 128.0));
 		packet.getIntegers().write(2, (int) ((location.getY() * 32.0 - previous.getY() * 32.0) * 128.0));
 		packet.getIntegers().write(3, (int) ((location.getZ() * 32.0 - previous.getZ() * 32.0) * 128.0));
-		packet.getBooleans().write(0, true);
+		packet.getBooleans().write(0, onGround);
 		// send packet
 		sendPacket(player, packet);
+		// send look packet eventually, if the y difference is less than 0.5 block
+		if (Math.abs(previous.getY() - location.getY()) < 0.5d) {
+			Pair<Float, Float> look = Npc.getTargetLook(previous.clone().add(0d, 1d, 0d), location.clone().add(0d, 1d, 0d));
+			sendTarget(player, entityId, look.getA(), look.getB());
+		}
 	}
 
 	@Override
@@ -229,15 +222,6 @@ public class NpcProtocols1_12 extends NpcProtocols {
 		sendTarget(player, entityId, location.getYaw(), location.getPitch());
 		// success
 		return metadata;
-	}
-
-	// send packet
-	private static void sendPacket(Player player, PacketContainer packet) {
-		try {
-			ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet);
-		} catch (Exception exception) {
-			exception.printStackTrace();
-		}
 	}
 
 }

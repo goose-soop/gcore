@@ -89,7 +89,7 @@ public class ModifiedNpcData {
 
 	// methods
 	public boolean isEmpty() {
-		return name == null && skin == null && location == null && targetDistance == 5d && status == null && items == null;
+		return name == null && skin == null && location == null && targetDistance == null && status == null && items == null;
 	}
 
 }

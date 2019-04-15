@@ -2,6 +2,7 @@ package com.guillaumevdn.gcore.lib.npc.navigation;
 
 import java.util.List;
 
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -19,39 +20,44 @@ public abstract class SimpleNavigator implements Navigator {
 	private State state = State.WAITING;
 	private BukkitTask task = null;
 	private Integer index = null;
-	private List<Point> path;
-	private Point currentStep = null;
+	private List<Location> path;
+	private Location currentStep = null;
 
 	// constructor
-	public SimpleNavigator(World world, Point start, Point target, List<Point> path, long ticksPerStep) {
+	public SimpleNavigator(World world, Point start, Point target, List<Location> path, long ticksPerStep) {
 		this.world = world;
 		this.path = path;
 		this.ticksPerStep = ticksPerStep;
 	}
 
 	// get
+	@Override
 	public World getWorld() {
 		return world;
 	}
 
+	@Override
 	public Point getStart() {
 		return start;
 	}
 
+	@Override
 	public Point getTarget() {
 		return target;
 	}
 
-	public List<Point> getPath() {
+	@Override
+	public List<Location> getPath() {
 		return path;
 	}
 
-	public Point getCurrentStep() {
+	@Override
+	public Location getCurrentStep() {
 		return currentStep;
 	}
 
 	// abstract methods
-	protected abstract void onStep(Point step);
+	protected abstract void onStep(Location step);
 	protected abstract void onSuccess();
 
 	// methods
@@ -65,7 +71,6 @@ public abstract class SimpleNavigator implements Navigator {
 		state = SimpleNavigator.State.TRAVELLING;
 		GCore.inst().getNpcManager().addNavigator(this);
 		index = -1;
-		SimpleNavigator.this.path = path;
 		task = new BukkitRunnable() {
 			@Override
 			public void run() {

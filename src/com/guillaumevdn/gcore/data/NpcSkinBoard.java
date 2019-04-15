@@ -34,7 +34,7 @@ public class NpcSkinBoard extends DataSingletonDisk {
 	}
 
 	public void set(UUID player, SkinData profile) {
-
+		skins.put(player, profile);
 		pushAsync();
 	}
 

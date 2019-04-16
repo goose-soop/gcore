@@ -1,5 +1,6 @@
 package com.guillaumevdn.gcore.lib.gui;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,20 +16,136 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.lib.material.Mat;
 import com.guillaumevdn.gcore.lib.messenger.Replacer;
 import com.guillaumevdn.gcore.lib.util.Utils;
 import com.guillaumevdn.gcore.lib.versioncompat.Compat;
+import com.guillaumevdn.gcore.libs.com.google.gson.Gson;
+import com.guillaumevdn.gcore.libs.com.google.gson.GsonBuilder;
+import com.guillaumevdn.gcore.libs.com.google.gson.TypeAdapter;
+import com.guillaumevdn.gcore.libs.com.google.gson.adapter.AdapterClassFactory;
+import com.guillaumevdn.gcore.libs.com.google.gson.adapter.AdapterEnchantment;
+import com.guillaumevdn.gcore.libs.com.google.gson.adapter.AdapterMat;
+import com.guillaumevdn.gcore.libs.com.google.gson.adapter.AdapterPotionEffectType;
+import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonReader;
+import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonToken;
+import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonWriter;
 
 public class ItemData implements Comparable<ItemData>, Cloneable {
+
+	// serialization
+	public static class Adapter extends TypeAdapter<ItemData> {
+
+		@Override
+		public ItemData read(JsonReader reader) throws IOException {
+			if (reader.peek() == JsonToken.NULL) {
+				reader.nextNull();
+				return null;
+			} else if (reader.peek() == JsonToken.STRING) {
+				DataWrapper wrapper = GCore.GSON.fromJson(reader.nextString(), DataWrapper.class);
+				return wrapper != null ? wrapper.toItemData() : null;
+			} else {
+				return GSON_ITEMDATA.fromJson(reader, ItemData.class);
+			}
+		}
+
+		@Override
+		public void write(JsonWriter writer, ItemData obj) throws IOException {
+			if (obj == null) {
+				writer.nullValue();
+			} else {
+				writer.value(GSON_ITEMDATA.toJson(new DataWrapper(obj)));
+			}
+		}
+
+	}
+
+	private static class DataWrapper {
+
+		private String id = null;
+		private Boolean enabled = null;
+		private Integer slot = null;
+		private Double chance = null;
+		private Integer maxAmount = null;
+		private Boolean hideFlags = null;
+		private Mat type = null;
+		private Integer amount = null;
+		private List<PotionEffect> effects = null;
+		private Map<Enchantment, Integer> enchants = null;
+		private String name = null;
+		private List<String> lore = null;
+		private String customNbt = null;
+		private Boolean unbreakable = null;
+
+		private DataWrapper(ItemData item) {
+			if (item.id != null) id = item.id;
+			if (!item.enabled) enabled = false;
+			if (item.slot != -1) slot = item.slot;
+			if (item.chance > 0d) chance = item.chance;
+			if (item.maxAmount > 1) maxAmount = item.maxAmount;
+			if (item.hideFlags) hideFlags = true;
+			if (item.type != null) type = item.type;
+			if (item.amount != 1) amount = item.amount;
+			if (item.effects != null && !item.effects.isEmpty()) effects = item.effects;
+			if (item.enchants != null && !item.enchants.isEmpty()) enchants = item.enchants;
+			if (item.name != null) name = item.name;
+			if (item.lore != null && !item.lore.isEmpty()) lore = item.lore;
+			if (item.customNbt != null) {
+				try {
+					customNbt = Compat.INSTANCE.serializeNbt(item.customNbt);
+				} catch (IOException exception) {
+					exception.printStackTrace();
+					GCore.inst().error("Couldn't serialize custom NBT for item " + item.id + " (" + item.getType() + ")");
+				}
+			}
+			if (item.unbreakable) unbreakable = true;
+		}
+
+		private ItemData toItemData() {
+			ItemData item = new ItemData(id);
+			if (enabled != null) item.setEnabled(enabled);
+			if (slot != null) item.setSlot(slot);
+			if (chance != null) item.setChance(chance);
+			if (maxAmount != null) item.setMaxAmount(maxAmount);
+			if (hideFlags != null) item.setHideFlags(hideFlags);
+			if (type != null) item.setType(type);
+			if (amount != null) item.setAmount(amount);
+			if (effects != null) item.effects.addAll(effects);
+			if (enchants != null) item.enchants.putAll(enchants);
+			if (name != null) item.setName(name);
+			if (lore != null) item.setLore(lore);
+			if (customNbt != null) {
+				try {
+					item.setCustomNbt(Compat.INSTANCE.unserializeNbt(customNbt));
+				} catch (IOException exception) {
+					exception.printStackTrace();
+					GCore.inst().error("Couldn't unserialize custom NBT for item " + id + " (" + type + ")");
+				}
+			}
+			if (unbreakable != null) item.setUnbreakable(unbreakable);
+			return item;
+		}
+
+	}
+
+	private static Gson GSON_ITEMDATA = new GsonBuilder()
+			.registerTypeAdapterFactory(new AdapterClassFactory())
+			.registerTypeAdapter(Enchantment.class, new AdapterEnchantment())
+			.registerTypeAdapter(Mat.class, new AdapterMat())
+			.registerTypeAdapter(PotionEffectType.class, new AdapterPotionEffectType())
+			.enableComplexMapKeySerialization()
+			.disableInnerClassSerialization()
+			.serializeSpecialFloatingPointValues()
+			.create();
 
 	// fields : settings
 	private String id;
 	private boolean enabled = true;
 	private int slot = -1;
-	private double chance = -1D;
+	private double chance = -1d;
 	private int maxAmount = 0;
 	private boolean hideFlags = false;
 

@@ -90,6 +90,7 @@ import com.guillaumevdn.gcore.lib.GPlugin;
 import com.guillaumevdn.gcore.lib.Logger;
 import com.guillaumevdn.gcore.lib.Logger.Level;
 import com.guillaumevdn.gcore.lib.Perm;
+import com.guillaumevdn.gcore.lib.gui.ItemData;
 import com.guillaumevdn.gcore.lib.material.Mat;
 import com.guillaumevdn.gcore.lib.messenger.Messenger;
 import com.guillaumevdn.gcore.lib.messenger.Replacer;
@@ -265,8 +266,7 @@ public class Utils {
 	// Storage
 	// ------------------------------------------------------------
 
-	public static GsonBuilder createGsonBuilder()
-	{
+	public static GsonBuilder createGsonBuilder() {
 		return new GsonBuilder()
 				.registerTypeAdapterFactory(new AdapterClassFactory())
 				.registerTypeAdapter(Class.class, new AdapterClass())
@@ -288,6 +288,7 @@ public class Utils {
 				.registerTypeAdapter(Inventory.class, new AdapterInventory())
 				.registerTypeAdapter(Plugin.class, new AdapterPlugin())
 				.registerTypeAdapter(UserInfo.class, new AdapterUserInfo())
+				.registerTypeAdapter(ItemData.class, new ItemData.Adapter())
 				.enableComplexMapKeySerialization()
 				.disableInnerClassSerialization()
 				.serializeSpecialFloatingPointValues();

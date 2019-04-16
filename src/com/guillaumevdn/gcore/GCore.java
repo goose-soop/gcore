@@ -1,6 +1,7 @@
 package com.guillaumevdn.gcore;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -184,10 +185,29 @@ public class GCore extends GPlugin {
 
 	@Override
 	protected boolean preEnable() {
-		// FIXME v5 : convert here
-		// FIXME v5 : rename/move/convert mysql tables with gcore !
-		// FIXME v5 : move gcore config !
-		// FIXME v5 : move gcore data !
+		// conversion V7
+		// it failed earlier
+		File failed = new File(getDataFolder() + "/conversion_failed.oops");
+		if (failed.exists()) {
+			cancelEnable("file " + failed.getPath() + " was found. This means that GCore tried to convert your files from a previous version but an error occured. Please check relevant logs, fix the problem (eventually contact the developper), then delete that file and reboot the server.");
+			return false;
+		}
+		// attempt to convert
+		try {
+			new ConversionV7().start();
+		} catch (Throwable exception) {
+			// log
+			exception.printStackTrace();
+			cancelEnable("an error occured during the conversion of your files from a previous version. Please check relevant logs, fix the problem (eventually contact the developper), then delete that file and reboot the server.");
+			// create lock file
+			failed.getParentFile().mkdirs();
+			try {
+				failed.createNewFile();
+			} catch (IOException exc) {
+				exc.printStackTrace();
+			}
+			return false;
+		}
 		// spigot resource id
 		spigotResourceId = 24180;
 		// success
@@ -201,7 +221,8 @@ public class GCore extends GPlugin {
 		(this.userDataRootFolder = new File(getDataFolder() + "/userdata/")).mkdirs();
 
 		// configuration
-		this.configuration = new YMLConfiguration(this, new File(getDataFolder() + "/config.yml"), "config.yml", false, true);
+		this.configuration = new YMLConfiguration(this, new File(getDataFolder() + "/config.yml"), "config.yml", false,
+				true);
 		this.allowCustomMaterials = getConfiguration().getBoolean("allow_custom_materials", false);
 		success("Loaded config.yml");
 
@@ -227,7 +248,8 @@ public class GCore extends GPlugin {
 			boolean hasProtocols = false;
 			try {
 				hasProtocols = NpcProtocols.INSTANCE != null;
-			} catch (Throwable ignored) {}
+			} catch (Throwable ignored) {
+			}
 			try {
 				if (hasProtocols && Utils.getPlugin("ProtocolLib") != null) {
 					(npcManager = new NpcManager()).enable();
@@ -236,7 +258,8 @@ public class GCore extends GPlugin {
 			} catch (Throwable exception) {
 				exception.printStackTrace();
 			}
-			if (npcManager == null) debug("Couldn't enable NPC manager with ProtocolLib");
+			if (npcManager == null)
+				debug("Couldn't enable NPC manager with ProtocolLib");
 		}
 
 		// auto update
@@ -250,15 +273,20 @@ public class GCore extends GPlugin {
 	@Override
 	protected boolean enable() {
 		// server version
-		debug("Detected server version : " + ServerVersion.CURRENT.getName() + (ServerVersion.CURRENT.equals(ServerVersion.UNSUPPORTED) ?
-				" - this version isn't officially supported and plugins might not work as expected" : ""));
-		debug("Detected server implementation : " + ServerImplementation.CURRENT.toString() + (!ServerImplementation.CURRENT.equals(ServerImplementation.SPIGOT) ?
-				" - this implementation isn't officially supported and plugins might not work as expected" : ""));
+		debug("Detected server version : " + ServerVersion.CURRENT.getName()
+		+ (ServerVersion.CURRENT.equals(ServerVersion.UNSUPPORTED)
+				? " - this version isn't officially supported and plugins might not work as expected"
+						: ""));
+		debug("Detected server implementation : " + ServerImplementation.CURRENT.toString()
+		+ (!ServerImplementation.CURRENT.equals(ServerImplementation.SPIGOT)
+				? " - this implementation isn't officially supported and plugins might not work as expected"
+						: ""));
 
 		// init compat
 		Compat.INSTANCE.init();
 
-		// load the Query class, as it seems to throw a LinkageError if it's done 'in action' (probably because MySQL operations are done asynchronously)
+		// load the Query class, as it seems to throw a LinkageError if it's done 'in
+		// action' (probably because MySQL operations are done asynchronously)
 		try {
 			getClassLoader().loadClass(Query.class.getName());
 		} catch (ClassNotFoundException exception) {
@@ -275,12 +303,14 @@ public class GCore extends GPlugin {
 		CommandRoot root = new CommandRoot(this, Utils.asList("gcore"), null, GPerm.GCORE_ADMIN, false);
 		registerCommand(root, GPerm.GCORE_ADMIN);
 		// data commands
-		CommandArgument data = new CommandArgument(this, Utils.asList("data"), "data-related commands", GPerm.GCORE_ADMIN, false);
+		CommandArgument data = new CommandArgument(this, Utils.asList("data"), "data-related commands",
+				GPerm.GCORE_ADMIN, false);
 		root.addChild(data);
 		data.addChild(new CommandDataExport());
 		data.addChild(new CommandDataReset());
 		// item commands
-		CommandArgument item = new CommandArgument(this, Utils.asList("item"), "item-related commands", GPerm.GCORE_ADMIN, false);
+		CommandArgument item = new CommandArgument(this, Utils.asList("item"), "item-related commands",
+				GPerm.GCORE_ADMIN, false);
 		root.addChild(item);
 		item.addChild(new CommandItemSetdura());
 		item.addChild(new CommandItemMat());
@@ -288,7 +318,7 @@ public class GCore extends GPlugin {
 		// other commands
 		root.addChild(new CommandPlugins());
 		root.addChild(new CommandSetuserprofile());
-		//root.addChild(new CommandPathfindingTest());
+		// root.addChild(new CommandPathfindingTest());
 		return true;
 	}
 
@@ -373,6 +403,7 @@ public class GCore extends GPlugin {
 			}
 		}
 	}
+
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void event(PlayerInteractEvent event) {
 		// location input
@@ -393,7 +424,8 @@ public class GCore extends GPlugin {
 			if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK) && event.getItem() != null) {
 				try {
 					lastInteractedEggs.put(SpawnEggUtils.getSpawnedType(event.getItem()), player);
-				} catch (Throwable ignored) {}// unsupported by server
+				} catch (Throwable ignored) {
+				} // unsupported by server
 			}
 		}
 	}
@@ -412,7 +444,8 @@ public class GCore extends GPlugin {
 	public void event(BlockIgniteEvent event) {
 		Player player = event.getPlayer();
 		if (interactedBlocks.containsKey(player)) {
-			PlayerFireBlockEvent newEvent = new PlayerFireBlockEvent(player, interactedBlocks.remove(player), event.getBlock(), event.getCause());
+			PlayerFireBlockEvent newEvent = new PlayerFireBlockEvent(player, interactedBlocks.remove(player),
+					event.getBlock(), event.getCause());
 			Bukkit.getPluginManager().callEvent(newEvent);
 			if (newEvent.isCancelled()) {
 				event.setCancelled(true);
@@ -438,7 +471,8 @@ public class GCore extends GPlugin {
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void event(ItemSpawnEvent event) {
 		if (System.currentTimeMillis() - lastBreakEvent < 50L) {
-			PlayerBlockDropEvent newEvent = new PlayerBlockDropEvent(lastBreakBlock.getPlayer(), event.getEntity(), lastBreakBlock, lastBreakBlockType);
+			PlayerBlockDropEvent newEvent = new PlayerBlockDropEvent(lastBreakBlock.getPlayer(), event.getEntity(),
+					lastBreakBlock, lastBreakBlockType);
 			Bukkit.getPluginManager().callEvent(newEvent);
 			event.setCancelled(newEvent.isCancelled());
 		}
@@ -489,7 +523,8 @@ public class GCore extends GPlugin {
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
 	public void event(final CraftItemEvent event) {
 		final Player player = (Player) event.getWhoClicked();
-		final ItemStack preCursor = !Mat.from(player.getItemOnCursor()).isAir() ? player.getItemOnCursor().clone() : null;
+		final ItemStack preCursor = !Mat.from(player.getItemOnCursor()).isAir() ? player.getItemOnCursor().clone()
+				: null;
 		final Map<Integer, ItemStack> preItems = new HashMap<Integer, ItemStack>();
 		for (int slot = 0; slot < player.getInventory().getContents().length; ++slot) {
 			ItemStack item = player.getInventory().getContents()[slot];
@@ -521,7 +556,8 @@ public class GCore extends GPlugin {
 					ItemStack cursor = player.getItemOnCursor();
 					if (!Mat.from(cursor).isAir()) {
 						if (preCursor != null) {// has pre cursor
-							int added = preCursor != null ? cursor.getAmount() - preCursor.getAmount() : cursor.getAmount();
+							int added = preCursor != null ? cursor.getAmount() - preCursor.getAmount()
+									: cursor.getAmount();
 							if (added > 0) {
 								preCursor.setAmount(added);
 								crafted.put(-1, preCursor);

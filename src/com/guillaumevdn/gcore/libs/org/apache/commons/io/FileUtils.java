@@ -25,6 +25,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.FileChannel;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -451,4 +452,257 @@ public class FileUtils
 		doCopyFile(srcFile, destFile, preserveFileDate);
 	}
 
+	/**
+	 * Moves a directory.
+	 * <p>
+	 * When the destination directory is on another file system, do a "copy and delete".
+	 *
+	 * @param srcDir  the directory to be moved
+	 * @param destDir the destination directory
+	 * @throws NullPointerException if source or destination is {@code null}
+	 * @throws FileExistsException  if the destination directory exists
+	 * @throws IOException          if source or destination is invalid
+	 * @throws IOException          if an IO error occurs moving the file
+	 * @since 1.4
+	 */
+	public static void moveDirectory(final File srcDir, final File destDir) throws IOException {
+		validateMoveParameters(srcDir, destDir);
+		if (!srcDir.isDirectory()) {
+			throw new IOException("Source '" + srcDir + "' is not a directory");
+		}
+		if (destDir.exists()) {
+			throw new FileExistsException("Destination '" + destDir + "' already exists");
+		}
+		final boolean rename = srcDir.renameTo(destDir);
+		if (!rename) {
+			if (destDir.getCanonicalPath().startsWith(srcDir.getCanonicalPath() + File.separator)) {
+				throw new IOException("Cannot move directory: " + srcDir + " to a subdirectory of itself: " + destDir);
+			}
+			copyDirectory(srcDir, destDir);
+			deleteDirectory(srcDir);
+			if (srcDir.exists()) {
+				throw new IOException("Failed to delete original directory '" + srcDir +
+						"' after copy to '" + destDir + "'");
+			}
+		}
+	}
+
+	/**
+	 * Moves a file.
+	 * <p>
+	 * When the destination file is on another file system, do a "copy and delete".
+	 *
+	 * @param srcFile  the file to be moved
+	 * @param destFile the destination file
+	 * @throws NullPointerException if source or destination is {@code null}
+	 * @throws FileExistsException  if the destination file exists
+	 * @throws IOException          if source or destination is invalid
+	 * @throws IOException          if an IO error occurs moving the file
+	 * @since 1.4
+	 */
+	public static void moveFile(final File srcFile, final File destFile) throws IOException {
+		validateMoveParameters(srcFile, destFile);
+		if (srcFile.isDirectory()) {
+			throw new IOException("Source '" + srcFile + "' is a directory");
+		}
+		if (destFile.exists()) {
+			throw new FileExistsException("Destination '" + destFile + "' already exists");
+		}
+		if (destFile.isDirectory()) {
+			throw new IOException("Destination '" + destFile + "' is a directory");
+		}
+		final boolean rename = srcFile.renameTo(destFile);
+		if (!rename) {
+			copyFile(srcFile, destFile);
+			if (!srcFile.delete()) {
+				deleteQuietly(destFile);
+				throw new IOException("Failed to delete original file '" + srcFile +
+						"' after copy to '" + destFile + "'");
+			}
+		}
+	}
+
+	//-----------------------------------------------------------------------
+	/**
+	 * Deletes a directory recursively.
+	 *
+	 * @param directory directory to delete
+	 * @throws IOException              in case deletion is unsuccessful
+	 * @throws IllegalArgumentException if {@code directory} does not exist or is not a directory
+	 */
+	public static void deleteDirectory(final File directory) throws IOException {
+		if (!directory.exists()) {
+			return;
+		}
+
+		if (!isSymlink(directory)) {
+			cleanDirectory(directory);
+		}
+
+		if (!directory.delete()) {
+			final String message =
+					"Unable to delete directory " + directory + ".";
+			throw new IOException(message);
+		}
+	}
+
+	/**
+	 * Cleans a directory without deleting it.
+	 *
+	 * @param directory directory to clean
+	 * @throws IOException              in case cleaning is unsuccessful
+	 * @throws IllegalArgumentException if {@code directory} does not exist or is not a directory
+	 */
+	public static void cleanDirectory(final File directory) throws IOException {
+		final File[] files = verifiedListFiles(directory);
+
+		IOException exception = null;
+		for (final File file : files) {
+			try {
+				forceDelete(file);
+			} catch (final IOException ioe) {
+				exception = ioe;
+			}
+		}
+
+		if (null != exception) {
+			throw exception;
+		}
+	}
+
+	//-----------------------------------------------------------------------
+	/**
+	 * Deletes a file. If file is a directory, delete it and all sub-directories.
+	 * <p>
+	 * The difference between File.delete() and this method are:
+	 * <ul>
+	 * <li>A directory to be deleted does not have to be empty.</li>
+	 * <li>You get exceptions when a file or directory cannot be deleted.
+	 * (java.io.File methods returns a boolean)</li>
+	 * </ul>
+	 *
+	 * @param file file or directory to delete, must not be {@code null}
+	 * @throws NullPointerException  if the directory is {@code null}
+	 * @throws FileNotFoundException if the file was not found
+	 * @throws IOException           in case deletion is unsuccessful
+	 */
+	public static void forceDelete(final File file) throws IOException {
+		if (file.isDirectory()) {
+			deleteDirectory(file);
+		} else {
+			final boolean filePresent = file.exists();
+			if (!file.delete()) {
+				if (!filePresent) {
+					throw new FileNotFoundException("File does not exist: " + file);
+				}
+				final String message =
+						"Unable to delete file: " + file;
+				throw new IOException(message);
+			}
+		}
+	}
+
+	/**
+	 * Validates the given arguments.
+	 * <ul>
+	 * <li>Throws {@link NullPointerException} if {@code src} is null</li>
+	 * <li>Throws {@link NullPointerException} if {@code dest} is null</li>
+	 * <li>Throws {@link FileNotFoundException} if {@code src} does not exist</li>
+	 * </ul>
+	 *
+	 * @param src                       the file or directory to be moved
+	 * @param dest                      the destination file or directory
+	 * @throws FileNotFoundException    if {@code src} file does not exist
+	 */
+	private static void validateMoveParameters(final File src, final File dest) throws FileNotFoundException {
+		if (src == null) {
+			throw new NullPointerException("Source must not be null");
+		}
+		if (dest == null) {
+			throw new NullPointerException("Destination must not be null");
+		}
+		if (!src.exists()) {
+			throw new FileNotFoundException("Source '" + src + "' does not exist");
+		}
+	}
+
+	/**
+	 * Lists files in a directory, asserting that the supplied directory satisfies exists and is a directory
+	 * @param directory The directory to list
+	 * @return The files in the directory, never null.
+	 * @throws IOException if an I/O error occurs
+	 */
+	private static File[] verifiedListFiles(final File directory) throws IOException {
+		if (!directory.exists()) {
+			final String message = directory + " does not exist";
+			throw new IllegalArgumentException(message);
+		}
+
+		if (!directory.isDirectory()) {
+			final String message = directory + " is not a directory";
+			throw new IllegalArgumentException(message);
+		}
+
+		final File[] files = directory.listFiles();
+		if (files == null) {  // null if security restricted
+			throw new IOException("Failed to list contents of " + directory);
+		}
+		return files;
+	}
+
+	/**
+	 * Determines whether the specified file is a Symbolic Link rather than an actual file.
+	 * <p>
+	 * Will not return true if there is a Symbolic Link anywhere in the path,
+	 * only if the specific file is.
+	 * <p>
+	 * When using jdk1.7, this method delegates to {@code boolean java.nio.file.Files.isSymbolicLink(Path path)}
+	 *
+	 * For code that runs on Java 1.7 or later, use the following method instead:
+	 * <br>
+	 * {@code boolean java.nio.file.Files.isSymbolicLink(Path path)}
+	 * @param file the file to check
+	 * @return true if the file is a Symbolic Link
+	 * @throws IOException if an IO error occurs while checking the file
+	 * @since 2.0
+	 */
+	public static boolean isSymlink(final File file) throws IOException {
+		if (file == null) {
+			throw new NullPointerException("File must not be null");
+		}
+		return Files.isSymbolicLink(file.toPath());
+	}
+
+	/**
+	 * Deletes a file, never throwing an exception. If file is a directory, delete it and all sub-directories.
+	 * <p>
+	 * The difference between File.delete() and this method are:
+	 * <ul>
+	 * <li>A directory to be deleted does not have to be empty.</li>
+	 * <li>No exceptions are thrown when a file or directory cannot be deleted.</li>
+	 * </ul>
+	 *
+	 * @param file file or directory to delete, can be {@code null}
+	 * @return {@code true} if the file or directory was deleted, otherwise
+	 * {@code false}
+	 *
+	 * @since 1.4
+	 */
+	public static boolean deleteQuietly(final File file) {
+		if (file == null) {
+			return false;
+		}
+		try {
+			if (file.isDirectory()) {
+				cleanDirectory(file);
+			}
+		} catch (final Exception ignored) {
+		}
+
+		try {
+			return file.delete();
+		} catch (final Exception ignored) {
+			return false;
+		}
+	}
 }

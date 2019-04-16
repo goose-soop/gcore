@@ -984,6 +984,15 @@ public class Mat implements Cloneable, Comparable<Mat> {
 	}
 
 	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + durability;
+		result = prime * result + ((modernName == null) ? 0 : modernName.hashCode());
+		return result;
+	}
+
+	@Override
 	public Mat clone() {
 		return new Mat(VERSION, modernName, legacyName, legacyData, durability);
 	}

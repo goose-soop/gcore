@@ -35,7 +35,7 @@ import com.guillaumevdn.gcore.lib.versioncompat.Compat;
 public class CPItem extends ContainerParseable {
 
 	// base
-	private PPMat type = addComponent(new PPMat("type", this, null, true, 0, EditorGUI.ICON_ITEM, GLocale.GUI_GENERIC_EDITOR_ITEM_TYPELORE.getLines()));
+	private PPMat type = addComponent(new PPMat("type", this, Mat.AIR.toString(), isMandatory(), 0, EditorGUI.ICON_ITEM, GLocale.GUI_GENERIC_EDITOR_ITEM_TYPELORE.getLines()));
 	private PPInteger durability = addComponent(new PPInteger("durability", this, "0", 0, Integer.MAX_VALUE, false, 1, EditorGUI.ICON_NUMBER, GLocale.GUI_GENERIC_EDITOR_ITEM_DURABILITYLORE.getLines()));
 	private PPBoolean unbreakable = addComponent(new PPBoolean("unbreakable", this, "false", false, 2, EditorGUI.ICON_BOOLEAN, GLocale.GUI_GENERIC_EDITOR_ITEM_UNBREAKABLELORE.getLines()));
 	private PPInteger amount = addComponent(new PPInteger("amount", this, "1", 1, Integer.MAX_VALUE, false, 3, EditorGUI.ICON_NUMBER, GLocale.GUI_GENERIC_EDITOR_ITEM_AMOUNTLORE.getLines()));

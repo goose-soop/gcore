@@ -145,7 +145,7 @@ public class YMLConfiguration {
 	/**
 	 * Get the keys of a section. Doesn't include default file (if there is any) keys.
 	 * @param sectionPath the path of the section
-	 * @param sort must sort the keys in alphanumerical order
+	 * @param sort true if the keys must be sorted in alphanumerical order
 	 * @return the keys associated to the section (can be empty)
 	 */
 
@@ -728,7 +728,7 @@ public class YMLConfiguration {
 
 	public void set(String path, Object value) {
 		path = path.replace(" ", "").replace("\t", "");
-		// clear whole file
+		// clear the entire file
 		if (value == null && path.isEmpty()) {
 			for (String key : getKeysForSection("", false)) {
 				yaml.set(key, null);
@@ -826,49 +826,52 @@ public class YMLConfiguration {
 	/**
 	 * Save the file (override) with the keys/values of this object
 	 */
-	public void save()
-	{
+	public void save() {
+		save(file);
+	}
+
+	/**
+	 * Save the file (override) with the keys/values of this object to a specific file
+	 */
+	public void save(File file) {
 		try {
-			innerSave();
+
+			// Resetting file
+			if (file.exists()) {
+				file.delete();
+				file.createNewFile();
+			} else {
+				file.getParentFile().mkdirs();
+			}
+
+			// Save file
+			yaml.save(file);
+
+			// Header
+			List<String> lines = new ArrayList<String>();
+			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
+			String ln = null;
+			while ((ln = reader.readLine()) != null) {
+				lines.add(ln);
+			}
+			reader.close();
+
+			OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8);
+
+			if (headerComment != null) {
+				writer.write(headerComment);
+			}
+
+			for (String line : lines) {
+				writer.write(line + "\n");
+			}
+
+			writer.close();
+
 		} catch (IOException exception) {
 			exception.printStackTrace();
 			Logger.log(Level.SEVERE, GCore.inst(), "Could not save the file while reloading " + file.getName());
 		}
-	}
-
-	private void innerSave() throws IOException
-	{
-		// Resetting file
-		if (file.exists()) {
-			file.delete();
-			file.createNewFile();
-		} else {
-			file.getParentFile().mkdirs();
-		}
-
-		// Save file
-		yaml.save(file);
-
-		// Header
-		List<String> lines = new ArrayList<String>();
-		BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
-		String ln = null;
-		while ((ln = reader.readLine()) != null) {
-			lines.add(ln);
-		}
-		reader.close();
-
-		OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8);
-
-		if (headerComment != null) {
-			writer.write(headerComment);
-		}
-
-		for (String line : lines) {
-			writer.write(line + "\n");
-		}
-
-		writer.close();
 	}
 
 	// ----------------------------------------------------------------------

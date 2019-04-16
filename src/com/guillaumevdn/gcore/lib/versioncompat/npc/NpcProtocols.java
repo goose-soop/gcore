@@ -35,7 +35,6 @@ public abstract class NpcProtocols {
 	public abstract WrappedDataWatcher createMetadata(Map<Integer, Object> map);
 	public abstract Map<Integer, Object> getDefaultHumanEntityMetadata();
 	public abstract Object createPlayerInfo(Object gameProfile, GameMode gameMode, int entityId, String name);
-	public abstract Object getNMSGameMode(GameMode gameMode);
 
 	// inventory
 	public abstract void sendInventory(Player player, int entityId, ItemStack... items);

@@ -18,6 +18,7 @@ import org.bukkit.scheduler.BukkitTask;
 import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.lib.material.Mat;
 import com.guillaumevdn.gcore.lib.util.Pair;
+import com.guillaumevdn.gcore.lib.util.ServerVersion;
 import com.guillaumevdn.gcore.lib.util.Utils;
 
 public abstract class Pathfinding {
@@ -442,13 +443,12 @@ public abstract class Pathfinding {
 		return null;
 	}
 
-
 	private static final List<String> TRAVERSABLE = Utils.asList("SAPLING", "RAIL", "GRASS", "BUSH", "DANDELION", "ORCHID", "BLUET", "TULIP", "DAISY", "MUSHROOM", "TORCH", "WHEAT", "SIGN", "LEVER", "PLATE", "PATH", "DOOR", "BUTTON", "CANE", "REPEATER", "COMPARATOR", "TRAPDOOR", "STEM", "VINE", "GATE", "LILY_PAD", "WART", "PORTAL", "TRIPWIRE", "CARROTS", "POTATOES", "CARPET", "FLOWER", "LILAC", "FERN", "BUSH", "BANNER", "PEONY", "END_GATEWAY");
 	private static final List<Mat> TRAVERSABLE_EXCEPTIONS = Utils.asList(Mat.GRASS_BLOCK, Mat.GRASS_PATH, Mat.REDSTONE_BLOCK, Mat.REDSTONE_LAMP);
 
 	private boolean isMatTraversable(Mat mat) {
 		if (mat.isAir()) return true;
-		if (mat.getCurrentMaterial().isBlock()) return false;
+		if (ServerVersion.CURRENT.isLessThan(ServerVersion.MC_1_13) && mat.getCurrentMaterial().isBlock()) return false;
 		String smat = mat.getModernName();
 		for (String trav : TRAVERSABLE) {
 			if (smat.contains(trav)) {

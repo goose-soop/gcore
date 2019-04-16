@@ -5,7 +5,6 @@
 package com.guillaumevdn.gcore.lib.versioncompat.npc;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +20,8 @@ import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
+import com.comphenix.protocol.wrappers.WrappedDataWatcher.Serializer;
+import com.comphenix.protocol.wrappers.WrappedDataWatcher.WrappedDataWatcherObject;
 import com.comphenix.protocol.wrappers.WrappedGameProfile;
 import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.lib.npc.Npc;
@@ -53,8 +54,20 @@ public class NpcProtocols1_13_1 extends NpcProtocols {
 	public WrappedDataWatcher createMetadata(Map<Integer, Object> map) {
 		// create data
 		WrappedDataWatcher data = new WrappedDataWatcher();
+		Serializer byteSerializer = WrappedDataWatcher.Registry.get(Byte.class);
+		Serializer integerSerializer = WrappedDataWatcher.Registry.get(Integer.class);
+		Serializer booleanSerializer = WrappedDataWatcher.Registry.get(Boolean.class);
+		Serializer floatSerializer = WrappedDataWatcher.Registry.get(Float.class);
 		for (Map.Entry<Integer, Object> entry : map.entrySet()) {
-			data.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(entry.getKey(), WrappedDataWatcher.Registry.get(entry.getValue().getClass())), entry.getValue());
+			if (entry.getValue() instanceof Byte) {
+				data.setObject(new WrappedDataWatcherObject(entry.getKey(), byteSerializer), entry.getValue());
+			} else if (entry.getValue() instanceof Integer) {
+				data.setObject(new WrappedDataWatcherObject(entry.getKey(), integerSerializer), entry.getValue());
+			} else if (entry.getValue() instanceof Boolean) {
+				data.setObject(new WrappedDataWatcherObject(entry.getKey(), booleanSerializer), entry.getValue());
+			} else if (entry.getValue() instanceof Float) {
+				data.setObject(new WrappedDataWatcherObject(entry.getKey(), floatSerializer), entry.getValue());
+			}
 		}
 		// return
 		return data;
@@ -83,23 +96,11 @@ public class NpcProtocols1_13_1 extends NpcProtocols {
 
 	@Override
 	public Object createPlayerInfo(Object gameProfile, GameMode gameMode, int entityId, String name) {
-		Object nmsGameMode = getNMSGameMode(GameMode.SURVIVAL);
+		EnumGamemode nmsGameMode = EnumGamemode.getById(gameMode.getValue());
 		try {
 			Constructor declaredConstructor = PlayerInfoData.class.getDeclaredConstructor(PacketPlayOutPlayerInfo.class, GameProfile.class, Integer.TYPE, nmsGameMode.getClass(), IChatBaseComponent.class);
 			declaredConstructor.setAccessible(true);
 			return declaredConstructor.newInstance(null, gameProfile, entityId, nmsGameMode, createNMSText(name));
-		} catch (Throwable exception) {
-			exception.printStackTrace();
-			return null;
-		}
-	}
-
-	@Override
-	public Object getNMSGameMode(GameMode gameMode) {
-		try {
-			Method method = EnumGamemode.class.getMethod("getById", Integer.TYPE);
-			method.setAccessible(true);
-			return method.invoke(null, gameMode.getValue());
 		} catch (Throwable exception) {
 			exception.printStackTrace();
 			return null;

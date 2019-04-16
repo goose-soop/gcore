@@ -5,7 +5,6 @@
 package com.guillaumevdn.gcore.lib.versioncompat.npc;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -82,23 +81,11 @@ public class NpcProtocols1_9 extends NpcProtocols {
 
 	@Override
 	public Object createPlayerInfo(Object gameProfile, GameMode gameMode, int entityId, String name) {
-		Object nmsGameMode = getNMSGameMode(GameMode.SURVIVAL);
+		EnumGamemode nmsGameMode = EnumGamemode.getById(gameMode.getValue());
 		try {
 			Constructor declaredConstructor = PlayerInfoData.class.getDeclaredConstructor(PacketPlayOutPlayerInfo.class, GameProfile.class, Integer.TYPE, nmsGameMode.getClass(), IChatBaseComponent.class);
 			declaredConstructor.setAccessible(true);
 			return declaredConstructor.newInstance(null, gameProfile, entityId, nmsGameMode, createNMSText(name));
-		} catch (Throwable exception) {
-			exception.printStackTrace();
-			return null;
-		}
-	}
-
-	@Override
-	public Object getNMSGameMode(GameMode gameMode) {
-		try {
-			Method method = EnumGamemode.class.getMethod("getById", Integer.TYPE);
-			method.setAccessible(true);
-			return method.invoke(null, gameMode.getValue());
 		} catch (Throwable exception) {
 			exception.printStackTrace();
 			return null;

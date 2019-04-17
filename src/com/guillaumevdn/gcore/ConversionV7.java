@@ -24,7 +24,7 @@ class ConversionV7 {
 			File data = new File(old + "/data/");
 			if (data.exists()) {
 				for (File sub : data.listFiles()) {
-					if (sub.getName().equalsIgnoreCase("questcreator_quests") || sub.getName().equalsIgnoreCase("temp")) continue;
+					if (sub.getName().equalsIgnoreCase("temp")) continue;
 					copyFile(sub, new File(neww + "/data/" + sub.getName() + "/"));
 				}
 			}

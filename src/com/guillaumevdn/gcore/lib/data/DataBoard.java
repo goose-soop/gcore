@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.guillaumevdn.gcore.lib.data.DataManager.BackEnd;
@@ -98,7 +99,16 @@ public abstract class DataBoard<T extends DataElement> {
 		push(true, elements);
 	}
 
+	public void pushAsync(final Collection<? extends T> elements, Callback callback) {
+		push(true, elements, callback);
+	}
+
 	public void push(boolean async, final Collection<? extends T> elements) {
+		push(async, elements, null);
+	}
+
+	public void push(boolean async, final Collection<? extends T> elements, final Callback callback) {
+		Bukkit.getLogger().info("pushing " + elements.size());
 		if (elements.isEmpty()) return;
 		BukkitRunnable runnable = new BukkitRunnable() { @Override public void run() {
 			try {
@@ -107,6 +117,7 @@ public abstract class DataBoard<T extends DataElement> {
 					for (T element : elements) {
 						element.jsonPush();
 					}
+					if (callback != null) callback.callback();
 				} else if (getDataManager().getBackEnd().equals(BackEnd.MYSQL)) {
 					Query query = new Query();
 					for (T element : elements) {
@@ -115,6 +126,7 @@ public abstract class DataBoard<T extends DataElement> {
 					if (!query.isEmpty()) {
 						getDataManager().performMySQLUpdateQuery(query);
 					}
+					if (callback != null) callback.callback();
 				}
 				//getDataManager().getPlugin().debug("Saved " + elements.size() + " " + DataBoard.this.getClass().getSimpleName() + Utils.getPluralFor(" element", elements.size()) + " for " + getDataManager().getClass().getSimpleName() + " (took " + (System.currentTimeMillis() - start) + " ms)");
 			} catch (Throwable exception) {

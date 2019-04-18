@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -28,7 +27,6 @@ import org.json.simple.parser.ParseException;
 import com.comphenix.protocol.wrappers.WrappedGameProfile;
 import com.comphenix.protocol.wrappers.WrappedSignedProperty;
 import com.google.common.collect.LinkedHashMultimap;
-import com.google.common.collect.Multimap;
 
 public class MojangsterAPI {
 
@@ -120,10 +118,10 @@ public class MojangsterAPI {
 		} catch (IllegalAccessException exception) {
 			exception.printStackTrace();
 			return null;
-		} catch (InvocationTargetException ignored) {
+		} catch (Throwable ignored) {
 			return null;
 		}
-		((Multimap)create).put("textures", WrappedGameProfile.fromHandle(handle).getProperties().get("textures").toArray()[0]);
+		create.put("textures", WrappedGameProfile.fromHandle(handle).getProperties().get("textures").toArray()[0]);
 		array[1] = create;
 		return array;
 	}

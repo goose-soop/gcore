@@ -155,6 +155,14 @@ public class NpcManager implements Listener {
 				else if (i == 5) items[i] = npcData.getHelmet(player);
 			}
 		}
+		// invalid name or location
+		if (name == null) {
+			GCore.inst().error("Couldn't spawn npc " + id + " for player " + player.getName() + " : invalid name");
+			return false;
+		} else if (location == null) {
+			GCore.inst().error("Couldn't spawn npc " + id + " for player " + player.getName() + " : invalid location");
+			return false;
+		}
 		// create npc and spawn it
 		addNpc(player, new Npc(player, id, name, skin, location, targetDistance, status, items));
 		// spawn

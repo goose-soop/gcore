@@ -41,7 +41,14 @@ public class SkinData {
 		}
 		lastUpdate = System.currentTimeMillis();
 		// refresh
-		Object[] skinPropandName = MojangsterAPI.getSkinPropandName(uuid);
+		Object[] skinPropandName = null;
+		try {
+			skinPropandName = MojangsterAPI.getSkinPropandName(uuid);
+		} catch (Throwable exception) {
+			if (!exception.getMessage().contains("too many requests")) {
+				exception.printStackTrace();
+			}
+		}
 		if (skinPropandName == null) {
 			return;
 		}

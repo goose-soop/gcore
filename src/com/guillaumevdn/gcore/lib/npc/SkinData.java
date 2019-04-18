@@ -1,5 +1,5 @@
 /**
- * Some parts of this code were found on the internet from an old plugin named "ZQuest"
+ * Parts of this code was from ZQuest, it was refactored by GuillaumeVDN
  */
 
 package com.guillaumevdn.gcore.lib.npc;
@@ -34,9 +34,10 @@ public class SkinData {
 	}
 
 	// methods
+	private static final long MIN_DELAY_MILLIS = 60L * 1000L;
 	public void refresh() {
 		// last update
-		if (lastUpdate + 60000L > System.currentTimeMillis()) {
+		if (System.currentTimeMillis() - lastUpdate < MIN_DELAY_MILLIS) {
 			return;
 		}
 		lastUpdate = System.currentTimeMillis();
@@ -45,11 +46,11 @@ public class SkinData {
 		try {
 			skinPropandName = MojangsterAPI.getSkinPropandName(uuid);
 		} catch (Throwable exception) {
-			if (!exception.getMessage().contains("too many requests")) {
-				exception.printStackTrace();
-			}
+			exception.printStackTrace();
 		}
-		if (skinPropandName == null) {
+		// push ; we made a request to Mojang, so the delay needs to be saved
+		GCore.inst().getData().getNpcSkins().set(uuid, this);
+		if (skinPropandName == null || skinPropandName.length < 2) {
 			return;
 		}
 		name = (String) skinPropandName[0];
@@ -65,8 +66,6 @@ public class SkinData {
 			return;
 		}
 		skinData = new WrappedProperty(wrappedSignedProperty.getName(), wrappedSignedProperty.getValue(), wrappedSignedProperty.getSignature());
-		// push
-		GCore.inst().getData().getNpcSkins().set(uuid, this);
 		// log
 		GCore.inst().debug("Refreshed NPC skin " + uuid);
 	}

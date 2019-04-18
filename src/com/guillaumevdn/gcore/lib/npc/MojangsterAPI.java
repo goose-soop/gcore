@@ -1,5 +1,5 @@
 /**
- * Some parts of this code were found on the internet from an old plugin named "ZQuest"
+ * Parts of this code was from ZQuest, it was refactored by GuillaumeVDN
  */
 
 package com.guillaumevdn.gcore.lib.npc;
@@ -174,7 +174,7 @@ public class MojangsterAPI {
 	private static Object getSessionService() {
 		Server server = Bukkit.getServer();
 		try {
-			Object invoke = server.getClass().getDeclaredMethod("getServer", (Class<?>[])new Class[0]).invoke(server, new Object[0]);
+			Object invoke = server.getClass().getDeclaredMethod("getServer", (Class<?>[]) new Class[0]).invoke(server, new Object[0]);
 			for (Method method : invoke.getClass().getMethods()) {
 				if (method.getReturnType().getSimpleName().equalsIgnoreCase("MinecraftSessionService")) {
 					return method.invoke(invoke, new Object[0]);

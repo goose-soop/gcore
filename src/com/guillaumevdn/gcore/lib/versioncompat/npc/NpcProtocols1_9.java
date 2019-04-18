@@ -1,5 +1,5 @@
 /**
- * Some parts of this code were found on the internet from an old plugin named "ZQuest"
+ * Parts of this code was from ZQuest, it was refactored by GuillaumeVDN
  */
 
 package com.guillaumevdn.gcore.lib.versioncompat.npc;

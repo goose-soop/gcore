@@ -7,7 +7,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.guillaumevdn.gcore.lib.data.DataManager.BackEnd;
@@ -108,7 +107,6 @@ public abstract class DataBoard<T extends DataElement> {
 	}
 
 	public void push(boolean async, final Collection<? extends T> elements, final Callback callback) {
-		Bukkit.getLogger().info("pushing " + elements.size());
 		if (elements.isEmpty()) return;
 		BukkitRunnable runnable = new BukkitRunnable() { @Override public void run() {
 			try {

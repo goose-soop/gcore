@@ -245,6 +245,7 @@ class ConversionV7 {
 					List<String> categoryQuests = categoriesConfig.getList("compact_npc_categories." + categoryId + ".quest_list", Utils.emptyList());
 					// activator
 					activators.set("activators.activator_" + id + ".type", "CITIZENS_NPC");
+					activators.set("activators.activator_" + id + ".id", npcId);
 					if (categoriesConfig.contains("categories." + categoryId + ".selection_gui_when_one_quest")) {
 						activators.set("activators.activator_" + categoryId + ".min_quests_for_gui", categoriesConfig.getBoolean("categories." + categoryId + ".selection_gui_when_one_quest", false) ? 1 : 2);
 					}

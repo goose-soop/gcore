@@ -504,7 +504,8 @@ public class GCore extends GPlugin {
 	public void event(AsyncPlayerChatEvent event) {
 		// chat input
 		if (chatInputs.containsKey(event.getPlayer())) {
-			chatInputs.remove(event.getPlayer()).onChat(event.getPlayer(), Utils.format(event.getMessage()));
+			ChatInput input = chatInputs.remove(event.getPlayer());
+			input.onChat(event.getPlayer(), Utils.format(event.getMessage()));
 			event.setCancelled(true);
 			event.getRecipients().clear();
 			event.setMessage("");

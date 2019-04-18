@@ -23,6 +23,8 @@ import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher.Serializer;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher.WrappedDataWatcherObject;
 import com.comphenix.protocol.wrappers.WrappedGameProfile;
+import com.comphenix.protocol.wrappers.WrappedSignedProperty;
+import com.google.common.collect.Multimap;
 import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.lib.npc.Npc;
 import com.guillaumevdn.gcore.lib.npc.SkinData;
@@ -184,8 +186,9 @@ public class NpcProtocols1_13_1 extends NpcProtocols {
 		final WrappedGameProfile gameProfile = new WrappedGameProfile(UUID.randomUUID(), (name.length() < 16) ? name : name.substring(0, 16));
 		// skin
 		SkinData skinData = skin != null && GCore.inst().getData().getNpcSkins() != null ? GCore.inst().getData().getNpcSkins().get(skin) : null;
-		if (skinData != null) {
-			gameProfile.getProperties().putAll(skinData.getSkinData());
+		Multimap<String, WrappedSignedProperty> data = skinData != null ? skinData.getSkinData() : null;
+		if (data != null) {
+			gameProfile.getProperties().putAll(data);
 		}
 		// create metadata
 		WrappedDataWatcher metadata = createMetadata(getDefaultHumanEntityMetadata());

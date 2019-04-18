@@ -57,9 +57,9 @@ public class LPItem extends ListParseable<CPItem> {
 		ConfigData data = new ConfigData(getLastData().getPlugin(), getLastData().getSuperId(), getLastData().getConfig(), getLastData().getPath().isEmpty() ? elementId : getLastData().getPath() + "." + elementId);
 		// create
 		CPItem element = new CPItem(elementId.toLowerCase(), this, false, -1, getEditorIcon(), getEditorDescription());
-		data.setComponent(element);
-		element.setLastData(data);
+		// load, add and return
 		element.load(data);
+		addElement(element);
 		return element;
 	}
 
@@ -67,9 +67,9 @@ public class LPItem extends ListParseable<CPItem> {
 	public CPItem loadElement(String elementId, ConfigData data) {
 		// create
 		CPItem element = new CPItem(elementId.toLowerCase(), this, false, -1, getEditorIcon(), getEditorDescription());
-		data.setComponent(element);
-		element.setLastData(data);
+		// load, add and return
 		element.load(data);
+		addElement(element);
 		return element;
 	}
 

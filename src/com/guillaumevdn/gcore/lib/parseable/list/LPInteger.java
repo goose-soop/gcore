@@ -65,9 +65,9 @@ public class LPInteger extends ListParseable<PPInteger> {
 		ConfigData data = new ConfigData(getLastData().getPlugin(), getLastData().getSuperId(), getLastData().getConfig(), getLastData().getPath().isEmpty() ? elementId : getLastData().getPath() + "." + elementId);
 		// create
 		PPInteger element = new PPInteger(elementId.toLowerCase(), this, defaultValue, min, max, false, -1, getEditorIcon(), getEditorDescription());
-		data.setComponent(element);
-		element.setLastData(data);
+		// load, add and return
 		element.load(data);
+		addElement(element);
 		return element;
 	}
 
@@ -75,9 +75,9 @@ public class LPInteger extends ListParseable<PPInteger> {
 	public PPInteger loadElement(String elementId, ConfigData data) {
 		// create
 		PPInteger element = new PPInteger(elementId.toLowerCase(), this, defaultValue, min, max, false, -1, getEditorIcon(), getEditorDescription());
-		data.setComponent(element);
-		element.setLastData(data);
+		// load, add and return
 		element.load(data);
+		addElement(element);
 		return element;
 	}
 

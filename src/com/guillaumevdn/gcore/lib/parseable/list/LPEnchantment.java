@@ -22,9 +22,9 @@ public class LPEnchantment extends ListParseable<CPEnchantment> {
 		ConfigData data = new ConfigData(getLastData().getPlugin(), getLastData().getSuperId(), getLastData().getConfig(), getLastData().getPath().isEmpty() ? elementId : getLastData().getPath() + "." + elementId);
 		// create
 		CPEnchantment element = new CPEnchantment(elementId.toLowerCase(), this, false, -1, getEditorIcon(), getEditorDescription());
-		data.setComponent(element);
-		element.setLastData(data);
+		// load, add and return
 		element.load(data);
+		addElement(element);
 		return element;
 	}
 
@@ -32,9 +32,9 @@ public class LPEnchantment extends ListParseable<CPEnchantment> {
 	public CPEnchantment loadElement(String elementId, ConfigData data) {
 		// create
 		CPEnchantment element = new CPEnchantment(elementId.toLowerCase(), this, false, -1, getEditorIcon(), getEditorDescription());
-		data.setComponent(element);
-		element.setLastData(data);
+		// load, add and return
 		element.load(data);
+		addElement(element);
 		return element;
 	}
 

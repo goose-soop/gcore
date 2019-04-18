@@ -22,9 +22,9 @@ public class LPPotionEffect extends ListParseable<CPPotionEffect> {
 		ConfigData data = new ConfigData(getLastData().getPlugin(), getLastData().getSuperId(), getLastData().getConfig(), getLastData().getPath().isEmpty() ? elementId : getLastData().getPath() + "." + elementId);
 		// create
 		CPPotionEffect element = new CPPotionEffect(elementId.toLowerCase(), this, false, -1, getEditorIcon(), getEditorDescription());
-		data.setComponent(element);
-		element.setLastData(data);
+		// load, add and return
 		element.load(data);
+		addElement(element);
 		return element;
 	}
 
@@ -32,9 +32,9 @@ public class LPPotionEffect extends ListParseable<CPPotionEffect> {
 	public CPPotionEffect loadElement(String elementId, ConfigData data) {
 		// create
 		CPPotionEffect element = new CPPotionEffect(elementId.toLowerCase(), this, false, -1, getEditorIcon(), getEditorDescription());
-		data.setComponent(element);
-		element.setLastData(data);
+		// load, add and return
 		element.load(data);
+		addElement(element);
 		return element;
 	}
 

@@ -5,14 +5,14 @@ import com.guillaumevdn.gcore.data.GUser;
 import com.guillaumevdn.gcore.data.UserInfo;
 import com.guillaumevdn.gcore.lib.data.DataManager.Callback;
 
-public abstract class PCUserOperator {
+public abstract class GUserOperator {
 
 	// base
 	private UserInfo info;
 	private GUser user = null;
 	private boolean offline = false;
 
-	public PCUserOperator(UserInfo info) {
+	public GUserOperator(UserInfo info) {
 		this.info = info;
 	}
 

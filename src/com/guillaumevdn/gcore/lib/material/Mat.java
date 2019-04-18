@@ -826,6 +826,7 @@ public class Mat implements Cloneable, Comparable<Mat> {
 	public static final Mat STRUCTURE_VOID = registerValue(new Mat(VERSION, "STRUCTURE_VOID", "STRUCTURE_VOID"));
 	public static final Mat SUGAR = registerValue(new Mat(VERSION, "SUGAR", "SUGAR"));
 	public static final Mat SUGAR_CANE = registerValue(new Mat(VERSION, "SUGAR_CANE", "SUGAR_CANE"));
+	public static final Mat SUGAR_CANE_BLOCK = registerValue(new Mat(VERSION, "SUGAR_CANE_BLOCK", "SUGAR_CANE_BLOCK"));
 	public static final Mat SUNFLOWER = registerValue(new Mat(VERSION, "SUNFLOWER", "DOUBLE_PLANT"));
 	public static final Mat TALL_GRASS = registerValue(new Mat(VERSION, "TALL_GRASS", "DOUBLE_PLANT", 2));
 	public static final Mat TALL_SEAGRASS = registerValue(new Mat(VERSION, "TALL_SEAGRASS", "-"));

@@ -8,12 +8,12 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import com.guillaumevdn.gcore.GCore;
-import com.guillaumevdn.gcore.data.ModifiedNpcData;
 import com.guillaumevdn.gcore.data.GUser;
+import com.guillaumevdn.gcore.data.ModifiedNpcData;
 import com.guillaumevdn.gcore.data.UserInfo;
 import com.guillaumevdn.gcore.lib.npc.Npc;
 import com.guillaumevdn.gcore.lib.npc.NpcData;
-import com.guillaumevdn.gcore.lib.util.PCUserOperator;
+import com.guillaumevdn.gcore.lib.util.GUserOperator;
 
 public class GroupNavigator extends PathfindingNavigator {
 
@@ -120,7 +120,7 @@ public class GroupNavigator extends PathfindingNavigator {
 
 	private void updateNpcDataLocation(final Location location) {
 		for (UserInfo info : allUsers) {
-			new PCUserOperator(info) {
+			new GUserOperator(info) {
 				@Override
 				protected void process(GUser user) {
 					ModifiedNpcData modif = user.getNpc(npcId);

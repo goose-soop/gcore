@@ -121,7 +121,9 @@ public class MojangsterAPI {
 		} catch (Throwable ignored) {
 			return null;
 		}
-		create.put("textures", WrappedGameProfile.fromHandle(handle).getProperties().get("textures").toArray()[0]);
+		Object[] arr = WrappedGameProfile.fromHandle(handle).getProperties().get("textures").toArray();
+		if (arr.length == 0) return null;
+		create.put("textures", arr[0]);
 		array[1] = create;
 		return array;
 	}

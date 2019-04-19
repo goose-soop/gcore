@@ -337,12 +337,10 @@ class ConversionV7 {
 
 	private Map<String, String> FIELD_RENAMING = Utils.asMap(
 			"auto_start", "starts_directly",
-			"check_leader_only", "only_for_role",
 			"fail_goto", "goto_if_not_valid",
 			"conditions_type", "conditions.type",
 			"sound", "sound.type",
 			"post_sound", "post_sound.type",
-			"leader_only", "for_leader_only",
 			"restricted_worlds", "world_whitelist"
 			);
 
@@ -361,42 +359,50 @@ class ConversionV7 {
 				convertModelConfig(from, to, fromPath.isEmpty() ? f : fromPath + "." + f, newFieldParent.isEmpty() || newField.isEmpty() ? newField : newFieldParent + "." + newField, SECTION_RENAMING.containsKey(f.toLowerCase()) ? SECTION_RENAMING.get(f.toLowerCase()) : f);
 			}
 		} else {
-			// get final path
-			String newPath = newFieldParent.isEmpty() ? newField : newFieldParent + "." + newField;
-			String toPath = null;
-			if (FIELD_RENAMING.containsKey(newField)) {
-				toPath = newFieldParent.isEmpty() ? FIELD_RENAMING.get(newField) : newFieldParent + "." + FIELD_RENAMING.get(newField);
-				GCore.inst().warning("Renamed " + newPath + " to " + toPath);
-			} else {
-				for (String str : PARENT_AND_FIELD_RENAMING.keySet()) {
-					if (newPath.endsWith(str)) {
-						toPath = newPath.substring(0, newPath.length() - str.length()) + PARENT_AND_FIELD_RENAMING.get(str);
-						GCore.inst().warning("Renamed " + newPath + " to " + toPath);
-						break;
+			// "check_leader_only" or "leader_only"
+			if (newField.equals("check_leader_only") || newField.equals("leader_only")) {
+				String newPath = newFieldParent.isEmpty() ? "only_for_role" : newFieldParent + ".only_for_role";
+				to.set(newPath, "LEADER");
+			}
+			// other field
+			else {
+				// get final path
+				String newPath = newFieldParent.isEmpty() ? newField : newFieldParent + "." + newField;
+				String toPath = null;
+				if (FIELD_RENAMING.containsKey(newField)) {
+					toPath = newFieldParent.isEmpty() ? FIELD_RENAMING.get(newField) : newFieldParent + "." + FIELD_RENAMING.get(newField);
+					GCore.inst().warning("Renamed " + newPath + " to " + toPath);
+				} else {
+					for (String str : PARENT_AND_FIELD_RENAMING.keySet()) {
+						if (newPath.endsWith(str)) {
+							toPath = newPath.substring(0, newPath.length() - str.length()) + PARENT_AND_FIELD_RENAMING.get(str);
+							GCore.inst().warning("Renamed " + newPath + " to " + toPath);
+							break;
+						}
+					}
+					if (toPath == null) {
+						toPath = newPath;
 					}
 				}
-				if (toPath == null) {
-					toPath = newPath;
-				}
-			}
-			// eventually modify value
-			Object obj = from.getObject(fromPath, null);
-			if (obj == null) GCore.inst().error("null : fromPath " + fromPath + ", toPath " + toPath + ", parent " + newFieldParent + ", field " + newField);
-			if (obj instanceof String) {
-				String str = (String) obj;
-				if (str.contains("NPC")) obj = str.replace("NPC", "CITIZENS_NPC");
-			} else if (obj instanceof List<?>) {
-				List<Object> list = (List<Object>) obj;
-				for (int i = 0; i < list.size(); ++i) {
-					Object o = list.get(i);
-					if (o instanceof String) {
-						String s = (String) o;
-						if (s.contains("NPC")) list.set(i, (Object) s.replace("NPC", "CITIZENS_NPC"));
+				// eventually modify value
+				Object obj = from.getObject(fromPath, null);
+				if (obj == null) GCore.inst().error("null : fromPath " + fromPath + ", toPath " + toPath + ", parent " + newFieldParent + ", field " + newField);
+				if (obj instanceof String) {
+					String str = (String) obj;
+					if (str.contains("NPC")) obj = str.replace("NPC", "CITIZENS_NPC");
+				} else if (obj instanceof List<?>) {
+					List<Object> list = (List<Object>) obj;
+					for (int i = 0; i < list.size(); ++i) {
+						Object o = list.get(i);
+						if (o instanceof String) {
+							String s = (String) o;
+							if (s.contains("NPC")) list.set(i, (Object) s.replace("NPC", "CITIZENS_NPC"));
+						}
 					}
 				}
+				// set value
+				to.set(toPath, obj);
 			}
-			// set value
-			to.set(toPath, obj);
 		}
 	}
 

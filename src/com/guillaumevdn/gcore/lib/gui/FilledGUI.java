@@ -47,10 +47,17 @@ public abstract class FilledGUI extends GUI {
 		}
 		register();
 		fill();
+		if (!postFill()) {
+			return;
+		}
 		super.open(player, pageIndex);
 	}
 
 	// abstract
 	protected abstract void fill();
+	/**
+	 * @return false if the GUI shouldn't be opened
+	 */
+	protected abstract boolean postFill();
 
 }

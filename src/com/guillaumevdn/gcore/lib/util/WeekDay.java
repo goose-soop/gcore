@@ -2,6 +2,8 @@ package com.guillaumevdn.gcore.lib.util;
 
 import java.util.Calendar;
 
+import com.guillaumevdn.gcore.GCore;
+
 public enum WeekDay {
 
 	MONDAY(Calendar.MONDAY),
@@ -26,7 +28,7 @@ public enum WeekDay {
 
 	// static methods
 	public static WeekDay getCurrent() {
-		return getFromCalendarField(Calendar.getInstance().get(Calendar.DAY_OF_WEEK));
+		return getFromCalendarField(GCore.inst().getCalendarInstance().get(Calendar.DAY_OF_WEEK));
 	}
 
 	public static WeekDay getFromCalendarField(int calendarField) {

@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
@@ -82,7 +81,7 @@ public class CommandDataExport extends CommandArgument {
 			Messenger.send(call.getSender(), Messenger.Level.SEVERE_ERROR, "GCore", "Couldn't create server info file.");
 		}
 		// zip
-		File target = new File(new File(".").getAbsolutePath() + File.separator + "plugins" + File.separator + "GCore_" + new SimpleDateFormat("YYYY'-'MM'-'dd'_'HH'-'mm").format(Calendar.getInstance().getTime()) + ".zip");
+		File target = new File(new File(".").getAbsolutePath() + File.separator + "plugins" + File.separator + "GCore_" + new SimpleDateFormat("YYYY'-'MM'-'dd'_'HH'-'mm").format(GCore.inst().getCalendarInstance().getTime()) + ".zip");
 		Utils.zipFile(tempRoot, target);
 		// delete temp root
 		if (!tempRoot.delete()) {

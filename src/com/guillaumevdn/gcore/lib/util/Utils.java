@@ -2451,7 +2451,7 @@ public class Utils {
 
 	// https://stackoverflow.com/a/46604975
 	public static int getDaysInMonth(int calendarMonth, int calendarYear) {
-		Calendar calendar = Calendar.getInstance();
+		Calendar calendar = GCore.inst().getCalendarInstance();
 		calendar.set(Calendar.YEAR, calendarYear);
 		calendar.set(Calendar.MONTH, calendarMonth++);
 		return calendarMonth == 2 ? 

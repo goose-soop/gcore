@@ -33,3 +33,10 @@ allow_custom_materials: false
 
 # NPC update delay (in ticks)
 npc_update_delay: 2
+
+# Time zone (if not specified, the server host time zone will be used)
+# Format : 'GMTxAA:BB' where :
+# - x is + or -
+# - AA is the hour, between 00 and 23
+# - BB is the minute, between 00 and 59
+#time_zone: 'GMT+01:00' (GMT +1h)

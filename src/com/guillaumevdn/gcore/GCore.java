@@ -2,8 +2,10 @@ package com.guillaumevdn.gcore;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
@@ -67,6 +69,8 @@ import com.guillaumevdn.gcore.lib.versioncompat.Compat;
 import com.guillaumevdn.gcore.lib.versioncompat.npc.NpcProtocols;
 import com.guillaumevdn.gcore.libs.com.google.gson.Gson;
 
+import sun.util.calendar.ZoneInfo;
+
 public class GCore extends GPlugin {
 
 	// ------------------------------------------------------------
@@ -98,6 +102,7 @@ public class GCore extends GPlugin {
 	// settings
 	private String activeLocaleLang = "en_US";
 	private boolean updateCheck = true;
+	private TimeZone calendarTimeZone = null;
 
 	// misc
 	private NpcManager npcManager = null;
@@ -145,6 +150,20 @@ public class GCore extends GPlugin {
 
 	public Map<Player, ItemInput> getItemInputs() {
 		return itemInputs;
+	}
+
+	/**
+	 * @return the configured calendar time zone, or null if none configured
+	 */
+	public TimeZone getCalendarTimeZone() {
+		return calendarTimeZone;
+	}
+
+	/**
+	 * @return the current calendar instance, using {@link #getCalendarTimeZone()} or the server host's time zone if none
+	 */
+	public Calendar getCalendarInstance() {
+		return calendarTimeZone != null ? Calendar.getInstance(calendarTimeZone) : Calendar.getInstance();
 	}
 
 	// ------------------------------------------------------------
@@ -224,6 +243,20 @@ public class GCore extends GPlugin {
 		this.configuration = new YMLConfiguration(this, new File(getDataFolder() + "/config.yml"), "config.yml", false,
 				true);
 		this.allowCustomMaterials = getConfiguration().getBoolean("allow_custom_materials", false);
+		if (getConfiguration().contains("time_zone")) {
+			String raw = getConfiguration().getString("time_zone", null);
+			try {
+				calendarTimeZone = TimeZone.getTimeZone(raw);
+			} catch (Throwable exception) {
+				exception.printStackTrace();
+			}
+			if (calendarTimeZone == null || calendarTimeZone.equals(new ZoneInfo("GMT", 0))) {
+				calendarTimeZone = null;
+				error("Couldn't parse time zone '" + raw + "', using server host's time zone");
+			}
+		} else {
+			calendarTimeZone = null;
+		}
 		success("Loaded config.yml");
 
 		// locale

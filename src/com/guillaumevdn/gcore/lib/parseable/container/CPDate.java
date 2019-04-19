@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.bukkit.entity.Player;
 
+import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.GLocale;
 import com.guillaumevdn.gcore.lib.material.Mat;
 import com.guillaumevdn.gcore.lib.parseable.ContainerParseable;
@@ -19,7 +20,7 @@ import com.guillaumevdn.gcore.lib.util.WeekDay;
 public class CPDate extends ContainerParseable {
 
 	// base
-	private PPInteger year = addComponent(new PPInteger("year", this, String.valueOf(Calendar.getInstance().get(Calendar.YEAR)), Integer.MIN_VALUE, Integer.MAX_VALUE, false, 0, EditorGUI.ICON_TECHNICAL, GLocale.GUI_GENERIC_EDITOR_YEARLORE.getLines()));
+	private PPInteger year = addComponent(new PPInteger("year", this, String.valueOf(GCore.inst().getCalendarInstance().get(Calendar.YEAR)), Integer.MIN_VALUE, Integer.MAX_VALUE, false, 0, EditorGUI.ICON_TECHNICAL, GLocale.GUI_GENERIC_EDITOR_YEARLORE.getLines()));
 	private PPEnum<Month> month = addComponent(new PPEnum<Month>("month", this, "FEBRUARY", Month.class, "month", false, 1, EditorGUI.ICON_TECHNICAL, GLocale.GUI_GENERIC_EDITOR_MONTHLORE.getLines()));
 	private PPEnum<WeekDay> day = addComponent(new PPEnum<WeekDay>("day", this, "MONDAY", WeekDay.class, "week day", false, 2, EditorGUI.ICON_TECHNICAL, GLocale.GUI_GENERIC_EDITOR_DAYLORE.getLines()));
 	private PPInteger hour = addComponent(new PPInteger("hour", this, "16", 0, 23, false, 3, EditorGUI.ICON_NUMBER, GLocale.GUI_GENERIC_EDITOR_HOURLORE.getLines()));
@@ -105,7 +106,7 @@ public class CPDate extends ContainerParseable {
 			return Status.ERROR;
 		}
 		// compare
-		Calendar calendar = Calendar.getInstance();
+		Calendar calendar = GCore.inst().getCalendarInstance();
 		int todayYear = calendar.get(Calendar.YEAR);
 		Month todayMonth = Month.getCurrent();
 		WeekDay todayDay = WeekDay.getCurrent();

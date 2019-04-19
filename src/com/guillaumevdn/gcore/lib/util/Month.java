@@ -2,6 +2,8 @@ package com.guillaumevdn.gcore.lib.util;
 
 import java.util.Calendar;
 
+import com.guillaumevdn.gcore.GCore;
+
 public enum Month {
 
 	JANUARY(Calendar.JANUARY),
@@ -31,7 +33,7 @@ public enum Month {
 
 	// static methods
 	public static Month getCurrent() {
-		return getFromCalendarField(Calendar.getInstance().get(Calendar.MONTH));
+		return getFromCalendarField(GCore.inst().getCalendarInstance().get(Calendar.MONTH));
 	}
 
 	public static Month getFromCalendarField(int calendarField) {

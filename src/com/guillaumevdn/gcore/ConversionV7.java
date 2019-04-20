@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import com.guillaumevdn.gcore.lib.configuration.YMLConfiguration;
 import com.guillaumevdn.gcore.lib.util.Utils;
@@ -179,31 +180,68 @@ class ConversionV7 {
 					GCore.inst().warning("- Category " + categoryId);
 					// quests
 					List<String> categoryQuests = categoriesConfig.getList("categories." + categoryId + ".quest_list", Utils.emptyList());
-					// activator
+					// activator type
 					String type = categoriesConfig.getString("categories." + categoryId + ".activator.type", "ENABLED");
-					activators.set("activators.activator_" + categoryId + ".type", type.equalsIgnoreCase("NPC") ? "CITIZENS_NPC" : type);
-					if (categoriesConfig.contains("categories." + categoryId + ".activator.selection_gui_when_one_quest")) {
-						activators.set("activators.activator_" + categoryId + ".min_quests_for_gui", categoriesConfig.getBoolean("categories." + categoryId + ".activator.selection_gui_when_one_quest", false) ? 1 : 2);
+					String activatorId = null, error = UUID.randomUUID().toString().split("-")[0];
+					if (type.equalsIgnoreCase("NPC")) {
+						activatorId = "activator_citizens_npc_" + categoriesConfig.getString("categories." + categoryId + ".activator.id", error);
+					} else if (type.equalsIgnoreCase("AUTO")) {
+						activatorId = "activator_auto";
+					} else if (type.equalsIgnoreCase("BLOCK")) {
+						activatorId = "activator_block_" + categoriesConfig.getString("categories." + categoryId + ".activator.block", error).replace(",", "_").replace(".", "-");
+					} else if (type.equalsIgnoreCase("DAILY")) {
+						activatorId = "activator_daily_" + categoriesConfig.getString("categories." + categoryId + ".activator.hour_of_day", error);
+					} else if (type.equalsIgnoreCase("DELAY")) {
+						activatorId = "activator_daily_" + categoriesConfig.getString("categories." + categoryId + ".activator.delay", error);
+					} else if (type.equalsIgnoreCase("DISABLED")) {
+						activatorId = "activator_disabled";
+					} else if (type.equalsIgnoreCase("ENABLED")) {
+						activatorId = "activator_enabled";
+					} else if (type.equalsIgnoreCase("FIRST_CONNECT")) {
+						activatorId = "activator_first_connect";
+					} else if (type.equalsIgnoreCase("ENTITY")) {
+						activatorId = "activator_entity_" + categoriesConfig.getString("categories." + categoryId + ".activator.name", error).replace(" ", "_").replace("&", "COLOR");
+					} else if (type.equalsIgnoreCase("PRECISE_ENTITY")) {
+						activatorId = "activator_precise_entity" + categoriesConfig.getString("categories." + categoryId + ".activator.uuid", error);
+					} else if (type.equalsIgnoreCase("WORLDGUARD_REGION")) {
+						activatorId = "activator_worldguard_region_" + categoriesConfig.getString("categories." + categoryId + ".activator.world", error) + "_" + categoriesConfig.getString("categories." + categoryId + ".activator.region", error);
 					}
-					if (categoriesConfig.contains("categories." + categoryId + ".activator.allow_gui_click_start")) {
-						activators.set("activators.activator_" + categoryId + ".gui_click_type_start", categoriesConfig.getBoolean("categories." + categoryId + ".activator.allow_gui_click_start", true) ? "LEFT_CLICK" : "NONE");
+					// couldn't find new id
+					boolean saveActivator = true;
+					if (activatorId == null || activatorId.contains(error)) {
+						GCore.inst().error("- Couldn't find new ID for activator, missing settings maybe ?");
+						saveActivator = false;
 					}
-					if (categoriesConfig.contains("categories." + categoryId + ".activator.start_click_type")) {
-						activators.set("activators.activator_" + categoryId + ".interaction_click", categoriesConfig.getString("categories." + categoryId + ".activator.start_click_type", null));
+					// already copied
+					if (activators.contains("activators." + activatorId)) {
+						saveActivator = false;
 					}
-					if (categoriesConfig.contains("categories." + categoryId + ".activator.gui_show_unavailable")) {
-						activators.set("activators.activator_" + categoryId + ".gui_show_quest_unavailable", categoriesConfig.getBoolean("categories." + categoryId + ".activator.gui_show_unavailable", true));
+					// activator
+					if (saveActivator) {
+						activators.set("activators." + activatorId + ".type", type.equalsIgnoreCase("NPC") ? "CITIZENS_NPC" : type);
+						if (categoriesConfig.contains("categories." + categoryId + ".activator.selection_gui_when_one_quest")) {
+							activators.set("activators." + activatorId + ".min_quests_for_gui", categoriesConfig.getBoolean("categories." + categoryId + ".activator.selection_gui_when_one_quest", false) ? 1 : 2);
+						}
+						if (categoriesConfig.contains("categories." + categoryId + ".activator.allow_gui_click_start")) {
+							activators.set("activators." + activatorId + ".gui_click_type_start", categoriesConfig.getBoolean("categories." + categoryId + ".activator.allow_gui_click_start", true) ? "LEFT_CLICK" : "NONE");
+						}
+						if (categoriesConfig.contains("categories." + categoryId + ".activator.start_click_type")) {
+							activators.set("activators." + activatorId + ".interaction_click", categoriesConfig.getString("categories." + categoryId + ".activator.start_click_type", null));
+						}
+						if (categoriesConfig.contains("categories." + categoryId + ".activator.gui_show_unavailable")) {
+							activators.set("activators." + activatorId + ".gui_show_quest_unavailable", categoriesConfig.getBoolean("categories." + categoryId + ".activator.gui_show_unavailable", true));
+						}
+						if (categoriesConfig.contains("categories." + categoryId + ".activator.gui_show_cooldown")) {
+							activators.set("activators." + activatorId + ".gui_show_quest_cooldown", categoriesConfig.getBoolean("categories." + categoryId + ".activator.gui_show_cooldown", true));
+						}
+						if (categoriesConfig.contains("categories." + categoryId + ".activator.gui_show_completed")) {
+							activators.set("activators." + activatorId + ".gui_show_quest_completed", categoriesConfig.getBoolean("categories." + categoryId + ".activator.gui_show_completed", true));
+						}
+						copyConfig(categoriesConfig, "categories." + categoryId + ".activator", activators, "activators." + activatorId, Utils.asList("type", "selection_gui_when_one_quest", "start_click_type", "gui_show_unavailable", "gui_show_cooldown", "gui_show_completed", "allow_gui_click_start"));
+						GCore.inst().warning("Created activator " + activatorId);
 					}
-					if (categoriesConfig.contains("categories." + categoryId + ".activator.gui_show_cooldown")) {
-						activators.set("activators.activator_" + categoryId + ".gui_show_quest_cooldown", categoriesConfig.getBoolean("categories." + categoryId + ".activator.gui_show_cooldown", true));
-					}
-					if (categoriesConfig.contains("categories." + categoryId + ".activator.gui_show_completed")) {
-						activators.set("activators.activator_" + categoryId + ".gui_show_quest_completed", categoriesConfig.getBoolean("categories." + categoryId + ".activator.gui_show_completed", true));
-					}
-					copyConfig(categoriesConfig, "categories." + categoryId + ".activator", activators, "activators.activator_" + categoryId, Utils.asList("type", "selection_gui_when_one_quest", "start_click_type", "gui_show_unavailable", "gui_show_cooldown", "gui_show_completed", "allow_gui_click_start"));
-					GCore.inst().warning("Created activator activator_" + categoryId);
 					// group (if more than one quest)
-					boolean createGroup = categoryQuests.size() > 1;
+					boolean createGroup = categoryQuests.size() > 1 && !groups.contains("groups.group_" + categoryId);
 					if (createGroup) {
 						// copy settings
 						groups.set("groups.group_" + categoryId + ".max_concurrent", categoriesConfig.getInt("categories." + categoryId + ".max_concurrent", 100));
@@ -230,9 +268,10 @@ class ConversionV7 {
 					}
 					// registration
 					for (String questId : categoryQuests) {
-						registration.set("quests." + questId + ".activators", Utils.asList("activator_" + categoryId));
+						if (registration.contains("quests." + questId)) continue;
+						registration.set("quests." + questId + ".activators", Utils.asList(activatorId));
 						if (createGroup) registration.set("quests." + questId + ".group", "group_" + categoryId);
-						GCore.inst().warning("Registered quest " + questId + " with activator activator_" + categoryId + (!createGroup ? "" : " and group group_" + categoryId));
+						GCore.inst().warning("Registered quest " + questId + " with activator " + activatorId + (!createGroup ? "" : " and group group_" + categoryId));
 					}
 				}
 				// convert compact npc categories
@@ -240,44 +279,51 @@ class ConversionV7 {
 					Integer npcId = Utils.integerOrNull(categoryId);
 					if (npcId == null) continue;
 					GCore.inst().warning("- Compact npc category " + categoryId);
-					String id = "npc_" + categoryId;
 					// quests
 					List<String> categoryQuests = categoriesConfig.getList("compact_npc_categories." + categoryId + ".quest_list", Utils.emptyList());
+					// already copied
+					String activatorId = "activator_citizens_npc_" + npcId;
+					boolean saveActivator = true;
+					if (activators.contains("activators." + activatorId)) {
+						saveActivator = false;
+					}
 					// activator
-					activators.set("activators.activator_" + id + ".type", "CITIZENS_NPC");
-					activators.set("activators.activator_" + id + ".id", npcId);
-					if (categoriesConfig.contains("categories." + categoryId + ".selection_gui_when_one_quest")) {
-						activators.set("activators.activator_" + categoryId + ".min_quests_for_gui", categoriesConfig.getBoolean("categories." + categoryId + ".selection_gui_when_one_quest", false) ? 1 : 2);
+					if (saveActivator) {
+						activators.set("activators." + activatorId + ".type", "CITIZENS_NPC");
+						activators.set("activators." + activatorId + ".id", npcId);
+						if (categoriesConfig.contains("categories." + categoryId + ".selection_gui_when_one_quest")) {
+							activators.set("activators." + activatorId + ".min_quests_for_gui", categoriesConfig.getBoolean("categories." + categoryId + ".selection_gui_when_one_quest", false) ? 1 : 2);
+						}
+						if (categoriesConfig.contains("categories." + categoryId + ".allow_gui_click_start")) {
+							activators.set("activators." + activatorId + ".gui_click_type_start", categoriesConfig.getBoolean("categories." + categoryId + ".allow_gui_click_start", true) ? "LEFT_CLICK" : "NONE");
+						}
+						if (categoriesConfig.contains("categories." + categoryId + ".start_click_type")) {
+							activators.set("activators." + activatorId + ".interaction_click", categoriesConfig.getString("categories." + categoryId + ".start_click_type", null));
+						}
+						if (categoriesConfig.contains("categories." + categoryId + ".gui_show_unavailable")) {
+							activators.set("activators." + activatorId + ".gui_show_quest_unavailable", categoriesConfig.getBoolean("categories." + categoryId + ".gui_show_unavailable", true));
+						}
+						if (categoriesConfig.contains("categories." + categoryId + ".gui_show_cooldown")) {
+							activators.set("activators." + activatorId + ".gui_show_quest_cooldown", categoriesConfig.getBoolean("categories." + categoryId + ".gui_show_cooldown", true));
+						}
+						if (categoriesConfig.contains("categories." + categoryId + ".gui_show_completed")) {
+							activators.set("activators." + activatorId + ".gui_show_quest_completed", categoriesConfig.getBoolean("categories." + categoryId + ".gui_show_completed", true));
+						}
+						for (String field : Utils.asList("sneak_click_cancel", "particle_offy", "particle_available", "particle_progress", "particle_cooldown", "particle_completed")) {
+							activators.set("activators." + activatorId + "." + field, categoriesConfig.getObject("categories." + categoryId + "." + field, null));
+						}
+						GCore.inst().warning("Created activator " + activatorId);
 					}
-					if (categoriesConfig.contains("categories." + categoryId + ".allow_gui_click_start")) {
-						activators.set("activators.activator_" + categoryId + ".gui_click_type_start", categoriesConfig.getBoolean("categories." + categoryId + ".allow_gui_click_start", true) ? "LEFT_CLICK" : "NONE");
-					}
-					if (categoriesConfig.contains("categories." + categoryId + ".start_click_type")) {
-						activators.set("activators.activator_" + categoryId + ".interaction_click", categoriesConfig.getString("categories." + categoryId + ".start_click_type", null));
-					}
-					if (categoriesConfig.contains("categories." + categoryId + ".gui_show_unavailable")) {
-						activators.set("activators.activator_" + categoryId + ".gui_show_quest_unavailable", categoriesConfig.getBoolean("categories." + categoryId + ".gui_show_unavailable", true));
-					}
-					if (categoriesConfig.contains("categories." + categoryId + ".gui_show_cooldown")) {
-						activators.set("activators.activator_" + categoryId + ".gui_show_quest_cooldown", categoriesConfig.getBoolean("categories." + categoryId + ".gui_show_cooldown", true));
-					}
-					if (categoriesConfig.contains("categories." + categoryId + ".gui_show_completed")) {
-						activators.set("activators.activator_" + categoryId + ".gui_show_quest_completed", categoriesConfig.getBoolean("categories." + categoryId + ".gui_show_completed", true));
-					}
-					for (String field : Utils.asList("sneak_click_cancel", "particle_offy", "particle_available", "particle_progress", "particle_cooldown", "particle_completed")) {
-						activators.set("activators.activator_" + categoryId + "." + field, categoriesConfig.getObject("categories." + categoryId + "." + field, null));
-					}
-					GCore.inst().warning("Created activator activator_" + id);
 					// group (if more than one quest)
-					boolean createGroup = categoryQuests.size() > 1;
+					boolean createGroup = categoryQuests.size() > 1 && !groups.contains("group.group_citizens_npc_" + npcId);
 					if (createGroup) {
 						// copy settings
-						groups.set("groups.group_" + id + ".max_concurrent", categoriesConfig.getInt("compact_npc_categories." + categoryId + ".max_concurrent", 100));
-						groups.set("groups.group_" + id + ".execution_order", categoriesConfig.getBoolean("compact_npc_categories." + categoryId + ".execution_order", true));
-						groups.set("groups.group_" + id + ".gui", "gui_" + categoryId);
-						GCore.inst().warning("Created group group_" + id);
+						groups.set("groups.group_citizens_npc_" + npcId + ".max_concurrent", categoriesConfig.getInt("compact_npc_categories." + categoryId + ".max_concurrent", 100));
+						groups.set("groups.group_citizens_npc_" + npcId + ".execution_order", categoriesConfig.getBoolean("compact_npc_categories." + categoryId + ".execution_order", true));
+						groups.set("groups.group_citizens_npc_" + npcId + ".gui", "gui_" + categoryId);
+						GCore.inst().warning("Created group group_citizens_npc_" + npcId);
 						// create group gui
-						YMLConfiguration groupGuiConfig = new YMLConfiguration(GCore.inst(), new File(neww + "/guis/gui_group_" + id + ".yml"), null, true, false);
+						YMLConfiguration groupGuiConfig = new YMLConfiguration(GCore.inst(), new File(neww + "/guis/gui_group_citizens_npc_" + npcId + ".yml"), null, true, false);
 						groupGuiConfig.setHeader(
 								"#----------------------------------------------------------------------------------------------------",
 								"# GUI configuration file (file name without the extension is the GUI identifier)",
@@ -292,13 +338,14 @@ class ConversionV7 {
 						groupGuiConfig.set("show_quest_unavailable", categoriesConfig.getBoolean("compact_npc_categories." + categoryId + ".show_quest_unavailable", true));
 						// save
 						groupGuiConfig.save();
-						GCore.inst().warning("Created gui gui_group_" + id);
+						GCore.inst().warning("Created gui gui_group_citizens_npc_" + npcId);
 					}
 					// registration
 					for (String questId : categoryQuests) {
-						registration.set("quests." + questId + ".activators", Utils.asList("activator_" + id));
-						if (createGroup) registration.set("quests." + questId + ".group", "group_" + id);
-						GCore.inst().warning("Registered quest " + questId + " with activator activator_" + id + (!createGroup ? "" : " and group group_" + id));
+						if (registration.contains("quests." + questId)) continue;
+						registration.set("quests." + questId + ".activators", Utils.asList("activator_citizens_npc_" + npcId));
+						if (createGroup) registration.set("quests." + questId + ".group", "group_citizens_npc_" + npcId);
+						GCore.inst().warning("Registered quest " + questId + " with activator activator_citizens_npc_" + npcId + (!createGroup ? "" : " and group group_citizens_npc_" + npcId));
 					}
 				}
 				// save yml

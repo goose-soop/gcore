@@ -31,7 +31,7 @@ public class LPPotionEffect extends ListParseable<CPPotionEffect> {
 	@Override
 	public CPPotionEffect loadElement(String elementId, ConfigData data) {
 		// create
-		CPPotionEffect element = new CPPotionEffect(elementId.toLowerCase(), this, false, -1, getEditorIcon(), getEditorDescription());
+		CPPotionEffect element = new CPPotionEffect(elementId, this, false, -1, getEditorIcon(), getEditorDescription());
 		// load, add and return
 		element.load(data);
 		addElement(element);

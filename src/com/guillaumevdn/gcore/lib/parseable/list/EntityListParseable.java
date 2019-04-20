@@ -122,7 +122,7 @@ public abstract class EntityListParseable<T extends Parseable> extends ListParse
 					@Override
 					public void onChat(Player player, String value) {
 						if (!value.replace(" ", "").equalsIgnoreCase("cancel")) {
-							value = getIdCase().transform("named:" + value.replace(" ", "_"));
+							value = "named:" + value.replace(" ", "_").toLowerCase();
 							if (!Utils.isAlphanumeric(value.replace("_", ""))) {
 								GLocale.MSG_GENERIC_INVALIDALPHANUMERIC.send(player, "{plugin}", GCore.inst().getName(), "{error}", value);
 							} else if (getElements().containsKey(value)) {

@@ -37,7 +37,7 @@ public class MatLPMatLPDouble extends MatListParseable<MatLPDouble> {
 	@Override
 	public MatLPDouble loadElement(String elementId, ConfigData data) {
 		// create
-		MatLPDouble element = new MatLPDouble(elementId.toLowerCase(), this, typeAllowDefault, defaultValue, min, max, false, -1, getEditorIcon(), getEditorDescription());
+		MatLPDouble element = new MatLPDouble(elementId, this, typeAllowDefault, defaultValue, min, max, false, -1, getEditorIcon(), getEditorDescription());
 		// load, add and return
 		element.load(data);
 		addElement(element);

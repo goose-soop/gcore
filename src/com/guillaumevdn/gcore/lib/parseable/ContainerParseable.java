@@ -35,15 +35,13 @@ public abstract class ContainerParseable extends Parseable {
 	}
 
 	public Parseable getComponent(String id) {
-		id = id.toLowerCase();
-		Parseable component = components.get(id);
+		Parseable component = components.get(id.toLowerCase());
 		if (component == null) throw new IllegalArgumentException("there's no component with id " + id);
 		return component;
 	}
 
 	public <C extends Parseable> C getComponent(String id, Class<C> componentClass) {
-		id = id.toLowerCase();
-		Parseable component = getComponent(id);
+		Parseable component = getComponent(id.toLowerCase());
 		if (!Utils.instanceOf(component, componentClass)) throw new IllegalArgumentException("component with id " + id + " is not of type " + componentClass.getName());
 		return (C) component;
 	}

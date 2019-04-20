@@ -66,7 +66,7 @@ public class LPItem extends ListParseable<CPItem> {
 	@Override
 	public CPItem loadElement(String elementId, ConfigData data) {
 		// create
-		CPItem element = new CPItem(elementId.toLowerCase(), this, false, -1, getEditorIcon(), getEditorDescription());
+		CPItem element = new CPItem(elementId, this, false, -1, getEditorIcon(), getEditorDescription());
 		// load, add and return
 		element.load(data);
 		addElement(element);

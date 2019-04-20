@@ -152,7 +152,7 @@ public class YMLConfiguration {
 	public LinkedHashSet<String> getKeysForSection(String sectionPath, boolean sort) {
 		sectionPath = sectionPath.replace(" ", "").replace("\t", "");
 		LinkedHashSet<String> keys = new LinkedHashSet<String>();
-		if (yaml.isConfigurationSection(sectionPath)) {
+		if (yaml.contains(sectionPath) && yaml.isConfigurationSection(sectionPath)) {
 			if (sort) {
 				List<String> list = Utils.asList(yaml.getConfigurationSection(sectionPath).getKeys(false));
 				Collections.sort(list);

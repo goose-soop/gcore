@@ -22,39 +22,39 @@ public abstract class ListParseable<T extends Parseable> extends Parseable {
 
 	// base
 	private String elementTypeName;
-	private CaseType idCase;
-	private Map<String, T> elements = new HashMap<String, T>();// LOWER/UPPER CASE KEY
+	//private CaseType idCase;
+	private Map<String, T> elements = new HashMap<String, T>();// LOWER-CASE KEY
 
 	public ListParseable(String id, Parseable parent, String elementTypeName, CaseType idCase, boolean mandatory, int editorSlot, Mat editorIcon, List<String> editorDescription) {
 		super(id, parent, mandatory, editorSlot, editorIcon, editorDescription);
 		this.elementTypeName = elementTypeName;
-		this.idCase = idCase;
+		//this.idCase = idCase;
 	}
 
 	public String getElementTypeName() {
 		return elementTypeName;
 	}
 
-	public CaseType getIdCase() {
+	/*public CaseType getIdCase() {
 		return idCase;
-	}
+	}*/
 
 	public Map<String, T> getElements() {
 		return elements;
 	}
 
 	public T getElement(String id) {
-		return elements.get(idCase.transform(id));
+		return elements.get(id.toLowerCase());
 	}
 
 	/** @return the previous value associated with the same id, or null if there was none */
 	public T addElement(T element) {
-		return elements.put(idCase.transform(element.getId()), element);
+		return elements.put(element.getId().toLowerCase(), element);
 	}
 
 	/** @return the removed value associated with the id, or null if there was none */
 	public T removeElement(String id) {
-		return elements.remove(idCase.transform(id));
+		return elements.remove(id.toLowerCase());
 	}
 
 	/** Create an element with the specified id, and add it to the list */
@@ -182,7 +182,7 @@ public abstract class ListParseable<T extends Parseable> extends Parseable {
 					@Override
 					public void onChat(Player player, String value) {
 						if (!value.replace(" ", "").equalsIgnoreCase("cancel")) {
-							value = idCase.transform(value.replace(" ", "_"));
+							value = value.replace(" ", "_").toLowerCase();
 							if (!Utils.isAlphanumeric(value.replace("_", ""))) {
 								GLocale.MSG_GENERIC_INVALIDALPHANUMERIC.send(player, "{plugin}", GCore.inst().getName(), "{error}", value);
 							} else if (elements.containsKey(value)) {
@@ -234,7 +234,6 @@ public abstract class ListParseable<T extends Parseable> extends Parseable {
 		ListParseable<T> clone = (ListParseable<T>) super.clone();
 		// clone properties
 		clone.elementTypeName = elementTypeName;
-		clone.idCase = idCase;
 		for (String elementId : elements.keySet()) {
 			clone.elements.put(elementId, (T) elements.get(elementId).clone());
 		}

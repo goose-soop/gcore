@@ -31,7 +31,7 @@ public class LPEnchantment extends ListParseable<CPEnchantment> {
 	@Override
 	public CPEnchantment loadElement(String elementId, ConfigData data) {
 		// create
-		CPEnchantment element = new CPEnchantment(elementId.toLowerCase(), this, false, -1, getEditorIcon(), getEditorDescription());
+		CPEnchantment element = new CPEnchantment(elementId, this, false, -1, getEditorIcon(), getEditorDescription());
 		// load, add and return
 		element.load(data);
 		addElement(element);

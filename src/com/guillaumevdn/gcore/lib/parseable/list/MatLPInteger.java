@@ -55,7 +55,7 @@ public class MatLPInteger extends MatListParseable<PPInteger> {
 	@Override
 	public PPInteger loadElement(String elementId, ConfigData data) {
 		// create
-		PPInteger element = new PPInteger(elementId.toLowerCase(), this, defaultValue, min, max, false, -1, getEditorIcon(), getEditorDescription());
+		PPInteger element = new PPInteger(elementId, this, defaultValue, min, max, false, -1, getEditorIcon(), getEditorDescription());
 		// load, add and return
 		element.load(data);
 		addElement(element);

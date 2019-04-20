@@ -37,7 +37,7 @@ public class MatLPMatLPInteger extends MatListParseable<MatLPInteger> {
 	@Override
 	public MatLPInteger loadElement(String elementId, ConfigData data) {
 		// create
-		MatLPInteger element = new MatLPInteger(elementId.toLowerCase(), this, typeAllowDefault, defaultValue, min, max, false, -1, getEditorIcon(), getEditorDescription());
+		MatLPInteger element = new MatLPInteger(elementId, this, typeAllowDefault, defaultValue, min, max, false, -1, getEditorIcon(), getEditorDescription());
 		// load, add and return
 		element.load(data);
 		addElement(element);

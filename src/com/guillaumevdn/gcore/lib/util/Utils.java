@@ -299,35 +299,35 @@ public class Utils {
 	}
 
 	public static <T> boolean saveToGson(T object, File file, Gson gson) {
-		File temp = new File(file.getPath() + ".temp");
+		File backup = new File(file.getParentFile() + "/backup_" + file.getName());
 		try {
+			// create directory
 			if (file.getParentFile() != null && !file.getParentFile().exists()) {
 				file.getParentFile().mkdirs();
 			}
-
-			if (temp.getParentFile() != null && !temp.getParentFile().exists()) {
-				temp.getParentFile().mkdirs();
+			// move file to backup if exists
+			if (file.exists()) {
+				file.renameTo(backup);
 			}
 
-			if (!temp.exists()) {
-				temp.createNewFile();
-			}
-
-			FileWriter writer = new FileWriter(temp);
+			// reset and write
+			file.createNewFile();
+			FileWriter writer = new FileWriter(file);
 			gson.toJson(object, writer);
 			writer.close();
 
-			if (file.exists()) {
-				file.delete();
+			// remove backup
+			if (!backup.delete()) {
+				backup.deleteOnExit();
 			}
 
-			temp.renameTo(file);
+			// success
 			return true;
-		}
-		catch (Throwable exception) {
+		} catch (Throwable exception) {
 			exception.printStackTrace();
-			temp.delete();
 			Logger.log(Level.SEVERE, "GCore", "Could not save " + file);
+			file.delete();
+			file.renameTo(backup);
 			return false;
 		}
 	}

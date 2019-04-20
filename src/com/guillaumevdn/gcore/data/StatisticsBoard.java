@@ -122,7 +122,7 @@ public class StatisticsBoard extends DataSingleton {
 	public final Query getMySQLInitQuery() {
 		return new Query("CREATE TABLE IF NOT EXISTS `" + getMySQLTable() + "`(" +
 				"`key` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT," +
-				"`id` VARCHAR(50) NOT NULL," +
+				"`id` VARCHAR(100) NOT NULL," +
 				"`userid` VARCHAR(100) NOT NULL," +
 				"`value` INT NOT NULL," +
 				"PRIMARY KEY(`key`)" +

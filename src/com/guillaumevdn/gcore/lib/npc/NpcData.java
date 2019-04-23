@@ -1,7 +1,6 @@
 package com.guillaumevdn.gcore.lib.npc;
 
 import java.util.List;
-import java.util.UUID;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -18,7 +17,6 @@ import com.guillaumevdn.gcore.lib.parseable.primitive.PPDouble;
 import com.guillaumevdn.gcore.lib.parseable.primitive.PPEnumList;
 import com.guillaumevdn.gcore.lib.parseable.primitive.PPLocation;
 import com.guillaumevdn.gcore.lib.parseable.primitive.PPString;
-import com.guillaumevdn.gcore.lib.parseable.primitive.PPUUID;
 import com.guillaumevdn.gcore.lib.util.Utils;
 
 public class NpcData extends ContainerParseable {
@@ -26,10 +24,11 @@ public class NpcData extends ContainerParseable {
 	// base
 	private PPBoolean shown = addComponent(new PPBoolean("shown", this, "true", false, 0, EditorGUI.ICON_BOOLEAN, GLocale.GUI_GENERIC_EDITOR_NPC_SHOWLORE.getLines()));
 	private PPString name = addComponent(new PPString("name", this, "GuillaumeVDN", false, 1, EditorGUI.ICON_STRING, GLocale.GUI_GENERIC_EDITOR_NPC_NAMELORE.getLines()));
-	private PPUUID skin = addComponent(new PPUUID("skin", this, "6833a1c9-95a5-4c79-bc1f-45341ec0ff40", false, 2, EditorGUI.ICON_TECHNICAL, GLocale.GUI_GENERIC_EDITOR_NPC_SKINLORE.getLines()));
-	private PPLocation location = addComponent(new PPLocation("location", this, "world,0,0,0", true, 3, EditorGUI.ICON_LOCATION, GLocale.GUI_GENERIC_EDITOR_NPC_LOCATIONLORE.getLines()));
-	private PPDouble targetDistance = addComponent(new PPDouble("target_distance", this, "5", 0d, Double.MAX_VALUE, false, 4, EditorGUI.ICON_NUMBER, GLocale.GUI_GENERIC_EDITOR_NPC_TARGEDISTANCELORE.getLines()));
-	private PPEnumList<NpcStatus> status = addComponent(new PPEnumList<NpcStatus>("status", this, Utils.emptyList(), NpcStatus.class, "npc status", false, 5, EditorGUI.ICON_NUMBER, GLocale.GUI_GENERIC_EDITOR_NPC_STATUSLORE.getLines()));
+	private PPString skinData = addComponent(new PPString("skin_data", this, null, false, 2, EditorGUI.ICON_TECHNICAL, GLocale.GUI_GENERIC_EDITOR_NPC_SKINDATALORE.getLines()));
+	private PPString skinSignature = addComponent(new PPString("skin_signature", this, null, false, 3, EditorGUI.ICON_TECHNICAL, GLocale.GUI_GENERIC_EDITOR_NPC_SKINSIGNATURELORE.getLines()));
+	private PPLocation location = addComponent(new PPLocation("location", this, "world,0,0,0", true, 4, EditorGUI.ICON_LOCATION, GLocale.GUI_GENERIC_EDITOR_NPC_LOCATIONLORE.getLines()));
+	private PPDouble targetDistance = addComponent(new PPDouble("target_distance", this, "5", 0d, Double.MAX_VALUE, false, 5, EditorGUI.ICON_NUMBER, GLocale.GUI_GENERIC_EDITOR_NPC_TARGEDISTANCELORE.getLines()));
+	private PPEnumList<NpcStatus> status = addComponent(new PPEnumList<NpcStatus>("status", this, Utils.emptyList(), NpcStatus.class, "npc status", false, 6, EditorGUI.ICON_NUMBER, GLocale.GUI_GENERIC_EDITOR_NPC_STATUSLORE.getLines()));
 	private CPItem heldItem = addComponent(new CPItem("held_item", this, false, 9, EditorGUI.ICON_ITEM, GLocale.GUI_GENERIC_EDITOR_NPC_STUFFLORE.getLines()));
 	private CPItem heldItemOff = addComponent(new CPItem("held_item_off", this, false, 10, EditorGUI.ICON_ITEM, GLocale.GUI_GENERIC_EDITOR_NPC_STUFFLORE.getLines()));
 	private CPItem boots = addComponent(new CPItem("boots", this, false, 11, EditorGUI.ICON_ITEM, GLocale.GUI_GENERIC_EDITOR_NPC_STUFFLORE.getLines()));
@@ -58,12 +57,20 @@ public class NpcData extends ContainerParseable {
 		return name.getParsedValue(parser);
 	}
 
-	public PPUUID getSkin() {
-		return skin;
+	public PPString getSkinData() {
+		return skinData;
 	}
 
-	public UUID getSkin(Player parser) {
-		return skin.getParsedValue(parser);
+	public String getSkinData(Player parser) {
+		return skinData.getParsedValue(parser);
+	}
+
+	public PPString getSkinSignature() {
+		return skinSignature;
+	}
+
+	public String getSkinSignature(Player parser) {
+		return skinSignature.getParsedValue(parser);
 	}
 
 	public PPLocation getLocation() {

@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -29,18 +28,19 @@ public class Npc {
 	private final Player player;
 	private final int id;
 	private String name;
-	private UUID skin;
+	private String skinData, skinSignature;
 	private Location location;
 	private double targetDistance;
 	private Set<NpcStatus> status = new HashSet<NpcStatus>();
 	private ItemData[] items = new ItemData[6];
 	private boolean spawned = false;
 
-	public Npc(final Player player, final int id, String name, UUID skin, Location location, double targetDistance, Set<NpcStatus> status, ItemData[] items) {
+	public Npc(final Player player, final int id, String name, String skinData, String skinSignature, Location location, double targetDistance, Set<NpcStatus> status, ItemData[] items) {
 		this.player = player;
 		this.id = id;
 		this.name = name;
-		this.skin = skin;
+		this.skinData = skinData;
+		this.skinSignature = skinSignature;
 		this.location = location;
 		this.targetDistance = targetDistance;
 		if (status != null) this.status.addAll(status);
@@ -70,10 +70,14 @@ public class Npc {
 		return name;
 	}
 
-	public UUID getSkin() {
-		return skin;
+	public String getSkinData() {
+		return skinData;
 	}
-
+	
+	public String getSkinSignature() {
+		return skinSignature;
+	}
+	
 	public Location getLocation() {
 		return location;
 	}
@@ -133,7 +137,7 @@ public class Npc {
 			return false;
 		}
 		// spawn
-		NpcProtocols.INSTANCE.spawn(player, getEntityId(), name, location, skin);
+		NpcProtocols.INSTANCE.spawn(player, getEntityId(), name, location, skinData, skinSignature);
 		spawned = true;
 		// update status and equipment
 		updateStatus();
@@ -304,8 +308,9 @@ public class Npc {
 		spawn();
 	}
 
-	public void changeSkin(UUID skin) {
-		this.skin = skin;
+	public void changeSkin(String skinData, String skinSignature) {
+		this.skinData = skinData;
+		this.skinSignature = skinSignature;
 		// update player
 		despawn();
 		spawn();

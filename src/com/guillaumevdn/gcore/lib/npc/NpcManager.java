@@ -8,7 +8,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -36,7 +35,6 @@ public class NpcManager implements Listener {
 	private NpcPacketListener packetListener = null;
 	private Map<Player, Map<Integer, Npc>> npcs = new HashMap<Player, Map<Integer, Npc>>();
 	private List<Navigator> navigators = new ArrayList<Navigator>();
-	private List<UUID> loadSkinLater = new ArrayList<UUID>();
 
 	// get
 	public Npc getNpc(Player player, int id) {
@@ -68,20 +66,6 @@ public class NpcManager implements Listener {
 
 	public void removeNavigator(Navigator navigator) {
 		navigators.remove(navigator);
-	}
-
-	public List<UUID> getLoadSkinLater() {
-		return loadSkinLater;
-	}
-
-	public void loadSkinLater(UUID skin) {
-		if (GCore.inst().getData().initializedNpcSkins()) {
-			if (GCore.inst().getData().getMojangStatus()) {
-				new SkinData(skin).refresh();// will be put it in the npc skins board
-			}
-		} else if (!loadSkinLater.contains(skin)) {
-			loadSkinLater.add(skin);
-		}
 	}
 
 	// methods
@@ -134,7 +118,8 @@ public class NpcManager implements Listener {
 		}
 		// build npc data
 		String name = userNpcData != null && userNpcData.getName() != null ? userNpcData.getName() : npcData.getName(player);
-		UUID skin = userNpcData != null && userNpcData.getSkin() != null ? userNpcData.getSkin() : npcData.getSkin(player);
+		String skinData = userNpcData != null && userNpcData.getSkinData() != null ? userNpcData.getSkinData() : npcData.getSkinData(player);
+		String skinSignature = userNpcData != null && userNpcData.getSkinSignature() != null ? userNpcData.getSkinSignature() : npcData.getSkinSignature(player);
 		Location location = forcedLocation != null ? forcedLocation : (userNpcData != null && userNpcData.getLocation() != null ? userNpcData.getLocation() : npcData.getLocation(player));
 		Double targetDistance = userNpcData != null && userNpcData.getTargetDistance() != null ? userNpcData.getTargetDistance() : npcData.getTargetDistance(player);
 		Set<NpcStatus> status = userNpcData != null && userNpcData.getStatus() != null ? userNpcData.getStatus() : null;
@@ -164,7 +149,7 @@ public class NpcManager implements Listener {
 			return false;
 		}
 		// create npc and spawn it
-		addNpc(player, new Npc(player, id, name, skin, location, targetDistance, status, items));
+		addNpc(player, new Npc(player, id, name, skinData, skinSignature, location, targetDistance, status, items));
 		// spawn
 		return true;
 	}

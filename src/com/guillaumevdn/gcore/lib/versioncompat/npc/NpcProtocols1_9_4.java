@@ -21,9 +21,9 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.comphenix.protocol.wrappers.WrappedGameProfile;
+import com.comphenix.protocol.wrappers.WrappedSignedProperty;
 import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.lib.npc.Npc;
-import com.guillaumevdn.gcore.lib.npc.SkinData;
 import com.guillaumevdn.gcore.lib.util.Pair;
 import com.guillaumevdn.gcore.lib.util.Utils;
 import com.mojang.authlib.GameProfile;
@@ -164,13 +164,12 @@ public class NpcProtocols1_9_4 extends NpcProtocols {
 	}
 
 	@Override
-	public WrappedDataWatcher spawn(final Player player, int entityId, String name, Location location, UUID skin) {
+	public WrappedDataWatcher spawn(final Player player, final int entityId, String name, Location location, String skinData, String skinSignature) {
 		// create game profile
 		final WrappedGameProfile gameProfile = new WrappedGameProfile(UUID.randomUUID(), (name.length() < 16) ? name : name.substring(0, 16));
 		// skin
-		SkinData skinData = skin != null && GCore.inst().getData().getNpcSkins() != null ? GCore.inst().getData().getNpcSkins().get(skin) : null;
-		if (skinData != null) {
-			gameProfile.getProperties().putAll(skinData.getSkinData());
+		if (skinData != null && skinSignature != null) {
+			gameProfile.getProperties().put("textures", new WrappedSignedProperty("textures", skinData, skinSignature));
 		}
 		// create metadata
 		WrappedDataWatcher metadata = createMetadata(getDefaultHumanEntityMetadata());
@@ -203,7 +202,7 @@ public class NpcProtocols1_9_4 extends NpcProtocols {
 				// send packet
 				sendPacket(player, packet);
 			}
-		}.runTaskLater(GCore.inst(), skin == null ? 5L : 40L);
+		}.runTaskLater(GCore.inst(), 40L);
 		// update look
 		sendTarget(player, entityId, location.getYaw(), location.getPitch());
 		// success

@@ -1,7 +1,6 @@
 package com.guillaumevdn.gcore.data;
 
 import java.util.Set;
-import java.util.UUID;
 
 import org.bukkit.Location;
 
@@ -14,7 +13,7 @@ public class ModifiedNpcData {
 	private final int id;
 	private boolean shown;
 	private String name = null;
-	private UUID skin = null;
+	private String skinData = null, skinSignature = null;
 	private Location location = null;
 	private Double targetDistance = null;
 	private Set<NpcStatus> status = null;
@@ -38,8 +37,12 @@ public class ModifiedNpcData {
 		return name;
 	}
 
-	public UUID getSkin() {
-		return skin;
+	public String getSkinData() {
+		return skinData;
+	}
+
+	public String getSkinSignature() {
+		return skinSignature;
 	}
 
 	public Location getLocation() {
@@ -67,8 +70,12 @@ public class ModifiedNpcData {
 		this.name = name;
 	}
 
-	public void setSkin(UUID skin) {
-		this.skin = skin;
+	public void setSkinData(String skinData) {
+		this.skinData = skinData;
+	}
+
+	public void setSkinSignature(String skinSignature) {
+		this.skinSignature = skinSignature;
 	}
 
 	public void setLocation(Location location) {
@@ -89,7 +96,7 @@ public class ModifiedNpcData {
 
 	// methods
 	public boolean isEmpty() {
-		return name == null && skin == null && location == null && targetDistance == null && status == null && items == null;
+		return name == null && skinData == null && skinSignature == null && location == null && targetDistance == null && status == null && items == null;
 	}
 
 }

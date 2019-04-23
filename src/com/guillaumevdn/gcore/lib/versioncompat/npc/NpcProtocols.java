@@ -6,7 +6,6 @@ package com.guillaumevdn.gcore.lib.versioncompat.npc;
 
 import java.lang.reflect.Constructor;
 import java.util.Map;
-import java.util.UUID;
 
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -60,7 +59,7 @@ public abstract class NpcProtocols {
 	public abstract void relativeMove(Player player, int entityId, Location previous, Location location, boolean onGround);
 	public abstract void teleport(Player player, int entityId, Location location);
 	public abstract void remove(Player player, int entityId);
-	public abstract WrappedDataWatcher spawn(Player player, int entityId, String name, Location location, UUID skinData);
+	public abstract WrappedDataWatcher spawn(Player player, int entityId, String name, Location location, String skinData, String skinSignature);
 
 	// text
 	public final Object createNMSText(String str) {

@@ -678,10 +678,16 @@ public class GLocale {
 			"fr_FR", Utils.asList("&7Nom du NPC")
 			);
 
-	public static final Text GUI_GENERIC_EDITOR_NPC_SKINLORE = new Text(
-			"GUI_GENERIC_EDITOR_NPC_SKINLORE", file,
-			"en_US", Utils.asList("&7UUID of a player from whom the skin", "&7 will be used by this NPC"),
-			"fr_FR", Utils.asList("&7UUID d'un joueur dont le skin sera", "&7 utilisé par ce NPC")
+	public static final Text GUI_GENERIC_EDITOR_NPC_SKINDATALORE = new Text(
+			"GUI_GENERIC_EDITOR_NPC_SKINDATALORE", file,
+			"en_US", Utils.asList("&7Skin data of the NPC (can be generated", "&7 or obtained at https://mineskin.org/)"),
+			"fr_FR", Utils.asList("&7Skin data de ce NPC (can be generated", "&7 or obtained at https://mineskin.org/)")
+			);
+
+	public static final Text GUI_GENERIC_EDITOR_NPC_SKINSIGNATURELORE = new Text(
+			"GUI_GENERIC_EDITOR_NPC_SKINSIGNATURELORE", file,
+			"en_US", Utils.asList("&7Skin signature of the NPC (can be generated", "&7 or obtained at https://mineskin.org/)"),
+			"fr_FR", Utils.asList("&7Skin signature de ce NPC (can be generated", "&7 or obtained at https://mineskin.org/)")
 			);
 
 	public static final Text GUI_GENERIC_EDITOR_NPC_LOCATIONLORE = new Text(

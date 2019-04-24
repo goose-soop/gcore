@@ -107,13 +107,13 @@ public abstract class PrimitiveParseable<T> extends Parseable {
 		// couldn't parse
 		catch (Throwable exception) {
 			if (getLastData() != null) {
-				getLastData().log("invalid primitive setting (must be a " + typeName + ") (" + exception.getMessage() + ")");
+				getLastData().log("invalid primitive setting (must be a " + typeName + ") (" + exception.getMessage() + "), value is '" + value + "'");
 			}
 			return null;
 		}
 		// unknown
 		if (getLastData() != null) {
-			getLastData().log("invalid primitive setting (must be a " + typeName + ")");
+			getLastData().log("invalid primitive setting (must be a " + typeName + "), value is '" + value + "'");
 		}
 		return null;
 	}

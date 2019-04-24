@@ -129,7 +129,7 @@ public class NpcManager implements Listener {
 		}
 		ItemData[] items = new ItemData[6];
 		for (int i = 0; i < 6; ++i) {
-			if (userNpcData != null && userNpcData.getItems() != null && userNpcData.getItems().length >= i) {// has user data
+			if (userNpcData != null && userNpcData.getItems() != null && userNpcData.getItems().length >= i && userNpcData.getItems()[i] != null) {// has user data
 				items[i] = userNpcData.getItems()[i];
 			} else {// default stuff
 				if (i == 0) items[i] = npcData.getHeldItem(player);

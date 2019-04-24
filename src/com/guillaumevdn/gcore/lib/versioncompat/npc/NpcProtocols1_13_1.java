@@ -109,8 +109,8 @@ public class NpcProtocols1_13_1 extends NpcProtocols {
 
 	// inventory
 	private static final Map<Integer, EnumItemSlot> slots = Utils.asMap(
-			0, EnumItemSlot.MAINHAND,
-			1, EnumItemSlot.OFFHAND,
+			0, EnumItemSlot.OFFHAND,
+			1, EnumItemSlot.MAINHAND,
 			2, EnumItemSlot.FEET,
 			3, EnumItemSlot.LEGS,
 			4, EnumItemSlot.CHEST,

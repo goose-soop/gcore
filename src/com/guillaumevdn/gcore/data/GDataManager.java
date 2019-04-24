@@ -46,7 +46,12 @@ public class GDataManager extends DataManager implements Listener {
 		}});
 		// users
 		Bukkit.getPluginManager().registerEvents(userBoard = new UserBoard(), getPlugin());
-		userBoard.pullOnline();
+		userBoard.initAsync(new Callback() {
+			@Override
+			public void callback() {
+				userBoard.pullOnline();
+			}
+		});
 	}
 
 	@Override

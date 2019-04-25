@@ -78,7 +78,7 @@ public class UpdateCheck {
 							// console
 							Messenger.send(Bukkit.getConsoleSender(), Messenger.Level.SEVERE_INFO, GCore.inst().getName(), (outdated.size() > 1 ? "These plugins are" : "This plugin is") + " outdated :");
 							Messenger.send(Bukkit.getConsoleSender(), Messenger.Level.SEVERE_INFO, GCore.inst().getName(), (outdated.size() > 1 ? "These plugins are" : "This plugin is") + " outdated : " + Utils.asNiceString(outdated.keySet(), true) + ".");
-							Messenger.send(Bukkit.getConsoleSender(), Messenger.Level.SEVERE_INFO, GCore.inst().getName(), "Get the update" + Utils.getPlural(outdated.size()) + " here : <http://www.guillaumevdn.be/plugins/list/>");
+							Messenger.send(Bukkit.getConsoleSender(), Messenger.Level.SEVERE_INFO, GCore.inst().getName(), "Get the update" + Utils.getPlural(outdated.size()) + " here : <http://www.guillaumevdn.com/plugins/list/>");
 						}
 					}
 				}.runTask(GCore.inst());

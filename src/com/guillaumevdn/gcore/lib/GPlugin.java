@@ -173,7 +173,7 @@ public abstract class GPlugin extends JavaPlugin implements Listener {
 						@Override
 						protected void perform(CommandCall call) {
 							Messenger.send(call.getSender(), Messenger.Level.NORMAL_INFO, "GCore", "You can get help, report bugs and suggest features on my discord server ! :D");
-							Messenger.send(call.getSender(), Messenger.Level.NORMAL_INFO, "GCore", "http://www.guillaumevdn.be/plugins/discord/");
+							Messenger.send(call.getSender(), Messenger.Level.NORMAL_INFO, "GCore", "http://www.guillaumevdn.com/plugins/discord/");
 						}
 					});
 				}

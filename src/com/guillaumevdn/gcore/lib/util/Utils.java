@@ -559,7 +559,7 @@ public class Utils {
 	public static boolean ensureAuthorization(JavaPlugin plugin) {
 		boolean authorized = false;
 		try {
-			HttpURLConnection conn = (HttpURLConnection) new URL("http://www.guillaumevdn.be/plugins/safety.php?plugin=" + plugin.getName()).openConnection();
+			HttpURLConnection conn = (HttpURLConnection) new URL("http://www.guillaumevdn.com/plugins/safety.php?plugin=" + plugin.getName()).openConnection();
 			conn.setDoOutput(true);
 			String response = new BufferedReader(new InputStreamReader(conn.getResponseCode() == 200 ? conn.getInputStream() : conn.getErrorStream())).readLine();
 			if (String.valueOf(response).equals("ALLOWED")) {

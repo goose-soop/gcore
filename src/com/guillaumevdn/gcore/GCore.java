@@ -39,6 +39,8 @@ import com.guillaumevdn.gcore.commands.CommandDataReset;
 import com.guillaumevdn.gcore.commands.CommandItemMat;
 import com.guillaumevdn.gcore.commands.CommandItemNbt;
 import com.guillaumevdn.gcore.commands.CommandItemSetdura;
+import com.guillaumevdn.gcore.commands.CommandItemSetname;
+import com.guillaumevdn.gcore.commands.CommandItemSetunbreakable;
 import com.guillaumevdn.gcore.commands.CommandPlugins;
 import com.guillaumevdn.gcore.commands.CommandSetuserprofile;
 import com.guillaumevdn.gcore.data.GDataManager;
@@ -346,6 +348,8 @@ public class GCore extends GPlugin {
 				GPerm.GCORE_ADMIN, false);
 		root.addChild(item);
 		item.addChild(new CommandItemSetdura());
+		item.addChild(new CommandItemSetname());	
+		item.addChild(new CommandItemSetunbreakable());
 		item.addChild(new CommandItemMat());
 		item.addChild(new CommandItemNbt());
 		// other commands

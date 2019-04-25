@@ -3,9 +3,7 @@ package com.guillaumevdn.gcore.lib.parseable.list;
 import java.util.List;
 
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 
-import com.guillaumevdn.gcore.lib.gui.ItemData;
 import com.guillaumevdn.gcore.lib.material.Mat;
 import com.guillaumevdn.gcore.lib.parseable.ConfigData;
 import com.guillaumevdn.gcore.lib.parseable.ListParseable;
@@ -21,13 +19,8 @@ public class LPItem extends ListParseable<CPItem> {
 
 	// methods
 	public boolean contains(Player player, Player parser) {
-		return contains(player.getInventory(), parser);
-	}
-
-	public boolean contains(Inventory inventory, Player parser) {
 		for (CPItem item : getElements().values()) {
-			ItemData it = item.getParsedValue(parser);
-			if (it != null && !it.contains(inventory)) {
+			if (!item.contains(player, parser)) {
 				return false;
 			}
 		}

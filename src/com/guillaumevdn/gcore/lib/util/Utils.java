@@ -105,6 +105,7 @@ import com.guillaumevdn.gcore.lib.versioncompat.sound.Sound;
 import com.guillaumevdn.gcore.libs.com.google.gson.Gson;
 import com.guillaumevdn.gcore.libs.com.google.gson.GsonBuilder;
 import com.guillaumevdn.gcore.libs.com.google.gson.adapter.AdapterAchievement;
+import com.guillaumevdn.gcore.libs.com.google.gson.adapter.AdapterBlockCoords;
 import com.guillaumevdn.gcore.libs.com.google.gson.adapter.AdapterClass;
 import com.guillaumevdn.gcore.libs.com.google.gson.adapter.AdapterClassFactory;
 import com.guillaumevdn.gcore.libs.com.google.gson.adapter.AdapterEnchantment;
@@ -289,6 +290,7 @@ public class Utils {
 				.registerTypeAdapter(Plugin.class, new AdapterPlugin())
 				.registerTypeAdapter(UserInfo.class, new AdapterUserInfo())
 				.registerTypeAdapter(ItemData.class, new ItemData.Adapter())
+				.registerTypeAdapter(BlockCoords.class, new AdapterBlockCoords())
 				.enableComplexMapKeySerialization()
 				.disableInnerClassSerialization()
 				.serializeSpecialFloatingPointValues();
@@ -1013,6 +1015,13 @@ public class Utils {
 		return location.getWorld().getName() + "," + Utils.round(location.getX()) + "," + Utils.round(location.getY()) + "," + Utils.round(location.getZ()) + "," + Utils.round(location.getYaw()) + "," + Utils.round(location.getPitch());
 	}
 
+	public static String serializeBlockCoords(BlockCoords coords) {
+		if (coords == null || coords.getWorld() == null) {
+			return "null";
+		}
+		return coords.getWorld().getName() + "," + coords.getX() + "," + coords.getY() + "," + coords.getZ();
+	}
+
 	/*public static Location unserializeLocation(String raw)
 	{
 		if (raw == null || raw.isEmpty()) {
@@ -1062,6 +1071,26 @@ public class Utils {
 		}
 
 		return new Location(world, x, y, z, yaw, pitch);
+	}
+
+	public static BlockCoords unserializeBlockCoords(String blockCoords)
+	{
+		if (blockCoords == null || blockCoords.isEmpty() || blockCoords.equals("null")) {
+			return null;
+		}
+
+		String[] split = blockCoords.split(",");
+		World world = Bukkit.getWorld(split[0]);
+
+		if (world == null) {
+			return null;
+		}
+
+		int x = Integer.parseInt(split[1]);
+		int y = Integer.parseInt(split[2]);
+		int z = Integer.parseInt(split[3]);
+
+		return new BlockCoords(world, x, y, z);
 	}
 
 	public static boolean isLocInArea(Location loc, Location p1, Location p2) {
@@ -1122,10 +1151,10 @@ public class Utils {
 		return block != null && block.getState().getData() instanceof Crops;
 	}
 
-	public static boolean isFullyGrown(Block block) {
-		if (block == null) return false;
+	public static boolean isFullyGrown(Block block, boolean resultIfNotCrops) {
+		if (block == null) return resultIfNotCrops;
 		MaterialData mat = block.getState().getData();
-		return mat instanceof Crops ? ((Crops) mat).getState().equals(CropState.RIPE) : false;
+		return mat instanceof Crops ? ((Crops) mat).getState().equals(CropState.RIPE) : resultIfNotCrops;
 	}
 
 	public static boolean setGrowthStage(Block block, int stage) {

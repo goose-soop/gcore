@@ -254,7 +254,7 @@ public class CPItem extends ContainerParseable {
 		return item == null || item.getType() == null || item.getType().isAir();
 	}
 
-	public boolean isValid(Player player, Player parser) {
+	public boolean contains(Player player, Player parser) {
 		// has item
 		ItemData item = getParsedValue(parser);
 		if (item != null && item.getType() != null && !item.getType().isAir()) {

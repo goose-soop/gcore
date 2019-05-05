@@ -59,6 +59,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.Ageable;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
@@ -1152,9 +1153,19 @@ public class Utils {
 	}
 
 	public static boolean isFullyGrown(Block block, boolean resultIfNotCrops) {
-		if (block == null) return resultIfNotCrops;
-		MaterialData mat = block.getState().getData();
-		return mat instanceof Crops ? ((Crops) mat).getState().equals(CropState.RIPE) : resultIfNotCrops;
+		if (block != null) {
+			// crops
+			MaterialData mat = block.getState().getData();
+			if (mat instanceof Crops) {
+				return ((Crops) mat).getState().equals(CropState.RIPE);
+			}
+			// cocoa
+			if (mat instanceof Ageable) {
+				return ((Ageable) mat).getAge() >= ((Ageable) mat).getMaximumAge();
+			}
+		}
+		// not crops
+		return resultIfNotCrops;
 	}
 
 	public static boolean setGrowthStage(Block block, int stage) {

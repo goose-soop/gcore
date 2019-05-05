@@ -9,6 +9,7 @@ import java.lang.reflect.Field;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.ListenerOptions;
@@ -83,12 +84,19 @@ public class NpcPacketListener implements PacketListener {
 				return;
 			}
 			lastInteract = System.currentTimeMillis();
-			// event
-			if (action.equals(NpcAction.INTERACT)) {
-				Bukkit.getPluginManager().callEvent(new NpcInteractEvent(npc));
-			} else if (action.equals(NpcAction.ATTACK)) {
-				Bukkit.getPluginManager().callEvent(new NpcAttackEvent(npc));
-			}
+			// trigger sync event
+			final NpcAction finalAction = action;
+			final Npc finalNpc = npc;
+			new BukkitRunnable() {
+				@Override
+				public  void run() {
+					if (finalAction.equals(NpcAction.INTERACT)) {
+						Bukkit.getPluginManager().callEvent(new NpcInteractEvent(finalNpc));
+					} else if (finalAction.equals(NpcAction.ATTACK)) {
+						Bukkit.getPluginManager().callEvent(new NpcAttackEvent(finalNpc));
+					}
+				}
+			}.runTask(GCore.inst());
 		}
 	}
 

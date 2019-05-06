@@ -756,6 +756,7 @@ public class Mat implements Cloneable, Comparable<Mat> {
 	public static final Mat SHULKER_SHELL = registerValue(new Mat(VERSION, "SHULKER_SHELL", "SHULKER_SHELL"));
 	public static final Mat SHULKER_SPAWN_EGG = registerValue(new Mat(VERSION, "SHULKER_SPAWN_EGG", "MONSTER_EGG"));
 	public static final Mat SIGN = registerValue(new Mat(VERSION, "SIGN", "SIGN"));
+	public static final Mat SIGN_POST = registerValue(new Mat(VERSION, "SIGN_POST", "SIGN_POST"));
 	public static final Mat SILVERFISH_SPAWN_EGG = registerValue(new Mat(VERSION, "SILVERFISH_SPAWN_EGG", "MONSTER_EGG"));
 	public static final Mat SKELETON_HORSE_SPAWN_EGG = registerValue(new Mat(VERSION, "SKELETON_HORSE_SPAWN_EGG", "MONSTER_EGG"));
 	public static final Mat SKELETON_SKULL = registerValue(new Mat(VERSION, "SKELETON_SKULL", "SKULL_ITEM"));

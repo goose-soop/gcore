@@ -41,6 +41,12 @@ import com.guillaumevdn.gcore.commands.CommandItemNbt;
 import com.guillaumevdn.gcore.commands.CommandItemSetdura;
 import com.guillaumevdn.gcore.commands.CommandItemSetname;
 import com.guillaumevdn.gcore.commands.CommandItemSetunbreakable;
+import com.guillaumevdn.gcore.commands.CommandNpcHide;
+import com.guillaumevdn.gcore.commands.CommandNpcSetEquipment;
+import com.guillaumevdn.gcore.commands.CommandNpcSetName;
+import com.guillaumevdn.gcore.commands.CommandNpcSetStatus;
+import com.guillaumevdn.gcore.commands.CommandNpcShow;
+import com.guillaumevdn.gcore.commands.CommandNpcTeleport;
 import com.guillaumevdn.gcore.commands.CommandPlugins;
 import com.guillaumevdn.gcore.commands.CommandSetuserprofile;
 import com.guillaumevdn.gcore.data.GDataManager;
@@ -344,14 +350,22 @@ public class GCore extends GPlugin {
 		data.addChild(new CommandDataExport());
 		data.addChild(new CommandDataReset());
 		// item commands
-		CommandArgument item = new CommandArgument(this, Utils.asList("item"), "item-related commands",
-				GPerm.GCORE_ADMIN, false);
+		CommandArgument item = new CommandArgument(this, Utils.asList("item"), "item-related commands", GPerm.GCORE_ADMIN, false);
 		root.addChild(item);
 		item.addChild(new CommandItemSetdura());
 		item.addChild(new CommandItemSetname());	
 		item.addChild(new CommandItemSetunbreakable());
 		item.addChild(new CommandItemMat());
 		item.addChild(new CommandItemNbt());
+		// item commands
+		CommandArgument npc = new CommandArgument(this, Utils.asList("npc"), "npc-related commands", GPerm.GCORE_NPC_MANIPULATE, false);
+		root.addChild(npc);
+		npc.addChild(new CommandNpcHide());
+		npc.addChild(new CommandNpcSetEquipment());
+		npc.addChild(new CommandNpcSetName());
+		npc.addChild(new CommandNpcSetStatus());
+		npc.addChild(new CommandNpcShow());
+		npc.addChild(new CommandNpcTeleport());
 		// other commands
 		root.addChild(new CommandPlugins());
 		root.addChild(new CommandSetuserprofile());

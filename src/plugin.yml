@@ -18,3 +18,5 @@ permissions:
     default: op
   gcore.reload:
     default: op
+  gcore.npc.manipulate:
+    default: op

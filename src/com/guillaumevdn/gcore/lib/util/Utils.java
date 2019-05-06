@@ -69,7 +69,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.Event;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -112,7 +111,6 @@ import com.guillaumevdn.gcore.libs.com.google.gson.adapter.AdapterClassFactory;
 import com.guillaumevdn.gcore.libs.com.google.gson.adapter.AdapterEnchantment;
 import com.guillaumevdn.gcore.libs.com.google.gson.adapter.AdapterEntityType;
 import com.guillaumevdn.gcore.libs.com.google.gson.adapter.AdapterFile;
-import com.guillaumevdn.gcore.libs.com.google.gson.adapter.AdapterInventory;
 import com.guillaumevdn.gcore.libs.com.google.gson.adapter.AdapterItemStack;
 import com.guillaumevdn.gcore.libs.com.google.gson.adapter.AdapterLocation;
 import com.guillaumevdn.gcore.libs.com.google.gson.adapter.AdapterMat;
@@ -287,7 +285,6 @@ public class Utils {
 				.registerTypeAdapter(Title.class, new AdapterTitle())
 				.registerTypeAdapter(Tab.class, new AdapterTab())
 				.registerTypeAdapter(World.class, new AdapterWorld())
-				.registerTypeAdapter(Inventory.class, new AdapterInventory())
 				.registerTypeAdapter(Plugin.class, new AdapterPlugin())
 				.registerTypeAdapter(UserInfo.class, new AdapterUserInfo())
 				.registerTypeAdapter(ItemData.class, new ItemData.Adapter())

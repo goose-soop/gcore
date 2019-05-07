@@ -6,6 +6,7 @@ import com.guillaumevdn.gcore.lib.versioncompat.Compat1_11;
 import com.guillaumevdn.gcore.lib.versioncompat.Compat1_12;
 import com.guillaumevdn.gcore.lib.versioncompat.Compat1_13;
 import com.guillaumevdn.gcore.lib.versioncompat.Compat1_13_1;
+import com.guillaumevdn.gcore.lib.versioncompat.Compat1_14;
 import com.guillaumevdn.gcore.lib.versioncompat.Compat1_7_10;
 import com.guillaumevdn.gcore.lib.versioncompat.Compat1_7_2;
 import com.guillaumevdn.gcore.lib.versioncompat.Compat1_7_9;
@@ -18,6 +19,7 @@ import com.guillaumevdn.gcore.lib.versioncompat.npc.NpcProtocols1_11;
 import com.guillaumevdn.gcore.lib.versioncompat.npc.NpcProtocols1_12;
 import com.guillaumevdn.gcore.lib.versioncompat.npc.NpcProtocols1_13;
 import com.guillaumevdn.gcore.lib.versioncompat.npc.NpcProtocols1_13_1;
+import com.guillaumevdn.gcore.lib.versioncompat.npc.NpcProtocols1_14;
 import com.guillaumevdn.gcore.lib.versioncompat.npc.NpcProtocols1_9;
 import com.guillaumevdn.gcore.lib.versioncompat.npc.NpcProtocols1_9_4;
 import com.guillaumevdn.gcore.lib.versioncompat.particle.ParticleManager;
@@ -43,7 +45,8 @@ public enum ServerVersion {
 	MC_1_12("1.12", Compat1_12.class, ParticleManager1_9.class, NpcProtocols1_12.class),
 	MC_1_13("1.13", Compat1_13.class, ParticleManager1_13.class, NpcProtocols1_13.class),
 	MC_1_13_1("1.13.1", Compat1_13_1.class, ParticleManager1_13.class, NpcProtocols1_13_1.class),
-	MC_1_13_2("1.13.2", Compat1_13_1.class, ParticleManager1_13.class, NpcProtocols1_13_1.class);
+	MC_1_13_2("1.13.2", Compat1_13_1.class, ParticleManager1_13.class, NpcProtocols1_13_1.class),
+	MC_1_14("1.14", Compat1_14.class, ParticleManager1_13.class, NpcProtocols1_14.class);
 	;
 
 	// current

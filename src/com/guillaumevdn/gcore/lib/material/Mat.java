@@ -567,6 +567,7 @@ public class Mat implements Cloneable, Comparable<Mat> {
 	public static final Mat NETHER_QUARTZ_ORE = registerValue(new Mat(VERSION, "NETHER_QUARTZ_ORE", "QUARTZ_ORE"));
 	public static final Mat NETHER_STAR = registerValue(new Mat(VERSION, "NETHER_STAR", "NETHER_STAR"));
 	public static final Mat NETHER_WART = registerValue(new Mat(VERSION, "NETHER_WART", "NETHER_STALK"));
+	public static final Mat NETHER_WARTS = registerValue(new Mat(VERSION, "NETHER_WARTS", "NETHER_WARTS"));
 	public static final Mat NETHER_WART_BLOCK = registerValue(new Mat(VERSION, "NETHER_WART_BLOCK", "NETHER_WART_BLOCK"));
 	public static final Mat NOTE_BLOCK = registerValue(new Mat(VERSION, "NOTE_BLOCK", "NOTE_BLOCK"));
 	public static final Mat OAK_BOAT = registerValue(new Mat(VERSION, "OAK_BOAT", "BOAT"));

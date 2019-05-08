@@ -280,7 +280,6 @@ public class NBTReflectionUtil {
     }
 
     public static void setObject(NBTCompound comp, String key, Object value) {
-        if (!MinecraftVersion.hasGsonSupport()) return;
         try {
             String json = GsonWrapper.getString(value);
             setData(comp, ReflectionMethod.COMPOUND_SET_STRING, key, json);
@@ -290,7 +289,6 @@ public class NBTReflectionUtil {
     }
 
     public static <T> T getObject(NBTCompound comp, String key, Class<T> type) {
-        if (!MinecraftVersion.hasGsonSupport()) return null;
         String json = (String) getData(comp, ReflectionMethod.COMPOUND_GET_STRING, key);
         if (json == null) {
             return null;

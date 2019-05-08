@@ -42,9 +42,7 @@ public class NBTReflectionUtil {
         return null;
     }
 
-    @SuppressWarnings({"unchecked"})
     public static Object getItemRootNBTTagCompound(Object nmsitem) {
-        @SuppressWarnings("rawtypes")
         Class clazz = nmsitem.getClass();
         Method method;
         try {
@@ -57,9 +55,7 @@ public class NBTReflectionUtil {
         return null;
     }
 
-    @SuppressWarnings({"unchecked"})
     public static Object convertNBTCompoundtoNMSItem(NBTCompound nbtcompound) {
-        @SuppressWarnings("rawtypes")
         Class clazz = ClassWrapper.NMS_ITEMSTACK.getClazz();
         try {
             if(MinecraftVersion.getVersion().getVersionId() >= MinecraftVersion.MC1_12_R1.getVersionId()){
@@ -77,9 +73,7 @@ public class NBTReflectionUtil {
         return null;
     }
 
-    @SuppressWarnings({"unchecked"})
     public static NBTContainer convertNMSItemtoNBTCompound(Object nmsitem) {
-        @SuppressWarnings("rawtypes")
         Class clazz = nmsitem.getClass();
         Method method;
         try {
@@ -145,9 +139,7 @@ public class NBTReflectionUtil {
     }
 
 
-    @SuppressWarnings("unchecked")
     public static Object getSubNBTTagCompound(Object compound, String name) {
-        @SuppressWarnings("rawtypes")
         Class c = compound.getClass();
         Method method;
         try {
@@ -307,7 +299,6 @@ public class NBTReflectionUtil {
         comp.setCompound(rootnbttag);
     }
 
-    @SuppressWarnings("unchecked")
     public static Set<String> getKeys(NBTCompound comp) {
         Object rootnbttag = comp.getCompound();
         if (rootnbttag == null) {

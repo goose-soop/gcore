@@ -81,7 +81,6 @@ public class NBTListCompound {
         return false;
     }
 
-    @SuppressWarnings("unchecked")
     public Set<String> getKeys() {
         try {
             return (Set<String>) ReflectionMethod.LISTCOMPOUND_GET_KEYS.run(compound);

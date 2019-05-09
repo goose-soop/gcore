@@ -79,7 +79,7 @@ public abstract class PrimitiveParseable<T> extends Parseable {
 	private Cache cache = null;
 	public T getParsedValue(Player parser) {
 		// return cache if has, and parser is null or shouldn't parse anything
-		if (parser == null || parseableIndexes.isEmpty() ? cache != null : false) {
+		if ((parser == null || parseableIndexes.isEmpty()) ? cache != null : false) {
 			return cache.value;
 		}
 		// no value

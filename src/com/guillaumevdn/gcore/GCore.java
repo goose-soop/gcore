@@ -552,15 +552,20 @@ public class GCore extends GPlugin {
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-	public void event(AsyncPlayerChatEvent event) {
+	public void event(final AsyncPlayerChatEvent event) {
 		// chat input
 		if (chatInputs.containsKey(event.getPlayer())) {
-			ChatInput input = chatInputs.remove(event.getPlayer());
-			input.onChat(event.getPlayer(), Utils.format(event.getMessage()));
 			event.setCancelled(true);
 			event.getRecipients().clear();
 			event.setMessage("");
 			event.setFormat("");
+			// resync to continue
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					chatInputs.remove(event.getPlayer()).onChat(event.getPlayer(), Utils.format(event.getMessage()));
+				}
+			}.runTask(GCore.instance);
 			return;
 		}
 	}

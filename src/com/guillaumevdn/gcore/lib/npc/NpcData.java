@@ -23,7 +23,7 @@ public class NpcData extends ContainerParseable {
 
 	// base
 	private PPBoolean shown = addComponent(new PPBoolean("shown", this, "true", false, 0, EditorGUI.ICON_BOOLEAN, GLocale.GUI_GENERIC_EDITOR_NPC_SHOWLORE.getLines()));
-	private PPString name = addComponent(new PPString("name", this, "GuillaumeVDN", false, 1, EditorGUI.ICON_STRING, GLocale.GUI_GENERIC_EDITOR_NPC_NAMELORE.getLines()));
+	private PPString name = addComponent(new PPString("name", this, "GuillaumeVDN", false, 1, EditorGUI.ICON_STRING, GLocale.GUI_GENERIC_EDITOR_NPC_LORE.getLines()));
 	private PPString skinData = addComponent(new PPString("skin_data", this, null, false, 2, EditorGUI.ICON_TECHNICAL, GLocale.GUI_GENERIC_EDITOR_NPC_SKINDATALORE.getLines()));
 	private PPString skinSignature = addComponent(new PPString("skin_signature", this, null, false, 3, EditorGUI.ICON_TECHNICAL, GLocale.GUI_GENERIC_EDITOR_NPC_SKINSIGNATURELORE.getLines()));
 	private PPLocation location = addComponent(new PPLocation("location", this, "world,0,0,0", true, 4, EditorGUI.ICON_LOCATION, GLocale.GUI_GENERIC_EDITOR_NPC_LOCATIONLORE.getLines()));

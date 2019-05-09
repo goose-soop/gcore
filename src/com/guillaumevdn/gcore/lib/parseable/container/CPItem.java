@@ -40,7 +40,7 @@ public class CPItem extends ContainerParseable {
 	private PPBoolean unbreakable = addComponent(new PPBoolean("unbreakable", this, "false", false, 2, EditorGUI.ICON_BOOLEAN, GLocale.GUI_GENERIC_EDITOR_ITEM_UNBREAKABLELORE.getLines()));
 	private PPInteger amount = addComponent(new PPInteger("amount", this, "1", 1, Integer.MAX_VALUE, false, 3, EditorGUI.ICON_NUMBER, GLocale.GUI_GENERIC_EDITOR_ITEM_AMOUNTLORE.getLines()));
 	private PPInteger maxAmount = addComponent(new PPInteger("max_amount", this, "0", 0, Integer.MAX_VALUE, false, 4, EditorGUI.ICON_NUMBER, GLocale.GUI_GENERIC_EDITOR_ITEM_MAXAMOUNTLORE.getLines()));
-	private PPString name = addComponent(new PPString("name", this, null, false, 5, EditorGUI.ICON_STRING, GLocale.GUI_GENERIC_EDITOR_ITEM_NAMELORE.getLines()));
+	private PPString name = addComponent(new PPString("name", this, null, false, 5, EditorGUI.ICON_STRING, GLocale.GUI_GENERIC_EDITOR_ITEM_LORE.getLines()));
 	private PPStringList lore = addComponent(new PPStringList("lore", this, null, false, 6, EditorGUI.ICON_STRING_LIST, GLocale.GUI_GENERIC_EDITOR_ITEM_LORELORE.getLines()));
 	private LPEnchantment enchants = addComponent(new LPEnchantment("enchants", this, false, 7, EditorGUI.ICON_ENCHANTMENT, GLocale.GUI_GENERIC_EDITOR_ITEM_ENCHANTSLORE.getLines()));
 	private LPPotionEffect effects = addComponent(new LPPotionEffect("effects", this, false, 8, EditorGUI.ICON_POTION, GLocale.GUI_GENERIC_EDITOR_ITEM_EFFECTSLORE.getLines()));

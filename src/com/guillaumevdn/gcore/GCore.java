@@ -557,8 +557,6 @@ public class GCore extends GPlugin {
 		if (chatInputs.containsKey(event.getPlayer())) {
 			event.setCancelled(true);
 			event.getRecipients().clear();
-			event.setMessage("");
-			event.setFormat("");
 			// resync to continue
 			new BukkitRunnable() {
 				@Override

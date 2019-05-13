@@ -1006,7 +1006,7 @@ public class Mat implements Cloneable, Comparable<Mat> {
 	public static final Mat WHITE_DYE = registerValue(new Mat(VERSION, "WHITE_DYE", "-"));
 	public static final Mat BLUE_DYE = registerValue(new Mat(VERSION, "BLUE_DYE", "-"));
 	public static final Mat BROWN_DYE = registerValue(new Mat(VERSION, "BROWN_DYE", "-"));
-	
+
 	// base
 	private MatVersion version;
 	private final String modernName;
@@ -1077,11 +1077,11 @@ public class Mat implements Cloneable, Comparable<Mat> {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (Utils.instanceOf(obj, Mat.class)) {
-			Mat other = (Mat) obj;
-			return this.modernName.equals(other.modernName) && (durability > 0 ? this.durability == other.durability : true);
-		}
-		return false;
+		return Utils.instanceOf(obj, Mat.class) ? equals((Mat) obj, true) : false;
+	}
+
+	public boolean equals(Mat other, boolean durabilityCheck) {
+		return this.modernName.equals(other.modernName) && (durabilityCheck ? this.durability == other.durability : true);
 	}
 
 	@Override

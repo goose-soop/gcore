@@ -2540,8 +2540,7 @@ public class Utils {
 		return getSecondsInTicks(hours * 60 * 60);
 	}
 
-	public static String formatDurationSeconds(int seconds)
-	{
+	public static String formatDurationSeconds(int seconds) {
 		if (seconds < 60) {
 			return GLocale.MISC_GENERIC_TIMEFORMATSECONDS.getLines("{seconds}", twoDigitString(seconds % 60)).get(0);
 		} else if (seconds < 3600) {
@@ -2561,8 +2560,7 @@ public class Utils {
 		return Utils.DATE_FORMAT.format(new Date(millis));
 	}
 
-	private static String twoDigitString(int number)
-	{
+	private static String twoDigitString(int number) {
 		if (number == 0) {
 			return "00";
 		} else if (number / 10 == 0) {

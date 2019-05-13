@@ -672,8 +672,8 @@ public class GLocale {
 			"fr_FR", Utils.asList("&7Est-ce que le NPC doit être montré par défaut")
 			);
 
-	public static final Text GUI_GENERIC_EDITOR_NPC_LORE = new Text(
-			"GUI_GENERIC_EDITOR_NPC_LORE", file,
+	public static final Text GUI_GENERIC_EDITOR_NPC_NAMELORE = new Text(
+			"GUI_GENERIC_EDITOR_NPC_NAMELORE", file,
 			"en_US", Utils.asList("&7Name of the NPC"),
 			"fr_FR", Utils.asList("&7Nom du NPC")
 			);

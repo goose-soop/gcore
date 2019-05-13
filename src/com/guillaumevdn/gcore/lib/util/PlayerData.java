@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -17,6 +18,7 @@ public class PlayerData {
 	private static PlayerData INSTANCE = new PlayerData();
 
 	// base
+	private Map<UUID, Location> lastLocations = new HashMap<UUID, Location>();
 	private Map<UUID, ItemStack[]> lastInventory = new HashMap<UUID, ItemStack[]>();
 	private Map<UUID, ItemStack[]> lastArmor = new HashMap<UUID, ItemStack[]>();
 	private Map<UUID, Scoreboard> lastScoreboard = new HashMap<UUID, Scoreboard>();
@@ -29,6 +31,9 @@ public class PlayerData {
 
 	// methods
 	public static void save(final Player player) {
+		if (player == null) return;
+
+		INSTANCE.lastLocations.put(player.getUniqueId(), player.getLocation().clone());
 		INSTANCE.lastInventory.put(player.getUniqueId(), player.getInventory().getContents());
 		INSTANCE.lastArmor.put(player.getUniqueId(), player.getInventory().getArmorContents());
 		INSTANCE.lastScoreboard.put(player.getUniqueId(), player.getScoreboard());
@@ -44,22 +49,29 @@ public class PlayerData {
 	}
 
 	public static void restore(final Player player) {
+		if (player == null) return;
+
+		// location
+		if (INSTANCE.lastLocations.containsKey(player.getUniqueId())) {
+			player.teleport(INSTANCE.lastLocations.remove(player.getUniqueId()));
+		}
+
 		// inv
 		if (INSTANCE.lastInventory.containsKey(player.getUniqueId())) {
-			player.getInventory().setContents(INSTANCE.lastInventory.get(player.getUniqueId()));
+			player.getInventory().setContents(INSTANCE.lastInventory.remove(player.getUniqueId()));
 		}
 		if (INSTANCE.lastArmor.containsKey(player.getUniqueId())) {
-			player.getInventory().setArmorContents(INSTANCE.lastArmor.get(player.getUniqueId()));
+			player.getInventory().setArmorContents(INSTANCE.lastArmor.remove(player.getUniqueId()));
 		}
 		player.updateInventory();
 
 		// scoreboard
 		if (INSTANCE.lastScoreboard.containsKey(player.getUniqueId())) {
-			Scoreboard scoreboard = INSTANCE.lastScoreboard.get(player.getUniqueId());
+			Scoreboard scoreboard = INSTANCE.lastScoreboard.remove(player.getUniqueId());
 			if (scoreboard == null) {
 				scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
 			}
-			player.setScoreboard(INSTANCE.lastScoreboard.get(player.getUniqueId()));
+			player.setScoreboard(scoreboard);
 		} else {
 			player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
 		}
@@ -67,7 +79,7 @@ public class PlayerData {
 		// effects
 		Utils.resetEffects(player);
 		if (INSTANCE.lastPotionEffects.containsKey(player.getUniqueId())) {
-			for (PotionEffect effect : INSTANCE.lastPotionEffects.get(player.getUniqueId())) {
+			for (PotionEffect effect : INSTANCE.lastPotionEffects.remove(player.getUniqueId())) {
 				player.addPotionEffect(effect);
 			}
 		}
@@ -77,19 +89,11 @@ public class PlayerData {
 		Utils.resetGameMode(player);
 		Utils.showToAll(player);
 		if (INSTANCE.allowFly.containsKey(player.getUniqueId())) {
-			Utils.allowFly(player, INSTANCE.allowFly.get(player.getUniqueId()));
+			Utils.allowFly(player, INSTANCE.allowFly.remove(player.getUniqueId()));
 		}
 		if (INSTANCE.gamemodes.containsKey(player.getUniqueId())) {
-			player.setGameMode(INSTANCE.gamemodes.get(player.getUniqueId()));
+			player.setGameMode(INSTANCE.gamemodes.remove(player.getUniqueId()));
 		}
-
-		// remove from lists
-		INSTANCE.lastInventory.remove(player.getUniqueId());
-		INSTANCE.lastArmor.remove(player.getUniqueId());
-		INSTANCE.lastScoreboard.remove(player.getUniqueId());
-		INSTANCE.lastPotionEffects.remove(player.getUniqueId());
-		INSTANCE.allowFly.remove(player.getUniqueId());
-		INSTANCE.gamemodes.remove(player.getUniqueId());
 	}
 
 }

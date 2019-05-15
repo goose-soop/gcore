@@ -50,8 +50,9 @@ public enum ServerVersion {
 	;
 
 	// current
-	public static final ServerVersion CURRENT = Utils.getServerVersion();
-	public static final ServerVersion HIGHEST = Utils.getHighestServerVersion();
+	public static final ServerVersion CURRENT = VersionUtils.getServerVersion();
+	public static final ServerVersion HIGHEST = VersionUtils.getHighestServerVersion();
+	public static final boolean IS_1_13 = CURRENT != null ? CURRENT.isAtLeast(ServerVersion.MC_1_13) : false;
 
 	// bases
 	private String name;
@@ -99,4 +100,5 @@ public enum ServerVersion {
 	public boolean isGreaterThan(ServerVersion other) {
 		return ordinal() > other.ordinal();
 	}
+
 }

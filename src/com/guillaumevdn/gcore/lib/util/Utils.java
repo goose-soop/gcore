@@ -136,40 +136,6 @@ public class Utils {
 	public static final Random RANDOM = new Random();
 	public static final long MILLIS_2HOURS = Utils.getHoursInMillis(2);
 	public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("hh:mm");
-	public static final boolean IS_1_13 = ServerVersion.CURRENT.isAtLeast(ServerVersion.MC_1_13);
-
-	// ------------------------------------------------------------
-	// Server version
-	// ------------------------------------------------------------
-
-	public static ServerVersion getServerVersion() {
-		String bukkitVersion = Bukkit.getBukkitVersion().split("-")[0];
-		List<ServerVersion> versions = Utils.asList(ServerVersion.values());
-		Collections.reverse(versions);
-		for (ServerVersion version : versions) {
-			if (bukkitVersion.contains(version.getName())) {
-				return version;
-			}
-		}
-		return ServerVersion.UNSUPPORTED;
-	}
-
-	public static ServerVersion getHighestServerVersion() {
-		ServerVersion[] versions = ServerVersion.values();
-		return versions[versions.length - 1];
-	}
-
-	public static ServerImplementation getServerImplementation() {
-		try {
-			Class.forName("com.destroystokyo.paper.PaperConfig");
-			return ServerImplementation.PAPERSPIGOT;
-		} catch (Throwable ignored) {}
-		try {
-			Class.forName("org.spigotmc.SpigotConfig");
-			return ServerImplementation.SPIGOT;
-		} catch (Throwable ignored) {}
-		return ServerImplementation.CRAFTBUKKIT;
-	}
 
 	// ------------------------------------------------------------
 	// Compatibility
@@ -1271,7 +1237,7 @@ public class Utils {
 			serializedItemStack += ":::dr@@@" + isDurability;
 		}
 
-		if (!IS_1_13 && item.getData().getData() != 0)
+		if (!ServerVersion.IS_1_13 && item.getData().getData() != 0)
 		{
 			String isData = String.valueOf(item.getData().getData());
 			serializedItemStack += ":::d@@@" + isData;
@@ -1355,7 +1321,7 @@ public class Utils {
 			else if (itemAttribute[0].equals("dr") && createdItemStack) {
 				item.setDurability(Short.valueOf(itemAttribute[1]));
 			}
-			else if (itemAttribute[0].equals("d") && createdItemStack && !IS_1_13) {
+			else if (itemAttribute[0].equals("d") && createdItemStack && !ServerVersion.IS_1_13) {
 				try {
 					item.setData(new MaterialData(item.getType(), Byte.valueOf(itemAttribute[1])));
 				} catch (Throwable exception) {

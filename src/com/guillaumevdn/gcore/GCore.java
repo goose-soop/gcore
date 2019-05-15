@@ -1,7 +1,6 @@
 package com.guillaumevdn.gcore;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -100,8 +99,8 @@ public class GCore extends GPlugin {
 	// ------------------------------------------------------------
 
 	// gson
-	public static final Gson GSON = Utils.createGsonBuilder().setPrettyPrinting().create();
-	public static final Gson UNPRETTY_GSON = Utils.createGsonBuilder().create();
+	public static Gson GSON = null;
+	public static Gson UNPRETTY_GSON = null;
 
 	// storage
 	private File dataRootFolder = null;
@@ -212,29 +211,6 @@ public class GCore extends GPlugin {
 
 	@Override
 	protected boolean preEnable() {
-		// conversion V7
-		// it failed earlier
-		File failed = new File(getDataFolder() + "/conversion_failed.oops");
-		if (failed.exists()) {
-			cancelEnable("file " + failed.getPath() + " was found. This means that GCore tried to convert your files from a previous version but an error occured. Please check relevant logs, fix the problem (eventually contact the developper), then delete that file and reboot the server.");
-			return false;
-		}
-		// attempt to convert
-		try {
-			new ConversionV7().start();
-		} catch (Throwable exception) {
-			// log
-			exception.printStackTrace();
-			cancelEnable("an error occured during the conversion of your files from a previous version. Please check relevant logs, fix the problem (eventually contact the developper), then delete that file and reboot the server.");
-			// create lock file
-			failed.getParentFile().mkdirs();
-			try {
-				failed.createNewFile();
-			} catch (IOException exc) {
-				exc.printStackTrace();
-			}
-			return false;
-		}
 		// spigot resource id
 		spigotResourceId = 24180;
 		// success
@@ -313,6 +289,9 @@ public class GCore extends GPlugin {
 
 	@Override
 	protected boolean enable() {
+		// reload inner (mainly settings)
+		innerReload();
+
 		// server version
 		debug("Detected server version : " + ServerVersion.CURRENT.getName()
 		+ (ServerVersion.CURRENT.equals(ServerVersion.UNSUPPORTED)
@@ -326,6 +305,13 @@ public class GCore extends GPlugin {
 		// init compat
 		Compat.INSTANCE.init();
 
+		// gson
+		GSON = Utils.createGsonBuilder().setPrettyPrinting().create();
+		UNPRETTY_GSON = Utils.createGsonBuilder().create();
+		
+		// vault integration
+		registerPluginIntegration("Vault", VaultIntegration.class);
+
 		// load the Query class, as it seems to throw a LinkageError if it's done 'in
 		// action' (probably because MySQL operations are done asynchronously)
 		try {
@@ -333,12 +319,6 @@ public class GCore extends GPlugin {
 		} catch (ClassNotFoundException exception) {
 			exception.printStackTrace();
 		}
-
-		// vault integration
-		registerPluginIntegration("Vault", VaultIntegration.class);
-
-		// reload inner (mainly settings)
-		innerReload();
 
 		// register command
 		CommandRoot root = new CommandRoot(this, Utils.asList("gcore"), null, GPerm.GCORE_ADMIN, false);
@@ -370,6 +350,7 @@ public class GCore extends GPlugin {
 		root.addChild(new CommandPlugins());
 		root.addChild(new CommandSetuserprofile());
 		// root.addChild(new CommandPathfindingTest());
+
 		return true;
 	}
 

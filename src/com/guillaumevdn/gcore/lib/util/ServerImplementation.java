@@ -7,6 +7,6 @@ public enum ServerImplementation {
 	PAPERSPIGOT;
 
 	// current
-	public static final ServerImplementation CURRENT = Utils.getServerImplementation();
+	public static final ServerImplementation CURRENT = VersionUtils.getServerImplementation();
 
 }

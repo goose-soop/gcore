@@ -19,7 +19,7 @@ public class CPMob extends ContainerParseable {
 
 	// base
 	private PPEnum<EntityType> type = addComponent(new PPEnum<EntityType>("type", this, null, EntityType.class, "mob type", false, 0, EditorGUI.ICON_MOB, GLocale.GUI_GENERIC_EDITOR_MOB_TYPELORE.getLines()));
-	private PPString name = addComponent(new PPString("name", this, null, false, 1, EditorGUI.ICON_STRING, GLocale.GUI_GENERIC_EDITOR_MOB_NAMELORE.getLines()));
+	private PPString name = addComponent(new PPString("name", this, null, false, 1, EditorGUI.ICON_STRING, GLocale.GUI_GENERIC_EDITOR_MOB_LORE.getLines()));
 
 	public CPMob(String id, Parseable parent, boolean mandatory, int editorSlot, Mat editorIcon, List<String> editorDescription) {
 		super(id, parent, "mob", mandatory, editorSlot, editorIcon, editorDescription);

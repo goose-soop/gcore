@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -292,7 +293,7 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 
 	public void setAmount(int amount) {
 		this.amount = amount;
-		if (build != null) rebuildItem(true);
+		if (build != null) build.setAmount(amount);
 	}
 
 	public List<PotionEffect> getEffects() {
@@ -408,11 +409,8 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 				meta.setLore(lore);
 				// unbreakable
 				if (unbreakable) {
-					try {
-						meta.spigot().setUnbreakable(unbreakable);
-					} catch (UnsupportedOperationException exception) {
-						GCore.inst().error("Trying to set item with type " + type.toString() + " unbreakable, but it's not supported");
-					}
+					Compat.INSTANCE.setUnbreakable(build);
+					meta = build.getItemMeta();// the meta changed so update it
 				}
 				// flags
 				if (hideFlags) {
@@ -447,6 +445,13 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 	 * @return an item with remaining amount if there wasn't enough place in the player's inventory, or null if no extra drop
 	 */
 	public Item give(Player player) {
+		return give(player, player.getEyeLocation());
+	}
+
+	/**
+	 * @return an item with remaining amount if there wasn't enough place in the player's inventory, or null if no extra drop
+	 */
+	public Item give(Player player, Location dropLocation) {
 		ItemStack item = getItemStack();
 		if (item == null) return null;
 		// add to inventory
@@ -484,7 +489,7 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 		}
 		// remaining, so drop it
 		item.setAmount(count);
-		return player.getWorld().dropItem(player.getEyeLocation(), item);
+		return player.getWorld().dropItem(dropLocation, item);
 	}
 
 	public boolean contains(Inventory inventory) {
@@ -539,6 +544,10 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 	}
 
 	public boolean isSimilar(ItemStack item, boolean checkAmount) {
+		return isSimilar(item, true, true, checkAmount);
+	}
+
+	public boolean isSimilar(ItemStack item, boolean checkDurability, boolean exactMatch, boolean checkAmount) {
 		// null
 		if (item == null) {
 			return false;
@@ -552,58 +561,106 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 			return false;
 		}
 		// type
-		if (!type.isMat(item)) {
+		if (type.equals(Mat.from(item), checkDurability)) {
 			return false;
 		}
-		// enchants
-		Map<Enchantment, Integer> itemEnchants = item.getEnchantments();
-		if (enchants.size() != itemEnchants.size()) {
-			return false;
-		}
-		for (Enchantment enchant : enchants.keySet()) {
-			if (enchants.get(enchant) != itemEnchants.get(enchant)) {
+		// exact match ?
+		if (exactMatch) {
+			// unbreakable
+			if (unbreakable != Compat.INSTANCE.isUnbreakable(item)) {
 				return false;
 			}
-		}
-		// effects
-		if (!effects.isEmpty()) {
-			// not a potion holder
-			PotionMeta potion = item.hasItemMeta() && item.getItemMeta() instanceof PotionMeta ? (PotionMeta) item.getItemMeta() : null;
-			if (potion == null) {
+			// enchants
+			Map<Enchantment, Integer> itemEnchants = item.getEnchantments();
+			if (enchants.size() != itemEnchants.size()) {
 				return false;
 			}
-			// check effects
-			if (effects.size() != potion.getCustomEffects().size()) {
-				return false;
-			}
-			for (PotionEffect potionEffect : potion.getCustomEffects()) {
-				boolean has = false;
-				for (PotionEffect effect : effects) {
-					if (potionEffect.equals(effect)) {
-						has = true;
-						break;
-					}
-				}
-				if (!has) {
+			for (Enchantment enchant : enchants.keySet()) {
+				if (enchants.get(enchant) != itemEnchants.get(enchant)) {
 					return false;
 				}
 			}
-			// all effects are good
+			// effects
+			if (!effects.isEmpty()) {
+				// not a potion holder
+				PotionMeta potion = item.hasItemMeta() && item.getItemMeta() instanceof PotionMeta ? (PotionMeta) item.getItemMeta() : null;
+				if (potion == null) {
+					return false;
+				}
+				// check effects
+				if (effects.size() != potion.getCustomEffects().size()) {
+					return false;
+				}
+				for (PotionEffect potionEffect : potion.getCustomEffects()) {
+					boolean has = false;
+					for (PotionEffect effect : effects) {
+						if (potionEffect.equals(effect)) {
+							has = true;
+							break;
+						}
+					}
+					if (!has) {
+						return false;
+					}
+				}
+				// all effects are good
+			}
+			// name
+			if (name == null ? (item.hasItemMeta() && item.getItemMeta().hasDisplayName())
+					: !(item.hasItemMeta() && item.getItemMeta().hasDisplayName() && item.getItemMeta().getDisplayName().equals(name))) {
+				return false;
+			}
+			// lore
+			if (lore == null ? (item.hasItemMeta() && item.getItemMeta().hasLore())
+					: (!lore.isEmpty() && !(item.hasItemMeta() && item.getItemMeta().hasLore() && item.getItemMeta().getLore().equals(lore)))) {
+				return false;
+			}
 		}
-		// name
-		if (name != null && !(item.hasItemMeta() && item.getItemMeta().hasDisplayName() && item.getItemMeta().getDisplayName().equals(name))) {
-			return false;
-		}
-		// lore
-		if (lore != null && !lore.isEmpty() && !(item.hasItemMeta() && item.getItemMeta().hasLore() && item.getItemMeta().getLore().equals(lore))) {
-			return false;
+		// not an exact match
+		else {
+			// unbreakable
+			if (unbreakable && !Compat.INSTANCE.isUnbreakable(item)) {
+				return false;
+			}
+			// enchants
+			for (Enchantment enchant : enchants.keySet()) {
+				if (item.getEnchantmentLevel(enchant) < enchants.get(enchant)) {
+					return false;
+				}
+			}
+			// effects
+			if (!effects.isEmpty()) {
+				// not a potion holder
+				PotionMeta potion = item.hasItemMeta() && item.getItemMeta() instanceof PotionMeta ? (PotionMeta) item.getItemMeta() : null;
+				if (potion == null) {
+					return false;
+				}
+				// check effects
+				for (PotionEffect potionEffect : potion.getCustomEffects()) {
+					boolean has = false;
+					for (PotionEffect effect : effects) {
+						if (potionEffect.getType().equals(effect.getType()) && potionEffect.getAmplifier() >= effect.getAmplifier() && potionEffect.getDuration() >= effect.getDuration()) {
+							has = true;
+							break;
+						}
+					}
+					if (!has) {
+						return false;
+					}
+				}
+				// all effects are good
+			}
+			// name
+			if (name != null && !(item.hasItemMeta() && item.getItemMeta().hasDisplayName() && item.getItemMeta().getDisplayName().equals(name))) {
+				return false;
+			}
+			// lore
+			if (lore != null && !lore.isEmpty() && !(item.hasItemMeta() && item.getItemMeta().hasLore() && item.getItemMeta().getLore().equals(lore))) {
+				return false;
+			}
 		}
 		// custom nbt
 		if (customNbt != null && !customNbt.equals(Compat.INSTANCE.getNbt(item))) {
-			return false;
-		}
-		// unbreakable
-		if (unbreakable && !(item.hasItemMeta() && item.getItemMeta().spigot().isUnbreakable())) {
 			return false;
 		}
 		// equals

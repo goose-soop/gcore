@@ -42,6 +42,19 @@ public class BlockCoords {
 		return z;
 	}
 
+	public Location toLocation() {
+		return new Location(world, x, y, z);
+	}
+	
+	public Block toBlock() {
+		return world.getBlockAt(x, y, z);
+	}
+	
+	@Override
+	public String toString() {
+		return world.getName() + "," + x + "," + y + "," + z;
+	}
+
 	// overriden
 	@Override
 	public int hashCode() {

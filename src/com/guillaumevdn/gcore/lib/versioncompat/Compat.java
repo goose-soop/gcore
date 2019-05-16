@@ -35,6 +35,37 @@ public abstract class Compat {
 		return null;
 	}
 
+	public void setUnbreakable(ItemStack item) {
+		ItemMeta meta = item.getItemMeta();
+		if (meta == null) return;
+		try {
+			ItemMeta.class.getDeclaredMethod("setUnbreakable", boolean.class).invoke(meta, true);
+			item.setItemMeta(meta);
+		} catch (Throwable ignored) {
+			try {
+				Object spigot = ItemMeta.class.getDeclaredMethod("spigot").invoke(item.getItemMeta());
+				spigot.getClass().getDeclaredMethod("setUnbreakable", boolean.class).invoke(meta, true);
+				item.setItemMeta(meta);
+			} catch (Throwable ignored2) {
+			}
+		}
+	}
+
+	public boolean isUnbreakable(ItemStack item) {
+		ItemMeta meta = item.getItemMeta();
+		if (meta == null) return false;
+		try {
+			return (boolean) ItemMeta.class.getDeclaredMethod("isUnbreakable").invoke(meta);
+		} catch (Throwable ignored) {
+			try {
+				Object spigot = ItemMeta.class.getDeclaredMethod("spigot").invoke(meta);
+				return (boolean) spigot.getClass().getDeclaredMethod("isUnbreakable").invoke(spigot);
+			} catch (Throwable ignored2) {
+			}
+		}
+		return false;
+	}
+
 	// nbt
 	public abstract String serializeNbt(Object nbt) throws IOException;
 	public abstract Object unserializeNbt(String serialized) throws IOException;

@@ -40,3 +40,6 @@ npc_update_delay: 2
 # - AA is the hour, between 00 and 23
 # - BB is the minute, between 00 and 59
 #time_zone: 'GMT+01:00' (GMT +1h)
+
+# Force the plugin to behave for this specific server version (use this if GCore can't detect the server implementation you're using)
+#forced_version_compat: MC_1_7_10

@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import com.guillaumevdn.gcore.GCore;
+import com.guillaumevdn.gcore.lib.util.ServerVersion;
 import com.guillaumevdn.gcore.lib.util.Utils;
 
 /**
@@ -21,7 +22,7 @@ public class Mat implements Cloneable, Comparable<Mat> {
 	private static final Map<String, Mat> REGULAR_VALUES = new HashMap<String, Mat>();
 	private static final Map<String, MatDurabilities> MODERN = new HashMap<String, MatDurabilities>();
 	private static final Map<String, MatDatas> LEGACY = new HashMap<String, MatDatas>();
-	public static final MatVersion VERSION = Utils.IS_1_13 ? MatVersion.MODERN : MatVersion.LEGACY;
+	public static final MatVersion VERSION = ServerVersion.IS_1_13 ? MatVersion.MODERN : MatVersion.LEGACY;
 
 	// values
 	public static final Mat ACACIA_BOAT = registerValue(new Mat(VERSION, "ACACIA_BOAT", "BOAT_ACACIA"));
@@ -1006,7 +1007,7 @@ public class Mat implements Cloneable, Comparable<Mat> {
 	public static final Mat WHITE_DYE = registerValue(new Mat(VERSION, "WHITE_DYE", "-"));
 	public static final Mat BLUE_DYE = registerValue(new Mat(VERSION, "BLUE_DYE", "-"));
 	public static final Mat BROWN_DYE = registerValue(new Mat(VERSION, "BROWN_DYE", "-"));
-	
+
 	// base
 	private MatVersion version;
 	private final String modernName;
@@ -1029,7 +1030,7 @@ public class Mat implements Cloneable, Comparable<Mat> {
 		this.legacyName = legacyName;
 		this.legacyData = legacyData;
 		this.durability = durability;
-		this.currentMaterial = Utils.IS_1_13 ? Material.getMaterial(modernName) : (!legacyName.equals("-") ? Material.getMaterial(legacyName) : null);
+		this.currentMaterial = ServerVersion.IS_1_13 ? Material.getMaterial(modernName) : (!legacyName.equals("-") ? Material.getMaterial(legacyName) : null);
 	}
 
 	// get
@@ -1077,11 +1078,11 @@ public class Mat implements Cloneable, Comparable<Mat> {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (Utils.instanceOf(obj, Mat.class)) {
-			Mat other = (Mat) obj;
-			return this.modernName.equals(other.modernName) && (durability > 0 ? this.durability == other.durability : true);
-		}
-		return false;
+		return Utils.instanceOf(obj, Mat.class) ? equals((Mat) obj, true) : false;
+	}
+
+	public boolean equals(Mat other, boolean durabilityCheck) {
+		return this.modernName.equals(other.modernName) && (durabilityCheck ? this.durability == other.durability : true);
 	}
 
 	@Override
@@ -1129,7 +1130,7 @@ public class Mat implements Cloneable, Comparable<Mat> {
 			return new ItemStack(AIR.getCurrentMaterial());
 		}
 		// modern
-		if (Utils.IS_1_13 || legacyData == 0) {
+		if (ServerVersion.IS_1_13 || legacyData == 0) {
 			return new ItemStack(currentMaterial, 1, (short) durability);
 		}
 		// legacy
@@ -1275,7 +1276,7 @@ public class Mat implements Cloneable, Comparable<Mat> {
 	}
 
 	public static Mat from(Material material) {
-		return material == null ? AIR : (Utils.IS_1_13 ? from(material, 0) : from(material, 0, 0));
+		return material == null ? AIR : (ServerVersion.IS_1_13 ? from(material, 0) : from(material, 0, 0));
 	}
 
 	public static Mat from(Material material, int durability) {
@@ -1339,11 +1340,11 @@ public class Mat implements Cloneable, Comparable<Mat> {
 	}
 
 	public static Mat from(Block raw) {
-		return raw == null ? AIR : (Utils.IS_1_13 || raw.getData() == (byte) 0 ? from(raw.getType(), 0) : from(raw.getType(), (int) raw.getData(), 0));
+		return raw == null ? AIR : (ServerVersion.IS_1_13 || raw.getData() == (byte) 0 ? from(raw.getType(), 0) : from(raw.getType(), (int) raw.getData(), 0));
 	}
 
 	public static Mat from(ItemStack raw) {
-		return raw == null ? AIR : (Utils.IS_1_13 || raw.getData().getData() == (byte) 0 ? from(raw.getType(), (int) raw.getDurability()) : from(raw.getType(), (int) raw.getData().getData(), (int) raw.getDurability()));
+		return raw == null ? AIR : (ServerVersion.IS_1_13 || raw.getData().getData() == (byte) 0 ? from(raw.getType(), (int) raw.getDurability()) : from(raw.getType(), (int) raw.getData().getData(), (int) raw.getDurability()));
 	}
 
 	// mat version

@@ -618,8 +618,8 @@ public class GLocale {
 			"it_IT", Utils.asList("&7Tipo di mob")
 			);
 
-	public static final Text GUI_GENERIC_EDITOR_MOB_NAMELORE = new Text(
-			"GUI_GENERIC_EDITOR_MOB_NAMELORE", file,
+	public static final Text GUI_GENERIC_EDITOR_MOB_LORE = new Text(
+			"GUI_GENERIC_EDITOR_MOB_LORE", file,
 			"en_US", Utils.asList("&7Name of mob"),
 			"fr_FR", Utils.asList("&7Nom de mob"),
 			"it_IT", Utils.asList("&7Nome del mob")
@@ -844,8 +844,8 @@ public class GLocale {
 			"it_IT", Utils.asList("&7Numero di oggetti")
 			);
 
-	public static final Text GUI_GENERIC_EDITOR_ITEM_NAMELORE = new Text(
-			"GUI_GENERIC_EDITOR_ITEM_NAMELORE", file,
+	public static final Text GUI_GENERIC_EDITOR_ITEM_LORE = new Text(
+			"GUI_GENERIC_EDITOR_ITEM_LORE", file,
 			"en_US", Utils.asList("&7Display name of item"),
 			"fr_FR", Utils.asList("&7Nom d'affichage de l'item"),
 			"it_IT", Utils.asList("&7Mostra il nome dell'oggetto")

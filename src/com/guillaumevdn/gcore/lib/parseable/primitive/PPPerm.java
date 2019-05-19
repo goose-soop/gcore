@@ -5,6 +5,7 @@ import java.util.List;
 import org.bukkit.entity.Player;
 
 import com.guillaumevdn.gcore.lib.Perm;
+import com.guillaumevdn.gcore.lib.gui.GUI;
 import com.guillaumevdn.gcore.lib.material.Mat;
 import com.guillaumevdn.gcore.lib.parseable.ParseResult;
 import com.guillaumevdn.gcore.lib.parseable.Parseable;
@@ -44,8 +45,8 @@ public class PPPerm extends PrimitiveParseable<Perm> {
 	}
 
 	@Override
-	public int getEditorMaxRegularSlot() {
-		return 7;
+	public List<Integer> getEditorRegularSlots() {
+		return GUI.SLOTS_0_TO_7;
 	}
 
 	@Override

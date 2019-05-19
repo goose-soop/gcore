@@ -561,7 +561,7 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 			return false;
 		}
 		// type
-		if (type.equals(Mat.from(item), checkDurability)) {
+		if (!type.equals(Mat.from(item), checkDurability)) {
 			return false;
 		}
 		// exact match ?
@@ -781,6 +781,12 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 	public ItemData cloneWithId(String id) {
 		ItemData clone = clone();
 		clone.setId(id);
+		return clone;
+	}
+
+	public ItemData cloneWithSlot(int slot) {
+		ItemData clone = clone();
+		clone.setSlot(slot);
 		return clone;
 	}
 

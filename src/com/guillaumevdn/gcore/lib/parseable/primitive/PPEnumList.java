@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 
 import com.guillaumevdn.gcore.GLocale;
+import com.guillaumevdn.gcore.lib.gui.GUI;
 import com.guillaumevdn.gcore.lib.material.Mat;
 import com.guillaumevdn.gcore.lib.parseable.ParseResult;
 import com.guillaumevdn.gcore.lib.parseable.Parseable;
@@ -68,7 +69,7 @@ public class PPEnumList<T extends Enum<T>> extends PrimitiveParseable<List<T>> {
 						if (clickType.isLeftClick()) {
 							// create sub GUI
 							String name = Utils.getNewInventoryName(gui.getName(), "" + (index + 1));
-							EditorGUI sub = new EditorGUI(getLastData().getPlugin(), gui, name, 9, 7) {
+							EditorGUI sub = new EditorGUI(getLastData().getPlugin(), gui, name, 9, GUI.SLOTS_0_TO_7) {
 								private EditorGUI subThis = this;
 								@Override
 								protected void fill() {
@@ -91,7 +92,7 @@ public class PPEnumList<T extends Enum<T>> extends PrimitiveParseable<List<T>> {
 										@Override
 										protected void onClick(final Player player, final ClickType clickType, final int pageIndex) {
 											// selection gui
-											EditorGUI subSelection = new EditorGUI(getLastData().getPlugin(), gui, Utils.getNewInventoryName(gui.getName(), "Select"), 54, 44) {
+											EditorGUI subSelection = new EditorGUI(getLastData().getPlugin(), gui, Utils.getNewInventoryName(gui.getName(), "Select"), 54, GUI.SLOTS_0_TO_44) {
 												@Override
 												protected void fill() {
 													// add values
@@ -169,8 +170,8 @@ public class PPEnumList<T extends Enum<T>> extends PrimitiveParseable<List<T>> {
 	}
 
 	@Override
-	public int getEditorMaxRegularSlot() {
-		return 17;
+	public List<Integer> getEditorRegularSlots() {
+		return GUI.SLOTS_0_TO_17;
 	}
 
 	@Override

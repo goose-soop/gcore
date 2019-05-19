@@ -1,5 +1,7 @@
 package com.guillaumevdn.gcore.lib.gui;
 
+import java.util.List;
+
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -10,8 +12,8 @@ import com.guillaumevdn.gcore.lib.Logger.Level;
 public abstract class FilledGUI extends GUI {
 
 	// base
-	public FilledGUI(Plugin plugin, String name, int size, int maxRegularSlot) {
-		super(plugin, name, size, maxRegularSlot, true);
+	public FilledGUI(Plugin plugin, String name, int size, List<Integer> regularItemSlots) {
+		super(plugin, name, size, regularItemSlots, true);
 	}
 
 	// overriden

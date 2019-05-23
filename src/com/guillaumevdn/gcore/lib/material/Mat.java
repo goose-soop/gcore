@@ -1007,6 +1007,7 @@ public class Mat implements Cloneable, Comparable<Mat> {
 	public static final Mat WHITE_DYE = registerValue(new Mat(VERSION, "WHITE_DYE", "-"));
 	public static final Mat BLUE_DYE = registerValue(new Mat(VERSION, "BLUE_DYE", "-"));
 	public static final Mat BROWN_DYE = registerValue(new Mat(VERSION, "BROWN_DYE", "-"));
+	public static final Mat RED_DYE = registerValue(new Mat(VERSION, "RED_ROSE", "RED_DYE"));
 
 	// base
 	private MatVersion version;

@@ -36,7 +36,7 @@ public class CommandItemSetname extends CommandArgument {
 			}
 			// set name
 			ItemMeta meta = item.getItemMeta();
-			meta.setDisplayName(name);
+			meta.setDisplayName(Utils.format(name));
 			item.setItemMeta(meta);
 			player.setItemInHand(item);
 			player.updateInventory();

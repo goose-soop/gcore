@@ -500,10 +500,27 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 		return count(inventory) >= amount;
 	}
 
+	public boolean contains(Inventory inventory, int amount, boolean checkDurability, boolean exactMatch, double minDurabilityIfNotUnbreakable) {
+		return count(inventory, checkDurability, exactMatch, minDurabilityIfNotUnbreakable) >= amount;
+	}
+
 	public int count(Inventory inventory) {
+		return count(inventory, true, true);
+	}
+
+	public int count(Inventory inventory, boolean checkDurability, boolean exactMatch) {
+		return count(inventory, checkDurability, exactMatch, 0d);
+	}
+
+	public int count(Inventory inventory, boolean checkDurability, boolean exactMatch, double minDurabilityIfNotUnbreakable) {
 		int count = 0;
 		for (ItemStack it : inventory.getContents()) {
-			if (isSimilar(it, false)) {
+			if (isSimilar(it, checkDurability, exactMatch, false)) {
+				// check durability
+				if (minDurabilityIfNotUnbreakable > 0d && !isUnbreakable() && getType().getDurability() / ((double) getType().getCurrentMaterial().getMaxDurability()) * 100d < minDurabilityIfNotUnbreakable) {
+					continue;
+				}
+				// add count
 				count += it.getAmount();
 			}
 		}
@@ -515,9 +532,18 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 	}
 
 	public void remove(Inventory inventory, int amount) {
+		
+	}
+
+	public void remove(Inventory inventory, int amount, boolean checkDurability, boolean exactMatch, double minDurabilityIfNotUnbreakable) {
 		for (int slot = 0; slot < inventory.getSize(); slot++) {
 			ItemStack item = inventory.getItem(slot);
-			if (isSimilar(item, false)) {
+			if (isSimilar(item, checkDurability, exactMatch, false)) {
+				// check durability
+				if (minDurabilityIfNotUnbreakable > 0d && !isUnbreakable() && getType().getDurability() / ((double) getType().getCurrentMaterial().getMaxDurability()) * 100d < minDurabilityIfNotUnbreakable) {
+					continue;
+				}
+				// remove
 				int itemAmount = item.getAmount();
 				if (amount >= itemAmount) {
 					amount -= itemAmount;

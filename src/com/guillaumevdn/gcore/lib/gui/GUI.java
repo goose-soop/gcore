@@ -58,6 +58,10 @@ public class GUI implements Listener {
 			}
 		}
 	}
+	
+	public static List<GUI> getRegisteredGUIs() {
+		return registeredGUIs;
+	}
 
 	// fields
 	private final Plugin plugin;

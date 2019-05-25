@@ -532,7 +532,7 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 	}
 
 	public void remove(Inventory inventory, int amount) {
-		
+		remove(inventory, amount, true, true, 0d);
 	}
 
 	public void remove(Inventory inventory, int amount, boolean checkDurability, boolean exactMatch, double minDurabilityIfNotUnbreakable) {

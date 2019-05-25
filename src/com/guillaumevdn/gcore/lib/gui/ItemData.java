@@ -404,14 +404,14 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 			// meta
 			ItemMeta meta = Bukkit.getItemFactory().getItemMeta(type.getCurrentMaterial());
 			if (meta != null) {
-				// name and lore
-				meta.setDisplayName(name);
-				meta.setLore(lore);
 				// unbreakable
 				if (unbreakable) {
 					Compat.INSTANCE.setUnbreakable(build);
 					meta = build.getItemMeta();// the meta changed so update it
 				}
+				// name and lore
+				meta.setDisplayName(name);
+				meta.setLore(lore);
 				// flags
 				if (hideFlags) {
 					meta = Compat.INSTANCE.addItemFlags(meta);
@@ -563,6 +563,10 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 
 	public boolean isAtLeast(ItemStack item) {
 		return isSimilar(item) && item.getAmount() >= amount;
+	}
+
+	public boolean isAtLeast(ItemStack item, boolean checkDurability, boolean exactMatch) {
+		return isSimilar(item, checkDurability, exactMatch, false) && item.getAmount() >= amount;
 	}
 
 	public boolean isSimilar(ItemStack item) {

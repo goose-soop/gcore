@@ -143,9 +143,9 @@ public class NpcProtocols1_14 extends NpcProtocols {
 		// create packet
 		PacketContainer packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.REL_ENTITY_MOVE);
 		packet.getIntegers().write(0, entityId);
-		packet.getShorts().write(1, (short) ((location.getX() * 32.0 - previous.getX() * 32.0) * 128.0));
-		packet.getShorts().write(2, (short) ((location.getY() * 32.0 - previous.getY() * 32.0) * 128.0));
-		packet.getShorts().write(3, (short) ((location.getZ() * 32.0 - previous.getZ() * 32.0) * 128.0));
+		packet.getShorts().write(0, (short) ((location.getX() * 32.0 - previous.getX() * 32.0) * 128.0));
+		packet.getShorts().write(1, (short) ((location.getY() * 32.0 - previous.getY() * 32.0) * 128.0));
+		packet.getShorts().write(2, (short) ((location.getZ() * 32.0 - previous.getZ() * 32.0) * 128.0));
 		packet.getBooleans().write(0, onGround);
 		// send packet
 		sendPacket(player, packet);

@@ -50,6 +50,8 @@ public class CPItem extends ContainerParseable {
 	private PPDouble chance = addComponent(new PPDouble("chance", this, "0", -1d, 100d, false, 12, EditorGUI.ICON_NUMBER, GLocale.GUI_GENERIC_EDITOR_ITEM_CHANCELORE.getLines()));
 	private PPBoolean mustHaveInHand = addComponent(new PPBoolean("must_have_in_hand", this, "false", false, 13, EditorGUI.ICON_BOOLEAN, GLocale.GUI_GENERIC_EDITOR_ITEM_MUSTHAVEINHANDLORE.getLines()));
 	private PPBoolean removeAfterAction = addComponent(new PPBoolean("remove_after_action", this, "false", false, 14, EditorGUI.ICON_BOOLEAN, GLocale.GUI_GENERIC_EDITOR_ITEM_REMOVEAFTERACTIONLORE.getLines()));
+	private PPBoolean checkDurability = addComponent(new PPBoolean("check_durability", this, "true", false, 15, EditorGUI.ICON_BOOLEAN, GLocale.GUI_GENERIC_EDITOR_ITEM_CHECKDURABILITYLORE.getLines()));
+	private PPBoolean exactMatch = addComponent(new PPBoolean("exact_match", this, "true", false, 16, EditorGUI.ICON_BOOLEAN, GLocale.GUI_GENERIC_EDITOR_ITEM_EXACTMATCHLORE.getLines()));
 
 	public CPItem(String id, Parseable parent, boolean mandatory, int editorSlot, Mat editorIcon, List<String> editorDescription) {
 		super(id, parent, "item", mandatory, editorSlot, editorIcon, editorDescription);
@@ -168,6 +170,22 @@ public class CPItem extends ContainerParseable {
 		return removeAfterAction.getParsedValue(parser);
 	}
 
+	public PPBoolean getCheckDurability() {
+		return checkDurability;
+	}
+
+	public Boolean getCheckDurability(Player parser) {
+		return checkDurability.getParsedValue(parser);
+	}
+
+	public PPBoolean getExactMatch() {
+		return exactMatch;
+	}
+
+	public Boolean getExactMatch(Player parser) {
+		return exactMatch.getParsedValue(parser);
+	}
+
 	// methods
 	private Map<UUID, ItemData> cache = new HashMap<UUID, ItemData>();
 
@@ -258,7 +276,7 @@ public class CPItem extends ContainerParseable {
 		// has item
 		ItemData item = getParsedValue(parser);
 		if (item != null && item.getType() != null && !item.getType().isAir()) {
-			return getMustHaveInHand(parser) ? isValid(player.getItemInHand(), true, parser) : item.contains(player.getInventory());
+			return getMustHaveInHand(parser) ? isValid(player.getItemInHand(), true, parser) : item.contains(player.getInventory(), item.getAmount(), getCheckDurability(parser), getExactMatch(parser), 0d);
 		}
 		// no conditions so it's valid
 		return true;
@@ -268,7 +286,7 @@ public class CPItem extends ContainerParseable {
 		// has item
 		ItemData item = getParsedValue(parser);
 		if (item != null && item.getType() != null && !item.getType().isAir()) {
-			return item.getType().isMat(toCheckType);
+			return item.getType().equals(Mat.from(toCheckType), getCheckDurability(parser));
 		}
 		// no conditions so it's valid
 		return true;
@@ -278,7 +296,7 @@ public class CPItem extends ContainerParseable {
 		// has item
 		ItemData item = getParsedValue(parser);
 		if (item != null && item.getType() != null && !item.getType().isAir()) {
-			return checkAmount ? item.isAtLeast(toCheck) : item.isSimilar(toCheck);
+			return checkAmount ? item.isAtLeast(toCheck, getCheckDurability(parser), getExactMatch(parser)) : item.isSimilar(toCheck, getCheckDurability(parser), getExactMatch(parser), false);
 		}
 		// no conditions so it's valid
 		return true;
@@ -287,11 +305,13 @@ public class CPItem extends ContainerParseable {
 	public int getValidAmount(Collection<ItemStack> items, Player parser) {
 		// has item
 		ItemData item = getParsedValue(parser);
+		boolean checkDurability = getCheckDurability(parser);
+		boolean exactMatch = getExactMatch(parser);
 		if (item != null && item.getType() != null && !item.getType().isAir()) {
 			int amount = 0;
-			for (ItemStack it : items) {
-				if (item.isSimilar(it)) {
-					amount += it.getAmount();
+			for (ItemStack toCheck : items) {
+				if (item.isSimilar(toCheck, checkDurability, exactMatch, false)) {
+					amount += toCheck.getAmount();
 				}
 			}
 			return amount;
@@ -305,10 +325,14 @@ public class CPItem extends ContainerParseable {
 		if (item != null && item.getType() != null && !item.getType().isAir() && (force || getRemoveAfterAction(parser))) {
 			if (getMustHaveInHand(parser)) {
 				ItemStack inHand = player.getItemInHand();
-				inHand.setAmount(inHand.getAmount() - item.getAmount());
-				player.setItemInHand(inHand.getAmount() > 0 ? inHand : null);
+				if (inHand != null && item.isSimilar(inHand, getCheckDurability(parser), getExactMatch(parser), false)) {
+					inHand.setAmount(inHand.getAmount() - item.getAmount());
+					player.setItemInHand(inHand.getAmount() > 0 ? inHand : null);
+				} else {
+					item.remove(player.getInventory(), item.getAmount(), getCheckDurability(parser), getExactMatch(parser), 0d);
+				}
 			} else {
-				item.remove(player.getInventory());
+				item.remove(player.getInventory(), item.getAmount(), getCheckDurability(parser), getExactMatch(parser), 0d);
 			}
 			player.updateInventory();
 		}

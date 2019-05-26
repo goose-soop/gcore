@@ -76,7 +76,7 @@ public abstract class Parseable implements Comparable<Parseable>, Cloneable {
 	// editor
 	public EditorGUI createEditor(final EditorGUI parent, final Player player, final ModifCallback onModif) {
 		if (getLastData() == null || getLastData().getPlugin() == null) return null;
-		return new EditorGUI(getLastData().getPlugin(), parent, parent != null ? Utils.getNewInventoryName(parent.getName(), getId()) : getId(), getEditorSize(), getEditorMaxRegularSlot()) {
+		return new EditorGUI(getLastData().getPlugin(), parent, parent != null ? Utils.getNewInventoryName(parent.getName(), getId()) : getId(), getEditorSize(), getEditorRegularSlots()) {
 			@Override
 			protected void fill() {
 				fillEditor(this, player, onModif);
@@ -93,7 +93,7 @@ public abstract class Parseable implements Comparable<Parseable>, Cloneable {
 	}
 
 	public abstract int getEditorSize();
-	public abstract int getEditorMaxRegularSlot();
+	public abstract List<Integer> getEditorRegularSlots();
 	public abstract int getEditorBackSlot();
 	protected abstract void fillEditor(EditorGUI gui, Player player, ModifCallback onModif);
 	public abstract List<String> describe(int depth);

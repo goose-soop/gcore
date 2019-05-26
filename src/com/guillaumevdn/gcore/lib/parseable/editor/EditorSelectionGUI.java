@@ -9,6 +9,7 @@ import org.bukkit.event.inventory.ClickType;
 import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.GLocale;
 import com.guillaumevdn.gcore.lib.GPlugin;
+import com.guillaumevdn.gcore.lib.gui.GUI;
 import com.guillaumevdn.gcore.lib.material.Mat;
 import com.guillaumevdn.gcore.lib.parseable.Parseable;
 import com.guillaumevdn.gcore.lib.util.Utils;
@@ -20,7 +21,7 @@ public abstract class EditorSelectionGUI<T> extends EditorGUI {
 	private boolean awaitingDeletion = false;
 
 	public EditorSelectionGUI(GPlugin plugin, EditorGUI parent, String name) {
-		super(plugin, parent, name, 54, 44);
+		super(plugin, parent, name, 54, GUI.SLOTS_0_TO_44);
 	}
 
 	// methods

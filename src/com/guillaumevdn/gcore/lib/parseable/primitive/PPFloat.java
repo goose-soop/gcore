@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 
 import com.guillaumevdn.gcore.GLocale;
+import com.guillaumevdn.gcore.lib.gui.GUI;
 import com.guillaumevdn.gcore.lib.material.Mat;
 import com.guillaumevdn.gcore.lib.parseable.ParseResult;
 import com.guillaumevdn.gcore.lib.parseable.Parseable;
@@ -80,8 +81,8 @@ public class PPFloat extends PrimitiveParseable<Float> {
 	}
 
 	@Override
-	public int getEditorMaxRegularSlot() {
-		return 25;
+	public List<Integer> getEditorRegularSlots() {
+		return GUI.SLOTS_0_TO_25;
 	}
 
 	@Override

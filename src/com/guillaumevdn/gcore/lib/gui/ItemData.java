@@ -404,14 +404,14 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 			// meta
 			ItemMeta meta = Bukkit.getItemFactory().getItemMeta(type.getCurrentMaterial());
 			if (meta != null) {
-				// name and lore
-				meta.setDisplayName(name);
-				meta.setLore(lore);
 				// unbreakable
 				if (unbreakable) {
 					Compat.INSTANCE.setUnbreakable(build);
 					meta = build.getItemMeta();// the meta changed so update it
 				}
+				// name and lore
+				meta.setDisplayName(name);
+				meta.setLore(lore);
 				// flags
 				if (hideFlags) {
 					meta = Compat.INSTANCE.addItemFlags(meta);
@@ -500,10 +500,27 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 		return count(inventory) >= amount;
 	}
 
+	public boolean contains(Inventory inventory, int amount, boolean checkDurability, boolean exactMatch, double minDurabilityIfNotUnbreakable) {
+		return count(inventory, checkDurability, exactMatch, minDurabilityIfNotUnbreakable) >= amount;
+	}
+
 	public int count(Inventory inventory) {
+		return count(inventory, true, true);
+	}
+
+	public int count(Inventory inventory, boolean checkDurability, boolean exactMatch) {
+		return count(inventory, checkDurability, exactMatch, 0d);
+	}
+
+	public int count(Inventory inventory, boolean checkDurability, boolean exactMatch, double minDurabilityIfNotUnbreakable) {
 		int count = 0;
 		for (ItemStack it : inventory.getContents()) {
-			if (isSimilar(it, false)) {
+			if (isSimilar(it, checkDurability, exactMatch, false)) {
+				// check durability
+				if (minDurabilityIfNotUnbreakable > 0d && !isUnbreakable() && getType().getDurability() / ((double) getType().getCurrentMaterial().getMaxDurability()) * 100d < minDurabilityIfNotUnbreakable) {
+					continue;
+				}
+				// add count
 				count += it.getAmount();
 			}
 		}
@@ -515,9 +532,18 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 	}
 
 	public void remove(Inventory inventory, int amount) {
+		remove(inventory, amount, true, true, 0d);
+	}
+
+	public void remove(Inventory inventory, int amount, boolean checkDurability, boolean exactMatch, double minDurabilityIfNotUnbreakable) {
 		for (int slot = 0; slot < inventory.getSize(); slot++) {
 			ItemStack item = inventory.getItem(slot);
-			if (isSimilar(item, false)) {
+			if (isSimilar(item, checkDurability, exactMatch, false)) {
+				// check durability
+				if (minDurabilityIfNotUnbreakable > 0d && !isUnbreakable() && getType().getDurability() / ((double) getType().getCurrentMaterial().getMaxDurability()) * 100d < minDurabilityIfNotUnbreakable) {
+					continue;
+				}
+				// remove
 				int itemAmount = item.getAmount();
 				if (amount >= itemAmount) {
 					amount -= itemAmount;
@@ -537,6 +563,10 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 
 	public boolean isAtLeast(ItemStack item) {
 		return isSimilar(item) && item.getAmount() >= amount;
+	}
+
+	public boolean isAtLeast(ItemStack item, boolean checkDurability, boolean exactMatch) {
+		return isSimilar(item, checkDurability, exactMatch, false) && item.getAmount() >= amount;
 	}
 
 	public boolean isSimilar(ItemStack item) {
@@ -561,7 +591,7 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 			return false;
 		}
 		// type
-		if (type.equals(Mat.from(item), checkDurability)) {
+		if (!type.equals(Mat.from(item), checkDurability)) {
 			return false;
 		}
 		// exact match ?
@@ -781,6 +811,12 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 	public ItemData cloneWithId(String id) {
 		ItemData clone = clone();
 		clone.setId(id);
+		return clone;
+	}
+
+	public ItemData cloneWithSlot(int slot) {
+		ItemData clone = clone();
+		clone.setSlot(slot);
 		return clone;
 	}
 

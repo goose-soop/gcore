@@ -59,7 +59,6 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.data.Ageable;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
@@ -1123,8 +1122,8 @@ public class Utils {
 				return ((Crops) mat).getState().equals(CropState.RIPE);
 			}
 			// cocoa
-			if (mat instanceof Ageable) {
-				return ((Ageable) mat).getAge() >= ((Ageable) mat).getMaximumAge();
+			if (AgeableUtils.instanceOf(mat)) {
+				return AgeableUtils.isFullyAged(mat);
 			}
 		}
 		// not crops

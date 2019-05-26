@@ -13,6 +13,7 @@ import java.util.UUID;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Pose;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -77,20 +78,21 @@ public class NpcProtocols1_14 extends NpcProtocols {
 	public Map<Integer, Object> getDefaultHumanEntityMetadata() {
 		return Utils.asMap(
 				0, (byte) 0,
-				1, 0,
+				1, 300,
 				2, "",
 				3, false,
 				4, false,
 				5, false,
-				6, (byte) 0,
-				7, 1f,
-				8, 0,
-				9, false,
-				10, 0,
-				11, 0f,
-				12, 0,
-				13, (byte) 127,
-				14, (byte) 0
+				6, Pose.STANDING.name(),
+				7, (byte) 0,
+				8, 1f,
+				9, 0,
+				10, false,
+				11, 0,
+				13, 0f,
+				14, 0,
+				15, (byte) 127,
+				16, (byte) 0
 				);
 	}
 
@@ -141,9 +143,9 @@ public class NpcProtocols1_14 extends NpcProtocols {
 		// create packet
 		PacketContainer packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.REL_ENTITY_MOVE);
 		packet.getIntegers().write(0, entityId);
-		packet.getIntegers().write(1, (int) ((location.getX() * 32.0 - previous.getX() * 32.0) * 128.0));
-		packet.getIntegers().write(2, (int) ((location.getY() * 32.0 - previous.getY() * 32.0) * 128.0));
-		packet.getIntegers().write(3, (int) ((location.getZ() * 32.0 - previous.getZ() * 32.0) * 128.0));
+		packet.getShorts().write(0, (short) ((location.getX() * 32.0 - previous.getX() * 32.0) * 128.0));
+		packet.getShorts().write(1, (short) ((location.getY() * 32.0 - previous.getY() * 32.0) * 128.0));
+		packet.getShorts().write(2, (short) ((location.getZ() * 32.0 - previous.getZ() * 32.0) * 128.0));
 		packet.getBooleans().write(0, onGround);
 		// send packet
 		sendPacket(player, packet);

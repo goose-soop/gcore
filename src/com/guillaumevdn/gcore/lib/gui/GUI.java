@@ -1,6 +1,7 @@
 package com.guillaumevdn.gcore.lib.gui;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +40,13 @@ public class GUI implements Listener {
 	public static final ItemData PREVIOUS_PAGE_ITEM_EMPTY = new ItemData("previous_page_empty", 45, Mat.AIR, 1, null, null);
 	public static final ItemData NEXT_PAGE_ITEM = new ItemData("next_page", 53, Mat.ARROW, 1, GLocale.GUI_GENERIC_NEXTPAGEITEM.getLine(), null);
 	public static final ItemData NEXT_PAGE_ITEM_EMPTY = new ItemData("next_page_empty", 53, Mat.AIR, 1, null, null);
+	public static final List<Integer> SLOTS_0_TO_7 = Collections.unmodifiableList(getRegularItemSlots(0, 7));
+	public static final List<Integer> SLOTS_0_TO_8 = Collections.unmodifiableList(getRegularItemSlots(0, 8));
+	public static final List<Integer> SLOTS_0_TO_17 = Collections.unmodifiableList(getRegularItemSlots(0, 17));
+	public static final List<Integer> SLOTS_0_TO_25 = Collections.unmodifiableList(getRegularItemSlots(0, 25));
+	public static final List<Integer> SLOTS_0_TO_26 = Collections.unmodifiableList(getRegularItemSlots(0, 26));
+	public static final List<Integer> SLOTS_0_TO_44 = Collections.unmodifiableList(getRegularItemSlots(0, 44));
+	public static final List<Integer> SLOTS_0_TO_53 = Collections.unmodifiableList(getRegularItemSlots(0, 53));
 	private static List<GUI> registeredGUIs = new ArrayList<GUI>();
 
 	// static methods
@@ -50,13 +58,17 @@ public class GUI implements Listener {
 			}
 		}
 	}
+	
+	public static List<GUI> getRegisteredGUIs() {
+		return registeredGUIs;
+	}
 
 	// fields
 	private final Plugin plugin;
 	private boolean registered = false;
 	private final String name;
 	private final int size;
-	private final int maxRegularItemSlot;
+	private final List<Integer> regularItemSlots;
 	private final boolean unregisterOnClose;
 	private ClickTolerance clickTolerance;
 	private final ItemData previousPageItem;
@@ -65,32 +77,33 @@ public class GUI implements Listener {
 	private final ItemData nextPageItem;
 	private final ItemData nextPageItemEmpty;
 	private int nextPageItemSlot;
+	private boolean disablePages = false;
 	private List<Inventory> pages = new ArrayList<Inventory>();
 	private Map<String, ClickeableItem> regularItems = new HashMap<String, ClickeableItem>();
 	private Map<String, ClickeableItem> persistentItems = new HashMap<String, ClickeableItem>();
 
 	// bases
-	public GUI(Plugin plugin, String name, int size, int maxRegularItemSlot) {
-		this(plugin, name, size, maxRegularItemSlot, true, ClickTolerance.ALLOW, null, null, null, null);
+	public GUI(Plugin plugin, String name, int size, List<Integer> regularItemSlots) {
+		this(plugin, name, size, regularItemSlots, true, ClickTolerance.ALLOW, null, null, null, null);
 	}
 
-	public GUI(Plugin plugin, String name, int size, int maxRegularItemSlot, ItemData previousPageItem, ItemData nextPageItem) {
-		this(plugin, name, size, maxRegularItemSlot, true, ClickTolerance.ALLOW, previousPageItem, null, nextPageItem, null);
+	public GUI(Plugin plugin, String name, int size, List<Integer> regularItemSlots, ItemData previousPageItem, ItemData nextPageItem) {
+		this(plugin, name, size, regularItemSlots, true, ClickTolerance.ALLOW, previousPageItem, null, nextPageItem, null);
 	}
 
-	public GUI(Plugin plugin, String name, int size, int maxRegularItemSlot, boolean unregisterOnClose) {
-		this(plugin, name, size, maxRegularItemSlot, unregisterOnClose, ClickTolerance.ALLOW, null, null, null, null);
+	public GUI(Plugin plugin, String name, int size, List<Integer> regularItemSlots, boolean unregisterOnClose) {
+		this(plugin, name, size, regularItemSlots, unregisterOnClose, ClickTolerance.ALLOW, null, null, null, null);
 	}
 
-	public GUI(Plugin plugin, String name, int size, int maxRegularItemSlot, boolean unregisterOnClose, ClickTolerance clickTolerance) {
-		this(plugin, name, size, maxRegularItemSlot, unregisterOnClose, clickTolerance, null, null, null, null);
+	public GUI(Plugin plugin, String name, int size, List<Integer> regularItemSlots, boolean unregisterOnClose, ClickTolerance clickTolerance) {
+		this(plugin, name, size, regularItemSlots, unregisterOnClose, clickTolerance, null, null, null, null);
 	}
 
-	public GUI(Plugin plugin, String name, int size, int maxRegularItemSlot, boolean unregisterOnClose, ClickTolerance clickTolerance, ItemData previousPageItem, ItemData previousPageItemEmpty, ItemData nextPageItem, ItemData nextPageItemEmpty) {
+	public GUI(Plugin plugin, String name, int size, List<Integer> regularItemSlots, boolean unregisterOnClose, ClickTolerance clickTolerance, ItemData previousPageItem, ItemData previousPageItemEmpty, ItemData nextPageItem, ItemData nextPageItemEmpty) {
 		this.plugin = plugin;
 		this.name = name;
 		this.size = size;
-		this.maxRegularItemSlot = maxRegularItemSlot >= size ? size - 1 : maxRegularItemSlot;
+		this.regularItemSlots = regularItemSlots;
 		this.unregisterOnClose = unregisterOnClose;
 		this.clickTolerance = clickTolerance;
 		// previous page items
@@ -130,8 +143,8 @@ public class GUI implements Listener {
 		return size;
 	}
 
-	public int getMaxRegularItemSlot() {
-		return maxRegularItemSlot;
+	public List<Integer> getRegularItemSlots() {
+		return regularItemSlots;
 	}
 
 	public ClickTolerance getClickTolerance() {
@@ -140,6 +153,14 @@ public class GUI implements Listener {
 
 	public void setClickTolerance(ClickTolerance clickTolerance) {
 		this.clickTolerance = clickTolerance;
+	}
+
+	public boolean isDisablePages() {
+		return disablePages;
+	}
+
+	public void disablePages(boolean disablePages) {
+		this.disablePages = disablePages;
 	}
 
 	public List<Inventory> getPages() {
@@ -167,6 +188,7 @@ public class GUI implements Listener {
 		return persistentItems;
 	}
 
+	// registration
 	public boolean isRegistered() {
 		return registered;
 	}
@@ -311,6 +333,9 @@ public class GUI implements Listener {
 
 	// pages
 	public int createPage() {
+		if (disablePages) {
+			return -1;
+		}
 		// get inventory name
 		int index = pages.size();
 		String invName = name + (index > 0 ? " - " + (index + 1) : "");
@@ -366,12 +391,14 @@ public class GUI implements Listener {
 	}
 
 	public void updatePageItems() {
-		for (int index = 0; index < pages.size(); index++) {
-			Inventory page = pages.get(index);
-			ItemStack prev = index == 0 ? previousPageItemEmpty.getItemStack() : previousPageItem.getItemStack();
-			ItemStack post = index + 1 == pages.size() ? nextPageItemEmpty.getItemStack() : nextPageItem.getItemStack();
-			if (!Mat.from(prev).isAir()) page.setItem(previousPageItemSlot, prev);
-			if (!Mat.from(post).isAir()) page.setItem(nextPageItemSlot, post);
+		if (!disablePages) {
+			for (int index = 0; index < pages.size(); index++) {
+				Inventory page = pages.get(index);
+				ItemStack prev = index == 0 ? previousPageItemEmpty.getItemStack() : previousPageItem.getItemStack();
+				ItemStack post = index + 1 == pages.size() ? nextPageItemEmpty.getItemStack() : nextPageItem.getItemStack();
+				if (!Mat.from(prev).isAir()) page.setItem(previousPageItemSlot, prev);
+				if (!Mat.from(post).isAir()) page.setItem(nextPageItemSlot, post);
+			}
 		}
 		updateFirstSlot();
 	}
@@ -389,7 +416,7 @@ public class GUI implements Listener {
 
 	// misc
 	public boolean canUseSlot(int slot, boolean regular) {
-		return slot > -1 && (regular ? slot <= maxRegularItemSlot : slot < size);
+		return slot > -1 && (regular ? regularItemSlots.contains(slot) : slot < size);
 	}
 
 	public ClickeableItem getItemInSlot(int pageIndex, int slot) {
@@ -450,7 +477,7 @@ public class GUI implements Listener {
 	 * @return true if the event must be cancelled
 	 */
 	protected boolean onBottomInventoryClick(Player player, ItemStack item, int slot) {
-		// TODO : this, but it'll need reworks in all GUI constructors !clickTolerance.isClickTypeAllowed(InventoryClickType.BOTTOM);
+		// TODO : this, but it'll need reworks in all GUI constructors : !clickTolerance.isClickTypeAllowed(InventoryClickType.BOTTOM);
 		return true;
 	}
 
@@ -518,31 +545,37 @@ public class GUI implements Listener {
 			int slot = event.getRawSlot();
 			int pageIndex = getPageIndex(inventory);
 			Player player = (Player) event.getWhoClicked();
-			// previous page
-			if (slot == previousPageItemSlot) {
-				if (pageIndex - 1 >= 0) {
-					open(player, pageIndex - 1);
-					return;
-				}
-			}
-			// next page
-			if (slot == nextPageItemSlot) {
-				if (pageIndex + 1 < pages.size()) {
-					open(player, pageIndex + 1);
-					return;
-				}
-			}
+
 			// bottom click
 			if (clickType.equals(InventoryClickType.BOTTOM)) {
 				try {
 					event.setCancelled(onBottomInventoryClick(player, clickedStack, slot));
 				} catch (Throwable exception) {
 					exception.printStackTrace();
-					GCore.inst().error("An unknown error occured while processing click at slot " + slot + ", page " + pageIndex);
+					GCore.inst().error("An unknown error occured while processing bottom click at slot " + slot + ", page " + pageIndex);
 					event.setCancelled(true);
 				}
 				return;
 			}
+
+			// pages
+			if (!disablePages) {
+				// previous page
+				if (slot == previousPageItemSlot) {
+					if (pageIndex - 1 >= 0) {
+						open(player, pageIndex - 1);
+						return;
+					}
+				}
+				// next page
+				if (slot == nextPageItemSlot) {
+					if (pageIndex + 1 < pages.size()) {
+						open(player, pageIndex + 1);
+						return;
+					}
+				}
+			}
+
 			// item
 			try {
 				ClickeableItem item = getItemInSlot(pageIndex, slot);
@@ -683,6 +716,14 @@ public class GUI implements Listener {
 
 	public static boolean isSimilar(ItemStack i1, ItemStack i2) {
 		return i1 == null ? i2 == null : new ItemData("item", i1).isSimilar(i2);
+	}
+
+	public static List<Integer> getRegularItemSlots(int min, int max) {
+		List<Integer> result = new ArrayList<Integer>();
+		for (int i = min; i <= max; ++i) {
+			result.add(i);
+		}
+		return result;
 	}
 
 }

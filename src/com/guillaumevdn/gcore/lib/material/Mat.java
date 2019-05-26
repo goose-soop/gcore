@@ -711,7 +711,8 @@ public class Mat implements Cloneable, Comparable<Mat> {
 	public static final Mat REDSTONE_BLOCK = registerValue(new Mat(VERSION, "REDSTONE_BLOCK", "REDSTONE_BLOCK"));
 	public static final Mat REDSTONE_LAMP = registerValue(new Mat(VERSION, "REDSTONE_LAMP", "REDSTONE_LAMP_OFF"));
 	public static final Mat REDSTONE_ORE = registerValue(new Mat(VERSION, "REDSTONE_ORE", "REDSTONE_ORE"));
-	public static final Mat REDSTONE_TORCH = registerValue(new Mat(VERSION, "REDSTONE_TORCH", "REDSTONE_TORCH_ON"));
+	public static final Mat GLOWING_REDSTONE_ORE = registerValue(new Mat(VERSION, "GLOWING_REDSTONE_ORE", "REDSTONE_ORE"));
+	public static final Mat REDSTONE_TORCH = registerValue(new Mat(VERSION, "REDSTONE_TORCH", "REDSTONE_TORCH_ON")); 
 	public static final Mat REDSTONE_WALL_TORCH = registerValue(new Mat(VERSION, "REDSTONE_WALL_TORCH", "REDSTONE_TORCH_ON", 1));
 	public static final Mat REDSTONE_WIRE = registerValue(new Mat(VERSION, "REDSTONE_WIRE", "REDSTONE_WIRE"));
 	public static final Mat RED_BANNER = registerValue(new Mat(VERSION, "RED_BANNER", "BANNER", 1));
@@ -1007,6 +1008,7 @@ public class Mat implements Cloneable, Comparable<Mat> {
 	public static final Mat WHITE_DYE = registerValue(new Mat(VERSION, "WHITE_DYE", "-"));
 	public static final Mat BLUE_DYE = registerValue(new Mat(VERSION, "BLUE_DYE", "-"));
 	public static final Mat BROWN_DYE = registerValue(new Mat(VERSION, "BROWN_DYE", "-"));
+	public static final Mat RED_DYE = registerValue(new Mat(VERSION, "RED_ROSE", "RED_DYE"));
 
 	// base
 	private MatVersion version;

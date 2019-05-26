@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 
 import com.guillaumevdn.gcore.GLocale;
+import com.guillaumevdn.gcore.lib.gui.GUI;
 import com.guillaumevdn.gcore.lib.material.Mat;
 import com.guillaumevdn.gcore.lib.parseable.ParseResult;
 import com.guillaumevdn.gcore.lib.parseable.Parseable;
@@ -54,7 +55,7 @@ public class PPEnum<T extends Enum<T>> extends PrimitiveParseable<T> {
 			@Override
 			protected void onClick(final Player player, final ClickType clickType, final int pageIndex) {
 				// selection gui
-				EditorGUI sub = new EditorGUI(getLastData().getPlugin(), gui, Utils.getNewInventoryName(gui.getName(), "Select"), 54, 44) {
+				EditorGUI sub = new EditorGUI(getLastData().getPlugin(), gui, Utils.getNewInventoryName(gui.getName(), "Select"), 54, GUI.SLOTS_0_TO_44) {
 					@Override
 					protected void fill() {
 						// add values
@@ -98,8 +99,8 @@ public class PPEnum<T extends Enum<T>> extends PrimitiveParseable<T> {
 	}
 
 	@Override
-	public int getEditorMaxRegularSlot() {
-		return 7;
+	public List<Integer> getEditorRegularSlots() {
+		return GUI.SLOTS_0_TO_7;
 	}
 
 	@Override

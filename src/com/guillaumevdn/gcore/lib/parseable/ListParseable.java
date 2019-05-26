@@ -10,6 +10,7 @@ import org.bukkit.event.inventory.ClickType;
 
 import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.GLocale;
+import com.guillaumevdn.gcore.lib.gui.GUI;
 import com.guillaumevdn.gcore.lib.material.Mat;
 import com.guillaumevdn.gcore.lib.parseable.editor.EditorGUI;
 import com.guillaumevdn.gcore.lib.parseable.editor.EditorItem;
@@ -151,7 +152,7 @@ public abstract class ListParseable<T extends Parseable> extends Parseable {
 					}
 					// create element GUI
 					String name = Utils.getNewInventoryName(gui.getName(), element.getId());
-					EditorGUI sub = new EditorGUI(element.getLastData().getPlugin(), gui, name, element.getEditorSize(), element.getEditorMaxRegularSlot()) {
+					EditorGUI sub = new EditorGUI(element.getLastData().getPlugin(), gui, name, element.getEditorSize(), element.getEditorRegularSlots()) {
 						private EditorGUI subThis = this;
 						@Override
 						protected void fill() {
@@ -214,8 +215,8 @@ public abstract class ListParseable<T extends Parseable> extends Parseable {
 	}
 
 	@Override
-	public int getEditorMaxRegularSlot() {
-		return 44;
+	public List<Integer> getEditorRegularSlots() {
+		return GUI.SLOTS_0_TO_44;
 	}
 
 	@Override

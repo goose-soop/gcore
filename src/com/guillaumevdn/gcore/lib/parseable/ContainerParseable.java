@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 
 import com.guillaumevdn.gcore.GLocale;
+import com.guillaumevdn.gcore.lib.gui.GUI;
 import com.guillaumevdn.gcore.lib.material.Mat;
 import com.guillaumevdn.gcore.lib.parseable.editor.EditorGUI;
 import com.guillaumevdn.gcore.lib.parseable.editor.EditorItem;
@@ -132,7 +133,7 @@ public abstract class ContainerParseable extends Parseable {
 				protected void onClick(final Player player, ClickType clickType, int pageIndex) {
 					// create component GUI
 					String name = Utils.getNewInventoryName(gui.getName(), component.getId());
-					EditorGUI sub = new EditorGUI(component.getLastData().getPlugin(), gui, name, component.getEditorSize(), component.getEditorMaxRegularSlot()) {
+					EditorGUI sub = new EditorGUI(component.getLastData().getPlugin(), gui, name, component.getEditorSize(), component.getEditorRegularSlots()) {
 						private EditorGUI subThis = this;
 						@Override
 						protected void fill() {
@@ -169,8 +170,8 @@ public abstract class ContainerParseable extends Parseable {
 	}
 
 	@Override
-	public int getEditorMaxRegularSlot() {
-		return getEditorSize() - 10;
+	public List<Integer> getEditorRegularSlots() {
+		return GUI.getRegularItemSlots(0, getEditorSize() - 10);
 	}
 
 	@Override

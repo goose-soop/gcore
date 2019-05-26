@@ -7,6 +7,7 @@ import org.bukkit.event.inventory.ClickType;
 
 import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.GLocale;
+import com.guillaumevdn.gcore.lib.gui.GUI;
 import com.guillaumevdn.gcore.lib.material.Mat;
 import com.guillaumevdn.gcore.lib.parseable.ParseResult;
 import com.guillaumevdn.gcore.lib.parseable.Parseable;
@@ -96,8 +97,8 @@ public class PPStringList extends PrimitiveParseable<List<String>> {
 	}
 
 	@Override
-	public int getEditorMaxRegularSlot() {
-		return 17;
+	public List<Integer> getEditorRegularSlots() {
+		return GUI.SLOTS_0_TO_17;
 	}
 
 	@Override

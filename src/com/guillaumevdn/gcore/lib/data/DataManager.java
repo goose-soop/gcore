@@ -136,7 +136,11 @@ public abstract class DataManager {
 	// ------------------------------------------------------------
 
 	public void runAsync(BukkitRunnable runnable) {
-		runnable.runTaskAsynchronously(getPlugin());
+		if (!getPlugin().isEnabled()) {// trying to run async, but plugin is disabled -> run sync
+			run(runnable);
+		} else {// we good
+			runnable.runTaskAsynchronously(getPlugin());
+		}
 	}
 
 	public void run(BukkitRunnable runnable) {

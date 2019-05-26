@@ -62,8 +62,16 @@ public class ParticleManager1_13 implements ParticleManager {
 			GCore.inst().warning("Trying to display particle of type " + type.toString() + " but it's most likely not supported on this server version (" + ServerVersion.CURRENT.getName() + ")");
 			return;
 		}
-		for (Player pl : players) {
-			pl.spawnParticle(particleType, loc, count, 0F, 0F, 0F, speed, getDustData(color));
+		try {
+			for (Player pl : players) {
+				pl.spawnParticle(particleType, loc, count, 0F, 0F, 0F, speed, getDustData(color));
+			}
+		} catch (IllegalArgumentException exception) {
+			if (exception.getMessage().contains("data should be class java.lang.Void")) {
+				for (Player pl : players) {
+					pl.spawnParticle(particleType, loc, count, 0F, 0F, 0F, speed);
+				}
+			}
 		}
 	}
 

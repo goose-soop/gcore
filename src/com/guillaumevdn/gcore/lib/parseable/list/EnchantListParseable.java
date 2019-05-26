@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 
 import com.guillaumevdn.gcore.GLocale;
+import com.guillaumevdn.gcore.lib.gui.GUI;
 import com.guillaumevdn.gcore.lib.material.Mat;
 import com.guillaumevdn.gcore.lib.parseable.ListParseable;
 import com.guillaumevdn.gcore.lib.parseable.Parseable;
@@ -64,7 +65,7 @@ public abstract class EnchantListParseable<T extends Parseable> extends ListPars
 			@Override
 			protected void onClick(final Player player, final ClickType clickType, final int pageIndex) {
 				// selection gui
-				EditorGUI sub = new EditorGUI(getLastData().getPlugin(), gui, Utils.getNewInventoryName(gui.getName(), "Select"), 54, 44) {
+				EditorGUI sub = new EditorGUI(getLastData().getPlugin(), gui, Utils.getNewInventoryName(gui.getName(), "Select"), 54, GUI.SLOTS_0_TO_44) {
 					@Override
 					protected void fill() {
 						// add default value

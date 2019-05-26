@@ -62,8 +62,8 @@ public abstract class EditorGUI extends GUI {
 	// base
 	private EditorGUI parent;
 
-	public EditorGUI(GPlugin plugin, EditorGUI parent, String name, int size, int maxRegularSlot) {
-		super(plugin, name, size, maxRegularSlot, true);
+	public EditorGUI(GPlugin plugin, EditorGUI parent, String name, int size, List<Integer> regularItemSlots) {
+		super(plugin, name, size, regularItemSlots, true);
 		this.parent = parent;
 	}
 

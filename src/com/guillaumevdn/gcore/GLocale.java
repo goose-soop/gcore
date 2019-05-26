@@ -892,4 +892,16 @@ public class GLocale {
 			"it_IT", Utils.asList("&7Se l'oggetto deve essere cancellato dopo l'azione")
 			);
 
+	public static final Text GUI_GENERIC_EDITOR_ITEM_CHECKDURABILITYLORE = new Text(
+			"GUI_GENERIC_EDITOR_ITEM_CHECKDURABILITYLORE", file,
+			"en_US", Utils.asList("&7Should the durability be the exact same"),
+			"fr_FR", Utils.asList("&7Est-ce que la durabilité doit être exactement la même")
+			);
+
+	public static final Text GUI_GENERIC_EDITOR_ITEM_EXACTMATCHLORE = new Text(
+			"GUI_GENERIC_EDITOR_ITEM_EXACTMATCHLORE", file,
+			"en_US", Utils.asList("&7Should the item be exactly the same or", "&7 can it has more enchants, name, ..."),
+			"fr_FR", Utils.asList("&7Est-ce que l'item doit être exactement le", "&7 même ou est-ce qu'il peut avoir des", "&7 enchantements, nom, en plus...")
+			);
+
 }

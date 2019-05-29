@@ -58,7 +58,7 @@ public class GUI implements Listener {
 			}
 		}
 	}
-	
+
 	public static List<GUI> getRegisteredGUIs() {
 		return registeredGUIs;
 	}
@@ -718,10 +718,21 @@ public class GUI implements Listener {
 		return i1 == null ? i2 == null : new ItemData("item", i1).isSimilar(i2);
 	}
 
-	public static List<Integer> getRegularItemSlots(int min, int max) {
+	@Deprecated
+	public static List<Integer> getRegularItemSlots(int begin, int end) {
+		return getItemSlots(begin, end);
+	}
+
+	public static List<Integer> getItemSlots(int begin, int end) {
+		return getItemSlots(begin, end, null);
+	}
+
+	public static List<Integer> getItemSlots(int begin, int end, List<Integer> ignore) {
 		List<Integer> result = new ArrayList<Integer>();
-		for (int i = min; i <= max; ++i) {
-			result.add(i);
+		for (int i = begin; i <= end; ++i) {
+			if (ignore == null || !ignore.contains(i)) {
+				result.add(i);
+			}
 		}
 		return result;
 	}

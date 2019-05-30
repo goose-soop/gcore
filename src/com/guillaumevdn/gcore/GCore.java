@@ -55,7 +55,6 @@ import com.guillaumevdn.gcore.lib.command.CommandArgument;
 import com.guillaumevdn.gcore.lib.command.CommandRoot;
 import com.guillaumevdn.gcore.lib.configuration.YMLConfiguration;
 import com.guillaumevdn.gcore.lib.data.DataManager.BackEnd;
-import com.guillaumevdn.gcore.lib.data.mysql.Query;
 import com.guillaumevdn.gcore.lib.event.PlayerBlockDropEvent;
 import com.guillaumevdn.gcore.lib.event.PlayerCowMilkEvent;
 import com.guillaumevdn.gcore.lib.event.PlayerCraftedItemEvent;
@@ -289,6 +288,15 @@ public class GCore extends GPlugin {
 
 	@Override
 	protected boolean enable() {
+		// load some buggy classes ? ;-;
+		for (String className : Utils.asList("com.guillaumevdn.gcore.lib.data.mysql.Query", "com.guillaumevdn.gcore.lib.parseable.editor.EditorGUI")) {
+			try {
+				getClassLoader().loadClass(className);
+			} catch (ClassNotFoundException exception) {
+				exception.printStackTrace();
+			}
+		}
+
 		// reload inner (mainly settings)
 		innerReload();
 
@@ -308,17 +316,9 @@ public class GCore extends GPlugin {
 		// gson
 		GSON = Utils.createGsonBuilder().setPrettyPrinting().create();
 		UNPRETTY_GSON = Utils.createGsonBuilder().create();
-		
+
 		// vault integration
 		registerPluginIntegration("Vault", VaultIntegration.class);
-
-		// load the Query class, as it seems to throw a LinkageError if it's done 'in
-		// action' (probably because MySQL operations are done asynchronously)
-		try {
-			getClassLoader().loadClass(Query.class.getName());
-		} catch (ClassNotFoundException exception) {
-			exception.printStackTrace();
-		}
 
 		// register command
 		CommandRoot root = new CommandRoot(this, Utils.asList("gcore"), null, GPerm.GCORE_ADMIN, false);

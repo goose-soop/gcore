@@ -53,6 +53,7 @@ public enum ServerVersion {
 	public static final ServerVersion CURRENT = VersionUtils.getServerVersion();
 	public static final ServerVersion HIGHEST = VersionUtils.getHighestServerVersion();
 	public static final boolean IS_1_13 = CURRENT != null ? CURRENT.isAtLeast(ServerVersion.MC_1_13) : false;
+	public static final boolean IS_1_14 = CURRENT != null ? CURRENT.isAtLeast(ServerVersion.MC_1_14) : false;
 
 	// bases
 	private String name;

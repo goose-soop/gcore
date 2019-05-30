@@ -47,6 +47,7 @@ public class GUI implements Listener {
 	public static final List<Integer> SLOTS_0_TO_26 = Collections.unmodifiableList(getRegularItemSlots(0, 26));
 	public static final List<Integer> SLOTS_0_TO_44 = Collections.unmodifiableList(getRegularItemSlots(0, 44));
 	public static final List<Integer> SLOTS_0_TO_53 = Collections.unmodifiableList(getRegularItemSlots(0, 53));
+	public static final List<Integer> SLOTS_WITHOUT_BORDERS = Collections.unmodifiableList(Utils.asList(10, 11, 12, 13, 14, 15, 19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43));
 	private static List<GUI> registeredGUIs = new ArrayList<GUI>();
 
 	// static methods
@@ -353,7 +354,9 @@ public class GUI implements Listener {
 		pages.add(page);
 		// add persistent items
 		for (ClickeableItem item : persistentItems.values()) {
-			page.setItem(item.getSlot(), item.getGUIStack());
+			if (item.getSlot() == previousPageItemSlot ? index == 0 : (item.getSlot() == nextPageItemSlot ? index == pages.size() - 1 : true)) {
+				page.setItem(item.getSlot(), item.getGUIStack());
+			}
 		}
 		// update page items
 		updatePageItems();
@@ -420,18 +423,18 @@ public class GUI implements Listener {
 	}
 
 	public ClickeableItem getItemInSlot(int pageIndex, int slot) {
+		// persistent
+		for (ClickeableItem item : persistentItems.values()) {
+			if (item.getSlot() == slot) {
+				return item;
+			}
+		}
 		// regular
 		if (pageIndex != -1) {
 			for (ClickeableItem item : regularItems.values()) {
 				if (item.getPageIndex() == pageIndex && item.getSlot() == slot) {
 					return item;
 				}
-			}
-		}
-		// persistent
-		for (ClickeableItem item : persistentItems.values()) {
-			if (item.getSlot() == slot) {
-				return item;
 			}
 		}
 		// none

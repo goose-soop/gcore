@@ -67,7 +67,6 @@ import org.bukkit.entity.Firework;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
-import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -352,56 +351,6 @@ public class Utils {
 	// ------------------------------------------------------------
 	// Reflection
 	// ------------------------------------------------------------
-
-	// TODO : remove this
-	private static Map<String, String> eventActorSpecialMethodName = asMap(
-			"EntityToggleGlideEvent", "getEntity",
-			"EntityBlockFormEvent", "getEntity",
-			"EntityRegainHealthEvent", "getEntity",
-			"CraftItemEvent", "getWhoClicked",
-			"EnchantItemEvent", "getEnchanter",
-			"HorseJumpEvent", "getEntity.getPassenger",
-			"EntityDismountEvent", "getEntity",
-			"EntityDeathEvent", "getEntity.getKiller",
-			"EntityMountEvent", "getEntity",
-			"EntityTameEvent", "getOwner",
-			"MythicMobDeathEvent", "getKiller",
-			"NPCClickEvent", "getClicker",
-			"NPCRightClickEvent", "getClicker",
-			"NPCLeftClickEvent", "getClicker",
-			"NPCDeathEvent", "getNPC.getEntity.getKiller",
-			"EntityPortalEnterEvent", "getEntity",
-			"EntityPortalExitEvent", "getEntity",
-			"PotionSplashEvent", "getPotion.getShooter",
-			"ProjectileHitEvent", "getEntity.getShooter",
-			"PlayerExperienceGainEvent", "getPlayerData.getPlayer",
-			"VehicleEnterEvent", "getEntered",
-			"VehicleExitEvent", "getExited",
-			"ExpBottleEvent", "getEntity.getShooter",
-			"BlockIgniteEvent", "getIgnitingEntity",
-			"PlayerDeathEvent", "getEntity",
-			"PlayerLootEvent", "getLooter"
-			);
-
-	public static Player getEventActor(Event event) {
-		try {
-			String raw = eventActorSpecialMethodName.containsKey(event.getClass().getSimpleName()) ? eventActorSpecialMethodName.get(event.getClass().getSimpleName()) : "getPlayer";
-			List<String> methodNames = Utils.split("\\.", raw, false);
-			Object invokeResult = null;
-			for (String methodName : methodNames) {
-				Object invoker = invokeResult == null ? event : invokeResult;
-				invokeResult = invoker.getClass().getMethod(methodName).invoke(invoker);
-				if (invokeResult == null) {
-					return null;
-				}
-			}
-			if (invokeResult != null && invokeResult instanceof Player) {
-				return (Player) invokeResult;
-			}
-			return null;
-		} catch (Throwable exception) {}
-		return null;
-	}
 
 	public static void setField(Object instance, String fieldName, Object value)
 	{

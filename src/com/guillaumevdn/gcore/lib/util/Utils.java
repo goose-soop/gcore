@@ -1122,9 +1122,11 @@ public class Utils {
 				return ((Crops) mat).getState().equals(CropState.RIPE);
 			}
 			// cocoa
-			if (AgeableUtils.instanceOf(mat)) {
-				return AgeableUtils.isFullyAged(mat);
-			}
+			try {
+				if (AgeableUtils.instanceOf(mat)) {
+					return AgeableUtils.isFullyAged(mat);
+				}
+			} catch (Throwable ignored) {}
 		}
 		// not crops
 		return resultIfNotCrops;

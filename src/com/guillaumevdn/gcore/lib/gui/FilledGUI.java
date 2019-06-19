@@ -32,7 +32,7 @@ public abstract class FilledGUI extends GUI {
 	public void checkOverwrite(ClickeableItem item) {
 		if (item.getItemData().getSlot() < 0) return;
 		ClickeableItem present = getItemInSlot(0, item.getItemData().getSlot());
-		if (present != null) {
+		if (present != null && !present.getItemData().getId().equals(item.getItemData().getId())) {
 			Logger.log(Level.WARNING, getPlugin() != null ? getPlugin().getName() : GCore.inst().getName(), "Overriding item " + present.getItemData().getId() + " by " + item.getItemData().getId() + " at slot " + item.getItemData().getSlot() + " of GUI " + getName());
 		}
 	}

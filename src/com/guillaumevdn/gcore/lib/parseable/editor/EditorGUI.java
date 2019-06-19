@@ -93,7 +93,7 @@ public abstract class EditorGUI extends GUI {
 	public void checkOverwrite(ClickeableItem item) {
 		if (item.getItemData().getSlot() < 0) return;
 		ClickeableItem present = getItemInSlot(0, item.getItemData().getSlot());
-		if (present != null) {
+		if (present != null && !present.getItemData().getId().equals(item.getItemData().getId())) {
 			getPlugin().warning("Overriding item " + present.getItemData().getId() + " by " + item.getItemData().getId() + " at slot " + item.getItemData().getSlot() + " of GUI " + getName());
 		}
 	}

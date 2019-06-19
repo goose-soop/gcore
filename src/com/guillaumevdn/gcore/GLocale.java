@@ -618,11 +618,17 @@ public class GLocale {
 			"it_IT", Utils.asList("&7Tipo di mob")
 			);
 
-	public static final Text GUI_GENERIC_EDITOR_MOB_LORE = new Text(
-			"GUI_GENERIC_EDITOR_MOB_LORE", file,
+	public static final Text GUI_GENERIC_EDITOR_MOB_NAMELORE = new Text(
+			"GUI_GENERIC_EDITOR_MOB_NAMELORE", file,
 			"en_US", Utils.asList("&7Name of mob"),
 			"fr_FR", Utils.asList("&7Nom de mob"),
 			"it_IT", Utils.asList("&7Nome del mob")
+			);
+
+	public static final Text GUI_GENERIC_EDITOR_MOB_COLORLORE = new Text(
+			"GUI_GENERIC_EDITOR_MOB_COLORLORE", file,
+			"en_US", Utils.asList("&7Color of the mob (if applicable)"),
+			"fr_FR", Utils.asList("&7Couleur du mob (si applicable)")
 			);
 
 	public static final Text GUI_GENERIC_EDITOR_MOB_AMOUNTLORE = new Text(

@@ -2,10 +2,12 @@ package com.guillaumevdn.gcore.lib.parseable.container;
 
 import java.util.List;
 
+import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.material.Colorable;
 
 import com.guillaumevdn.gcore.GLocale;
 import com.guillaumevdn.gcore.lib.material.Mat;
@@ -19,7 +21,8 @@ public class CPMob extends ContainerParseable {
 
 	// base
 	private PPEnum<EntityType> type = addComponent(new PPEnum<EntityType>("type", this, null, EntityType.class, "mob type", false, 0, EditorGUI.ICON_MOB, GLocale.GUI_GENERIC_EDITOR_MOB_TYPELORE.getLines()));
-	private PPString name = addComponent(new PPString("name", this, null, false, 1, EditorGUI.ICON_STRING, GLocale.GUI_GENERIC_EDITOR_MOB_LORE.getLines()));
+	private PPString name = addComponent(new PPString("name", this, null, false, 1, EditorGUI.ICON_STRING, GLocale.GUI_GENERIC_EDITOR_MOB_NAMELORE.getLines()));
+	private PPEnum<DyeColor> color = addComponent(new PPEnum<DyeColor>("color", this, null, DyeColor.class, "dye color", false, 2, EditorGUI.ICON_COLOR, GLocale.GUI_GENERIC_EDITOR_MOB_COLORLORE.getLines()));
 
 	public CPMob(String id, Parseable parent, boolean mandatory, int editorSlot, Mat editorIcon, List<String> editorDescription) {
 		super(id, parent, "mob", mandatory, editorSlot, editorIcon, editorDescription);
@@ -42,30 +45,53 @@ public class CPMob extends ContainerParseable {
 		return name.getParsedValue(parser);
 	}
 
+	public PPEnum<DyeColor> getColor() {
+		return color;
+	}
+
+	public DyeColor getColor(Player parser) {
+		return color.getParsedValue(parser);
+	}
+
 	// methods
 	public boolean isValid(Entity entity, Player parser) {
-		// has type and/or name
+		if (entity == null) return false;
+		// type
 		EntityType type = getType(parser);
-		String name = getName(parser);
-		if (type != null || name != null) {
-			return entity != null && (type != null ? type.equals(entity.getType()) : true) && (name != null ? name.equals(entity.getCustomName()) : true);
+		if (type != null && !type.equals(entity.getType())) {
+			return false;
 		}
-		// no type or name, it's valid
+		// name
+		String name = getName(parser);
+		if (name != null && !name.equals(entity.getCustomName())) {
+			return false;
+		}
+		// color
+		DyeColor color = getColor(parser);
+		if (color != null && !(entity instanceof Colorable) && !((Colorable) entity).getColor().equals(color)) {
+			return false;
+		}
+		// it's valid
 		return true;
 	}
 
 	public Entity spawn(Location location, Player parser) {
+		// type
 		EntityType type = getType(parser);
+		if (type == null) return null;
+		// name
+		Entity entity = location.getWorld().spawnEntity(location, type);
 		String name = getName(parser);
-		if (type != null) {
-			Entity ent = location.getWorld().spawnEntity(location, type);
-			if (name != null) {
-				ent.setCustomName(name);
-				ent.setCustomNameVisible(true);
-			}
-			return ent;
+		if (name != null) {
+			entity.setCustomName(name);
+			entity.setCustomNameVisible(true);
 		}
-		return null;
+		// color
+		DyeColor color = getColor(parser);
+		if (color != null && entity instanceof Colorable) {
+			((Colorable) entity).setColor(color);
+		}
+		return entity;
 	}
 
 	// clone

@@ -650,12 +650,9 @@ public class Utils {
 		return (Player) player;
 	}
 
-	public static Player getPlayer(UUID uuid)
-	{
+	public static Player getPlayer(UUID uuid) {
 		if (uuid == null) return null;
-		OfflinePlayer player = getOfflinePlayer(uuid);
-		if (player != null && !(player instanceof Player)) return player.getPlayer();
-		return (Player) player;
+		return Bukkit.getPlayer(uuid);
 	}
 
 	public static OfflinePlayer getOfflinePlayer(String name) {
@@ -670,8 +667,7 @@ public class Utils {
 		return null;
 	}
 
-	public static OfflinePlayer getOfflinePlayer(UUID uuid)
-	{
+	public static OfflinePlayer getOfflinePlayer(UUID uuid) {
 		if (uuid == null) return null;
 		OfflinePlayer player = null;
 		if ((player = Bukkit.getPlayer(uuid)) != null) {

@@ -566,7 +566,22 @@ public class YMLConfiguration {
 		// configuration section
 		if (isConfigurationSection(path)) {
 			// create
-			ItemData item = new ItemData(id);
+			ItemData item;
+			if (contains(path + ".head_database_id")) {
+				String hdbId = getString(path + ".head_database_id", null);
+				ItemStack headStack = GCore.inst().getHeadDatabaseIntegration() != null ? GCore.inst().getHeadDatabaseIntegration().getItem(hdbId) : null;
+				if (headStack == null) {
+					Logger.log(Logger.Level.SEVERE, plugin, "Couldn't load head database item with id '" + hdbId + "', using item of type DIRT");
+					item = new ItemData(id);
+					item.setType(Mat.DIRT);
+				} else {
+					item = new ItemData(id, headStack);
+				}
+			} else {
+				item = new ItemData(id);
+			}
+
+			// settings
 			item.setSlot(getInt(path + ".slot", -1));
 			item.setChance(getDouble(path + ".chance", -1D));
 			item.setMaxAmount(getInt(path + ".max_amount", 0));

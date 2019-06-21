@@ -36,6 +36,7 @@ import com.guillaumevdn.gcore.lib.parseable.primitive.PPMat;
 import com.guillaumevdn.gcore.lib.parseable.primitive.PPString;
 import com.guillaumevdn.gcore.lib.parseable.primitive.PPStringList;
 import com.guillaumevdn.gcore.lib.util.Utils;
+import com.guillaumevdn.gcore.lib.util.input.ChatInput;
 import com.guillaumevdn.gcore.lib.util.input.ItemInput;
 import com.guillaumevdn.gcore.lib.versioncompat.Compat;
 
@@ -410,7 +411,7 @@ public class CPItem extends ContainerParseable {
 								nbt.setValue(nbtString == null ? null : Utils.asList(nbtString));
 							} catch (IOException exception) {
 								exception.printStackTrace();
-								Messenger.send(player, Messenger.Level.SEVERE_ERROR, GCore.inst().getName(), "Couldn't save item nbt (see console)");
+								Messenger.send(player, Messenger.Level.SEVERE_ERROR, GCore.inst().getName(), "Couldn't save item NTB (see console)");
 							}
 							// callback
 							onModif.callback(gui, player);
@@ -421,6 +422,62 @@ public class CPItem extends ContainerParseable {
 				});
 			}
 		});
+		// add import HeadDatabase item
+		if (GCore.inst().getHeadDatabaseIntegration() != null) {
+			gui.setPersistentItem(new EditorItem("control_item_import_headdatabase", getEditorBackSlot() - 3, Mat.ENDER_CHEST, GLocale.GUI_GENERIC_EDITORITEMIMPORTHEADDATABASE.getLine(), GLocale.GUI_GENERIC_EDITORITEMIMPORTHEADDATABASELORE.getLines()) {
+				@Override
+				protected void onClick(final Player player, final ClickType clickType, final int pageIndex) {
+					// location
+					player.closeInventory();
+					GLocale.MSG_GENERIC_ITEMHEADDATABASEINPUT.send(player);
+					GCore.inst().getChatInputs().put(player, new ChatInput() {
+						@Override
+						public void onChat(Player player, String value) {
+							// replace value
+							if (!value.replace(" ", "").equalsIgnoreCase("cancel") && GCore.inst().getHeadDatabaseIntegration() != null) {
+								ItemStack headStack = GCore.inst().getHeadDatabaseIntegration().getItem(value);
+								if (headStack != null) {
+									ItemData item = new ItemData(headStack);
+									type.setValue(Utils.asList(item.getType().toString()));
+									durability.setValue(Utils.asList("" + item.getType().getDurability()));
+									unbreakable.setValue(Utils.asList("" + item.isUnbreakable()));
+									amount.setValue(Utils.asList("" + item.getAmount()));
+									maxAmount.setValue(Utils.asList("" + item.getAmount()));
+									name.setValue(item.getName() != null ? Utils.asList(item.getName()) : null);
+									lore.setValue(item.getLore() != null ? Utils.asList(item.getLore()) : null);
+									enchants.clearElements();
+									int id = 0;
+									for (Enchantment enchant : item.getEnchants().keySet()) {
+										CPEnchantment ench = enchants.createElement("" + ++id);
+										ench.getType().setValue(Utils.asList(enchant.getName()));
+										ench.getLevel().setValue(Utils.asList("" + item.getEnchants().get(enchant)));
+									}
+									effects.clearElements();
+									id = 0;
+									for (PotionEffect effect : item.getEffects()) {
+										CPPotionEffect eff = effects.createElement("" + ++id);
+										eff.getType().setValue(Utils.asList(effect.getType().getName()));
+										eff.getAmplifier().setValue(Utils.asList("" + effect.getAmplifier()));
+										eff.getDuration().setValue(Utils.asList("" + effect.getDuration()));
+									}
+									try {
+										String nbtString = Compat.INSTANCE.serializeNbt(item.getCustomNbt());
+										nbt.setValue(nbtString == null ? null : Utils.asList(nbtString));
+									} catch (IOException exception) {
+										exception.printStackTrace();
+										Messenger.send(player, Messenger.Level.SEVERE_ERROR, GCore.inst().getName(), "Couldn't save item NTB (see console)");
+									}
+									// callback
+									onModif.callback(gui, player);
+								}
+							}
+							// re-fill and open
+							gui.open(player);
+						}
+					});
+				}
+			});
+		}
 	}
 
 	// clone

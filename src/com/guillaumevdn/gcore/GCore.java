@@ -116,6 +116,7 @@ public class GCore extends GPlugin {
 	// misc
 	private NpcManager npcManager = null;
 	private VaultIntegration vaultIntegration = null;
+	private HeadDatabaseIntegration headDatabaseIntegration = null;
 	private Map<Player, ChatInput> chatInputs = new HashMap<Player, ChatInput>();
 	private Map<Player, LocationInput> locationInputs = new HashMap<Player, LocationInput>();
 	private Map<Player, ItemInput> itemInputs = new HashMap<Player, ItemInput>();
@@ -147,6 +148,14 @@ public class GCore extends GPlugin {
 
 	public void setVaultIntegration(VaultIntegration vaultIntegration) {
 		this.vaultIntegration = vaultIntegration;
+	}
+
+	public HeadDatabaseIntegration getHeadDatabaseIntegration() {
+		return headDatabaseIntegration;
+	}
+
+	public void setHeadDatabaseIntegration(HeadDatabaseIntegration headDatabaseIntegration) {
+		this.headDatabaseIntegration = headDatabaseIntegration;
 	}
 
 	public Map<Player, ChatInput> getChatInputs() {
@@ -304,14 +313,8 @@ public class GCore extends GPlugin {
 		innerReload();
 
 		// server version
-		debug("Detected server version : " + ServerVersion.CURRENT.getName()
-		+ (ServerVersion.CURRENT.equals(ServerVersion.UNSUPPORTED)
-				? " - this version isn't officially supported and plugins might not work as expected"
-						: ""));
-		debug("Detected server implementation : " + ServerImplementation.CURRENT.toString()
-		+ (!ServerImplementation.CURRENT.equals(ServerImplementation.SPIGOT)
-				? " - this implementation isn't officially supported and plugins might not work as expected"
-						: ""));
+		debug("Detected server version : " + ServerVersion.CURRENT.getName() + (ServerVersion.CURRENT.equals(ServerVersion.UNSUPPORTED) ? " - this version isn't officially supported and plugins might not work as expected" : ""));
+		debug("Detected server implementation : " + ServerImplementation.CURRENT.toString() + (!ServerImplementation.CURRENT.equals(ServerImplementation.SPIGOT) ? " - this implementation isn't officially supported and plugins might not work as expected" : ""));
 
 		// init compat
 		Compat.INSTANCE.init();
@@ -320,15 +323,15 @@ public class GCore extends GPlugin {
 		GSON = Utils.createGsonBuilder().setPrettyPrinting().create();
 		UNPRETTY_GSON = Utils.createGsonBuilder().create();
 
-		// vault integration
+		// integration
 		registerPluginIntegration("Vault", VaultIntegration.class);
+		registerPluginIntegration("HeadDatabase", HeadDatabaseIntegration.class);
 
 		// register command
 		CommandRoot root = new CommandRoot(this, Utils.asList("gcore"), null, GPerm.GCORE_ADMIN, false);
 		registerCommand(root, GPerm.GCORE_ADMIN);
 		// data commands
-		CommandArgument data = new CommandArgument(this, Utils.asList("data"), "data-related commands",
-				GPerm.GCORE_ADMIN, false);
+		CommandArgument data = new CommandArgument(this, Utils.asList("data"), "data-related commands", GPerm.GCORE_ADMIN, false);
 		root.addChild(data);
 		data.addChild(new CommandDataExport());
 		data.addChild(new CommandDataReset());

@@ -1,5 +1,6 @@
 package com.guillaumevdn.gcore.lib.parseable.container;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -11,6 +12,7 @@ import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 
@@ -18,10 +20,13 @@ import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.GLocale;
 import com.guillaumevdn.gcore.lib.gui.ItemData;
 import com.guillaumevdn.gcore.lib.material.Mat;
+import com.guillaumevdn.gcore.lib.messenger.Messenger;
 import com.guillaumevdn.gcore.lib.parseable.ContainerParseable;
 import com.guillaumevdn.gcore.lib.parseable.Parseable;
 import com.guillaumevdn.gcore.lib.parseable.PrimitiveParseable;
 import com.guillaumevdn.gcore.lib.parseable.editor.EditorGUI;
+import com.guillaumevdn.gcore.lib.parseable.editor.EditorItem;
+import com.guillaumevdn.gcore.lib.parseable.editor.ModifCallback;
 import com.guillaumevdn.gcore.lib.parseable.list.LPEnchantment;
 import com.guillaumevdn.gcore.lib.parseable.list.LPPotionEffect;
 import com.guillaumevdn.gcore.lib.parseable.primitive.PPBoolean;
@@ -30,6 +35,8 @@ import com.guillaumevdn.gcore.lib.parseable.primitive.PPInteger;
 import com.guillaumevdn.gcore.lib.parseable.primitive.PPMat;
 import com.guillaumevdn.gcore.lib.parseable.primitive.PPString;
 import com.guillaumevdn.gcore.lib.parseable.primitive.PPStringList;
+import com.guillaumevdn.gcore.lib.util.Utils;
+import com.guillaumevdn.gcore.lib.util.input.ItemInput;
 import com.guillaumevdn.gcore.lib.versioncompat.Compat;
 
 public class CPItem extends ContainerParseable {
@@ -356,6 +363,64 @@ public class CPItem extends ContainerParseable {
 				player.updateInventory();
 			}
 		}
+	}
+
+	// editor
+	@Override
+	protected void fillEditor(final EditorGUI gui, Player player, final ModifCallback onModif) {
+		// fill editor
+		super.fillEditor(gui, player, onModif);
+		// add import item
+		gui.setPersistentItem(new EditorItem("control_item_import", getEditorBackSlot() - 4, Mat.ENDER_CHEST, GLocale.GUI_GENERIC_EDITORITEMIMPORT.getLine(), GLocale.GUI_GENERIC_EDITORITEMIMPORTLORE.getLines()) {
+			@Override
+			protected void onClick(final Player player, final ClickType clickType, final int pageIndex) {
+				// location
+				player.closeInventory();
+				GLocale.MSG_GENERIC_ITEMINPUT.send(player);
+				GCore.inst().getItemInputs().put(player, new ItemInput() {
+					@Override
+					public void onChoose(Player player, ItemStack value) {
+						// replace value
+						if (value != null && !Mat.from(value).isAir()) {
+							ItemData item = new ItemData(value);
+							type.setValue(Utils.asList(item.getType().toString()));
+							durability.setValue(Utils.asList("" + item.getType().getDurability()));
+							unbreakable.setValue(Utils.asList("" + item.isUnbreakable()));
+							amount.setValue(Utils.asList("" + item.getAmount()));
+							maxAmount.setValue(Utils.asList("" + item.getAmount()));
+							name.setValue(item.getName() != null ? Utils.asList(item.getName()) : null);
+							lore.setValue(item.getLore() != null ? Utils.asList(item.getLore()) : null);
+							enchants.clearElements();
+							int id = 0;
+							for (Enchantment enchant : item.getEnchants().keySet()) {
+								CPEnchantment ench = enchants.createElement("" + ++id);
+								ench.getType().setValue(Utils.asList(enchant.getName()));
+								ench.getLevel().setValue(Utils.asList("" + item.getEnchants().get(enchant)));
+							}
+							effects.clearElements();
+							id = 0;
+							for (PotionEffect effect : item.getEffects()) {
+								CPPotionEffect eff = effects.createElement("" + ++id);
+								eff.getType().setValue(Utils.asList(effect.getType().getName()));
+								eff.getAmplifier().setValue(Utils.asList("" + effect.getAmplifier()));
+								eff.getDuration().setValue(Utils.asList("" + effect.getDuration()));
+							}
+							try {
+								String nbtString = Compat.INSTANCE.serializeNbt(item.getCustomNbt());
+								nbt.setValue(nbtString == null ? null : Utils.asList(nbtString));
+							} catch (IOException exception) {
+								exception.printStackTrace();
+								Messenger.send(player, Messenger.Level.SEVERE_ERROR, GCore.inst().getName(), "Couldn't save item nbt (see console)");
+							}
+							// callback
+							onModif.callback(gui, player);
+						}
+						// re-fill and open
+						gui.open(player);
+					}
+				});
+			}
+		});
 	}
 
 	// clone

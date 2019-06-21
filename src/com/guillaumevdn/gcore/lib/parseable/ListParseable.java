@@ -57,6 +57,10 @@ public abstract class ListParseable<T extends Parseable> extends Parseable {
 	public T removeElement(String id) {
 		return elements.remove(id.toLowerCase());
 	}
+	
+	public void clearElements() {
+		elements.clear();
+	}
 
 	/** Create an element with the specified id, and add it to the list */
 	public abstract T createElement(String elementId);

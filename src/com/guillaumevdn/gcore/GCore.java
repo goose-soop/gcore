@@ -20,6 +20,8 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -61,6 +63,7 @@ import com.guillaumevdn.gcore.lib.event.PlayerCraftedItemEvent;
 import com.guillaumevdn.gcore.lib.event.PlayerFireBlockEvent;
 import com.guillaumevdn.gcore.lib.event.PlayerKillEvent;
 import com.guillaumevdn.gcore.lib.event.PlayerSpawnedMobEvent;
+import com.guillaumevdn.gcore.lib.event.PlayerTradedVillagerEvent;
 import com.guillaumevdn.gcore.lib.material.Mat;
 import com.guillaumevdn.gcore.lib.npc.NpcManager;
 import com.guillaumevdn.gcore.lib.util.BucketType;
@@ -559,8 +562,7 @@ public class GCore extends GPlugin {
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
 	public void event(final CraftItemEvent event) {
 		final Player player = (Player) event.getWhoClicked();
-		final ItemStack preCursor = !Mat.from(player.getItemOnCursor()).isAir() ? player.getItemOnCursor().clone()
-				: null;
+		final ItemStack preCursor = !Mat.from(player.getItemOnCursor()).isAir() ? player.getItemOnCursor().clone() : null;
 		final Map<Integer, ItemStack> preItems = new HashMap<Integer, ItemStack>();
 		for (int slot = 0; slot < player.getInventory().getContents().length; ++slot) {
 			ItemStack item = player.getInventory().getContents()[slot];
@@ -579,7 +581,7 @@ public class GCore extends GPlugin {
 						ItemStack item = player.getInventory().getContents()[slot];
 						if (!Mat.from(item).isAir()) {
 							if (preItem != null) {// has pre item
-								int added = preItem != null ? item.getAmount() - preItem.getAmount() : item.getAmount();
+								int added = item.getAmount() - preItem.getAmount();
 								if (added > 0) {
 									preItem.setAmount(added);
 									crafted.put(slot, preItem);
@@ -604,6 +606,68 @@ public class GCore extends GPlugin {
 					}
 					if (!crafted.isEmpty()) {
 						Bukkit.getPluginManager().callEvent(new PlayerCraftedItemEvent(event, crafted));
+					}
+				}
+			}
+		}.runTaskLater(this, 1L);
+	}
+
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+	public void event(final InventoryClickEvent event) {
+		if (event instanceof CraftItemEvent) return;
+		if (!event.getInventory().getType().equals(InventoryType.MERCHANT)) return;
+		final Player player = (Player) event.getWhoClicked();
+		final ItemStack preCursor = !Mat.from(player.getItemOnCursor()).isAir() ? player.getItemOnCursor().clone() : null;
+		final Map<Integer, ItemStack> preItems = new HashMap<Integer, ItemStack>();
+		for (int slot = 0; slot < player.getInventory().getContents().length; ++slot) {
+			ItemStack item = player.getInventory().getContents()[slot];
+			if (!Mat.from(item).isAir()) {
+				preItems.put(slot, item.clone());
+			}
+		}
+		// delay for craft
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				if (!event.isCancelled()) {
+					Map<Integer, ItemStack> given = new HashMap<Integer, ItemStack>();
+					Map<Integer, ItemStack> received = new HashMap<Integer, ItemStack>();
+					for (int slot = 0; slot < player.getInventory().getContents().length; ++slot) {
+						ItemStack preItem = preItems.get(slot);
+						ItemStack item = player.getInventory().getContents()[slot];
+						// has in inventory
+						if (!Mat.from(item).isAir()) {
+							if (preItem != null) {// has pre item
+								int delta = item.getAmount() - preItem.getAmount();
+								if (delta > 0) {
+									preItem.setAmount(delta);
+									received.put(slot, preItem);
+								} else if (delta < 0) {
+									preItem.setAmount(-delta);
+									given.put(slot, preItem);
+								}
+							} else {// no pre item
+								received.put(slot, item.clone());
+							}
+						}
+					}
+					ItemStack cursor = player.getItemOnCursor();
+					if (!Mat.from(cursor).isAir()) {
+						if (preCursor != null) {// has pre cursor
+							int delta = preCursor != null ? cursor.getAmount() - preCursor.getAmount() : cursor.getAmount();
+							if (delta > 0) {
+								preCursor.setAmount(delta);
+								received.put(-1, preCursor);
+							} else if (delta < 0) {
+								preCursor.setAmount(-delta);
+								given.put(-1, preCursor);
+							}
+						} else {// no pre item
+							received.put(-1, cursor.clone());
+						}
+					}
+					if (!given.isEmpty() || !received.isEmpty()) {
+						Bukkit.getPluginManager().callEvent(new PlayerTradedVillagerEvent(event, given, received));
 					}
 				}
 			}

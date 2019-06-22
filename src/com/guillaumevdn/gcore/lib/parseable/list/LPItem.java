@@ -14,7 +14,7 @@ public class LPItem extends ListParseable<CPItem> {
 
 	// base
 	public LPItem(String id, Parseable parent, boolean mandatory, int editorSlot, Mat editorIcon, List<String> editorDescription) {
-		super(id, parent, "item", CaseType.LOWER, mandatory, editorSlot, editorIcon, editorDescription);
+		super(id, parent, "item", mandatory, editorSlot, editorIcon, editorDescription);
 	}
 
 	// methods

@@ -19,7 +19,7 @@ public class LPInteger extends ListParseable<PPInteger> {
 	private Integer min, max;
 
 	public LPInteger(String id, Parseable parent, String defaultValue, Integer min, Integer max, boolean mandatory, int editorSlot, Mat editorIcon, List<String> editorDescription) {
-		super(id, parent, "number", CaseType.LOWER, mandatory, editorSlot, editorIcon, editorDescription);
+		super(id, parent, "number", mandatory, editorSlot, editorIcon, editorDescription);
 		this.defaultValue = defaultValue;
 		this.min = min;
 		this.max = max;

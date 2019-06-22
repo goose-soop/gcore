@@ -12,7 +12,7 @@ public class LPPotionEffect extends ListParseable<CPPotionEffect> {
 
 	// base
 	public LPPotionEffect(String id, Parseable parent, boolean mandatory, int editorSlot, Mat editorIcon, List<String> editorDescription) {
-		super(id, parent, "potion effect", CaseType.LOWER, mandatory, editorSlot, editorIcon, editorDescription);
+		super(id, parent, "potion effect", mandatory, editorSlot, editorIcon, editorDescription);
 	}
 
 	// methods

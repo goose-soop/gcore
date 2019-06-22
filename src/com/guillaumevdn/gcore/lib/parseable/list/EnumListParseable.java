@@ -23,7 +23,7 @@ public abstract class EnumListParseable<T extends Parseable, E extends Enum<E>> 
 	private Class<E> enumClass;
 
 	public EnumListParseable(String id, Parseable parent, boolean allowDefaultCase, Class<E> enumClass, String typeName, boolean mandatory, int editorSlot, Mat editorIcon, List<String> editorDescription) {
-		super(id, parent, typeName, CaseType.UPPER, mandatory, editorSlot, editorIcon, editorDescription);
+		super(id, parent, typeName, mandatory, editorSlot, editorIcon, editorDescription);
 		this.allowDefaultCase = allowDefaultCase;
 		this.enumClass = enumClass;
 	}

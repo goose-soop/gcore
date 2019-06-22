@@ -12,7 +12,7 @@ public class LPEnchantment extends ListParseable<CPEnchantment> {
 
 	// base
 	public LPEnchantment(String id, Parseable parent, boolean mandatory, int editorSlot, Mat editorIcon, List<String> editorDescription) {
-		super(id, parent, "enchantment", CaseType.LOWER, mandatory, editorSlot, editorIcon, editorDescription);
+		super(id, parent, "enchantment", mandatory, editorSlot, editorIcon, editorDescription);
 	}
 
 	// methods

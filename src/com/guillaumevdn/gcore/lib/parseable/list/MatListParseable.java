@@ -22,7 +22,7 @@ public abstract class MatListParseable<T extends Parseable> extends ListParseabl
 	private boolean allowDefaultCase;
 
 	public MatListParseable(String id, Parseable parent, boolean allowDefaultCase, String typeName, boolean mandatory, int editorSlot, Mat editorIcon, List<String> editorDescription) {
-		super(id, parent, typeName, CaseType.UPPER, mandatory, editorSlot, editorIcon, editorDescription);
+		super(id, parent, typeName, mandatory, editorSlot, editorIcon, editorDescription);
 		this.allowDefaultCase = allowDefaultCase;
 	}
 

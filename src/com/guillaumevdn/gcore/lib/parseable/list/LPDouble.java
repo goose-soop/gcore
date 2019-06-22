@@ -17,7 +17,7 @@ public class LPDouble extends ListParseable<PPDouble> {
 	private Double min, max;
 
 	public LPDouble(String id, Parseable parent, String defaultValue, Double min, Double max, boolean mandatory, int editorSlot, Mat editorIcon, List<String> editorDescription) {
-		super(id, parent, "decimal number", CaseType.LOWER, mandatory, editorSlot, editorIcon, editorDescription);
+		super(id, parent, "decimal number", mandatory, editorSlot, editorIcon, editorDescription);
 		this.defaultValue = defaultValue;
 		this.min = min;
 		this.max = max;

@@ -290,6 +290,24 @@ public class CPItem extends ContainerParseable {
 		return true;
 	}
 
+	public int count(Player player, Player parser) {
+		// has item
+		ItemData item = getParsedValue(parser);
+		if (item != null && item.getType() != null && !item.getType().isAir()) {
+			if (getMustHaveInHand(parser)) {// in hand
+				if (!item.isSimilar(player.getItemInHand())) {
+					return 0;
+				} else {
+					return player.getItemInHand().getAmount();
+				}
+			} else {// in inventory
+				return item.count(player.getInventory(),getCheckDurability(parser), getExactMatch(parser), 0d);
+			}
+		}
+		// well there's no item configured and we won't count fookin empty slots
+		return 0;
+	}
+
 	public boolean isValid(Material toCheckType, Player parser) {
 		// has item
 		ItemData item = getParsedValue(parser);
@@ -328,22 +346,32 @@ public class CPItem extends ContainerParseable {
 		return Integer.MAX_VALUE;
 	}
 
-	public void remove(Player player, Player parser, boolean force) {
+	public int remove(Player player, Player parser, boolean force) {
+		return remove(player, parser, null, force);
+	}
+
+	public int remove(Player player, Player parser, Integer forcedAmount, boolean force) {
+		// try to remove
+		int removed = 0;
 		ItemData item = getParsedValue(parser);
 		if (item != null && item.getType() != null && !item.getType().isAir() && (force || getRemoveAfterAction(parser))) {
+			int amount = forcedAmount != null ? forcedAmount : item.getAmount();
 			if (getMustHaveInHand(parser)) {
 				ItemStack inHand = player.getItemInHand();
 				if (inHand != null && item.isSimilar(inHand, getCheckDurability(parser), getExactMatch(parser), false)) {
-					inHand.setAmount(inHand.getAmount() - item.getAmount());
+					removed = inHand.getAmount();
+					inHand.setAmount(inHand.getAmount() - amount);
 					player.setItemInHand(inHand.getAmount() > 0 ? inHand : null);
 				} else {
-					item.remove(player.getInventory(), item.getAmount(), getCheckDurability(parser), getExactMatch(parser), 0d);
+					removed = item.remove(player.getInventory(), amount, getCheckDurability(parser), getExactMatch(parser), 0d);
 				}
 			} else {
-				item.remove(player.getInventory(), item.getAmount(), getCheckDurability(parser), getExactMatch(parser), 0d);
+				removed = item.remove(player.getInventory(), amount, getCheckDurability(parser), getExactMatch(parser), 0d);
 			}
 			player.updateInventory();
 		}
+		// return
+		return removed;
 	}
 
 	public Item drop(Location location, Player parser) {

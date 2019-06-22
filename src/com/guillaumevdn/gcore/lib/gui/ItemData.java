@@ -527,15 +527,16 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 		return count;
 	}
 
-	public void remove(Inventory inventory) {
-		remove(inventory, amount);
+	public int remove(Inventory inventory) {
+		return remove(inventory, amount);
 	}
 
-	public void remove(Inventory inventory, int amount) {
-		remove(inventory, amount, true, true, 0d);
+	public int remove(Inventory inventory, int amount) {
+		return remove(inventory, amount, true, true, 0d);
 	}
 
-	public void remove(Inventory inventory, int amount, boolean checkDurability, boolean exactMatch, double minDurabilityIfNotUnbreakable) {
+	public int remove(Inventory inventory, int amount, boolean checkDurability, boolean exactMatch, double minDurabilityIfNotUnbreakable) {
+		int initAmount = 0;
 		for (int slot = 0; slot < inventory.getSize(); slot++) {
 			ItemStack item = inventory.getItem(slot);
 			if (isSimilar(item, checkDurability, exactMatch, false)) {
@@ -555,10 +556,11 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 					inventory.setItem(slot, item);
 				}
 				if (amount <= 0) {
-					return;
+					break;
 				}
 			}
 		}
+		return initAmount - amount;
 	}
 
 	public boolean isAtLeast(ItemStack item) {

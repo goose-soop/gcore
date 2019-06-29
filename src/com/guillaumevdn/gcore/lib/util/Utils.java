@@ -55,6 +55,7 @@ import org.bukkit.FireworkEffect.Type;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NetherWartsState;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -74,6 +75,7 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.material.Crops;
 import org.bukkit.material.MaterialData;
+import org.bukkit.material.NetherWarts;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
@@ -1063,13 +1065,21 @@ public class Utils {
 		if (block != null) {
 			// crops
 			MaterialData mat = block.getState().getData();
+			Bukkit.getLogger().info("mat " + mat.getClass());
 			if (mat instanceof Crops) {
 				return ((Crops) mat).getState().equals(CropState.RIPE);
+			} else if (mat instanceof NetherWarts) {
+				NetherWarts ageable = (NetherWarts) mat;
+				Bukkit.getLogger().info("state : " + ageable.getState() + " (" + ageable.getState().ordinal() + "), max " + NetherWartsState.RIPE + " (" + NetherWartsState.RIPE.ordinal() + ")");
+				return ageable.getState().ordinal() >= NetherWartsState.RIPE.ordinal();
 			}
-			// cocoa
+			// cocoa or other ageables
 			try {
-				if (AgeableUtils.instanceOf(mat)) {
-					return AgeableUtils.isFullyAged(mat);
+				Class<?> ageableClass = Class.forName("org.bukkit.block.data.Ageable");
+				if (Utils.instanceOf(mat, ageableClass)) {
+					int age = (int) ageableClass.getMethod("getAge").invoke(mat);
+					int maxAge = (int) ageableClass.getMethod("getAgetMaximumAgege").invoke(mat);
+					return age > maxAge;
 				}
 			} catch (Throwable ignored) {}
 		}

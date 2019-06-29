@@ -1065,16 +1065,15 @@ public class Utils {
 		if (block != null) {
 			// crops
 			MaterialData mat = block.getState().getData();
-			Bukkit.getLogger().info("mat " + mat.getClass());
 			if (mat instanceof Crops) {
 				return ((Crops) mat).getState().equals(CropState.RIPE);
 			} else if (mat instanceof NetherWarts) {
 				NetherWarts ageable = (NetherWarts) mat;
-				Bukkit.getLogger().info("state : " + ageable.getState() + " (" + ageable.getState().ordinal() + "), max " + NetherWartsState.RIPE + " (" + NetherWartsState.RIPE.ordinal() + ")");
 				return ageable.getState().ordinal() >= NetherWartsState.RIPE.ordinal();
 			}
 			// cocoa or other ageables
 			try {
+				// we use reflection for inter-versions
 				Class<?> ageableClass = Class.forName("org.bukkit.block.data.Ageable");
 				if (Utils.instanceOf(mat, ageableClass)) {
 					int age = (int) ageableClass.getMethod("getAge").invoke(mat);

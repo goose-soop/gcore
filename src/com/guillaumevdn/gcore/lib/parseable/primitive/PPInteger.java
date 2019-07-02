@@ -58,8 +58,9 @@ public class PPInteger extends PrimitiveParseable<Integer> {
 		EditorGUI.fillItemRaw(gui, player, this, 21, onModif);
 		EditorGUI.fillItemDelete(gui, player, this, 24, onModif);
 		// delta items
-		for (int i = 0; i < 9; ++i) fillDeltaItem(gui, player, i == 0 ? 1 : (int) Math.pow(10, i), i, Mat.GREEN_WOOL, onModif);
-		for (int i = 0; i < 9; ++i) fillDeltaItem(gui, player, i == 0 ? 1 : (int) -Math.pow(10, i), 9 + i, Mat.RED_WOOL, onModif);
+		for (int i = 0; i < 9; ++i) fillDeltaItem(gui, player, (int) Math.pow(10, i), i, Mat.GREEN_WOOL, onModif);
+		for (int i = 0; i < 9; ++i) fillDeltaItem(gui, player, (int) -Math.pow(10, i), 9 + i, Mat.RED_WOOL, onModif);
+		gui.updateFirstSlot();
 	}
 
 	private void fillDeltaItem(final EditorGUI gui, Player player, final int delta, final int slot, final Mat icon, final ModifCallback onModif) {

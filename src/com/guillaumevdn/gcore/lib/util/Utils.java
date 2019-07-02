@@ -159,6 +159,11 @@ public class Utils {
 			GCore.inst().debug("Could not find ProtocolLib to create npc protocols compatibility for version " + ServerVersion.CURRENT.getName());
 			return null;
 		}
+		// no protocols for this version
+		if (ServerVersion.CURRENT.getNpcProtocolsClass() == null) {
+			GCore.inst().debug("No npc protocols compatibility are available for version " + ServerVersion.CURRENT.getName());
+			return null;
+		}
 		// attempt to create protocols
 		try {
 			NpcProtocols protocols = ServerVersion.CURRENT.getNpcProtocolsClass().newInstance();

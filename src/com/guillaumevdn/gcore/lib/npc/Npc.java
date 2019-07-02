@@ -11,7 +11,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.lib.event.NpcDespawnEvent;
@@ -19,6 +18,7 @@ import com.guillaumevdn.gcore.lib.event.NpcMoveEvent;
 import com.guillaumevdn.gcore.lib.event.NpcSpawnEvent;
 import com.guillaumevdn.gcore.lib.event.NpcTeleportEvent;
 import com.guillaumevdn.gcore.lib.gui.ItemData;
+import com.guillaumevdn.gcore.lib.util.Handler;
 import com.guillaumevdn.gcore.lib.util.Pair;
 import com.guillaumevdn.gcore.lib.util.Utils;
 import com.guillaumevdn.gcore.lib.versioncompat.npc.NpcProtocols;
@@ -144,12 +144,12 @@ public class Npc {
 		updateStatus();
 		updateEquipment();
 		// event
-		new BukkitRunnable() {
+		new Handler() {
 			@Override
-			public void run() {
+			public void execute() {
 				Bukkit.getPluginManager().callEvent(new NpcSpawnEvent(Npc.this));
 			}
-		}.runTask(GCore.inst());
+		}.runSync();
 		// success
 		return true;
 	}
@@ -164,12 +164,12 @@ public class Npc {
 		NpcProtocols.INSTANCE.remove(player, getEntityId());
 		spawned = false;
 		// event
-		new BukkitRunnable() {
+		new Handler() {
 			@Override
-			public void run() {
+			public void execute() {
 				Bukkit.getPluginManager().callEvent(new NpcDespawnEvent(Npc.this));
 			}
-		}.runTask(GCore.inst());
+		}.runSync();
 		// success
 		return true;
 	}
@@ -224,12 +224,12 @@ public class Npc {
 			spawn();
 		}
 		// event
-		new BukkitRunnable() {
+		new Handler() {
 			@Override
-			public void run() {
+			public void execute() {
 				Bukkit.getPluginManager().callEvent(new NpcMoveEvent(Npc.this, previous));
 			}
-		}.runTask(GCore.inst());
+		}.runSync();
 	}
 
 	public void teleport(Location location) {
@@ -247,12 +247,12 @@ public class Npc {
 			spawn();
 		}
 		// event
-		new BukkitRunnable() {
+		new Handler() {
 			@Override
-			public void run() {
+			public void execute() {
 				Bukkit.getPluginManager().callEvent(new NpcTeleportEvent(Npc.this, previous));
 			}
-		}.runTask(GCore.inst());
+		}.runSync();
 	}
 
 	// methods : status

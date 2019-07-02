@@ -11,6 +11,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.lib.event.NpcDespawnEvent;
@@ -143,7 +144,12 @@ public class Npc {
 		updateStatus();
 		updateEquipment();
 		// event
-		Bukkit.getPluginManager().callEvent(new NpcSpawnEvent(this));
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				Bukkit.getPluginManager().callEvent(new NpcSpawnEvent(Npc.this));
+			}
+		}.runTask(GCore.inst());
 		// success
 		return true;
 	}
@@ -158,7 +164,12 @@ public class Npc {
 		NpcProtocols.INSTANCE.remove(player, getEntityId());
 		spawned = false;
 		// event
-		Bukkit.getPluginManager().callEvent(new NpcDespawnEvent(this));
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				Bukkit.getPluginManager().callEvent(new NpcDespawnEvent(Npc.this));
+			}
+		}.runTask(GCore.inst());
 		// success
 		return true;
 	}
@@ -199,7 +210,7 @@ public class Npc {
 			return;
 		}
 		// too far away, teleport
-		Location previous = this.location;
+		final Location previous = this.location;
 		if (Utils.distance(previous, location) > 8d) {
 			teleport(location);
 			return;
@@ -213,7 +224,12 @@ public class Npc {
 			spawn();
 		}
 		// event
-		Bukkit.getPluginManager().callEvent(new NpcMoveEvent(this, previous));
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				Bukkit.getPluginManager().callEvent(new NpcMoveEvent(Npc.this, previous));
+			}
+		}.runTask(GCore.inst());
 	}
 
 	public void teleport(Location location) {
@@ -222,7 +238,7 @@ public class Npc {
 			return;
 		}
 		// set location
-		Location previous = this.location;
+		final Location previous = this.location;
 		this.location = location;
 		// update player
 		if (spawned) {// already spawned
@@ -231,7 +247,12 @@ public class Npc {
 			spawn();
 		}
 		// event
-		Bukkit.getPluginManager().callEvent(new NpcTeleportEvent(this, previous));
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				Bukkit.getPluginManager().callEvent(new NpcTeleportEvent(Npc.this, previous));
+			}
+		}.runTask(GCore.inst());
 	}
 
 	// methods : status

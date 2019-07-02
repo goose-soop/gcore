@@ -1061,7 +1061,7 @@ public class Mat implements Cloneable, Comparable<Mat> {
 	}
 
 	public boolean exists() {
-		return currentMaterial != null;
+		return currentMaterial == null ? false : (currentMaterial.equals(Material.AIR) ? isAir() : true);
 	}
 
 	public boolean isAir() {

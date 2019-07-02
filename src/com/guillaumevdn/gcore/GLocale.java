@@ -722,10 +722,22 @@ public class GLocale {
 			"fr_FR", Utils.asList("&7Emplacement par défaut du NPC")
 			);
 
-	public static final Text GUI_GENERIC_EDITOR_NPC_TARGEDISTANCELORE = new Text(
-			"GUI_GENERIC_EDITOR_NPC_TARGEDISTANCELORE", file,
+	public static final Text GUI_GENERIC_EDITOR_NPC_TARGETDISTANCELORE = new Text(
+			"GUI_GENERIC_EDITOR_NPC_TARGETDISTANCELORE", file,
 			"en_US", Utils.asList("&7Distance under which the NPC will", "&7 look at the player when close"),
 			"fr_FR", Utils.asList("&7Distance à laquelle le NPC regardera", "&7 le joueur s'il en est proche")
+			);
+
+	public static final Text GUI_GENERIC_EDITOR_NPC_ATTACKBEHAVIORLORE = new Text(
+			"GUI_GENERIC_EDITOR_NPC_ATTACKBEHAVIORLORE", file,
+			"en_US", Utils.asList("&7Attack behavior towards other entities"),
+			"fr_FR", Utils.asList("&7Comportement d'attaque envers les autres entités")
+			);
+
+	public static final Text GUI_GENERIC_EDITOR_NPC_ATTACKDISTANCELORE = new Text(
+			"GUI_GENERIC_EDITOR_NPC_ATTACKDISTANCELORE", file,
+			"en_US", Utils.asList("&7Distance under which the NPC will", "&7 try to attack the player when close"),
+			"fr_FR", Utils.asList("&7Distance à laquelle le NPC essaiera", "&7 d'attaquer le joueur s'il en est proche")
 			);
 
 	public static final Text GUI_GENERIC_EDITOR_NPC_STATUSLORE = new Text(

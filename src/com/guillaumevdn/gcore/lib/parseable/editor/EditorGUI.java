@@ -35,6 +35,7 @@ public abstract class EditorGUI extends GUI {
 	public static Mat ICON_NBT = Mat.ANVIL;
 	public static Mat ICON_SOUND = Mat.NOTE_BLOCK;
 	public static Mat ICON_ACTION = Mat.COMMAND_BLOCK_MINECART;
+	public static Mat ICON_ATTACK = Mat.DIAMOND_SWORD;
 	public static Mat ICON_SKILL = Mat.DIAMOND_AXE;
 	public static Mat ICON_CONDITION = Mat.GOLD_INGOT;
 	public static Mat ICON_GROUP = Mat.BOOKSHELF;

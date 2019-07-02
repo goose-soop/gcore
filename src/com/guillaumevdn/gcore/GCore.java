@@ -286,8 +286,14 @@ public class GCore extends GPlugin {
 			} catch (Throwable exception) {
 				exception.printStackTrace();
 			}
-			if (npcManager == null)
+			if (npcManager == null) {
 				debug("Couldn't enable NPC manager with ProtocolLib");
+			}
+		}
+
+		// reload NPCs data
+		if (npcManager != null) {
+			npcManager.loadNpcsData();
 		}
 
 		// auto update

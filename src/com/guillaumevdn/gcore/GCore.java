@@ -20,6 +20,8 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -61,6 +63,7 @@ import com.guillaumevdn.gcore.lib.event.PlayerCraftedItemEvent;
 import com.guillaumevdn.gcore.lib.event.PlayerFireBlockEvent;
 import com.guillaumevdn.gcore.lib.event.PlayerKillEvent;
 import com.guillaumevdn.gcore.lib.event.PlayerSpawnedMobEvent;
+import com.guillaumevdn.gcore.lib.event.PlayerTradedVillagerEvent;
 import com.guillaumevdn.gcore.lib.material.Mat;
 import com.guillaumevdn.gcore.lib.npc.NpcManager;
 import com.guillaumevdn.gcore.lib.util.BucketType;
@@ -113,6 +116,7 @@ public class GCore extends GPlugin {
 	// misc
 	private NpcManager npcManager = null;
 	private VaultIntegration vaultIntegration = null;
+	private HeadDatabaseIntegration headDatabaseIntegration = null;
 	private Map<Player, ChatInput> chatInputs = new HashMap<Player, ChatInput>();
 	private Map<Player, LocationInput> locationInputs = new HashMap<Player, LocationInput>();
 	private Map<Player, ItemInput> itemInputs = new HashMap<Player, ItemInput>();
@@ -144,6 +148,14 @@ public class GCore extends GPlugin {
 
 	public void setVaultIntegration(VaultIntegration vaultIntegration) {
 		this.vaultIntegration = vaultIntegration;
+	}
+
+	public HeadDatabaseIntegration getHeadDatabaseIntegration() {
+		return headDatabaseIntegration;
+	}
+
+	public void setHeadDatabaseIntegration(HeadDatabaseIntegration headDatabaseIntegration) {
+		this.headDatabaseIntegration = headDatabaseIntegration;
 	}
 
 	public Map<Player, ChatInput> getChatInputs() {
@@ -274,8 +286,14 @@ public class GCore extends GPlugin {
 			} catch (Throwable exception) {
 				exception.printStackTrace();
 			}
-			if (npcManager == null)
+			if (npcManager == null) {
 				debug("Couldn't enable NPC manager with ProtocolLib");
+			}
+		}
+
+		// reload NPCs data
+		if (npcManager != null) {
+			npcManager.loadNpcsData();
 		}
 
 		// auto update
@@ -301,14 +319,8 @@ public class GCore extends GPlugin {
 		innerReload();
 
 		// server version
-		debug("Detected server version : " + ServerVersion.CURRENT.getName()
-		+ (ServerVersion.CURRENT.equals(ServerVersion.UNSUPPORTED)
-				? " - this version isn't officially supported and plugins might not work as expected"
-						: ""));
-		debug("Detected server implementation : " + ServerImplementation.CURRENT.toString()
-		+ (!ServerImplementation.CURRENT.equals(ServerImplementation.SPIGOT)
-				? " - this implementation isn't officially supported and plugins might not work as expected"
-						: ""));
+		debug("Detected server version : " + ServerVersion.CURRENT.getName() + (ServerVersion.CURRENT.equals(ServerVersion.UNSUPPORTED) ? " - this version isn't officially supported and plugins might not work as expected" : ""));
+		debug("Detected server implementation : " + ServerImplementation.CURRENT.toString() + (!ServerImplementation.CURRENT.equals(ServerImplementation.SPIGOT) ? " - this implementation isn't officially supported and plugins might not work as expected" : ""));
 
 		// init compat
 		Compat.INSTANCE.init();
@@ -317,15 +329,15 @@ public class GCore extends GPlugin {
 		GSON = Utils.createGsonBuilder().setPrettyPrinting().create();
 		UNPRETTY_GSON = Utils.createGsonBuilder().create();
 
-		// vault integration
+		// integration
 		registerPluginIntegration("Vault", VaultIntegration.class);
+		registerPluginIntegration("HeadDatabase", HeadDatabaseIntegration.class);
 
 		// register command
 		CommandRoot root = new CommandRoot(this, Utils.asList("gcore"), null, GPerm.GCORE_ADMIN, false);
 		registerCommand(root, GPerm.GCORE_ADMIN);
 		// data commands
-		CommandArgument data = new CommandArgument(this, Utils.asList("data"), "data-related commands",
-				GPerm.GCORE_ADMIN, false);
+		CommandArgument data = new CommandArgument(this, Utils.asList("data"), "data-related commands", GPerm.GCORE_ADMIN, false);
 		root.addChild(data);
 		data.addChild(new CommandDataExport());
 		data.addChild(new CommandDataReset());
@@ -559,8 +571,7 @@ public class GCore extends GPlugin {
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
 	public void event(final CraftItemEvent event) {
 		final Player player = (Player) event.getWhoClicked();
-		final ItemStack preCursor = !Mat.from(player.getItemOnCursor()).isAir() ? player.getItemOnCursor().clone()
-				: null;
+		final ItemStack preCursor = !Mat.from(player.getItemOnCursor()).isAir() ? player.getItemOnCursor().clone() : null;
 		final Map<Integer, ItemStack> preItems = new HashMap<Integer, ItemStack>();
 		for (int slot = 0; slot < player.getInventory().getContents().length; ++slot) {
 			ItemStack item = player.getInventory().getContents()[slot];
@@ -579,7 +590,7 @@ public class GCore extends GPlugin {
 						ItemStack item = player.getInventory().getContents()[slot];
 						if (!Mat.from(item).isAir()) {
 							if (preItem != null) {// has pre item
-								int added = preItem != null ? item.getAmount() - preItem.getAmount() : item.getAmount();
+								int added = item.getAmount() - preItem.getAmount();
 								if (added > 0) {
 									preItem.setAmount(added);
 									crafted.put(slot, preItem);
@@ -604,6 +615,68 @@ public class GCore extends GPlugin {
 					}
 					if (!crafted.isEmpty()) {
 						Bukkit.getPluginManager().callEvent(new PlayerCraftedItemEvent(event, crafted));
+					}
+				}
+			}
+		}.runTaskLater(this, 1L);
+	}
+
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+	public void event(final InventoryClickEvent event) {
+		if (event instanceof CraftItemEvent) return;
+		if (!event.getInventory().getType().equals(InventoryType.MERCHANT)) return;
+		final Player player = (Player) event.getWhoClicked();
+		final ItemStack preCursor = !Mat.from(player.getItemOnCursor()).isAir() ? player.getItemOnCursor().clone() : null;
+		final Map<Integer, ItemStack> preItems = new HashMap<Integer, ItemStack>();
+		for (int slot = 0; slot < player.getInventory().getContents().length; ++slot) {
+			ItemStack item = player.getInventory().getContents()[slot];
+			if (!Mat.from(item).isAir()) {
+				preItems.put(slot, item.clone());
+			}
+		}
+		// delay for craft
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				if (!event.isCancelled()) {
+					Map<Integer, ItemStack> given = new HashMap<Integer, ItemStack>();
+					Map<Integer, ItemStack> received = new HashMap<Integer, ItemStack>();
+					for (int slot = 0; slot < player.getInventory().getContents().length; ++slot) {
+						ItemStack preItem = preItems.get(slot);
+						ItemStack item = player.getInventory().getContents()[slot];
+						// has in inventory
+						if (!Mat.from(item).isAir()) {
+							if (preItem != null) {// has pre item
+								int delta = item.getAmount() - preItem.getAmount();
+								if (delta > 0) {
+									preItem.setAmount(delta);
+									received.put(slot, preItem);
+								} else if (delta < 0) {
+									preItem.setAmount(-delta);
+									given.put(slot, preItem);
+								}
+							} else {// no pre item
+								received.put(slot, item.clone());
+							}
+						}
+					}
+					ItemStack cursor = player.getItemOnCursor();
+					if (!Mat.from(cursor).isAir()) {
+						if (preCursor != null) {// has pre cursor
+							int delta = preCursor != null ? cursor.getAmount() - preCursor.getAmount() : cursor.getAmount();
+							if (delta > 0) {
+								preCursor.setAmount(delta);
+								received.put(-1, preCursor);
+							} else if (delta < 0) {
+								preCursor.setAmount(-delta);
+								given.put(-1, preCursor);
+							}
+						} else {// no pre item
+							received.put(-1, cursor.clone());
+						}
+					}
+					if (!given.isEmpty() || !received.isEmpty()) {
+						Bukkit.getPluginManager().callEvent(new PlayerTradedVillagerEvent(event, given, received));
 					}
 				}
 			}

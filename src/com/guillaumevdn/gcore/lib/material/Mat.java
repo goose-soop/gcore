@@ -865,6 +865,7 @@ public class Mat implements Cloneable, Comparable<Mat> {
 	public static final Mat STATIONARY_WATER = registerValue(new Mat(VERSION, "WATER", "STATIONARY_WATER"));
 	public static final Mat WATER_BUCKET = registerValue(new Mat(VERSION, "WATER_BUCKET", "WATER_BUCKET"));
 	public static final Mat WET_SPONGE = registerValue(new Mat(VERSION, "WET_SPONGE", "SPONGE", 1));
+	public static final Mat CROPS = registerValue(new Mat(VERSION, "CROPS", "-"));
 	public static final Mat WHEAT = registerValue(new Mat(VERSION, "WHEAT", "WHEAT"));
 	public static final Mat WHEAT_SEEDS = registerValue(new Mat(VERSION, "WHEAT_SEEDS", "SEEDS"));
 	public static final Mat WHITE_BANNER = registerValue(new Mat(VERSION, "WHITE_BANNER", "BANNER", 15));
@@ -951,6 +952,7 @@ public class Mat implements Cloneable, Comparable<Mat> {
 	public static final Mat CAMPFIRE = registerValue(new Mat(VERSION, "CAMPFIRE", "-"));
 	public static final Mat CORNFLOWER = registerValue(new Mat(VERSION, "CORNFLOWER", "-"));
 	public static final Mat LILY_OF_THE_VALLEY = registerValue(new Mat(VERSION, "LILY_OF_THE_VALLEY", "-"));
+	public static final Mat WITHER_ROSE = registerValue(new Mat(VERSION, "WITHER_ROSE", "WITHER_ROSE"));
 	public static final Mat POTTED_WITHER_ROSE = registerValue(new Mat(VERSION, "POTTED_WITHER_ROSE", "-"));
 	public static final Mat POTTER_CORNFLOWER = registerValue(new Mat(VERSION, "POTTER_CORNFLOWER", "-"));
 	public static final Mat POTTER_LILY_OF_THE_VALLEY = registerValue(new Mat(VERSION, "POTTER_LILY_OF_THE_VALLEY", "-"));
@@ -1061,7 +1063,7 @@ public class Mat implements Cloneable, Comparable<Mat> {
 	}
 
 	public boolean exists() {
-		return currentMaterial != null;
+		return currentMaterial == null ? false : (currentMaterial.equals(Material.AIR) ? isAir() : true);
 	}
 
 	public boolean isAir() {

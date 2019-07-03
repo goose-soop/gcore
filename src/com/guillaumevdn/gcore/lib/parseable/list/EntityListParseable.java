@@ -26,7 +26,7 @@ public abstract class EntityListParseable<T extends Parseable> extends ListParse
 	private boolean allowDefaultCase;
 
 	public EntityListParseable(String id, Parseable parent, boolean allowDefaultCase, String typeName, boolean mandatory, int editorSlot, Mat editorIcon, List<String> editorDescription) {
-		super(id, parent, typeName, CaseType.UPPER, mandatory, editorSlot, editorIcon, editorDescription);
+		super(id, parent, typeName, mandatory, editorSlot, editorIcon, editorDescription);
 		this.allowDefaultCase = allowDefaultCase;
 	}
 

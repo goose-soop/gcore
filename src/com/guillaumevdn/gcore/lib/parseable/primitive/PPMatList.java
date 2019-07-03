@@ -88,7 +88,7 @@ public class PPMatList extends PrimitiveParseable<List<Mat>> {
 												@Override
 												protected void fill() {
 													// add values
-													for (final Mat val : Mat.values()) {
+													for (final Mat val : Utils.asSortedList(Mat.values(), Utils.objectSorter)) {
 														if (!val.exists()) continue;
 														final String valName = val.getModernName();
 														setRegularItem(new EditorItem("value_" + valName, -1, val, "§6" + valName, null) {

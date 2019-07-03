@@ -360,6 +360,12 @@ public class GLocale {
 			"it_IT", Utils.asList("&7Premere 'drop' quando sei pronto a importare gli oggetti nella tua mano.")
 			);
 
+	public static final Text MSG_GENERIC_ITEMHEADDATABASEINPUT = new Text(
+			"MSG_GENERIC_ITEMHEADDATABASEINPUT", file,
+			"en_US", "&7Enter the HeadDatabase item ID in the chat or &ccancel &7to cancel.",
+			"fr_FR", "&7Entrez l'ID de l'item HeadDatabase dans le chat ou &ccancel &7pour annuler."
+			);
+
 	public static final Text MSG_GENERIC_DELETEELEMENT = new Text(
 			"MSG_GENERIC_DELETEELEMENT", file,
 			"en_US", "&7Click on the element that you wish to delete (cancel by closing the GUI).",
@@ -533,6 +539,20 @@ public class GLocale {
 			"it_IT", Utils.asList("&7Importa un valore (item)")
 			);
 
+	public static final Text GUI_GENERIC_EDITORITEMIMPORTHEADDATABASE = new Text(
+			"GUI_GENERIC_EDITORITEMIMPORTHEADDATABASE", file,
+			"en_US", "&6Select (HeadDatabase)",
+			"fr_FR", "&6Sélectionner (HeadDatabase)",
+			"it_IT", Utils.asList("&6Seleziona (HeadDatabase)")
+			);
+
+	public static final Text GUI_GENERIC_EDITORITEMIMPORTHEADDATABASELORE = new Text(
+			"GUI_GENERIC_EDITORITEMIMPORTHEADDATABASELORE", file,
+			"en_US", Utils.asList("&7Import a value (item) from HeadDatabase"),
+			"fr_FR", Utils.asList("&7Importer une valeur (item) from HeadDatabase"),
+			"it_IT", Utils.asList("&7Importa un valore (item) from HeadDatabase")
+			);
+
 	public static final Text GUI_GENERIC_EDITORENUMSELECT = new Text(
 			"GUI_GENERIC_EDITORENUMSELECT", file,
 			"en_US", "&6Select",
@@ -553,7 +573,7 @@ public class GLocale {
 			"fr_FR", "&6Sélectionner le type",
 			"it_IT", Utils.asList("&6Seleziona il tipo")
 			);
-	
+
 	// editor : date
 	public static final Text GUI_GENERIC_EDITOR_YEARLORE = new Text(
 			"GUI_GENERIC_EDITOR_YEARLORE", file,
@@ -601,7 +621,7 @@ public class GLocale {
 			"en_US", Utils.asList("&7If this setting is specified, the time frame", "&7 will be split into smaller parts"),
 			"fr_FR", Utils.asList("&7Si ce paramètre est spécifié, la période sera", "&7 divisée en plus petites parties")
 			);
-	
+
 	// editor : block setting
 	public static final Text GUI_GENERIC_EDITOR_BLOCKTYPELORE = new Text(
 			"GUI_GENERIC_EDITOR_BLOCKTYPELORE", file,
@@ -618,11 +638,17 @@ public class GLocale {
 			"it_IT", Utils.asList("&7Tipo di mob")
 			);
 
-	public static final Text GUI_GENERIC_EDITOR_MOB_LORE = new Text(
-			"GUI_GENERIC_EDITOR_MOB_LORE", file,
+	public static final Text GUI_GENERIC_EDITOR_MOB_NAMELORE = new Text(
+			"GUI_GENERIC_EDITOR_MOB_NAMELORE", file,
 			"en_US", Utils.asList("&7Name of mob"),
 			"fr_FR", Utils.asList("&7Nom de mob"),
 			"it_IT", Utils.asList("&7Nome del mob")
+			);
+
+	public static final Text GUI_GENERIC_EDITOR_MOB_COLORLORE = new Text(
+			"GUI_GENERIC_EDITOR_MOB_COLORLORE", file,
+			"en_US", Utils.asList("&7Color of the mob (if applicable)"),
+			"fr_FR", Utils.asList("&7Couleur du mob (si applicable)")
 			);
 
 	public static final Text GUI_GENERIC_EDITOR_MOB_AMOUNTLORE = new Text(
@@ -696,10 +722,22 @@ public class GLocale {
 			"fr_FR", Utils.asList("&7Emplacement par défaut du NPC")
 			);
 
-	public static final Text GUI_GENERIC_EDITOR_NPC_TARGEDISTANCELORE = new Text(
-			"GUI_GENERIC_EDITOR_NPC_TARGEDISTANCELORE", file,
+	public static final Text GUI_GENERIC_EDITOR_NPC_TARGETDISTANCELORE = new Text(
+			"GUI_GENERIC_EDITOR_NPC_TARGETDISTANCELORE", file,
 			"en_US", Utils.asList("&7Distance under which the NPC will", "&7 look at the player when close"),
 			"fr_FR", Utils.asList("&7Distance à laquelle le NPC regardera", "&7 le joueur s'il en est proche")
+			);
+
+	public static final Text GUI_GENERIC_EDITOR_NPC_ATTACKBEHAVIORLORE = new Text(
+			"GUI_GENERIC_EDITOR_NPC_ATTACKBEHAVIORLORE", file,
+			"en_US", Utils.asList("&7Attack behavior towards other entities"),
+			"fr_FR", Utils.asList("&7Comportement d'attaque envers les autres entités")
+			);
+
+	public static final Text GUI_GENERIC_EDITOR_NPC_ATTACKDISTANCELORE = new Text(
+			"GUI_GENERIC_EDITOR_NPC_ATTACKDISTANCELORE", file,
+			"en_US", Utils.asList("&7Distance under which the NPC will", "&7 try to attack the player when close"),
+			"fr_FR", Utils.asList("&7Distance à laquelle le NPC essaiera", "&7 d'attaquer le joueur s'il en est proche")
 			);
 
 	public static final Text GUI_GENERIC_EDITOR_NPC_STATUSLORE = new Text(

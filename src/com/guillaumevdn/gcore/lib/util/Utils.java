@@ -55,6 +55,7 @@ import org.bukkit.FireworkEffect.Type;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NetherWartsState;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -67,7 +68,6 @@ import org.bukkit.entity.Firework;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
-import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -75,6 +75,7 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.material.Crops;
 import org.bukkit.material.MaterialData;
+import org.bukkit.material.NetherWarts;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
@@ -156,6 +157,11 @@ public class Utils {
 		// no protocol lib
 		if (getPlugin("ProtocolLib") == null) {
 			GCore.inst().debug("Could not find ProtocolLib to create npc protocols compatibility for version " + ServerVersion.CURRENT.getName());
+			return null;
+		}
+		// no protocols for this version
+		if (ServerVersion.CURRENT.getNpcProtocolsClass() == null) {
+			GCore.inst().debug("No npc protocols compatibility are available for version " + ServerVersion.CURRENT.getName());
 			return null;
 		}
 		// attempt to create protocols
@@ -352,56 +358,6 @@ public class Utils {
 	// ------------------------------------------------------------
 	// Reflection
 	// ------------------------------------------------------------
-
-	// TODO : remove this
-	private static Map<String, String> eventActorSpecialMethodName = asMap(
-			"EntityToggleGlideEvent", "getEntity",
-			"EntityBlockFormEvent", "getEntity",
-			"EntityRegainHealthEvent", "getEntity",
-			"CraftItemEvent", "getWhoClicked",
-			"EnchantItemEvent", "getEnchanter",
-			"HorseJumpEvent", "getEntity.getPassenger",
-			"EntityDismountEvent", "getEntity",
-			"EntityDeathEvent", "getEntity.getKiller",
-			"EntityMountEvent", "getEntity",
-			"EntityTameEvent", "getOwner",
-			"MythicMobDeathEvent", "getKiller",
-			"NPCClickEvent", "getClicker",
-			"NPCRightClickEvent", "getClicker",
-			"NPCLeftClickEvent", "getClicker",
-			"NPCDeathEvent", "getNPC.getEntity.getKiller",
-			"EntityPortalEnterEvent", "getEntity",
-			"EntityPortalExitEvent", "getEntity",
-			"PotionSplashEvent", "getPotion.getShooter",
-			"ProjectileHitEvent", "getEntity.getShooter",
-			"PlayerExperienceGainEvent", "getPlayerData.getPlayer",
-			"VehicleEnterEvent", "getEntered",
-			"VehicleExitEvent", "getExited",
-			"ExpBottleEvent", "getEntity.getShooter",
-			"BlockIgniteEvent", "getIgnitingEntity",
-			"PlayerDeathEvent", "getEntity",
-			"PlayerLootEvent", "getLooter"
-			);
-
-	public static Player getEventActor(Event event) {
-		try {
-			String raw = eventActorSpecialMethodName.containsKey(event.getClass().getSimpleName()) ? eventActorSpecialMethodName.get(event.getClass().getSimpleName()) : "getPlayer";
-			List<String> methodNames = Utils.split("\\.", raw, false);
-			Object invokeResult = null;
-			for (String methodName : methodNames) {
-				Object invoker = invokeResult == null ? event : invokeResult;
-				invokeResult = invoker.getClass().getMethod(methodName).invoke(invoker);
-				if (invokeResult == null) {
-					return null;
-				}
-			}
-			if (invokeResult != null && invokeResult instanceof Player) {
-				return (Player) invokeResult;
-			}
-			return null;
-		} catch (Throwable exception) {}
-		return null;
-	}
 
 	public static void setField(Object instance, String fieldName, Object value)
 	{
@@ -701,12 +657,9 @@ public class Utils {
 		return (Player) player;
 	}
 
-	public static Player getPlayer(UUID uuid)
-	{
+	public static Player getPlayer(UUID uuid) {
 		if (uuid == null) return null;
-		OfflinePlayer player = getOfflinePlayer(uuid);
-		if (player != null && !(player instanceof Player)) return player.getPlayer();
-		return (Player) player;
+		return Bukkit.getPlayer(uuid);
 	}
 
 	public static OfflinePlayer getOfflinePlayer(String name) {
@@ -721,8 +674,7 @@ public class Utils {
 		return null;
 	}
 
-	public static OfflinePlayer getOfflinePlayer(UUID uuid)
-	{
+	public static OfflinePlayer getOfflinePlayer(UUID uuid) {
 		if (uuid == null) return null;
 		OfflinePlayer player = null;
 		if ((player = Bukkit.getPlayer(uuid)) != null) {
@@ -1120,11 +1072,20 @@ public class Utils {
 			MaterialData mat = block.getState().getData();
 			if (mat instanceof Crops) {
 				return ((Crops) mat).getState().equals(CropState.RIPE);
+			} else if (mat instanceof NetherWarts) {
+				NetherWarts ageable = (NetherWarts) mat;
+				return ageable.getState().ordinal() >= NetherWartsState.RIPE.ordinal();
 			}
-			// cocoa
-			if (AgeableUtils.instanceOf(mat)) {
-				return AgeableUtils.isFullyAged(mat);
-			}
+			// cocoa or other ageables
+			try {
+				// we use reflection for inter-versions
+				Class<?> ageableClass = Class.forName("org.bukkit.block.data.Ageable");
+				if (Utils.instanceOf(mat, ageableClass)) {
+					int age = (int) ageableClass.getMethod("getAge").invoke(mat);
+					int maxAge = (int) ageableClass.getMethod("getAgetMaximumAgege").invoke(mat);
+					return age > maxAge;
+				}
+			} catch (Throwable ignored) {}
 		}
 		// not crops
 		return resultIfNotCrops;

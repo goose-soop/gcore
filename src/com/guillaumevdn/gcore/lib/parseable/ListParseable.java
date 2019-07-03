@@ -23,22 +23,16 @@ public abstract class ListParseable<T extends Parseable> extends Parseable {
 
 	// base
 	private String elementTypeName;
-	//private CaseType idCase;
 	private Map<String, T> elements = new HashMap<String, T>();// LOWER-CASE KEY
 
-	public ListParseable(String id, Parseable parent, String elementTypeName, CaseType idCase, boolean mandatory, int editorSlot, Mat editorIcon, List<String> editorDescription) {
+	public ListParseable(String id, Parseable parent, String elementTypeName, boolean mandatory, int editorSlot, Mat editorIcon, List<String> editorDescription) {
 		super(id, parent, mandatory, editorSlot, editorIcon, editorDescription);
 		this.elementTypeName = elementTypeName;
-		//this.idCase = idCase;
 	}
 
 	public String getElementTypeName() {
 		return elementTypeName;
 	}
-
-	/*public CaseType getIdCase() {
-		return idCase;
-	}*/
 
 	public Map<String, T> getElements() {
 		return elements;
@@ -56,6 +50,10 @@ public abstract class ListParseable<T extends Parseable> extends Parseable {
 	/** @return the removed value associated with the id, or null if there was none */
 	public T removeElement(String id) {
 		return elements.remove(id.toLowerCase());
+	}
+
+	public void clearElements() {
+		elements.clear();
 	}
 
 	/** Create an element with the specified id, and add it to the list */
@@ -240,25 +238,6 @@ public abstract class ListParseable<T extends Parseable> extends Parseable {
 		}
 		// success
 		return clone;
-	}
-
-	// id case
-	public static enum CaseType {
-
-		UPPER,
-		LOWER;
-
-		public String transform(String string) {
-			switch (this) {
-			case UPPER:
-				return string.toUpperCase();
-			case LOWER:
-				return string.toLowerCase();
-			default:
-				return string;
-			}
-		}
-
 	}
 
 }

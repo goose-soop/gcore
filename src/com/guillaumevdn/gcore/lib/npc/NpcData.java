@@ -27,7 +27,7 @@ public class NpcData extends ContainerParseable {
 	private PPString skinData = addComponent(new PPString("skin_data", this, null, false, 2, EditorGUI.ICON_TECHNICAL, GLocale.GUI_GENERIC_EDITOR_NPC_SKINDATALORE.getLines()));
 	private PPString skinSignature = addComponent(new PPString("skin_signature", this, null, false, 3, EditorGUI.ICON_TECHNICAL, GLocale.GUI_GENERIC_EDITOR_NPC_SKINSIGNATURELORE.getLines()));
 	private PPLocation location = addComponent(new PPLocation("location", this, "world,0,0,0", true, 4, EditorGUI.ICON_LOCATION, GLocale.GUI_GENERIC_EDITOR_NPC_LOCATIONLORE.getLines()));
-	private PPDouble targetDistance = addComponent(new PPDouble("target_distance", this, "5", 0d, Double.MAX_VALUE, false, 5, EditorGUI.ICON_NUMBER, GLocale.GUI_GENERIC_EDITOR_NPC_TARGEDISTANCELORE.getLines()));
+	private PPDouble targetDistance = addComponent(new PPDouble("target_distance", this, "5", 0d, Double.MAX_VALUE, false, 5, EditorGUI.ICON_NUMBER, GLocale.GUI_GENERIC_EDITOR_NPC_TARGETDISTANCELORE.getLines()));
 	private PPEnumList<NpcStatus> status = addComponent(new PPEnumList<NpcStatus>("status", this, Utils.emptyList(), NpcStatus.class, "npc status", false, 6, EditorGUI.ICON_NUMBER, GLocale.GUI_GENERIC_EDITOR_NPC_STATUSLORE.getLines()));
 	private CPItem heldItem = addComponent(new CPItem("held_item", this, false, 9, EditorGUI.ICON_ITEM, GLocale.GUI_GENERIC_EDITOR_NPC_STUFFLORE.getLines()));
 	private CPItem heldItemOff = addComponent(new CPItem("held_item_off", this, false, 10, EditorGUI.ICON_ITEM, GLocale.GUI_GENERIC_EDITOR_NPC_STUFFLORE.getLines()));

@@ -1,5 +1,6 @@
 package com.guillaumevdn.gcore.lib.npc;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -24,8 +25,11 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.data.GUser;
 import com.guillaumevdn.gcore.data.ModifiedNpcData;
+import com.guillaumevdn.gcore.lib.configuration.YMLConfiguration;
 import com.guillaumevdn.gcore.lib.gui.ItemData;
 import com.guillaumevdn.gcore.lib.npc.navigation.Navigator;
+import com.guillaumevdn.gcore.lib.parseable.ConfigData;
+import com.guillaumevdn.gcore.lib.parseable.editor.EditorGUI;
 import com.guillaumevdn.gcore.lib.util.Utils;
 
 public class NpcManager implements Listener {
@@ -33,10 +37,19 @@ public class NpcManager implements Listener {
 	// base
 	private BukkitTask updateTask = null;
 	private NpcPacketListener packetListener = null;
+	private Map<Integer, NpcData> npcsData = new HashMap<Integer, NpcData>();
 	private Map<Player, Map<Integer, Npc>> npcs = new HashMap<Player, Map<Integer, Npc>>();
 	private List<Navigator> navigators = new ArrayList<Navigator>();
 
 	// get
+	public Map<Integer, NpcData> getNpcsData() {
+		return npcsData;
+	}
+
+	public NpcData getNpcData(Integer id) {
+		return npcsData.get(id);
+	}
+
 	public Npc getNpc(Player player, int id) {
 		Map<Integer, Npc> playerNpcs = npcs.get(player);
 		return playerNpcs != null ? playerNpcs.get(id) : null;
@@ -69,6 +82,42 @@ public class NpcManager implements Listener {
 	}
 
 	// methods
+	public void loadNpcsData() {
+		// despawn existing NPCs
+		for (Player player : npcs.keySet()) {
+			for (Npc npc : npcs.get(player).values()) {
+				npc.despawn();
+			}
+		}
+		// load npcs
+		npcsData.clear();
+		YMLConfiguration config = new YMLConfiguration(GCore.inst(), new File(GCore.inst().getDataFolder() + "/npcs.yml"), "npcs.yml", true, true);
+		for (String rawId : config.getKeysForSection("npcs", false)) {
+			Integer id = Utils.integerOrNull(rawId);
+			if (id == null || id < 1) {
+				GCore.inst().warning("Id " + id + " for npc data is invalid, it must be a number (at least 1)");
+				continue;
+			}
+			ConfigData data = new ConfigData(GCore.inst(), "npc " + id, config, "npcs." + id);
+			final NpcData npc = new NpcData(id.toString(), null, false, -1, EditorGUI.ICON_NPC, null);
+			// register npc
+			npc.load(data);
+			npcsData.put(id, npc);
+			// log
+			if (!npc.hasErrors()) {
+				GCore.inst().success("Loaded npc data " + id);
+			} else {
+				GCore.inst().warning("Loaded npc data " + id + " but some parts failed to load");
+			}
+		}
+		// respawn existing NPCs
+		for (Player player : npcs.keySet()) {
+			for (Npc npc : npcs.get(player).values()) {
+				npc.spawn();
+			}
+		}
+	}
+
 	public void addNpc(Player player, Npc npc) {
 		Map<Integer, Npc> playerNpcs = npcs.get(player);
 		if (playerNpcs == null) npcs.put(player, playerNpcs = new HashMap<Integer, Npc>());

@@ -37,7 +37,12 @@ public class NpcPacketListener implements PacketListener {
 
 	@Override
 	public ListeningWhitelist getReceivingWhitelist() {
-		return ListeningWhitelist.newBuilder().priority(ListenerPriority.NORMAL).types(new PacketType[] { PacketType.Play.Client.USE_ENTITY }).gamePhase(GamePhase.PLAYING).options(new ListenerOptions[0]).build();
+		return ListeningWhitelist.newBuilder()
+				.gamePhase(GamePhase.PLAYING)
+				.types(new PacketType[] { PacketType.Play.Client.USE_ENTITY })
+				.options(new ListenerOptions[0])
+				.priority(ListenerPriority.NORMAL)
+				.build();
 	}
 
 	@Override

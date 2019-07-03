@@ -23,8 +23,17 @@ public class PPDouble extends PrimitiveParseable<Double> {
 
 	public PPDouble(String id, Parseable parent, String defaultValue, Double min, Double max, boolean mandatory, int editorSlot, Mat editorIcon, List<String> editorDescription) {
 		super(id, parent, defaultValue == null ? null : Utils.asList(defaultValue), "decimal number", mandatory, editorSlot, editorIcon, editorDescription);
-		this.min = min;
+		this.min = min == Double.MIN_VALUE ? -Double.MAX_VALUE : min;
 		this.max = max;
+	}
+
+	// get
+	public Double getMin() {
+		return min;
+	}
+
+	public Double getMax() {
+		return max;
 	}
 
 	// parse
@@ -33,8 +42,14 @@ public class PPDouble extends PrimitiveParseable<Double> {
 		if (value.isEmpty()) {
 			return new ParseResult<Double>(null);
 		}
+		// couldn't parse
 		Double parsed = parse(value.get(0));
-		return parsed != null ? ((min != null && parsed < min) || (max != null && parsed > max) ? null : new ParseResult<Double>(parsed)) : null;
+		if (parsed == null) return null;
+		// outside bounds
+		if (min != null && parsed < min) throw new NumberOutsideBoundsException("value " + parsed + " is below min value " + min);
+		if (max != null && parsed > max) throw new NumberOutsideBoundsException("value " + parsed + " is above max value " + max);
+		// seems good
+		return new ParseResult<Double>(parsed);
 	}
 
 	public static Double parse(String raw) {

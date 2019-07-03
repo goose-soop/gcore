@@ -49,15 +49,14 @@ public abstract class PrimitiveParseable<T> extends Parseable {
 	public List<String> getValue() {
 		return value;
 	}
-	
+
 	public List<Integer> getParseableIndexes() {
 		return parseableIndexes;
 	}
 
 	public void setValue(List<String> value) {
-		if (this.value != null) parseableIndexes.clear();
-		this.value = value;
-		if (value != null) {
+		if ((this.value = value) != null) {
+			parseableIndexes.clear();
 			for (int lineIndex = 0; lineIndex < value.size(); ++lineIndex) {
 				if (isParseable(value.get(lineIndex))) {
 					parseableIndexes.add(lineIndex);
@@ -113,7 +112,7 @@ public abstract class PrimitiveParseable<T> extends Parseable {
 		}
 		// unknown
 		if (getLastData() != null) {
-			getLastData().log("invalid primitive setting (must be a " + typeName + "), value is '" + value + "'");
+			getLastData().log("invalid primitive setting (must be a " + typeName + "), value is '" + raw + "'");
 		}
 		return null;
 	}

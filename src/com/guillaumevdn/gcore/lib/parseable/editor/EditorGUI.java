@@ -35,6 +35,7 @@ public abstract class EditorGUI extends GUI {
 	public static Mat ICON_NBT = Mat.ANVIL;
 	public static Mat ICON_SOUND = Mat.NOTE_BLOCK;
 	public static Mat ICON_ACTION = Mat.COMMAND_BLOCK_MINECART;
+	public static Mat ICON_ATTACK = Mat.DIAMOND_SWORD;
 	public static Mat ICON_SKILL = Mat.DIAMOND_AXE;
 	public static Mat ICON_CONDITION = Mat.GOLD_INGOT;
 	public static Mat ICON_GROUP = Mat.BOOKSHELF;
@@ -54,6 +55,7 @@ public abstract class EditorGUI extends GUI {
 	public static Mat ICON_QUEST = Mat.DIAMOND_AXE;
 	public static Mat ICON_NPC = Mat.EMERALD;
 	public static Mat ICON_TIME = Mat.CLOCK;
+	public static Mat ICON_COLOR = Mat.RED_WOOL;
 
 	// max lines
 	public static int MAX_DESCRIPTION_LINES = 22;
@@ -93,7 +95,7 @@ public abstract class EditorGUI extends GUI {
 	public void checkOverwrite(ClickeableItem item) {
 		if (item.getItemData().getSlot() < 0) return;
 		ClickeableItem present = getItemInSlot(0, item.getItemData().getSlot());
-		if (present != null) {
+		if (present != null && !present.getItemData().getId().equals(item.getItemData().getId())) {
 			getPlugin().warning("Overriding item " + present.getItemData().getId() + " by " + item.getItemData().getId() + " at slot " + item.getItemData().getSlot() + " of GUI " + getName());
 		}
 	}

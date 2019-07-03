@@ -1,5 +1,6 @@
 package com.guillaumevdn.gcore.lib.util;
 
+import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.guillaumevdn.gcore.GCore;
@@ -11,12 +12,16 @@ public abstract class Handler
 	// ------------------------------------------------------------
 
 	public void runSync() {
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				execute();
-			}
-		}.runTask(GCore.inst());
+		if (Bukkit.isPrimaryThread()) {
+			execute();
+		} else {
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					execute();
+				}
+			}.runTask(GCore.inst());
+		}
 	}
 
 	public void runSyncLater(long ticks) {
@@ -29,12 +34,16 @@ public abstract class Handler
 	}
 
 	public void runAsync() {
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				execute();
-			}
-		}.runTaskAsynchronously(GCore.inst());
+		if (Bukkit.isPrimaryThread()) {
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					execute();
+				}
+			}.runTaskAsynchronously(GCore.inst());
+		} else {
+			execute();
+		}
 	}
 
 	// ------------------------------------------------------------

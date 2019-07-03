@@ -45,6 +45,7 @@ public class GUI implements Listener {
 	public static final List<Integer> SLOTS_0_TO_17 = Collections.unmodifiableList(getRegularItemSlots(0, 17));
 	public static final List<Integer> SLOTS_0_TO_25 = Collections.unmodifiableList(getRegularItemSlots(0, 25));
 	public static final List<Integer> SLOTS_0_TO_26 = Collections.unmodifiableList(getRegularItemSlots(0, 26));
+	public static final List<Integer> SLOTS_0_TO_35 = Collections.unmodifiableList(getRegularItemSlots(0, 35));
 	public static final List<Integer> SLOTS_0_TO_44 = Collections.unmodifiableList(getRegularItemSlots(0, 44));
 	public static final List<Integer> SLOTS_0_TO_53 = Collections.unmodifiableList(getRegularItemSlots(0, 53));
 	public static final List<Integer> SLOTS_WITHOUT_BORDERS = Collections.unmodifiableList(Utils.asList(10, 11, 12, 13, 14, 15, 19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43));
@@ -334,7 +335,7 @@ public class GUI implements Listener {
 
 	// pages
 	public int createPage() {
-		if (disablePages) {
+		if (!pages.isEmpty() && disablePages) {
 			return -1;
 		}
 		// get inventory name
@@ -376,14 +377,14 @@ public class GUI implements Listener {
 
 	public int getFirstEmptyPageIndex(int slot, boolean createNew) {
 		if (canUseSlot(slot, true)) {
-			for (int index = 0; index < pages.size(); index++) {
+			for (int index = 0; index < pages.size(); ++index) {
 				ItemStack it = pages.get(index).getItem(slot);
 				if (Mat.from(it).isAir()) {
 					return index;
 				}
 			}
 		} else {
-			for (int index = 0; index < pages.size(); index++) {
+			for (int index = 0; index < pages.size(); ++index) {
 				int free = firstBlank(pages.get(index));
 				if (canUseSlot(free, true)) {
 					return index;

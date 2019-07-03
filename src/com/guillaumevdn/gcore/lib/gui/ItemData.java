@@ -822,6 +822,13 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 		return clone;
 	}
 
+	public ItemData cloneWithIdAndSlot(String id, int slot) {
+		ItemData clone = clone();
+		clone.setId(id);
+		clone.setSlot(slot);
+		return clone;
+	}
+
 	@Override
 	public String toString() {
 		return "ItemData{id=" + id + ",enabled=" + enabled + ",slot=" + slot + ",chance=" + chance + ",type=" + type + ",amount=" + amount + ",maxAmount=" + maxAmount + ",effects=" + effects.toString()

@@ -55,6 +55,10 @@ public class Npc {
 	}
 
 	// get
+	public NpcData getData() {
+		return GCore.inst().getNpcManager().getNpcData(id);
+	}
+
 	public Player getPlayer() {
 		return player;
 	}
@@ -74,11 +78,11 @@ public class Npc {
 	public String getSkinData() {
 		return skinData;
 	}
-	
+
 	public String getSkinSignature() {
 		return skinSignature;
 	}
-	
+
 	public Location getLocation() {
 		return location;
 	}
@@ -335,6 +339,10 @@ public class Npc {
 		// update player
 		despawn();
 		spawn();
+	}
+
+	public void animate(NpcAnimation animation) {
+		NpcProtocols.INSTANCE.sendAnimation(player, getEntityId(), animation);
 	}
 
 	// equals

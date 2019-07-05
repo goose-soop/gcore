@@ -21,7 +21,7 @@ public class GUser extends DataElement {
 
 	// base
 	private UserInfo user;
-	private Map<Integer, ModifiedNpcData> npcs = new HashMap<Integer, ModifiedNpcData>();
+	private Map<Integer, GUserNpcData> npcs = new HashMap<Integer, GUserNpcData>();
 
 	GUser(UserInfo user) {
 		this.user = user;
@@ -36,37 +36,39 @@ public class GUser extends DataElement {
 	 * Get all the modified values for NPCs for this user
 	 * @return a map containing the npcs by id
 	 */
-	public Map<Integer, ModifiedNpcData> getNpcs() {
+	public Map<Integer, GUserNpcData> getUserNpcData() {
 		return Collections.unmodifiableMap(npcs);
 	}
 
 	/**
-	 * Get an user-modified NPC by its id
+	 * Get an user NPC data by its id
 	 * @param id the npc id
-	 * @return the npc if has at least one modified value for this user
+	 * @return the npc data for this user
 	 */
-	public ModifiedNpcData getNpc(Integer id) {
+	public GUserNpcData getUserNpcData(Integer id) {
 		return npcs.get(id);
 	}
 
 	/**
 	 * Update the user-modified NPC
 	 * @param id the npc id
-	 * @param npc the npc data (null or no modified value = remove)
+	 * @param npc the npc data
 	 */
-	public void updateNpc(Integer id, ModifiedNpcData npc) {
-		// remove
-		if (npc == null || npc.isEmpty()) {
-			if (npcs.containsKey(id)) {
-				npcs.remove(id);
-				pushAsync();
-			}
-		}
+	public void updateNpc(Integer id, GUserNpcData npc) {
+		updateNpc(id, npc, true);
+	}
+
+	/**
+	 * Update the user-modified NPC
+	 * @param id the npc id
+	 * @param npc the npc data
+	 * @param push true if the data must be pushed
+	 */
+	public void updateNpc(Integer id, GUserNpcData npc, boolean push) {
+		if (npc == null) throw new IllegalArgumentException("npc can't be null");
 		// update
-		else {
-			npcs.put(id, npc);
-			pushAsync();
-		}
+		npcs.put(id, npc);
+		pushAsync();
 	}
 
 	// data
@@ -81,7 +83,7 @@ public class GUser extends DataElement {
 	}
 
 	private static final class JsonData {
-		private final Map<Integer, ModifiedNpcData> npcs;
+		private final Map<Integer, GUserNpcData> npcs;
 		private JsonData(GUser user) {
 			this.npcs = user.npcs;
 		}

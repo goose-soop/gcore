@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -21,7 +22,9 @@ import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.lib.data.DataBoard;
 import com.guillaumevdn.gcore.lib.data.DataManager.Callback;
 import com.guillaumevdn.gcore.lib.data.mysql.Query;
+import com.guillaumevdn.gcore.lib.event.GUserPulledEvent;
 import com.guillaumevdn.gcore.lib.event.UserDataProfileChangedEvent;
+import com.guillaumevdn.gcore.lib.util.Handler;
 import com.guillaumevdn.gcore.lib.util.Utils;
 
 public class UserBoard extends DataBoard<GUser> implements Listener {
@@ -57,23 +60,46 @@ public class UserBoard extends DataBoard<GUser> implements Listener {
 			toPull.add(user);// add to pull list
 		}
 		// pull users
-		pullAsync(toPull, null);
+		pullAsync(toPull, new Callback() {
+			@Override
+			public void callback() {
+				new Handler() {
+					@Override
+					public void execute() {
+						for (GUser user : toPull) {
+							Bukkit.getPluginManager().callEvent(new GUserPulledEvent(user));
+						}
+					}
+				}.runSync();
+			}
+		});
 	}
 
 	/**
 	 * Loads an user, overwriting the current cached data if any is present.
 	 * @param info the user info
 	 */
-	public void loadUser(UserInfo info, Callback callback) {
+	public void loadUser(UserInfo info, final Callback callback) {
 		// get user or add to cache
-		GUser user;
+		final GUser user;
 		if (cache.containsKey(info)) {
 			user = cache.get(info);
 		} else {
 			cache.put(info, user = new GUser(info));
 		}
 		// pull user
-		user.pullAsync(callback);
+		user.pullAsync(new Callback() {
+			@Override
+			public void callback() {
+				if (callback != null) callback.callback();
+				new Handler() {
+					@Override
+					public void execute() {
+						Bukkit.getPluginManager().callEvent(new GUserPulledEvent(user));
+					}
+				}.runSync();
+			}
+		});
 	}
 
 	/**
@@ -96,18 +122,44 @@ public class UserBoard extends DataBoard<GUser> implements Listener {
 
 	// events
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void event(PlayerJoinEvent event) {
-		loadUser(new UserInfo(event.getPlayer()), null);
+	public void event(final PlayerJoinEvent event) {
+		loadUser(new UserInfo(event.getPlayer()), new Callback() {
+			@Override
+			public void callback() {
+				final GUser user = GUser.get(event.getPlayer());
+				if (user != null) {
+					new Handler() {
+						@Override
+						public void execute() {
+							Bukkit.getPluginManager().callEvent(new GUserPulledEvent(user));
+						}
+					}.runSync();
+				}
+			}
+		});
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void event(UserDataProfileChangedEvent event) {
+	public void event(final UserDataProfileChangedEvent event) {
 		// unload
 		UserInfo user = event.getUser();
 		unloadUser(user);
 		// load if online
 		if (user.toPlayer() != null) {
-			loadUser(user, null);
+			loadUser(user, new Callback() {
+				@Override
+				public void callback() {
+					final GUser user = GUser.get(event.getUser());
+					if (user != null) {
+						new Handler() {
+							@Override
+							public void execute() {
+								Bukkit.getPluginManager().callEvent(new GUserPulledEvent(user));
+							}
+						}.runSync();
+					}
+				}
+			});
 		}
 	}
 

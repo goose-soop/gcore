@@ -17,6 +17,7 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.utility.MinecraftReflection;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
+import com.guillaumevdn.gcore.lib.npc.NpcAnimation;
 import com.guillaumevdn.gcore.lib.util.Utils;
 
 public abstract class NpcProtocols {
@@ -35,8 +36,18 @@ public abstract class NpcProtocols {
 	public abstract Map<Integer, Object> getDefaultHumanEntityMetadata();
 	public abstract Object createPlayerInfo(Object gameProfile, GameMode gameMode, int entityId, String name);
 
-	// inventory
+	// misc
 	public abstract void sendInventory(Player player, int entityId, ItemStack... items);
+
+	public void sendAnimation(Player player, int entityId, NpcAnimation animation) {
+		// create packet
+		PacketContainer packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.ANIMATION);
+		packet.getModifier().writeDefaults();
+		packet.getIntegers().write(0, entityId);
+		packet.getBytes().write(0, animation.getAnimationData());
+		// send packet
+		sendPacket(player, packet);
+	}
 
 	// position
 	public final void sendTarget(Player player, int entityId, double yaw, double pitch) {

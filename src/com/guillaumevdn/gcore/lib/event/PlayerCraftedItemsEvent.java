@@ -4,29 +4,30 @@ import java.util.Map;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
-import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.guillaumevdn.gcore.lib.gui.InventoryState;
 
-public class PlayerTradedVillagerEvent extends PlayerEvent {
+public class PlayerCraftedItemsEvent extends PlayerEvent {
 
 	// base
-	private InventoryClickEvent event;
+	private CraftItemEvent event;
 	private InventoryState inventoryBefore, inventoryAfter;
-	private Map<Integer, ItemStack> given, received;
+	private Map<Integer, ItemStack> cost, crafted;
 
-	public PlayerTradedVillagerEvent(InventoryClickEvent event, InventoryState inventoryBefore, InventoryState inventoryAfter, Map<Integer, ItemStack> given, Map<Integer, ItemStack> received) {
+	public PlayerCraftedItemsEvent(CraftItemEvent event, InventoryState inventoryBefore, InventoryState inventoryAfter, Map<Integer, ItemStack> cost, Map<Integer, ItemStack> crafted) {
 		super((Player) event.getWhoClicked());
 		this.inventoryBefore = inventoryBefore;
 		this.inventoryAfter = inventoryAfter;
-		this.given = given;
-		this.received = received;
+		this.event = event;
+		this.cost = cost;
+		this.crafted = crafted;
 	}
 
 	// get
-	public InventoryClickEvent getEvent() {
+	public CraftItemEvent getEvent() {
 		return event;
 	}
 
@@ -38,12 +39,12 @@ public class PlayerTradedVillagerEvent extends PlayerEvent {
 		return inventoryAfter;
 	}
 
-	public Map<Integer, ItemStack> getGiven() {
-		return given;
+	public Map<Integer, ItemStack> getCost() {
+		return cost;
 	}
 
-	public Map<Integer, ItemStack> getReceived() {
-		return received;
+	public Map<Integer, ItemStack> getCrafted() {
+		return crafted;
 	}
 
 	// handlers

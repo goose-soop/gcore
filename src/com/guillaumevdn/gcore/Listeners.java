@@ -33,13 +33,15 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.guillaumevdn.gcore.lib.UpdateCheck;
 import com.guillaumevdn.gcore.lib.event.PlayerBlockDropEvent;
 import com.guillaumevdn.gcore.lib.event.PlayerCowMilkEvent;
-import com.guillaumevdn.gcore.lib.event.PlayerCraftedItemEvent;
+import com.guillaumevdn.gcore.lib.event.PlayerCraftedItemsEvent;
 import com.guillaumevdn.gcore.lib.event.PlayerFireBlockEvent;
 import com.guillaumevdn.gcore.lib.event.PlayerKillEvent;
 import com.guillaumevdn.gcore.lib.event.PlayerSpawnedMobEvent;
 import com.guillaumevdn.gcore.lib.event.PlayerTradedVillagerEvent;
+import com.guillaumevdn.gcore.lib.gui.InventoryState;
 import com.guillaumevdn.gcore.lib.material.Mat;
 import com.guillaumevdn.gcore.lib.util.BucketType;
+import com.guillaumevdn.gcore.lib.util.Pair;
 import com.guillaumevdn.gcore.lib.util.SpawnEggUtils;
 import com.guillaumevdn.gcore.lib.util.Utils;
 
@@ -195,51 +197,22 @@ public class Listeners implements Listener {
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
 	public void event(final CraftItemEvent event) {
+		// build initial state
 		final Player player = (Player) event.getWhoClicked();
-		final ItemStack preCursor = !Mat.from(player.getItemOnCursor()).isAir() ? player.getItemOnCursor().clone() : null;
-		final Map<Integer, ItemStack> preItems = new HashMap<Integer, ItemStack>();
-		for (int slot = 0; slot < player.getInventory().getContents().length; ++slot) {
-			ItemStack item = player.getInventory().getContents()[slot];
-			if (!Mat.from(item).isAir()) {
-				preItems.put(slot, item.clone());
-			}
-		}
+		final InventoryState initialState = new InventoryState(player, event.getView().getTopInventory(), 1, 2, 3, 4, 5, 6, 7, 8, 9);
 		// delay for craft
 		new BukkitRunnable() {
 			@Override
 			public void run() {
 				if (!event.isCancelled()) {
-					Map<Integer, ItemStack> crafted = new HashMap<Integer, ItemStack>();
-					for (int slot = 0; slot < player.getInventory().getContents().length; ++slot) {
-						ItemStack preItem = preItems.get(slot);
-						ItemStack item = player.getInventory().getContents()[slot];
-						if (!Mat.from(item).isAir()) {
-							if (preItem != null) {// has pre item
-								int added = item.getAmount() - preItem.getAmount();
-								if (added > 0) {
-									preItem.setAmount(added);
-									crafted.put(slot, preItem);
-								}
-							} else {// no pre item
-								crafted.put(slot, item.clone());
-							}
-						}
-					}
-					ItemStack cursor = player.getItemOnCursor();
-					if (!Mat.from(cursor).isAir()) {
-						if (preCursor != null) {// has pre cursor
-							int added = preCursor != null ? cursor.getAmount() - preCursor.getAmount()
-									: cursor.getAmount();
-							if (added > 0) {
-								preCursor.setAmount(added);
-								crafted.put(-1, preCursor);
-							}
-						} else {// no pre item
-							crafted.put(-1, cursor.clone());
-						}
-					}
-					if (!crafted.isEmpty()) {
-						Bukkit.getPluginManager().callEvent(new PlayerCraftedItemEvent(event, crafted));
+					// get new state and given/received
+					InventoryState newState = new InventoryState(player, event.getView().getTopInventory(), 1, 2, 3, 4, 5, 6, 7, 8, 9);
+					Pair<Map<Integer, ItemStack>, Map<Integer, ItemStack>> changes = initialState.getChanges(newState);
+					Map<Integer, ItemStack> removed = changes.getA();
+					Map<Integer, ItemStack> added = changes.getB();
+					// call craft event
+					if (!(removed.isEmpty() && added.isEmpty())) {
+						Bukkit.getPluginManager().callEvent(new PlayerCraftedItemsEvent(event, initialState, newState, removed, added));
 					}
 				}
 			}
@@ -248,60 +221,27 @@ public class Listeners implements Listener {
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
 	public void event(final InventoryClickEvent event) {
+		// ensure we're trading
 		if (event instanceof CraftItemEvent) return;
-		if (!event.getInventory().getType().equals(InventoryType.MERCHANT)) return;
+		if (event.getView().getTopInventory() == null) return;
+		if (!event.getView().getTopInventory().getType().equals(InventoryType.MERCHANT)) return;
+		if (event.getRawSlot() != 2) return;
+		// build initial state
 		final Player player = (Player) event.getWhoClicked();
-		final ItemStack preCursor = !Mat.from(player.getItemOnCursor()).isAir() ? player.getItemOnCursor().clone() : null;
-		final Map<Integer, ItemStack> preItems = new HashMap<Integer, ItemStack>();
-		for (int slot = 0; slot < player.getInventory().getContents().length; ++slot) {
-			ItemStack item = player.getInventory().getContents()[slot];
-			if (!Mat.from(item).isAir()) {
-				preItems.put(slot, item.clone());
-			}
-		}
+		final InventoryState initialState = new InventoryState(player, event.getView().getTopInventory(), 0, 1);
 		// delay for craft
 		new BukkitRunnable() {
 			@Override
 			public void run() {
 				if (!event.isCancelled()) {
-					Map<Integer, ItemStack> given = new HashMap<Integer, ItemStack>();
-					Map<Integer, ItemStack> received = new HashMap<Integer, ItemStack>();
-					for (int slot = 0; slot < player.getInventory().getContents().length; ++slot) {
-						ItemStack preItem = preItems.get(slot);
-						ItemStack item = player.getInventory().getContents()[slot];
-						// has in inventory
-						if (!Mat.from(item).isAir()) {
-							if (preItem != null) {// has pre item
-								int delta = item.getAmount() - preItem.getAmount();
-								if (delta > 0) {
-									preItem.setAmount(delta);
-									received.put(slot, preItem);
-								} else if (delta < 0) {
-									preItem.setAmount(-delta);
-									given.put(slot, preItem);
-								}
-							} else {// no pre item
-								received.put(slot, item.clone());
-							}
-						}
-					}
-					ItemStack cursor = player.getItemOnCursor();
-					if (!Mat.from(cursor).isAir()) {
-						if (preCursor != null) {// has pre cursor
-							int delta = preCursor != null ? cursor.getAmount() - preCursor.getAmount() : cursor.getAmount();
-							if (delta > 0) {
-								preCursor.setAmount(delta);
-								received.put(-1, preCursor);
-							} else if (delta < 0) {
-								preCursor.setAmount(-delta);
-								given.put(-1, preCursor);
-							}
-						} else {// no pre item
-							received.put(-1, cursor.clone());
-						}
-					}
-					if (!given.isEmpty() || !received.isEmpty()) {
-						Bukkit.getPluginManager().callEvent(new PlayerTradedVillagerEvent(event, given, received));
+					// get new state and given/received
+					InventoryState newState = new InventoryState(player, event.getView().getTopInventory(), 0, 1);
+					Pair<Map<Integer, ItemStack>, Map<Integer, ItemStack>> changes = initialState.getChanges(newState);
+					Map<Integer, ItemStack> removed = changes.getA();
+					Map<Integer, ItemStack> added = changes.getB();
+					// call trade event
+					if (!(removed.isEmpty() && added.isEmpty())) {
+						Bukkit.getPluginManager().callEvent(new PlayerTradedVillagerEvent(event, initialState, newState, removed, added));
 					}
 				}
 			}

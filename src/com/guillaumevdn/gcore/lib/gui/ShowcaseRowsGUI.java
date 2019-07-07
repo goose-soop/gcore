@@ -8,6 +8,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.plugin.Plugin;
 
+import com.guillaumevdn.gcore.lib.util.Utils;
+
 public class ShowcaseRowsGUI {
 
 	// base
@@ -16,7 +18,7 @@ public class ShowcaseRowsGUI {
 
 	public ShowcaseRowsGUI(Plugin plugin, String name, int size, List<Integer> regularItemSlots, boolean unregisterOnClose) {
 		// initialize GUI
-		gui = new GUI(plugin, name, size, regularItemSlots, unregisterOnClose);
+		gui = new GUI(plugin, name, size, Utils.asList(regularItemSlots), unregisterOnClose);
 	}
 
 	// get

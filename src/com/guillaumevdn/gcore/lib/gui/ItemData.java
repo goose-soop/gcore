@@ -186,7 +186,7 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 	}
 
 	public ItemData(String id, int slot, ItemStack item) {
-		this(id, slot, item == null ? Mat.AIR : Mat.from(item.getType()),
+		this(id, slot, item == null ? Mat.AIR : Mat.from(item),
 				item == null ? (short) 0 : item.getDurability(),
 						item == null ? 1 : item.getAmount(), item == null || !item.hasItemMeta() || !item.getItemMeta().hasDisplayName() ? null : item.getItemMeta().getDisplayName(),
 								item == null || !item.hasItemMeta() || !item.getItemMeta().hasLore() ? null : Utils.asList(item.getItemMeta().getLore()),
@@ -818,6 +818,13 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 
 	public ItemData cloneWithSlot(int slot) {
 		ItemData clone = clone();
+		clone.setSlot(slot);
+		return clone;
+	}
+
+	public ItemData cloneWithIdAndSlot(String id, int slot) {
+		ItemData clone = clone();
+		clone.setId(id);
 		clone.setSlot(slot);
 		return clone;
 	}

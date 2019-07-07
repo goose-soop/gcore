@@ -448,7 +448,7 @@ public abstract class Pathfinding {
 
 	private boolean isMatTraversable(Mat mat) {
 		if (mat.isAir()) return true;
-		if (ServerVersion.CURRENT.isLessThan(ServerVersion.MC_1_13) && mat.getCurrentMaterial().isBlock()) return false;
+		if (ServerVersion.CURRENT.isLessThan(ServerVersion.MC_1_13) && mat.getCurrentMaterial() != null && mat.getCurrentMaterial().isBlock()) return false;
 		String smat = mat.getModernName();
 		for (String trav : TRAVERSABLE) {
 			if (smat.contains(trav)) {

@@ -8,6 +8,7 @@ import java.util.Map;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 
+import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.GLocale;
 import com.guillaumevdn.gcore.lib.gui.GUI;
 import com.guillaumevdn.gcore.lib.material.Mat;
@@ -133,7 +134,7 @@ public abstract class ContainerParseable extends Parseable {
 				protected void onClick(final Player player, ClickType clickType, int pageIndex) {
 					// create component GUI
 					String name = Utils.getNewInventoryName(gui.getName(), component.getId());
-					EditorGUI sub = new EditorGUI(component.getLastData().getPlugin(), gui, name, component.getEditorSize(), component.getEditorRegularSlots()) {
+					EditorGUI sub = new EditorGUI(component.getLastData() == null ? GCore.inst() : component.getLastData().getPlugin(), gui, name, component.getEditorSize(), component.getEditorRegularSlots()) {
 						private EditorGUI subThis = this;
 						@Override
 						protected void fill() {

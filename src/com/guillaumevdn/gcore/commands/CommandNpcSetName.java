@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.GPerm;
 import com.guillaumevdn.gcore.data.GUser;
-import com.guillaumevdn.gcore.data.ModifiedNpcData;
+import com.guillaumevdn.gcore.data.GUserNpcData;
 import com.guillaumevdn.gcore.data.UserInfo;
 import com.guillaumevdn.gcore.lib.command.CommandArgument;
 import com.guillaumevdn.gcore.lib.command.CommandCall;
@@ -51,10 +51,9 @@ public class CommandNpcSetName extends CommandArgument {
 						@Override
 						protected void process(GUser user) {
 							// change data
-							ModifiedNpcData modif = user.getNpc(npcId);
-							if (modif == null) modif = new ModifiedNpcData(npcId, true);
-							modif.setName(name);
-							user.updateNpc(npcId, modif);
+							GUserNpcData userNpc = user.getUserNpcData(npcId);
+							userNpc.setName(name);
+							user.updateNpc(npcId, userNpc);
 							// rename
 							npc.rename(name);
 							Messenger.send(call.getSender(), Messenger.Level.NORMAL_SUCCESS, GCore.inst().getName(), "Renamed NPC with ID " + npcId + " for player " + owner.getName() + ".");

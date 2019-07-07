@@ -752,6 +752,18 @@ public class GLocale {
 			"fr_FR", Utils.asList("&7Équipement par défaut du NPC")
 			);
 
+	public static final Text GUI_GENERIC_EDITOR_NPC_BEHAVIORSLORE = new Text(
+			"GUI_GENERIC_EDITOR_NPC_BEHAVIORSLORE", file,
+			"en_US", Utils.asList("&7Behaviors that the NPC can naturally trigger"),
+			"fr_FR", Utils.asList("&7Behaviors que le NPC peut activer naturellement")
+			);
+
+	public static final Text GUI_GENERIC_EDITOR_NPC_VARIABLESLORE = new Text(
+			"GUI_GENERIC_EDITOR_NPC_VARIABLESLORE", file,
+			"en_US", Utils.asList("&7Default variables values for the NPC"),
+			"fr_FR", Utils.asList("&7Variables par défaut pour le NPC")
+			);
+
 	// editor : sound setting
 	public static final Text GUI_GENERIC_EDITOR_SOUND_TYPELORE = new Text(
 			"GUI_GENERIC_EDITOR_SOUND_TYPELORE", file,
@@ -940,6 +952,139 @@ public class GLocale {
 			"GUI_GENERIC_EDITOR_ITEM_EXACTMATCHLORE", file,
 			"en_US", Utils.asList("&7Should the item be exactly the same or", "&7 can it has more enchants, name, ..."),
 			"fr_FR", Utils.asList("&7Est-ce que l'item doit être exactement le", "&7 même ou est-ce qu'il peut avoir des", "&7 enchantements, nom, en plus...")
+			);
+
+	// editor : npc settings
+	public static final Text GUI_GCORE_EDITOR_NPC_BEHAVIOREVENTSLORE = new Text(
+			"GUI_GCORE_EDITOR_NPC_BEHAVIORCONDITIONTYPELORE", file,
+			"en_US", Utils.asList("&7A list of events triggering the behavior"),
+			"fr_FR", Utils.asList("&7Une liste d'events qui activeront le behavior")
+			);
+
+	public static final Text GUI_GCORE_EDITOR_NPC_BEHAVIORPROCESSESLORE = new Text(
+			"GUI_GCORE_EDITOR_NPC_BEHAVIORPROCESSESLORE", file,
+			"en_US", Utils.asList("&7A list of processes for this behavior", "&7You select which ones will be run in the events", "&7 or in the processes themselves"),
+			"fr_FR", Utils.asList("&7Une liste de processus pour ce behavior", "&7Vous définissez lesquels seront lancés dans les events", "&7 ou directement dans les processus")
+			);
+
+	public static final Text GUI_GCORE_EDITOR_NPC_BEHAVIORACTIONSLORE = new Text(
+			"GUI_GCORE_EDITOR_NPC_BEHAVIORACTIONSLORE", file,
+			"en_US", Utils.asList("&7A list of actions for this behavior", "&7You select which ones will be run in the processes"),
+			"fr_FR", Utils.asList("&7Une liste d'actions pour ce behavior", "&7Vous définissez lesquelles seront lancées dans les processus")
+			);
+
+	public static final Text GUI_GCORE_EDITOR_NPC_BEHAVIORCONDITIONSLORE = new Text(
+			"GUI_GCORE_EDITOR_NPC_BEHAVIORCONDITIONSLORE", file,
+			"en_US", Utils.asList("&7A list of conditions for this behavior", "&7You select which ones will be checked in the processes"),
+			"fr_FR", Utils.asList("&7Une liste de conditions pour ce behavior", "&7Vous définissez lesquelles seront vérifiées dans les processus")
+			);
+
+	public static final Text GUI_GCORE_EDITOR_NPC_BEHAVIORMAXCONCURRENTINSTANCESLORE = new Text(
+			"GUI_GCORE_EDITOR_NPC_BEHAVIORMAXCONCURRENTINSTANCESLORE", file,
+			"en_US", Utils.asList("&7How many instances of this behavior", "&7 can be active at the same time"),
+			"fr_FR", Utils.asList("&7Combien d'instances de ce behavior", "&7 peuvent être actives en même temps")
+			);
+
+	public static final Text GUI_GCORE_EDITOR_NPC_BEHAVIOREVENTTYPELORE = new Text(
+			"GUI_GCORE_EDITOR_NPC_BEHAVIOREVENTTYPELORE", file,
+			"en_US", Utils.asList("&7Type of event"),
+			"fr_FR", Utils.asList("&7Type d'event")
+			);
+
+	public static final Text GUI_GCORE_EDITOR_NPC_BEHAVIOREVENTPROCESSLORE = new Text(
+			"GUI_GCORE_EDITOR_NPC_BEHAVIOREVENTPROCESSLORE", file,
+			"en_US", Utils.asList("&7What process should be run when this event is triggered"),
+			"fr_FR", Utils.asList("&7Quel processus doit être lancé lorsque cet event est activé")
+			);
+
+	public static final Text GUI_GCORE_EDITOR_NPC_BEHAVIORACTIONTYPELORE = new Text(
+			"GUI_GCORE_EDITOR_NPC_BEHAVIORACTIONTYPELORE", file,
+			"en_US", Utils.asList("&7Type of action"),
+			"fr_FR", Utils.asList("&7Type d'action")
+			);
+
+	public static final Text GUI_GCORE_EDITOR_NPC_BEHAVIORCONDITIONTYPELORE = new Text(
+			"GUI_GCORE_EDITOR_NPC_BEHAVIORCONDITIONTYPELORE", file,
+			"en_US", Utils.asList("&7Type of condition"),
+			"fr_FR", Utils.asList("&7Type de condition")
+			);
+
+	public static final Text GUI_GCORE_EDITOR_NPC_BEHAVIORPLAYERDISTANCEVALUELORE = new Text(
+			"GUI_GCORE_EDITOR_NPC_BEHAVIORPLAYERDISTANCEVALUELORE", file,
+			"en_US", Utils.asList("&7To which value the distance must be compared"),
+			"fr_FR", Utils.asList("&7À quelle valeur la distance doit être comparée")
+			);
+
+	public static final Text GUI_GCORE_EDITOR_NPC_BEHAVIORRANDOMVALUELORE = new Text(
+			"GUI_GCORE_EDITOR_NPC_BEHAVIORRANDOMVALUELORE", file,
+			"en_US", Utils.asList("&7To which value the generated number must be compared"),
+			"fr_FR", Utils.asList("&7À quelle valeur le nombre généré doit être comparée")
+			);
+
+	public static final Text GUI_GCORE_EDITOR_NPC_BEHAVIORRANDOMMINLORE = new Text(
+			"GUI_GCORE_EDITOR_NPC_BEHAVIORRANDOMMINLORE", file,
+			"en_US", Utils.asList("&7The minimum value that will be generated"),
+			"fr_FR", Utils.asList("&7La valeur minimum qui sera générée")
+			);
+
+	public static final Text GUI_GCORE_EDITOR_NPC_BEHAVIORRANDOMMAXLORE = new Text(
+			"GUI_GCORE_EDITOR_NPC_BEHAVIORRANDOMMAXLORE", file,
+			"en_US", Utils.asList("&7The maximum value that will be generated"),
+			"fr_FR", Utils.asList("&7La valeur maximale qui sera générée")
+			);
+
+	public static final Text GUI_GCORE_EDITOR_NPC_BEHAVIORVARIABLELORE = new Text(
+			"GUI_GCORE_EDITOR_NPC_BEHAVIORACTIONVARIABLELORE", file,
+			"en_US", Utils.asList("&7Which variable must be changed"),
+			"fr_FR", Utils.asList("&7Quelle variable doit être changée")
+			);
+
+	public static final Text GUI_GCORE_EDITOR_NPC_BEHAVIORVARIABLEVALUELORE = new Text(
+			"GUI_GCORE_EDITOR_NPC_BEHAVIORVARIABLEVALUELORE", file,
+			"en_US", Utils.asList("&7To which value the variable must be changed"),
+			"fr_FR", Utils.asList("&7À quelle valeur la variable doit être changée")
+			);
+
+	public static final Text GUI_GCORE_EDITOR_NPC_BEHAVIORCHECKLORE = new Text(
+			"GUI_GCORE_EDITOR_NPC_BEHAVIORVARIABLECHECKLORE", file,
+			"en_US", Utils.asList("&7What type of comparaison must be made"),
+			"fr_FR", Utils.asList("&7Quel type de comparaison doit être fait")
+			);
+
+	public static final Text GUI_GCORE_EDITOR_NPC_BEHAVIORVARIABLEMULTIPLIERLORE = new Text(
+			"GUI_GCORE_EDITOR_NPC_BEHAVIORVARIABLEMULTIPLIERLORE", file,
+			"en_US", Utils.asList("&7The multiplier applied to the variable value"),
+			"fr_FR", Utils.asList("&7Le multiplicateur appliqué à la valeur de la variable")
+			);
+
+	public static final Text GUI_GCORE_EDITOR_NPC_BEHAVIORVARIABLEMODIFIERLORE = new Text(
+			"GUI_GCORE_EDITOR_NPC_BEHAVIORVARIABLEMODIFIERLORE", file,
+			"en_US", Utils.asList("&7The modifier added to the variable value"),
+			"fr_FR", Utils.asList("&7Le modificateur ajouté à la valeur de la variable")
+			);
+
+	public static final Text GUI_GCORE_EDITOR_NPC_BEHAVIORHEALTHMODIFIERLORE = new Text(
+			"GUI_GCORE_EDITOR_NPC_BEHAVIORHEALTHMODIFIERLORE", file,
+			"en_US", Utils.asList("&7The modifier added to the player life"),
+			"fr_FR", Utils.asList("&7Le modificateur ajouté à la vie du joueur")
+			);
+
+	public static final Text GUI_GCORE_EDITOR_NPC_BEHAVIORMESSAGESLORE = new Text(
+			"GUI_GCORE_EDITOR_NPC_BEHAVIORMESSAGESLORE", file,
+			"en_US", Utils.asList("&7The variants of the messages to be send"),
+			"fr_FR", Utils.asList("&7Les variantes du message qui sera envoyé")
+			);
+
+	public static final Text GUI_GCORE_EDITOR_NPC_BEHAVIORMOVETARGETLORE = new Text(
+			"GUI_GCORE_EDITOR_NPC_BEHAVIORMOVETARGETLORE", file,
+			"en_US", Utils.asList("&7To where should the npc move (set a location or 'player')"),
+			"fr_FR", Utils.asList("&7Où est-ce que le npc doit aller (définir une location ou 'player'")
+			);
+
+	public static final Text GUI_GCORE_EDITOR_NPC_BEHAVIORANIMATIONLORE = new Text(
+			"GUI_GCORE_EDITOR_NPC_BEHAVIORANIMATIONLORE", file,
+			"en_US", Utils.asList("&7What animation should be played"),
+			"fr_FR", Utils.asList("&7Quelle animation doit être jouée")
 			);
 
 }

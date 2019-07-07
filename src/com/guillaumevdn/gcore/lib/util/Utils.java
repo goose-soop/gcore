@@ -2568,6 +2568,7 @@ public class Utils {
 					else if (func.equals("log")) x = Math.log(x);
 					else if (func.equals("ceil")) x = Math.ceil(x);
 					else if (func.equals("floor")) x = Math.floor(x);
+					else if (func.equals("rand")) x = Utils.randomDouble(0d, x);
 					else throw new RuntimeException("Unknown function: " + func);
 				} else {
 					throw new RuntimeException("Unexpected: " + (char)ch);

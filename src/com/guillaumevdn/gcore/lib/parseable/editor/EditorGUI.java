@@ -34,6 +34,7 @@ public abstract class EditorGUI extends GUI {
 	public static Mat ICON_ENCHANTMENT = Mat.ENCHANTED_BOOK;
 	public static Mat ICON_NBT = Mat.ANVIL;
 	public static Mat ICON_SOUND = Mat.NOTE_BLOCK;
+	public static Mat ICON_TRIGGER = Mat.STONE_PRESSURE_PLATE;
 	public static Mat ICON_ACTION = Mat.COMMAND_BLOCK_MINECART;
 	public static Mat ICON_ATTACK = Mat.DIAMOND_SWORD;
 	public static Mat ICON_SKILL = Mat.DIAMOND_AXE;

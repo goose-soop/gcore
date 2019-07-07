@@ -8,14 +8,19 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.inventory.ItemStack;
 
+import com.guillaumevdn.gcore.lib.gui.InventoryState;
+
 public class PlayerTradedVillagerEvent extends PlayerEvent {
 
 	// base
 	private InventoryClickEvent event;
+	private InventoryState inventoryBefore, inventoryAfter;
 	private Map<Integer, ItemStack> given, received;
 
-	public PlayerTradedVillagerEvent(InventoryClickEvent event, Map<Integer, ItemStack> given, Map<Integer, ItemStack> received) {
+	public PlayerTradedVillagerEvent(InventoryClickEvent event, InventoryState inventoryBefore, InventoryState inventoryAfter, Map<Integer, ItemStack> given, Map<Integer, ItemStack> received) {
 		super((Player) event.getWhoClicked());
+		this.inventoryBefore = inventoryBefore;
+		this.inventoryAfter = inventoryAfter;
 		this.given = given;
 		this.received = received;
 	}
@@ -23,6 +28,14 @@ public class PlayerTradedVillagerEvent extends PlayerEvent {
 	// get
 	public InventoryClickEvent getEvent() {
 		return event;
+	}
+
+	public InventoryState getInventoryBefore() {
+		return inventoryBefore;
+	}
+
+	public InventoryState getInventoryAfter() {
+		return inventoryAfter;
 	}
 
 	public Map<Integer, ItemStack> getGiven() {

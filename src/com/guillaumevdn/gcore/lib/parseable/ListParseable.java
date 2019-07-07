@@ -39,7 +39,7 @@ public abstract class ListParseable<T extends Parseable> extends Parseable {
 	}
 
 	public T getElement(String id) {
-		return elements.get(id.toLowerCase());
+		return id == null ? null : elements.get(id.toLowerCase());
 	}
 
 	/** @return the previous value associated with the same id, or null if there was none */
@@ -49,7 +49,7 @@ public abstract class ListParseable<T extends Parseable> extends Parseable {
 
 	/** @return the removed value associated with the id, or null if there was none */
 	public T removeElement(String id) {
-		return elements.remove(id.toLowerCase());
+		return id == null ? null : elements.remove(id.toLowerCase());
 	}
 
 	public void clearElements() {

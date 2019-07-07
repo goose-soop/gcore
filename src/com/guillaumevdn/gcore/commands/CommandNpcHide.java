@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.GPerm;
 import com.guillaumevdn.gcore.data.GUser;
-import com.guillaumevdn.gcore.data.ModifiedNpcData;
+import com.guillaumevdn.gcore.data.GUserNpcData;
 import com.guillaumevdn.gcore.data.UserInfo;
 import com.guillaumevdn.gcore.lib.command.CommandArgument;
 import com.guillaumevdn.gcore.lib.command.CommandCall;
@@ -46,11 +46,10 @@ public class CommandNpcHide extends CommandArgument {
 				new GUserOperator(new UserInfo(owner)) {
 					@Override
 					protected void process(GUser user) {
-						// change data
-						ModifiedNpcData modif = user.getNpc(npcId);
-						if (modif == null) modif = new ModifiedNpcData(npcId, false);
-						modif.setShown(false);
-						user.updateNpc(npcId, modif);
+						// change user npc
+						GUserNpcData userNpc = user.getUserNpcData(npcId);
+						userNpc.setShown(false);
+						user.updateNpc(npcId, userNpc);
 						// hide
 						npc.despawn();
 						Messenger.send(call.getSender(), Messenger.Level.NORMAL_SUCCESS, GCore.inst().getName(), "Hidden NPC with ID " + npcId + " for player " + owner.getName() + ".");

@@ -1011,6 +1011,48 @@ public class Mat implements Cloneable, Comparable<Mat> {
 	public static final Mat BLUE_DYE = registerValue(new Mat(VERSION, "BLUE_DYE", "-"));
 	public static final Mat BROWN_DYE = registerValue(new Mat(VERSION, "BROWN_DYE", "-"));
 	public static final Mat RED_DYE = registerValue(new Mat(VERSION, "RED_ROSE", "RED_DYE"));
+	// forgotten blocks or legacy blocks
+	public static final Mat LEGACY_DOUBLE_STEP_0 = registerValue(new Mat(VERSION, "-", "DOUBLE_STEP"));
+	public static final Mat LEGACY_DOUBLE_STEP_1 = registerValue(new Mat(VERSION, "-", "DOUBLE_STEP", 1));
+	public static final Mat LEGACY_DOUBLE_STEP_2 = registerValue(new Mat(VERSION, "-", "DOUBLE_STEP", 2));
+	public static final Mat LEGACY_DOUBLE_STEP_3 = registerValue(new Mat(VERSION, "-", "DOUBLE_STEP", 3));
+	public static final Mat LEGACY_DOUBLE_STEP_4 = registerValue(new Mat(VERSION, "-", "DOUBLE_STEP", 4));
+	public static final Mat LEGACY_DOUBLE_STEP_5 = registerValue(new Mat(VERSION, "-", "DOUBLE_STEP", 5));
+	public static final Mat LEGACY_DOUBLE_STEP_6 = registerValue(new Mat(VERSION, "-", "DOUBLE_STEP", 6));
+	public static final Mat LEGACY_DOUBLE_STEP_7 = registerValue(new Mat(VERSION, "-", "DOUBLE_STEP", 7));
+	public static final Mat LEGACY_DOUBLE_STEP_8 = registerValue(new Mat(VERSION, "-", "DOUBLE_STEP", 8));
+	public static final Mat LEGACY_DOUBLE_STEP_9 = registerValue(new Mat(VERSION, "-", "DOUBLE_STEP", 9));
+	public static final Mat LEGACY_DOUBLE_STEP_10 = registerValue(new Mat(VERSION, "-", "DOUBLE_STEP", 10));
+	public static final Mat LEGACY_DOUBLE_STEP_11 = registerValue(new Mat(VERSION, "-", "DOUBLE_STEP", 11));
+	public static final Mat LEGACY_DOUBLE_STEP_12 = registerValue(new Mat(VERSION, "-", "DOUBLE_STEP", 12));
+	public static final Mat LEGACY_DOUBLE_STEP_13 = registerValue(new Mat(VERSION, "-", "DOUBLE_STEP", 13));
+	public static final Mat LEGACY_DOUBLE_STEP_14 = registerValue(new Mat(VERSION, "-", "DOUBLE_STEP", 14));
+	public static final Mat LEGACY_DOUBLE_STEP_15 = registerValue(new Mat(VERSION, "-", "DOUBLE_STEP", 15));
+	public static final Mat LEGACY_WOOD_DOUBLE_STEP_0 = registerValue(new Mat(VERSION, "-", "WOOD_DOUBLE_STEP"));
+	public static final Mat LEGACY_WOOD_DOUBLE_STEP_1 = registerValue(new Mat(VERSION, "-", "WOOD_DOUBLE_STEP", 1));
+	public static final Mat LEGACY_WOOD_DOUBLE_STEP_2 = registerValue(new Mat(VERSION, "-", "WOOD_DOUBLE_STEP", 2));
+	public static final Mat LEGACY_WOOD_DOUBLE_STEP_3 = registerValue(new Mat(VERSION, "-", "WOOD_DOUBLE_STEP", 3));
+	public static final Mat LEGACY_WOOD_DOUBLE_STEP_4 = registerValue(new Mat(VERSION, "-", "WOOD_DOUBLE_STEP", 4));
+	public static final Mat LEGACY_WOOD_DOUBLE_STEP_5 = registerValue(new Mat(VERSION, "-", "WOOD_DOUBLE_STEP", 5));
+	public static final Mat LEGACY_WOOD_DOUBLE_STEP_6 = registerValue(new Mat(VERSION, "-", "WOOD_DOUBLE_STEP", 6));
+	public static final Mat LEGACY_WOOD_DOUBLE_STEP_7 = registerValue(new Mat(VERSION, "-", "WOOD_DOUBLE_STEP", 7));
+	public static final Mat LEGACY_WOOD_DOUBLE_STEP_8 = registerValue(new Mat(VERSION, "-", "WOOD_DOUBLE_STEP", 8));
+	public static final Mat LEGACY_WOOD_DOUBLE_STEP_9 = registerValue(new Mat(VERSION, "-", "WOOD_DOUBLE_STEP", 9));
+	public static final Mat LEGACY_WOOD_DOUBLE_STEP_10 = registerValue(new Mat(VERSION, "-", "WOOD_DOUBLE_STEP", 10));
+	public static final Mat LEGACY_WOOD_DOUBLE_STEP_11 = registerValue(new Mat(VERSION, "-", "WOOD_DOUBLE_STEP", 11));
+	public static final Mat LEGACY_WOOD_DOUBLE_STEP_12 = registerValue(new Mat(VERSION, "-", "WOOD_DOUBLE_STEP", 12));
+	public static final Mat LEGACY_WOOD_DOUBLE_STEP_13 = registerValue(new Mat(VERSION, "-", "WOOD_DOUBLE_STEP", 13));
+	public static final Mat LEGACY_WOOD_DOUBLE_STEP_14 = registerValue(new Mat(VERSION, "-", "WOOD_DOUBLE_STEP", 14));
+	public static final Mat LEGACY_WOOD_DOUBLE_STEP_15 = registerValue(new Mat(VERSION, "-", "WOOD_DOUBLE_STEP", 15));
+	public static final Mat LEGACY_STANDING_BANNER = registerValue(new Mat(VERSION, "-", "STANDING_BANNER"));
+	public static final Mat LEGACY_BED_BLOCK = registerValue(new Mat(VERSION, "-", "BED_BLOCK"));
+	public static final Mat LEGACY_IRON_DOOR_BLOCK = registerValue(new Mat(VERSION, "-", "IRON_DOOR_BLOCK"));
+	public static final Mat LEGACY_SKULL_0 = registerValue(new Mat(VERSION, "-", "SKULL"));
+	public static final Mat LEGACY_SKULL_1 = registerValue(new Mat(VERSION, "-", "SKULL", 1));
+	public static final Mat LEGACY_SKULL_2 = registerValue(new Mat(VERSION, "-", "SKULL", 2));
+	public static final Mat LEGACY_SKULL_3 = registerValue(new Mat(VERSION, "-", "SKULL", 3));
+	public static final Mat LEGACY_SKULL_4 = registerValue(new Mat(VERSION, "-", "SKULL", 4));
+	public static final Mat LEGACY_SKULL_5 = registerValue(new Mat(VERSION, "-", "SKULL", 5));
 
 	// base
 	private MatVersion version;

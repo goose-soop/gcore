@@ -60,6 +60,7 @@ public class CPItem extends ContainerParseable {
 	private PPBoolean removeAfterAction = addComponent(new PPBoolean("remove_after_action", this, "false", false, 14, EditorGUI.ICON_BOOLEAN, GLocale.GUI_GENERIC_EDITOR_ITEM_REMOVEAFTERACTIONLORE.getLines()));
 	private PPBoolean checkDurability = addComponent(new PPBoolean("check_durability", this, "true", false, 15, EditorGUI.ICON_BOOLEAN, GLocale.GUI_GENERIC_EDITOR_ITEM_CHECKDURABILITYLORE.getLines()));
 	private PPBoolean exactMatch = addComponent(new PPBoolean("exact_match", this, "true", false, 16, EditorGUI.ICON_BOOLEAN, GLocale.GUI_GENERIC_EDITOR_ITEM_EXACTMATCHLORE.getLines()));
+	private PPBoolean hideFlags = addComponent(new PPBoolean("hide_flags", this, "true", false, 17, EditorGUI.ICON_BOOLEAN, GLocale.GUI_GENERIC_EDITOR_ITEM_HIDEFLAGSLORE.getLines()));
 
 	public CPItem(String id, Parseable parent, boolean mandatory, int editorSlot, Mat editorIcon, List<String> editorDescription) {
 		super(id, parent, "item", mandatory, editorSlot, editorIcon, editorDescription);
@@ -194,6 +195,14 @@ public class CPItem extends ContainerParseable {
 		return exactMatch.getParsedValue(parser);
 	}
 
+	public PPBoolean getHideFlags() {
+		return hideFlags;
+	}
+
+	public Boolean getHideFlags(Player parser) {
+		return hideFlags.getParsedValue(parser);
+	}
+
 	// methods
 	private Map<UUID, ItemData> cache = new HashMap<UUID, ItemData>();
 
@@ -260,6 +269,11 @@ public class CPItem extends ContainerParseable {
 			// unbreakable
 			if (getUnbreakable(parser)) {
 				item.setUnbreakable(true);
+			}
+
+			// flags
+			if (getHideFlags(parser)) {
+				item.setHideFlags(true);
 			}
 
 			// cache if name/lore don't contain placeholders

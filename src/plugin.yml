@@ -1,0 +1,22 @@
+﻿# Display
+name: GCore
+author: GuillaumeVDN
+description: 'Core for GuillaumeVDN''s plugins'
+website: www.guillaumevdn.com
+# Techy
+version: indev
+api-version: 1.13
+main: com.guillaumevdn.gcore.GCore
+softdepend: [Vault,PlaceholderAPI,Multiverse-Core,ProtocolLib]
+# Commands
+commands:
+  gcore:
+    description: 'GCore plugins command'
+# Permission
+permissions:
+  gcore.admin:
+    default: op
+  gcore.reload:
+    default: op
+  gcore.npc.manipulate:
+    default: op

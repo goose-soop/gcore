@@ -175,13 +175,14 @@ public class Listeners implements Listener {
 	public void event(final AsyncPlayerChatEvent event) {
 		// chat input
 		if (GCore.inst().getChatInputs().containsKey(event.getPlayer())) {
+			final String message = Utils.format(event.getMessage().trim());
 			event.setCancelled(true);
 			event.getRecipients().clear();
 			// resync to continue
 			new BukkitRunnable() {
 				@Override
 				public void run() {
-					GCore.inst().getChatInputs().remove(event.getPlayer()).onChat(event.getPlayer(), Utils.format(event.getMessage()));
+					GCore.inst().getChatInputs().remove(event.getPlayer()).onChat(event.getPlayer(), message);
 				}
 			}.runTask(GCore.inst());
 			return;

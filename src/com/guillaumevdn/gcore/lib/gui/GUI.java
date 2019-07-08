@@ -452,6 +452,10 @@ public class GUI implements Listener {
 		if (pageIndex == 0 && pages.isEmpty()) {
 			createPage();
 		}
+		// get last page
+		if (pageIndex >= pages.size()) {
+			pageIndex = pages.size() - 1;
+		}
 		// verify page existence
 		Inventory page = getPage(pageIndex);
 		if (page == null) {

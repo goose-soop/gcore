@@ -954,6 +954,12 @@ public class GLocale {
 			"fr_FR", Utils.asList("&7Est-ce que l'item doit être exactement le", "&7 même ou est-ce qu'il peut avoir des", "&7 enchantements, nom, en plus...")
 			);
 
+	public static final Text GUI_GENERIC_EDITOR_ITEM_HIDEFLAGSLORE = new Text(
+			"GUI_GENERIC_EDITOR_ITEM_HIDEFLAGSLORE", file,
+			"en_US", Utils.asList("&7Should the flags of the item be hidden"),
+			"fr_FR", Utils.asList("&7Est-ce que les flags de l'item doivent être cachés")
+			);
+
 	// editor : npc settings
 	public static final Text GUI_GCORE_EDITOR_NPC_BEHAVIOREVENTSLORE = new Text(
 			"GUI_GCORE_EDITOR_NPC_BEHAVIORCONDITIONTYPELORE", file,

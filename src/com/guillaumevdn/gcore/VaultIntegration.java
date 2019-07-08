@@ -8,6 +8,7 @@ import org.bukkit.OfflinePlayer;
 import com.guillaumevdn.gcore.lib.integration.PluginIntegration;
 
 import net.milkbowl.vault.economy.Economy;
+import net.milkbowl.vault.permission.Permission;
 
 public class VaultIntegration extends PluginIntegration {
 
@@ -17,12 +18,23 @@ public class VaultIntegration extends PluginIntegration {
 	}
 
 	// override
-	private Economy vault;
+	private Economy economy;
+	private Permission permission;
 
 	@Override
 	public void enable() {
 		// get economy instance
-		vault = Bukkit.getServicesManager().getRegistration(Economy.class).getProvider();
+		try {
+			economy = Bukkit.getServicesManager().getRegistration(Economy.class).getProvider();
+		} catch (Throwable ignored) {
+			GCore.inst().error("No economy manager found for Vault");
+		}
+		// get permission instance
+		try {
+			permission = Bukkit.getServicesManager().getRegistration(Permission.class).getProvider();
+		} catch (Throwable ignored) {
+			GCore.inst().error("No permission manager found for Vault");
+		}
 		// register
 		GCore.inst().setVaultIntegration(this);
 	}
@@ -30,14 +42,23 @@ public class VaultIntegration extends PluginIntegration {
 	@Override
 	public void disable() {
 		// unregister instance
-		vault = null;
+		economy = null;
+		permission = null;
 		// unregister
 		GCore.inst().setVaultIntegration(null);
 	}
-
+	
 	// methods
+	public boolean hasEconomy() {
+		return economy != null;
+	}
+	
+	public boolean hasPermissions() {
+		return permission != null;
+	}
+	
 	public void add(OfflinePlayer player, double amount) {
-		vault.depositPlayer(player, amount);
+		economy.depositPlayer(player, amount);
 	}
 
 	private static BigDecimal maxDouble = new BigDecimal(Double.MAX_VALUE);
@@ -54,7 +75,7 @@ public class VaultIntegration extends PluginIntegration {
 	}
 
 	public void take(OfflinePlayer player, double amount) {
-		vault.withdrawPlayer(player, amount);
+		economy.withdrawPlayer(player, amount);
 	}
 
 	public void take(OfflinePlayer player, BigDecimal amount) {
@@ -70,11 +91,15 @@ public class VaultIntegration extends PluginIntegration {
 	}
 
 	public double get(OfflinePlayer player) {
-		return vault.getBalance(player);
+		return economy.getBalance(player);
 	}
 
 	public String format(double amount) {
-		return vault.format(amount);
+		return economy.format(amount);
+	}
+
+	public boolean hasOfflinePermission(OfflinePlayer player, String permission) {
+		return this.permission.playerHas(null, player, permission);
 	}
 
 }

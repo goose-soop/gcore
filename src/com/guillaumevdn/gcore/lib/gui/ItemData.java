@@ -192,7 +192,7 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 								item == null || !item.hasItemMeta() || !item.getItemMeta().hasLore() ? null : Utils.asList(item.getItemMeta().getLore()),
 										item == null || !item.hasItemMeta() || !(item.getItemMeta() instanceof PotionMeta) ? null : Utils.asList(((PotionMeta) item.getItemMeta()).getCustomEffects()),
 												item == null ? null : Utils.asMapCopy(item.getEnchantments()));
-		this.build = item;
+		this.build = item == null ? null : item.clone();
 		try {
 			this.customNbt = Compat.INSTANCE.getNbt(item);
 		} catch (Throwable ignored) {

@@ -1864,7 +1864,7 @@ public class Utils {
 	}
 
 	/**
-	 * @return un nombre qui dépend de la similarité des deux chaînes de caractère. Même chaînes = 0. Chaîne de similarité potentielle = environ 5.
+	 * @return a number depending on the similarity of the two strings ; 0 = same strings, and the more it's up, the more it's similar ; potential similarity = 3
 	 */
 
 	public static int getLevenshteinSimilarity(String s1, String s2)

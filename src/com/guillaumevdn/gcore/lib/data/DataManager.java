@@ -36,7 +36,8 @@ public abstract class DataManager {
 			String name = plugin.getConfiguration().getString("data.mysql.name", "mydatabase");
 			String usr = plugin.getConfiguration().getString("data.mysql.user", "username");
 			String pwd = plugin.getConfiguration().getString("data.mysql.pass", "pwd");
-			String url = "jdbc:mysql://" + host + "/" + name + "?allowMultiQueries=true";
+			String customArgs = plugin.getConfiguration().getString("data.mysql.args", "");
+			String url = "jdbc:mysql://" + host + "/" + name + "?allowMultiQueries=true" + customArgs;
 			this.mySQL = new MySQL(url, usr, pwd);
 		}
 	}

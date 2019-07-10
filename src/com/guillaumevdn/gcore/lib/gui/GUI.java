@@ -447,6 +447,7 @@ public class GUI implements Listener {
 		open(player, 0);
 	}
 
+	private transient long lastOpening = System.currentTimeMillis();
 	public void open(Player player, int pageIndex) {
 		// create page if doesn't exist
 		if (pageIndex == 0 && pages.isEmpty()) {
@@ -465,6 +466,7 @@ public class GUI implements Listener {
 		// update first slot
 		updateFirstSlot();
 		// open GUI
+		lastOpening = System.currentTimeMillis();// this might trigger the onClose inv if we're already here with this inv opened
 		player.openInventory(page);
 	}
 
@@ -509,7 +511,7 @@ public class GUI implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void event(final InventoryCloseEvent event) {
 		Inventory inventory = event.getInventory();
-		if (pages.contains(inventory)) {
+		if (pages.contains(inventory) && System.currentTimeMillis() - lastOpening < 10L) {
 			// call onClose()
 			Player player = (Player) event.getPlayer();
 			boolean mustReopen = onClose(Utils.asList(player), getPageIndex(event.getInventory()));

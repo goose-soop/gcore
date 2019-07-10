@@ -57,6 +57,7 @@ public abstract class EditorGUI extends GUI {
 	public static Mat ICON_NPC = Mat.EMERALD;
 	public static Mat ICON_TIME = Mat.CLOCK;
 	public static Mat ICON_COLOR = Mat.RED_WOOL;
+	public static Mat ICON_GUI = Mat.CHEST;
 
 	// max lines
 	public static int MAX_DESCRIPTION_LINES = 22;

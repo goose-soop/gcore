@@ -1,7 +1,8 @@
-package com.guillaumevdn.gcore;
+package com.guillaumevdn.gcore.integration;
 
 import org.bukkit.inventory.ItemStack;
 
+import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.lib.integration.PluginIntegration;
 
 import me.arcaniax.hdb.api.HeadDatabaseAPI;

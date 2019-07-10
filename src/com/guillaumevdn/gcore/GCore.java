@@ -29,6 +29,9 @@ import com.guillaumevdn.gcore.commands.CommandNpcTeleport;
 import com.guillaumevdn.gcore.commands.CommandPlugins;
 import com.guillaumevdn.gcore.commands.CommandSetuserprofile;
 import com.guillaumevdn.gcore.data.GDataManager;
+import com.guillaumevdn.gcore.integration.HeadDatabaseIntegration;
+import com.guillaumevdn.gcore.integration.economy.EconomyHandler;
+import com.guillaumevdn.gcore.integration.permission.PermissionHandler;
 import com.guillaumevdn.gcore.lib.GPlugin;
 import com.guillaumevdn.gcore.lib.command.CommandArgument;
 import com.guillaumevdn.gcore.lib.command.CommandRoot;
@@ -47,7 +50,7 @@ import com.guillaumevdn.gcore.libs.com.google.gson.Gson;
 
 import sun.util.calendar.ZoneInfo;
 
-// FIXME : add fucking gravity
+// FIXME : add fucking gravity to NPCs
 public class GCore extends GPlugin {
 
 	// ------------------------------------------------------------
@@ -82,14 +85,23 @@ public class GCore extends GPlugin {
 	private TimeZone calendarTimeZone = null;
 
 	// misc
+	private EconomyHandler economyHandler = new EconomyHandler();
+	private PermissionHandler permissionHandler = new PermissionHandler();
 	private NpcManager npcManager = null;
-	private VaultIntegration vaultIntegration = null;
 	private HeadDatabaseIntegration headDatabaseIntegration = null;
 	private Map<Player, ChatInput> chatInputs = new HashMap<Player, ChatInput>();
 	private Map<Player, LocationInput> locationInputs = new HashMap<Player, LocationInput>();
 	private Map<Player, ItemInput> itemInputs = new HashMap<Player, ItemInput>();
 
 	// get
+	public EconomyHandler getEconomyHandler() {
+		return economyHandler;
+	}
+
+	public PermissionHandler getPermissionHandler() {
+		return permissionHandler;
+	}
+
 	public File getDataRootFolder() {
 		return dataRootFolder;
 	}
@@ -108,14 +120,6 @@ public class GCore extends GPlugin {
 
 	public NpcManager getNpcManager() {
 		return npcManager;
-	}
-
-	public VaultIntegration getVaultIntegration() {
-		return vaultIntegration;
-	}
-
-	public void setVaultIntegration(VaultIntegration vaultIntegration) {
-		this.vaultIntegration = vaultIntegration;
 	}
 
 	public HeadDatabaseIntegration getHeadDatabaseIntegration() {
@@ -203,8 +207,7 @@ public class GCore extends GPlugin {
 		(this.userDataRootFolder = new File(getDataFolder() + "/userdata/")).mkdirs();
 
 		// configuration
-		this.configuration = new YMLConfiguration(this, new File(getDataFolder() + "/config.yml"), "config.yml", false,
-				true);
+		this.configuration = new YMLConfiguration(this, new File(getDataFolder() + "/config.yml"), "config.yml", false, true);
 		this.allowCustomMaterials = getConfiguration().getBoolean("allow_custom_materials", false);
 		if (getConfiguration().contains("time_zone")) {
 			String raw = getConfiguration().getString("time_zone", null);
@@ -298,7 +301,8 @@ public class GCore extends GPlugin {
 		UNPRETTY_GSON = Utils.createGsonBuilder().create();
 
 		// integration
-		registerPluginIntegration("Vault", VaultIntegration.class);
+		initEconomy();
+		initPermission();
 		registerPluginIntegration("HeadDatabase", HeadDatabaseIntegration.class);
 
 		// register command
@@ -337,6 +341,22 @@ public class GCore extends GPlugin {
 		return true;
 	}
 
+	private void initEconomy() {
+		if (economyHandler.init()) {
+			debug("Initialized economy handler with " + economyHandler.getUtils().getClass().getSimpleName().replace("Utils", ""));
+		} else {
+			warning("No economy handler was found, some features might not work as intended");
+		}
+	}
+
+	private void initPermission() {
+		if (permissionHandler.init()) {
+			debug("Initialized permission handler with " + permissionHandler.getUtils().getClass().getSimpleName().replace("Utils", ""));
+		} else {
+			warning("No permission handler was found, some features might not work as intended");
+		}
+	}
+
 	// ------------------------------------------------------------
 	// On disable
 	// ------------------------------------------------------------
@@ -368,21 +388,41 @@ public class GCore extends GPlugin {
 
 	@EventHandler
 	public void event(PluginDisableEvent event) {
-		if (event.getPlugin().getName().equalsIgnoreCase("ProtocolLib")) {
+		// ProtocolLib
+		if (event.getPlugin().getName().equals("ProtocolLib")) {
 			if (npcManager != null) {
 				npcManager.disable(isEnabled());
 				npcManager = null;
 				debug("Disabled NPC manager with ProtocolLib");
 			}
 		}
+		// economy and permissions
+		else {
+			if (economyHandler.isPluginHandled(event.getPlugin().getName())) {
+				initEconomy();
+			}
+			if (permissionHandler.isPluginHandled(event.getPlugin().getName())) {
+				initPermission();
+			}
+		}
 	}
 
 	@EventHandler
 	public void event(PluginEnableEvent event) {
-		if (event.getPlugin().getName().equalsIgnoreCase("ProtocolLib")) {
+		// ProtocolLib
+		if (event.getPlugin().getName().equals("ProtocolLib")) {
 			if (npcManager == null) {
 				(npcManager = new NpcManager()).enable();
 				debug("Enabled NPC manager with ProtocolLib");
+			}
+		}
+		// economy and permissions
+		else {
+			if (economyHandler.isPluginHandled(event.getPlugin().getName())) {
+				initEconomy();
+			}
+			if (permissionHandler.isPluginHandled(event.getPlugin().getName())) {
+				initPermission();
 			}
 		}
 	}

@@ -98,7 +98,7 @@ public final class ResourceExtractor
 				continue;
 			}
 
-			if (entry.isDirectory())
+			if (entry.isDirectory() || path.indexOf('/', this.folderpath.length() + 1) != -1 || path.indexOf(File.separatorChar, this.folderpath.length() + 1) != -1)
 			{
 				if (subpaths)
 				{
@@ -118,7 +118,9 @@ public final class ResourceExtractor
 				if (subpaths) {
 					file = new File(this.extractfolder, path.replaceFirst(this.folderpath, ""));
 				} else {
-					file = new File(this.extractfolder, path.substring(path.indexOf(File.separatorChar), path.length()));
+					int index = path.indexOf(File.separatorChar);
+					if (index == -1) index = path.indexOf('/');
+					file = new File(this.extractfolder, path.substring(index, path.length()));
 				}
 
 				String name = file.getName();

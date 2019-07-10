@@ -3,6 +3,8 @@ package com.guillaumevdn.gcore.lib;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 
+import com.guillaumevdn.gcore.GCore;
+
 public class Perm {
 
 	// base
@@ -31,12 +33,21 @@ public class Perm {
 	}
 
 	// methods
-	public boolean has(CommandSender sender) {
-		return sender.isOp() || sender.hasPermission(name) || (parent == null ? false : parent.has(sender));
+	public boolean has(Object permissible) {
+		if (permissible instanceof CommandSender) {
+			return hasSender((CommandSender) permissible);
+		} else if (permissible instanceof OfflinePlayer) {
+			return hasPlayer((OfflinePlayer) permissible);
+		}
+		return false;
 	}
 
-	public boolean hasOffline(OfflinePlayer player) {
-		return player == null ? false : (player.isOnline() ? has((CommandSender) player) : player.isOp());
+	private boolean hasSender(CommandSender sender) {
+		return sender.isOp() || sender.hasPermission(name) || (parent == null ? false : parent.hasSender(sender));
+	}
+
+	private boolean hasPlayer(OfflinePlayer player) {
+		return player.isOp() || GCore.inst().getPermissionHandler().has(player, name) || (parent == null ? false : parent.hasPlayer(player));
 	}
 
 }

@@ -187,9 +187,6 @@ public class NpcManager implements Listener {
 		} else if (userNpc.getLocation() == null) {
 			GCore.inst().error("Couldn't spawn npc " + id + " for player " + player.getName() + " : invalid location");
 			return false;
-		} else if (!userNpc.getLocation().getWorld().equals(player.getWorld())) {
-			GCore.inst().error("Couldn't spawn npc " + id + " for player " + player.getName() + " : not the same world");
-			return false;
 		}
 		// create npc and spawn it
 		addNpc(player, new Npc(player, id, userNpc.getName(), userNpc.getSkinData(), userNpc.getSkinSignature(), userNpc.getLocation(), userNpc.getTargetDistance(), userNpc.getStatus(), items));

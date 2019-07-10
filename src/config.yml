@@ -16,6 +16,7 @@ data:
 #    name: mydatabase
 #    user: username
 #    pass: pwd
+#    args: '&useSSL=false' # This line is optional, you can add custom arguments if you want it
 
 # Locale lang (affects all plugins)
 locale_lang: en_US

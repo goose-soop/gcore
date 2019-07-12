@@ -83,6 +83,7 @@ public class GCore extends GPlugin {
 	private String activeLocaleLang = "en_US";
 	private boolean updateCheck = true;
 	private TimeZone calendarTimeZone = null;
+	private boolean cacheParsedItems = true;
 
 	// misc
 	private EconomyHandler economyHandler = new EconomyHandler();
@@ -116,6 +117,10 @@ public class GCore extends GPlugin {
 
 	public boolean updateCheck() {
 		return updateCheck;
+	}
+	
+	public boolean cacheParsedItems() {
+		return cacheParsedItems;
 	}
 
 	public NpcManager getNpcManager() {
@@ -209,6 +214,7 @@ public class GCore extends GPlugin {
 		// configuration
 		this.configuration = new YMLConfiguration(this, new File(getDataFolder() + "/config.yml"), "config.yml", false, true);
 		this.allowCustomMaterials = getConfiguration().getBoolean("allow_custom_materials", false);
+		this.cacheParsedItems = getConfiguration().getBoolean("cache_parsed_items", true);
 		if (getConfiguration().contains("time_zone")) {
 			String raw = getConfiguration().getString("time_zone", null);
 			try {
@@ -278,7 +284,7 @@ public class GCore extends GPlugin {
 	@Override
 	protected boolean enable() {
 		// load some buggy classes ? ;-;
-		for (String className : Utils.asList("com.guillaumevdn.gcore.lib.data.mysql.Query", "com.guillaumevdn.gcore.lib.parseable.editor.EditorGUI")) {
+		for (String className : Utils.asList("com.guillaumevdn.gcore.lib.data.mysql.Query", "com.guillaumevdn.gcore.lib.parseable.editor.EditorGUI", "com.guillaumevdn.gcore.lib.util.Handler")) {
 			try {
 				getClassLoader().loadClass(className);
 			} catch (ClassNotFoundException exception) {

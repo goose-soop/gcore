@@ -402,6 +402,11 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 		try {
 			// type (this type is the one with the correct durability so don't reapply it after building a new stack)
 			build = type.getNewCurrentStack();
+			// set nbt first -> some settings could be stored in it ! so we'll override it
+			// nbt
+			if (customNbt != null) {
+				build = Compat.INSTANCE.setNbt(build, customNbt);
+			}
 			// amount
 			build.setAmount(amount);
 			// meta
@@ -432,10 +437,6 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 			}
 			// enchants
 			build.addUnsafeEnchantments(enchants);
-			// nbt
-			if (customNbt != null) {
-				build = Compat.INSTANCE.setNbt(build, customNbt);
-			}
 		} catch (Throwable exception) {
 			if (logError) {
 				exception.printStackTrace();

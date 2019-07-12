@@ -3,8 +3,10 @@ package com.guillaumevdn.gcore.lib.parseable.container;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Location;
@@ -204,7 +206,15 @@ public class CPItem extends ContainerParseable {
 	}
 
 	// methods
+	private static Set<CPItem> withCache = new HashSet<CPItem>();
 	private Map<UUID, ItemData> cache = new HashMap<UUID, ItemData>();
+
+	public static void clearAllCache() {
+		for (CPItem item : withCache) {
+			item.cache.clear();
+		}
+		withCache.clear();
+	}
 
 	public ItemData getParsedValue(Player parser) {
 		if ((parser != null && !cache.containsKey(parser.getUniqueId())) || !cache.containsKey(null)) {
@@ -276,9 +286,10 @@ public class CPItem extends ContainerParseable {
 				item.setHideFlags(true);
 			}
 
-			// cache if name/lore don't contain placeholders
-			if (!metaPlaceholders) {
+			// cache if name/lore don't contain placeholders and if can cache
+			if (!metaPlaceholders && GCore.inst().cacheParsedItems()) {
 				cache.put(parser != null ? parser.getUniqueId() : null, item);
+				withCache.add(this);
 			}
 
 			// return

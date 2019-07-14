@@ -10,19 +10,32 @@ import org.bukkit.plugin.Plugin;
 
 import com.guillaumevdn.gcore.lib.util.Utils;
 
-public class ShowcaseRowsGUI {
+public abstract class ShowcaseRowsGUI {
 
 	// base
-	private GUI gui = null;
+	private FilledGUI gui = null;
 	private List<Row> rows = new ArrayList<Row>();
 
 	public ShowcaseRowsGUI(Plugin plugin, String name, int size, List<Integer> regularItemSlots, boolean unregisterOnClose) {
 		// initialize GUI
-		gui = new GUI(plugin, name, size, Utils.asList(regularItemSlots), unregisterOnClose);
+		gui = new FilledGUI(plugin, name, size, Utils.asList(regularItemSlots) /* copy list, because we might change it later when adding rows */) {
+			@Override
+			protected void fill() {
+				ShowcaseRowsGUI.this.fill();
+			}
+			@Override
+			protected boolean postFill() {
+				return ShowcaseRowsGUI.this.postFill();
+			}
+		};
 	}
 
+	// abstract methods
+	protected abstract void fill();
+	protected abstract boolean postFill();
+
 	// get
-	public GUI getGui() {
+	public FilledGUI getGui() {
 		return gui;
 	}
 
@@ -90,6 +103,11 @@ public class ShowcaseRowsGUI {
 		public void replaceItems(List<ClickeableItem> items, boolean update) {
 			this.items.clear();
 			this.items.addAll(items);
+			if (update) update();
+		}
+
+		public void clear(boolean update) {
+			this.items.clear();
 			if (update) update();
 		}
 

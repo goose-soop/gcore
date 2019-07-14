@@ -144,7 +144,8 @@ public class Mat implements Cloneable, Comparable<Mat> {
 	public static final Mat BUCKET = registerValue(new Mat(VERSION, "BUCKET", "BUCKET"));
 	public static final Mat CACTUS = registerValue(new Mat(VERSION, "CACTUS", "CACTUS"));
 	public static final Mat CACTUS_GREEN = registerValue(new Mat(VERSION, "CACTUS_GREEN", "INK_SACK", 2));
-	public static final Mat CAKE = registerValue(new Mat(VERSION, "CAKE", "CAKE"));
+	public static final Mat GREEN_DYE = registerValue(new Mat(VERSION, "GREEN_DYE", "INK_SACK", 2));
+	public static final Mat CAKE = registerValue(new Mat(VERSION, "CAKE", "CAKE")); 
 	public static final Mat CARROT = registerValue(new Mat(VERSION, "CARROT", "CARROT_ITEM"));
 	public static final Mat CARROTS = registerValue(new Mat(VERSION, "CARROTS", "CARROT"));
 	public static final Mat CARROT_ON_A_STICK = registerValue(new Mat(VERSION, "CARROT_ON_A_STICK", "CARROT_STICK"));

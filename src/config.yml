@@ -35,6 +35,10 @@ allow_custom_materials: false
 # NPC update delay (in ticks)
 npc_update_delay: 2
 
+# Cache parsed items
+# Set this option to false to re-parse every item when needed, instead of parsing them ; items with placeholders in their name/lore will NOT be cached no matter what
+cache_parsed_items: true
+
 # Time zone (if not specified, the server host time zone will be used)
 # Format : 'GMTxAA:BB' where :
 # - x is + or -

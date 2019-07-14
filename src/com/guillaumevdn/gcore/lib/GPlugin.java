@@ -30,6 +30,7 @@ import com.guillaumevdn.gcore.lib.gui.GUI;
 import com.guillaumevdn.gcore.lib.integration.PluginIntegration;
 import com.guillaumevdn.gcore.lib.messenger.Messenger;
 import com.guillaumevdn.gcore.lib.messenger.Text;
+import com.guillaumevdn.gcore.lib.parseable.container.CPItem;
 import com.guillaumevdn.gcore.lib.util.ServerVersion;
 import com.guillaumevdn.gcore.lib.util.Utils;
 import com.guillaumevdn.gcore.libs.org.bstats.Metrics;
@@ -354,6 +355,8 @@ public abstract class GPlugin extends JavaPlugin implements Listener {
 	// ----------------------------------------------------------------------
 
 	public void reload() {
+		// clear all item cache
+		CPItem.clearAllCache();
 		// integration
 		for (PluginIntegration integration : pluginIntegration) {
 			try {

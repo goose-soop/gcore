@@ -402,6 +402,11 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 		try {
 			// type (this type is the one with the correct durability so don't reapply it after building a new stack)
 			build = type.getNewCurrentStack();
+			// set nbt first -> some settings could be stored in it ! so we'll override it
+			// nbt
+			if (customNbt != null) {
+				build = Compat.INSTANCE.setNbt(build, customNbt);
+			}
 			// amount
 			build.setAmount(amount);
 			// meta
@@ -432,10 +437,6 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 			}
 			// enchants
 			build.addUnsafeEnchantments(enchants);
-			// nbt
-			if (customNbt != null) {
-				build = Compat.INSTANCE.setNbt(build, customNbt);
-			}
 		} catch (Throwable exception) {
 			if (logError) {
 				exception.printStackTrace();
@@ -455,10 +456,18 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 	 * @return an item with remaining amount if there wasn't enough place in the player's inventory, or null if no extra drop
 	 */
 	public Item give(Player player, Location dropLocation) {
+		return give(player, dropLocation, null, true);
+	}
+
+
+	/**
+	 * @return an item with remaining amount if there wasn't enough place in the player's inventory, or null if no extra drop
+	 */
+	public Item give(Player player, Location dropLocation, Integer forcedAmount, boolean drop) {
 		ItemStack item = getItemStack();
 		if (item == null) return null;
 		// add to inventory
-		int count = item.getAmount();
+		int count = forcedAmount != null ? forcedAmount : item.getAmount();
 		for (int slot = 0; slot < player.getInventory().getSize() && count > 0; slot++) {
 			ItemStack slotItem = player.getInventory().getItem(slot);
 			if (slotItem == null || Mat.from(slotItem).isAir()) {
@@ -491,8 +500,13 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 			}
 		}
 		// remaining, so drop it
-		item.setAmount(count);
-		return player.getWorld().dropItem(dropLocation, item);
+		if (drop) {
+			ItemStack clone = item.clone();
+			clone.setAmount(count);
+			return player.getWorld().dropItem(dropLocation, clone);
+		}
+		// don't drop
+		return null;
 	}
 
 	public boolean contains(Inventory inventory) {
@@ -528,6 +542,23 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 			}
 		}
 		return count;
+	}
+	
+	public int countFreeFor(Inventory inventory, boolean checkDurability, boolean exactMatch, double minDurabilityIfNotUnbreakable) {
+		int free = 0;
+		for (ItemStack it : inventory.getContents()) {
+			if (it == null || Mat.from(it.getType()).isAir()) {
+				free += getItemStack().getMaxStackSize();
+			} else if (isSimilar(it, checkDurability, exactMatch, false)) {
+				// check durability
+				if (minDurabilityIfNotUnbreakable > 0d && !isUnbreakable() && getType().getDurability() / ((double) getType().getCurrentMaterial().getMaxDurability()) * 100d < minDurabilityIfNotUnbreakable) {
+					continue;
+				}
+				// add count
+				free += it.getMaxStackSize() - it.getAmount();
+			}
+		}
+		return free;
 	}
 
 	public int remove(Inventory inventory) {

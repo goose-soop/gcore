@@ -19,7 +19,7 @@ public class LPItem extends ListParseable<CPItem> {
 
 	// methods
 	public boolean contains(Player player, Player parser, int amountOfElements) {
-		return countContainedElements(player, parser) >= amountOfElements;
+		return countContainedElements(player, parser) >= (amountOfElements > getElements().size() ? getElements().size() : amountOfElements);
 	}
 
 	public int countContainedElements(Player player, Player parser) {

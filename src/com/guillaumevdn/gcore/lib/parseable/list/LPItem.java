@@ -18,18 +18,26 @@ public class LPItem extends ListParseable<CPItem> {
 	}
 
 	// methods
-	public boolean contains(Player player, Player parser) {
-		for (CPItem item : getElements().values()) {
-			if (!item.contains(player, parser)) {
-				return false;
-			}
-		}
-		return true;
+	public boolean contains(Player player, Player parser, int amountOfElements) {
+		return countContainedElements(player, parser) >= amountOfElements;
 	}
 
-	public void take(Player player, Player parser, boolean force) {
+	public int countContainedElements(Player player, Player parser) {
+		int count = 0;
 		for (CPItem item : getElements().values()) {
-			item.remove(player, parser, force);
+			if (item.contains(player, parser)) {
+				++count;
+			}
+		}
+		return count;
+	}
+
+	public void take(Player player, Player parser, boolean force, int amountOfElements) {
+		for (CPItem item : getElements().values()) {
+			if (item.remove(player, parser, force) > 0) {
+				--amountOfElements;
+			}
+			if (amountOfElements <= 0) break;
 		}
 	}
 

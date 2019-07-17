@@ -237,6 +237,10 @@ public class GUI implements Listener {
 		removeRegularItem(item);
 		// get page
 		int pageIndex = getFirstEmptyPageIndex(item.getItemData().getSlot(), true);
+		if (pageIndex < 0 || pageIndex >= pages.size()) {
+			GCore.inst().error("Couldn't add item " + item.getItemData().getId() + " in GUI " + getName() + ", page index " + pageIndex + " is invalid");
+			return;
+		}
 		Inventory page = pages.get(pageIndex);
 		item.setPageIndex(pageIndex);
 		// get slot

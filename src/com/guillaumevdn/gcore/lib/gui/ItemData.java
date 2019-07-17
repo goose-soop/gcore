@@ -543,7 +543,7 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 		}
 		return count;
 	}
-	
+
 	public int countFreeFor(Inventory inventory, boolean checkDurability, boolean exactMatch, double minDurabilityIfNotUnbreakable) {
 		int free = 0;
 		for (ItemStack it : inventory.getContents()) {
@@ -856,9 +856,20 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 		return clone;
 	}
 
-	public ItemData cloneWithIdAndSlot(String id, int slot) {
+	public ItemData cloneWithAmount(int amount) {
 		ItemData clone = clone();
-		clone.setId(id);
+		clone.setAmount(amount);
+		return clone;
+	}
+
+	public ItemData cloneWithIdAndAmount(String id, int amount) {
+		ItemData clone = cloneWithId(id);
+		clone.setAmount(amount);
+		return clone;
+	}
+
+	public ItemData cloneWithIdAndSlot(String id, int slot) {
+		ItemData clone = cloneWithId(id);
 		clone.setSlot(slot);
 		return clone;
 	}

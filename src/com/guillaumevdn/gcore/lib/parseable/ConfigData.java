@@ -16,7 +16,6 @@ public class ConfigData {
 	private String path = null;
 	private boolean contains = false;
 
-	// compact
 	public ConfigData(GPlugin plugin, String superId, YMLConfiguration config, String path) {
 		this.plugin = plugin;
 		this.superId = superId;
@@ -78,12 +77,6 @@ public class ConfigData {
 
 	public ConfigData clone() {
 		return new ConfigData(plugin, superId, config, path);
-	}
-
-	// copy
-	public void copyPropertiesTo(ConfigData other) {
-		other.plugin = plugin;
-		other.superId = superId;
 	}
 
 }

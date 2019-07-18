@@ -10,14 +10,17 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.plugin.Plugin;
 
 import com.guillaumevdn.gcore.lib.util.Utils;
+import com.guillaumevdn.gcore.lib.versioncompat.sound.Sound;
 
 public abstract class ShowcaseRowsGUI {
 
 	// base
 	private FilledGUI gui = null;
 	private List<Row> rows = new ArrayList<Row>();
+	private Sound clickSound;
 
-	public ShowcaseRowsGUI(Plugin plugin, String name, int size, List<Integer> regularItemSlots, boolean unregisterOnClose) {
+	public ShowcaseRowsGUI(Plugin plugin, String name, int size, List<Integer> regularItemSlots, boolean unregisterOnClose, Sound clickSound) {
+		this.clickSound = clickSound;
 		// initialize GUI
 		gui = new FilledGUI(plugin, name, size, Utils.asList(regularItemSlots) /* copy list, because we might change it later when adding rows */) {
 			@Override
@@ -58,6 +61,7 @@ public abstract class ShowcaseRowsGUI {
 
 		// base
 		private List<Integer> slots;
+		private List<Integer> currentSlots;
 		private List<ClickeableItem> items;
 		private int startItemIndex = 0;
 
@@ -67,6 +71,7 @@ public abstract class ShowcaseRowsGUI {
 
 		public Row(List<Integer> slots, List<ClickeableItem> items) {
 			this.slots = slots;
+			this.currentSlots = Utils.asList(slots);
 			this.items = items != null ? items : new ArrayList<ClickeableItem>();
 		}
 
@@ -115,7 +120,7 @@ public abstract class ShowcaseRowsGUI {
 			if (startItemIndex < 0) startItemIndex = 0;
 			else if (startItemIndex >= items.size()) startItemIndex = items.size() - 1;
 			// must add page controls
-			List<Integer> currentSlots = Utils.asList(slots);
+			currentSlots = Utils.asList(slots);
 			if (items.size() > slots.size()) {
 				// previous page item
 				if (startItemIndex != 0) {
@@ -125,6 +130,10 @@ public abstract class ShowcaseRowsGUI {
 							startItemIndex -= slots.size();
 							if (startItemIndex < 0) startItemIndex = 0;
 							update();
+							// sound
+							if (clickSound != null) {
+								clickSound.play(player);
+							}
 							return true;
 						}
 					});
@@ -136,6 +145,10 @@ public abstract class ShowcaseRowsGUI {
 						public boolean onClick(Player player, ClickType clickType, GUI gui, int pageIndex) {
 							startItemIndex += slots.size();
 							update();
+							// sound
+							if (clickSound != null) {
+								clickSound.play(player);
+							}
 							return true;
 						}
 					});

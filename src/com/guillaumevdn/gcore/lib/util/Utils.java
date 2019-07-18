@@ -1132,13 +1132,13 @@ public class Utils {
 		return true;
 	}*/
 
-	public static Set<Block> getBlocksAround(Location center, double radius) {
+	public static List<Block> getBlocksAround(Location center, double radius) {
 		int offset = (int) Math.floor(radius);
 		return getBlocksAround(center, radius, offset, offset, offset);
 	}
 
-	public static Set<Block> getBlocksAround(Location center, double radius, int offx, int offy, int offz) {
-		Set<Block> result = new HashSet<Block>();
+	public static List<Block> getBlocksAround(Location center, double radius, int offx, int offy, int offz) {
+		List<Block> result = new ArrayList<Block>();
 		for (int x = -offx; x <= offx; x++) {
 			for (int z = -offy; z <= offy; z++) {
 				for (int y = -offz; y <= offz; y++) {
@@ -1678,8 +1678,20 @@ public class Utils {
 	}
 
 	public static boolean containsIgnoreCase(Collection<String> list, String toCheck) {
+		if (list == null) return false;
 		for (String str : list) {
 			if (str.equalsIgnoreCase(toCheck)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static boolean anElementContainsIgnoreCase(Collection<String> list, String toCheck) {
+		if (list == null) return false;
+		toCheck = toCheck.toLowerCase();
+		for (String str : list) {
+			if (str.toLowerCase().contains(toCheck)) {
 				return true;
 			}
 		}

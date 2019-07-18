@@ -2486,7 +2486,7 @@ public class Utils {
 		} else if (seconds < 86400) {
 			return GLocale.MISC_GENERIC_TIMEFORMATHOURS.getLines("{hours}", (seconds / 3600), "{minutes}", ((seconds % 3600) / 60), "{seconds}", twoDigitString(seconds = seconds % 60)).get(0);
 		} else {
-			return GLocale.MISC_GENERIC_TIMEFORMATDAYS.getLines("{days}", (seconds / 86400), "{hours}", ((seconds / 86400 * 24) - (seconds / 3600)), "{minutes}", ((seconds % 3600) / 60), "{seconds}", twoDigitString(seconds = seconds % 60)).get(0);
+			return GLocale.MISC_GENERIC_TIMEFORMATDAYS.getLines("{days}", (seconds / 86400), "{hours}", (Math.abs((seconds / 86400 * 24) - (seconds / 3600))), "{minutes}", ((seconds % 3600) / 60), "{seconds}", twoDigitString(seconds = seconds % 60)).get(0);
 		}
 	}
 

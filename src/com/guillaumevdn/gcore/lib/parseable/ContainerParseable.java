@@ -106,8 +106,8 @@ public abstract class ContainerParseable extends Parseable {
 	@Override
 	public List<String> describe(int depth) {
 		String spaces = Utils.copyString(" ", depth + 1);
-		List<String> desc = Utils.asList(spaces + "§6> " + getId() + " :");
-		for (Parseable component : components.values()) {
+		List<String> desc = Utils.asList(spaces + "§6> " + getId() + " :" + (components.isEmpty() ? " §8(empty value)" : ""));
+		for (Parseable component : Utils.asSortedList(components.values(), Utils.objectSorter)) {
 			List<String> sub = component.describe(depth + 1);
 			if (depth + 1 == EditorGUI.MAX_DESCRIPTION_DEPTH && sub.size() > 1) {// max depth reached, and sub description is more than one line
 				desc.add(spaces + " §6> " + component.getId() + " : §8...");
@@ -122,14 +122,20 @@ public abstract class ContainerParseable extends Parseable {
 	protected void fillEditor(final EditorGUI gui, Player player, final ModifCallback onModif) {
 		// add components items
 		for (final Parseable component : components.values()) {
-			List<String> lore = new ArrayList<String>(), desc = component.getEditorDescription();
-			if (desc != null) {
-				for (String line : desc) {
-					lore.add(line);
+			// build lore
+			List<String> lore = new ArrayList<String>();
+			if (component.getEditorDescription() != null) {
+				for (String line : component.getEditorDescription()) {
 					if (lore.size() >= EditorGUI.MAX_DESCRIPTION_LINES) break;
+					lore.add(line);
 				}
 			}
-			gui.setRegularItem(new EditorItem(component.getId(), component.getEditorSlot(), component.getEditorIcon(), "§6" + component.getId(), lore) {// TODO : (same for list) instead of getEditorDescription, describe children as well
+			for (String line : component.describe(1)) {
+				if (lore.size() >= EditorGUI.MAX_DESCRIPTION_LINES) break;
+				lore.add(line);
+			}
+			// set item
+			gui.setRegularItem(new EditorItem(component.getId(), component.getEditorSlot(), component.getEditorIcon(), "§6" + component.getId(), lore) {
 				@Override
 				protected void onClick(final Player player, ClickType clickType, int pageIndex) {
 					// create component GUI

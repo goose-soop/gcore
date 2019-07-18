@@ -891,6 +891,10 @@ public enum Sound {
 		}
 	}
 
+	public void play(Player... players) {
+		play(Utils.asList(players), 1F, 1F);
+	}
+
 	public void play(Collection<? extends Player> players) {
 		play(players, 1F, 1F);
 	}

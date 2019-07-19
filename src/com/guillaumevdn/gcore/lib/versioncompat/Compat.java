@@ -67,6 +67,7 @@ public abstract class Compat {
 	}
 
 	// nbt
+	public abstract Object parseMojangson(String serialized) throws Throwable;
 	public abstract String serializeNbt(Object nbt) throws IOException;
 	public abstract Object unserializeNbt(String serialized) throws IOException;
 	public abstract Object getNbt(ItemStack item);

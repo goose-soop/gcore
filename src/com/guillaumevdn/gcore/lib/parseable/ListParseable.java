@@ -110,8 +110,8 @@ public abstract class ListParseable<T extends Parseable> extends Parseable {
 	@Override
 	public List<String> describe(int depth) {
 		String spaces = Utils.copyString(" ", depth + 1);
-		List<String> desc = Utils.asList(spaces + "§6> " + getId() + " :");
-		for (Parseable element : Utils.asSortedList(elements.values())) {
+		List<String> desc = Utils.asList(spaces + "§6> " + getId() + " :" + (elements.isEmpty() ? " §8(empty value)" : ""));
+		for (Parseable element : Utils.asSortedList(elements.values(), Utils.objectSorter)) {
 			List<String> sub = element.describe(depth + 1);
 			if (depth + 1 == EditorGUI.MAX_DESCRIPTION_DEPTH && sub.size() > 1) {// max depth reached, and sub description is more than one line
 				desc.add(spaces + " §6> " + element.getId() + " : §8...");
@@ -128,13 +128,19 @@ public abstract class ListParseable<T extends Parseable> extends Parseable {
 		final Wrapper<Boolean> delete = new Wrapper<Boolean>(false);
 		// add elements items
 		for (final Parseable element : Utils.asSortedList(elements.values())) {
-			List<String> lore = new ArrayList<String>(), desc = element.getEditorDescription();
-			if (desc != null) {
-				for (String line : desc) {
-					lore.add(line);
+			// build lore
+			List<String> lore = new ArrayList<String>();
+			if (element.getEditorDescription() != null) {
+				for (String line : element.getEditorDescription()) {
 					if (lore.size() >= EditorGUI.MAX_DESCRIPTION_LINES) break;
+					lore.add(line);
 				}
 			}
+			for (String line : element.describe(1)) {
+				if (lore.size() >= EditorGUI.MAX_DESCRIPTION_LINES) break;
+				lore.add(line);
+			}
+			// set item
 			gui.setRegularItem(new EditorItem(element.getId(), element.getEditorSlot(), element.getEditorIcon(), "§6" + element.getId(), lore) {
 				@Override
 				public void onClick(final Player player, final ClickType clickType, final int pageIndex) {

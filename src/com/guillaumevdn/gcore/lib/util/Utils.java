@@ -270,7 +270,7 @@ public class Utils {
 	}
 
 	public static <T> boolean saveToGson(T object, File file, Gson gson) {
-		File backup = new File(file.getParentFile() + "/backup_" + file.getName());
+		File backup = new File(file.getParentFile() + "/" + file.getName() + "_backup");
 		try {
 			// create directory
 			if (file.getParentFile() != null && !file.getParentFile().exists()) {
@@ -1132,13 +1132,13 @@ public class Utils {
 		return true;
 	}*/
 
-	public static Set<Block> getBlocksAround(Location center, double radius) {
+	public static List<Block> getBlocksAround(Location center, double radius) {
 		int offset = (int) Math.floor(radius);
 		return getBlocksAround(center, radius, offset, offset, offset);
 	}
 
-	public static Set<Block> getBlocksAround(Location center, double radius, int offx, int offy, int offz) {
-		Set<Block> result = new HashSet<Block>();
+	public static List<Block> getBlocksAround(Location center, double radius, int offx, int offy, int offz) {
+		List<Block> result = new ArrayList<Block>();
 		for (int x = -offx; x <= offx; x++) {
 			for (int z = -offy; z <= offy; z++) {
 				for (int y = -offz; y <= offz; y++) {
@@ -1678,8 +1678,20 @@ public class Utils {
 	}
 
 	public static boolean containsIgnoreCase(Collection<String> list, String toCheck) {
+		if (list == null) return false;
 		for (String str : list) {
 			if (str.equalsIgnoreCase(toCheck)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static boolean anElementContainsIgnoreCase(Collection<String> list, String toCheck) {
+		if (list == null) return false;
+		toCheck = toCheck.toLowerCase();
+		for (String str : list) {
+			if (str.toLowerCase().contains(toCheck)) {
 				return true;
 			}
 		}
@@ -2474,7 +2486,7 @@ public class Utils {
 		} else if (seconds < 86400) {
 			return GLocale.MISC_GENERIC_TIMEFORMATHOURS.getLines("{hours}", (seconds / 3600), "{minutes}", ((seconds % 3600) / 60), "{seconds}", twoDigitString(seconds = seconds % 60)).get(0);
 		} else {
-			return GLocale.MISC_GENERIC_TIMEFORMATDAYS.getLines("{days}", (seconds / 86400), "{hours}", ((seconds / 86400 * 24) - (seconds / 3600)), "{minutes}", ((seconds % 3600) / 60), "{seconds}", twoDigitString(seconds = seconds % 60)).get(0);
+			return GLocale.MISC_GENERIC_TIMEFORMATDAYS.getLines("{days}", (seconds / 86400), "{hours}", (Math.abs((seconds / 86400 * 24) - (seconds / 3600))), "{minutes}", ((seconds % 3600) / 60), "{seconds}", twoDigitString(seconds = seconds % 60)).get(0);
 		}
 	}
 
@@ -2497,7 +2509,8 @@ public class Utils {
 	}
 
 	// https://stackoverflow.com/questions/3422673/how-to-evaluate-a-math-expression-given-in-string-form, that guy is a real programmer, Pog
-	public static double calculateExpression(final String str) {
+	public static double calculateExpression(String expression) {
+		final String str = expression.toLowerCase();
 		return new Object() {
 			int pos = -1, ch;
 
@@ -2517,7 +2530,7 @@ public class Utils {
 			double parse() {
 				nextChar();
 				double x = parseExpression();
-				if (pos < str.length()) throw new RuntimeException("Unexpected: " + (char)ch);
+				if (pos < str.length()) throw new Error("Unexpected: " + (char)ch);
 				return x;
 			}
 
@@ -2569,9 +2582,12 @@ public class Utils {
 					else if (func.equals("ceil")) x = Math.ceil(x);
 					else if (func.equals("floor")) x = Math.floor(x);
 					else if (func.equals("rand")) x = Utils.randomDouble(0d, x);
-					else throw new RuntimeException("Unknown function: " + func);
+					else if (func.equals("abs")) x = Math.abs(x);
+					else if (func.equals("posorzero")) x = x >= 0d ? x : 0d;
+					else if (func.equals("posorone")) x = x >= 0d ? x : 1d;
+					else throw new Error("Unknown function: " + func);
 				} else {
-					throw new RuntimeException("Unexpected: " + (char)ch);
+					throw new Error("Unexpected: " + (char) ch);
 				}
 
 				if (eat('^')) x = Math.pow(x, parseFactor()); // exponentiation

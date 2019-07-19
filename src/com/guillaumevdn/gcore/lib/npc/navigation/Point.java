@@ -2,6 +2,7 @@ package com.guillaumevdn.gcore.lib.npc.navigation;
 
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 
 import com.guillaumevdn.gcore.lib.util.Utils;
 
@@ -56,6 +57,10 @@ public class Point {
 
 	public Location toLocation(World world) {
 		return new Location(world, x, y, z);
+	}
+	
+	public Block toBlock(World world) {
+		return world.getBlockAt(x, y, z);
 	}
 
 	// overriden

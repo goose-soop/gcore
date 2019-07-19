@@ -17,6 +17,7 @@ import com.guillaumevdn.gcore.commands.CommandDataExport;
 import com.guillaumevdn.gcore.commands.CommandDataReset;
 import com.guillaumevdn.gcore.commands.CommandItemMat;
 import com.guillaumevdn.gcore.commands.CommandItemNbt;
+import com.guillaumevdn.gcore.commands.CommandItemRead;
 import com.guillaumevdn.gcore.commands.CommandItemSetdura;
 import com.guillaumevdn.gcore.commands.CommandItemSetname;
 import com.guillaumevdn.gcore.commands.CommandItemSetunbreakable;
@@ -322,6 +323,7 @@ public class GCore extends GPlugin {
 		// item commands
 		CommandArgument item = new CommandArgument(this, Utils.asList("item"), "item-related commands", GPerm.GCORE_ADMIN, false);
 		root.addChild(item);
+		item.addChild(new CommandItemRead());
 		item.addChild(new CommandItemSetdura());
 		item.addChild(new CommandItemSetname());	
 		item.addChild(new CommandItemSetunbreakable());

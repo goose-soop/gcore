@@ -3,20 +3,24 @@ package com.guillaumevdn.gcore.lib.gui;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.plugin.Plugin;
 
 import com.guillaumevdn.gcore.lib.util.Utils;
+import com.guillaumevdn.gcore.lib.versioncompat.sound.Sound;
 
 public abstract class ShowcaseRowsGUI {
 
 	// base
 	private FilledGUI gui = null;
 	private List<Row> rows = new ArrayList<Row>();
+	private Sound clickSound;
 
-	public ShowcaseRowsGUI(Plugin plugin, String name, int size, List<Integer> regularItemSlots, boolean unregisterOnClose) {
+	public ShowcaseRowsGUI(Plugin plugin, String name, int size, List<Integer> regularItemSlots, boolean unregisterOnClose, Sound clickSound) {
+		this.clickSound = clickSound;
 		// initialize GUI
 		gui = new FilledGUI(plugin, name, size, Utils.asList(regularItemSlots) /* copy list, because we might change it later when adding rows */) {
 			@Override
@@ -45,39 +49,35 @@ public abstract class ShowcaseRowsGUI {
 
 	// methods
 	public void addRow(Row row) {
-		// remove showcase slots from regular item slots
-		for (Integer i = row.beginSlot; i < row.endSlot; ++i) {
-			gui.getRegularItemSlots().remove(i);// Integer, so it removes the object and not the index
+		if (!rows.contains(row)) {
+			// remove showcase slots from regular item slots
+			gui.getRegularItemSlots().removeAll(row.getSlots());
+			rows.add(row);
 		}
-		// add row
-		rows.add(row);
 	}
 
 	// row
 	public class Row {
 
 		// base
-		private int beginSlot, endSlot, size, startItemIndex = 0;
+		private List<Integer> slots;
+		private List<Integer> currentSlots;
 		private List<ClickeableItem> items;
+		private int startItemIndex = 0;
 
-		public Row(int beginSlot, int endSlot) {
-			this(beginSlot, endSlot, null);
+		public Row(List<Integer> slots) {
+			this(slots, null);
 		}
 
-		public Row(int beginSlot, int endSlot, List<ClickeableItem> items) {
-			this.beginSlot = beginSlot;
-			this.endSlot = endSlot;
-			this.size = endSlot - beginSlot + 1;
+		public Row(List<Integer> slots, List<ClickeableItem> items) {
+			this.slots = slots;
+			this.currentSlots = Utils.asList(slots);
 			this.items = items != null ? items : new ArrayList<ClickeableItem>();
 		}
 
 		// get
-		public int getBeginSlot() {
-			return beginSlot;
-		}
-
-		public int getEndSlot() {
-			return endSlot;
+		public List<Integer> getSlots() {
+			return slots;
 		}
 
 		public List<ClickeableItem> getItems() {
@@ -113,47 +113,59 @@ public abstract class ShowcaseRowsGUI {
 
 		public void update() {
 			// clear slots
-			for (int slot = beginSlot; slot <= endSlot; ++slot) {
+			for (int slot : slots) {
 				gui.removePersistentItem(slot);
 			}
 			// update start index
 			if (startItemIndex < 0) startItemIndex = 0;
 			else if (startItemIndex >= items.size()) startItemIndex = items.size() - 1;
 			// must add page controls
-			int currentBeginSlot = beginSlot, currentEndSlot = endSlot;
-			if (items.size() > size) {
+			currentSlots = Utils.asList(slots);
+			if (items.size() > slots.size()) {
 				// previous page item
 				if (startItemIndex != 0) {
-					++currentBeginSlot;
-					gui.setPersistentItem(new ClickeableItem(GUI.PREVIOUS_PAGE_ITEM.cloneWithSlot(beginSlot)) {
+					gui.setPersistentItem(new ClickeableItem(GUI.PREVIOUS_PAGE_ITEM.cloneWithIdAndSlot("back_row_" + UUID.randomUUID(), currentSlots.remove(0))) {
 						@Override
 						public boolean onClick(Player player, ClickType clickType, GUI gui, int pageIndex) {
-							startItemIndex -= size;
+							startItemIndex -= slots.size();
 							if (startItemIndex < 0) startItemIndex = 0;
 							update();
+							// sound
+							if (clickSound != null) {
+								clickSound.play(player);
+							}
 							return true;
 						}
 					});
 				}
 				// next page item
-				if (items.size() - startItemIndex + 1 > size) {
-					--currentEndSlot;
-					gui.setPersistentItem(new ClickeableItem(GUI.NEXT_PAGE_ITEM.cloneWithSlot(endSlot)) {
+				if (items.size() - startItemIndex + 1 > slots.size()) {
+					gui.setPersistentItem(new ClickeableItem(GUI.NEXT_PAGE_ITEM.cloneWithIdAndSlot("back_row_" + UUID.randomUUID(), currentSlots.remove(currentSlots.size() - 1))) {
 						@Override
 						public boolean onClick(Player player, ClickType clickType, GUI gui, int pageIndex) {
-							startItemIndex += size;
+							startItemIndex += slots.size();
 							update();
+							// sound
+							if (clickSound != null) {
+								clickSound.play(player);
+							}
 							return true;
 						}
 					});
 				}
 			}
 			// add content
-			for (int index = startItemIndex, slot = currentBeginSlot; index < items.size() && slot <= currentEndSlot; ++index, ++slot) {
-				ClickeableItem item = items.get(index);
-				item.getItemData().setSlot(slot);
-				gui.setPersistentItem(item);
+			if (!items.isEmpty()) {
+				int index = startItemIndex - 1;
+				for (int slot : currentSlots) {
+					if (++index >= items.size()) break;
+					ClickeableItem item = items.get(index);
+					item.getItemData().setSlot(slot);
+					gui.setPersistentItem(item);
+				}
 			}
+			// update first slot ffs
+			gui.updateFirstSlot();
 		}
 
 	}

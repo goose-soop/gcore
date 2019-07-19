@@ -28,6 +28,10 @@ update_check: true
 # Show debug console messages (basically more information, you shouldn't disable it) (affects all plugins)
 show_debug: true
 
+# Show data debug console messages (initialize/load/save/delete elements/boards, etc)
+# Will only appear if show_debug is true
+show_data_debug: true
+
 # Allow custom materials to be loaded
 # If this is set to true, basically no check will be made for material validity when it comes to loading one, so make sure that you know what you're doing
 allow_custom_materials: false

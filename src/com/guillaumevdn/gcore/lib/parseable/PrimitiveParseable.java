@@ -195,10 +195,13 @@ public abstract class PrimitiveParseable<T> extends Parseable {
 		} else if (val.isEmpty()) {
 			desc.add(first += " §8(empty value)" + (defaultValue != null && defaultValue.isEmpty() ? " §8(def)" : ""));
 		} else if (val.size() == 1) {
-			desc.add(first += " §e" + val.get(0) + (defaultValue != null && !defaultValue.isEmpty() && Utils.equals(defaultValue.get(0), val.get(0)) ? " §8(def)" : ""));
+			String str = val.get(0);
+			if (str.length() > 40) str = str.substring(0, 25) + "§8...";
+			desc.add(first += " §e" + str + (defaultValue != null && !defaultValue.isEmpty() && Utils.equals(defaultValue.get(0), val.get(0)) ? " §8(def)" : ""));
 		} else {
 			desc.add(first += (val.equals(defaultValue) ? " §8(def)" : ""));
 			for (String v : val) {
+				if (v.length() > 40) v = v.substring(0, 25) + "§8...";
 				desc.add(spaces + "  §6- §e" + v);
 			}
 		}

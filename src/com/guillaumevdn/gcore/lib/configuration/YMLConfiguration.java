@@ -619,6 +619,22 @@ public class YMLConfiguration {
 				item.setType(Mat.from(getString(path + ".type", null), getInt(path + ".durability", 0)));
 			}
 
+			// nbt
+			String nbt = getString(path + ".nbt", null);
+			if (nbt != null) {
+				try {
+					// convert custom nbt to a base64 encoded string
+					if (nbt.toLowerCase().startsWith("custom:")) {
+						nbt = Compat.INSTANCE.serializeNbt(Compat.INSTANCE.parseMojangson(nbt.substring("custom:".length())));
+					}
+					// base64 nbt
+					item.setCustomNbt(Compat.INSTANCE.unserializeNbt(nbt));
+				} catch (Throwable exception) {
+					exception.printStackTrace();
+					GCore.inst().error("Couldn't load NBT for item " + id + " (" + getFile().getName() + ", " + path + ")");
+				}
+			}
+
 			// amount
 			item.setAmount(getInt(path + ".amount", 1));
 
@@ -647,17 +663,6 @@ public class YMLConfiguration {
 					int duration = Integer.parseInt(raw[2]);
 					item.addPotionEffect(new PotionEffect(type, duration, amplifier));
 				} catch (Throwable ignored) {}
-			}
-
-			// nbt
-			String nbt = getString(path + ".nbt", null);
-			if (nbt != null) {
-				try {
-					item.setCustomNbt(Compat.INSTANCE.unserializeNbt(nbt));
-				} catch (Throwable exception) {
-					exception.printStackTrace();
-					GCore.inst().error("Couldn't load NBT for item " + id + " (" + getFile().getName() + ", " + path + ")");
-				}
 			}
 
 			// unbreakable

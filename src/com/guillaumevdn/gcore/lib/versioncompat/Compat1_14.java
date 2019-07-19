@@ -102,6 +102,12 @@ public class Compat1_14 extends Compat {
 	// https://bukkit.org/threads/serializing-a-nbt-tag.404362/
 	// https://stackoverflow.com/questions/1536054/how-to-convert-byte-array-to-string-and-vice-versa
 	// https://www.spigotmc.org/threads/help-help-needed-with-adding-nbt-tags-to-items.230498/
+	// https://www.spigotmc.org/threads/converting-itemstacks-to-strings-and-back.334600/ (mojangson for custom NBT string)
+
+	@Override
+	public Object parseMojangson(String serialized) throws Throwable {
+		return net.minecraft.server.v1_14_R1.MojangsonParser.parse(serialized);
+	}
 
 	@Override
 	public String serializeNbt(Object nbt) throws IOException {

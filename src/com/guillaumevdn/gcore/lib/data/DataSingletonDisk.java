@@ -4,6 +4,7 @@ import java.io.File;
 
 import org.bukkit.scheduler.BukkitRunnable;
 
+import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.lib.data.DataManager.Callback;
 
 public abstract class DataSingletonDisk {
@@ -17,7 +18,9 @@ public abstract class DataSingletonDisk {
 				long start = System.currentTimeMillis();
 				jsonPull();
 				if (callback != null) callback.callback();
-				getDataManager().getPlugin().debug("Loaded " + DataSingletonDisk.this.getClass().getSimpleName() + " for " + getDataManager().getClass().getSimpleName() + " (took " + (System.currentTimeMillis() - start) + " ms)");
+				if (GCore.inst().getConfiguration() == null ? false : GCore.inst().getConfiguration().getBoolean("show_data_debug", true)) {
+					getDataManager().getPlugin().debug("Loaded " + DataSingletonDisk.this.getClass().getSimpleName() + " for " + getDataManager().getClass().getSimpleName() + " (took " + (System.currentTimeMillis() - start) + " ms)");
+				}
 			} catch (Throwable exception) {
 				exception.printStackTrace();
 				getDataManager().getPlugin().error("Couldn't load " + DataSingletonDisk.this.getClass().getSimpleName() + " for " + getDataManager().getClass().getSimpleName());
@@ -30,7 +33,9 @@ public abstract class DataSingletonDisk {
 			try {
 				long start = System.currentTimeMillis();
 				jsonPush();
-				getDataManager().getPlugin().debug("Saved " + DataSingletonDisk.this.getClass().getSimpleName() + " for " + getDataManager().getClass().getSimpleName() + " (took " + (System.currentTimeMillis() - start) + " ms)");
+				if (GCore.inst().getConfiguration() == null ? false : GCore.inst().getConfiguration().getBoolean("show_data_debug", true)) {
+					getDataManager().getPlugin().debug("Saved " + DataSingletonDisk.this.getClass().getSimpleName() + " for " + getDataManager().getClass().getSimpleName() + " (took " + (System.currentTimeMillis() - start) + " ms)");
+				}
 			} catch (Throwable exception) {
 				exception.printStackTrace();
 				getDataManager().getPlugin().error("Couldn't save " + DataSingletonDisk.this.getClass().getSimpleName() + " for " + getDataManager().getClass().getSimpleName());
@@ -43,7 +48,9 @@ public abstract class DataSingletonDisk {
 			try {
 				long start = System.currentTimeMillis();
 				jsonDelete();
-				getDataManager().getPlugin().debug("Deleted " + DataSingletonDisk.this.getClass().getSimpleName() + " for " + getDataManager().getClass().getSimpleName() + " (took " + (System.currentTimeMillis() - start) + " ms)");
+				if (GCore.inst().getConfiguration() == null ? false : GCore.inst().getConfiguration().getBoolean("show_data_debug", true)) {
+					getDataManager().getPlugin().debug("Deleted " + DataSingletonDisk.this.getClass().getSimpleName() + " for " + getDataManager().getClass().getSimpleName() + " (took " + (System.currentTimeMillis() - start) + " ms)");
+				}
 			} catch (Throwable exception) {
 				exception.printStackTrace();
 				getDataManager().getPlugin().error("Couldn't delete " + DataSingletonDisk.this.getClass().getSimpleName() + " for " + getDataManager().getClass().getSimpleName());

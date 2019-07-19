@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
+import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.lib.GPlugin;
 import com.guillaumevdn.gcore.lib.data.mysql.MySQL;
 import com.guillaumevdn.gcore.lib.data.mysql.Query;
@@ -85,17 +86,19 @@ public abstract class DataManager {
 		// on register
 		innerEnable();
 		// log
-		plugin.success("Registering data manager (using " + backEnd.toString() + ")");
+		plugin.success("Registered data manager (using " + backEnd.toString() + ")");
 	}
 
 	public void synchronize() {
 		innerSynchronize();
-		plugin.debug("Synchronizing data manager (using " + backEnd.toString() + ")");
+		if (GCore.inst().getConfiguration() == null ? false : GCore.inst().getConfiguration().getBoolean("show_data_debug", true)) {
+			plugin.debug("Synchronized data manager (using " + backEnd.toString() + ")");
+		}
 	}
 
 	public void reset() {
 		innerReset();
-		plugin.success("Resetting data manager (using " + backEnd.toString() + ")");
+		plugin.success("Reset data manager (using " + backEnd.toString() + ")");
 	}
 
 	public void disable() {
@@ -106,7 +109,7 @@ public abstract class DataManager {
 		// on unregister
 		innerDisable();
 		// log
-		plugin.success("Unregistering data manager");
+		plugin.success("Unregistered data manager");
 	}
 
 	// ------------------------------------------------------------

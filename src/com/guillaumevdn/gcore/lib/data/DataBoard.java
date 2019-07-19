@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.bukkit.scheduler.BukkitRunnable;
 
+import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.lib.data.DataManager.BackEnd;
 import com.guillaumevdn.gcore.lib.data.DataManager.Callback;
 import com.guillaumevdn.gcore.lib.data.mysql.Query;
@@ -29,7 +30,9 @@ public abstract class DataBoard<T extends DataElement> {
 					getDataManager().performMySQLUpdateQuery(getMySQLInitQuery());
 				}
 				if (callback != null) callback.callback();
-				getDataManager().getPlugin().debug("Initialized " + DataBoard.this.getClass().getSimpleName() + " for " + getDataManager().getClass().getSimpleName() + " (took " + (System.currentTimeMillis() - start) + " ms)");
+				if (GCore.inst().getConfiguration() == null ? false : GCore.inst().getConfiguration().getBoolean("show_data_debug", true)) {
+					getDataManager().getPlugin().debug("Initialized " + DataBoard.this.getClass().getSimpleName() + " for " + getDataManager().getClass().getSimpleName() + " (took " + (System.currentTimeMillis() - start) + " ms)");
+				}
 			} catch (Throwable exception) {
 				exception.printStackTrace();
 				getDataManager().getPlugin().error("Couldn't initialize " + DataBoard.this.getClass().getSimpleName() + " for " + getDataManager().getClass().getSimpleName());
@@ -48,7 +51,9 @@ public abstract class DataBoard<T extends DataElement> {
 					mysqlPull();
 					if (callback != null) callback.callback();
 				}
-				getDataManager().getPlugin().debug("Loaded " + DataBoard.this.getClass().getSimpleName() + " for " + getDataManager().getClass().getSimpleName() + " (took " + (System.currentTimeMillis() - start) + " ms)");
+				if (GCore.inst().getConfiguration() == null ? false : GCore.inst().getConfiguration().getBoolean("show_data_debug", true)) {
+					getDataManager().getPlugin().debug("Loaded " + DataBoard.this.getClass().getSimpleName() + " for " + getDataManager().getClass().getSimpleName() + " (took " + (System.currentTimeMillis() - start) + " ms)");
+				}
 			} catch (Throwable exception) {
 				exception.printStackTrace();
 				getDataManager().getPlugin().error("Couldn't load " + DataBoard.this.getClass().getSimpleName() + " for " + getDataManager().getClass().getSimpleName());
@@ -86,7 +91,9 @@ public abstract class DataBoard<T extends DataElement> {
 						if (callback != null) callback.callback();
 					}
 				}
-				getDataManager().getPlugin().debug("Loaded " + elements.size() + " " + DataBoard.this.getClass().getSimpleName() + Utils.getPluralFor(" element", elements.size()) + " for " + getDataManager().getClass().getSimpleName() + " (took " + (System.currentTimeMillis() - start) + " ms)");
+				if (GCore.inst().getConfiguration() == null ? false : GCore.inst().getConfiguration().getBoolean("show_data_debug", true)) {
+					getDataManager().getPlugin().debug("Loaded " + elements.size() + " " + DataBoard.this.getClass().getSimpleName() + Utils.getPluralFor(" element", elements.size()) + " for " + getDataManager().getClass().getSimpleName() + " (took " + (System.currentTimeMillis() - start) + " ms)");
+				}
 			} catch (Throwable exception) {
 				exception.printStackTrace();
 				getDataManager().getPlugin().error("Couldn't load " + elements.size() + " " + DataBoard.this.getClass().getSimpleName() + Utils.getPluralFor(" element", elements.size()) + " for " + getDataManager().getClass().getSimpleName());
@@ -110,7 +117,7 @@ public abstract class DataBoard<T extends DataElement> {
 		if (elements.isEmpty()) return;
 		BukkitRunnable runnable = new BukkitRunnable() { @Override public void run() {
 			try {
-				//long start = System.currentTimeMillis();
+				long start = System.currentTimeMillis();
 				if (getDataManager().getBackEnd().equals(BackEnd.JSON)) {
 					for (T element : elements) {
 						element.jsonPush();
@@ -126,7 +133,9 @@ public abstract class DataBoard<T extends DataElement> {
 					}
 					if (callback != null) callback.callback();
 				}
-				//getDataManager().getPlugin().debug("Saved " + elements.size() + " " + DataBoard.this.getClass().getSimpleName() + Utils.getPluralFor(" element", elements.size()) + " for " + getDataManager().getClass().getSimpleName() + " (took " + (System.currentTimeMillis() - start) + " ms)");
+				if (GCore.inst().getConfiguration() == null ? false : GCore.inst().getConfiguration().getBoolean("show_data_debug", true)) {
+					getDataManager().getPlugin().debug("Saved " + elements.size() + " " + DataBoard.this.getClass().getSimpleName() + Utils.getPluralFor(" element", elements.size()) + " for " + getDataManager().getClass().getSimpleName() + " (took " + (System.currentTimeMillis() - start) + " ms)");
+				}
 			} catch (Throwable exception) {
 				exception.printStackTrace();
 				getDataManager().getPlugin().error("Couldn't load " + elements.size() + " " + DataBoard.this.getClass().getSimpleName() + Utils.getPluralFor(" element", elements.size()) + " for " + getDataManager().getClass().getSimpleName());
@@ -162,6 +171,7 @@ public abstract class DataBoard<T extends DataElement> {
 		if (elements.isEmpty()) return;
 		BukkitRunnable runnable = new BukkitRunnable() { @Override public void run() {
 			try {
+				long start = System.currentTimeMillis();
 				if (getDataManager().getBackEnd().equals(BackEnd.JSON)) {
 					for (T element : elements) {
 						element.jsonDelete();
@@ -174,6 +184,9 @@ public abstract class DataBoard<T extends DataElement> {
 					if (!query.isEmpty()) {
 						getDataManager().performMySQLUpdateQuery(query);
 					}
+				}
+				if (GCore.inst().getConfiguration() == null ? false : GCore.inst().getConfiguration().getBoolean("show_data_debug", true)) {
+					getDataManager().getPlugin().debug("Deleted " + elements.size() + " " + DataBoard.this.getClass().getSimpleName() + Utils.getPluralFor(" element", elements.size()) + " for " + getDataManager().getClass().getSimpleName() + " (took " + (System.currentTimeMillis() - start) + " ms)");
 				}
 			} catch (Throwable exception) {
 				exception.printStackTrace();

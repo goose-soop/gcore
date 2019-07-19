@@ -5,6 +5,7 @@ import java.sql.SQLException;
 
 import org.bukkit.scheduler.BukkitRunnable;
 
+import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.lib.data.DataManager.BackEnd;
 import com.guillaumevdn.gcore.lib.data.DataManager.Callback;
 import com.guillaumevdn.gcore.lib.data.mysql.Query;
@@ -23,7 +24,9 @@ public abstract class DataSingleton {
 					getDataManager().performMySQLUpdateQuery(getMySQLInitQuery());
 				}
 				if (callback != null) callback.callback();
-				getDataManager().getPlugin().debug("Initialized " + DataSingleton.this.getClass().getSimpleName() + " for " + getDataManager().getClass().getSimpleName() + " (took " + (System.currentTimeMillis() - start) + " ms)");
+				if (GCore.inst().getConfiguration() == null ? false : GCore.inst().getConfiguration().getBoolean("show_data_debug", true)) {
+					getDataManager().getPlugin().debug("Initialized " + DataSingleton.this.getClass().getSimpleName() + " for " + getDataManager().getClass().getSimpleName() + " (took " + (System.currentTimeMillis() - start) + " ms)");
+				}
 			} catch (Throwable exception) {
 				exception.printStackTrace();
 				getDataManager().getPlugin().error("Couldn't initialize " + DataSingleton.this.getClass().getSimpleName() + " for " + getDataManager().getClass().getSimpleName());
@@ -45,7 +48,9 @@ public abstract class DataSingleton {
 					mysqlPull();
 				}
 				if (callback != null) callback.callback();
-				getDataManager().getPlugin().debug("Loaded " + DataSingleton.this.getClass().getSimpleName() + " for " + getDataManager().getClass().getSimpleName() + " (took " + (System.currentTimeMillis() - start) + " ms)");
+				if (GCore.inst().getConfiguration() == null ? false : GCore.inst().getConfiguration().getBoolean("show_data_debug", true)) {
+					getDataManager().getPlugin().debug("Loaded " + DataSingleton.this.getClass().getSimpleName() + " for " + getDataManager().getClass().getSimpleName() + " (took " + (System.currentTimeMillis() - start) + " ms)");
+				}
 			} catch (Throwable exception) {
 				exception.printStackTrace();
 				getDataManager().getPlugin().error("Couldn't load " + DataSingleton.this.getClass().getSimpleName() + " for " + getDataManager().getClass().getSimpleName());
@@ -62,7 +67,9 @@ public abstract class DataSingleton {
 				} else if (getDataManager().getBackEnd().equals(BackEnd.MYSQL)) {
 					mysqlPush(params);
 				}
-				getDataManager().getPlugin().debug("Saved " + DataSingleton.this.getClass().getSimpleName() + " for " + getDataManager().getClass().getSimpleName() + " (took " + (System.currentTimeMillis() - start) + " ms)");
+				if (GCore.inst().getConfiguration() == null ? false : GCore.inst().getConfiguration().getBoolean("show_data_debug", true)) {
+					getDataManager().getPlugin().debug("Saved " + DataSingleton.this.getClass().getSimpleName() + " for " + getDataManager().getClass().getSimpleName() + " (took " + (System.currentTimeMillis() - start) + " ms)");
+				}
 			} catch (Throwable exception) {
 				exception.printStackTrace();
 				getDataManager().getPlugin().error("Couldn't save " + DataSingleton.this.getClass().getSimpleName() + " for " + getDataManager().getClass().getSimpleName());
@@ -79,7 +86,9 @@ public abstract class DataSingleton {
 				} else if (getDataManager().getBackEnd().equals(BackEnd.MYSQL)) {
 					mysqlDelete(params);
 				}
-				getDataManager().getPlugin().debug("Deleted " + DataSingleton.this.getClass().getSimpleName() + " for " + getDataManager().getClass().getSimpleName() + " (took " + (System.currentTimeMillis() - start) + " ms)");
+				if (GCore.inst().getConfiguration() == null ? false : GCore.inst().getConfiguration().getBoolean("show_data_debug", true)) {
+					getDataManager().getPlugin().debug("Deleted " + DataSingleton.this.getClass().getSimpleName() + " for " + getDataManager().getClass().getSimpleName() + " (took " + (System.currentTimeMillis() - start) + " ms)");
+				}
 			} catch (Throwable exception) {
 				exception.printStackTrace();
 				getDataManager().getPlugin().error("Couldn't delete data (unknown error)");

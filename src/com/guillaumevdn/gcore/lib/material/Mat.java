@@ -141,6 +141,7 @@ public class Mat implements Cloneable, Comparable<Mat> {
 	public static final Mat BUBBLE_CORAL = registerValue(new Mat(VERSION, "BUBBLE_CORAL", "-"));
 	public static final Mat BUBBLE_CORAL_BLOCK = registerValue(new Mat(VERSION, "BUBBLE_CORAL_BLOCK", "-"));
 	public static final Mat BUBBLE_CORAL_FAN = registerValue(new Mat(VERSION, "BUBBLE_CORAL_FAN", "-"));
+	public static final Mat BUBBLE_CORAL_WALL_FAN = registerValue(new Mat(VERSION, "DEAD_BUBBLE_CORAL_WALL_FAN", "-"));
 	public static final Mat BUCKET = registerValue(new Mat(VERSION, "BUCKET", "BUCKET"));
 	public static final Mat CACTUS = registerValue(new Mat(VERSION, "CACTUS", "CACTUS"));
 	public static final Mat CACTUS_GREEN = registerValue(new Mat(VERSION, "CACTUS_GREEN", "INK_SACK", 2));

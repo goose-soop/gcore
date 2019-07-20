@@ -65,7 +65,7 @@ public abstract class ListParseable<T extends Parseable> extends Parseable {
 		if (getLastData() != null && getLastData().getLastError() != null) {
 			return true;
 		}
-		for (Parseable element : elements.values()) {
+		for (T element : elements.values()) {
 			if (element.hasErrors()) {
 				return true;
 			}
@@ -100,7 +100,7 @@ public abstract class ListParseable<T extends Parseable> extends Parseable {
 		data.setComponent(this);
 		// save
 		data.getConfig().set(data.getPath(), null);
-		for (Parseable element : Utils.asSortedList(elements.values())) {
+		for (T element : Utils.asSortedList(elements.values())) {
 			element.save(new ConfigData(data.getPlugin(), data.getSuperId(), data.getConfig(), data.getPath().isEmpty() ? element.getId() : data.getPath() + "." + element.getId()));
 		}
 		data.setContains(data.getConfig().contains(data.getPath()));

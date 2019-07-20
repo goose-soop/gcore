@@ -183,7 +183,6 @@ public abstract class PrimitiveParseable<T> extends Parseable {
 		data.setContains(data.getConfig().contains(data.getPath()));
 	}
 
-	// editor
 	@Override
 	public List<String> describe(int depth) {
 		String spaces = Utils.copyString(" ", depth + 1);

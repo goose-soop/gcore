@@ -23,7 +23,7 @@ public class LPBEvent extends ListParseable<BEvent> implements ParseableContainm
 		// create data
 		ConfigData data = new ConfigData(getLastData().getPlugin(), getLastData().getSuperId(), getLastData().getConfig(), getLastData().getPath().isEmpty() ? elementId : getLastData().getPath() + "." + elementId);
 		// create
-		BEvent element = BEventType.BEHAVIOR_CALL.createNew(elementId, getParent(), data, false, false, -1, getEditorIcon(), null);
+		BEvent element = BEventType.BEHAVIOR_CALL.createNew(elementId, this, data, false, false, -1, getEditorIcon(), null);
 		// load, add and return
 		element.load(data);
 		addElement(element);

@@ -68,7 +68,7 @@ public abstract class Parseable implements Comparable<Parseable>, Cloneable {
 	public void setLastData(ConfigData lastData) {
 		this.lastData = lastData;
 	}
-	
+
 	// set
 	/** To use with extreme caution ! */
 	@Deprecated

@@ -324,6 +324,48 @@ public class GLocale {
 			"es_ES", Utils.asList("{days}d {hours}h {minutes}m {seconds}s")
 			);
 
+	public static final Text MISC_GENERIC_DAY_MONDAY = new Text(
+			"MISC_GENERIC_DAY_MONDAY", file,
+			"en_US", "Monday",
+			"fr_FR", "lundi"
+			);
+
+	public static final Text MISC_GENERIC_DAY_TUESDAY = new Text(
+			"MISC_GENERIC_DAY_TUESDAY", file,
+			"en_US", "Tuesday",
+			"fr_FR", "mardi"
+			);
+
+	public static final Text MISC_GENERIC_DAY_WEDNESDAY = new Text(
+			"MISC_GENERIC_DAY_WEDNESDAY", file,
+			"en_US", "Wednesday",
+			"fr_FR", "mercredi"
+			);
+
+	public static final Text MISC_GENERIC_DAY_THURSDAY = new Text(
+			"MISC_GENERIC_DAY_THURSDAY", file,
+			"en_US", "Thursday",
+			"fr_FR", "jeudi"
+			);
+
+	public static final Text MISC_GENERIC_DAY_FRIDAY = new Text(
+			"MISC_GENERIC_DAY_FRIDAY", file,
+			"en_US", "Friday",
+			"fr_FR", "vendredi"
+			);
+
+	public static final Text MISC_GENERIC_DAY_SATURDAY = new Text(
+			"MISC_GENERIC_DAY_SATURDAY", file,
+			"en_US", "Saturday",
+			"fr_FR", "samedi"
+			);
+
+	public static final Text MISC_GENERIC_DAY_SUNDAY = new Text(
+			"MISC_GENERIC_DAY_SUNDAY", file,
+			"en_US", "Sunday",
+			"fr_FR", "dimanche"
+			);
+
 	// ------------------------------------------------------------
 	// GUI
 	// ------------------------------------------------------------

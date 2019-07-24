@@ -101,12 +101,14 @@ public abstract class ShowcaseRowsGUI {
 		}
 
 		public void replaceItems(List<ClickeableItem> items, boolean update) {
+			startItemIndex = 0;
 			this.items.clear();
 			this.items.addAll(items);
 			if (update) update();
 		}
 
 		public void clear(boolean update) {
+			startItemIndex = 0;
 			this.items.clear();
 			if (update) update();
 		}
@@ -143,7 +145,7 @@ public abstract class ShowcaseRowsGUI {
 					gui.setPersistentItem(new ClickeableItem(GUI.NEXT_PAGE_ITEM.cloneWithIdAndSlot("back_row_" + UUID.randomUUID(), currentSlots.remove(currentSlots.size() - 1))) {
 						@Override
 						public boolean onClick(Player player, ClickType clickType, GUI gui, int pageIndex) {
-							startItemIndex += slots.size();
+							startItemIndex += slots.size() - 1;
 							update();
 							// sound
 							if (clickSound != null) {

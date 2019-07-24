@@ -1366,13 +1366,19 @@ public class Utils {
 	// ------------------------------------------------------------
 
 	private static DecimalFormat FORMAT = new DecimalFormat("#.##", DecimalFormatSymbols.getInstance(java.util.Locale.US));
+	private static DecimalFormat FORMAT5 = new DecimalFormat("#.#####", DecimalFormatSymbols.getInstance(java.util.Locale.US));
 
 	static {
 		FORMAT.setRoundingMode(RoundingMode.FLOOR);
+		FORMAT5.setRoundingMode(RoundingMode.FLOOR);
 	}
 
 	public static String round(double value) {
 		return value % 1 == 0 ? String.valueOf((int) value) : FORMAT.format(value);
+	}
+
+	public static String round5(double value) {
+		return value % 1 == 0 ? String.valueOf((int) value) : FORMAT5.format(value);
 	}
 
 	public static String round(BigDecimal value) {

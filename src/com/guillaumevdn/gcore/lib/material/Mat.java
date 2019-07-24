@@ -1184,7 +1184,9 @@ public class Mat implements Cloneable, Comparable<Mat> {
 		}
 		// legacy
 		else {
-			return new ItemStack(currentMaterial, 1, (short) durability, (byte) legacyData);
+			ItemStack item = new ItemStack(currentMaterial, 1, (short) durability, (byte) legacyData);
+			item.setDurability((short) durability);// fucking force it
+			return item;
 		}
 	}
 

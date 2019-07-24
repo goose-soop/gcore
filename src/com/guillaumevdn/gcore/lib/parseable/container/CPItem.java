@@ -343,7 +343,11 @@ public class CPItem extends ContainerParseable {
 		// has item
 		ItemData item = getParsedValue(parser);
 		if (item != null && item.getType() != null && !item.getType().isAir()) {
-			return getMustHaveInHand(parser) ? isValid(player.getItemInHand(), true, parser) : item.contains(player.getInventory(), item.getAmount(), getCheckDurability(parser), getExactMatch(parser), 0d);
+			if (getMustHaveInHand(parser)) {
+				return isValid(player.getItemInHand(), true, parser);
+			} else {
+				return item.contains(player.getInventory(), item.getAmount(), getCheckDurability(parser), getExactMatch(parser), 0d);
+			}
 		}
 		// no conditions so it's valid
 		return true;

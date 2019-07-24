@@ -410,7 +410,8 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 			// amount
 			build.setAmount(amount);
 			// meta
-			ItemMeta meta = Bukkit.getItemFactory().getItemMeta(type.getCurrentMaterial());
+			ItemMeta meta = build.getItemMeta();
+			if (meta == null) meta = Bukkit.getItemFactory().getItemMeta(type.getCurrentMaterial());
 			if (meta != null) {
 				// unbreakable
 				if (unbreakable) {
@@ -518,7 +519,8 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 	}
 
 	public boolean contains(Inventory inventory, int amount, boolean checkDurability, boolean exactMatch, double minDurabilityIfNotUnbreakable) {
-		return count(inventory, checkDurability, exactMatch, minDurabilityIfNotUnbreakable) >= amount;
+		int count = count(inventory, checkDurability, exactMatch, minDurabilityIfNotUnbreakable);
+		return count >= amount;
 	}
 
 	public int count(Inventory inventory) {
@@ -626,8 +628,9 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 		if (checkAmount && item.getAmount() != amount) {
 			return false;
 		}
+		Mat itemType = Mat.from(item);
 		// type
-		if (!type.equals(Mat.from(item), checkDurability)) {
+		if (!type.equals(itemType, checkDurability)) {
 			return false;
 		}
 		// exact match ?

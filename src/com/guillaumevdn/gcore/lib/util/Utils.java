@@ -625,6 +625,18 @@ public class Utils {
 		return online;
 	}
 
+	public static List<Player> getOnlinePlayersOfUUID(Collection<UUID> players) {
+		List<Player> online = new ArrayList<Player>();
+		if (players == null) return online;
+		for (UUID player : players) {
+			Player onlinePlayer = Utils.getPlayer(player);
+			if (onlinePlayer != null) {
+				online.add(onlinePlayer);
+			}
+		}
+		return online;
+	}
+
 	public static List<UUID> getOnlinePlayersUUIDs() {
 		return getPlayersUUIDs(getOnlinePlayers());
 	}

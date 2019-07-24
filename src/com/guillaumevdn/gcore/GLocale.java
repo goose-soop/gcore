@@ -22,10 +22,10 @@ public class GLocale {
 	public static final Text MSG_GENERIC_NOPERMISSION = new Text(
 			"MSG_GENERIC_NOPERMISSION", file,
 			"en_US", "&6{plugin} >> &7You don't have the permission to do this.",
+			"es_ES", Utils.asList("&6{plugin} >> &7No posees permiso para realizar esto."),
 			"fr_FR", "&6{plugin} >> &7Vous n'avez pas la permission de faire cela.",
 			"hu_HU", "&6{plugin} >> &7Nincs jogod ehhez.",
-			"it_IT", Utils.asList("&6{plugin} >> &7Non hai il permesso di farlo."),
-			"es_ES", Utils.asList("&6{plugin} >> &7No posees permiso para realizar esto")
+			"it_IT", Utils.asList("&6{plugin} >> &7Non hai il permesso di farlo.")
 			);
 
 	public static final Text MSG_GENERIC_NOHANDITEM = new Text(
@@ -43,7 +43,7 @@ public class GLocale {
 			"fr_FR", "&6{plugin} >> &7Vous avez besoin de &c{money}$ &7mais vous avez seulement &c{balance}$ &7dans votre compte en banque.",
 			"hu_HU", "&6{plugin} >> &7Neked kell &c{money}$ &7de csak van &c{balance}$ &7a bank fiókodban.",
 			"it_IT", Utils.asList("&6{plugin} >> &7Hai bisogno di &c{money}$ &7ma hai solo &c{balance}$ &7a nel tuo account."),
-			"es_ES", Utils.asList("&6{plugin} >> &7Requieres &c{money}$ pero solo posees &c{balance}$ en tu banco")
+			"es_ES", Utils.asList("&6{plugin} >> &7Requieres &c{money}$ pero solo posees &c{balance}$ en tu")
 			);
 
 	public static final Text MSG_GENERIC_NAMETAKEN = new Text(
@@ -79,7 +79,7 @@ public class GLocale {
 			"fr_FR", "&6{plugin} >> &7Le joueur &c{error} &7est invalide.",
 			"hu_HU", "&6{plugin} >> &7A játékos &c{error} &7érvénytelen.",
 			"it_IT", Utils.asList("&6{plugin} >> &7Il giocatore &c{error} &7non è valido."),
-			"es_ES", Utils.asList("&6{plugin} >> &7ElJugador &c{error} &7no es válido")
+			"es_ES", Utils.asList("&6{plugin} >> &7El jugador &c{error} &7no es válido")
 			);
 
 	public static final Text MSG_GENERIC_INVALIDDOUBLE = new Text(
@@ -116,7 +116,7 @@ public class GLocale {
 			"hu_HU", "&6{plugin} >> &7Ehhez a játékban kell játszani.",
 			"pl_PL", "&6{plugin} >> &7Musisz być w grze, aby to zrobić.",
 			"it_IT", Utils.asList("&6{plugin} >> &7Devi essere in gioco per farlo."),
-			"es_ES", Utils.asList("&6{plugin} >> &7Debes ser parte del juego para realizar esto")
+			"es_ES", Utils.asList("&6{plugin} >> &7Debes estar en el juego para realizar esto")
 			);
 
 	public static final Text MSG_GENERIC_INVALIDCROSSHAIRBLOCK = new Text(
@@ -125,7 +125,7 @@ public class GLocale {
 			"fr_FR", "&6{plugin} >> &7Vous ne pointez aucun bloc.",
 			"hu_HU", "&6{plugin} >> &7Nem nézel egy blokkra sem.",
 			"it_IT", Utils.asList("&6{plugin} >> &7Non stai indicando alcun blocco."),
-			"es_ES", Utils.asList("&6{plugin} >> &7No estás apuntando a ningun bloque.")
+			"es_ES", Utils.asList("&6{plugin} >> &7No estás apuntando a ningún bloque.")
 			);
 
 	public static final Text MSG_GENERIC_INVALIDACTION = new Text(
@@ -143,7 +143,7 @@ public class GLocale {
 			"fr_FR", "&6{plugin} >> &7Le plugin a été reload (took {time}).",
 			"hu_HU", "&6{plugin} >> &7A plugin újratöltve (took {time}).",
 			"it_IT", Utils.asList("&6{plugin} >> &7Il plugin è stato ricaricato (took {time})."),
-			"es_ES", Utils.asList("&6{plugin} >> &7Se ha vuelto a cargar el plugin, ( tardó {time} ).")
+			"es_ES", Utils.asList("&6{plugin} >> &7Se ha vuelto a cargar el plugin (tardó {time}).")
 			);
 
 	public static final Text MSG_GENERIC_NOTHING = new Text(
@@ -162,13 +162,12 @@ public class GLocale {
 			"fr_FR", "&6{plugin} >> &7Vous devez attendre &c{time} &7pour faire cela à nouveau.",
 			"hu_HU", "&6{plugin} >> &7Meg kell várni &c{time}&7, hogy ezt újra elvégezhesse.",
 			"it_IT", Utils.asList("&6{plugin} >> &7Devi aspettare &c{time}&7, per rifarlo."),
-			"es_ES", Utils.asList("&6{plugin} >> &7Debes esperar &c{time} &7antes de realizar esto denuevo")
+			"es_ES", Utils.asList("&6{plugin} >> &7Debes esperar &c{time} &7antes de realizar esto de nuevo")
 			);
 
 	public static final Text MSG_GENERIC_COMMAND_DISABLED = new Text(
 			"MSG_GENERIC_COMMAND_DISABLED", file,
 			"en_US", "&6{plugin} >> &7This command is disabled.",
-			"es_ES", "&6{plugin} >> &7Comando desactivado.",
 			"fr_FR", "&6{plugin} >> &7Cette commande est désactivée.",
 			"hu_HU", "&6{plugin} >> &7Ez a parancs letiltva.",
 			"pl_PL", "&6{plugin} >> &7To polecenie jest wyłączone.",
@@ -184,7 +183,7 @@ public class GLocale {
 			"fr_FR", "&6{plugin} >> &7Vous avez spécifié trop d'arguments, cela devrait s'arrêter après &c{current_path}&7. Utilisez &c{current_path} -help &7ou &c-help:page &7and refer to tab completion to show help.",
 			"hu_HU", "&6{plugin} >> &7Túl sok argumentumot adtál meg, a &c{current_path}&7. Use &c{current_path} -help &7or &c-help:page &7and refer to tab completion to show help.",
 			"it_IT", Utils.asList("&6{plugin} >> &7Hai inserito troppi argomenti, potrebbe finire dopo &c{current_path}&7."),
-			"es_ES", Utils.asList("&6{plugin} >> &7Has especificado demasiadas variables, debería terminar despues de &c{current_path}&7.")
+			"es_ES", Utils.asList("&6{plugin} >> &7Has especificado demasiadas variables, debería terminar")
 			);
 
 	public static final Text MSG_GENERIC_COMMAND_NOCHILDPERFORMED = new Text(
@@ -193,7 +192,7 @@ public class GLocale {
 			"fr_FR", "&6{plugin} >> &7Impossible de comprendre les arguments que vous avez spécifié après &c{current_path}&7.",
 			"hu_HU", "&6{plugin} >> &7Nem sikerült megérteni a &c{current_path}&7 után megadott argumentumokat&7.",
 			"it_IT", Utils.asList("&6{plugin} >> &7Non è possibile capire gli argomenti specificati dopo &c{current_path}&7.."),
-			"es_ES", Utils.asList("&6{plugin} >> &7No ha sido posible entender los parametros que has especificado después de &c{current_path}&7.")
+			"es_ES", Utils.asList("&6{plugin} >> &7No ha sido posible entender los parametros que has especificado")
 			);
 
 	public static final Text MSG_GENERIC_COMMAND_MISSINGPARAM = new Text(
@@ -229,7 +228,7 @@ public class GLocale {
 			"fr_FR", "&6{plugin} >> &7Le paramètre &c{parameter} &7devrait être un nombre décimal.",
 			"hu_HU", "&6{plugin} >> &7A paraméter &c{parameter} &7tizedes számnak kell lennie.",
 			"it_IT", Utils.asList("&6{plugin} >> &7Il parametro &c{parameter} &7dovrebbe essere un numero decimale."),
-			"es_ES", Utils.asList("&6{plugin} >> &7El parametro &c{parameter} &7 debería ser un número decimal'  ")
+			"es_ES", Utils.asList("&6{plugin} >> &7El parámetro &c{parameter} &7 debería ser un número decimal'  ")
 			);
 
 	public static final Text MSG_GENERIC_COMMAND_INVALIDENUMPARAM = new Text(
@@ -247,7 +246,7 @@ public class GLocale {
 			"fr_FR", "&6{plugin} >> &7Le paramètre &c{parameter} &7devrait être un joueur existant.",
 			"hu_HU", "&6{plugin} >> &7A paraméter &c{parameter} &7létező játékosnak kell lennie.",
 			"it_IT", Utils.asList("&6{plugin} >> &7Il parametro &c{parameter} &7dovrebbe essere un giocatore esistente."),
-			"es_ES", Utils.asList("&6{plugin} >> &7El parámetro &c{parameter} &7 debería ser un jugador existente")
+			"es_ES", Utils.asList("&6{plugin} >> &7El parámetro &c{parameter} &7debería ser un jugador existente")
 			);
 
 	public static final Text MSG_GENERIC_COMMAND_INVALIDPLAYERPARAM = new Text(
@@ -265,7 +264,7 @@ public class GLocale {
 			"fr_FR", "&6{plugin} >> &7Le paramètre &c{parameter} &7devrait être un UUID.",
 			"hu_HU", "&6{plugin} >> &7A paraméter &c{parameter} &7UUD-nek kell lennie.",
 			"it_IT", Utils.asList("&6{plugin} >> &7Il parametro &c{parameter} &7dovrebbe essere un UUID."),
-			"es_ES", Utils.asList("&6{plugin} >>  &7El parámetro &c{parameter} &7 debería ser un UUID.")
+			"es_ES", Utils.asList("&6{plugin} >> &7El parámetro &c{parameter} &7 debería ser un UUID.")
 			);
 
 	// gcore messages
@@ -275,7 +274,7 @@ public class GLocale {
 			"fr_FR", "&6{plugin} >> &7Le paramètre &c{parameter} &7devrait être un plugin enregistré avec GCore.",
 			"hu_HU", "&6{plugin} >> &7A paraméter &c{parameter} &7a GCore-ban regisztrált bővítménynek kell lennie.",
 			"it_IT", Utils.asList("&6{plugin} >> &7Il parametro &c{parameter} &7a dovrebbe essere un plugin registrato con GCore."),
-			"es_ES", Utils.asList("&6{plugin} >> &7El parámetro &c{parameter} &7 debería ser un plugin registrado con GCore")
+			"es_ES", Utils.asList("&6{plugin} >> &7El parámetro &c{parameter} &7 debería ser un plugin registrado")
 			);
 
 	public static final Text MSG_GCORE_PLUGINSLIST = new Text(
@@ -284,7 +283,7 @@ public class GLocale {
 			"fr_FR", Utils.asList("&6{plugin} >> &7Il y a &a{count} plugin{plural} &7enregistrés :", "&a{plugins}"),
 			"hu_HU", Utils.asList("&6{plugin} >> &7Van &a{count} plugin{plural} &7regisztrálva :", "&a{plugins}"),
 			"it_IT", Utils.asList("&6{plugin} >> &7Ci sono &a{count} plugin{plural} &7registrati :", "&a{plugins}"),
-			"es_ES", Utils.asList("&6{plugin} >> &7Hay &a{count} plugin{plural} &7registrados :")
+			"es_ES", Utils.asList("&6{plugin} >> &7Hay &a{count} plugin{plural} &7registrados :", "&a{plugins}")
 			);
 
 	// ------------------------------------------------------------
@@ -386,7 +385,7 @@ public class GLocale {
 			"fr_FR", "&6Page suivante",
 			"hu_HU", "&6Következő oldal",
 			"it_IT", Utils.asList("&6Pagina successiva"),
-			"es_ES", Utils.asList("Página siguiente")
+			"es_ES", Utils.asList("&6Página siguiente")
 			);
 
 	public static final Text GUI_GENERIC_CONFIRMNAME = new Text(
@@ -408,7 +407,7 @@ public class GLocale {
 			"en_US", "&7An element with id &6{id} &7already exists.",
 			"fr_FR", "&7Un élément avec l'id &6{id} &7existe déjà.",
 			"it_IT", Utils.asList("&7Un elemento con l'id &6{id} &7esiste già."),
-			"es_ES", Utils.asList("&7Un elemento con la id &6{id} &7 ya existe")
+			"es_ES", Utils.asList("&7Un elemento con la id &6{id} &7ya existe")
 			);
 
 	public static final Text MSG_GENERIC_CHATINPUT = new Text(
@@ -432,7 +431,7 @@ public class GLocale {
 			"en_US", "&7Press 'sneak' when you're ready to import your location, or right-click a block.",
 			"fr_FR", "&7Appuyez sur 's'accroupir' lorsque vous serez prêt à importer votre location, ou bien cliquez sur un bloc.",
 			"it_IT", Utils.asList("&7Premere 'sneak' quando sei pronto a importare la tua posizione, o tasto destro su un blocco."),
-			"es_ES", Utils.asList("&7Presione 'sneak' cuando esté listo para importar su localización,")
+			"es_ES", Utils.asList("&7Presione 'sneak' cuando esté listo para importar su localización, o presione")
 			);
 
 	public static final Text MSG_GENERIC_ITEMINPUT = new Text(
@@ -447,14 +446,14 @@ public class GLocale {
 			"MSG_GENERIC_ITEMHEADDATABASEINPUT", file,
 			"en_US", "&7Enter the HeadDatabase item ID in the chat or &ccancel &7to cancel.",
 			"fr_FR", "&7Entrez l'ID de l'item HeadDatabase dans le chat ou &ccancel &7pour annuler.",
-			"es_ES", Utils.asList("&7Escriba la ID del item de la base de datos de cabezas en el chat, o &ccancel &7para cancelar")
+			"es_ES", Utils.asList("&7Escriba la ID del item de la base de datos de cabezas en el chat, o &ccancel")
 			);
 
 	public static final Text MSG_GENERIC_DELETEELEMENT = new Text(
 			"MSG_GENERIC_DELETEELEMENT", file,
 			"en_US", "&7Click on the element that you wish to delete (cancel by closing the GUI).",
 			"fr_FR", "&7Cliquez sur l'élement que vous souhaitez supprimer (annulez en fermant le GUI).",
-			"es_ES", Utils.asList("&7Haga click en el elemento que desea borrar (cancele mediante el cierre de la GUI).")
+			"es_ES", Utils.asList("&7Haga click en el elemento que desea borrar (cancele mediante el cierre")
 			);
 
 	// items
@@ -471,7 +470,7 @@ public class GLocale {
 			"en_US", Utils.asList("&c&lThis action is irreversible", "&cClick this icon to reset every", "&c setting of this element"),
 			"fr_FR", Utils.asList("&c&lCette action est irréversible", "&cCliquez sur cette icône pour", "&c réinitialiser chaque paramètre de", "&c cet élément"),
 			"it_IT", Utils.asList("&c&lQuesta azione è irreversibile", "&cClicca questa icona per resettare", "&ctutte le impostazioni di questo", "&celemento"),
-			"es_ES", Utils.asList("&c&1Esta acción es irreversible!", "&cHaga click en el icono para reiniciar", "&ctodas las configuraciones de este elemento")
+			"es_ES", Utils.asList("&c&lEsta acción es irreversible!", "&cHaga click en el icono para reiniciar", "&c todas las configuraciones de este elemento")
 			);
 
 	public static final Text GUI_GENERIC_EDITORITEMBACK = new Text(
@@ -479,7 +478,7 @@ public class GLocale {
 			"en_US", "&7Back",
 			"fr_FR", "&7Retour",
 			"it_IT", Utils.asList("&7Indietro"),
-			"es_ES", Utils.asList("Volver")
+			"es_ES", Utils.asList("&7Volver")
 			);
 
 	public static final Text GUI_GENERIC_EDITORITEMADD = new Text(
@@ -517,7 +516,7 @@ public class GLocale {
 			"en_US", Utils.asList("&c&lThis action is irreversible", "&cClick this icon, then the element", "&c that you wish to delete"),
 			"fr_FR", Utils.asList("&c&lCette action est irréversible", "&cCliquez sur cette icône, ensuite sur", "&c l'élement que vous souhaitez supprimer"),
 			"it_IT", Utils.asList("&c&lQuesta azione è irreversibile", "&cClicca su questa icona, poi sull'elemento", "&c che desideri eliminare"),
-			"es_ES", Utils.asList("&c&1Está acción es irreversible!", "&cHaga click en el icono, y después en el elemento", "que desee borrar")
+			"es_ES", Utils.asList("&c&lEstá acción es irreversible!", "&cHaga click en el icono, y después en el elemento", "&c que desee borrar")
 			);
 
 	public static final Text GUI_GENERIC_EDITORCURRENTLORE = new Text(
@@ -554,7 +553,7 @@ public class GLocale {
 			"en_US", Utils.asList("&7Edit the raw value (it will be parsed", "&7 for a player when needed)", "", "{placeholders}"),
 			"fr_FR", Utils.asList("&7Éditer la valeur brute (elle sera", "&7 convertie pour un joueur quand nécessaire)", "", "{placeholders}"),
 			"it_IT", Utils.asList("&7Modifica il valore originale (sarà analizzato", "&7per un giocatore quando sarà necessario)", "{placeholders}"),
-			"es_ES", Utils.asList("&7Edite el valor original, (será analizado para un", "&7jugador cuando sea necesario)", "", "{placeholders}")
+			"es_ES", Utils.asList("&7Edite el valor original (será analizado para un", "&7 jugador cuando sea necesario)", "", "{placeholders}")
 			);
 
 	public static final Text GUI_GENERIC_EDITORTYPERAW = new Text(
@@ -562,7 +561,7 @@ public class GLocale {
 			"en_US", "&6Raw type value",
 			"fr_FR", "&6Valeur brute de type",
 			"it_IT", Utils.asList("&6Valore originale non trovato"),
-			"es_ES", Utils.asList("Valor del tipo original")
+			"es_ES", Utils.asList("&6Valor del tipo original")
 			);
 
 	public static final Text GUI_GENERIC_EDITORTEXTLINELORE = new Text(
@@ -585,7 +584,7 @@ public class GLocale {
 			"en_US", "&6Toggle",
 			"fr_FR", "&6Basculer",
 			"it_IT", Utils.asList("&6Disabilita"),
-			"es_ES", Utils.asList("Activar|desactivar")
+			"es_ES", Utils.asList("&6Cambiar")
 			);
 
 	public static final Text GUI_GENERIC_EDITORBOOLEANTOGGLELORE = new Text(
@@ -598,19 +597,21 @@ public class GLocale {
 
 	public static final Text GUI_GENERIC_EDITORNUMBERADD = new Text(
 			"GUI_GENERIC_EDITORNUMBERADD", file,
-			"en_US", "&a+{amount}"
+			"en_US", "&a+{amount}",
+			"es_ES", Utils.asList("&a+{amount}")
 			);
 
 	public static final Text GUI_GENERIC_EDITORNUMBERTAKE = new Text(
 			"GUI_GENERIC_EDITORNUMBERTAKE", file,
-			"en_US", "&c-{amount}"
+			"en_US", "&c-{amount}",
+			"es_ES", Utils.asList("&c-{amount}")
 			);
 
 	public static final Text GUI_GENERIC_EDITORNUMBERADDTAKELORE = new Text(
 			"GUI_GENERIC_EDITORNUMBERADDTAKELORE", file,
 			"en_US", Utils.asList("&7Click to apply"),
 			"fr_FR", Utils.asList("&7Cliquez pour appliquer"),
-			"es_ES", Utils.asList("Haga click para aplicar")
+			"es_ES", Utils.asList("&7Haga click para aplicar")
 			);
 
 	public static final Text GUI_GENERIC_EDITORLOCATIONIMPORT = new Text(
@@ -634,7 +635,7 @@ public class GLocale {
 			"en_US", "&6Select",
 			"fr_FR", "&6Sélectionner",
 			"it_IT", Utils.asList("&6Seleziona"),
-			"es_ES", Utils.asList("Seleccione")
+			"es_ES", Utils.asList("&6Seleccionar")
 			);
 
 	public static final Text GUI_GENERIC_EDITORITEMIMPORTLORE = new Text(
@@ -650,7 +651,7 @@ public class GLocale {
 			"en_US", "&6Select (HeadDatabase)",
 			"fr_FR", "&6Sélectionner (HeadDatabase)",
 			"it_IT", Utils.asList("&6Seleziona (HeadDatabase)"),
-			"es_ES", Utils.asList("&6Seleccione (HeadDatabase)")
+			"es_ES", Utils.asList("&6Seleccionar (HeadDatabase)")
 			);
 
 	public static final Text GUI_GENERIC_EDITORITEMIMPORTHEADDATABASELORE = new Text(
@@ -682,7 +683,7 @@ public class GLocale {
 			"en_US", "&6Select type",
 			"fr_FR", "&6Sélectionner le type",
 			"it_IT", Utils.asList("&6Seleziona il tipo"),
-			"es_ES", Utils.asList("&6Sleccione el tipo")
+			"es_ES", Utils.asList("&6Seleccione el tipo")
 			);
 
 	// editor : date
@@ -770,7 +771,8 @@ public class GLocale {
 	public static final Text GUI_GENERIC_EDITOR_MOB_COLORLORE = new Text(
 			"GUI_GENERIC_EDITOR_MOB_COLORLORE", file,
 			"en_US", Utils.asList("&7Color of the mob (if applicable)"),
-			"fr_FR", Utils.asList("&7Couleur du mob (si applicable)")
+			"fr_FR", Utils.asList("&7Couleur du mob (si applicable)"),
+			"es_ES", Utils.asList("&7Color del mob (si es aplicable)")
 			);
 
 	public static final Text GUI_GENERIC_EDITOR_MOB_AMOUNTLORE = new Text(
@@ -831,7 +833,7 @@ public class GLocale {
 			"GUI_GENERIC_EDITOR_NPC_NAMELORE", file,
 			"en_US", Utils.asList("&7Name of the NPC"),
 			"fr_FR", Utils.asList("&7Nom du NPC"),
-			"es_ES", Utils.asList("Nombre del NPC")
+			"es_ES", Utils.asList("&7Nombre del NPC")
 			);
 
 	public static final Text GUI_GENERIC_EDITOR_NPC_SKINDATALORE = new Text(
@@ -952,7 +954,7 @@ public class GLocale {
 			"en_US", Utils.asList("&7Title"),
 			"fr_FR", Utils.asList("&7Titre"),
 			"it_IT", Utils.asList("&7Titolo"),
-			"es_ES", Utils.asList("Título")
+			"es_ES", Utils.asList("&7Título")
 			);
 
 	public static final Text GUI_GENERIC_EDITOR_TITLE_SUBTITLELORE = new Text(
@@ -960,7 +962,7 @@ public class GLocale {
 			"en_US", Utils.asList("&7Subtitle"),
 			"fr_FR", Utils.asList("&7Sous-titre"),
 			"it_IT", Utils.asList("&7Sottotitolo"),
-			"es_ES", Utils.asList("Subtítulo")
+			"es_ES", Utils.asList("&7Subtítulo")
 			);
 
 	public static final Text GUI_GENERIC_EDITOR_TITLE_FADEINLORE = new Text(
@@ -984,7 +986,7 @@ public class GLocale {
 			"en_US", Utils.asList("&7Fade out (in ticks) (1 sec = 20 ticks)"),
 			"fr_FR", Utils.asList("&7Temps de disparition (en ticks) (1 sec = 20 ticks)"),
 			"it_IT", Utils.asList("&7Tempo di scomparsa (in ticks) (1 sec = 20 ticks)"),
-			"es_ES", Utils.asList("&&7Duración (en ticks) (1 seg = 20 ticks)")
+			"es_ES", Utils.asList("&7Duración (en ticks) (1 seg = 20 ticks)")
 			);
 
 	// editor : item setting
@@ -1000,7 +1002,8 @@ public class GLocale {
 			"GUI_GENERIC_EDITOR_ITEM_CHANCELORE", file,
 			"en_US", Utils.asList("&7Item apparition chance"),
 			"fr_FR", Utils.asList("&7Chance pour l'item d'apparaître"),
-			"it_IT", Utils.asList("&7Cambia il tempo d'attesa")
+			"it_IT", Utils.asList("&7Cambia il tempo d'attesa"),
+			"es_ES", Utils.asList("&7Posibilidad de aparición del item")
 			);
 
 	public static final Text GUI_GENERIC_EDITOR_ITEM_MAXAMOUNTLORE = new Text(
@@ -1016,7 +1019,7 @@ public class GLocale {
 			"en_US", Utils.asList("&7Is the item enabled"),
 			"fr_FR", Utils.asList("&7Est-ce que l'item est activé"),
 			"it_IT", Utils.asList("&7È l'oggetto attivo"),
-			"es_ES", Utils.asList("&7Está activo el item?")
+			"es_ES", Utils.asList("&7¿Está activo el item?")
 			);
 
 	public static final Text GUI_GENERIC_EDITOR_ITEM_TYPELORE = new Text(
@@ -1040,7 +1043,7 @@ public class GLocale {
 			"en_US", Utils.asList("&7Does the item has the unbreakable tag"),
 			"fr_FR", Utils.asList("&7Est-ce que l'item a le tag unbreakable"),
 			"it_IT", Utils.asList("&7L'oggetto ha il tag unbreakable"),
-			"es_ES", Utils.asList("&7Es irrompible el item?")
+			"es_ES", Utils.asList("&7¿Es irrompible el item?")
 			);
 
 	public static final Text GUI_GENERIC_EDITOR_ITEM_AMOUNTLORE = new Text(
@@ -1055,7 +1058,8 @@ public class GLocale {
 			"GUI_GENERIC_EDITOR_ITEM_LORE", file,
 			"en_US", Utils.asList("&7Display name of item"),
 			"fr_FR", Utils.asList("&7Nom d'affichage de l'item"),
-			"it_IT", Utils.asList("&7Mostra il nome dell'oggetto")
+			"it_IT", Utils.asList("&7Mostra il nome dell'oggetto"),
+			"es_ES", Utils.asList("&7Mostrar el nombre del item")
 			);
 
 	public static final Text GUI_GENERIC_EDITOR_ITEM_LORELORE = new Text(
@@ -1070,13 +1074,15 @@ public class GLocale {
 			"GUI_GENERIC_EDITOR_ITEM_ENCHANTSLORE", file,
 			"en_US", Utils.asList("&7List of item enchants"),
 			"fr_FR", Utils.asList("&7Liste des enchantements de l'item"),
-			"it_IT", Utils.asList("&7Lista di incantesimi dell'oggetto")
+			"it_IT", Utils.asList("&7Lista di incantesimi dell'oggetto"),
+			"es_ES", Utils.asList("&7Lista de encantamientos para el item")
 			);
 
 	public static final Text GUI_GENERIC_EDITOR_ITEM_EFFECTSLORE = new Text(
 			"GUI_GENERIC_EDITOR_ITEM_EFFECTSLORE", file,
 			"en_US", Utils.asList("&7List of item effects"),
-			"fr_FR", Utils.asList("&7Liste des effets de l'item")
+			"fr_FR", Utils.asList("&7Liste des effets de l'item"),
+			"es_ES", Utils.asList("&7Lista de efectos para el item")
 			);
 
 	public static final Text GUI_GENERIC_EDITOR_ITEM_NBTLORE = new Text(
@@ -1091,7 +1097,8 @@ public class GLocale {
 			"GUI_GENERIC_EDITOR_ITEM_MUSTHAVEINHANDLORE", file,
 			"en_US", Utils.asList("&7Should the item be hold in hand"),
 			"fr_FR", Utils.asList("&7Est-ce que l'item doit être tenu en main"),
-			"it_IT", Utils.asList("&7Se l'oggetto si tiene in mano")
+			"it_IT", Utils.asList("&7Se l'oggetto si tiene in mano"),
+			"es_ES", Utils.asList("&7¿Debería el item estar sujeto en la mano?")
 			);
 
 	public static final Text GUI_GENERIC_EDITOR_ITEM_REMOVEAFTERACTIONLORE = new Text(
@@ -1099,27 +1106,28 @@ public class GLocale {
 			"en_US", Utils.asList("&7Should the item be removed after action"),
 			"fr_FR", Utils.asList("&7Est-ce que l'item doit être supprimé après l'action"),
 			"it_IT", Utils.asList("&7Se l'oggetto deve essere cancellato dopo l'azione"),
-			"es_ES", Utils.asList("&7Debería eliminarse el item despues de la acción?")
+			"es_ES", Utils.asList("&7¿Debería eliminarse el item después de la acción?")
 			);
 
 	public static final Text GUI_GENERIC_EDITOR_ITEM_CHECKDURABILITYLORE = new Text(
 			"GUI_GENERIC_EDITOR_ITEM_CHECKDURABILITYLORE", file,
 			"en_US", Utils.asList("&7Should the durability be the exact same"),
 			"fr_FR", Utils.asList("&7Est-ce que la durabilité doit être exactement la même"),
-			"es_ES", Utils.asList("&7Debería mantenerse la durabilidad?")
+			"es_ES", Utils.asList("&7¿Debería mantenerse la durabilidad?")
 			);
 
 	public static final Text GUI_GENERIC_EDITOR_ITEM_EXACTMATCHLORE = new Text(
 			"GUI_GENERIC_EDITOR_ITEM_EXACTMATCHLORE", file,
 			"en_US", Utils.asList("&7Should the item be exactly the same or", "&7 can it has more enchants, name, ..."),
 			"fr_FR", Utils.asList("&7Est-ce que l'item doit être exactement le", "&7 même ou est-ce qu'il peut avoir des", "&7 enchantements, nom, en plus..."),
-			"es_ES", Utils.asList("&7Debería ser exactamente el mismo item, o ", "&7puede tener mas encantamientos /nombres... ?")
+			"es_ES", Utils.asList("&7¿Debería ser exactamente el mismo item o ", "&7 puede tener mas encantamientos, nombres, ...?")
 			);
 
 	public static final Text GUI_GENERIC_EDITOR_ITEM_HIDEFLAGSLORE = new Text(
 			"GUI_GENERIC_EDITOR_ITEM_HIDEFLAGSLORE", file,
 			"en_US", Utils.asList("&7Should the flags of the item be hidden"),
-			"fr_FR", Utils.asList("&7Est-ce que les flags de l'item doivent être cachés")
+			"fr_FR", Utils.asList("&7Est-ce que les flags de l'item doivent être cachés"),
+			"es_ES", Utils.asList("&7¿Debería las flags del item estar ocultas?")
 			);
 
 	// editor : npc settings
@@ -1132,7 +1140,8 @@ public class GLocale {
 	public static final Text GUI_GCORE_EDITOR_NPC_BEHAVIORPROCESSESLORE = new Text(
 			"GUI_GCORE_EDITOR_NPC_BEHAVIORPROCESSESLORE", file,
 			"en_US", Utils.asList("&7A list of processes for this behavior", "&7You select which ones will be run in the events", "&7 or in the processes themselves"),
-			"fr_FR", Utils.asList("&7Une liste de processus pour ce behavior", "&7Vous définissez lesquels seront lancés dans les events", "&7 ou directement dans les processus")
+			"fr_FR", Utils.asList("&7Une liste de processus pour ce behavior", "&7Vous définissez lesquels seront lancés dans les events", "&7 ou directement dans les processus"),
+			"es_ES", Utils.asList("&7Una lista de procesos para este comportamiento", "&7Selecciona cuáles se ejecutarán en los eventos", "&7 o en los procesos mismos")
 			);
 
 	public static final Text GUI_GCORE_EDITOR_NPC_BEHAVIORACTIONSLORE = new Text(
@@ -1153,7 +1162,7 @@ public class GLocale {
 			"GUI_GCORE_EDITOR_NPC_BEHAVIORMAXCONCURRENTINSTANCESLORE", file,
 			"en_US", Utils.asList("&7How many instances of this behavior", "&7 can be active at the same time"),
 			"fr_FR", Utils.asList("&7Combien d'instances de ce behavior", "&7 peuvent être actives en même temps"),
-			"es_ES", Utils.asList("&7Cuantas instancias puede tener este comportamiento", "&7 activas al mismo tiempo?")
+			"es_ES", Utils.asList("&7¿Cuantas instancias puede tener este comportamiento", "&7 activas al mismo tiempo?")
 			);
 
 	public static final Text GUI_GCORE_EDITOR_NPC_BEHAVIOREVENTTYPELORE = new Text(
@@ -1167,7 +1176,7 @@ public class GLocale {
 			"GUI_GCORE_EDITOR_NPC_BEHAVIOREVENTPROCESSLORE", file,
 			"en_US", Utils.asList("&7What process should be run when this event is triggered"),
 			"fr_FR", Utils.asList("&7Quel processus doit être lancé lorsque cet event est activé"),
-			"es_ES", Utils.asList("&7Que tipo de procesos se deberían activar caundo se activa este evento?")
+			"es_ES", Utils.asList("&7¿Qué tipo de procesos se deberían activar caundo se activa este evento?")
 			);
 
 	public static final Text GUI_GCORE_EDITOR_NPC_BEHAVIORACTIONTYPELORE = new Text(
@@ -1188,7 +1197,7 @@ public class GLocale {
 			"GUI_GCORE_EDITOR_NPC_BEHAVIORPLAYERDISTANCEVALUELORE", file,
 			"en_US", Utils.asList("&7To which value the distance must be compared"),
 			"fr_FR", Utils.asList("&7À quelle valeur la distance doit être comparée"),
-			"es_ES", Utils.asList("&7A que distancia se debe comparar el valor de la distancia")
+			"es_ES", Utils.asList("&7A qué distancia se debe comparar el valor de la distancia")
 			);
 
 	public static final Text GUI_GCORE_EDITOR_NPC_BEHAVIORRANDOMVALUELORE = new Text(
@@ -1222,7 +1231,7 @@ public class GLocale {
 			"GUI_GCORE_EDITOR_NPC_BEHAVIORVARIABLEVALUELORE", file,
 			"en_US", Utils.asList("&7To which value the variable must be changed"),
 			"fr_FR", Utils.asList("&7À quelle valeur la variable doit être changée"),
-			"es_ES", Utils.asList("&7A qué valor se debe cambiar la variable")
+			"es_ES", Utils.asList("&7A que valor se debe cambiar la variable")
 			);
 
 	public static final Text GUI_GCORE_EDITOR_NPC_BEHAVIORCHECKLORE = new Text(
@@ -1263,14 +1272,14 @@ public class GLocale {
 			"GUI_GCORE_EDITOR_NPC_BEHAVIORMOVETARGETLORE", file,
 			"en_US", Utils.asList("&7To where should the npc move (set a location or 'player')"),
 			"fr_FR", Utils.asList("&7Où est-ce que le npc doit aller (définir une location ou 'player'"),
-			"es_ES", Utils.asList("&7A donde se debería mover el NPC(defina una localización o 'player')")
+			"es_ES", Utils.asList("&7A donde se debería mover el NPC (defina una localización o 'player')")
 			);
 
 	public static final Text GUI_GCORE_EDITOR_NPC_BEHAVIORANIMATIONLORE = new Text(
 			"GUI_GCORE_EDITOR_NPC_BEHAVIORANIMATIONLORE", file,
 			"en_US", Utils.asList("&7What animation should be played"),
 			"fr_FR", Utils.asList("&7Quelle animation doit être jouée"),
-			"es_ES", Utils.asList("&7Qué animación se debería activar")
+			"es_ES", Utils.asList("&7¿Qué animación se debería activar?")
 			);
 
 }

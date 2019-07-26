@@ -11,7 +11,7 @@ import com.guillaumevdn.gcore.lib.command.CommandArgument;
 import com.guillaumevdn.gcore.lib.command.CommandCall;
 import com.guillaumevdn.gcore.lib.command.Param;
 import com.guillaumevdn.gcore.lib.messenger.Messenger;
-import com.guillaumevdn.gcore.lib.npc.Npc;
+import com.guillaumevdn.gcore.lib.npc.NpcData;
 import com.guillaumevdn.gcore.lib.util.GUserOperator;
 import com.guillaumevdn.gcore.lib.util.Utils;
 
@@ -37,8 +37,8 @@ public class CommandNpcShow extends CommandArgument {
 			// get npc
 			final Integer npcId = paramNpc.getInt(call);
 			if (npcId != null) {
-				final Npc npc = GCore.inst().getNpcManager().getNpc(owner, npcId);
-				if (npc == null) {
+				final NpcData npcData = GCore.inst().getNpcManager().getNpcData(npcId);
+				if (npcData == null) {
 					Messenger.send(call.getSender(), Messenger.Level.SEVERE_ERROR, GCore.inst().getName(), "Couldn't find NPC with ID " + npcId + " for player " + owner.getName() + ".");
 					return;
 				}
@@ -51,7 +51,7 @@ public class CommandNpcShow extends CommandArgument {
 						userNpc.setShown(true);
 						user.updateNpc(npcId, userNpc);
 						// show
-						npc.spawn();
+						GCore.inst().getNpcManager().spawnNpc(owner, npcId, null);
 						Messenger.send(call.getSender(), Messenger.Level.NORMAL_SUCCESS, GCore.inst().getName(), "Shown NPC with ID " + npcId + " for player " + owner.getName() + ".");
 					}
 				}.operate();

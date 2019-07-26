@@ -4,6 +4,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 
 import com.guillaumevdn.gcore.GCore;
+import com.guillaumevdn.gcore.data.UserInfo;
 
 public class Perm {
 
@@ -38,16 +39,18 @@ public class Perm {
 			return hasSender((CommandSender) permissible);
 		} else if (permissible instanceof OfflinePlayer) {
 			return hasPlayer((OfflinePlayer) permissible);
+		} else if (permissible instanceof UserInfo) {
+			return hasPlayer(((UserInfo) permissible).toOfflinePlayer());
 		}
 		return false;
 	}
 
 	private boolean hasSender(CommandSender sender) {
-		return sender.isOp() || sender.hasPermission(name) || (parent == null ? false : parent.hasSender(sender));
+		return sender != null && sender.isOp() || sender.hasPermission(name) || (parent == null ? false : parent.hasSender(sender));
 	}
 
 	private boolean hasPlayer(OfflinePlayer player) {
-		return player.isOp() || GCore.inst().getPermissionHandler().has(player, name) || (parent == null ? false : parent.hasPlayer(player));
+		return player != null && player.isOp() || GCore.inst().getPermissionHandler().has(player, name) || (parent == null ? false : parent.hasPlayer(player));
 	}
 
 }

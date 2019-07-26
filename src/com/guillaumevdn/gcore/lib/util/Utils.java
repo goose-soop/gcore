@@ -108,6 +108,7 @@ import com.guillaumevdn.gcore.libs.com.google.gson.adapter.AdapterAchievement;
 import com.guillaumevdn.gcore.libs.com.google.gson.adapter.AdapterBlockCoords;
 import com.guillaumevdn.gcore.libs.com.google.gson.adapter.AdapterClass;
 import com.guillaumevdn.gcore.libs.com.google.gson.adapter.AdapterClassFactory;
+import com.guillaumevdn.gcore.libs.com.google.gson.adapter.AdapterDouble;
 import com.guillaumevdn.gcore.libs.com.google.gson.adapter.AdapterEnchantment;
 import com.guillaumevdn.gcore.libs.com.google.gson.adapter.AdapterEntityType;
 import com.guillaumevdn.gcore.libs.com.google.gson.adapter.AdapterFile;
@@ -260,6 +261,8 @@ public class Utils {
 				.registerTypeAdapter(UserInfo.class, new AdapterUserInfo())
 				.registerTypeAdapter(ItemData.class, new ItemData.Adapter())
 				.registerTypeAdapter(BlockCoords.class, new AdapterBlockCoords())
+				.registerTypeAdapter(double.class, new AdapterDouble())
+				.registerTypeAdapter(Double.class, new AdapterDouble())
 				.enableComplexMapKeySerialization()
 				.disableInnerClassSerialization()
 				.serializeSpecialFloatingPointValues();
@@ -620,6 +623,18 @@ public class Utils {
 		for (OfflinePlayer player : players) {
 			if (player.isOnline()) {
 				online.add(player.getPlayer());
+			}
+		}
+		return online;
+	}
+
+	public static List<Player> getOnlinePlayersOfUUID(Collection<UUID> players) {
+		List<Player> online = new ArrayList<Player>();
+		if (players == null) return online;
+		for (UUID player : players) {
+			Player onlinePlayer = Utils.getPlayer(player);
+			if (onlinePlayer != null) {
+				online.add(onlinePlayer);
 			}
 		}
 		return online;
@@ -1354,13 +1369,19 @@ public class Utils {
 	// ------------------------------------------------------------
 
 	private static DecimalFormat FORMAT = new DecimalFormat("#.##", DecimalFormatSymbols.getInstance(java.util.Locale.US));
+	private static DecimalFormat FORMAT5 = new DecimalFormat("#.#####", DecimalFormatSymbols.getInstance(java.util.Locale.US));
 
 	static {
 		FORMAT.setRoundingMode(RoundingMode.FLOOR);
+		FORMAT5.setRoundingMode(RoundingMode.FLOOR);
 	}
 
 	public static String round(double value) {
 		return value % 1 == 0 ? String.valueOf((int) value) : FORMAT.format(value);
+	}
+
+	public static String round5(double value) {
+		return value % 1 == 0 ? String.valueOf((int) value) : FORMAT5.format(value);
 	}
 
 	public static String round(BigDecimal value) {

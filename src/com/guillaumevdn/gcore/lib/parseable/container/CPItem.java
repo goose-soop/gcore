@@ -62,7 +62,7 @@ public class CPItem extends ContainerParseable {
 	private PPBoolean removeAfterAction = addComponent(new PPBoolean("remove_after_action", this, "false", false, 14, EditorGUI.ICON_BOOLEAN, GLocale.GUI_GENERIC_EDITOR_ITEM_REMOVEAFTERACTIONLORE.getLines()));
 	private PPBoolean checkDurability = addComponent(new PPBoolean("check_durability", this, "true", false, 15, EditorGUI.ICON_BOOLEAN, GLocale.GUI_GENERIC_EDITOR_ITEM_CHECKDURABILITYLORE.getLines()));
 	private PPBoolean exactMatch = addComponent(new PPBoolean("exact_match", this, "true", false, 16, EditorGUI.ICON_BOOLEAN, GLocale.GUI_GENERIC_EDITOR_ITEM_EXACTMATCHLORE.getLines()));
-	private PPBoolean hideFlags = addComponent(new PPBoolean("hide_flags", this, "true", false, 17, EditorGUI.ICON_BOOLEAN, GLocale.GUI_GENERIC_EDITOR_ITEM_HIDEFLAGSLORE.getLines()));
+	private PPBoolean hideFlags = addComponent(new PPBoolean("hide_flags", this, "false", false, 17, EditorGUI.ICON_BOOLEAN, GLocale.GUI_GENERIC_EDITOR_ITEM_HIDEFLAGSLORE.getLines()));
 
 	public CPItem(String id, Parseable parent, boolean mandatory, int editorSlot, Mat editorIcon, List<String> editorDescription) {
 		super(id, parent, "item", mandatory, editorSlot, editorIcon, editorDescription);
@@ -299,6 +299,40 @@ public class CPItem extends ContainerParseable {
 		return cache.get(parser != null ? parser.getUniqueId() : null);
 	}
 
+	public void replace(ItemData item, Player nbtErrorMessagePlayer) {
+		type.setValue(Utils.asList(item.getType().toString()));
+		durability.setValue(Utils.asList("" + item.getType().getDurability()));
+		unbreakable.setValue(Utils.asList("" + item.isUnbreakable()));
+		amount.setValue(Utils.asList("" + item.getAmount()));
+		maxAmount.setValue(Utils.asList("" + item.getAmount()));
+		name.setValue(item.getName() != null ? Utils.asList(item.getName()) : null);
+		lore.setValue(item.getLore() != null ? Utils.asList(item.getLore()) : null);
+		enchants.clearElements();
+		int id = 0;
+		for (Enchantment enchant : item.getEnchants().keySet()) {
+			CPEnchantment ench = enchants.createElement("" + ++id);
+			ench.getType().setValue(Utils.asList(enchant.getName()));
+			ench.getLevel().setValue(Utils.asList("" + item.getEnchants().get(enchant)));
+		}
+		effects.clearElements();
+		id = 0;
+		for (PotionEffect effect : item.getEffects()) {
+			CPPotionEffect eff = effects.createElement("" + ++id);
+			eff.getType().setValue(Utils.asList(effect.getType().getName()));
+			eff.getAmplifier().setValue(Utils.asList("" + effect.getAmplifier()));
+			eff.getDuration().setValue(Utils.asList("" + effect.getDuration()));
+		}
+		try {
+			String nbtString = Compat.INSTANCE.serializeNbt(item.getCustomNbt());
+			nbt.setValue(nbtString == null ? null : Utils.asList(nbtString));
+		} catch (IOException exception) {
+			exception.printStackTrace();
+			if (nbtErrorMessagePlayer != null) {
+				Messenger.send(nbtErrorMessagePlayer, Messenger.Level.SEVERE_ERROR, GCore.inst().getName(), "Couldn't save item NTB (see console)");
+			}
+		}
+	}
+
 	// methods
 	public boolean isEmpty(Player parser) {
 		ItemData item = getParsedValue(parser);
@@ -309,7 +343,11 @@ public class CPItem extends ContainerParseable {
 		// has item
 		ItemData item = getParsedValue(parser);
 		if (item != null && item.getType() != null && !item.getType().isAir()) {
-			return getMustHaveInHand(parser) ? isValid(player.getItemInHand(), true, parser) : item.contains(player.getInventory(), item.getAmount(), getCheckDurability(parser), getExactMatch(parser), 0d);
+			if (getMustHaveInHand(parser)) {
+				return isValid(player.getItemInHand(), true, parser);
+			} else {
+				return item.contains(player.getInventory(), item.getAmount(), getCheckDurability(parser), getExactMatch(parser), 0d);
+			}
 		}
 		// no conditions so it's valid
 		return true;
@@ -490,36 +528,7 @@ public class CPItem extends ContainerParseable {
 							if (!value.replace(" ", "").equalsIgnoreCase("cancel") && GCore.inst().getHeadDatabaseIntegration() != null) {
 								ItemStack headStack = GCore.inst().getHeadDatabaseIntegration().getItem(value);
 								if (headStack != null) {
-									ItemData item = new ItemData(headStack);
-									type.setValue(Utils.asList(item.getType().toString()));
-									durability.setValue(Utils.asList("" + item.getType().getDurability()));
-									unbreakable.setValue(Utils.asList("" + item.isUnbreakable()));
-									amount.setValue(Utils.asList("" + item.getAmount()));
-									maxAmount.setValue(Utils.asList("" + item.getAmount()));
-									name.setValue(item.getName() != null ? Utils.asList(item.getName()) : null);
-									lore.setValue(item.getLore() != null ? Utils.asList(item.getLore()) : null);
-									enchants.clearElements();
-									int id = 0;
-									for (Enchantment enchant : item.getEnchants().keySet()) {
-										CPEnchantment ench = enchants.createElement("" + ++id);
-										ench.getType().setValue(Utils.asList(enchant.getName()));
-										ench.getLevel().setValue(Utils.asList("" + item.getEnchants().get(enchant)));
-									}
-									effects.clearElements();
-									id = 0;
-									for (PotionEffect effect : item.getEffects()) {
-										CPPotionEffect eff = effects.createElement("" + ++id);
-										eff.getType().setValue(Utils.asList(effect.getType().getName()));
-										eff.getAmplifier().setValue(Utils.asList("" + effect.getAmplifier()));
-										eff.getDuration().setValue(Utils.asList("" + effect.getDuration()));
-									}
-									try {
-										String nbtString = Compat.INSTANCE.serializeNbt(item.getCustomNbt());
-										nbt.setValue(nbtString == null ? null : Utils.asList(nbtString));
-									} catch (IOException exception) {
-										exception.printStackTrace();
-										Messenger.send(player, Messenger.Level.SEVERE_ERROR, GCore.inst().getName(), "Couldn't save item NTB (see console)");
-									}
+									replace(new ItemData(headStack), player);
 									// callback
 									onModif.callback(gui, player);
 								}

@@ -15,7 +15,7 @@ public class Logger {
 		SUCCESS("§d", "§d§l", "SUCCESS: "),
 		WARNING("§e", "§6", "WARNING: "),
 		DEBUG("§5", "§d", "DEBUG: "),
-		SEVERE("§c", "§4", "ERROR: ");
+		SEVERE("§4", "§c", "ERROR: ");
 
 		private String color, varColor, prefix;
 

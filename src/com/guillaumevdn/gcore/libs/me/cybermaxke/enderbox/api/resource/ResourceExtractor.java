@@ -84,7 +84,6 @@ public final class ResourceExtractor
 		this.extractfolder.mkdirs();
 
 		// Loop through all the entries
-
 		JarFile jar = new JarFile(jarfile);
 		Enumeration<JarEntry> entries = jar.entries();
 
@@ -98,7 +97,7 @@ public final class ResourceExtractor
 				continue;
 			}
 
-			if (entry.isDirectory() || path.indexOf('/', this.folderpath.length() + 1) != -1 || path.indexOf(File.separatorChar, this.folderpath.length() + 1) != -1)
+			if (entry.isDirectory() && !path.contains("."))
 			{
 				if (subpaths)
 				{

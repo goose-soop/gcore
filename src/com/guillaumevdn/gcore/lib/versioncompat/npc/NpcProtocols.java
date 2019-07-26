@@ -25,7 +25,7 @@ public abstract class NpcProtocols {
 	// static base
 	/** Can be null if ProtocolLib isn't installed or if there's no support for this Minecraft version */
 	public static final NpcProtocols INSTANCE = Utils.createNPCProtocols();
-	public static final int ENTITY_ID_BASE = 302300;
+	public static final int ENTITY_ID_BASE = 381326;
 
 	public void init() {
 	}

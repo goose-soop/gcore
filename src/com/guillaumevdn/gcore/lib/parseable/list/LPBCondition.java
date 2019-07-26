@@ -23,7 +23,7 @@ public class LPBCondition extends ListParseable<BCondition> implements Parseable
 		// create data
 		ConfigData data = new ConfigData(getLastData().getPlugin(), getLastData().getSuperId(), getLastData().getConfig(), getLastData().getPath().isEmpty() ? elementId : getLastData().getPath() + "." + elementId);
 		// create
-		BCondition element = BConditionType.NPC_VARIABLE_CHECK.createNew(elementId, getParent(), data, false, false, -1, getEditorIcon(), null);
+		BCondition element = BConditionType.NPC_VARIABLE_CHECK.createNew(elementId, this, data, false, false, -1, getEditorIcon(), null);
 		// load, add and return
 		element.load(data);
 		addElement(element);

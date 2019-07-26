@@ -68,7 +68,18 @@ public class GUser extends DataElement {
 		if (npc == null) throw new IllegalArgumentException("npc can't be null");
 		// update
 		npcs.put(id, npc);
-		pushAsync();
+		if (push) pushAsync();
+	}
+
+	/**
+	 * Remove the user-modified NPC
+	 * @param id the npc id
+	 * @param push true if the data must be pushed
+	 */
+	public void removeNpc(Integer id, boolean push) {
+		if (npcs.remove(id) != null) {
+			if (push) pushAsync();
+		}
 	}
 
 	// data

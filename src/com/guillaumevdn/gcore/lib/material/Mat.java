@@ -116,6 +116,7 @@ public class Mat implements Cloneable, Comparable<Mat> {
 	public static final Mat BRAIN_CORAL = registerValue(new Mat(VERSION, "BRAIN_CORAL", "-"));
 	public static final Mat BRAIN_CORAL_BLOCK = registerValue(new Mat(VERSION, "BRAIN_CORAL_BLOCK", "-"));
 	public static final Mat BRAIN_CORAL_FAN = registerValue(new Mat(VERSION, "BRAIN_CORAL_FAN", "-"));
+	public static final Mat BRAIN_CORAL_WALL_FAN = registerValue(new Mat(VERSION, "BRAIN_CORAL_WALL_FAN", "-"));
 	public static final Mat BREAD = registerValue(new Mat(VERSION, "BREAD", "BREAD"));
 	public static final Mat BREWING_STAND = registerValue(new Mat(VERSION, "BREWING_STAND", "BREWING_STAND"));
 	public static final Mat BREWING_STAND_ITEM = registerValue(new Mat(VERSION, "BREWING_STAND", "BREWING_STAND_ITEM"));
@@ -141,7 +142,7 @@ public class Mat implements Cloneable, Comparable<Mat> {
 	public static final Mat BUBBLE_CORAL = registerValue(new Mat(VERSION, "BUBBLE_CORAL", "-"));
 	public static final Mat BUBBLE_CORAL_BLOCK = registerValue(new Mat(VERSION, "BUBBLE_CORAL_BLOCK", "-"));
 	public static final Mat BUBBLE_CORAL_FAN = registerValue(new Mat(VERSION, "BUBBLE_CORAL_FAN", "-"));
-	public static final Mat BUBBLE_CORAL_WALL_FAN = registerValue(new Mat(VERSION, "DEAD_BUBBLE_CORAL_WALL_FAN", "-"));
+	public static final Mat BUBBLE_CORAL_WALL_FAN = registerValue(new Mat(VERSION, "BUBBLE_CORAL_WALL_FAN", "-"));
 	public static final Mat BUCKET = registerValue(new Mat(VERSION, "BUCKET", "BUCKET"));
 	public static final Mat CACTUS = registerValue(new Mat(VERSION, "CACTUS", "CACTUS"));
 	public static final Mat CACTUS_GREEN = registerValue(new Mat(VERSION, "CACTUS_GREEN", "INK_SACK", 2));
@@ -1183,7 +1184,9 @@ public class Mat implements Cloneable, Comparable<Mat> {
 		}
 		// legacy
 		else {
-			return new ItemStack(currentMaterial, 1, (short) durability, (byte) legacyData);
+			ItemStack item = new ItemStack(currentMaterial, 1, (short) durability, (byte) legacyData);
+			item.setDurability((short) durability);// fucking force it
+			return item;
 		}
 	}
 

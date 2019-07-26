@@ -161,8 +161,6 @@ public abstract class BAction extends ContainerParseable {
 	 * @return the loaded behavior action, or null if couldn't instantiate it for some reason
 	 */
 	public static BAction load(String id, Parseable parent, ConfigData data, boolean mandatory, int editorSlot, Mat editorIcon, List<String> editorDescription) {
-		// compact
-		BActionType type = null;
 		// missing type setting
 		data.setContains(data.getConfig().contains(data.getPath() + ".type"));
 		if (!data.contains()) {
@@ -170,7 +168,7 @@ public abstract class BAction extends ContainerParseable {
 			return null;
 		}
 		// invalid type
-		type = BActionType.valueOf(data.getConfig().getString(data.getPath() + ".type", ""));
+		BActionType type = BActionType.valueOf(data.getConfig().getString(data.getPath() + ".type", ""));
 		if (type == null) {
 			data.log("invalid primitive setting 'type' (must be a behavior action type)");
 			return null;

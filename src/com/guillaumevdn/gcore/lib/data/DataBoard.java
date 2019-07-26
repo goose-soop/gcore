@@ -85,7 +85,7 @@ public abstract class DataBoard<T extends DataElement> {
 						while (set.next()) {
 							String id = set.getString("id");
 							if (byId.containsKey(id)) {
-								byId.get(id).mysqlPull(set);;
+								byId.get(id).mysqlPull(set);
 							}
 						}
 						if (callback != null) callback.callback();

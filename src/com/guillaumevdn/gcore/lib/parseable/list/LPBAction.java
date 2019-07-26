@@ -23,7 +23,7 @@ public class LPBAction extends ListParseable<BAction> implements ParseableContai
 		// create data
 		ConfigData data = new ConfigData(getLastData().getPlugin(), getLastData().getSuperId(), getLastData().getConfig(), getLastData().getPath().isEmpty() ? elementId : getLastData().getPath() + "." + elementId);
 		// create
-		BAction element = BActionType.PLAYER_SEND_MESSAGE.createNew(elementId, getParent(), data, false, false, -1, getEditorIcon(), null);
+		BAction element = BActionType.PLAYER_SEND_MESSAGE.createNew(elementId, this, data, false, false, -1, getEditorIcon(), null);
 		// load, add and return
 		element.load(data);
 		addElement(element);

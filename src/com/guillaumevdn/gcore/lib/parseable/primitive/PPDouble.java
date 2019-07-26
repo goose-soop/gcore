@@ -1,5 +1,6 @@
 package com.guillaumevdn.gcore.lib.parseable.primitive;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.bukkit.entity.Player;
@@ -53,7 +54,7 @@ public class PPDouble extends PrimitiveParseable<Double> {
 	}
 
 	public static Double parse(String raw) {
-		return Utils.calculateExpression(raw);
+		return Utils.calculateExpression(raw.contains("E") ? new BigDecimal(raw).toPlainString() : raw);
 	}
 
 	// editor

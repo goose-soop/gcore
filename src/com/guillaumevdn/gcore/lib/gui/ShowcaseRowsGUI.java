@@ -12,37 +12,18 @@ import org.bukkit.plugin.Plugin;
 import com.guillaumevdn.gcore.lib.util.Utils;
 import com.guillaumevdn.gcore.lib.versioncompat.sound.Sound;
 
-public abstract class ShowcaseRowsGUI {
+public abstract class ShowcaseRowsGUI extends FilledGUI {
 
 	// base
-	private FilledGUI gui = null;
 	private List<Row> rows = new ArrayList<Row>();
 	private Sound clickSound;
 
 	public ShowcaseRowsGUI(Plugin plugin, String name, int size, List<Integer> regularItemSlots, boolean unregisterOnClose, Sound clickSound) {
+		super(plugin, name, size, Utils.asList(regularItemSlots));
 		this.clickSound = clickSound;
-		// initialize GUI
-		gui = new FilledGUI(plugin, name, size, Utils.asList(regularItemSlots) /* copy list, because we might change it later when adding rows */) {
-			@Override
-			protected void fill() {
-				ShowcaseRowsGUI.this.fill();
-			}
-			@Override
-			protected boolean postFill() {
-				return ShowcaseRowsGUI.this.postFill();
-			}
-		};
 	}
-
-	// abstract methods
-	protected abstract void fill();
-	protected abstract boolean postFill();
 
 	// get
-	public FilledGUI getGui() {
-		return gui;
-	}
-
 	public List<Row> getRows() {
 		return rows;
 	}
@@ -51,7 +32,7 @@ public abstract class ShowcaseRowsGUI {
 	public void addRow(Row row) {
 		if (!rows.contains(row)) {
 			// remove showcase slots from regular item slots
-			gui.getRegularItemSlots().removeAll(row.getSlots());
+			getRegularItemSlots().removeAll(row.getSlots());
 			rows.add(row);
 		}
 	}
@@ -101,12 +82,14 @@ public abstract class ShowcaseRowsGUI {
 		}
 
 		public void replaceItems(List<ClickeableItem> items, boolean update) {
+			startItemIndex = 0;
 			this.items.clear();
 			this.items.addAll(items);
 			if (update) update();
 		}
 
 		public void clear(boolean update) {
+			startItemIndex = 0;
 			this.items.clear();
 			if (update) update();
 		}
@@ -114,7 +97,7 @@ public abstract class ShowcaseRowsGUI {
 		public void update() {
 			// clear slots
 			for (int slot : slots) {
-				gui.removePersistentItem(slot);
+				removePersistentItem(slot);
 			}
 			// update start index
 			if (startItemIndex < 0) startItemIndex = 0;
@@ -124,7 +107,7 @@ public abstract class ShowcaseRowsGUI {
 			if (items.size() > slots.size()) {
 				// previous page item
 				if (startItemIndex != 0) {
-					gui.setPersistentItem(new ClickeableItem(GUI.PREVIOUS_PAGE_ITEM.cloneWithIdAndSlot("back_row_" + UUID.randomUUID(), currentSlots.remove(0))) {
+					setPersistentItem(new ClickeableItem(GUI.PREVIOUS_PAGE_ITEM.cloneWithIdAndSlot("back_row_" + UUID.randomUUID(), currentSlots.remove(0))) {
 						@Override
 						public boolean onClick(Player player, ClickType clickType, GUI gui, int pageIndex) {
 							startItemIndex -= slots.size();
@@ -140,10 +123,10 @@ public abstract class ShowcaseRowsGUI {
 				}
 				// next page item
 				if (items.size() - startItemIndex + 1 > slots.size()) {
-					gui.setPersistentItem(new ClickeableItem(GUI.NEXT_PAGE_ITEM.cloneWithIdAndSlot("back_row_" + UUID.randomUUID(), currentSlots.remove(currentSlots.size() - 1))) {
+					setPersistentItem(new ClickeableItem(GUI.NEXT_PAGE_ITEM.cloneWithIdAndSlot("back_row_" + UUID.randomUUID(), currentSlots.remove(currentSlots.size() - 1))) {
 						@Override
 						public boolean onClick(Player player, ClickType clickType, GUI gui, int pageIndex) {
-							startItemIndex += slots.size();
+							startItemIndex += slots.size() - 1;
 							update();
 							// sound
 							if (clickSound != null) {
@@ -161,11 +144,11 @@ public abstract class ShowcaseRowsGUI {
 					if (++index >= items.size()) break;
 					ClickeableItem item = items.get(index);
 					item.getItemData().setSlot(slot);
-					gui.setPersistentItem(item);
+					setPersistentItem(item);
 				}
 			}
 			// update first slot ffs
-			gui.updateFirstSlot();
+			updateFirstSlot();
 		}
 
 	}

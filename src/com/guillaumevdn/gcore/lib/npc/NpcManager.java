@@ -385,7 +385,7 @@ public class NpcManager implements Listener {
 			}
 			// ensure data is complete if has
 			else {
-				if (userNpc.replaceNullValues(npcData, player) > 0) {
+				if (userNpc.replaceValues(npcData, player, false) > 0) {
 					push = true;
 				}
 			}

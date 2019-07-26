@@ -22,6 +22,7 @@ import com.guillaumevdn.gcore.commands.CommandItemSetdura;
 import com.guillaumevdn.gcore.commands.CommandItemSetname;
 import com.guillaumevdn.gcore.commands.CommandItemSetunbreakable;
 import com.guillaumevdn.gcore.commands.CommandNpcHide;
+import com.guillaumevdn.gcore.commands.CommandNpcReset;
 import com.guillaumevdn.gcore.commands.CommandNpcSetEquipment;
 import com.guillaumevdn.gcore.commands.CommandNpcSetName;
 import com.guillaumevdn.gcore.commands.CommandNpcSetStatus;
@@ -51,7 +52,7 @@ import com.guillaumevdn.gcore.libs.com.google.gson.Gson;
 
 import sun.util.calendar.ZoneInfo;
 
-// FIXME : add fucking gravity to NPCs
+// FIXME : add fucking gravity to NPCs -> behavior ? :thinking:
 public class GCore extends GPlugin {
 
 	// ------------------------------------------------------------
@@ -119,7 +120,7 @@ public class GCore extends GPlugin {
 	public boolean updateCheck() {
 		return updateCheck;
 	}
-	
+
 	public boolean cacheParsedItems() {
 		return cacheParsedItems;
 	}
@@ -329,7 +330,7 @@ public class GCore extends GPlugin {
 		item.addChild(new CommandItemSetunbreakable());
 		item.addChild(new CommandItemMat());
 		item.addChild(new CommandItemNbt());
-		// item commands
+		// npc commands
 		CommandArgument npc = new CommandArgument(this, Utils.asList("npc"), "npc-related commands", GPerm.GCORE_NPC_MANIPULATE, false);
 		root.addChild(npc);
 		npc.addChild(new CommandNpcHide());
@@ -338,6 +339,7 @@ public class GCore extends GPlugin {
 		npc.addChild(new CommandNpcSetStatus());
 		npc.addChild(new CommandNpcShow());
 		npc.addChild(new CommandNpcTeleport());
+		npc.addChild(new CommandNpcReset());
 		// other commands
 		root.addChild(new CommandPlugins());
 		root.addChild(new CommandSetuserprofile());

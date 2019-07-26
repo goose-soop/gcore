@@ -39,66 +39,70 @@ public class GUserNpcData {
 	public GUserNpcData(int id, NpcData data, Player player) {
 		this.id = id;
 		this.shown = data.getShown(player);
-		replaceNullValues(data, player);
+		replaceValues(data, player, false);
 	}
 
 	// methods
 	/**
 	 * @return the amount of modified values
 	 */
-	public int replaceNullValues(NpcData data, Player player) {
+	public int replaceValues(NpcData data, Player player, boolean force) {
 		int changed = 0;
-		if (name == null) {
+		if (force) {
+			++changed;
+			shown = data.getShown(player);
+		}
+		if (name == null || force) {
 			++changed;
 			name = data.getName(player);
 		}
-		if (skinData == null) {
+		if (skinData == null || force) {
 			++changed;
 			skinData = data.getSkinData(player);
 		}
-		if (skinSignature == null) {
+		if (skinSignature == null || force) {
 			++changed;
 			skinSignature = data.getSkinSignature(player);
 		}
-		if (location == null) {
+		if (location == null || force) {
 			++changed;
 			location = data.getLocation(player);
 		}
-		if (targetDistance == null) {
+		if (targetDistance == null || force) {
 			++changed;
 			targetDistance = data.getTargetDistance(player);
 		}
-		if (status == null) {
+		if (status == null || force) {
 			++changed;
 			status = new HashSet<NpcStatus>();
 			List<NpcStatus> list = data.getStatus(player);
 			if (list != null) status.addAll(list);
 		}
-		if (heldItem == null) {
+		if (heldItem == null || force) {
 			++changed;
 			heldItem = data.getHeldItem(player);
 		}
-		if (heldItemOff == null) {
+		if (heldItemOff == null || force) {
 			++changed;
 			heldItemOff = data.getHeldItemOff(player);
 		}
-		if (boots == null) {
+		if (boots == null || force) {
 			++changed;
 			boots = data.getBoots(player);
 		}
-		if (leggings == null) {
+		if (leggings == null || force) {
 			++changed;
 			leggings = data.getLeggings(player);
 		}
-		if (chestplate == null) {
+		if (chestplate == null || force) {
 			++changed;
 			chestplate = data.getChestplate(player);
 		}
-		if (helmet == null) {
+		if (helmet == null || force) {
 			++changed;
 			helmet = data.getHelmet(player);
 		}
-		if (variables == null) {
+		if (variables == null || force) {
 			++changed;
 			variables = new HashMap<String, String>();
 			for (String variable : data.getVariables().getElements().keySet()) {
@@ -106,7 +110,7 @@ public class GUserNpcData {
 				variables.put(variable, value == null ? "0" : value);
 			}
 		}
-		if (behaviors == null) {
+		if (behaviors == null || force) {
 			++changed;
 			behaviors = new ArrayList<String>();
 			List<String> list = data.getBehaviors(player);
@@ -175,7 +179,7 @@ public class GUserNpcData {
 	public Map<String, String> getVariables() {
 		return variables;
 	}
-	
+
 	public String getVariableValue(String variable) {
 		String value = variables.get(variable);
 		return value == null ? "0" : value;
@@ -241,7 +245,7 @@ public class GUserNpcData {
 	public void setHelmet(ItemData helmet) {
 		this.helmet = helmet;
 	}
-	
+
 	public void setVariableValue(String variable, String value) {
 		variables.put(variable, value);
 	}

@@ -149,9 +149,8 @@ public class NpcManager implements Listener {
 		Map<Integer, Npc> playerNpcs = npcs.get(player);
 		if (playerNpcs != null) {
 			for (Npc npc : toDespawn) {
-				if (playerNpcs.remove(npc.getId()) != null) {
-					npc.despawn();
-				}
+				playerNpcs.remove(npc.getId());
+				npc.despawn();
 			}
 			if (playerNpcs.isEmpty()) {
 				npcs.remove(player);
@@ -190,6 +189,25 @@ public class NpcManager implements Listener {
 		}
 		// create npc and spawn it
 		addNpc(player, new Npc(player, id, userNpc.getName(), userNpc.getSkinData(), userNpc.getSkinSignature(), userNpc.getLocation(), userNpc.getTargetDistance(), userNpc.getStatus(), items));
+		// spawn
+		return true;
+	}
+
+	public boolean spawnNpc(Player player, int id, String name, String skinData, String skinSignature, Location location, double targetDistance, Set<NpcStatus> status, ItemData[] items) {
+		// already spawned
+		if (getNpc(player, id) != null) {
+			return false;
+		}
+		// invalid name or location
+		if (name == null) {
+			GCore.inst().error("Couldn't spawn npc " + id + " for player " + player.getName() + " : invalid name");
+			return false;
+		} else if (location == null) {
+			GCore.inst().error("Couldn't spawn npc " + id + " for player " + player.getName() + " : invalid location");
+			return false;
+		}
+		// create npc and spawn it
+		addNpc(player, new Npc(player, id, name, skinData, skinSignature, location, targetDistance, status, items));
 		// spawn
 		return true;
 	}

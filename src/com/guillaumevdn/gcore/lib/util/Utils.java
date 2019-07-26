@@ -104,14 +104,11 @@ import com.guillaumevdn.gcore.lib.versioncompat.particle.ParticleManager;
 import com.guillaumevdn.gcore.lib.versioncompat.sound.Sound;
 import com.guillaumevdn.gcore.libs.com.google.gson.Gson;
 import com.guillaumevdn.gcore.libs.com.google.gson.GsonBuilder;
-import com.guillaumevdn.gcore.libs.com.google.gson.JsonElement;
-import com.guillaumevdn.gcore.libs.com.google.gson.JsonPrimitive;
-import com.guillaumevdn.gcore.libs.com.google.gson.JsonSerializationContext;
-import com.guillaumevdn.gcore.libs.com.google.gson.JsonSerializer;
 import com.guillaumevdn.gcore.libs.com.google.gson.adapter.AdapterAchievement;
 import com.guillaumevdn.gcore.libs.com.google.gson.adapter.AdapterBlockCoords;
 import com.guillaumevdn.gcore.libs.com.google.gson.adapter.AdapterClass;
 import com.guillaumevdn.gcore.libs.com.google.gson.adapter.AdapterClassFactory;
+import com.guillaumevdn.gcore.libs.com.google.gson.adapter.AdapterDouble;
 import com.guillaumevdn.gcore.libs.com.google.gson.adapter.AdapterEnchantment;
 import com.guillaumevdn.gcore.libs.com.google.gson.adapter.AdapterEntityType;
 import com.guillaumevdn.gcore.libs.com.google.gson.adapter.AdapterFile;
@@ -264,12 +261,8 @@ public class Utils {
 				.registerTypeAdapter(UserInfo.class, new AdapterUserInfo())
 				.registerTypeAdapter(ItemData.class, new ItemData.Adapter())
 				.registerTypeAdapter(BlockCoords.class, new AdapterBlockCoords())
-				.registerTypeAdapter(Double.class, new JsonSerializer<Double>() {
-					@Override
-					public JsonElement serialize(Double src, java.lang.reflect.Type typeOfSrc, JsonSerializationContext context) {
-						return new JsonPrimitive(BigDecimal.valueOf(src).toPlainString());
-					}
-				})
+				.registerTypeAdapter(double.class, new AdapterDouble())
+				.registerTypeAdapter(Double.class, new AdapterDouble())
 				.enableComplexMapKeySerialization()
 				.disableInnerClassSerialization()
 				.serializeSpecialFloatingPointValues();

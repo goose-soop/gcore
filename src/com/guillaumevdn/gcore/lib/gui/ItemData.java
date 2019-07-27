@@ -376,6 +376,25 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 		return build;
 	}
 
+	public List<Integer> getSplitAmounts(int maxStackSize) {
+		if (maxStackSize <= 0) throw new IllegalArgumentException("maxStackSize should be at least 1");
+		List<Integer> split = new ArrayList<Integer>();
+		ItemStack item = getItemStack();
+		if (item != null) {
+			int remaining = item.getAmount();
+			while (remaining > 0) {
+				if (remaining > maxStackSize) {
+					split.add(maxStackSize);
+					remaining -= maxStackSize;
+				} else {
+					split.add(remaining);
+					remaining = 0;
+				}
+			}
+		}
+		return split;
+	}
+
 	public ItemStack getItemStack(Object... replacements) {
 		ItemStack item = getItemStack();
 		if (item != null) {

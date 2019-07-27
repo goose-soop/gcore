@@ -46,6 +46,7 @@ import com.guillaumevdn.gcore.lib.util.Utils;
 import com.guillaumevdn.gcore.lib.util.input.ChatInput;
 import com.guillaumevdn.gcore.lib.util.input.ItemInput;
 import com.guillaumevdn.gcore.lib.util.input.LocationInput;
+import com.guillaumevdn.gcore.lib.util.input.NpcInput;
 import com.guillaumevdn.gcore.lib.versioncompat.Compat;
 import com.guillaumevdn.gcore.lib.versioncompat.npc.NpcProtocols;
 import com.guillaumevdn.gcore.libs.com.google.gson.Gson;
@@ -94,6 +95,7 @@ public class GCore extends GPlugin {
 	private HeadDatabaseIntegration headDatabaseIntegration = null;
 	private Map<Player, ChatInput> chatInputs = new HashMap<Player, ChatInput>();
 	private Map<Player, LocationInput> locationInputs = new HashMap<Player, LocationInput>();
+	private Map<Player, NpcInput> npcInputs = new HashMap<Player, NpcInput>();
 	private Map<Player, ItemInput> itemInputs = new HashMap<Player, ItemInput>();
 
 	// get
@@ -143,6 +145,10 @@ public class GCore extends GPlugin {
 
 	public Map<Player, LocationInput> getLocationInputs() {
 		return locationInputs;
+	}
+
+	public Map<Player, NpcInput> getNpcInputs() {
+		return npcInputs;
 	}
 
 	public Map<Player, ItemInput> getItemInputs() {

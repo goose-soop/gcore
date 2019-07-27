@@ -31,6 +31,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.guillaumevdn.gcore.lib.UpdateCheck;
+import com.guillaumevdn.gcore.lib.event.NpcAttackEvent;
+import com.guillaumevdn.gcore.lib.event.NpcInteractEvent;
 import com.guillaumevdn.gcore.lib.event.PlayerBlockDropEvent;
 import com.guillaumevdn.gcore.lib.event.PlayerCowMilkEvent;
 import com.guillaumevdn.gcore.lib.event.PlayerCraftedItemsEvent;
@@ -167,6 +169,26 @@ public class Listeners implements Listener {
 			Player player = event.getPlayer();
 			GCore.inst().getLocationInputs().remove(event.getPlayer()).onChoose(player, player.getLocation());
 			event.setCancelled(true);
+			return;
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void event(NpcInteractEvent event) {
+		// location input
+		if (GCore.inst().getNpcInputs().containsKey(event.getPlayer())) {
+			Player player = event.getPlayer();
+			GCore.inst().getNpcInputs().remove(event.getPlayer()).onChoose(player, event.getNpc());
+			return;
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void event(NpcAttackEvent event) {
+		// location input
+		if (GCore.inst().getNpcInputs().containsKey(event.getPlayer())) {
+			Player player = event.getPlayer();
+			GCore.inst().getNpcInputs().remove(event.getPlayer()).onChoose(player, event.getNpc());
 			return;
 		}
 	}

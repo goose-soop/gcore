@@ -43,7 +43,7 @@ public class CommandRoot extends CommandArgument implements CommandExecutor, Tab
 			if (spl.contains(":")) {
 				if (spl.charAt(spl.length() - 1) == ':') spl = spl.substring(0, spl.length() - 1);
 				Pair<String, String> splSplit = Utils.separateRootAtChar(spl, ':');
-				parameters.put(splSplit.getA().toLowerCase(), splSplit.getB().isEmpty() ? null : splSplit.getB());
+				parameters.put(splSplit.getA().toLowerCase(), splSplit.getB() == null || splSplit.getB().isEmpty() ? null : splSplit.getB());
 			} else {
 				parameters.put(spl.toLowerCase(), null);
 			}

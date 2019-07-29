@@ -418,6 +418,12 @@ public class GLocale {
 			"es_ES", Utils.asList("&7Escriba un nuevo valor o &ccancel &7para cancelar.")
 			);
 
+	public static final Text MSG_GENERIC_CHATINPUTMODIFY = new Text(
+			"MSG_GENERIC_CHATINPUTMODIFY", file,
+			"en_US", "&7Type the new value or &ccancel &7to cancel. Click on this message to add the existing text.",
+			"fr_FR", "&7Entrez une nouvelle valeur ou bien &ccancel &7pour annuler. Cliquez sur ce message pour ajouter le texte existant."
+			);
+
 	public static final Text MSG_GENERIC_CHATINPUTID = new Text(
 			"MSG_GENERIC_CHATINPUTID", file,
 			"en_US", "&7Enter an &aID &7in the chat or &ccancel &7to cancel.",

@@ -212,6 +212,36 @@ public class NpcManager implements Listener {
 		return true;
 	}
 
+	/**
+	 * Initialize default NPCs data for an user
+	 * @param user the user
+	 * @param player the connected user
+	 * @return the amount of new npc data created or completed with new values
+	 */
+	public int createDefaultNpcData(GUser user, Player player) {
+		int changed = 0;
+		for (NpcData npcData : npcsData.values()) {
+			// get npc id
+			Integer npcId = Utils.integerOrNull(npcData.getId());
+			if (npcId == null) continue;
+			// add data if hasn't
+			GUserNpcData userNpc = user.getUserNpcData(npcId);
+			if (userNpc == null) {
+				user.updateNpc(npcId, new GUserNpcData(npcId, npcData, player));
+				++changed;
+			}
+			// ensure data is complete if has
+			else {
+				if (userNpc.replaceValues(npcData, player, false) > 0) {
+					++changed;
+				}
+			}
+			// add npc if shown (shown check is made in method so just call it)
+			spawnNpc(player, npcId, null);
+		}
+		return changed;
+	}
+
 	public void runBehaviorsAttempt(AttemptContext context, Player player, Event event) {
 		// check npcs
 		for (Npc npc : GCore.inst().getNpcManager().getNpcs(player)) {
@@ -372,28 +402,7 @@ public class NpcManager implements Listener {
 		Player player = user.getInfo().toPlayer();
 		if (player == null) return;
 		// ensure user has data for every npcs, and add it eventually
-		boolean push = false;
-		for (NpcData npcData : npcsData.values()) {
-			// get npc id
-			Integer npcId = Utils.integerOrNull(npcData.getId());
-			if (npcId == null) continue;
-			// add data if hasn't
-			GUserNpcData userNpc = user.getUserNpcData(npcId);
-			if (userNpc == null) {
-				user.updateNpc(npcId, new GUserNpcData(npcId, npcData, player));
-				push = true;
-			}
-			// ensure data is complete if has
-			else {
-				if (userNpc.replaceValues(npcData, player, false) > 0) {
-					push = true;
-				}
-			}
-			// add npc if shown (check made in submethod)
-			spawnNpc(player, npcId, null);
-		}
-		// push data
-		if (push) {
+		if (createDefaultNpcData(user, player) > 0) {
 			user.pushAsync();
 		}
 	}

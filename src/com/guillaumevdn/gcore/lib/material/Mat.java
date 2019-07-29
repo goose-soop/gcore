@@ -1013,7 +1013,7 @@ public class Mat implements Cloneable, Comparable<Mat> {
 	public static final Mat WHITE_DYE = registerValue(new Mat(VERSION, "WHITE_DYE", "-"));
 	public static final Mat BLUE_DYE = registerValue(new Mat(VERSION, "BLUE_DYE", "-"));
 	public static final Mat BROWN_DYE = registerValue(new Mat(VERSION, "BROWN_DYE", "-"));
-	public static final Mat RED_DYE = registerValue(new Mat(VERSION, "RED_ROSE", "RED_DYE"));
+	public static final Mat RED_DYE = registerValue(new Mat(VERSION, "RED_DYE", "RED_ROSE"));
 	// forgotten blocks or legacy blocks
 	public static final Mat LEGACY_DOUBLE_STEP_0 = registerValue(new Mat(VERSION, "-", "DOUBLE_STEP"));
 	public static final Mat LEGACY_DOUBLE_STEP_1 = registerValue(new Mat(VERSION, "-", "DOUBLE_STEP", 1));

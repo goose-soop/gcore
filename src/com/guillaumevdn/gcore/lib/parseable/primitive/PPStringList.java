@@ -9,6 +9,7 @@ import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.GLocale;
 import com.guillaumevdn.gcore.lib.gui.GUI;
 import com.guillaumevdn.gcore.lib.material.Mat;
+import com.guillaumevdn.gcore.lib.messenger.JsonMessage;
 import com.guillaumevdn.gcore.lib.parseable.ParseResult;
 import com.guillaumevdn.gcore.lib.parseable.Parseable;
 import com.guillaumevdn.gcore.lib.parseable.PrimitiveParseable;
@@ -48,7 +49,11 @@ public class PPStringList extends PrimitiveParseable<List<String>> {
 						// edit
 						if (clickType.isLeftClick()) {
 							player.closeInventory();
-							GLocale.MSG_GENERIC_CHATINPUT.send(player);
+							JsonMessage json = new JsonMessage();
+							for (String str : GLocale.MSG_GENERIC_CHATINPUTMODIFY.getLines()) {
+								json.append(str).setClickAsSuggestCmd(getValue().get(index).replace("§", "&")).save();
+							}
+							json.send(player);
 							GCore.inst().getChatInputs().put(player, new ChatInput() {
 								@Override
 								public void onChat(Player player, String value) {

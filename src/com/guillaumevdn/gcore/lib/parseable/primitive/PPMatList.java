@@ -67,7 +67,7 @@ public class PPMatList extends PrimitiveParseable<List<Mat>> {
 								protected void fill() {
 									// current, raw and delete
 									EditorGUI.fillItemCurrent(subThis, player, "" + (index + 1), Utils.asList(line), null, "GCore material", isMandatory(), getEditorIcon(), 0, onModif);
-									EditorGUI.fillItemRaw(subThis, player, 3, onModif, new RawChangeCallback() {
+									EditorGUI.fillItemRaw(subThis, player, 3, getValue().get(index), onModif, new RawChangeCallback() {
 										@Override
 										public void callback(EditorGUI from, Player player, String value) {
 											getValue().set(index, value);

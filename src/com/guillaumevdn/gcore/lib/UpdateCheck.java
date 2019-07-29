@@ -16,7 +16,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.lib.Logger.Level;
-import com.guillaumevdn.gcore.lib.messenger.MessageSpecial;
+import com.guillaumevdn.gcore.lib.messenger.JsonMessage;
 import com.guillaumevdn.gcore.lib.messenger.Messenger;
 import com.guillaumevdn.gcore.lib.util.Utils;
 
@@ -69,10 +69,10 @@ public class UpdateCheck {
 							if (!players.isEmpty()) {
 								Messenger.send(players, Messenger.Level.SEVERE_INFO, GCore.inst().getName(), (outdated.size() > 1 ? "These plugins are" : "This plugin is") + " outdated :");
 								for (GPlugin plugin : outdated.keySet()) {
-									MessageSpecial special = new MessageSpecial();
-									special.newJComp(Messenger.Level.SEVERE_INFO.format("", "<" + plugin.getName() + " (new is " + outdated.get(plugin) + ", current is " + getVersionRelatedCharacters(plugin.getDescription().getVersion()) + ")>")).build(special);
-									special.newJComp(" §b§l[UPDATE]").addURL("https://www.spigotmc.org/resources/" + plugin.spigotResourceId + "/").build(special);
-									special.send(players);
+									new JsonMessage()
+									.append(Messenger.Level.SEVERE_INFO.format("", "<" + plugin.getName() + " (new is " + outdated.get(plugin) + ", current is " + getVersionRelatedCharacters(plugin.getDescription().getVersion()) + ")> ")).save()
+									.append("§b§l[UPDATE]").setClickAsURL("https://www.spigotmc.org/resources/" + plugin.spigotResourceId + "/").save()
+									.send(players);
 								}
 							}
 							// console

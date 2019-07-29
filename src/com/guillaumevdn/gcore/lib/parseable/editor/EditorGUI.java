@@ -11,6 +11,7 @@ import com.guillaumevdn.gcore.lib.GPlugin;
 import com.guillaumevdn.gcore.lib.gui.ClickeableItem;
 import com.guillaumevdn.gcore.lib.gui.GUI;
 import com.guillaumevdn.gcore.lib.material.Mat;
+import com.guillaumevdn.gcore.lib.messenger.JsonMessage;
 import com.guillaumevdn.gcore.lib.parseable.ContainerParseable;
 import com.guillaumevdn.gcore.lib.parseable.ListParseable;
 import com.guillaumevdn.gcore.lib.parseable.Parseable;
@@ -179,8 +180,8 @@ public abstract class EditorGUI extends GUI {
 		}
 	}
 
-	public static void fillItemRaw(final EditorGUI gui, Player player, final PrimitiveParseable<?> component, final int rawSlot, final ModifCallback onModif) {
-		fillItemRaw(gui, player, rawSlot, onModif, new RawChangeCallback() {
+	public static void fillItemRaw(final EditorGUI gui, Player player, final PrimitiveParseable<?> component, final int rawSlot, final String currentValue, final ModifCallback onModif) {
+		fillItemRaw(gui, player, rawSlot, currentValue, onModif, new RawChangeCallback() {
 			@Override
 			public void callback(EditorGUI from, Player player, String value) {
 				if (component.getValue() == null) {
@@ -192,13 +193,21 @@ public abstract class EditorGUI extends GUI {
 		});
 	}
 
-	public static void fillItemRaw(final EditorGUI gui, Player player, final int rawSlot, final ModifCallback onModif, final RawChangeCallback onChange) {
+	public static void fillItemRaw(final EditorGUI gui, Player player, final int rawSlot, final String currentValue, final ModifCallback onModif, final RawChangeCallback onChange) {
 		gui.setRegularItem(new EditorItem("control_item_raw", rawSlot, Mat.COMMAND_BLOCK, GLocale.GUI_GENERIC_EDITORRAW.getLine(), GLocale.GUI_GENERIC_EDITORRAWLORE.getLines("{placeholders}", PlaceholderParser.describeAll())) {
 			@Override
 			protected void onClick(final Player player, final ClickType clickType, final int pageIndex) {
 				// chat
 				player.closeInventory();
-				GLocale.MSG_GENERIC_CHATINPUT.send(player);
+				if (currentValue != null && !currentValue.isEmpty()) {
+					JsonMessage json = new JsonMessage();
+					for (String str : GLocale.MSG_GENERIC_CHATINPUTMODIFY.getLines()) {
+						json.append(str).setHoverAsTooltip(currentValue.replace("§", "&")).save();
+					}
+					json.send(player);
+				} else {
+					GLocale.MSG_GENERIC_CHATINPUT.send(player);
+				}
 				GCore.inst().getChatInputs().put(player, new ChatInput() {
 					@Override
 					public void onChat(Player player, String value) {

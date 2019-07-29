@@ -75,7 +75,7 @@ public class PPEnumList<T extends Enum<T>> extends PrimitiveParseable<List<T>> {
 								protected void fill() {
 									// current, raw and delete
 									EditorGUI.fillItemCurrent(subThis, player, "" + (index + 1), Utils.asList(line), null, getTypeName(), isMandatory(), getEditorIcon(), 0, onModif);
-									EditorGUI.fillItemRaw(subThis, player, 3, onModif, new RawChangeCallback() {
+									EditorGUI.fillItemRaw(subThis, player, 3, getValue().get(index), onModif, new RawChangeCallback() {
 										@Override
 										public void callback(EditorGUI from, Player player, String value) {
 											getValue().set(index, value);

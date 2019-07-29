@@ -36,7 +36,7 @@ public class PPUUID extends PrimitiveParseable<UUID> {
 	protected void fillEditor(final EditorGUI gui, Player player, final ModifCallback onModif) {
 		// current, raw and delete
 		EditorGUI.fillItemCurrent(gui, player, this, 0, onModif);
-		EditorGUI.fillItemRaw(gui, player, this, 3, onModif);
+		EditorGUI.fillItemRaw(gui, player, this, 3, getValue() == null || getValue().isEmpty() ? null : getValue().get(0), onModif);
 		EditorGUI.fillItemDelete(gui, player, this, 6, onModif);
 	}
 

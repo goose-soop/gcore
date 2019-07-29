@@ -40,7 +40,7 @@ public class PPWorld extends PrimitiveParseable<World> {
 	protected void fillEditor(final EditorGUI gui, Player player, final ModifCallback onModif) {
 		// current, raw and delete
 		EditorGUI.fillItemCurrent(gui, player, this, 0, onModif);
-		EditorGUI.fillItemRaw(gui, player, this, 3, onModif);
+		EditorGUI.fillItemRaw(gui, player, this, 3, getValue() == null || getValue().isEmpty() ? null : getValue().get(0), onModif);
 		EditorGUI.fillItemDelete(gui, player, this, 6, onModif);
 		// select
 		gui.setRegularItem(new EditorItem("select", 2, Mat.ENDER_CHEST, GLocale.GUI_GENERIC_EDITORENUMSELECT.getLine(), GLocale.GUI_GENERIC_EDITORENUMSELECTLORE.getLines()) {

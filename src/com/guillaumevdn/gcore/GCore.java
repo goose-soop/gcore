@@ -53,7 +53,7 @@ import com.guillaumevdn.gcore.libs.com.google.gson.Gson;
 
 import sun.util.calendar.ZoneInfo;
 
-// FIXME : add fucking gravity to NPCs -> behavior ? :thinking:
+// TODO : add fucking gravity to NPCs -> behavior ? :thinking:
 public class GCore extends GPlugin {
 
 	// ------------------------------------------------------------

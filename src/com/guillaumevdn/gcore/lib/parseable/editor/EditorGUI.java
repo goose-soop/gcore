@@ -202,7 +202,7 @@ public abstract class EditorGUI extends GUI {
 				if (currentValue != null && !currentValue.isEmpty()) {
 					JsonMessage json = new JsonMessage();
 					for (String str : GLocale.MSG_GENERIC_CHATINPUTMODIFY.getLines()) {
-						json.append(str).setHoverAsTooltip(currentValue.replace("§", "&")).save();
+						json.append(str).setClickAsSuggestCmd(currentValue.replace("§", "&")).setHoverAsTooltip(currentValue.replace("§", "&")).save();
 					}
 					json.send(player);
 				} else {

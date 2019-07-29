@@ -20,6 +20,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.lib.data.DataBoard;
+import com.guillaumevdn.gcore.lib.data.DataManager.BackEnd;
 import com.guillaumevdn.gcore.lib.data.DataManager.Callback;
 import com.guillaumevdn.gcore.lib.data.mysql.Query;
 import com.guillaumevdn.gcore.lib.event.GUserPulledEvent;
@@ -123,10 +124,28 @@ public class UserBoard extends DataBoard<GUser> implements Listener {
 	// events
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void event(final PlayerJoinEvent event) {
-		loadUser(new UserInfo(event.getPlayer()), new Callback() {
+		// ensure he has a profile
+		final Player player = event.getPlayer();
+		boolean created = false;
+		boolean json = getDataManager().getBackEnd().equals(BackEnd.JSON);
+		if (getDataManager().getDataProfiles().createDefaultProfile(player.getUniqueId(), !json)) {
+			created = true;
+		}
+		if (created) {
+			// log
+			if (GCore.inst().getConfiguration() == null ? false : GCore.inst().getConfiguration().getBoolean("show_data_debug", true)) {
+				GCore.inst().debug("Created " + created + " new default player data profile");
+			}
+			// push data if json
+			if (json) {
+				getDataManager().getDataProfiles().pushAsync();
+			}
+		}
+		// load user
+		loadUser(new UserInfo(player), new Callback() {
 			@Override
 			public void callback() {
-				final GUser user = GUser.get(event.getPlayer());
+				final GUser user = GUser.get(player);
 				if (user != null) {
 					new Handler() {
 						@Override

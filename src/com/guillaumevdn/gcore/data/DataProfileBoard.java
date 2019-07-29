@@ -49,6 +49,20 @@ public class DataProfileBoard extends DataSingleton {
 		// event
 		Bukkit.getPluginManager().callEvent(new UserDataProfileChangedEvent(new UserInfo(player, profile), previousProfile));
 	}
+	
+	/**
+	 * @param player the player to check
+	 * @param push true if the data should be pushed
+	 * @return true if the user had no profile and was added
+	 */
+	public boolean createDefaultProfile(UUID player, boolean push) {
+		if (!profiles.containsKey(player)) {
+			profiles.put(player, "default");
+			if (push) pushAsync(player.toString(), "default");
+			return true;
+		}
+		return false;
+	}
 
 	// data
 	@Override

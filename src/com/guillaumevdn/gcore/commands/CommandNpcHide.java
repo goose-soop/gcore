@@ -51,7 +51,7 @@ public class CommandNpcHide extends CommandArgument {
 						userNpc.setShown(false);
 						user.updateNpc(npcId, userNpc);
 						// hide
-						npc.despawn();
+						GCore.inst().getNpcManager().removeNpc(owner, npc);
 						Messenger.send(call.getSender(), Messenger.Level.NORMAL_SUCCESS, GCore.inst().getName(), "Hidden NPC with ID " + npcId + " for player " + owner.getName() + ".");
 					}
 				}.operate();

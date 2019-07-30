@@ -1767,6 +1767,15 @@ public class Utils {
 		}
 		return Character.toUpperCase(original.charAt(0)) + original.substring(1);
 	}
+	
+	public static String reverseString(String original) {
+		StringBuilder result = new StringBuilder();
+		char[] chars = original.toCharArray();
+		for (int i = chars.length - 1; i >= 0; --i) {
+			result.append(chars[i]);
+		}
+		return result.toString();
+	}
 
 	public static String uncapitalizeFirstLetter(String original) {
 		if (original == null || original.length() == 0) {
@@ -1822,6 +1831,18 @@ public class Utils {
 			}
 		}
 		return true;
+	}
+	
+	public static String getAlphanumeric(String str) {
+		StringBuilder builder = new StringBuilder();
+		for (int i = 0; i < str.length(); i++) {
+			char c = str.charAt(i);
+			if (c < 0x30 || (c >= 0x3a && c <= 0x40) || (c > 0x5a && c <= 0x60) || c > 0x7a) {
+			} else {
+				builder.append(c);
+			}
+		}
+		return builder.toString();
 	}
 
 	public static List<String> toList(String[][] array) {

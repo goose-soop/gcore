@@ -566,6 +566,7 @@ public class Mat implements Cloneable, Comparable<Mat> {
 	public static final Mat NETHER_BRICKS = registerValue(new Mat(VERSION, "NETHER_BRICKS", "NETHER_BRICK"));
 	public static final Mat NETHER_BRICK_FENCE = registerValue(new Mat(VERSION, "NETHER_BRICK_FENCE", "NETHER_FENCE"));
 	public static final Mat NETHER_BRICK_SLAB = registerValue(new Mat(VERSION, "NETHER_BRICK_SLAB", "STEP", 6));
+	public static final Mat RED_NETHER_BRICK_SLAB = registerValue(new Mat(VERSION, "RED_NETHER_BRICK_SLAB", "-"));
 	public static final Mat NETHER_BRICK_STAIRS = registerValue(new Mat(VERSION, "NETHER_BRICK_STAIRS", "NETHER_BRICK_STAIRS"));
 	public static final Mat NETHER_PORTAL = registerValue(new Mat(VERSION, "NETHER_PORTAL", "PORTAL"));
 	public static final Mat NETHER_QUARTZ_ORE = registerValue(new Mat(VERSION, "NETHER_QUARTZ_ORE", "QUARTZ_ORE"));
@@ -1112,7 +1113,7 @@ public class Mat implements Cloneable, Comparable<Mat> {
 	}
 
 	public boolean isAir() {
-		return modernName.contains("AIR");
+		return equals(AIR) || equals(CAVE_AIR) || equals(VOID_AIR);
 	}
 
 	public boolean isSkull() {
@@ -1145,6 +1146,10 @@ public class Mat implements Cloneable, Comparable<Mat> {
 
 	@Override
 	public Mat clone() {
+		return new Mat(VERSION, modernName, legacyName, legacyData, durability);
+	}
+	
+	public Mat cloneWithDurability(int durability) {
 		return new Mat(VERSION, modernName, legacyName, legacyData, durability);
 	}
 

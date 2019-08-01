@@ -141,7 +141,7 @@ public class Param {
 		String value = getString(call);
 		if (value != null) {
 			// valid alphanumeric string
-			if (Utils.isAlphanumeric(value)) {
+			if (Utils.isAlphanumeric(value.replace("_", ""))) {
 				return value;
 			}
 			// not alphanumeric

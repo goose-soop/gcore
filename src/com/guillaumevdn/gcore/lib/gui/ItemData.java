@@ -596,7 +596,7 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 			ItemStack item = inventory.getItem(slot);
 			if (isSimilar(item, checkDurability, exactMatch, false)) {
 				// check durability
-				if (minDurabilityIfNotUnbreakable > 0d && !isUnbreakable() && getType().getDurability() / ((double) getType().getCurrentMaterial().getMaxDurability()) * 100d < minDurabilityIfNotUnbreakable) {
+				if (minDurabilityIfNotUnbreakable > 0d && !isUnbreakable() && (100d - (getType().getDurability() / ((double) getType().getCurrentMaterial().getMaxDurability()) * 100d) < minDurabilityIfNotUnbreakable)) {
 					continue;
 				}
 				// remove

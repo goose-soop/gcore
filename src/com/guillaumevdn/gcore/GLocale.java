@@ -46,6 +46,12 @@ public class GLocale {
 			"es_ES", Utils.asList("&6{plugin} >> &7Requieres &c{money}$ pero solo posees &c{balance}$ en tu")
 			);
 
+	public static final Text MSG_GENERIC_NOXPLEVEL = new Text(
+			"MSG_GENERIC_NOXPLEVEL", file,
+			"en_US", "&6{plugin} >> &7You need &c{amount} LVL &7but you only have &c{balance}&7.",
+			"fr_FR", "&6{plugin} >> &7Vous avez besoin de &c{amount} LVL &7mais vous avez seulement &c{balance}&7."
+			);
+
 	public static final Text MSG_GENERIC_NAMETAKEN = new Text(
 			"MSG_GENERIC_NAMETAKEN", file,
 			"en_US", "&6{plugin} >> &7Name &c{name} &7is already taken.",

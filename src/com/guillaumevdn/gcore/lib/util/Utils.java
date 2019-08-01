@@ -1767,6 +1767,15 @@ public class Utils {
 		}
 		return Character.toUpperCase(original.charAt(0)) + original.substring(1);
 	}
+	
+	public static String reverseString(String original) {
+		StringBuilder result = new StringBuilder();
+		char[] chars = original.toCharArray();
+		for (int i = chars.length - 1; i >= 0; --i) {
+			result.append(chars[i]);
+		}
+		return result.toString();
+	}
 
 	public static String uncapitalizeFirstLetter(String original) {
 		if (original == null || original.length() == 0) {
@@ -1822,6 +1831,18 @@ public class Utils {
 			}
 		}
 		return true;
+	}
+	
+	public static String getAlphanumeric(String str) {
+		StringBuilder builder = new StringBuilder();
+		for (int i = 0; i < str.length(); i++) {
+			char c = str.charAt(i);
+			if (c < 0x30 || (c >= 0x3a && c <= 0x40) || (c > 0x5a && c <= 0x60) || c > 0x7a) {
+			} else {
+				builder.append(c);
+			}
+		}
+		return builder.toString();
 	}
 
 	public static List<String> toList(String[][] array) {
@@ -2530,7 +2551,7 @@ public class Utils {
 	}
 
 	// https://stackoverflow.com/questions/3422673/how-to-evaluate-a-math-expression-given-in-string-form, that guy is a real programmer, Pog
-	public static double calculateExpression(String expression) {
+	public static double calculateExpression(String expression) throws CalculationError {
 		final String str = expression.toLowerCase();
 		return new Object() {
 			int pos = -1, ch;
@@ -2551,7 +2572,7 @@ public class Utils {
 			double parse() {
 				nextChar();
 				double x = parseExpression();
-				if (pos < str.length()) throw new Error("Unexpected: " + (char)ch);
+				if (pos < str.length()) throw new CalculationError("unexpected character '" + (char) ch + "'");
 				return x;
 			}
 
@@ -2606,9 +2627,9 @@ public class Utils {
 					else if (func.equals("abs")) x = Math.abs(x);
 					else if (func.equals("posorzero")) x = x >= 0d ? x : 0d;
 					else if (func.equals("posorone")) x = x >= 0d ? x : 1d;
-					else throw new Error("Unknown function: " + func);
+					else throw new CalculationError("unknown function '" + func + "'");
 				} else {
-					throw new Error("Unexpected: " + (char) ch);
+					throw new CalculationError("unexpected character : '" + (char) ch + "'");
 				}
 
 				if (eat('^')) x = Math.pow(x, parseFactor()); // exponentiation
@@ -2616,6 +2637,16 @@ public class Utils {
 				return x;
 			}
 		}.parse();
+	}
+	
+	public static class CalculationError extends Error {
+		
+		private static final long serialVersionUID = 4723673620719545559L;
+
+		public CalculationError(String message) {
+			super(message);
+		}
+		
 	}
 
 }

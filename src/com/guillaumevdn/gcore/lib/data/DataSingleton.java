@@ -58,23 +58,30 @@ public abstract class DataSingleton {
 		}});
 	}
 
-	public void pushAsync(final Object... params) {
-		getDataManager().runAsync(new BukkitRunnable() { @Override public void run() {
-			try {
-				long start = System.currentTimeMillis();
-				if (getDataManager().getBackEnd().equals(BackEnd.JSON)) {
-					jsonPush();
-				} else if (getDataManager().getBackEnd().equals(BackEnd.MYSQL)) {
-					mysqlPush(params);
-				}
-				if (GCore.inst().getConfiguration() == null ? false : GCore.inst().getConfiguration().getBoolean("show_data_debug", true)) {
-					getDataManager().getPlugin().debug("Saved " + DataSingleton.this.getClass().getSimpleName() + " for " + getDataManager().getClass().getSimpleName() + " (took " + (System.currentTimeMillis() - start) + " ms)");
-				}
-			} catch (Throwable exception) {
-				exception.printStackTrace();
-				getDataManager().getPlugin().error("Couldn't save " + DataSingleton.this.getClass().getSimpleName() + " for " + getDataManager().getClass().getSimpleName());
+	public void push(final Object... params) {
+		try {
+			long start = System.currentTimeMillis();
+			if (getDataManager().getBackEnd().equals(BackEnd.JSON)) {
+				jsonPush();
+			} else if (getDataManager().getBackEnd().equals(BackEnd.MYSQL)) {
+				mysqlPush(params);
 			}
-		}});
+			if (GCore.inst().getConfiguration() == null ? false : GCore.inst().getConfiguration().getBoolean("show_data_debug", true)) {
+				getDataManager().getPlugin().debug("Saved " + DataSingleton.this.getClass().getSimpleName() + " for " + getDataManager().getClass().getSimpleName() + " (took " + (System.currentTimeMillis() - start) + " ms)");
+			}
+		} catch (Throwable exception) {
+			exception.printStackTrace();
+			getDataManager().getPlugin().error("Couldn't save " + DataSingleton.this.getClass().getSimpleName() + " for " + getDataManager().getClass().getSimpleName());
+		}
+	}
+
+	public void pushAsync(final Object... params) {
+		getDataManager().runAsync(new BukkitRunnable() {
+			@Override
+			public void run() {
+				push();
+			}
+		});
 	}
 
 	public void deleteAsync(final Object... params) {

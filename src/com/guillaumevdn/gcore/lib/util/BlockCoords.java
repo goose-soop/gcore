@@ -45,17 +45,16 @@ public class BlockCoords {
 	public Location toLocation() {
 		return new Location(world, x, y, z);
 	}
-	
+
 	public Block toBlock() {
 		return world.getBlockAt(x, y, z);
 	}
-	
+
 	@Override
 	public String toString() {
 		return world.getName() + "," + x + "," + y + "," + z;
 	}
 
-	// overriden
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -88,6 +87,14 @@ public class BlockCoords {
 		if (z != other.z)
 			return false;
 		return true;
+	}
+
+	// methods
+	public double distance(int x, int y, int z) {
+		int offx = x - this.x;
+		int offy = y - this.y;
+		int offz = z - this.z;
+		return Math.sqrt(offx * offx + offy * offy + offz * offz);
 	}
 
 }

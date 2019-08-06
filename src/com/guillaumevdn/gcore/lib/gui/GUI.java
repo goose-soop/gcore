@@ -72,7 +72,6 @@ public class GUI implements Listener {
 	private final int size;
 	private final List<Integer> regularItemSlots;
 	private final boolean unregisterOnClose;
-	private ClickTolerance clickTolerance;
 	private final ItemData previousPageItem;
 	private final ItemData previousPageItemEmpty;
 	private int previousPageItemSlot;
@@ -86,28 +85,23 @@ public class GUI implements Listener {
 
 	// bases
 	public GUI(Plugin plugin, String name, int size, List<Integer> regularItemSlots) {
-		this(plugin, name, size, regularItemSlots, true, ClickTolerance.ALLOW, null, null, null, null);
+		this(plugin, name, size, regularItemSlots, true, null, null, null, null);
 	}
 
 	public GUI(Plugin plugin, String name, int size, List<Integer> regularItemSlots, ItemData previousPageItem, ItemData nextPageItem) {
-		this(plugin, name, size, regularItemSlots, true, ClickTolerance.ALLOW, previousPageItem, null, nextPageItem, null);
+		this(plugin, name, size, regularItemSlots, true, previousPageItem, null, nextPageItem, null);
 	}
 
 	public GUI(Plugin plugin, String name, int size, List<Integer> regularItemSlots, boolean unregisterOnClose) {
-		this(plugin, name, size, regularItemSlots, unregisterOnClose, ClickTolerance.ALLOW, null, null, null, null);
+		this(plugin, name, size, regularItemSlots, unregisterOnClose, null, null, null, null);
 	}
 
-	public GUI(Plugin plugin, String name, int size, List<Integer> regularItemSlots, boolean unregisterOnClose, ClickTolerance clickTolerance) {
-		this(plugin, name, size, regularItemSlots, unregisterOnClose, clickTolerance, null, null, null, null);
-	}
-
-	public GUI(Plugin plugin, String name, int size, List<Integer> regularItemSlots, boolean unregisterOnClose, ClickTolerance clickTolerance, ItemData previousPageItem, ItemData previousPageItemEmpty, ItemData nextPageItem, ItemData nextPageItemEmpty) {
+	public GUI(Plugin plugin, String name, int size, List<Integer> regularItemSlots, boolean unregisterOnClose, ItemData previousPageItem, ItemData previousPageItemEmpty, ItemData nextPageItem, ItemData nextPageItemEmpty) {
 		this.plugin = plugin;
 		this.name = name;
 		this.size = size;
 		this.regularItemSlots = regularItemSlots;
 		this.unregisterOnClose = unregisterOnClose;
-		this.clickTolerance = clickTolerance;
 		// previous page items
 		this.previousPageItemSlot = size - 9;
 		if (previousPageItem == null) previousPageItem = PREVIOUS_PAGE_ITEM;
@@ -147,14 +141,6 @@ public class GUI implements Listener {
 
 	public List<Integer> getRegularItemSlots() {
 		return regularItemSlots;
-	}
-
-	public ClickTolerance getClickTolerance() {
-		return clickTolerance;
-	}
-
-	public void setClickTolerance(ClickTolerance clickTolerance) {
-		this.clickTolerance = clickTolerance;
 	}
 
 	public boolean isDisablePages() {
@@ -490,9 +476,7 @@ public class GUI implements Listener {
 	/**
 	 * @return true if the event must be cancelled
 	 */
-	protected boolean onBottomInventoryClick(Player player, ItemStack item, int slot) {
-		// TODO : this, but it'll need reworks in all GUI constructors : !clickTolerance.isClickTypeAllowed(InventoryClickType.BOTTOM);
-		return true;
+	protected void onBottomInventoryClick(Player player, ItemStack item, int slot) {
 	}
 
 	/**
@@ -544,62 +528,64 @@ public class GUI implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-	public void event(InventoryClickEvent event) {
-		Inventory inventory = event.getInventory();
+	public void event(final InventoryClickEvent event) {
+		final Inventory inventory = event.getInventory();
 		if (pages.contains(inventory)) {
-			ItemStack clickedStack = event.getCurrentItem();
-			InventoryClickType clickType = event.getClickedInventory() == null ? InventoryClickType.OUTSIDE : (inventory.equals(event.getClickedInventory()) ? (clickedStack == null ? InventoryClickType.OUTSIDE : InventoryClickType.TOP) : (clickedStack == null ? InventoryClickType.OUTSIDE : InventoryClickType.BOTTOM)); 
-			// disallowed click type
-			if (!clickTolerance.isClickTypeAllowed(clickType)) {
-				event.setCancelled(true);
-				return;
-			}
+			// cancel event
+			event.setCancelled(true);
+			// perform actions outside of the event (because on some actions, for example GUI opening, the item is still taken
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					ItemStack clickedStack = event.getCurrentItem();
+					InventoryClickType clickType = event.getClickedInventory() == null ? InventoryClickType.OUTSIDE : (inventory.equals(event.getClickedInventory()) ? (clickedStack == null ? InventoryClickType.OUTSIDE : InventoryClickType.TOP) : (clickedStack == null ? InventoryClickType.OUTSIDE : InventoryClickType.BOTTOM)); 
 
-			// vars
-			int slot = event.getRawSlot();
-			int pageIndex = getPageIndex(inventory);
-			Player player = (Player) event.getWhoClicked();
-
-			// bottom click
-			if (clickType.equals(InventoryClickType.BOTTOM)) {
-				try {
-					event.setCancelled(onBottomInventoryClick(player, clickedStack, slot));
-				} catch (Throwable exception) {
-					exception.printStackTrace();
-					GCore.inst().error("An unknown error occured while processing bottom click at slot " + slot + ", page " + pageIndex);
-					event.setCancelled(true);
-				}
-				return;
-			}
-
-			// pages
-			if (!disablePages) {
-				// previous page
-				if (slot == previousPageItemSlot) {
-					if (pageIndex - 1 >= 0) {
-						open(player, pageIndex - 1);
+					// bottom click
+					int slot = event.getRawSlot();
+					int pageIndex = getPageIndex(inventory);
+					Player player = (Player) event.getWhoClicked();
+					if (clickType.equals(InventoryClickType.BOTTOM)) {
+						try {
+							onBottomInventoryClick(player, clickedStack, slot);
+						} catch (Throwable exception) {
+							exception.printStackTrace();
+							GCore.inst().error("An unknown error occured while processing bottom click at slot " + slot + ", page " + pageIndex);
+							event.setCancelled(true);
+						}
 						return;
 					}
-				}
-				// next page
-				if (slot == nextPageItemSlot) {
-					if (pageIndex + 1 < pages.size()) {
-						open(player, pageIndex + 1);
-						return;
+
+					// pages
+					if (!disablePages) {
+						// previous page
+						if (slot == previousPageItemSlot) {
+							if (pageIndex - 1 >= 0) {
+								open(player, pageIndex - 1);
+								return;
+							}
+						}
+						// next page
+						if (slot == nextPageItemSlot) {
+							if (pageIndex + 1 < pages.size()) {
+								open(player, pageIndex + 1);
+								return;
+							}
+						}
+					}
+
+					// item
+					try {
+						ClickeableItem item = getItemInSlot(pageIndex, slot);
+						if (item != null) {
+							item.onClick(player, event.getClick(), GUI.this, pageIndex);
+						}
+					} catch (Throwable exception) {
+						exception.printStackTrace();
+						GCore.inst().error("An unknown error occured while processing click at slot " + slot + ", page " + pageIndex);
+						event.setCancelled(true);
 					}
 				}
-			}
-
-			// item
-			try {
-				ClickeableItem item = getItemInSlot(pageIndex, slot);
-				event.setCancelled(item == null ? true : item.onClick(player, event.getClick(), this, pageIndex));
-			} catch (Throwable exception) {
-				exception.printStackTrace();
-				GCore.inst().error("An unknown error occured while processing click at slot " + slot + ", page " + pageIndex);
-				event.setCancelled(true);
-			}
-			return;
+			}.runTask(getPlugin());
 		}
 	}
 

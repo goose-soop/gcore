@@ -18,6 +18,8 @@ import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.scheduler.BukkitWorker;
 
 import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.GLocale;
@@ -412,15 +414,6 @@ public abstract class GPlugin extends JavaPlugin implements Listener {
 			return;
 		}
 
-		// close GUIs
-		GUI.unregisterAll(this);
-
-		// events
-		HandlerList.unregisterAll((JavaPlugin) this);
-
-		// tasks
-		Bukkit.getScheduler().cancelTasks(this);
-
 		// disable
 		try {
 			disable();
@@ -429,6 +422,25 @@ public abstract class GPlugin extends JavaPlugin implements Listener {
 			exception.printStackTrace();
 			error("An unknown error occured while disabling");
 		}
+
+		// events
+		HandlerList.unregisterAll((JavaPlugin) this);
+
+		// cancel all tasks
+		Bukkit.getScheduler().cancelTasks(this);
+		for (BukkitTask task : Utils.asList(Bukkit.getScheduler().getPendingTasks())) {
+			if (equals(task.getOwner())) {
+				task.cancel();
+			}
+		}
+		for (BukkitWorker worker : Utils.asList(Bukkit.getScheduler().getActiveWorkers())) {
+			if (equals(worker.getOwner())) {
+				Bukkit.getScheduler().cancelTask(worker.getTaskId());
+			}
+		}
+
+		// close GUIs
+		GUI.unregisterAll(this);
 
 		// integration
 		for (PluginIntegration integration : pluginIntegration) {

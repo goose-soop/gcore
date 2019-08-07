@@ -479,21 +479,28 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 		return give(player, dropLocation, null, true);
 	}
 
-
 	/**
 	 * @return an item with remaining amount if there wasn't enough place in the player's inventory, or null if no extra drop
 	 */
 	public Item give(Player player, Location dropLocation, Integer forcedAmount, boolean drop) {
+		return give(player, dropLocation, forcedAmount, drop, null);
+	}
+
+	/**
+	 * @return an item with remaining amount if there wasn't enough place in the player's inventory, or null if no extra drop
+	 */
+	public Item give(Player player, Location dropLocation, Integer forcedAmount, boolean drop, Integer forcedMaxStackSize) {
 		ItemStack item = getItemStack();
 		if (item == null) return null;
 		// add to inventory
 		int count = forcedAmount != null ? forcedAmount : item.getAmount();
-		for (int slot = 0; slot < player.getInventory().getSize() && count > 0; slot++) {
+		int maxStackSize = forcedMaxStackSize != null ? (forcedMaxStackSize > 64 ? 64 : forcedMaxStackSize) : item.getMaxStackSize();
+		for (int slot = 0; slot < 36 && count > 0; slot++) {
 			ItemStack slotItem = player.getInventory().getItem(slot);
 			if (slotItem == null || Mat.from(slotItem).isAir()) {
 				int newSlotCount = count;
-				if (newSlotCount > item.getMaxStackSize()) {
-					count = newSlotCount - item.getMaxStackSize();
+				if (newSlotCount > maxStackSize) {
+					count = newSlotCount - maxStackSize;
 					slotItem = item.clone();
 					slotItem.setAmount(slotItem.getMaxStackSize());
 					player.getInventory().setItem(slot, slotItem);
@@ -555,7 +562,7 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 		for (ItemStack it : inventory.getContents()) {
 			if (isSimilar(it, checkDurability, exactMatch, false)) {
 				// check durability
-				if (minDurabilityIfNotUnbreakable > 0d && !isUnbreakable() && getType().getDurability() / ((double) getType().getCurrentMaterial().getMaxDurability()) * 100d < minDurabilityIfNotUnbreakable) {
+				if (minDurabilityIfNotUnbreakable > 0d && !isUnbreakable() && (100d - getType().getDurability() / ((double) getType().getCurrentMaterial().getMaxDurability()) * 100d) < minDurabilityIfNotUnbreakable) {
 					continue;
 				}
 				// add count
@@ -566,17 +573,22 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 	}
 
 	public int countFreeFor(Inventory inventory, boolean checkDurability, boolean exactMatch, double minDurabilityIfNotUnbreakable) {
+		return countFreeFor(inventory, checkDurability, exactMatch, minDurabilityIfNotUnbreakable, null);
+	}
+
+	public int countFreeFor(Inventory inventory, boolean checkDurability, boolean exactMatch, double minDurabilityIfNotUnbreakable, Integer forcedMaxStackSize) {
 		int free = 0;
+		int maxStackSize = forcedMaxStackSize != null ? (forcedMaxStackSize > 64 ? 64 : forcedMaxStackSize) : getItemStack().getMaxStackSize();
 		for (ItemStack it : inventory.getContents()) {
 			if (it == null || Mat.from(it.getType()).isAir()) {
-				free += getItemStack().getMaxStackSize();
+				free += maxStackSize;
 			} else if (isSimilar(it, checkDurability, exactMatch, false)) {
 				// check durability
-				if (minDurabilityIfNotUnbreakable > 0d && !isUnbreakable() && getType().getDurability() / ((double) getType().getCurrentMaterial().getMaxDurability()) * 100d < minDurabilityIfNotUnbreakable) {
+				if (minDurabilityIfNotUnbreakable > 0d && !isUnbreakable() && (100d - getType().getDurability() / ((double) getType().getCurrentMaterial().getMaxDurability()) * 100d) < minDurabilityIfNotUnbreakable) {
 					continue;
 				}
 				// add count
-				free += it.getMaxStackSize() - it.getAmount();
+				free += maxStackSize - it.getAmount();
 			}
 		}
 		return free;

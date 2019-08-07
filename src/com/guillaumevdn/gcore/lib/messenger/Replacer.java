@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.guillaumevdn.gcore.lib.util.Utils;
-
 
 public class Replacer {
 
@@ -33,14 +31,6 @@ public class Replacer {
 				for (int j = 0; j < strs.length; j += 2) {
 					String placeholder = String.valueOf(strs[j]);
 					String replacer = String.valueOf(strs[j + 1]);
-					replacements.put(placeholder, replacer);
-				}
-				i++;
-			} else if (objs[i] instanceof Collection<?>) {
-				List<?> strs = Utils.asList((Collection<?>) objs[i]);
-				for (int j = 0; j < strs.size(); j += 2) {
-					String placeholder = String.valueOf(strs.get(j));
-					String replacer = String.valueOf(strs.get(j + 1));
 					replacements.put(placeholder, replacer);
 				}
 				i++;

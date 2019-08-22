@@ -32,7 +32,7 @@ public class PPMatList extends PrimitiveParseable<List<Mat>> {
 		}
 		List<Mat> result = new ArrayList<Mat>();
 		for (String val : value) {
-			Mat parsed = Mat.from(val, 0);
+			Mat parsed = Mat.valueOf(val.toUpperCase());
 			if (parsed != null) {
 				result.add(parsed);
 			} else {

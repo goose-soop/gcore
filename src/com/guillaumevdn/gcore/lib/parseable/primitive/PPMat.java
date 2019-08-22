@@ -29,7 +29,7 @@ public class PPMat extends PrimitiveParseable<Mat> {
 		if (value.isEmpty()) {
 			return new ParseResult<Mat>(null);
 		}
-		Mat result = Mat.from(value.get(0), 0);
+		Mat result = Mat.valueOf(value.get(0).toUpperCase());
 		return result != null ? new ParseResult<Mat>(result) : null;
 	}
 

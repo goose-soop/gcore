@@ -1,6 +1,5 @@
 package com.guillaumevdn.gcore.data;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -13,7 +12,6 @@ import org.bukkit.entity.Player;
 import com.guillaumevdn.gcore.lib.gui.ItemData;
 import com.guillaumevdn.gcore.lib.npc.NpcData;
 import com.guillaumevdn.gcore.lib.npc.NpcStatus;
-import com.guillaumevdn.gcore.lib.npc.behavior.RunningBehavior;
 
 public class GUserNpcData {
 
@@ -33,8 +31,6 @@ public class GUserNpcData {
 	private ItemData chestplate = null;
 	private ItemData helmet = null;
 	private Map<String, String> variables = null;
-	private List<String> behaviors = null;
-	private List<RunningBehavior> runningBehaviors = new ArrayList<RunningBehavior>();
 
 	public GUserNpcData(int id, NpcData data, Player player) {
 		this.id = id;
@@ -110,12 +106,6 @@ public class GUserNpcData {
 				variables.put(variable, value == null ? "0" : value);
 			}
 		}
-		if (behaviors == null || force) {
-			++changed;
-			behaviors = new ArrayList<String>();
-			List<String> list = data.getBehaviors(player);
-			if (list != null) behaviors.addAll(list);
-		}
 		return changed;
 	}
 
@@ -183,14 +173,6 @@ public class GUserNpcData {
 	public String getVariableValue(String variable) {
 		String value = variables.get(variable);
 		return value == null ? "0" : value;
-	}
-
-	public List<String> getBehaviors() {
-		return behaviors;
-	}
-
-	public List<RunningBehavior> getRunningBehaviors() {
-		return runningBehaviors;
 	}
 
 	// set

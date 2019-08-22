@@ -3,30 +3,14 @@ package com.guillaumevdn.gcore.lib.event;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-import com.guillaumevdn.gcore.data.GUser;
-
 /**
- * Triggered when a GUser finished loading
+ * Triggered when the online GUsers finished loading due to the user board pullOnline() method
  */
-public class GUserPulledEvent extends Event {
+public class GUsersPulledOnlineEvent extends Event {
 
 	// base
-	private GUser user;
-	private Context context;
-
-	public GUserPulledEvent(boolean async, GUser user, Context context) {
+	public GUsersPulledOnlineEvent(boolean async) {
 		super(async);
-		this.user = user;
-		this.context = context;
-	}
-
-	// get
-	public GUser getUser() {
-		return user;
-	}
-
-	public Context getContext() {
-		return context;
 	}
 
 	// handlers
@@ -45,7 +29,8 @@ public class GUserPulledEvent extends Event {
 
 		JOIN,
 		PROFILE_CHANGE,
-		USER_OPERATOR
+		USER_OPERATOR,
+		PULL_ONLINE
 
 	}
 

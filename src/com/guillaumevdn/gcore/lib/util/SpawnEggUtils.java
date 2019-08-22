@@ -15,7 +15,7 @@ public class SpawnEggUtils {
 				return meta.getSpawnedType();
 			}
 		} catch (UnsupportedOperationException ignored) {// 1.13+, check item type
-			Mat mat = Mat.from(item);
+			Mat mat = Mat.fromItem(item);
 			if (mat.getModernName().endsWith("_SPAWN_EGG")) {
 				EntityType type = Utils.valueOfOrNull(EntityType.class, mat.getModernName().substring(0, "_SPAWN_EGG".length() - 3));
 				if (type != null) {

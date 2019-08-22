@@ -91,7 +91,7 @@ public class Compat1_14 extends Compat {
 
 	@Override
 	public Mat getArmorStandHelmetType(Entity armorStand) {
-		return armorStand instanceof ArmorStand ? Mat.from(((ArmorStand) armorStand).getHelmet().getType()) : null;
+		return armorStand instanceof ArmorStand ? Mat.fromItem(((ArmorStand) armorStand).getHelmet()) : null;
 	}
 
 	@Override

@@ -9,18 +9,16 @@ import java.util.TreeMap;
 
 import com.guillaumevdn.gcore.lib.util.Utils;
 
-public class SortedMap<K, V> implements Map<K, V>
-{
-	// ------------------------------------------------------------
-	// Order
-	// ------------------------------------------------------------
+public class SortedMap<K, V> implements Map<K, V>, Cloneable {
 
+	// type
 	public enum Type {
 		KEY_SORTED, VALUE_SORTED, UNSORTED;
 	}
 
-	public enum Order
-	{
+	// order
+	public enum Order {
+
 		NATURAL(1),
 		REVERSE(-1);
 
@@ -31,10 +29,9 @@ public class SortedMap<K, V> implements Map<K, V>
 		}
 	}
 
-	// ------------------------------------------------------------
-	// Fields and constructor
-	// ------------------------------------------------------------
-
+	// base
+	private Type type;
+	private Order order;
 	private Map<K, V> map;
 	private transient Map<K, V> lookupMap = new HashMap<K, V>();
 
@@ -42,13 +39,11 @@ public class SortedMap<K, V> implements Map<K, V>
 		this(Type.UNSORTED, null, content);
 	}
 
-	
-	public SortedMap(final Type type, final Order order, final Object... content)
-	{
-		// Key sorted
-
-		if (type != null && type.equals(Type.KEY_SORTED))
-		{
+	public SortedMap(final Type type, final Order order, final Object... content) {
+		this.type = type;
+		this.order = order;
+		// key sorted
+		if (type != null && type.equals(Type.KEY_SORTED)) {
 			map = new TreeMap<K, V>(new Comparator<K>() {
 				@Override
 				public int compare(final K k1, final K k2)
@@ -79,11 +74,8 @@ public class SortedMap<K, V> implements Map<K, V>
 				}
 			});
 		}
-
-		// Value sorted
-
-		else if (type != null && type.equals(Type.VALUE_SORTED))
-		{
+		// value sorted
+		else if (type != null && type.equals(Type.VALUE_SORTED)) {
 			map = new TreeMap<K, V>(new Comparator<K>() {
 				@Override
 				public int compare(final K k1, final K k2)
@@ -113,26 +105,20 @@ public class SortedMap<K, V> implements Map<K, V>
 				}
 			});
 		}
-
-		// Unsorted
-
+		// unsorted
 		else {
 			map = new HashMap<K, V>();
 		}
-
-		// Content
-
-		if (content.length != 0 && content.length % 2 != 0) throw new IllegalArgumentException("size isn't a multiple of 2");
-
-		for (int i = 0; i < content.length; i += 2) {
-			map.put((K) content[i], (V) content[i + 1]);
+		// init contents
+		if (content != null) {
+			if (content.length != 0 && content.length % 2 != 0) throw new IllegalArgumentException("size isn't a multiple of 2");
+			for (int i = 0; i < content.length; i += 2) {
+				map.put((K) content[i], (V) content[i + 1]);
+			}
 		}
 	}
 
-	// ------------------------------------------------------------
-	// Override
-	// ------------------------------------------------------------
-
+	// map
 	@Override
 	public void clear() {
 		lookupMap.clear();
@@ -155,18 +141,8 @@ public class SortedMap<K, V> implements Map<K, V>
 	}
 
 	@Override
-	public boolean equals(final Object obj) {
-		return map.equals(obj);
-	}
-
-	@Override
 	public V get(final Object key) {
 		return lookupMap.get(key);
-	}
-
-	@Override
-	public int hashCode() {
-		return map.hashCode();
 	}
 
 	@Override
@@ -210,9 +186,9 @@ public class SortedMap<K, V> implements Map<K, V>
 		return map.values();
 	}
 
+	// object
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		if (isEmpty()) {
 			return "{}";
 		}
@@ -223,14 +199,29 @@ public class SortedMap<K, V> implements Map<K, V>
 		return str;
 	}
 
-	// ------------------------------------------------------------
-	// Methods
-	// ------------------------------------------------------------
+	@Override
+	public boolean equals(Object obj) {
+		return map.equals(obj);
+	}
 
+	@Override
+	public int hashCode() {
+		return map.hashCode();
+	}
+
+	@Override
+	public SortedMap<K, V> clone() {
+		SortedMap<K, V> clone = new SortedMap<>(type, order);
+		clone.putAll(this);
+		return this;
+	}
+
+	// methods
 	public K getKeyByValue(V v) {
 		for (K k : keySet()) {
-			if (get(k).equals(v))
+			if (get(k).equals(v)) {
 				return k;
+			}
 		}
 		return null;
 	}
@@ -240,20 +231,18 @@ public class SortedMap<K, V> implements Map<K, V>
 		return Utils.getSetElement(keySet(), index);
 	}
 
-	// ------------------------------------------------------------
-	// Static methods
-	// ------------------------------------------------------------
+	public V removeKeyAt(int index) {
+		if (index < 0 || index >= map.size()) throw new IndexOutOfBoundsException("index " + index + ", size " + map.size());
+		return remove(Utils.getSetElement(keySet(), index));
+	}
 
-	
-	public static <TK, TV> SortedMap<TK, TV> createMap(Object... objects)
-	{
+	// static methods
+	public static <TK, TV> SortedMap<TK, TV> createMap(Object... objects) {
 		if (objects.length != 0 && objects.length % 2 != 0) throw new IllegalArgumentException("size isn't a multiple of 2");
 		SortedMap<TK, TV> map = new SortedMap<TK, TV>();
-
 		for (int i = 0; i < objects.length; i += 2) {
 			map.put((TK) objects[i], (TV) objects[i + 1]);
 		}
-
 		return map;
 	}
 }

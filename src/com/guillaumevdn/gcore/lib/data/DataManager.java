@@ -2,6 +2,7 @@ package com.guillaumevdn.gcore.lib.data;
 
 import java.sql.ResultSet;
 
+import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -140,15 +141,23 @@ public abstract class DataManager {
 	// ------------------------------------------------------------
 
 	public void runAsync(BukkitRunnable runnable) {
-		if (!getPlugin().isEnabled()) {// trying to run async, but plugin is disabled -> run sync
-			run(runnable);
+		if (!getPlugin().isEnabled()) {// trying to run async, but plugin is disabled -> just run it in the current thread
+			runnable.run();
 		} else {// we good
-			runnable.runTaskAsynchronously(getPlugin());
+			if (Bukkit.isPrimaryThread()) {// we need to async
+				runnable.runTaskAsynchronously(getPlugin());
+			} else {// we're already async
+				runnable.run();
+			}
 		}
 	}
 
 	public void run(BukkitRunnable runnable) {
-		runnable.run();
+		if (Bukkit.isPrimaryThread()) {// we're already sync
+			runnable.run();
+		} else {// we need to resync
+			runnable.runTask(getPlugin());
+		}
 	}
 
 	// data backend

@@ -514,7 +514,7 @@ public class YMLConfiguration {
 	 */
 
 	public Mat getMat(String path, int durability, Mat def) {
-		return contains(path) ? Mat.from(getString(path, null), durability) : def;
+		return contains(path) ? Mat.valueOf(getString(path, null), durability) : def;
 	}
 
 	/**
@@ -598,7 +598,7 @@ public class YMLConfiguration {
 				if (extended) potion.extend();
 				if (splash) potion.splash();
 				ItemStack it = potion.toItemStack(1);
-				item.setType(Mat.from(it.getType(), it.getDurability()));
+				item.setType(Mat.fromMaterial(it.getType(), it.getDurability(), 0));
 			}
 			/*// enchanted book
 			else if (contains(path + ".enchanted_book")) {
@@ -616,7 +616,7 @@ public class YMLConfiguration {
 			}*/
 			// basic item
 			else {
-				item.setType(Mat.from(getString(path + ".type", null), getInt(path + ".durability", 0)));
+				item.setType(Mat.valueOf(getString(path + ".type", null), getInt(path + ".durability", 0)));
 			}
 
 			// nbt
@@ -680,7 +680,7 @@ public class YMLConfiguration {
 			// [type] [amount]
 			if (split.size() == 2) {
 				try {
-					Mat type = Mat.from(split.get(0), 0);
+					Mat type = Mat.valueOf(split.get(0), 0);
 					int amount = Integer.parseInt(split.get(2));
 					return new ItemData(id, -1, type, (short) 0, 1, null, null);
 				} catch (Throwable exception) {

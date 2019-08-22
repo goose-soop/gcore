@@ -20,7 +20,7 @@ public class CommandItemMat extends CommandArgument {
 	@Override
 	public void perform(CommandCall call) {
 		Player player = call.getSenderAsPlayer();
-		Mat mat = Mat.from(player.getInventory().getItemInHand());
+		Mat mat = Mat.fromItem(player.getInventory().getItemInHand());
 		Messenger.send(player, Level.NORMAL_INFO, "GCore", "GCore type : " + mat.getModernName() + " (durability " + mat.getDurability() + ")");
 	}
 

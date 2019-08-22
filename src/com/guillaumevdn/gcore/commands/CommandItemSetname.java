@@ -28,7 +28,7 @@ public class CommandItemSetname extends CommandArgument {
 		if (name != null) {
 			Player player = call.getSenderAsPlayer();
 			ItemStack item = player.getInventory().getItemInHand();
-			Mat mat = Mat.from(item);
+			Mat mat = Mat.fromItem(item);
 			// invalid mat
 			if (mat == null || mat.isAir()) {
 				GCore.inst().messageError(player, "Can't set name for this item");

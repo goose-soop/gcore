@@ -1,10 +1,8 @@
-package com.guillaumevdn.gcore.lib.npc.navigation;
+package com.guillaumevdn.gcore.lib.util;
 
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-
-import com.guillaumevdn.gcore.lib.util.Utils;
 
 public class Point {
 

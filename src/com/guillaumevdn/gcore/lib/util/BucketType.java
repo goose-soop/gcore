@@ -26,7 +26,7 @@ public enum BucketType {
 	}
 
 	public static BucketType get(Block block) {
-		Mat material = Mat.from(block);
+		Mat material = Mat.fromBlock(block);
 		if (material.equals(Mat.LAVA) || material.equals(Mat.STATIONARY_LAVA)) return LAVA;
 		if (material.equals(Mat.WATER) || material.equals(Mat.STATIONARY_WATER)) return WATER;
 		return null;

@@ -33,7 +33,7 @@ public class MatLPDouble extends MatListParseable<PPDouble> {
 	public Map<Mat, PPDouble> getAllValues() {
 		Map<Mat, PPDouble> values = new HashMap<Mat, PPDouble>();
 		for (String key : getElements().keySet()) {
-			Mat mat = Mat.from(key, 0);
+			Mat mat = Mat.valueOf(key);
 			if (mat != null) values.put(mat, getElements().get(key));
 		}
 		return values;

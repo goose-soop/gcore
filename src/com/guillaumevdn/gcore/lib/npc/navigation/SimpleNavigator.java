@@ -8,6 +8,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import com.guillaumevdn.gcore.GCore;
+import com.guillaumevdn.gcore.lib.util.Point;
 
 public abstract class SimpleNavigator implements Navigator {
 

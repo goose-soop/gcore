@@ -424,39 +424,70 @@ public abstract class GPlugin extends JavaPlugin implements Listener {
 		}
 
 		// events
-		HandlerList.unregisterAll((JavaPlugin) this);
+		try {
+			HandlerList.unregisterAll((JavaPlugin) this);
+		} catch (Throwable exception) {
+			exception.printStackTrace();
+			error("An unknown error occured while unregistering listeners");
+		}
 
 		// cancel all tasks
-		Bukkit.getScheduler().cancelTasks(this);
-		for (BukkitTask task : Utils.asList(Bukkit.getScheduler().getPendingTasks())) {
-			if (equals(task.getOwner())) {
-				task.cancel();
+		try {
+			Bukkit.getScheduler().cancelTasks(this);
+			for (BukkitTask task : Utils.asList(Bukkit.getScheduler().getPendingTasks())) {
+				if (equals(task.getOwner())) {
+					task.cancel();
+				}
 			}
-		}
-		for (BukkitWorker worker : Utils.asList(Bukkit.getScheduler().getActiveWorkers())) {
-			if (equals(worker.getOwner())) {
-				Bukkit.getScheduler().cancelTask(worker.getTaskId());
+			// try even much harder even though some async tasks will still be executed a few times while reloading :'(
+			for (BukkitWorker worker : Utils.asList(Bukkit.getScheduler().getActiveWorkers())) {
+				if (equals(worker.getOwner())) {
+					Bukkit.getScheduler().cancelTask(worker.getTaskId());
+				}
 			}
+		} catch (Throwable exception) {
+			exception.printStackTrace();
+			error("An unknown error occured while unregistering listeners");
 		}
 
 		// close GUIs
-		GUI.unregisterAll(this);
+		try {
+			GUI.unregisterAll(this);
+		} catch (Throwable exception) {
+			exception.printStackTrace();
+			error("An unknown error occured while unregistering GUIs");
+		}
 
 		// integration
-		for (PluginIntegration integration : pluginIntegration) {
-			integration.disable();
-			debug("Unregistered " + integration.getPluginName() + " integration");
+		try {
+			for (PluginIntegration integration : pluginIntegration) {
+				integration.disable();
+				debug("Unregistered " + integration.getPluginName() + " integration");
+			}
+			pluginIntegration.clear();
+		} catch (Throwable exception) {
+			exception.printStackTrace();
+			error("An unknown error occured while disabling plugin integration");
 		}
-		pluginIntegration.clear();
 
 		// data
-		unregisterData();
+		try {
+			unregisterData();
+		} catch (Throwable exception) {
+			exception.printStackTrace();
+			error("An unknown error occured while disabling unregistering data");
+		}
 
 		// unregister commands
-		for (CommandRoot command : commands.values()) {
-			getCommand(command.getAliases().get(0)).setExecutor(null);
+		try {
+			for (CommandRoot command : commands.values()) {
+				getCommand(command.getAliases().get(0)).setExecutor(null);
+			}
+			commands.clear();
+		} catch (Throwable exception) {
+			exception.printStackTrace();
+			error("An unknown error occured while disabling unregistering commands");
 		}
-		commands.clear();
 
 		// log
 		success(getDescription().getName() + " v" + getDescription().getVersion() + " is now disabled.");

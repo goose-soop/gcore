@@ -333,7 +333,7 @@ public class GLocale {
 			"hu_HU", "{seconds}m",
 			"it_IT", Utils.asList("{seconds}s"),
 			"es_ES", Utils.asList("{seconds}s"),
-			"zh_TW", Utils.asList("{seconds}秒")
+			"zh_TW", Utils.asList("&f{seconds}&6秒")
 			);
 
 	public static final Text MISC_GENERIC_TIMEFORMATMINUTES = new Text(
@@ -342,7 +342,7 @@ public class GLocale {
 			"hu_HU", "{minutes}p {seconds}m",
 			"it_IT", Utils.asList("{minutes}m {seconds}m"),
 			"es_ES", Utils.asList("{minutes}m {seconds}s"),
-			"zh_TW", Utils.asList("{minutes}分 {seconds}秒")
+			"zh_TW", Utils.asList("&f{minutes}&6分 &f{seconds}&6秒")
 			);
 
 	public static final Text MISC_GENERIC_TIMEFORMATHOURS = new Text(
@@ -350,7 +350,8 @@ public class GLocale {
 			"en_US", "{hours}h {minutes}m {seconds}s",
 			"hu_HU", "{hours}ó {minutes}p {seconds}m",
 			"it_IT", Utils.asList("{hours}h {minutes}m {seconds}s"),
-			"es_ES", Utils.asList("{hours}h {minutes}m {seconds}s")
+			"es_ES", Utils.asList("{hours}h {minutes}m {seconds}s"),
+			"zh_TW", Utils.asList("&f{hours}&6小時 &f{minutes}&6分 &f{seconds}&6秒")
 			);
 
 	public static final Text MISC_GENERIC_TIMEFORMATDAYS = new Text(
@@ -358,7 +359,8 @@ public class GLocale {
 			"en_US", "{days}d {hours}h {minutes}m {seconds}s",
 			"hu_HU", "{days}n {hours}ó {minutes}p {seconds}m",
 			"it_IT", Utils.asList("{days}d {hours}h {minutes}m {seconds}s"),
-			"es_ES", Utils.asList("{days}d {hours}h {minutes}m {seconds}s")
+			"es_ES", Utils.asList("{days}d {hours}h {minutes}m {seconds}s"),
+			"zh_TW", Utils.asList("&f{days}&6天 &f{hours}&6小時 &f{minutes}&6分 &f{seconds}&6秒")
 			);
 
 	public static final Text MISC_GENERIC_DAY_MONDAY = new Text(
@@ -643,7 +645,8 @@ public class GLocale {
 			"en_US", Utils.asList("&e{current}", "", "&7Edit the raw value (it will be parsed", "&7 for a player when needed)", "", "{placeholders}", "&7Change colors with &{code}", "", "&a&lLeft-click to edit", "&a&lRight-click to delete"),
 			"fr_FR", Utils.asList("&e{current}", "", "&7Éditer la valeur brute (elle sera convertie pour un joueur quand nécessaire)", "", "{placeholders}", "&7Change colors with &{code}", "", "&a&lClic gauche pour éditer", "&a&lClic droit pour supprimer"),
 			"it_IT", Utils.asList("&e{current}", "", "&7Modifica il valore originale (sarà analizzato ", "&7per un giocatore quando sarà necessario)", "{placeholders}", "", "&7Cambia il colore con &{code}", "", "&a&lTasto sinistro per modificare", "&a&lTasto destro per eliminare", "", "&a&l", "", "&5Valore obbligatorio: &d{value_mandatory}", "&5Tipo di valore: &d{value_type}", "", "&5Valore attuale:", "&d{value_current"),
-			"es_ES", Utils.asList("&e{current}", "", "&7Edite el valor original (será analizado para", "&7 un jugador cuando sea necesario)", "", "{placeholders}", "&7Cambie los colores con &{code}", "", "&a&lHaga click izquierdo para editar", "&a&lHaga click derecho para borrar")
+			"es_ES", Utils.asList("&e{current}", "", "&7Edite el valor original (será analizado para", "&7 un jugador cuando sea necesario)", "", "{placeholders}", "&7Cambie los colores con &{code}", "", "&a&lHaga click izquierdo para editar", "&a&lHaga click derecho para borrar"),
+			"zh_TW", Utils.asList("&e{current}", "", "&7編輯原始數值", "", "{placeholders}", "&7更改顏色使用 &{code}", "", "&f右鍵點擊 &a編輯", "&f左鍵點擊 &c刪除")
 			);
 
 	public static final Text GUI_GENERIC_EDITORLISTELEMENTLORE = new Text(
@@ -838,6 +841,93 @@ public class GLocale {
 			"es_ES", Utils.asList("&7Si este parametro es especificado", "&7 el período será dividido en partes más pequéñas"),
 			"zh_TW", Utils.asList("&7如果這個設定可用 時間周期", "&7會被 分成小部分")
 			);
+	public static final Text GUI_GENERIC_EDITOR_NPC_SHOWLORE = new Text(
+			"GUI_GENERIC_EDITOR_NPC_SHOWLORE", file,
+			"en_US", Utils.asList("&7Should the NPC be shown by default"),
+			"fr_FR", Utils.asList("&7Est-ce que le NPC doit être montré par défaut"),
+			"es_ES", Utils.asList("&7¿Debería mostrarse el NPC por defecto?"),
+			"zh_TW", Utils.asList("&7哪一個NPC要做為預設顯示")
+			);
+
+	public static final Text GUI_GENERIC_EDITOR_NPC_NAMELORE = new Text(
+			"GUI_GENERIC_EDITOR_NPC_NAMELORE", file,
+			"en_US", Utils.asList("&7Name of the NPC"),
+			"fr_FR", Utils.asList("&7Nom du NPC"),
+			"es_ES", Utils.asList("&7Nombre del NPC"),
+			"zh_TW", Utils.asList("&7NPC名稱")
+			);
+
+	public static final Text GUI_GENERIC_EDITOR_NPC_SKINDATALORE = new Text(
+			"GUI_GENERIC_EDITOR_NPC_SKINDATALORE", file,
+			"en_US", Utils.asList("&7Skin data of the NPC (can be generated", "&7 or obtained at https://mineskin.org/)"),
+			"fr_FR", Utils.asList("&7Skin data de ce NPC (can be generated", "&7 or obtained at https://mineskin.org/)"),
+			"es_ES", Utils.asList("&7Los datos de skin del NPC (pueden ser generados", "&7 o ser obtenidos en https://mineskin.org/)"),
+			"zh_TW", Utils.asList("&7NPC的SKIN Data可以在下方網址找到", "&7heeps://mineskin.org/")
+			);
+
+	public static final Text GUI_GENERIC_EDITOR_NPC_SKINSIGNATURELORE = new Text(
+			"GUI_GENERIC_EDITOR_NPC_SKINSIGNATURELORE", file,
+			"en_US", Utils.asList("&7Skin signature of the NPC (can be generated", "&7 or obtained at https://mineskin.org/)"),
+			"fr_FR", Utils.asList("&7Skin signature de ce NPC (can be generated", "&7 or obtained at https://mineskin.org/)"),
+			"es_ES", Utils.asList("&7La firma de la skin del NPC (puede ser generada", "&7 o obtenida en https://mineskin.org/)"),
+			"zh_TW", Utils.asList("&7NPC的SKIN Signature可以在下方網址找到", "&7heeps://mineskin.org/")
+			);
+
+	public static final Text GUI_GENERIC_EDITOR_NPC_LOCATIONLORE = new Text(
+			"GUI_GENERIC_EDITOR_NPC_LOCATIONLORE", file,
+			"en_US", Utils.asList("&7Default location of the NPC"),
+			"fr_FR", Utils.asList("&7Emplacement par défaut du NPC"),
+			"es_ES", Utils.asList("&7Localización por defecto del NPC"),
+			"zh_TW", Utils.asList("&7NPC的預設位置")
+			);
+
+	public static final Text GUI_GENERIC_EDITOR_NPC_TARGETDISTANCELORE = new Text(
+			"GUI_GENERIC_EDITOR_NPC_TARGETDISTANCELORE", file,
+			"en_US", Utils.asList("&7Distance under which the NPC will", "&7 look at the player when close"),
+			"fr_FR", Utils.asList("&7Distance à laquelle le NPC regardera", "&7 le joueur s'il en est proche"),
+			"es_ES", Utils.asList("&7Distancia desde la cual el NPC", "&7Va a a mirar al jugador cercano"),
+			"zh_TW", Utils.asList("&7設定一個距離 當玩家進入這個距離時", "&7NPC將會看向那個玩家")
+			);
+
+	public static final Text GUI_GENERIC_EDITOR_NPC_ATTACKBEHAVIORLORE = new Text(
+			"GUI_GENERIC_EDITOR_NPC_ATTACKBEHAVIORLORE", file,
+			"en_US", Utils.asList("&7Attack behavior towards other entities"),
+			"fr_FR", Utils.asList("&7Comportement d'attaque envers les autres entités"),
+			"es_ES", Utils.asList("&7Comportamiento de ataque a otras entidades"),
+			"zh_TW", Utils.asList("&7對其他實體的攻擊行為")
+			);
+
+	public static final Text GUI_GENERIC_EDITOR_NPC_ATTACKDISTANCELORE = new Text(
+			"GUI_GENERIC_EDITOR_NPC_ATTACKDISTANCELORE", file,
+			"en_US", Utils.asList("&7Distance under which the NPC will", "&7 try to attack the player when close"),
+			"fr_FR", Utils.asList("&7Distance à laquelle le NPC essaiera", "&7 d'attaquer le joueur s'il en est proche"),
+			"es_ES", Utils.asList("&7Distancia a la cual el NPC intentara", "&7 atacar a un jugador cercano"),
+			"zh_TW", Utils.asList("&7設定一個距離 當玩家進入這個距離時", "&7NPC將會攻擊那個玩家")
+			);
+
+	public static final Text GUI_GENERIC_EDITOR_NPC_STATUSLORE = new Text(
+			"GUI_GENERIC_EDITOR_NPC_STATUSLORE", file,
+			"en_US", Utils.asList("&7List of status of the NPC"),
+			"fr_FR", Utils.asList("&7Liste de status du NPC"),
+			"es_ES", Utils.asList("&7Lista del estado de los NPC"),
+			"zh_TW", Utils.asList("&7列出NPC可設定的狀態")
+			);
+
+	public static final Text GUI_GENERIC_EDITOR_NPC_STUFFLORE = new Text(
+			"GUI_GENERIC_EDITOR_NPC_STUFFLORE", file,
+			"en_US", Utils.asList("&7Stuff by default of the NPC"),
+			"fr_FR", Utils.asList("&7Équipement par défaut du NPC"),
+			"es_ES", Utils.asList("&7Equipamiento por defecto del NPC"),
+			"zh_TW", Utils.asList("&7NPC的預設裝備/物品")
+			);
+
+	public static final Text GUI_GENERIC_EDITOR_NPC_VARIABLESLORE = new Text(
+			"GUI_GENERIC_EDITOR_NPC_VARIABLESLORE", file,
+			"en_US", Utils.asList("&7Default variables values for the NPC"),
+			"fr_FR", Utils.asList("&7Variables par défaut pour le NPC"),
+			"es_ES", Utils.asList("&7Valores de variables por defecto para el NPC"),
+			"zh_TW", Utils.asList("&7NPC可以自然觸發的行為")
+			);
 
 	// editor : block setting
 	public static final Text GUI_GENERIC_EDITOR_BLOCKTYPELORE = new Text(
@@ -926,103 +1016,6 @@ public class GLocale {
 			"it_IT", Utils.asList("&7Durata dell'effetto (in tick, 1 sec = 20 ticks)"),
 			"es_ES", Utils.asList("&7Duración del efecto (en ticks, 1 seg = 20 ticks)"),
 			"zh_TW", Utils.asList("&7藥水效果持續時間 (遊戲刻，1秒 = 20 遊戲刻)")
-			);
-
-	// editor : npc
-	public static final Text GUI_GENERIC_EDITOR_NPC_SHOWLORE = new Text(
-			"GUI_GENERIC_EDITOR_NPC_SHOWLORE", file,
-			"en_US", Utils.asList("&7Should the NPC be shown by default"),
-			"fr_FR", Utils.asList("&7Est-ce que le NPC doit être montré par défaut"),
-			"es_ES", Utils.asList("&7¿Debería mostrarse el NPC por defecto?"),
-			"zh_TW", Utils.asList("&7哪一個NPC要做為預設顯示")
-			);
-
-	public static final Text GUI_GENERIC_EDITOR_NPC_NAMELORE = new Text(
-			"GUI_GENERIC_EDITOR_NPC_NAMELORE", file,
-			"en_US", Utils.asList("&7Name of the NPC"),
-			"fr_FR", Utils.asList("&7Nom du NPC"),
-			"es_ES", Utils.asList("&7Nombre del NPC"),
-			"zh_TW", Utils.asList("&7NPC名稱")
-			);
-
-	public static final Text GUI_GENERIC_EDITOR_NPC_SKINDATALORE = new Text(
-			"GUI_GENERIC_EDITOR_NPC_SKINDATALORE", file,
-			"en_US", Utils.asList("&7Skin data of the NPC (can be generated", "&7 or obtained at https://mineskin.org/)"),
-			"fr_FR", Utils.asList("&7Skin data de ce NPC (can be generated", "&7 or obtained at https://mineskin.org/)"),
-			"es_ES", Utils.asList("&7Los datos de skin del NPC (pueden ser generados", "&7 o ser obtenidos en https://mineskin.org/)"),
-			"zh_TW", Utils.asList("&7NPC的SKIN Data可以在下方網址找到", "&7heeps://mineskin.org/")
-			);
-
-	public static final Text GUI_GENERIC_EDITOR_NPC_SKINSIGNATURELORE = new Text(
-			"GUI_GENERIC_EDITOR_NPC_SKINSIGNATURELORE", file,
-			"en_US", Utils.asList("&7Skin signature of the NPC (can be generated", "&7 or obtained at https://mineskin.org/)"),
-			"fr_FR", Utils.asList("&7Skin signature de ce NPC (can be generated", "&7 or obtained at https://mineskin.org/)"),
-			"es_ES", Utils.asList("&7La firma de la skin del NPC (puede ser generada", "&7 o obtenida en https://mineskin.org/)"),
-			"zh_TW", Utils.asList("&7NPC的SKIN Signature可以在下方網址找到", "&7heeps://mineskin.org/")
-			);
-
-	public static final Text GUI_GENERIC_EDITOR_NPC_LOCATIONLORE = new Text(
-			"GUI_GENERIC_EDITOR_NPC_LOCATIONLORE", file,
-			"en_US", Utils.asList("&7Default location of the NPC"),
-			"fr_FR", Utils.asList("&7Emplacement par défaut du NPC"),
-			"es_ES", Utils.asList("&7Localización por defecto del NPC"),
-			"zh_TW", Utils.asList("&7NPC的預設位置")
-			);
-
-	public static final Text GUI_GENERIC_EDITOR_NPC_TARGETDISTANCELORE = new Text(
-			"GUI_GENERIC_EDITOR_NPC_TARGETDISTANCELORE", file,
-			"en_US", Utils.asList("&7Distance under which the NPC will", "&7 look at the player when close"),
-			"fr_FR", Utils.asList("&7Distance à laquelle le NPC regardera", "&7 le joueur s'il en est proche"),
-			"es_ES", Utils.asList("&7Distancia desde la cual el NPC", "&7Va a a mirar al jugador cercano"),
-			"zh_TW", Utils.asList("&7設定一個距離 當玩家進入這個距離時", "&7NPC將會看向那個玩家")
-			);
-
-	public static final Text GUI_GENERIC_EDITOR_NPC_ATTACKBEHAVIORLORE = new Text(
-			"GUI_GENERIC_EDITOR_NPC_ATTACKBEHAVIORLORE", file,
-			"en_US", Utils.asList("&7Attack behavior towards other entities"),
-			"fr_FR", Utils.asList("&7Comportement d'attaque envers les autres entités"),
-			"es_ES", Utils.asList("&7Comportamiento de ataque a otras entidades"),
-			"zh_TW", Utils.asList("&7對其他實體的攻擊行為")
-			);
-
-	public static final Text GUI_GENERIC_EDITOR_NPC_ATTACKDISTANCELORE = new Text(
-			"GUI_GENERIC_EDITOR_NPC_ATTACKDISTANCELORE", file,
-			"en_US", Utils.asList("&7Distance under which the NPC will", "&7 try to attack the player when close"),
-			"fr_FR", Utils.asList("&7Distance à laquelle le NPC essaiera", "&7 d'attaquer le joueur s'il en est proche"),
-			"es_ES", Utils.asList("&7Distancia a la cual el NPC intentara", "&7 atacar a un jugador cercano"),
-			"zh_TW", Utils.asList("&7設定一個距離 當玩家進入這個距離時", "&7NPC將會攻擊那個玩家")
-			);
-
-	public static final Text GUI_GENERIC_EDITOR_NPC_STATUSLORE = new Text(
-			"GUI_GENERIC_EDITOR_NPC_STATUSLORE", file,
-			"en_US", Utils.asList("&7List of status of the NPC"),
-			"fr_FR", Utils.asList("&7Liste de status du NPC"),
-			"es_ES", Utils.asList("&7Lista del estado de los NPC"),
-			"zh_TW", Utils.asList("&7列出NPC可設定的狀態")
-			);
-
-	public static final Text GUI_GENERIC_EDITOR_NPC_STUFFLORE = new Text(
-			"GUI_GENERIC_EDITOR_NPC_STUFFLORE", file,
-			"en_US", Utils.asList("&7Stuff by default of the NPC"),
-			"fr_FR", Utils.asList("&7Équipement par défaut du NPC"),
-			"es_ES", Utils.asList("&7Equipamiento por defecto del NPC"),
-			"zh_TW", Utils.asList("&7NPC的預設裝備/物品")
-			);
-
-	public static final Text GUI_GENERIC_EDITOR_NPC_BEHAVIORSLORE = new Text(
-			"GUI_GENERIC_EDITOR_NPC_BEHAVIORSLORE", file,
-			"en_US", Utils.asList("&7Behaviors that the NPC can naturally trigger"),
-			"fr_FR", Utils.asList("&7Behaviors que le NPC peut activer naturellement"),
-			"es_ES", Utils.asList("&7Comportamientos que el NPC activará naturalmente"),
-			"zh_TW", Utils.asList("&7NPC的預設裝備/物品")
-			);
-
-	public static final Text GUI_GENERIC_EDITOR_NPC_VARIABLESLORE = new Text(
-			"GUI_GENERIC_EDITOR_NPC_VARIABLESLORE", file,
-			"en_US", Utils.asList("&7Default variables values for the NPC"),
-			"fr_FR", Utils.asList("&7Variables par défaut pour le NPC"),
-			"es_ES", Utils.asList("&7Valores de variables por defecto para el NPC"),
-			"zh_TW", Utils.asList("&7NPC可以自然觸發的行為")
 			);
 
 	// editor : sound setting
@@ -1278,10 +1271,10 @@ public class GLocale {
 			);
 
 	// editor : npc settings
-	public static final Text GUI_GCORE_EDITOR_NPC_BEHAVIOREVENTSLORE = new Text(
-			"GUI_GCORE_EDITOR_NPC_BEHAVIORCONDITIONTYPELORE", file,
-			"en_US", Utils.asList("&7A list of events triggering the behavior"),
-			"fr_FR", Utils.asList("&7Une liste d'events qui activeront le behavior")
+	public static final Text GUI_GCORE_EDITOR_NPC_BEHAVIORTRIGGERSLORE = new Text(
+			"GUI_GCORE_EDITOR_NPC_BEHAVIORTRIGGERSLORE", file,
+			"en_US", Utils.asList("&7A list of triggers that'll activate the behavior"),
+			"fr_FR", Utils.asList("&7Une liste de triggers qui activeront le behavior")
 			);
 
 	public static final Text GUI_GCORE_EDITOR_NPC_BEHAVIORPROCESSESLORE = new Text(

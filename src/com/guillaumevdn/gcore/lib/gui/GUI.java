@@ -219,12 +219,17 @@ public class GUI implements Listener {
 
 	// items
 	public void setRegularItem(ClickeableItem item) {
+		// invalid item
+		if (item.getItemData().getType() == null || item.getItemData().getType().isAir()) {
+			GCore.inst().error("Couldn't set regular item " + item.getItemData().getId() + " in GUI " + getName() + ", item type is invalid");
+			return;
+		}
 		// remove if existing
 		removeRegularItem(item);
 		// get page
 		int pageIndex = getFirstEmptyPageIndex(item.getItemData().getSlot(), true);
 		if (pageIndex < 0 || pageIndex >= pages.size()) {
-			GCore.inst().error("Couldn't add item " + item.getItemData().getId() + " in GUI " + getName() + ", page index " + pageIndex + " is invalid");
+			GCore.inst().error("Couldn't set regular item " + item.getItemData().getId() + " in GUI " + getName() + ", page index " + pageIndex + " is invalid");
 			return;
 		}
 		Inventory page = pages.get(pageIndex);
@@ -268,6 +273,11 @@ public class GUI implements Listener {
 	}
 
 	public void setPersistentItem(ClickeableItem item) {
+		// invalid item
+		if (item.getItemData().getType() == null || item.getItemData().getType().isAir()) {
+			GCore.inst().error("Couldn't set persistent item " + item.getItemData().getId() + " in GUI " + getName() + ", item type is invalid");
+			return;
+		}
 		// remove if existing
 		removePersistentItem(item);
 		// slot
@@ -369,7 +379,7 @@ public class GUI implements Listener {
 		if (canUseSlot(slot, true)) {
 			for (int index = 0; index < pages.size(); ++index) {
 				ItemStack it = pages.get(index).getItem(slot);
-				if (Mat.from(it).isAir()) {
+				if (Mat.fromItem(it).isAir()) {
 					return index;
 				}
 			}
@@ -390,8 +400,8 @@ public class GUI implements Listener {
 				Inventory page = pages.get(index);
 				ItemStack prev = index == 0 ? previousPageItemEmpty.getItemStack() : previousPageItem.getItemStack();
 				ItemStack post = index + 1 == pages.size() ? nextPageItemEmpty.getItemStack() : nextPageItem.getItemStack();
-				if (!Mat.from(prev).isAir()) page.setItem(previousPageItemSlot, prev);
-				if (!Mat.from(post).isAir()) page.setItem(nextPageItemSlot, post);
+				if (!Mat.fromItem(prev).isAir()) page.setItem(previousPageItemSlot, prev);
+				if (!Mat.fromItem(post).isAir()) page.setItem(nextPageItemSlot, post);
 			}
 		}
 		updateFirstSlot();
@@ -599,7 +609,7 @@ public class GUI implements Listener {
 		ItemStack[] contents = inventory.getContents();
 		for (int slot = 0; slot < contents.length; slot++) {
 			ItemStack it = contents[slot];
-			if (Mat.from(it).isAir()) {
+			if (Mat.fromItem(it).isAir()) {
 				return slot;
 			}
 		}

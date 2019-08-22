@@ -14,6 +14,7 @@ import com.guillaumevdn.gcore.data.GUserNpcData;
 import com.guillaumevdn.gcore.data.UserInfo;
 import com.guillaumevdn.gcore.lib.npc.Npc;
 import com.guillaumevdn.gcore.lib.util.GUserOperator;
+import com.guillaumevdn.gcore.lib.util.Point;
 
 public class GroupNavigator extends PathfindingNavigator {
 

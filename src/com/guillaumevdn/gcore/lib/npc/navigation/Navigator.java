@@ -6,7 +6,6 @@ import org.bukkit.Location;
 import org.bukkit.World;
 
 import com.guillaumevdn.gcore.lib.npc.Npc;
-import com.guillaumevdn.gcore.lib.util.Point;
 
 public interface Navigator {
 

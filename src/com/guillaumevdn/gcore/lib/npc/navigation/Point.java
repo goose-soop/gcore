@@ -1,13 +1,15 @@
-package com.guillaumevdn.gcore.lib.util;
+package com.guillaumevdn.gcore.lib.npc.navigation;
 
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 
-public class Point {
+import com.guillaumevdn.gcore.lib.util.Utils;
+
+public class Point implements Cloneable {
 
 	// base
-	private int x, y, z;
+	private final int x, y, z;
 
 	public Point(int x, int y, int z) {
 		this.x = x;
@@ -17,6 +19,10 @@ public class Point {
 
 	public Point(Location location) {
 		this(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+	}
+
+	public Point(Block block) {
+		this(block.getX(), block.getY(), block.getZ());
 	}
 
 	// get
@@ -32,19 +38,6 @@ public class Point {
 		return z;
 	}
 
-	// set
-	public void setX(int x) {
-		this.x = x;
-	}
-
-	public void setY(int y) {
-		this.y = y;
-	}
-
-	public void setZ(int z) {
-		this.z = z;
-	}
-
 	// methods
 	public double distance(Point other) {
 		int offx = other.x - x;
@@ -53,15 +46,22 @@ public class Point {
 		return Math.sqrt(offx * offx + offy * offy + offz * offz);
 	}
 
+	public double distance(Location other) {
+		int offx = other.getBlockX() - x;
+		int offy = other.getBlockY() - y;
+		int offz = other.getBlockZ() - z;
+		return Math.sqrt(offx * offx + offy * offy + offz * offz);
+	}
+
 	public Location toLocation(World world) {
 		return new Location(world, x, y, z);
 	}
-	
+
 	public Block toBlock(World world) {
 		return world.getBlockAt(x, y, z);
 	}
 
-	// overriden
+	// object
 	@Override
 	public String toString() {
 		return "(" + x + "," + y + "," + z + ")";
@@ -84,6 +84,11 @@ public class Point {
 			return other.x == x && other.y == y && other.z == z;
 		}
 		return false;
+	}
+
+	@Override
+	public Point clone() {
+		return new Point(x, y, z);
 	}
 
 }

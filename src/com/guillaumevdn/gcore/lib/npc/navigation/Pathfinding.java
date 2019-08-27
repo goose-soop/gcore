@@ -18,7 +18,6 @@ import org.bukkit.scheduler.BukkitTask;
 import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.lib.material.Mat;
 import com.guillaumevdn.gcore.lib.util.Pair;
-import com.guillaumevdn.gcore.lib.util.Point;
 import com.guillaumevdn.gcore.lib.util.ServerVersion;
 import com.guillaumevdn.gcore.lib.util.Utils;
 

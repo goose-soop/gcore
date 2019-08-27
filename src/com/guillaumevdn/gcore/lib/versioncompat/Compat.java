@@ -77,5 +77,6 @@ public abstract class Compat {
 	public abstract Score getScore(Objective objective, String name);
 	public void setScoreboardTeamNameTags(Team team, String prefix, String suffix) {}
 	public abstract Enchantment getEnchantment(String raw);
+	public abstract double getAttackDamage(ItemStack item);
 
 }

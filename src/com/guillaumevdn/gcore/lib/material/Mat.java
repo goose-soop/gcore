@@ -1216,11 +1216,23 @@ public class Mat implements Cloneable, Comparable<Mat> {
 		}
 		// modern
 		if (ServerVersion.IS_1_13) {
-			return new ItemStack(currentMaterial, 1, (short) durability);
+			ItemStack item = new ItemStack(currentMaterial);
+			if (durability != 0) {
+				item.setDurability((short) durability);
+			}
+			return item;
 		}
 		// legacy
 		else {
-			return new ItemStack(currentMaterial, 1, (short) durability, (byte) legacyData);
+			if (legacyData != 0) {
+				return new ItemStack(currentMaterial, 1, (short) durability, (byte) legacyData);
+			} else {
+				ItemStack item = new ItemStack(currentMaterial);
+				if (durability != 0) {
+					item.setDurability((short) durability);
+				}
+				return item;
+			}
 		}
 	}
 
@@ -1255,7 +1267,7 @@ public class Mat implements Cloneable, Comparable<Mat> {
 		}
 		// players
 		for (Player player : players) {
-			player.sendBlockChange(block.getLocation(), getCurrentMaterial(), (byte) (ServerVersion.IS_1_13 ? 0 : legacyData));
+			player.sendBlockChange(block.getLocation(), getCurrentMaterial(), (byte) legacyData);// even in 1.13+, send data
 		}
 	}
 

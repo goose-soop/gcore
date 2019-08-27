@@ -218,7 +218,7 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 	public ItemData(String id, int slot, Mat type, int durability, int amount, String name, List<String> lore, List<PotionEffect> effects, Map<Enchantment, Integer> enchants) {
 		this.id = id;
 		this.slot = slot;
-		this.type = type.getDurability() != (int) durability ? type.cloneWithDurability((int) durability) : type;
+		this.type = type == null ? Mat.AIR : (type.getDurability() != (int) durability ? type.cloneWithDurability((int) durability) : type);
 		this.amount = amount;
 		this.name = name == null || name.isEmpty() ? null : Utils.format(name);
 		this.lore = lore == null || lore.isEmpty() ? null : Utils.format(lore);

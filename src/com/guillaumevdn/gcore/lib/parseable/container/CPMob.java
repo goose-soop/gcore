@@ -68,7 +68,7 @@ public class CPMob extends ContainerParseable {
 		}
 		// color
 		DyeColor color = getColor(parser);
-		if (color != null && !(entity instanceof Colorable) && !((Colorable) entity).getColor().equals(color)) {
+		if (color != null && (entity instanceof Colorable ? !((Colorable) entity).getColor().equals(color) : true)) {
 			return false;
 		}
 		// it's valid

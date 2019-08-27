@@ -24,19 +24,19 @@ public class InventoryState {
 		// save player items
 		for (int slot = 0; slot < player.getInventory().getContents().length; ++slot) {
 			ItemStack item = player.getInventory().getContents()[slot];
-			if (!Mat.from(item).isAir()) {
+			if (!Mat.fromItem(item).isAir()) {
 				items.put(slot, item.clone());
 			}
 		}
 		// save player cursor
-		ItemStack cursor = !Mat.from(player.getItemOnCursor()).isAir() ? player.getItemOnCursor().clone() : null;
+		ItemStack cursor = !Mat.fromItem(player.getItemOnCursor()).isAir() ? player.getItemOnCursor().clone() : null;
 		if (cursor != null) {
 			items.put(-1, cursor);
 		}
 		// save other inventory items
 		for (int slot : otherSlots) {
 			ItemStack item = otherInventory.getItem(slot);
-			if (!Mat.from(item).isAir()) {
+			if (!Mat.fromItem(item).isAir()) {
 				items.put(-slot + OTHER_SLOTS_DIFF, item.clone());
 			}
 		}
@@ -63,7 +63,7 @@ public class InventoryState {
 			ItemStack newItem = newState.items.get(slot);
 			if (newItem != null) newItem = newItem.clone();
 			// has new item
-			if (!Mat.from(newItem).isAir()) {
+			if (!Mat.fromItem(newItem).isAir()) {
 				if (oldItem != null) {// had old item
 					int delta = newItem.getAmount() - oldItem.getAmount();
 					if (delta > 0) {
@@ -78,7 +78,7 @@ public class InventoryState {
 				}
 			}
 			// hasn't new item but had old item
-			else if (!Mat.from(oldItem).isAir()) {
+			else if (!Mat.fromItem(oldItem).isAir()) {
 				removed.put(slot, oldItem);
 			}
 		}

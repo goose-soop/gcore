@@ -109,7 +109,7 @@ public abstract class ShowcaseRowsGUI extends FilledGUI {
 				if (startItemIndex != 0) {
 					setPersistentItem(new ClickeableItem(GUI.PREVIOUS_PAGE_ITEM.cloneWithIdAndSlot("back_row_" + UUID.randomUUID(), currentSlots.remove(0))) {
 						@Override
-						public boolean onClick(Player player, ClickType clickType, GUI gui, int pageIndex) {
+						public void onClick(Player player, ClickType clickType, GUI gui, int pageIndex) {
 							startItemIndex -= slots.size();
 							if (startItemIndex < 0) startItemIndex = 0;
 							update();
@@ -117,7 +117,6 @@ public abstract class ShowcaseRowsGUI extends FilledGUI {
 							if (clickSound != null) {
 								clickSound.play(player);
 							}
-							return true;
 						}
 					});
 				}
@@ -125,14 +124,13 @@ public abstract class ShowcaseRowsGUI extends FilledGUI {
 				if (items.size() - startItemIndex + 1 > slots.size()) {
 					setPersistentItem(new ClickeableItem(GUI.NEXT_PAGE_ITEM.cloneWithIdAndSlot("back_row_" + UUID.randomUUID(), currentSlots.remove(currentSlots.size() - 1))) {
 						@Override
-						public boolean onClick(Player player, ClickType clickType, GUI gui, int pageIndex) {
+						public void onClick(Player player, ClickType clickType, GUI gui, int pageIndex) {
 							startItemIndex += slots.size() - 1;
 							update();
 							// sound
 							if (clickSound != null) {
 								clickSound.play(player);
 							}
-							return true;
 						}
 					});
 				}

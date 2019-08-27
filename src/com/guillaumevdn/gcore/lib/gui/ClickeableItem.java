@@ -43,8 +43,7 @@ public class ClickeableItem {
 	/**
 	 * @return true if the event must be cancelled
 	 */
-	public boolean onClick(final Player player, final ClickType clickType, final GUI gui, final int pageIndex) {
-		return true;
+	public void onClick(final Player player, final ClickType clickType, final GUI gui, final int pageIndex) {
 	}
 
 }

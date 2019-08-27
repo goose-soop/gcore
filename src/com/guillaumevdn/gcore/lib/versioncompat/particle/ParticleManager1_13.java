@@ -21,20 +21,13 @@ public class ParticleManager1_13 implements ParticleManager {
 			GCore.inst().warning("Trying to display particle of type " + type.toString() + " but it's most likely not supported on this server version (" + ServerVersion.CURRENT.getName() + ")");
 			return;
 		}
-
-		if (particleType.getDataType().getName().contains("DustOptions")) {
-			Object data = getDustData(null);
+		if (particleType.equals(Particle.NOTE)) {
 			for (Player pl : players) {
-				try {
-					pl.spawnParticle(particleType, loc, count, 0F, 0F, 0F, speed, data);
-				} catch (Throwable exception) {
-					exception.printStackTrace();
-					GCore.inst().error("Couldn't display particle " + particleType.toString());
-				}
+				pl.spawnParticle(particleType, loc, count, speed, ((double) Utils.random(1, 24)) / 25d, 1);
 			}
 		} else {
 			for (Player pl : players) {
-				pl.spawnParticle(particleType, loc, count, 0F, 0F, 0F, speed, null);
+				pl.spawnParticle(particleType, loc, count, speed, 0F, 0F, 0F);
 			}
 		}
 	}
@@ -62,16 +55,17 @@ public class ParticleManager1_13 implements ParticleManager {
 			GCore.inst().warning("Trying to display particle of type " + type.toString() + " but it's most likely not supported on this server version (" + ServerVersion.CURRENT.getName() + ")");
 			return;
 		}
-		try {
+		if (particleType.equals(Particle.REDSTONE)) {
+			Object dust = getDustData(color);
 			for (Player pl : players) {
-				pl.spawnParticle(particleType, loc, count, 0F, 0F, 0F, speed, getDustData(color));
+				pl.spawnParticle(particleType, loc, count, speed, 0F, 0F, 0F, dust);
 			}
-		} catch (IllegalArgumentException exception) {
-			if (exception.getMessage().contains("data should be class java.lang.Void")) {
-				for (Player pl : players) {
-					pl.spawnParticle(particleType, loc, count, 0F, 0F, 0F, speed);
-				}
+		} else if (particleType.equals(Particle.SPELL_MOB) || particleType.equals(Particle.SPELL_MOB_AMBIENT)) {
+			for (Player pl : players) {
+				pl.spawnParticle(particleType, loc, count, speed, ((double) color.getRed()) / 255d, ((double) color.getGreen()) / 255d, ((double) color.getBlue()) / 255d);
 			}
+		} else {
+			send(type, loc, speed, count, players);
 		}
 	}
 

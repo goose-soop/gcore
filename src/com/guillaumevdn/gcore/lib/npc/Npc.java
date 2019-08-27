@@ -198,13 +198,13 @@ public class Npc {
 		return new Pair<Float, Float>((float) yaw, (float) pitch);
 	}
 
-	public void target(float yaw, float pitch) {
+	public void target(double yaw, double pitch) {
 		// not spawned
 		if (!spawned) {
 			return;
 		}
 		// target
-		location = new Location(location.getWorld(), location.getX(), location.getY(), location.getZ(), yaw, pitch);
+		location = new Location(location.getWorld(), location.getX(), location.getY(), location.getZ(), (float) yaw, (float) pitch);
 		NpcProtocols.INSTANCE.sendTarget(player, getEntityId(), yaw, pitch);
 	}
 

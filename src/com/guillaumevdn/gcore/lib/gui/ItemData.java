@@ -188,7 +188,7 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 	public ItemData(String id, int slot, ItemStack item) {
 		this(id,
 				slot,
-				item == null ? Mat.AIR : Mat.from(item),
+				item == null ? Mat.AIR : Mat.fromItem(item),
 						item == null ? (short) 0 : item.getDurability(),
 								item == null ? 1 : item.getAmount(),
 										item == null || !item.hasItemMeta() || !item.getItemMeta().hasDisplayName() ? null : item.getItemMeta().getDisplayName(),
@@ -218,7 +218,7 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 	public ItemData(String id, int slot, Mat type, int durability, int amount, String name, List<String> lore, List<PotionEffect> effects, Map<Enchantment, Integer> enchants) {
 		this.id = id;
 		this.slot = slot;
-		this.type = type.getDurability() != (int) durability ? Mat.from(type.getModernName(), durability) : type;
+		this.type = type == null ? Mat.AIR : (type.getDurability() != (int) durability ? type.cloneWithDurability((int) durability) : type);
 		this.amount = amount;
 		this.name = name == null || name.isEmpty() ? null : Utils.format(name);
 		this.lore = lore == null || lore.isEmpty() ? null : Utils.format(lore);
@@ -479,21 +479,28 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 		return give(player, dropLocation, null, true);
 	}
 
-
 	/**
 	 * @return an item with remaining amount if there wasn't enough place in the player's inventory, or null if no extra drop
 	 */
 	public Item give(Player player, Location dropLocation, Integer forcedAmount, boolean drop) {
+		return give(player, dropLocation, forcedAmount, drop, null);
+	}
+
+	/**
+	 * @return an item with remaining amount if there wasn't enough place in the player's inventory, or null if no extra drop
+	 */
+	public Item give(Player player, Location dropLocation, Integer forcedAmount, boolean drop, Integer forcedMaxStackSize) {
 		ItemStack item = getItemStack();
 		if (item == null) return null;
 		// add to inventory
 		int count = forcedAmount != null ? forcedAmount : item.getAmount();
-		for (int slot = 0; slot < player.getInventory().getSize() && count > 0; slot++) {
+		int maxStackSize = forcedMaxStackSize != null ? (forcedMaxStackSize > 64 ? 64 : forcedMaxStackSize) : item.getMaxStackSize();
+		for (int slot = 0; slot < 36 && count > 0; slot++) {
 			ItemStack slotItem = player.getInventory().getItem(slot);
-			if (slotItem == null || Mat.from(slotItem).isAir()) {
+			if (slotItem == null || Mat.fromItem(slotItem).isAir()) {
 				int newSlotCount = count;
-				if (newSlotCount > item.getMaxStackSize()) {
-					count = newSlotCount - item.getMaxStackSize();
+				if (newSlotCount > maxStackSize) {
+					count = newSlotCount - maxStackSize;
 					slotItem = item.clone();
 					slotItem.setAmount(slotItem.getMaxStackSize());
 					player.getInventory().setItem(slot, slotItem);
@@ -555,7 +562,7 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 		for (ItemStack it : inventory.getContents()) {
 			if (isSimilar(it, checkDurability, exactMatch, false)) {
 				// check durability
-				if (minDurabilityIfNotUnbreakable > 0d && !isUnbreakable() && getType().getDurability() / ((double) getType().getCurrentMaterial().getMaxDurability()) * 100d < minDurabilityIfNotUnbreakable) {
+				if (minDurabilityIfNotUnbreakable > 0d && !isUnbreakable() && (100d - getType().getDurability() / ((double) getType().getCurrentMaterial().getMaxDurability()) * 100d) < minDurabilityIfNotUnbreakable) {
 					continue;
 				}
 				// add count
@@ -566,17 +573,22 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 	}
 
 	public int countFreeFor(Inventory inventory, boolean checkDurability, boolean exactMatch, double minDurabilityIfNotUnbreakable) {
+		return countFreeFor(inventory, checkDurability, exactMatch, minDurabilityIfNotUnbreakable, null);
+	}
+
+	public int countFreeFor(Inventory inventory, boolean checkDurability, boolean exactMatch, double minDurabilityIfNotUnbreakable, Integer forcedMaxStackSize) {
 		int free = 0;
+		int maxStackSize = forcedMaxStackSize != null ? (forcedMaxStackSize > 64 ? 64 : forcedMaxStackSize) : getItemStack().getMaxStackSize();
 		for (ItemStack it : inventory.getContents()) {
-			if (it == null || Mat.from(it.getType()).isAir()) {
-				free += getItemStack().getMaxStackSize();
+			if (it == null || Mat.fromItem(it).isAir()) {
+				free += maxStackSize;
 			} else if (isSimilar(it, checkDurability, exactMatch, false)) {
 				// check durability
-				if (minDurabilityIfNotUnbreakable > 0d && !isUnbreakable() && getType().getDurability() / ((double) getType().getCurrentMaterial().getMaxDurability()) * 100d < minDurabilityIfNotUnbreakable) {
+				if (minDurabilityIfNotUnbreakable > 0d && !isUnbreakable() && (100d - getType().getDurability() / ((double) getType().getCurrentMaterial().getMaxDurability()) * 100d) < minDurabilityIfNotUnbreakable) {
 					continue;
 				}
 				// add count
-				free += it.getMaxStackSize() - it.getAmount();
+				free += maxStackSize - it.getAmount();
 			}
 		}
 		return free;
@@ -647,7 +659,7 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 		if (checkAmount && item.getAmount() != amount) {
 			return false;
 		}
-		Mat itemType = Mat.from(item);
+		Mat itemType = Mat.fromItem(item);
 		// type
 		if (!type.equals(itemType, checkDurability)) {
 			return false;
@@ -855,7 +867,7 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 
 	@Override
 	public ItemData clone() {
-		ItemData clone = new ItemData(id, slot, type, type.getDurability(), amount, name, lore == null ? null : Utils.asList(lore), Utils.asList(effects), Utils.asMapCopy(enchants));
+		ItemData clone = new ItemData(id, slot, type, type == null ? 0 : type.getDurability(), amount, name, lore == null ? null : Utils.asList(lore), Utils.asList(effects), Utils.asMapCopy(enchants));
 		clone.enabled = enabled;
 		clone.maxAmount = maxAmount;
 		clone.chance = chance;
@@ -898,8 +910,26 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 
 	@Override
 	public String toString() {
-		return "ItemData{id=" + id + ",enabled=" + enabled + ",slot=" + slot + ",chance=" + chance + ",type=" + type + ",amount=" + amount + ",maxAmount=" + maxAmount + ",effects=" + effects.toString()
-		+ ",enchants=" + enchants.toString() + ",name=" + name + ",lore=" + (lore == null ? "null" : Utils.asString(lore)) + ",nbt=" + !(customNbt == null) + ",unbreakable=" + unbreakable + "}";
+		return toString(false);
+	}
+
+	public String toString(boolean colorReset) {
+		String desc = "";
+		if (id != null) desc += (desc.isEmpty() ? "" : ",") + "id=" + id;
+		if (slot != -1) desc += (desc.isEmpty() ? "" : ",") + "slot=" + slot;
+		if (chance != -1d) desc += (desc.isEmpty() ? "" : ",") + "chance=" + Utils.round(chance);
+		if (!enabled) desc += (desc.isEmpty() ? "" : ",") + "disabled";
+		if (unbreakable) desc += (desc.isEmpty() ? "" : ",") + "unbreakable";
+		if (type != null) desc += (desc.isEmpty() ? "" : ",") + "type=" + (type.isCustom() ? "custom:" : "") + type.toString();
+		if (type != null && type.getDurability() != 0) desc += (desc.isEmpty() ? "" : ",") + "durability=" + type.getDurability();
+		if (amount != 1) desc += (desc.isEmpty() ? "" : ",") + "amount=" + amount;
+		if (maxAmount > 0 && maxAmount != amount) desc += (desc.isEmpty() ? "" : ",") + "maxAmount=" + maxAmount;
+		if (effects != null && !effects.isEmpty()) desc += (desc.isEmpty() ? "" : ",") + "effects=[" + effects.toString() + "]";
+		if (enchants != null && !enchants.isEmpty()) desc += (desc.isEmpty() ? "" : ",") + "enchants=[" + enchants.toString() + "]";
+		if (name != null) desc += (desc.isEmpty() ? "" : ",") + "name=" + name;
+		if (lore != null && !lore.isEmpty()) desc += (desc.isEmpty() ? "" : ",") + "lore=" + Utils.asString(lore);
+		if (customNbt != null) desc += (desc.isEmpty() ? "" : ",") + "customNbt=" + customNbt;
+		return "ItemData{" + (colorReset ? Utils.unformat(Utils.format(desc)) : desc) + "}";
 	}
 
 }

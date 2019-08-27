@@ -25,7 +25,7 @@ public class CommandItemSetunbreakable extends CommandArgument {
 	public void perform(CommandCall call) {
 		Player player = call.getSenderAsPlayer();
 		ItemStack item = player.getInventory().getItemInHand();
-		Mat mat = Mat.from(item);
+		Mat mat = Mat.fromItem(item);
 		// invalid mat
 		if (mat == null || mat.isAir()) {
 			GCore.inst().messageError(player, "Can't set this item unbreakable");

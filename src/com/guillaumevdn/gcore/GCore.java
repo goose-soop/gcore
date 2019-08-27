@@ -13,8 +13,10 @@ import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.plugin.Plugin;
 
+import com.guillaumevdn.gcore.commands.CommandBlockMat;
 import com.guillaumevdn.gcore.commands.CommandDataExport;
 import com.guillaumevdn.gcore.commands.CommandDataReset;
+import com.guillaumevdn.gcore.commands.CommandItemClickinfo;
 import com.guillaumevdn.gcore.commands.CommandItemMat;
 import com.guillaumevdn.gcore.commands.CommandItemNbt;
 import com.guillaumevdn.gcore.commands.CommandItemRead;
@@ -35,6 +37,7 @@ import com.guillaumevdn.gcore.data.GDataManager;
 import com.guillaumevdn.gcore.integration.HeadDatabaseIntegration;
 import com.guillaumevdn.gcore.integration.economy.EconomyHandler;
 import com.guillaumevdn.gcore.integration.permission.PermissionHandler;
+import com.guillaumevdn.gcore.integration.placeholderapi.PlaceholderAPIIntegration;
 import com.guillaumevdn.gcore.lib.GPlugin;
 import com.guillaumevdn.gcore.lib.command.CommandArgument;
 import com.guillaumevdn.gcore.lib.command.CommandRoot;
@@ -94,6 +97,7 @@ public class GCore extends GPlugin {
 	private PermissionHandler permissionHandler = new PermissionHandler();
 	private NpcManager npcManager = null;
 	private HeadDatabaseIntegration headDatabaseIntegration = null;
+	private PlaceholderAPIIntegration placeholderAPIIntegration = null;
 	private Map<Player, ChatInput> chatInputs = new HashMap<Player, ChatInput>();
 	private Map<Player, LocationInput> locationInputs = new HashMap<Player, LocationInput>();
 	private Map<Player, NpcInput> npcInputs = new HashMap<Player, NpcInput>();
@@ -138,6 +142,14 @@ public class GCore extends GPlugin {
 
 	public void setHeadDatabaseIntegration(HeadDatabaseIntegration headDatabaseIntegration) {
 		this.headDatabaseIntegration = headDatabaseIntegration;
+	}
+
+	public PlaceholderAPIIntegration getPlaceholderAPIIntegration() {
+		return placeholderAPIIntegration;
+	}
+
+	public void setPlaceholderAPIIntegration(PlaceholderAPIIntegration placeholderAPIIntegration) {
+		this.placeholderAPIIntegration = placeholderAPIIntegration;
 	}
 
 	public Map<Player, ChatInput> getChatInputs() {
@@ -319,6 +331,7 @@ public class GCore extends GPlugin {
 		initEconomy();
 		initPermission();
 		registerPluginIntegration("HeadDatabase", HeadDatabaseIntegration.class);
+		registerPluginIntegration("PlaceholderAPI", PlaceholderAPIIntegration.class);
 
 		// register command
 		CommandRoot root = new CommandRoot(this, Utils.asList("gcore"), null, GPerm.GCORE_ADMIN, false);
@@ -328,9 +341,14 @@ public class GCore extends GPlugin {
 		root.addChild(data);
 		data.addChild(new CommandDataExport());
 		data.addChild(new CommandDataReset());
+		// block commands
+		CommandArgument block = new CommandArgument(this, Utils.asList("block"), "block-related commands", GPerm.GCORE_ADMIN, false);
+		root.addChild(block);
+		block.addChild(new CommandBlockMat());
 		// item commands
 		CommandArgument item = new CommandArgument(this, Utils.asList("item"), "item-related commands", GPerm.GCORE_ADMIN, false);
 		root.addChild(item);
+		item.addChild(new CommandItemClickinfo());
 		item.addChild(new CommandItemRead());
 		item.addChild(new CommandItemSetdura());
 		item.addChild(new CommandItemSetname());	

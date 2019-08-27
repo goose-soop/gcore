@@ -21,7 +21,7 @@ public class AdapterMat extends TypeAdapter<Mat> {
 			return null;
 		}
 		String[] raw = reader.nextString().split(",");
-		return Mat.from(raw[0], Integer.parseInt(raw[1]));
+		return Mat.valueOf(raw[0], Integer.parseInt(raw[1]));
 	}
 
 	@Override

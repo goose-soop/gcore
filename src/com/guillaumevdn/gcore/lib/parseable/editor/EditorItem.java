@@ -19,9 +19,8 @@ public abstract class EditorItem extends ClickeableItem {
 
 	// methods
 	@Override
-	public boolean onClick(Player player, ClickType clickType, GUI gui, int pageIndex) {
+	public void onClick(Player player, ClickType clickType, GUI gui, int pageIndex) {
 		onClick(player, clickType, pageIndex);
-		return true;
 	}
 
 	// abstract methods

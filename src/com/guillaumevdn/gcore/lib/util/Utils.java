@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
@@ -476,6 +477,15 @@ public class Utils {
 	public static String getClassActualName(Class<?> clazz) {
 		String name = clazz.getName();
 		return name.contains(".") ? name.substring(name.lastIndexOf(".") + 1, name.length()) : name;
+	}
+
+	public static boolean hasOneSuper(Class<?> toCheck, Collection<? extends Class<?>> superclasses) {
+		for (Class<?> clazz : superclasses) {
+			if (clazz.isAssignableFrom(toCheck)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public static boolean ensureAuthorization(JavaPlugin plugin) {
@@ -1029,7 +1039,7 @@ public class Utils {
 
 	public static boolean isLocInArea(Location loc, Location p1, Location p2, boolean checkY) {
 		// validity and world check
-		if (loc == null || p1 == null || p2 == null || !loc.getWorld().equals(p1.getWorld()) || !p1.getWorld().equals(p2.getWorld())) {
+		if (loc == null || p1 == null || p2 == null || !loc.getWorld().equals(p1.getWorld()) || !loc.getWorld().equals(p2.getWorld())) {
 			return false;
 		}
 		// coords
@@ -1042,6 +1052,20 @@ public class Utils {
 			return false;
 		}
 		return true;
+	}
+
+	public static boolean isBlockInArea(BlockCoords block, BlockCoords p1, BlockCoords p2) {
+		// validity and world check
+		if (block == null || p1 == null || p2 == null || !block.getWorld().equals(p1.getWorld()) || !block.getWorld().equals(p2.getWorld())) {
+			return false;
+		}
+		// coords
+		int x1 = p1.getX(), y1 = p1.getY(), z1 = p1.getZ();
+		int x2 = p2.getX(), y2 = p2.getY(), z2 = p2.getZ();
+		int minX = Math.min(x1, x2), maxX = Math.max(x1, x2);
+		int minY = Math.min(y1, y2), maxY = Math.max(y1, y2);
+		int minZ = Math.min(z1, z2), maxZ = Math.max(z1, z2);
+		return block.getX() > minX && block.getX() < maxX && block.getZ() > minZ && block.getZ() < maxZ && block.getY() > minY && block.getY() < maxY;
 	}
 
 	public static boolean isChunkInArea(Chunk chunk, Location p1, Location p2) {
@@ -1129,7 +1153,7 @@ public class Utils {
 	public static boolean isIgnited(Block block) {
 		if (block == null) return false;
 		for (BlockFace face : BlockFace.values()) {
-			if (Mat.from(block.getRelative(face).getType()).equals(Mat.FIRE)) {
+			if (Mat.fromBlock(block.getRelative(face)).equals(Mat.FIRE)) {
 				return true;
 			}
 		}
@@ -1176,7 +1200,7 @@ public class Utils {
 			return "null";
 		}
 		ItemMeta meta = item.getItemMeta();
-		Mat mat = Mat.from(item);
+		Mat mat = Mat.fromItem(item);
 		String key = mat.getModernName() + "-" + mat.getLegacyData() + "-" + mat.getDurability() + (withAmount ? "-" + item.getAmount() : "");
 		for (Entry<Enchantment,Integer> ench : item.getEnchantments().entrySet()) {
 			key += ench.getKey().getName() + "#" + ench.getValue();
@@ -1204,7 +1228,7 @@ public class Utils {
 		}
 
 		ItemMeta meta = item.getItemMeta();
-		String serializedItemStack = "t@@@" + Mat.from(item).getModernName();
+		String serializedItemStack = "t@@@" + Mat.fromItem(item).getModernName();
 
 		if (item.getDurability() != 0)
 		{
@@ -1280,53 +1304,51 @@ public class Utils {
 
 		ItemStack item = null;
 		String[] serializedItemStack = serialized.split(":::");
-		boolean createdItemStack = false;
 
 		for (String itemInfo : serializedItemStack)
 		{
 			String[] itemAttribute = itemInfo.split("@@@");
 
 			if (itemAttribute[0].equals("t")) {
-				Mat mat = Mat.from(itemAttribute[1], 0);
+				Mat mat = Mat.valueOf(itemAttribute[1].toUpperCase());
 				if (mat != null) {
 					item = mat.getNewCurrentStack();
-					createdItemStack = true;
 				}
 			}
-			else if (itemAttribute[0].equals("dr") && createdItemStack) {
+			else if (itemAttribute[0].equals("dr") && item != null) {
 				item.setDurability(Short.valueOf(itemAttribute[1]));
 			}
-			else if (itemAttribute[0].equals("d") && createdItemStack && !ServerVersion.IS_1_13) {
+			else if (itemAttribute[0].equals("d") && item != null && !ServerVersion.IS_1_13) {
 				try {
 					item.setData(new MaterialData(item.getType(), Byte.valueOf(itemAttribute[1])));
 				} catch (Throwable exception) {
 				}
 			}
-			else if (itemAttribute[0].equals("a") && createdItemStack) {
+			else if (itemAttribute[0].equals("a") && item != null) {
 				item.setAmount(Integer.valueOf(itemAttribute[1]));
 			}
-			else if (itemAttribute[0].equals("e") && createdItemStack) {
+			else if (itemAttribute[0].equals("e") && item != null) {
 				item.addUnsafeEnchantment(Enchantment.getByName(itemAttribute[1]), Integer.valueOf(itemAttribute[2]));
 			}
-			else if (itemAttribute[0].equals("o") && createdItemStack)
+			else if (itemAttribute[0].equals("o") && item != null)
 			{
 				ItemMeta meta = item.getItemMeta();
 				((SkullMeta) meta).setOwner(itemAttribute[1]);
 				item.setItemMeta(meta);
 			}
-			else if (itemAttribute[0].equals("eff") && createdItemStack)
+			else if (itemAttribute[0].equals("eff") && item != null)
 			{
 				ItemMeta meta = item.getItemMeta();
 				((PotionMeta) meta).addCustomEffect(new PotionEffect(PotionEffectType.getByName(itemAttribute[1]), Integer.parseInt(itemAttribute[2]), Integer.parseInt(itemAttribute[3])), true);
 				item.setItemMeta(meta);
 			}
-			else if (itemAttribute[0].equals("n") && createdItemStack)
+			else if (itemAttribute[0].equals("n") && item != null)
 			{
 				ItemMeta meta = item.getItemMeta();
 				meta.setDisplayName(itemAttribute[1]);
 				item.setItemMeta(meta);
 			}
-			else if (itemAttribute[0].equals("l") && createdItemStack)
+			else if (itemAttribute[0].equals("l") && item != null)
 			{
 				ItemMeta meta = item.getItemMeta();
 				List<String> lore = new ArrayList<String>();
@@ -1338,7 +1360,7 @@ public class Utils {
 				meta.setLore(lore);
 				item.setItemMeta(meta);
 			}
-			else if (itemAttribute[0].equals("nbt") && createdItemStack) {
+			else if (itemAttribute[0].equals("nbt") && item != null) {
 				try {
 					Object nbt = Compat.INSTANCE.unserializeNbt(itemAttribute[1]);
 					item = Compat.INSTANCE.setNbt(item, nbt);
@@ -1767,7 +1789,7 @@ public class Utils {
 		}
 		return Character.toUpperCase(original.charAt(0)) + original.substring(1);
 	}
-	
+
 	public static String reverseString(String original) {
 		StringBuilder result = new StringBuilder();
 		char[] chars = original.toCharArray();
@@ -1832,7 +1854,7 @@ public class Utils {
 		}
 		return true;
 	}
-	
+
 	public static String getAlphanumeric(String str) {
 		StringBuilder builder = new StringBuilder();
 		for (int i = 0; i < str.length(); i++) {
@@ -2012,7 +2034,7 @@ public class Utils {
 
 		return result;
 	}
-
+	
 	public static String copyString(String str, int count) {
 		StringBuilder builder = new StringBuilder();
 		for (int i = 0; i < count; ++i) {
@@ -2021,7 +2043,7 @@ public class Utils {
 		return builder.toString();
 	}
 
-	public static boolean isNull(Object obj) {// TODO : what in the world is that thing
+	public static boolean isNull(Object obj) {// TODO : what in the world is that thing ; edit : no, really, what the FUCK is that ???? WHERE ????
 		try {
 			obj.getClass();
 			return obj == null ? true : false;
@@ -2153,9 +2175,13 @@ public class Utils {
 		for (Object obj : objects) {
 			if (obj != null) {
 				if (obj instanceof Collection) {
-					list.addAll((Collection<T>) obj);
+					for (Object o : (Collection<?>) obj) {
+						list.add((T) o);
+					}
 				} else if (obj instanceof Object[]) {
-					for (T t : (T[]) obj) list.add(t);
+					for (Object o : (Object[]) obj) {
+						list.add((T) o);
+					}
 				} else {
 					list.add((T) obj);
 				}
@@ -2206,6 +2232,12 @@ public class Utils {
 		List<T> copy = asList(list);
 		sortList(copy, comparator);
 		return copy;
+	}
+
+	public static <T> TreeSet<T> asSortedSet(Collection<T> list, Comparator<? super T> comparator) {
+		TreeSet<T> sorted = new TreeSet<T>(comparator);
+		sorted.addAll(list);
+		return sorted;
 	}
 
 	public static <T> void sortList(List<T> list, Comparator<? super T> comparator) {
@@ -2552,7 +2584,7 @@ public class Utils {
 
 	// https://stackoverflow.com/questions/3422673/how-to-evaluate-a-math-expression-given-in-string-form, that guy is a real programmer, Pog
 	public static double calculateExpression(String expression) throws CalculationError {
-		final String str = expression.toLowerCase();
+		final String str = expression.trim().toLowerCase();
 		return new Object() {
 			int pos = -1, ch;
 
@@ -2638,15 +2670,15 @@ public class Utils {
 			}
 		}.parse();
 	}
-	
+
 	public static class CalculationError extends Error {
-		
+
 		private static final long serialVersionUID = 4723673620719545559L;
 
 		public CalculationError(String message) {
 			super(message);
 		}
-		
+
 	}
 
 }

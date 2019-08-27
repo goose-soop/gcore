@@ -352,19 +352,19 @@ public abstract class Pathfinding {
 
 	private Point getAvailableForMoving(Point point) {
 		// not free
-		if (!isMatTraversable(Mat.from(world.getBlockAt(point.getX(), point.getY(), point.getZ())))) {
+		if (!isMatTraversable(Mat.fromBlock(world.getBlockAt(point.getX(), point.getY(), point.getZ())))) {
 			Point available = getFirstTraversableUp(point);
 			// no available block to jump on, or too high
 			if (available == null || available.getY() - point.getY() > yToleranceUp) {
 				return null;
 			}
 			// there's a fence below the target block
-			Mat bmat = Mat.from(world.getBlockAt(available.getX(), available.getY() - 1, available.getZ()));
+			Mat bmat = Mat.fromBlock(world.getBlockAt(available.getX(), available.getY() - 1, available.getZ()));
 			if (bmat.toString().contains("FENCE") || bmat.equals(Mat.COBBLESTONE_WALL) || bmat.equals(Mat.MOSSY_COBBLESTONE_WALL)) {
 				return null;
 			}
 			// not enough space above the target block to pass or jump up
-			if (!isMatTraversable(Mat.from(world.getBlockAt(available.getX(), available.getY() + 1, available.getZ()))) || !isMatTraversable(Mat.from(world.getBlockAt(available.getX(), available.getY() + 2, available.getZ())))) {
+			if (!isMatTraversable(Mat.fromBlock(world.getBlockAt(available.getX(), available.getY() + 1, available.getZ()))) || !isMatTraversable(Mat.fromBlock(world.getBlockAt(available.getX(), available.getY() + 2, available.getZ())))) {
 				return null;
 			}
 			// good for jumping up
@@ -373,7 +373,7 @@ public abstract class Pathfinding {
 		// free
 		else {
 			// not enough heigh above the target block to pass or jump down
-			if (!isMatTraversable(Mat.from(world.getBlockAt(point.getX(), point.getY() + 1, point.getZ())))) {
+			if (!isMatTraversable(Mat.fromBlock(world.getBlockAt(point.getX(), point.getY() + 1, point.getZ())))) {
 				return null;
 			}
 			Point available = getLastTraversableDown(point);
@@ -425,7 +425,7 @@ public abstract class Pathfinding {
 		int y = point.getY();
 		while (y-- > 0) {// -- so we check the argument on first iteration
 			Block block = world.getBlockAt(point.getX(), y, point.getZ());
-			if (!isMatTraversable(Mat.from(block))) {
+			if (!isMatTraversable(Mat.fromBlock(block))) {
 				return new Point(point.getX(), y + 1, point.getZ());
 			}
 		}
@@ -436,7 +436,7 @@ public abstract class Pathfinding {
 		int y = point.getY();
 		while (y++ < 255) {// ++ so we check the argument on first iteration
 			Block block = world.getBlockAt(point.getX(), y, point.getZ());
-			if (isMatTraversable(Mat.from(block))) {
+			if (isMatTraversable(Mat.fromBlock(block))) {
 				return new Point(point.getX(), y, point.getZ());
 			}
 		}

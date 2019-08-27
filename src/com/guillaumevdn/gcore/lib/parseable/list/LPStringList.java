@@ -2,6 +2,8 @@ package com.guillaumevdn.gcore.lib.parseable.list;
 
 import java.util.List;
 
+import org.bukkit.entity.Player;
+
 import com.guillaumevdn.gcore.lib.material.Mat;
 import com.guillaumevdn.gcore.lib.parseable.ConfigData;
 import com.guillaumevdn.gcore.lib.parseable.ListParseable;
@@ -14,6 +16,12 @@ public class LPStringList extends ListParseable<PPStringList> {
 	// base
 	public LPStringList(String id, Parseable parent, boolean mandatory, int editorSlot, Mat editorIcon, List<String> editorDescription) {
 		super(id, parent, "string list", mandatory, editorSlot, editorIcon, editorDescription);
+	}
+	
+	// get
+	public List<String> getElement(String elementId, Player parser) {
+		PPStringList elem = getElement(elementId);
+		return elem == null ? null : elem.getParsedValue(parser);
 	}
 
 	// methods

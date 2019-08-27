@@ -4,6 +4,7 @@ import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.data.GUser;
 import com.guillaumevdn.gcore.data.UserInfo;
 import com.guillaumevdn.gcore.lib.data.DataManager.Callback;
+import com.guillaumevdn.gcore.lib.event.GUserPulledEvent;
 
 public abstract class GUserOperator {
 
@@ -18,12 +19,11 @@ public abstract class GUserOperator {
 
 	// methods
 	public void operate() {
-		// get quests
 		user = GUser.get(info);
 		if (user != null) {// online
 			process();
 		} else {// offline, load
-			GCore.inst().getData().getUsers().loadUser(info, new Callback() {
+			GCore.inst().getData().getUsers().loadUser(info, GUserPulledEvent.Context.USER_OPERATOR, new Callback() {
 				@Override
 				public void callback() {
 					user = GUser.get(info);

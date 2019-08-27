@@ -84,7 +84,7 @@ public interface ParticleManager {
 		}
 
 		public boolean hasColor() {
-			return equals(SPELL_MOB) || equals(SPELL_MOB_AMBIENT) || equals(REDSTONE) || equals(NOTE);
+			return equals(SPELL_MOB) || equals(SPELL_MOB_AMBIENT) || equals(REDSTONE);
 		}
 
 		public static Type from(String name) {

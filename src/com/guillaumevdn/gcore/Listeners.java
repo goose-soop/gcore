@@ -30,6 +30,7 @@ import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import com.guillaumevdn.gcore.commands.CommandItemClickinfo;
 import com.guillaumevdn.gcore.lib.UpdateCheck;
 import com.guillaumevdn.gcore.lib.event.NpcAttackEvent;
 import com.guillaumevdn.gcore.lib.event.NpcInteractEvent;
@@ -41,6 +42,7 @@ import com.guillaumevdn.gcore.lib.event.PlayerKillEvent;
 import com.guillaumevdn.gcore.lib.event.PlayerSpawnedMobEvent;
 import com.guillaumevdn.gcore.lib.event.PlayerTradedVillagerEvent;
 import com.guillaumevdn.gcore.lib.gui.InventoryState;
+import com.guillaumevdn.gcore.lib.gui.ItemData;
 import com.guillaumevdn.gcore.lib.material.Mat;
 import com.guillaumevdn.gcore.lib.util.BucketType;
 import com.guillaumevdn.gcore.lib.util.Pair;
@@ -137,7 +139,7 @@ public class Listeners implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void event(BlockBreakEvent event) {
 		lastBreakEvent = System.currentTimeMillis();
-		lastBreakBlockType = Mat.from(event.getBlock());
+		lastBreakBlockType = Mat.fromBlock(event.getBlock());
 		lastBreakBlock = event;
 	}
 
@@ -242,15 +244,26 @@ public class Listeners implements Listener {
 		}.runTaskLater(GCore.inst(), 1L);
 	}
 
-	@EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR)
 	public void event(final InventoryClickEvent event) {
+		// log item
+		final Player player = (Player) event.getWhoClicked();
+		if (CommandItemClickinfo.enabled.contains(player)) {
+			ItemData item = event.getCurrentItem() == null ? null : new ItemData(event.getCurrentItem());
+			if (item != null) {
+				GCore.inst().debug("[GUI-Click-Info] " + player.getName() + " clicked on " + item.toString(true));
+			}
+		}
+		// cancelled
+		if (event.isCancelled()) {
+			return;
+		}
 		// ensure we're trading
 		if (event instanceof CraftItemEvent) return;
 		if (event.getView().getTopInventory() == null) return;
 		if (!event.getView().getTopInventory().getType().equals(InventoryType.MERCHANT)) return;
 		if (event.getRawSlot() != 2) return;
 		// build initial state
-		final Player player = (Player) event.getWhoClicked();
 		final InventoryState initialState = new InventoryState(player, event.getView().getTopInventory(), 0, 1);
 		// delay for craft
 		new BukkitRunnable() {

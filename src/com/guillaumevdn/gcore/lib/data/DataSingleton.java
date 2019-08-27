@@ -79,7 +79,7 @@ public abstract class DataSingleton {
 		getDataManager().runAsync(new BukkitRunnable() {
 			@Override
 			public void run() {
-				push();
+				push(params);
 			}
 		});
 	}

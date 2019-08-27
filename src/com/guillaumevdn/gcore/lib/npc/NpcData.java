@@ -18,7 +18,6 @@ import com.guillaumevdn.gcore.lib.parseable.primitive.PPDouble;
 import com.guillaumevdn.gcore.lib.parseable.primitive.PPEnumList;
 import com.guillaumevdn.gcore.lib.parseable.primitive.PPLocation;
 import com.guillaumevdn.gcore.lib.parseable.primitive.PPString;
-import com.guillaumevdn.gcore.lib.parseable.primitive.PPStringList;
 import com.guillaumevdn.gcore.lib.util.Utils;
 
 public class NpcData extends ContainerParseable {
@@ -38,7 +37,6 @@ public class NpcData extends ContainerParseable {
 	private CPItem chestplate = addComponent(new CPItem("chestplate", this, false, 13, EditorGUI.ICON_ITEM, GLocale.GUI_GENERIC_EDITOR_NPC_STUFFLORE.getLines()));
 	private CPItem helmet = addComponent(new CPItem("helmet", this, false, 14, EditorGUI.ICON_ITEM, GLocale.GUI_GENERIC_EDITOR_NPC_STUFFLORE.getLines()));
 	private LPString variables = addComponent(new LPString("variables", this, false, 15, EditorGUI.ICON_NUMBER, GLocale.GUI_GENERIC_EDITOR_NPC_VARIABLESLORE.getLines()));
-	private PPStringList behaviors = addComponent(new PPStringList("behaviors", this, Utils.emptyList(), false, 16, EditorGUI.ICON_TECHNICAL, GLocale.GUI_GENERIC_EDITOR_NPC_BEHAVIORSLORE.getLines()));
 
 	public NpcData(String id, Parseable parent, boolean mandatory, int editorSlot, Mat editorIcon, List<String> editorDescription) {
 		super(id, parent, "npc data", mandatory, editorSlot, editorIcon, editorDescription);
@@ -151,14 +149,6 @@ public class NpcData extends ContainerParseable {
 
 	public LPString getVariables() {
 		return variables;
-	}
-
-	public PPStringList getBehaviors() {
-		return behaviors;
-	}
-
-	public List<String> getBehaviors(Player parser) {
-		return behaviors.getParsedValue(parser);
 	}
 
 	// clone

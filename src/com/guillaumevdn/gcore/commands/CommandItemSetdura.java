@@ -27,7 +27,7 @@ public class CommandItemSetdura extends CommandArgument {
 		if (durability != Integer.MIN_VALUE) {
 			Player player = call.getSenderAsPlayer();
 			ItemStack item = player.getInventory().getItemInHand();
-			Mat mat = Mat.from(item);
+			Mat mat = Mat.fromItem(item);
 			// invalid mat
 			if (mat == null || mat.isAir()) {
 				GCore.inst().messageError(player, "Can't set durability for this item");
@@ -37,7 +37,7 @@ public class CommandItemSetdura extends CommandArgument {
 			item.setDurability((short) durability);
 			player.setItemInHand(item);
 			player.updateInventory();
-			mat = Mat.from(item);
+			mat = Mat.fromItem(item);
 			Messenger.send(player, Level.NORMAL_INFO, "GCore", "Set durability to " + durability + ". Item : GCore type : " + mat.getModernName() + " (durability " + mat.getDurability() + ")");
 		}
 	}

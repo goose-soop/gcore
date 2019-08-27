@@ -33,7 +33,7 @@ public class MatLPInteger extends MatListParseable<PPInteger> {
 	public Map<Mat, PPInteger> getAllValues() {
 		Map<Mat, PPInteger> values = new HashMap<Mat, PPInteger>();
 		for (String key : getElements().keySet()) {
-			Mat mat = Mat.from(key, 0);
+			Mat mat = Mat.valueOf(key);
 			if (mat != null) values.put(mat, getElements().get(key));
 		}
 		return values;

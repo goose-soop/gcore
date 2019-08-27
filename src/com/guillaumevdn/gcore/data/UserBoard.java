@@ -24,8 +24,8 @@ import com.guillaumevdn.gcore.lib.data.DataManager.BackEnd;
 import com.guillaumevdn.gcore.lib.data.DataManager.Callback;
 import com.guillaumevdn.gcore.lib.data.mysql.Query;
 import com.guillaumevdn.gcore.lib.event.GUserPulledEvent;
+import com.guillaumevdn.gcore.lib.event.GUsersPulledOnlineEvent;
 import com.guillaumevdn.gcore.lib.event.UserDataProfileChangedEvent;
-import com.guillaumevdn.gcore.lib.util.Handler;
 import com.guillaumevdn.gcore.lib.util.Utils;
 
 public class UserBoard extends DataBoard<GUser> implements Listener {
@@ -64,14 +64,7 @@ public class UserBoard extends DataBoard<GUser> implements Listener {
 		pullAsync(toPull, new Callback() {
 			@Override
 			public void callback() {
-				new Handler() {
-					@Override
-					public void execute() {
-						for (GUser user : toPull) {
-							Bukkit.getPluginManager().callEvent(new GUserPulledEvent(user));
-						}
-					}
-				}.runSync();
+				Bukkit.getPluginManager().callEvent(new GUsersPulledOnlineEvent(!Bukkit.isPrimaryThread()));
 			}
 		});
 	}
@@ -80,7 +73,7 @@ public class UserBoard extends DataBoard<GUser> implements Listener {
 	 * Loads an user, overwriting the current cached data if any is present.
 	 * @param info the user info
 	 */
-	public void loadUser(UserInfo info, final Callback callback) {
+	public void loadUser(UserInfo info, final GUserPulledEvent.Context context, final Callback callback) {
 		// get user or add to cache
 		final GUser user;
 		if (cache.containsKey(info)) {
@@ -93,12 +86,7 @@ public class UserBoard extends DataBoard<GUser> implements Listener {
 			@Override
 			public void callback() {
 				if (callback != null) callback.callback();
-				new Handler() {
-					@Override
-					public void execute() {
-						Bukkit.getPluginManager().callEvent(new GUserPulledEvent(user));
-					}
-				}.runSync();
+				Bukkit.getPluginManager().callEvent(new GUserPulledEvent(!Bukkit.isPrimaryThread(), user, context));
 			}
 		});
 	}
@@ -142,20 +130,7 @@ public class UserBoard extends DataBoard<GUser> implements Listener {
 			}
 		}
 		// load user
-		loadUser(new UserInfo(player), new Callback() {
-			@Override
-			public void callback() {
-				final GUser user = GUser.get(player);
-				if (user != null) {
-					new Handler() {
-						@Override
-						public void execute() {
-							Bukkit.getPluginManager().callEvent(new GUserPulledEvent(user));
-						}
-					}.runSync();
-				}
-			}
-		});
+		loadUser(new UserInfo(player), GUserPulledEvent.Context.JOIN, null);
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
@@ -165,20 +140,7 @@ public class UserBoard extends DataBoard<GUser> implements Listener {
 		unloadUser(user);
 		// load if online
 		if (user.toPlayer() != null) {
-			loadUser(user, new Callback() {
-				@Override
-				public void callback() {
-					final GUser user = GUser.get(event.getUser());
-					if (user != null) {
-						new Handler() {
-							@Override
-							public void execute() {
-								Bukkit.getPluginManager().callEvent(new GUserPulledEvent(user));
-							}
-						}.runSync();
-					}
-				}
-			});
+			loadUser(user, GUserPulledEvent.Context.PROFILE_CHANGE, null);
 		}
 	}
 

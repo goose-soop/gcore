@@ -28,6 +28,15 @@ public class EconomyHandler {
 		return PLUGINS.containsKey(plugin);
 	}
 
+	public static Map<String, String> getHandledPlugins() {
+		return PLUGINS;
+	}
+
+	// set
+	public void setUtils(EconomyUtils utils) {
+		this.utils = utils;
+	}
+
 	// methods
 	public boolean init() {
 		// check for handled plugin

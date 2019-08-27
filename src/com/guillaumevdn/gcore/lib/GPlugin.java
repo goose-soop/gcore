@@ -18,6 +18,8 @@ import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.scheduler.BukkitWorker;
 
 import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.GLocale;
@@ -412,15 +414,6 @@ public abstract class GPlugin extends JavaPlugin implements Listener {
 			return;
 		}
 
-		// close GUIs
-		GUI.unregisterAll(this);
-
-		// events
-		HandlerList.unregisterAll((JavaPlugin) this);
-
-		// tasks
-		Bukkit.getScheduler().cancelTasks(this);
-
 		// disable
 		try {
 			disable();
@@ -430,21 +423,71 @@ public abstract class GPlugin extends JavaPlugin implements Listener {
 			error("An unknown error occured while disabling");
 		}
 
-		// integration
-		for (PluginIntegration integration : pluginIntegration) {
-			integration.disable();
-			debug("Unregistered " + integration.getPluginName() + " integration");
+		// events
+		try {
+			HandlerList.unregisterAll((JavaPlugin) this);
+		} catch (Throwable exception) {
+			exception.printStackTrace();
+			error("An unknown error occured while unregistering listeners");
 		}
-		pluginIntegration.clear();
+
+		// cancel all tasks
+		try {
+			Bukkit.getScheduler().cancelTasks(this);
+			for (BukkitTask task : Utils.asList(Bukkit.getScheduler().getPendingTasks())) {
+				if (equals(task.getOwner())) {
+					task.cancel();
+				}
+			}
+			// try even much harder even though some async tasks will still be executed a few times while reloading :'(
+			for (BukkitWorker worker : Utils.asList(Bukkit.getScheduler().getActiveWorkers())) {
+				if (equals(worker.getOwner())) {
+					Bukkit.getScheduler().cancelTask(worker.getTaskId());
+				}
+			}
+		} catch (Throwable exception) {
+			exception.printStackTrace();
+			error("An unknown error occured while unregistering listeners");
+		}
+
+		// close GUIs
+		try {
+			GUI.unregisterAll(this);
+		} catch (Throwable exception) {
+			exception.printStackTrace();
+			error("An unknown error occured while unregistering GUIs");
+		}
+
+		// integration
+		try {
+			for (PluginIntegration integration : pluginIntegration) {
+				integration.disable();
+				debug("Unregistered " + integration.getPluginName() + " integration");
+			}
+			pluginIntegration.clear();
+		} catch (Throwable exception) {
+			exception.printStackTrace();
+			error("An unknown error occured while disabling plugin integration");
+		}
 
 		// data
-		unregisterData();
+		try {
+			unregisterData();
+		} catch (Throwable exception) {
+			exception.printStackTrace();
+			error("An unknown error occured while disabling unregistering data");
+		}
 
 		// unregister commands
-		for (CommandRoot command : commands.values()) {
-			getCommand(command.getAliases().get(0)).setExecutor(null);
+		try {
+			for (CommandRoot command : commands.values()) {
+				getCommand(command.getAliases().get(0)).setExecutor(null);
+			}
+			commands.clear();
+		} catch (Throwable exception) {
+			exception.printStackTrace();
+			error("An unknown error occured while disabling unregistering commands");
 		}
-		commands.clear();
 
 		// log
 		success(getDescription().getName() + " v" + getDescription().getVersion() + " is now disabled.");

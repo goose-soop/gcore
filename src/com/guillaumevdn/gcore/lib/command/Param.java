@@ -194,7 +194,7 @@ public class Param {
 				GLocale.MSG_GENERIC_COMMAND_INVALIDDOUBLEPARAM.send(call.getSender(), "{plugin}", call.getPlugin().getName(), "{parameter}", "-" + toString(), "{value}", value);
 			}
 		}
-		return Integer.MIN_VALUE;
+		return Double.MIN_VALUE;
 	}
 
 	public OfflinePlayer getOfflinePlayer(CommandCall call, boolean senderIfNone) {

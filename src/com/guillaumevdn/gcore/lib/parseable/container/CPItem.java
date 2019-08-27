@@ -226,7 +226,10 @@ public class CPItem extends ContainerParseable {
 			item.setEnabled(getEnabled(parser));
 
 			// type
-			item.setType(Mat.from(getType(parser).getModernName(), getDurability(parser)));
+			Mat mat = getType(parser);
+			Integer durability = getDurability(parser);
+			if (mat != null && durability != null && mat.getDurability() != durability) mat = mat.cloneWithDurability(durability);
+			item.setType(mat);
 
 			// amount
 			item.setAmount(getAmount(parser));
@@ -375,7 +378,7 @@ public class CPItem extends ContainerParseable {
 		// has item
 		ItemData item = getParsedValue(parser);
 		if (item != null && item.getType() != null && !item.getType().isAir()) {
-			return item.getType().equals(Mat.from(toCheckType), getCheckDurability(parser));
+			return item.getType().equals(Mat.fromMaterial(toCheckType, 0, 0), getCheckDurability(parser));
 		}
 		// no conditions so it's valid
 		return true;
@@ -473,7 +476,7 @@ public class CPItem extends ContainerParseable {
 					@Override
 					public void onChoose(Player player, ItemStack value) {
 						// replace value
-						if (value != null && !Mat.from(value).isAir()) {
+						if (value != null && !Mat.fromItem(value).isAir()) {
 							ItemData item = new ItemData(value);
 							type.setValue(Utils.asList(item.getType().toString()));
 							durability.setValue(Utils.asList("" + item.getType().getDurability()));

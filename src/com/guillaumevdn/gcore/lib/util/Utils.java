@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
@@ -2033,7 +2034,7 @@ public class Utils {
 
 		return result;
 	}
-
+	
 	public static String copyString(String str, int count) {
 		StringBuilder builder = new StringBuilder();
 		for (int i = 0; i < count; ++i) {
@@ -2042,7 +2043,7 @@ public class Utils {
 		return builder.toString();
 	}
 
-	public static boolean isNull(Object obj) {// TODO : what in the world is that thing
+	public static boolean isNull(Object obj) {// TODO : what in the world is that thing ; edit : no, really, what the FUCK is that ???? WHERE ????
 		try {
 			obj.getClass();
 			return obj == null ? true : false;
@@ -2231,6 +2232,12 @@ public class Utils {
 		List<T> copy = asList(list);
 		sortList(copy, comparator);
 		return copy;
+	}
+
+	public static <T> TreeSet<T> asSortedSet(Collection<T> list, Comparator<? super T> comparator) {
+		TreeSet<T> sorted = new TreeSet<T>(comparator);
+		sorted.addAll(list);
+		return sorted;
 	}
 
 	public static <T> void sortList(List<T> list, Comparator<? super T> comparator) {

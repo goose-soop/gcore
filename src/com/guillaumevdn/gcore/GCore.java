@@ -37,6 +37,7 @@ import com.guillaumevdn.gcore.data.GDataManager;
 import com.guillaumevdn.gcore.integration.HeadDatabaseIntegration;
 import com.guillaumevdn.gcore.integration.economy.EconomyHandler;
 import com.guillaumevdn.gcore.integration.permission.PermissionHandler;
+import com.guillaumevdn.gcore.integration.placeholderapi.PlaceholderAPIIntegration;
 import com.guillaumevdn.gcore.lib.GPlugin;
 import com.guillaumevdn.gcore.lib.command.CommandArgument;
 import com.guillaumevdn.gcore.lib.command.CommandRoot;
@@ -96,6 +97,7 @@ public class GCore extends GPlugin {
 	private PermissionHandler permissionHandler = new PermissionHandler();
 	private NpcManager npcManager = null;
 	private HeadDatabaseIntegration headDatabaseIntegration = null;
+	private PlaceholderAPIIntegration placeholderAPIIntegration = null;
 	private Map<Player, ChatInput> chatInputs = new HashMap<Player, ChatInput>();
 	private Map<Player, LocationInput> locationInputs = new HashMap<Player, LocationInput>();
 	private Map<Player, NpcInput> npcInputs = new HashMap<Player, NpcInput>();
@@ -140,6 +142,14 @@ public class GCore extends GPlugin {
 
 	public void setHeadDatabaseIntegration(HeadDatabaseIntegration headDatabaseIntegration) {
 		this.headDatabaseIntegration = headDatabaseIntegration;
+	}
+
+	public PlaceholderAPIIntegration getPlaceholderAPIIntegration() {
+		return placeholderAPIIntegration;
+	}
+
+	public void setPlaceholderAPIIntegration(PlaceholderAPIIntegration placeholderAPIIntegration) {
+		this.placeholderAPIIntegration = placeholderAPIIntegration;
 	}
 
 	public Map<Player, ChatInput> getChatInputs() {
@@ -321,6 +331,7 @@ public class GCore extends GPlugin {
 		initEconomy();
 		initPermission();
 		registerPluginIntegration("HeadDatabase", HeadDatabaseIntegration.class);
+		registerPluginIntegration("PlaceholderAPI", PlaceholderAPIIntegration.class);
 
 		// register command
 		CommandRoot root = new CommandRoot(this, Utils.asList("gcore"), null, GPerm.GCORE_ADMIN, false);

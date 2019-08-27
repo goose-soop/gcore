@@ -10,7 +10,7 @@ public abstract class SimplePlaceholderParser extends PlaceholderParser {
 	// base
 	private char beginChar, endChar;
 
-	/** @param priority priority for parsing (PlaceholderAPI is 100 and {math:EXPRESSION} is 200) */
+	/** @param priority priority for parsing (PlaceholderAPI is 100 and {math:EXPRESSION} is 1000) */
 	public SimplePlaceholderParser(int priority, char beginChar, char endChar, List<String> description) {
 		super(priority, description);
 		this.beginChar = beginChar;
@@ -28,7 +28,7 @@ public abstract class SimplePlaceholderParser extends PlaceholderParser {
 
 	// overriden
 	@Override
-	protected String parse(Player player, String raw) {
+	public String parse(Player player, String raw) {
 		List<Character> chars = new ArrayList<Character>();
 		for (char c : raw.toCharArray()) {
 			chars.add(c);

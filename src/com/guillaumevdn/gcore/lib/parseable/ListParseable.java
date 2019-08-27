@@ -41,7 +41,7 @@ public abstract class ListParseable<T extends Parseable> extends Parseable {
 	public T getElement(String id) {
 		return id == null ? null : elements.get(id.toLowerCase());
 	}
-
+	
 	/** @return the previous value associated with the same id, or null if there was none */
 	public T addElement(T element) {
 		return elements.put(element.getId().toLowerCase(), element);

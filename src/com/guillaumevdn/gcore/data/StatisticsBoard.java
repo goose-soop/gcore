@@ -17,7 +17,7 @@ import com.guillaumevdn.gcore.lib.util.Utils;
 public class StatisticsBoard extends DataSingleton {
 
 	// base
-	private Map<String, Map<String, Integer>> stats = new HashMap<String, Map<String, Integer>>();
+	private Map<String, Map<String, Integer>> stats = new HashMap<>();
 
 	public StatisticsBoard() {
 	}
@@ -39,6 +39,10 @@ public class StatisticsBoard extends DataSingleton {
 		return get(stat, player, getDataManager().getDataProfiles().get(player));
 	}
 
+	public int get(String stat, UserInfo user) {
+		return get(stat, user.getUniqueId(), user.getProfile());
+	}
+
 	public int get(String stat, UUID player, String profile) {
 		if (stats.containsKey(stat)) {
 			Map<String, Integer> values = stats.get(stat);
@@ -48,6 +52,10 @@ public class StatisticsBoard extends DataSingleton {
 			}
 		}
 		return 0;
+	}
+
+	public void add(final String stat, final UserInfo user, int delta) {
+		set(stat, user, get(stat, user) + delta);
 	}
 
 	public void add(final String stat, final UUID player, int delta) {
@@ -60,6 +68,10 @@ public class StatisticsBoard extends DataSingleton {
 
 	public void set(final String stat, final UUID player, int value) {
 		set(stat, player, getDataManager().getDataProfiles().get(player), value);
+	}
+
+	public void set(final String stat, final UserInfo user, int value) {
+		set(stat, user.getUniqueId(), user.getProfile(), value);
 	}
 
 	public void set(final String stat, final UUID player, String profile, int value) {
@@ -137,13 +149,8 @@ public class StatisticsBoard extends DataSingleton {
 				String id = set.getString("id");
 				String userId = set.getString("userid");
 				int value = set.getInt("value");
-				if (!stats.containsKey(id)) {
-					stats.put(id, new HashMap<String, Integer>());
-				}
-				if (!stats.containsKey(userId) || stats.get(userId) == null) {
-					stats.put(userId, new HashMap<String, Integer>());
-				}
-				Map<String, Integer> values = stats.get(userId);
+				Map<String, Integer> values = stats.get(id);
+				if (values == null) stats.put(id, values = new HashMap<String, Integer>());
 				values.put(userId, value);
 			}
 		}

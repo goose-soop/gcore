@@ -195,7 +195,7 @@ public abstract class GPlugin extends JavaPlugin implements Listener {
 	 * @param integrationClass the integration class that will be instanciated (must have a constructor with a single String param)
 	 * @return the plugin integration instance, or null if didn't succeed
 	 */
-	public <T extends PluginIntegration> boolean registerPluginIntegration(String pluginName, Class<T> integrationClass) {
+	public <T extends PluginIntegration> boolean registerPluginIntegration(String pluginName, Class<? extends T> integrationClass) {
 		return registerPluginIntegration(pluginName, integrationClass, null, null);
 	}
 

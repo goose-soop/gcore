@@ -58,6 +58,10 @@ public class UserInfo {
 		return GCore.inst().getData().getDataProfiles().get(uuid).equals(profile);
 	}
 
+	public boolean isPlayer(Player player) {
+		return isCurrentProfile() && uuid.equals(player.getUniqueId());
+	}
+
 	// methods
 	public void sendMessage(String message) {
 		Player player = toPlayer();

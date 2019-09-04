@@ -25,7 +25,7 @@ public class MatLPMatLPDouble extends MatListParseable<MatLPDouble> {
 	@Override
 	public MatLPDouble createElement(String elementId) {
 		// create data
-		ConfigData data = new ConfigData(getLastData().getPlugin(), getLastData().getSuperId(), getLastData().getConfig(), getLastData().getPath().isEmpty() ? elementId : getLastData().getPath() + "." + elementId);
+		ConfigData data = new ConfigData(getLastData().getPlugin(), getLastData().getSuperId(), getLastData().getConfig(), getLastData().getPath().isEmpty() ? elementId : getLastData().getPath() + "." + elementId, getLastData().isSilent());
 		// create
 		MatLPDouble element = new MatLPDouble(elementId.toLowerCase(), this, typeAllowDefault, defaultValue, min, max, false, -1, getEditorIcon(), getEditorDescription());
 		// load, add and return

@@ -47,7 +47,6 @@ public class ParticleManager1_7_10 implements ParticleManager {
 		float y = (float) loc.getY();
 		float z = (float) loc.getZ();
 		PacketPlayOutWorldParticles packet = new PacketPlayOutWorldParticles(type.getName(), x, y, z, color.getRed(), color.getGreen(), color.getBlue(), speed, count);
-
 		for (Player pl : players) {
 			((CraftPlayer) pl).getHandle().playerConnection.sendPacket(packet);
 		}

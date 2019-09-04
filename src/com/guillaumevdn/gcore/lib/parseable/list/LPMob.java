@@ -33,7 +33,7 @@ public class LPMob extends ListParseable<CPMob> {
 	@Override
 	public CPMob createElement(String elementId) {
 		// create data
-		ConfigData data = new ConfigData(getLastData().getPlugin(), getLastData().getSuperId(), getLastData().getConfig(), getLastData().getPath().isEmpty() ? elementId : getLastData().getPath() + "." + elementId);
+		ConfigData data = new ConfigData(getLastData().getPlugin(), getLastData().getSuperId(), getLastData().getConfig(), getLastData().getPath().isEmpty() ? elementId : getLastData().getPath() + "." + elementId, getLastData().isSilent());
 		// create
 		CPMob element = new CPMob(elementId.toLowerCase(), this, false, -1, getEditorIcon(), getEditorDescription());
 		// load, add and return

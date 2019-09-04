@@ -28,7 +28,7 @@ public class LPString extends ListParseable<PPString> {
 	public PPString createElement(String elementId) {
 		// create data
 		boolean unknown = getLastData() == null;
-		ConfigData data = unknown ? null : new ConfigData(getLastData().getPlugin(), getLastData().getSuperId(), getLastData().getConfig(), getLastData().getPath().isEmpty() ? elementId : getLastData().getPath() + "." + elementId);
+		ConfigData data = unknown ? null : new ConfigData(getLastData().getPlugin(), getLastData().getSuperId(), getLastData().getConfig(), getLastData().getPath().isEmpty() ? elementId : getLastData().getPath() + "." + elementId, getLastData().isSilent());
 		// create
 		PPString element = new PPString(elementId.toLowerCase(), this, "", false, -1, getEditorIcon(), getEditorDescription());
 		// load, add and return

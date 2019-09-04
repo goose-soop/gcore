@@ -81,7 +81,7 @@ public abstract class ContainerParseable extends Parseable {
 		data.setContains(data.getConfig().contains(data.getPath()));
 		if (data.contains()) {
 			for (Parseable component : components.values()) {
-				component.load(new ConfigData(data.getPlugin(), data.getSuperId(), data.getConfig(), data.getPath().isEmpty() ? component.getId() : data.getPath() + "." + component.getId()));
+				component.load(new ConfigData(data.getPlugin(), data.getSuperId(), data.getConfig(), data.getPath().isEmpty() ? component.getId() : data.getPath() + "." + component.getId(), data.isSilent()));
 			}
 		} else if (isMandatory()) {
 			data.log("missing setting (must be a " + typeName + ")");
@@ -97,7 +97,7 @@ public abstract class ContainerParseable extends Parseable {
 		// save
 		data.getConfig().set(data.getPath(), null);
 		for (Parseable component : components.values()) {
-			component.save(new ConfigData(data.getPlugin(), data.getSuperId(), data.getConfig(), data.getPath().isEmpty() ? component.getId() : data.getPath() + "." + component.getId()));
+			component.save(new ConfigData(data.getPlugin(), data.getSuperId(), data.getConfig(), data.getPath().isEmpty() ? component.getId() : data.getPath() + "." + component.getId(), data.isSilent()));
 		}
 		data.setContains(data.getConfig().contains(data.getPath()));
 	}

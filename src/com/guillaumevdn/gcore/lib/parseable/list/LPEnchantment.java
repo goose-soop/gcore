@@ -20,7 +20,7 @@ public class LPEnchantment extends ListParseable<CPEnchantment> {
 	public CPEnchantment createElement(String elementId) {
 		// create data
 		boolean unknown = getLastData() == null;
-		ConfigData data = unknown ? null : new ConfigData(getLastData().getPlugin(), getLastData().getSuperId(), getLastData().getConfig(), getLastData().getPath().isEmpty() ? elementId : getLastData().getPath() + "." + elementId);
+		ConfigData data = unknown ? null : new ConfigData(getLastData().getPlugin(), getLastData().getSuperId(), getLastData().getConfig(), getLastData().getPath().isEmpty() ? elementId : getLastData().getPath() + "." + elementId, getLastData().isSilent());
 		// create
 		CPEnchantment element = new CPEnchantment(elementId.toLowerCase(), this, false, -1, getEditorIcon(), getEditorDescription());
 		// load, add and return

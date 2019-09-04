@@ -83,7 +83,7 @@ public abstract class ListParseable<T extends Parseable> extends Parseable {
 		data.setContains(data.getConfig().contains(data.getPath()));
 		if (data.contains()) {
 			for (String elementId : data.getConfig().getKeysForSection(data.getPath(), false)) {
-				loadElement(elementId, new ConfigData(data.getPlugin(), data.getSuperId(), data.getConfig(), data.getPath().isEmpty() ? elementId : data.getPath() + "." + elementId));
+				loadElement(elementId, new ConfigData(data.getPlugin(), data.getSuperId(), data.getConfig(), data.getPath().isEmpty() ? elementId : data.getPath() + "." + elementId, data.isSilent()));
 			}
 		} else if (isMandatory()) {
 			data.log("missing setting (must be a list of " + elementTypeName + ")");
@@ -101,7 +101,7 @@ public abstract class ListParseable<T extends Parseable> extends Parseable {
 		// save
 		data.getConfig().set(data.getPath(), null);
 		for (T element : Utils.asSortedList(elements.values())) {
-			element.save(new ConfigData(data.getPlugin(), data.getSuperId(), data.getConfig(), data.getPath().isEmpty() ? element.getId() : data.getPath() + "." + element.getId()));
+			element.save(new ConfigData(data.getPlugin(), data.getSuperId(), data.getConfig(), data.getPath().isEmpty() ? element.getId() : data.getPath() + "." + element.getId(), data.isSilent()));
 		}
 		data.setContains(data.getConfig().contains(data.getPath()));
 	}

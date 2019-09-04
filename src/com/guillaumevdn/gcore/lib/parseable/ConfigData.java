@@ -15,12 +15,18 @@ public class ConfigData {
 	private YMLConfiguration config = null;
 	private String path = null;
 	private boolean contains = false;
+	private boolean silent;
 
 	public ConfigData(GPlugin plugin, String superId, YMLConfiguration config, String path) {
+		this(plugin, superId, config, path, false);
+	}
+
+	public ConfigData(GPlugin plugin, String superId, YMLConfiguration config, String path, boolean silent) {
 		this.plugin = plugin;
 		this.superId = superId;
 		this.config = config;
 		this.path = path;
+		this.silent = silent;
 	}
 
 	// get
@@ -51,6 +57,10 @@ public class ConfigData {
 	public boolean contains() {
 		return contains;
 	}
+	
+	public boolean isSilent() {
+		return silent;
+	}
 
 	// set
 	public void setContains(boolean contains) {
@@ -68,7 +78,9 @@ public class ConfigData {
 	// methods
 	public void log(String error) {
 		String log = buildLog(this.lastError = error);
-		Logger.log(Level.SEVERE, plugin != null ? plugin.getName() : "UNKNOWN PLUGIN", log);
+		if (!silent) {
+			Logger.log(Level.SEVERE, plugin != null ? plugin.getName() : "UNKNOWN PLUGIN", log);
+		}
 	}
 
 	protected String buildLog(String error) {

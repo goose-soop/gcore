@@ -25,7 +25,7 @@ public class MatLPMatLPInteger extends MatListParseable<MatLPInteger> {
 	@Override
 	public MatLPInteger createElement(String elementId) {
 		// create data
-		ConfigData data = new ConfigData(getLastData().getPlugin(), getLastData().getSuperId(), getLastData().getConfig(), getLastData().getPath().isEmpty() ? elementId : getLastData().getPath() + "." + elementId);
+		ConfigData data = new ConfigData(getLastData().getPlugin(), getLastData().getSuperId(), getLastData().getConfig(), getLastData().getPath().isEmpty() ? elementId : getLastData().getPath() + "." + elementId, getLastData().isSilent());
 		// create
 		MatLPInteger element = new MatLPInteger(elementId.toLowerCase(), this, typeAllowDefault, defaultValue, min, max, false, -1, getEditorIcon(), getEditorDescription());
 		// load, add and return

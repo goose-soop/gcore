@@ -990,6 +990,7 @@ public class Mat implements Cloneable, Comparable<Mat> {
 	public static final Mat SMOOTH_QUARTZ_STAIRS = registerValue(new Mat(false, "SMOOTH_QUARTZ_STAIRS", "-"));
 	public static final Mat SMOOTH_RED_SANDSTONE_STAIRS = registerValue(new Mat(false, "SMOOTH_RED_SANDSTONE_STAIRS", "-"));
 	public static final Mat SMOOTH_SANDSTONE_STAIRS = registerValue(new Mat(false, "SMOOTH_SANDSTONE_STAIRS", "-"));
+	public static final Mat STONE_STAIRS = registerValue(new Mat(false, "STONE_STAIRS", "-"));
 	public static final Mat CAMPFIRE = registerValue(new Mat(false, "CAMPFIRE", "-"));
 	public static final Mat CORNFLOWER = registerValue(new Mat(false, "CORNFLOWER", "-"));
 	public static final Mat LILY_OF_THE_VALLEY = registerValue(new Mat(false, "LILY_OF_THE_VALLEY", "-"));

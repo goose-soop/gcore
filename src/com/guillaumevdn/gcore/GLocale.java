@@ -154,7 +154,7 @@ public class GLocale {
 			"hu_HU", "&6{plugin} >> &7Ez a művelet érvénytelen vagy lejárt.",
 			"it_IT", Utils.asList("&6{plugin} >> &7Questa azione non è valida o è scaduta."),
 			"es_ES", Utils.asList("&6{plugin} >> &7Esta acción es invalida o ha expirado"),
-			"zh_TW", Utils.asList("&6{plugin} >> &7這是個無效的動作或是已經過期了")
+			"zh_TW", Utils.asList("&6{plugin} >> &7這是個無效的動作或是已經取消了")
 			);
 
 	public static final Text MSG_GENERIC_RELOAD = new Text(
@@ -208,7 +208,7 @@ public class GLocale {
 			"hu_HU", "&6{plugin} >> &7Túl sok argumentumot adtál meg, a &c{current_path}&7. Use &c{current_path} -help &7or &c-help:page &7and refer to tab completion to show help.",
 			"it_IT", Utils.asList("&6{plugin} >> &7Hai inserito troppi argomenti, potrebbe finire dopo &c{current_path}&7."),
 			"es_ES", Utils.asList("&6{plugin} >> &7Has especificado demasiadas variables, debería terminar"),
-			"zh_TW", Utils.asList("&6{plugin} >> &7你輸入太多的參數了，在 &c{current_path} &7後就不應該輸入其他數值了。 使用 &c{current_path}")
+			"zh_TW", Utils.asList("&6{plugin} >> &7你輸入太多的參數了，在 &c{current_path} &7後就不應該輸入其他數值了。 使用 &c{current_path} -help &7或是 &c-help:頁數 &7與TAB結合使用取得詳細幫助")
 			);
 
 	public static final Text MSG_GENERIC_COMMAND_NOCHILDPERFORMED = new Text(
@@ -218,7 +218,7 @@ public class GLocale {
 			"hu_HU", "&6{plugin} >> &7Nem sikerült megérteni a &c{current_path}&7 után megadott argumentumokat&7.",
 			"it_IT", Utils.asList("&6{plugin} >> &7Non è possibile capire gli argomenti specificati dopo &c{current_path}&7.."),
 			"es_ES", Utils.asList("&6{plugin} >> &7No ha sido posible entender los parametros que has especificado"),
-			"zh_TW", Utils.asList("&6{plugin} >> &7系統無法讀懂，你輸入的指令 &c{current_path} &7後面的參數")
+			"zh_TW", Utils.asList("&6{plugin} >> &7系統無法讀懂，你輸入在 &c{current_path} &7後面的參數")
 			);
 
 	public static final Text MSG_GENERIC_COMMAND_MISSINGPARAM = new Text(
@@ -238,7 +238,7 @@ public class GLocale {
 			"hu_HU", "&6{plugin} >> &7A paraméter &c{parameter} &7alfanumerikusnak kell lennie.",
 			"it_IT", Utils.asList("&6{plugin} >> &7Il parametro &c{parameter} &7deve essere alfanumerico."),
 			"es_ES", Utils.asList("&6{plugin} >> &7El parámetro &c{parameter} &7debería ser alfanumérico"),
-			"zh_TW", Utils.asList("&6{plugin} >> &7參數 &c{parameter} &7字母")
+			"zh_TW", Utils.asList("&6{plugin} >> &7參數 &c{parameter} &7必須是 字母")
 			);
 
 	public static final Text MSG_GENERIC_COMMAND_INVALIDINTPARAM = new Text(
@@ -248,7 +248,7 @@ public class GLocale {
 			"hu_HU", "&6{plugin} >> &7A paraméter &c{parameter} &7számnak kell lennie.",
 			"it_IT", Utils.asList("&6{plugin} >> &7Il parametro &c{parameter} &7dovrebbe essere un numero."),
 			"es_ES", Utils.asList("&6{plugin} >> &7El parámetro &c{parameter} &7 debería ser un número'  "),
-			"zh_TW", Utils.asList("&6{plugin} >> &7參數 &c{parameter} &7必須要是 數字")
+			"zh_TW", Utils.asList("&6{plugin} >> &7參數 &c{parameter} &7必須是 數字")
 			);
 
 	public static final Text MSG_GENERIC_COMMAND_INVALIDDOUBLEPARAM = new Text(
@@ -258,7 +258,7 @@ public class GLocale {
 			"hu_HU", "&6{plugin} >> &7A paraméter &c{parameter} &7tizedes számnak kell lennie.",
 			"it_IT", Utils.asList("&6{plugin} >> &7Il parametro &c{parameter} &7dovrebbe essere un numero decimale."),
 			"es_ES", Utils.asList("&6{plugin} >> &7El parámetro &c{parameter} &7 debería ser un número decimal'  "),
-			"zh_TW", Utils.asList("&6{plugin} >> &7參數 &c{parameter} &7必須要是 十位數字")
+			"zh_TW", Utils.asList("&6{plugin} >> &7參數 &c{parameter} &7必須是 十位數字")
 			);
 
 	public static final Text MSG_GENERIC_COMMAND_INVALIDENUMPARAM = new Text(
@@ -278,7 +278,7 @@ public class GLocale {
 			"hu_HU", "&6{plugin} >> &7A paraméter &c{parameter} &7létező játékosnak kell lennie.",
 			"it_IT", Utils.asList("&6{plugin} >> &7Il parametro &c{parameter} &7dovrebbe essere un giocatore esistente."),
 			"es_ES", Utils.asList("&6{plugin} >> &7El parámetro &c{parameter} &7debería ser un jugador existente"),
-			"zh_TW", Utils.asList("&6{plugin} >> &7參數 &c{parameter} &7必須是登入過的玩家")
+			"zh_TW", Utils.asList("&6{plugin} >> &7參數 &c{parameter} &7必須是 登入過的玩家")
 			);
 
 	public static final Text MSG_GENERIC_COMMAND_INVALIDPLAYERPARAM = new Text(
@@ -288,7 +288,7 @@ public class GLocale {
 			"hu_HU", "&6{plugin} >> &7A paraméter &c{parameter} &7elérhető játékosnak kell lennie.",
 			"it_IT", Utils.asList("&6{plugin} >> &7Il parametro &c{parameter} &7dovrebbe essere un giocatore online."),
 			"es_ES", Utils.asList("&6{plugin} >>"),
-			"zh_TW", Utils.asList("&6{plugin} >> &7參數 &c{parameter} &7必須是線上玩家")
+			"zh_TW", Utils.asList("&6{plugin} >> &7參數 &c{parameter} &7必須是 線上玩家")
 			);
 
 	public static final Text MSG_GENERIC_COMMAND_INVALIDUUIDPARAM = new Text(
@@ -492,7 +492,7 @@ public class GLocale {
 			"fr_FR", "&7Appuyez sur 's'accroupir' lorsque vous serez prêt à importer votre location, ou bien cliquez sur un bloc.",
 			"it_IT", Utils.asList("&7Premere 'sneak' quando sei pronto a importare la tua posizione, o tasto destro su un blocco."),
 			"es_ES", Utils.asList("&7Presione 'sneak' cuando esté listo para importar su localización, o presione"),
-			"zh_TW", Utils.asList("&7站到你要儲存的做標點按下&fSHIFT&7或是&f右鍵點選&7一個方塊")
+			"zh_TW", Utils.asList("&7站到你要儲存的座標點按下&fSHIFT&7或是&f右鍵點選&7一個方塊")
 			);
 
 	public static final Text MSG_GENERIC_ITEMINPUT = new Text(
@@ -501,7 +501,7 @@ public class GLocale {
 			"fr_FR", "&7Appuyez sur 'jeter l'objet' lorsque vous serez prêt à importer l'item dans votre main.",
 			"it_IT", Utils.asList("&7Premere 'drop' quando sei pronto a importare gli oggetti nella tua mano."),
 			"es_ES", Utils.asList("&7Presione 'drop' cuando esté listo para importar el item de su mano."),
-			"zh_TW", Utils.asList("&7將你要匯入的物品拿在手上，並按下鍵盤的 &fQ ")
+			"zh_TW", Utils.asList("&7將你要匯入的物品拿在手上，並按下鍵盤上的 &fQ &7鍵")
 			);
 
 	public static final Text MSG_GENERIC_ITEMHEADDATABASEINPUT = new Text(
@@ -517,7 +517,7 @@ public class GLocale {
 			"en_US", "&7Click on the element that you wish to delete (cancel by closing the GUI).",
 			"fr_FR", "&7Cliquez sur l'élement que vous souhaitez supprimer (annulez en fermant le GUI).",
 			"es_ES", Utils.asList("&7Haga click en el elemento que desea borrar (cancele mediante el cierre"),
-			"zh_TW", Utils.asList("&7點擊圖示刪除你想刪除的物品，或是&c關閉GUI&7取消")
+			"zh_TW", Utils.asList("&7點擊圖示刪除你想刪除的物品，或是 &c關閉GUI &7取消")
 			);
 
 	// items
@@ -536,7 +536,7 @@ public class GLocale {
 			"fr_FR", Utils.asList("&c&lCette action est irréversible", "&cCliquez sur cette icône pour", "&c réinitialiser chaque paramètre de", "&c cet élément"),
 			"it_IT", Utils.asList("&c&lQuesta azione è irreversibile", "&cClicca questa icona per resettare", "&ctutte le impostazioni di questo", "&celemento"),
 			"es_ES", Utils.asList("&c&lEsta acción es irreversible!", "&cHaga click en el icono para reiniciar", "&c todas las configuraciones de este elemento"),
-			"zh_TW", Utils.asList("&c&l這個動作是不可復原的", "&c點擊這個選項 &6重置所有", "&c在這個介面的選項")
+			"zh_TW", Utils.asList("&c&l這個動作是不可復原的", "&c點擊這個選項 &6重置所有", "&c在這個介面的設定")
 			);
 
 	public static final Text GUI_GENERIC_EDITORITEMBACK = new Text(
@@ -588,7 +588,7 @@ public class GLocale {
 			"fr_FR", Utils.asList("&c&lCette action est irréversible", "&cCliquez sur cette icône, ensuite sur", "&c l'élement que vous souhaitez supprimer"),
 			"it_IT", Utils.asList("&c&lQuesta azione è irreversibile", "&cClicca su questa icona, poi sull'elemento", "&c che desideri eliminare"),
 			"es_ES", Utils.asList("&c&lEstá acción es irreversible!", "&cHaga click en el icono, y después en el elemento", "&c que desee borrar"),
-			"zh_TW", Utils.asList("&c&l這個動作是不可復原的", "&c點擊這個選項 然後點擊", "&c在這個介面你要刪除的物品")
+			"zh_TW", Utils.asList("&c&l這個動作是不可復原的", "&c點擊這個選項 然後點擊", "&c在這個介面你要刪除的設定圖示")
 			);
 
 	public static final Text GUI_GENERIC_EDITORCURRENTLORE = new Text(
@@ -621,6 +621,17 @@ public class GLocale {
 			"es_ES", Utils.asList("&6Valor original"),
 			"zh_TW", Utils.asList("&6原始數值")
 			);
+	
+	public static final Text GUI_GENERIC_EDITOR_GENERIC_SETTINGLORE = new Text(
+			"GUI_GENERIC_EDITOR_GENERIC_SETTINGLORE", file,
+			"en_US", "&6Setting (if applicable)",
+			"fr_FR", "&6Paramètre (si applicable)",
+			"pt_BR", Utils.asList("&6Configuração (se aplicável)"),
+			"zh_CN", Utils.asList("&6设置(如果可用)"),
+			"es_ES", Utils.asList("&6Parámetro (si es aplicable)"),
+			"lt_LT", Utils.asList("&6Nustatymai (jei taikoma)"),
+			"zh_TW", Utils.asList("&6設置(如果可用)")
+			);
 
 	public static final Text GUI_GENERIC_EDITORRAWLORE = new Text(
 			"GUI_GENERIC_EDITORRAWLORE", file,
@@ -646,7 +657,7 @@ public class GLocale {
 			"fr_FR", Utils.asList("&e{current}", "", "&7Éditer la valeur brute (elle sera convertie pour un joueur quand nécessaire)", "", "{placeholders}", "&7Change colors with &{code}", "", "&a&lClic gauche pour éditer", "&a&lClic droit pour supprimer"),
 			"it_IT", Utils.asList("&e{current}", "", "&7Modifica il valore originale (sarà analizzato ", "&7per un giocatore quando sarà necessario)", "{placeholders}", "", "&7Cambia il colore con &{code}", "", "&a&lTasto sinistro per modificare", "&a&lTasto destro per eliminare", "", "&a&l", "", "&5Valore obbligatorio: &d{value_mandatory}", "&5Tipo di valore: &d{value_type}", "", "&5Valore attuale:", "&d{value_current"),
 			"es_ES", Utils.asList("&e{current}", "", "&7Edite el valor original (será analizado para", "&7 un jugador cuando sea necesario)", "", "{placeholders}", "&7Cambie los colores con &{code}", "", "&a&lHaga click izquierdo para editar", "&a&lHaga click derecho para borrar"),
-			"zh_TW", Utils.asList("&e{current}", "", "&7編輯原始數值", "", "{placeholders}", "&7更改顏色使用 &{code}", "", "&f右鍵點擊 &a編輯", "&f左鍵點擊 &c刪除")
+			"zh_TW", Utils.asList("&e{current}", "", "&7編輯原始數值", "", "{placeholders}", "&7更改顏色使用 &{code}", "", "&f左鍵點擊 &a編輯", "&f右鍵點擊 &c刪除")
 			);
 
 	public static final Text GUI_GENERIC_EDITORLISTELEMENTLORE = new Text(
@@ -654,7 +665,7 @@ public class GLocale {
 			"en_US", Utils.asList("&e{current}", "", "&a&lLeft-click to edit", "&a&lRight-click to delete"),
 			"fr_FR", Utils.asList("&e{current}", "", "&a&lClic gauche pour éditer", "&a&lClic droit pour supprimer"),
 			"es_ES", Utils.asList("&e{current}", "", "&a&lHaga click izquierdo para editar", "&a&lHaga click derecho para borrar"),
-			"zh_TW", Utils.asList("&e{current}", "", "&f右鍵點擊 &a編輯", "&f左鍵點擊 &c刪除")
+			"zh_TW", Utils.asList("&e{current}", "", "&f左鍵點擊 &a編輯", "&f右鍵點擊 &c刪除")
 			);
 
 	public static final Text GUI_GENERIC_EDITORBOOLEANTOGGLE = new Text(
@@ -679,14 +690,14 @@ public class GLocale {
 			"GUI_GENERIC_EDITORNUMBERADD", file,
 			"en_US", "&a+{amount}",
 			"es_ES", Utils.asList("&a+{amount}"),
-			"zh_TW", Utils.asList("&a+{amount}")
+			"zh_TW", Utils.asList("&a增加 {amount}")
 			);
 
 	public static final Text GUI_GENERIC_EDITORNUMBERTAKE = new Text(
 			"GUI_GENERIC_EDITORNUMBERTAKE", file,
 			"en_US", "&c-{amount}",
 			"es_ES", Utils.asList("&c-{amount}"),
-			"zh_TW", Utils.asList("&c-{amount}")
+			"zh_TW", Utils.asList("&c減少 {amount}")
 			);
 
 	public static final Text GUI_GENERIC_EDITORNUMBERADDTAKELORE = new Text(
@@ -839,7 +850,7 @@ public class GLocale {
 			"en_US", Utils.asList("&7If this setting is specified, the time frame", "&7 will be split into smaller parts"),
 			"fr_FR", Utils.asList("&7Si ce paramètre est spécifié, la période sera", "&7 divisée en plus petites parties"),
 			"es_ES", Utils.asList("&7Si este parametro es especificado", "&7 el período será dividido en partes más pequéñas"),
-			"zh_TW", Utils.asList("&7如果這個設定可用 時間周期", "&7會被 分成小部分")
+			"zh_TW", Utils.asList("&7如果這個設定可用 時間周期", "&7會被分成小部分")
 			);
 	public static final Text GUI_GENERIC_EDITOR_NPC_SHOWLORE = new Text(
 			"GUI_GENERIC_EDITOR_NPC_SHOWLORE", file,
@@ -862,7 +873,7 @@ public class GLocale {
 			"en_US", Utils.asList("&7Skin data of the NPC (can be generated", "&7 or obtained at https://mineskin.org/)"),
 			"fr_FR", Utils.asList("&7Skin data de ce NPC (can be generated", "&7 or obtained at https://mineskin.org/)"),
 			"es_ES", Utils.asList("&7Los datos de skin del NPC (pueden ser generados", "&7 o ser obtenidos en https://mineskin.org/)"),
-			"zh_TW", Utils.asList("&7NPC的SKIN Data可以在下方網址找到", "&7heeps://mineskin.org/")
+			"zh_TW", Utils.asList("&7NPC的SKIN Data可以在下方網址找到", "&fheeps://mineskin.org/")
 			);
 
 	public static final Text GUI_GENERIC_EDITOR_NPC_SKINSIGNATURELORE = new Text(
@@ -870,7 +881,7 @@ public class GLocale {
 			"en_US", Utils.asList("&7Skin signature of the NPC (can be generated", "&7 or obtained at https://mineskin.org/)"),
 			"fr_FR", Utils.asList("&7Skin signature de ce NPC (can be generated", "&7 or obtained at https://mineskin.org/)"),
 			"es_ES", Utils.asList("&7La firma de la skin del NPC (puede ser generada", "&7 o obtenida en https://mineskin.org/)"),
-			"zh_TW", Utils.asList("&7NPC的SKIN Signature可以在下方網址找到", "&7heeps://mineskin.org/")
+			"zh_TW", Utils.asList("&7NPC的SKIN Signature可以在下方網址找到", "&fheeps://mineskin.org/")
 			);
 
 	public static final Text GUI_GENERIC_EDITOR_NPC_LOCATIONLORE = new Text(
@@ -1006,7 +1017,7 @@ public class GLocale {
 			"en_US", Utils.asList("&7Amplifier of effect"),
 			"fr_FR", Utils.asList("&7Amplificateur d'effet"),
 			"es_ES", Utils.asList("&7Amplificador del efecto"),
-			"zh_TW", Utils.asList("&7藥水效果等擊")
+			"zh_TW", Utils.asList("&7藥水效果等級")
 			);
 
 	public static final Text GUI_GENERIC_EDITOR_POTIONEFFECT_DURATIONLORE = new Text(
@@ -1118,7 +1129,7 @@ public class GLocale {
 			"fr_FR", Utils.asList("&7Position dans le GUI"),
 			"it_IT", Utils.asList("&7Posizione nella GUI"),
 			"es_ES", Utils.asList("&7Lugar en la GUI"),
-			"zh_TW", Utils.asList("&7物品在GUI的位置")
+			"zh_TW", Utils.asList("&7物品在GUI的位置 (數值0 = 第一格)")
 			);
 
 	public static final Text GUI_GENERIC_EDITOR_ITEM_CHANCELORE = new Text(
@@ -1274,7 +1285,8 @@ public class GLocale {
 	public static final Text GUI_GCORE_EDITOR_NPC_BEHAVIORTRIGGERSLORE = new Text(
 			"GUI_GCORE_EDITOR_NPC_BEHAVIORTRIGGERSLORE", file,
 			"en_US", Utils.asList("&7A list of triggers that'll activate the behavior"),
-			"fr_FR", Utils.asList("&7Une liste de triggers qui activeront le behavior")
+			"fr_FR", Utils.asList("&7Une liste de triggers qui activeront le behavior"),
+			"zh_TW", Utils.asList("&7觸發器列表，用於激活行為")
 			);
 
 	public static final Text GUI_GCORE_EDITOR_NPC_BEHAVIORPROCESSESLORE = new Text(
@@ -1298,7 +1310,7 @@ public class GLocale {
 			"en_US", Utils.asList("&7A list of conditions for this behavior", "&7You select which ones will be checked in the processes"),
 			"fr_FR", Utils.asList("&7Une liste de conditions pour ce behavior", "&7Vous définissez lesquelles seront vérifiées dans les processus"),
 			"es_ES", Utils.asList("&7Una lista de condiciones para este comportamiento", "&7Usted selecciona cuales de ellos serán verificados en los procesos"),
-			"zh_TW", Utils.asList("&7列出此行為的條件", "&7選出哪一個條件在運行時會被查看")
+			"zh_TW", Utils.asList("&7列出此行為的條件", "&7選出哪一個條件在執行時會被查看")
 			);
 
 	public static final Text GUI_GCORE_EDITOR_NPC_BEHAVIORMAXCONCURRENTINSTANCESLORE = new Text(
@@ -1321,7 +1333,8 @@ public class GLocale {
 			"GUI_GCORE_EDITOR_NPC_BEHAVIOREVENTPROCESSLORE", file,
 			"en_US", Utils.asList("&7What process should be run when this event is triggered"),
 			"fr_FR", Utils.asList("&7Quel processus doit être lancé lorsque cet event est activé"),
-			"es_ES", Utils.asList("&7¿Qué tipo de procesos se deberían activar caundo se activa este evento?")
+			"es_ES", Utils.asList("&7¿Qué tipo de procesos se deberían activar caundo se activa este evento?"),
+			"zh_TW", Utils.asList("&7當這個事件被觸發時，要執行什麼程序")
 			);
 
 	public static final Text GUI_GCORE_EDITOR_NPC_BEHAVIORACTIONTYPELORE = new Text(
@@ -1429,7 +1442,7 @@ public class GLocale {
 			"en_US", Utils.asList("&7To where should the npc move (set a location or 'player')"),
 			"fr_FR", Utils.asList("&7Où est-ce que le npc doit aller (définir une location ou 'player'"),
 			"es_ES", Utils.asList("&7A donde se debería mover el NPC (defina una localización o 'player')"),
-			"zh_TW", Utils.asList("&7NPC要往哪裡移動 (設定一個地點或事 '玩家')")
+			"zh_TW", Utils.asList("&7NPC要往哪裡移動 (設定一個地點或是 '玩家')")
 			);
 
 	public static final Text GUI_GCORE_EDITOR_NPC_BEHAVIORANIMATIONLORE = new Text(

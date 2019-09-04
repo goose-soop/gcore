@@ -390,6 +390,18 @@ public class Utils {
 		}
 	}
 
+	public static Object unsafeValueOfOrNull(Class<?> typeClass, String string) {
+		Object[] consts = typeClass.getEnumConstants();
+		if (consts != null) {
+			for (Object object : consts) {
+				if (((Enum<?>) object).name().equalsIgnoreCase(string)) {
+					return object;
+				}
+			}
+		}
+		return null;
+	}
+
 	public static Enchantment enchantmentOrNull(String string) {
 		try {
 			return Enchantment.getByName(string);
@@ -659,6 +671,13 @@ public class Utils {
 		if (players == null) return uuids;
 		for (Player pl : players) uuids.add(pl.getUniqueId());
 		return uuids;
+	}
+	
+	public static List<String> getPlayersNames(Collection<Player> players) {
+		List<String> names = new ArrayList<String>();
+		if (players == null) return names;
+		for (Player pl : players) names.add(pl.getName());
+		return names;
 	}
 
 	public static List<OfflinePlayer> getOfflinePlayers(Collection<UUID> uuids) {
@@ -1189,6 +1208,27 @@ public class Utils {
 			}
 		}
 		return result;
+	}
+
+	// https://stackoverflow.com/questions/31225062/rotating-a-vector-by-angle-and-axis-in-java
+	/**
+	 * @param axis est un vecteur normal au plan dans lequel on veut faire tourner le vecteur
+	 */
+	public static Vector rotateVector(Vector vec, Vector axis, double theta){
+		double x, y, z;
+		double u, v, w;
+		x = vec.getX();y=vec.getY();z=vec.getZ();
+		u = axis.getX();v=axis.getY();w=axis.getZ();
+		double xPrime = u*(u*x + v*y + w*z)*(1d - Math.cos(theta)) 
+				+ x*Math.cos(theta)
+				+ (-w*y + v*z)*Math.sin(theta);
+		double yPrime = v*(u*x + v*y + w*z)*(1d - Math.cos(theta))
+				+ y*Math.cos(theta)
+				+ (w*x - u*z)*Math.sin(theta);
+		double zPrime = w*(u*x + v*y + w*z)*(1d - Math.cos(theta))
+				+ z*Math.cos(theta)
+				+ (-v*x + u*y)*Math.sin(theta);
+		return new Vector(xPrime, yPrime, zPrime);
 	}
 
 	// ------------------------------------------------------------
@@ -2034,7 +2074,7 @@ public class Utils {
 
 		return result;
 	}
-	
+
 	public static String copyString(String str, int count) {
 		StringBuilder builder = new StringBuilder();
 		for (int i = 0; i < count; ++i) {

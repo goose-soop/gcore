@@ -6,7 +6,9 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.function.BiConsumer;
 
 import com.guillaumevdn.gcore.lib.util.Utils;
 
@@ -160,6 +162,13 @@ public class SortedMap<K, V> implements Cloneable {
 		}
 		return Collections.unmodifiableList(list);
 	}
+	
+    public void forEach(BiConsumer<? super K, ? super V> action) {
+        Objects.requireNonNull(action);
+        for (K key : keySet()) {
+            action.accept(key, get(key));
+        }
+    }
 
 	@Override
 	public String toString() {
@@ -219,6 +228,17 @@ public class SortedMap<K, V> implements Cloneable {
 
 	public V removeKeyAt(int index) {
 		return remove(getKeyAt(index));
+	}
+	
+	public int indexOf(K key) {
+		int i = -1;
+		for (K k : keySet()) {
+			++i;
+			if (key == null ? k == null : key.equals(k)) {
+				return i;
+			}
+		}
+		return -1;
 	}
 
 	// type enum

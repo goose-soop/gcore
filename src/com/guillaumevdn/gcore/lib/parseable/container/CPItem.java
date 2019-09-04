@@ -408,8 +408,8 @@ public class CPItem extends ContainerParseable {
 			}
 			return amount;
 		}
-		// no item, so max value
-		return Integer.MAX_VALUE;
+		// no item
+		return -1;
 	}
 
 	public int remove(Player player, Player parser, boolean force) {

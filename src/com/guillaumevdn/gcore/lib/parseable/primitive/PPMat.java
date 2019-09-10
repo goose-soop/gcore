@@ -37,9 +37,9 @@ public class PPMat extends PrimitiveParseable<Mat> {
 	@Override
 	protected void fillEditor(final EditorGUI gui, Player player, final ModifCallback onModif) {
 		// current, raw and delete
-		EditorGUI.fillItemCurrent(gui, player, this, 0, onModif);
+		EditorGUI.fillItemCurrent(gui, player, 0, this, onModif);
 		EditorGUI.fillItemRaw(gui, player, this, 3, getValue() == null || getValue().isEmpty() ? null : getValue().get(0), onModif);
-		EditorGUI.fillItemDelete(gui, player, this, 6, onModif);
+		EditorGUI.fillItemDelete(gui, player, 6, this, onModif);
 		// select
 		gui.setRegularItem(new EditorItem("control_item_select", 2, Mat.ENDER_CHEST, GLocale.GUI_GENERIC_EDITORENUMSELECT.getLine(), GLocale.GUI_GENERIC_EDITORENUMSELECTLORE.getLines()) {
 			@Override
@@ -50,7 +50,7 @@ public class PPMat extends PrimitiveParseable<Mat> {
 					protected void fill() {
 						// add values
 						for (final Mat val : Utils.asSortedList(Mat.values(), Utils.objectSorter)) {
-							if (!val.exists()) continue;
+							if (!val.exists() || !val.canHaveItem()) continue;
 							final String valName = val.getModernName();
 							setRegularItem(new EditorItem("value_" + valName, -1, val, "§6" + valName, null) {
 								@Override
@@ -61,7 +61,7 @@ public class PPMat extends PrimitiveParseable<Mat> {
 									} else {
 										setValue(Utils.asList(valName));
 									}
-									onModif.callback(gui, player);
+									onModif.callback(null, gui, player);
 									// re-fill and open
 									gui.open(player);
 								}

@@ -139,7 +139,7 @@ public class YMLConfiguration {
 	 */
 
 	public boolean containsInt(String path) {
-		return contains(path) ? Utils.isInteger(getString(path, "-")) : false;
+		return contains(path) && Utils.isInteger(getString(path, "-"));
 	}
 
 	/**
@@ -717,7 +717,7 @@ public class YMLConfiguration {
 	 * @throws IOException 
 	 */
 
-	private void load() throws FileNotFoundException, IOException {
+	private void load() throws IOException {
 		new YMLReader(this).read();
 	}
 
@@ -800,7 +800,7 @@ public class YMLConfiguration {
 			GCore.inst().warning("Exported mat '" + type + "'. Name '" + item.getType().getModernName() + ", legacy " + item.getType().getLegacyName() + "', toString() '" + item.getType().toString() + "', material '" + (item.getType().exists() ? "null" : String.valueOf(item.getType().getCurrentMaterial())) + "'. Please notify the developer with /gcore support");
 		}
 		set(path + ".type", type);
-		if (item.getType().getDurability() != (short) 0) set(path + ".durability", (int) item.getType().getDurability());
+		if (item.getType().getDurability() != (short) 0) set(path + ".durability", item.getType().getDurability());
 		if (item.isUnbreakable()) set(path + ".unbreakable", true);
 		// amount
 		set(path + ".amount", item.getAmount());

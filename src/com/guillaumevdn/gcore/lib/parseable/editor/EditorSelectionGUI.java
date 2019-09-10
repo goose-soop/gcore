@@ -70,7 +70,6 @@ public abstract class EditorSelectionGUI<T> extends EditorGUI {
 	}
 
 	public void addItem(final T element, Mat icon, String id, String name, int slot) {
-		// add item
 		List<String> lore = new ArrayList<String>(), desc =  element instanceof Parseable ? ((Parseable) element).describe(0) : null;
 		if (desc != null) {
 			for (String line : desc) {
@@ -78,6 +77,11 @@ public abstract class EditorSelectionGUI<T> extends EditorGUI {
 				if (lore.size() >= EditorGUI.MAX_DESCRIPTION_LINES) break;
 			}
 		}
+		addItem(element, icon, id, name, lore, slot);
+	}
+
+	public void addItem(final T element, Mat icon, String id, String name, List<String> lore, int slot) {
+		// add item
 		setRegularItem(new EditorItem(id, slot, icon, name, lore) {
 			@Override
 			protected void onClick(Player player, ClickType clickType, int pageIndex) {

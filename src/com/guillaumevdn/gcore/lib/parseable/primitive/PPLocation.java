@@ -40,9 +40,9 @@ public class PPLocation extends PrimitiveParseable<Location> {
 	@Override
 	protected void fillEditor(final EditorGUI gui, Player player, final ModifCallback onModif) {
 		// current, raw and delete
-		EditorGUI.fillItemCurrent(gui, player, this, 0, onModif);
+		EditorGUI.fillItemCurrent(gui, player, 0, this, onModif);
 		EditorGUI.fillItemRaw(gui, player, this, 3, getValue() == null || getValue().isEmpty() ? null : getValue().get(0), onModif);
-		EditorGUI.fillItemDelete(gui, player, this, 6, onModif);
+		EditorGUI.fillItemDelete(gui, player, 6, this, onModif);
 		// select
 		gui.setRegularItem(new EditorItem("control_item_import", 2, Mat.ENDER_CHEST, GLocale.GUI_GENERIC_EDITORLOCATIONIMPORT.getLine(), GLocale.GUI_GENERIC_EDITORLOCATIONIMPORTLORE.getLines()) {
 			@Override
@@ -60,7 +60,7 @@ public class PPLocation extends PrimitiveParseable<Location> {
 							} else {
 								setValue(Utils.asList(Utils.serializeWXYZLocation(value)));
 							}
-							onModif.callback(gui, player);
+							onModif.callback(null, gui, player);
 						}
 						// re-fill and open
 						gui.open(player);

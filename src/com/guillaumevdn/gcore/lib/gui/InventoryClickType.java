@@ -4,6 +4,6 @@ public enum InventoryClickType {
 
 	TOP,
 	BOTTOM,
-	OUTSIDE;
+	OUTSIDE
 
 }

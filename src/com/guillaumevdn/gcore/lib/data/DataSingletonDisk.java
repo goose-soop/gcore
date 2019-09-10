@@ -18,7 +18,7 @@ public abstract class DataSingletonDisk {
 				long start = System.currentTimeMillis();
 				jsonPull();
 				if (callback != null) callback.callback();
-				if (GCore.inst().getConfiguration() == null ? false : GCore.inst().getConfiguration().getBoolean("show_data_debug", true)) {
+				if (GCore.inst().getConfiguration() != null && GCore.inst().getConfiguration().getBoolean("show_data_debug", true)) {
 					getDataManager().getPlugin().debug("Loaded " + DataSingletonDisk.this.getClass().getSimpleName() + " for " + getDataManager().getClass().getSimpleName() + " (took " + (System.currentTimeMillis() - start) + " ms)");
 				}
 			} catch (Throwable exception) {
@@ -33,7 +33,7 @@ public abstract class DataSingletonDisk {
 			try {
 				long start = System.currentTimeMillis();
 				jsonPush();
-				if (GCore.inst().getConfiguration() == null ? false : GCore.inst().getConfiguration().getBoolean("show_data_debug", true)) {
+				if (GCore.inst().getConfiguration() != null && GCore.inst().getConfiguration().getBoolean("show_data_debug", true)) {
 					getDataManager().getPlugin().debug("Saved " + DataSingletonDisk.this.getClass().getSimpleName() + " for " + getDataManager().getClass().getSimpleName() + " (took " + (System.currentTimeMillis() - start) + " ms)");
 				}
 			} catch (Throwable exception) {
@@ -48,7 +48,7 @@ public abstract class DataSingletonDisk {
 			try {
 				long start = System.currentTimeMillis();
 				jsonDelete();
-				if (GCore.inst().getConfiguration() == null ? false : GCore.inst().getConfiguration().getBoolean("show_data_debug", true)) {
+				if (GCore.inst().getConfiguration() != null && GCore.inst().getConfiguration().getBoolean("show_data_debug", true)) {
 					getDataManager().getPlugin().debug("Deleted " + DataSingletonDisk.this.getClass().getSimpleName() + " for " + getDataManager().getClass().getSimpleName() + " (took " + (System.currentTimeMillis() - start) + " ms)");
 				}
 			} catch (Throwable exception) {

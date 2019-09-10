@@ -131,7 +131,7 @@ public class Npc {
 	}
 
 	public static enum UpdateResult {
-		SPAWNED, DESPAWNED, TARGETED_PLAYER, NONE;
+		SPAWNED, DESPAWNED, TARGETED_PLAYER, NONE
 	}
 
 	// methods : spawn/despawn
@@ -319,7 +319,7 @@ public class Npc {
 		ItemStack[] array = new ItemStack[6];
 		for (int i = 0; i < 6; ++i) {
 			ItemData item = items[i];
-			array[i] = item != null && !item.getType().isAir() ? item.getItemStack() : null;
+			array[i] = item != null && item.getType() != null && !item.getType().isAir() ? item.getItemStack() : null;
 		}
 		// update inventory
 		NpcProtocols.INSTANCE.sendInventory(player, getEntityId(), array);

@@ -16,15 +16,14 @@
 
 package com.guillaumevdn.gcore.libs.com.google.gson.annotations;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 import com.guillaumevdn.gcore.libs.com.google.gson.JsonDeserializer;
 import com.guillaumevdn.gcore.libs.com.google.gson.JsonSerializer;
 import com.guillaumevdn.gcore.libs.com.google.gson.TypeAdapter;
 import com.guillaumevdn.gcore.libs.com.google.gson.TypeAdapterFactory;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * An annotation that indicates the Gson {@link TypeAdapter} to use with a class

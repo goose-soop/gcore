@@ -16,11 +16,6 @@
 
 package com.guillaumevdn.gcore.libs.com.google.gson.internal.bind;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import com.guillaumevdn.gcore.libs.com.google.gson.Gson;
 import com.guillaumevdn.gcore.libs.com.google.gson.TypeAdapter;
 import com.guillaumevdn.gcore.libs.com.google.gson.TypeAdapterFactory;
@@ -30,13 +25,18 @@ import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonReader;
 import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonToken;
 import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonWriter;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 /**
  * Adapts types whose static type is only 'Object'. Uses getClass() on
  * serialization and a primitive/Map/List on deserialization.
  */
 public final class ObjectTypeAdapter extends TypeAdapter<Object> {
   public static final TypeAdapterFactory FACTORY = new TypeAdapterFactory() {
-    
+    @SuppressWarnings("unchecked")
     @Override public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
       if (type.getRawType() == Object.class) {
         return (TypeAdapter<T>) new ObjectTypeAdapter(gson);
@@ -90,7 +90,7 @@ public final class ObjectTypeAdapter extends TypeAdapter<Object> {
     }
   }
 
-  
+  @SuppressWarnings("unchecked")
   @Override public void write(JsonWriter out, Object value) throws IOException {
     if (value == null) {
       out.nullValue();

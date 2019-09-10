@@ -65,7 +65,7 @@ public final class TypeAdapters {
     throw new UnsupportedOperationException();
   }
 
-  
+  @SuppressWarnings("rawtypes")
   public static final TypeAdapter<Class> CLASS = new TypeAdapter<Class>() {
     @Override
     public void write(JsonWriter out, Class value) throws IOException {
@@ -133,10 +133,11 @@ public final class TypeAdapters {
   public static final TypeAdapter<Boolean> BOOLEAN = new TypeAdapter<Boolean>() {
     @Override
     public Boolean read(JsonReader in) throws IOException {
-      if (in.peek() == JsonToken.NULL) {
+      JsonToken peek = in.peek();
+      if (peek == JsonToken.NULL) {
         in.nextNull();
         return null;
-      } else if (in.peek() == JsonToken.STRING) {
+      } else if (peek == JsonToken.STRING) {
         // support strings for compatibility with GSON 1.7
         return Boolean.parseBoolean(in.nextString());
       }
@@ -569,7 +570,7 @@ public final class TypeAdapters {
   public static final TypeAdapterFactory CURRENCY_FACTORY = newFactory(Currency.class, CURRENCY);
 
   public static final TypeAdapterFactory TIMESTAMP_FACTORY = new TypeAdapterFactory() {
-     // we use a runtime check to make sure the 'T's equal
+    @SuppressWarnings("unchecked") // we use a runtime check to make sure the 'T's equal
     @Override public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
       if (typeToken.getRawType() != Timestamp.class) {
         return null;
@@ -805,6 +806,7 @@ public final class TypeAdapters {
   }
 
   public static final TypeAdapterFactory ENUM_FACTORY = new TypeAdapterFactory() {
+    @SuppressWarnings({"rawtypes", "unchecked"})
     @Override public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
       Class<? super T> rawType = typeToken.getRawType();
       if (!Enum.class.isAssignableFrom(rawType) || rawType == Enum.class) {
@@ -820,7 +822,7 @@ public final class TypeAdapters {
   public static <TT> TypeAdapterFactory newFactory(
       final TypeToken<TT> type, final TypeAdapter<TT> typeAdapter) {
     return new TypeAdapterFactory() {
-       // we use a runtime check to make sure the 'T's equal
+      @SuppressWarnings("unchecked") // we use a runtime check to make sure the 'T's equal
       @Override public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
         return typeToken.equals(type) ? (TypeAdapter<T>) typeAdapter : null;
       }
@@ -830,7 +832,7 @@ public final class TypeAdapters {
   public static <TT> TypeAdapterFactory newFactory(
       final Class<TT> type, final TypeAdapter<TT> typeAdapter) {
     return new TypeAdapterFactory() {
-       // we use a runtime check to make sure the 'T's equal
+      @SuppressWarnings("unchecked") // we use a runtime check to make sure the 'T's equal
       @Override public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
         return typeToken.getRawType() == type ? (TypeAdapter<T>) typeAdapter : null;
       }
@@ -843,7 +845,7 @@ public final class TypeAdapters {
   public static <TT> TypeAdapterFactory newFactory(
       final Class<TT> unboxed, final Class<TT> boxed, final TypeAdapter<? super TT> typeAdapter) {
     return new TypeAdapterFactory() {
-       // we use a runtime check to make sure the 'T's equal
+      @SuppressWarnings("unchecked") // we use a runtime check to make sure the 'T's equal
       @Override public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
         Class<? super T> rawType = typeToken.getRawType();
         return (rawType == unboxed || rawType == boxed) ? (TypeAdapter<T>) typeAdapter : null;
@@ -858,7 +860,7 @@ public final class TypeAdapters {
   public static <TT> TypeAdapterFactory newFactoryForMultipleTypes(final Class<TT> base,
       final Class<? extends TT> sub, final TypeAdapter<? super TT> typeAdapter) {
     return new TypeAdapterFactory() {
-       // we use a runtime check to make sure the 'T's equal
+      @SuppressWarnings("unchecked") // we use a runtime check to make sure the 'T's equal
       @Override public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
         Class<? super T> rawType = typeToken.getRawType();
         return (rawType == base || rawType == sub) ? (TypeAdapter<T>) typeAdapter : null;
@@ -877,7 +879,7 @@ public final class TypeAdapters {
   public static <T1> TypeAdapterFactory newTypeHierarchyFactory(
       final Class<T1> clazz, final TypeAdapter<T1> typeAdapter) {
     return new TypeAdapterFactory() {
-      
+      @SuppressWarnings("unchecked")
       @Override public <T2> TypeAdapter<T2> create(Gson gson, TypeToken<T2> typeToken) {
         final Class<? super T2> requestedType = typeToken.getRawType();
         if (!clazz.isAssignableFrom(requestedType)) {

@@ -36,7 +36,7 @@ import java.util.Set;
  * <p>This implementation was derived from Android 4.1's TreeMap class.
  */
 public final class LinkedTreeMap<K, V> extends AbstractMap<K, V> implements Serializable {
-   // to avoid Comparable<Comparable<Comparable<...>>>
+  @SuppressWarnings({ "unchecked", "rawtypes" }) // to avoid Comparable<Comparable<Comparable<...>>>
   private static final Comparator<Comparable> NATURAL_ORDER = new Comparator<Comparable>() {
     public int compare(Comparable a, Comparable b) {
       return a.compareTo(b);
@@ -55,7 +55,7 @@ public final class LinkedTreeMap<K, V> extends AbstractMap<K, V> implements Seri
    * Create a natural order, empty tree map whose keys must be mutually
    * comparable and non-null.
    */
-   // unsafe! this assumes K is comparable
+  @SuppressWarnings("unchecked") // unsafe! this assumes K is comparable
   public LinkedTreeMap() {
     this((Comparator<? super K>) NATURAL_ORDER);
   }
@@ -67,7 +67,7 @@ public final class LinkedTreeMap<K, V> extends AbstractMap<K, V> implements Seri
    * @param comparator the comparator to order elements with, or {@code null} to
    *     use the natural ordering.
    */
-   // unsafe! if comparator is null, this assumes K is comparable
+  @SuppressWarnings({ "unchecked", "rawtypes" }) // unsafe! if comparator is null, this assumes K is comparable
   public LinkedTreeMap(Comparator<? super K> comparator) {
     this.comparator = comparator != null
         ? comparator
@@ -125,7 +125,7 @@ public final class LinkedTreeMap<K, V> extends AbstractMap<K, V> implements Seri
 
     if (nearest != null) {
       // Micro-optimization: avoid polymorphic calls to Comparator.compare().
-       // Throws a ClassCastException below if there's trouble.
+      @SuppressWarnings("unchecked") // Throws a ClassCastException below if there's trouble.
           Comparable<Object> comparableKey = (comparator == NATURAL_ORDER)
           ? (Comparable<Object>) key
           : null;
@@ -180,7 +180,7 @@ public final class LinkedTreeMap<K, V> extends AbstractMap<K, V> implements Seri
     return created;
   }
 
-  
+  @SuppressWarnings("unchecked")
   Node<K, V> findByObject(Object key) {
     try {
       return key != null ? find((K) key, false) : null;
@@ -477,7 +477,7 @@ public final class LinkedTreeMap<K, V> extends AbstractMap<K, V> implements Seri
       return oldValue;
     }
 
-    
+    @SuppressWarnings("rawtypes")
     @Override public boolean equals(Object o) {
       if (o instanceof Entry) {
         Entry other = (Entry) o;

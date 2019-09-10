@@ -119,7 +119,7 @@ public final class ResourceExtractor
 				} else {
 					int index = path.indexOf(File.separatorChar);
 					if (index == -1) index = path.indexOf('/');
-					file = new File(this.extractfolder, path.substring(index, path.length()));
+					file = new File(this.extractfolder, path.substring(index));
 				}
 
 				String name = file.getName();

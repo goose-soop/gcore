@@ -2,11 +2,7 @@ package com.guillaumevdn.gcore.libs.com.google.gson.internal.bind.util;
 
 import java.text.ParseException;
 import java.text.ParsePosition;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Locale;
-import java.util.TimeZone;
+import java.util.*;
 
 /**
  * Utilities methods for manipulating dates in iso8601 format. This is much much faster and GC friendly than using SimpleDateFormat so
@@ -98,7 +94,7 @@ public class ISO8601Utils
         if (offset != 0) {
             int hours = Math.abs((offset / (60 * 1000)) / 60);
             int minutes = Math.abs((offset / (60 * 1000)) % 60);
-            formatted.append(offset <= 0 ? '-' : '+');
+            formatted.append(offset < 0 ? '-' : '+');
             padInt(formatted, hours, "hh".length());
             formatted.append(':');
             padInt(formatted, minutes, "mm".length());
@@ -270,7 +266,7 @@ public class ISO8601Utils
         } catch (IllegalArgumentException e) {
             fail = e;
         }
-        String input = (date == null) ? null : ('"' + date + "'");
+        String input = (date == null) ? null : ('"' + date + '"');
         String msg = fail.getMessage();
         if (msg == null || msg.isEmpty()) {
             msg = "("+fail.getClass().getName()+")";

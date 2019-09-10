@@ -45,7 +45,7 @@ public class UserBoard extends DataBoard<GUser> implements Listener {
 		} else if (param instanceof UUID) {
 			return cache.get(new UserInfo((UUID) param));
 		} else if (param instanceof UserInfo) {
-			return cache.get((UserInfo) param);
+			return cache.get(param);
 		}
 		throw new IllegalArgumentException("param type " + param.getClass() + " isn't allowed");
 	}
@@ -121,7 +121,7 @@ public class UserBoard extends DataBoard<GUser> implements Listener {
 		}
 		if (created) {
 			// log
-			if (GCore.inst().getConfiguration() == null ? false : GCore.inst().getConfiguration().getBoolean("show_data_debug", true)) {
+			if (GCore.inst().getConfiguration() != null && GCore.inst().getConfiguration().getBoolean("show_data_debug", true)) {
 				GCore.inst().debug("Created " + created + " new default player data profile");
 			}
 			// push data if json

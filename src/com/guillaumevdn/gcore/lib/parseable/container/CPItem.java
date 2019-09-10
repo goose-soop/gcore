@@ -508,7 +508,7 @@ public class CPItem extends ContainerParseable {
 								Messenger.send(player, Messenger.Level.SEVERE_ERROR, GCore.inst().getName(), "Couldn't save item NTB (see console)");
 							}
 							// callback
-							onModif.callback(gui, player);
+							onModif.callback(null, gui, player);
 						}
 						// re-fill and open
 						gui.open(player);
@@ -533,7 +533,7 @@ public class CPItem extends ContainerParseable {
 								if (headStack != null) {
 									replace(new ItemData(headStack), player);
 									// callback
-									onModif.callback(gui, player);
+									onModif.callback(null, gui, player);
 								}
 							}
 							// re-fill and open

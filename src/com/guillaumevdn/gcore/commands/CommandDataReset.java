@@ -55,7 +55,7 @@ public class CommandDataReset extends CommandArgument {
 			Plugin plugin = Utils.getPlugin(value);
 			// doesn't exist
 			if (!Utils.instanceOf(plugin, GPlugin.class)) {
-				GLocale.MSG_GCORE_INVALIDPLUGINPARAM.send(sender, "{parameter}", "-" + parameter.toString() + (parameter.getDescription() == null ? "" : ":" + value.toString()));
+				GLocale.MSG_GCORE_INVALIDPLUGINPARAM.send(sender, "{parameter}", "-" + parameter.toString() + (parameter.getDescription() == null ? "" : ":" + value));
 				return null;
 			}
 			// return plugin

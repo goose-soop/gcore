@@ -218,7 +218,7 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 	public ItemData(String id, int slot, Mat type, int durability, int amount, String name, List<String> lore, List<PotionEffect> effects, Map<Enchantment, Integer> enchants) {
 		this.id = id;
 		this.slot = slot;
-		this.type = type == null ? Mat.AIR : (type.getDurability() != (int) durability ? type.cloneWithDurability((int) durability) : type);
+		this.type = type == null ? Mat.AIR : (type.getDurability() != durability ? type.cloneWithDurability(durability) : type);
 		this.amount = amount;
 		this.name = name == null || name.isEmpty() ? null : Utils.format(name);
 		this.lore = lore == null || lore.isEmpty() ? null : Utils.format(lore);
@@ -760,11 +760,8 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 			}
 		}
 		// custom nbt
-		if (customNbt != null && !customNbt.equals(Compat.INSTANCE.getNbt(item))) {
-			return false;
-		}
+		return customNbt == null || customNbt.equals(Compat.INSTANCE.getNbt(item));
 		// equals
-		return true;
 	}
 
 	// misc
@@ -860,9 +857,7 @@ public class ItemData implements Comparable<ItemData>, Cloneable {
 				return false;
 		} else if (!type.equals(other.type))
 			return false;
-		if (unbreakable != other.unbreakable)
-			return false;
-		return true;
+		return unbreakable == other.unbreakable;
 	}
 
 	@Override

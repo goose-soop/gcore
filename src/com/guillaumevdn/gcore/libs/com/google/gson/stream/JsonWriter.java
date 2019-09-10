@@ -16,6 +16,12 @@
 
 package com.guillaumevdn.gcore.libs.com.google.gson.stream;
 
+import java.io.Closeable;
+import java.io.Flushable;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.Arrays;
+
 import static com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonScope.DANGLING_NAME;
 import static com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonScope.EMPTY_ARRAY;
 import static com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonScope.EMPTY_DOCUMENT;
@@ -23,11 +29,6 @@ import static com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonScope.EMPTY
 import static com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonScope.NONEMPTY_ARRAY;
 import static com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonScope.NONEMPTY_DOCUMENT;
 import static com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonScope.NONEMPTY_OBJECT;
-
-import java.io.Closeable;
-import java.io.Flushable;
-import java.io.IOException;
-import java.io.Writer;
 
 /**
  * Writes a JSON (<a href="http://www.ietf.org/rfc/rfc7159.txt">RFC 7159</a>)
@@ -352,9 +353,7 @@ public class JsonWriter implements Closeable, Flushable {
 
   private void push(int newTop) {
     if (stackSize == stack.length) {
-      int[] newStack = new int[stackSize * 2];
-      System.arraycopy(stack, 0, newStack, 0, stackSize);
-      stack = newStack;
+      stack = Arrays.copyOf(stack, stackSize * 2);
     }
     stack[stackSize++] = newTop;
   }
@@ -624,6 +623,7 @@ public class JsonWriter implements Closeable, Flushable {
    * inline array, or inline object. Also adjusts the stack to expect either a
    * closing bracket or another element.
    */
+  @SuppressWarnings("fallthrough")
   private void beforeValue() throws IOException {
     switch (peek()) {
     case NONEMPTY_DOCUMENT:

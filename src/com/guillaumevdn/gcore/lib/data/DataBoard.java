@@ -30,7 +30,7 @@ public abstract class DataBoard<T extends DataElement> {
 					getDataManager().performMySQLUpdateQuery(getMySQLInitQuery());
 				}
 				if (callback != null) callback.callback();
-				if (GCore.inst().getConfiguration() == null ? false : GCore.inst().getConfiguration().getBoolean("show_data_debug", true)) {
+				if (GCore.inst().getConfiguration() != null && GCore.inst().getConfiguration().getBoolean("show_data_debug", true)) {
 					getDataManager().getPlugin().debug("Initialized " + DataBoard.this.getClass().getSimpleName() + " for " + getDataManager().getClass().getSimpleName() + " (took " + (System.currentTimeMillis() - start) + " ms)");
 				}
 			} catch (Throwable exception) {
@@ -51,7 +51,7 @@ public abstract class DataBoard<T extends DataElement> {
 					mysqlPull();
 					if (callback != null) callback.callback();
 				}
-				if (GCore.inst().getConfiguration() == null ? false : GCore.inst().getConfiguration().getBoolean("show_data_debug", true)) {
+				if (GCore.inst().getConfiguration() != null && GCore.inst().getConfiguration().getBoolean("show_data_debug", true)) {
 					getDataManager().getPlugin().debug("Loaded " + DataBoard.this.getClass().getSimpleName() + " for " + getDataManager().getClass().getSimpleName() + " (took " + (System.currentTimeMillis() - start) + " ms)");
 				}
 			} catch (Throwable exception) {
@@ -91,7 +91,7 @@ public abstract class DataBoard<T extends DataElement> {
 						if (callback != null) callback.callback();
 					}
 				}
-				if (GCore.inst().getConfiguration() == null ? false : GCore.inst().getConfiguration().getBoolean("show_data_debug", true)) {
+				if (GCore.inst().getConfiguration() != null && GCore.inst().getConfiguration().getBoolean("show_data_debug", true)) {
 					getDataManager().getPlugin().debug("Loaded " + elements.size() + " " + DataBoard.this.getClass().getSimpleName() + Utils.getPluralFor(" element", elements.size()) + " for " + getDataManager().getClass().getSimpleName() + " (took " + (System.currentTimeMillis() - start) + " ms)");
 				}
 			} catch (Throwable exception) {
@@ -133,7 +133,7 @@ public abstract class DataBoard<T extends DataElement> {
 					}
 					if (callback != null) callback.callback();
 				}
-				if (GCore.inst().getConfiguration() == null ? false : GCore.inst().getConfiguration().getBoolean("show_data_debug", true)) {
+				if (GCore.inst().getConfiguration() != null && GCore.inst().getConfiguration().getBoolean("show_data_debug", true)) {
 					getDataManager().getPlugin().debug("Saved " + elements.size() + " " + DataBoard.this.getClass().getSimpleName() + Utils.getPluralFor(" element", elements.size()) + " for " + getDataManager().getClass().getSimpleName() + " (took " + (System.currentTimeMillis() - start) + " ms)");
 				}
 			} catch (Throwable exception) {
@@ -185,7 +185,7 @@ public abstract class DataBoard<T extends DataElement> {
 						getDataManager().performMySQLUpdateQuery(query);
 					}
 				}
-				if (GCore.inst().getConfiguration() == null ? false : GCore.inst().getConfiguration().getBoolean("show_data_debug", true)) {
+				if (GCore.inst().getConfiguration() != null && GCore.inst().getConfiguration().getBoolean("show_data_debug", true)) {
 					getDataManager().getPlugin().debug("Deleted " + elements.size() + " " + DataBoard.this.getClass().getSimpleName() + Utils.getPluralFor(" element", elements.size()) + " for " + getDataManager().getClass().getSimpleName() + " (took " + (System.currentTimeMillis() - start) + " ms)");
 				}
 			} catch (Throwable exception) {

@@ -16,11 +16,6 @@
 
 package com.guillaumevdn.gcore.libs.com.google.gson.internal.bind;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.util.Iterator;
-import java.util.Map;
-
 import com.guillaumevdn.gcore.libs.com.google.gson.JsonArray;
 import com.guillaumevdn.gcore.libs.com.google.gson.JsonElement;
 import com.guillaumevdn.gcore.libs.com.google.gson.JsonNull;
@@ -28,6 +23,11 @@ import com.guillaumevdn.gcore.libs.com.google.gson.JsonObject;
 import com.guillaumevdn.gcore.libs.com.google.gson.JsonPrimitive;
 import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonReader;
 import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonToken;
+import java.io.IOException;
+import java.io.Reader;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Arrays;
 
 /**
  * This reader walks the elements of a JsonElement as if it was coming from a
@@ -283,15 +283,10 @@ public final class JsonTreeReader extends JsonReader {
 
   private void push(Object newTop) {
     if (stackSize == stack.length) {
-      Object[] newStack = new Object[stackSize * 2];
-      int[] newPathIndices = new int[stackSize * 2];
-      String[] newPathNames = new String[stackSize * 2];
-      System.arraycopy(stack, 0, newStack, 0, stackSize);
-      System.arraycopy(pathIndices, 0, newPathIndices, 0, stackSize);
-      System.arraycopy(pathNames, 0, newPathNames, 0, stackSize);
-      stack = newStack;
-      pathIndices = newPathIndices;
-      pathNames = newPathNames;
+      int newLength = stackSize * 2;
+      stack = Arrays.copyOf(stack, newLength);
+      pathIndices = Arrays.copyOf(pathIndices, newLength);
+      pathNames = Arrays.copyOf(pathNames, newLength);
     }
     stack[stackSize++] = newTop;
   }
@@ -315,8 +310,7 @@ public final class JsonTreeReader extends JsonReader {
     return result.toString();
   }
 
-  @SuppressWarnings("all")
-  private String locationString() {
+  protected String locationString() {
     return " at path " + getPath();
   }
 }

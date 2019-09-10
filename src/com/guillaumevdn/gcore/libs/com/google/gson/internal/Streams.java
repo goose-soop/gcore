@@ -16,10 +16,6 @@
 
 package com.guillaumevdn.gcore.libs.com.google.gson.internal;
 
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.Writer;
-
 import com.guillaumevdn.gcore.libs.com.google.gson.JsonElement;
 import com.guillaumevdn.gcore.libs.com.google.gson.JsonIOException;
 import com.guillaumevdn.gcore.libs.com.google.gson.JsonNull;
@@ -29,6 +25,9 @@ import com.guillaumevdn.gcore.libs.com.google.gson.internal.bind.TypeAdapters;
 import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonReader;
 import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonWriter;
 import com.guillaumevdn.gcore.libs.com.google.gson.stream.MalformedJsonException;
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.Writer;
 
 /**
  * Reads and writes GSON parse trees over streams.

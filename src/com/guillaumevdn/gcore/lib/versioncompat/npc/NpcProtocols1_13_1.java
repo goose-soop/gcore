@@ -30,12 +30,12 @@ import com.guillaumevdn.gcore.lib.util.Pair;
 import com.guillaumevdn.gcore.lib.util.Utils;
 import com.mojang.authlib.GameProfile;
 
+import net.minecraft.server.v1_13_R2.PacketPlayOutPlayerInfo.PlayerInfoData;
 import net.minecraft.server.v1_13_R2.EnumGamemode;
 import net.minecraft.server.v1_13_R2.EnumItemSlot;
 import net.minecraft.server.v1_13_R2.IChatBaseComponent;
 import net.minecraft.server.v1_13_R2.PacketPlayOutPlayerInfo;
 import net.minecraft.server.v1_13_R2.PacketPlayOutPlayerInfo.EnumPlayerInfoAction;
-import net.minecraft.server.v1_13_R2.PacketPlayOutPlayerInfo.PlayerInfoData;
 
 public class NpcProtocols1_13_1 extends NpcProtocols {
 

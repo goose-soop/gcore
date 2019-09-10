@@ -36,9 +36,9 @@ public class PPBoolean extends PrimitiveParseable<Boolean> {
 	@Override
 	protected void fillEditor(final EditorGUI gui, Player player, final ModifCallback onModif) {
 		// current, raw and delete
-		EditorGUI.fillItemCurrent(gui, player, this, 0, onModif);
+		EditorGUI.fillItemCurrent(gui, player, 0, this, onModif);
 		EditorGUI.fillItemRaw(gui, player, this, 3, getValue() == null || getValue().isEmpty() ? null : getValue().get(0), onModif);
-		EditorGUI.fillItemDelete(gui, player, this, 6, onModif);
+		EditorGUI.fillItemDelete(gui, player, 6, this, onModif);
 		// toggle
 		gui.setRegularItem(new EditorItem("control_item_toggle", 2, Mat.BAKED_POTATO, GLocale.GUI_GENERIC_EDITORBOOLEANTOGGLE.getLine(), GLocale.GUI_GENERIC_EDITORBOOLEANTOGGLELORE.getLines()) {
 			@Override
@@ -57,9 +57,9 @@ public class PPBoolean extends PrimitiveParseable<Boolean> {
 				} else {
 					setValue(getDefaultValue() != null && !getDefaultValue().isEmpty() ? Utils.asList(getDefaultValue()) : Utils.asList(Boolean.TRUE.toString()));
 				}
-				onModif.callback(gui, player);
+				onModif.callback(null, gui, player);
 				// update current item
-				EditorGUI.fillItemCurrent(gui, player, PPBoolean.this, 0, onModif);
+				EditorGUI.fillItemCurrent(gui, player, 0, PPBoolean.this, onModif);
 			}
 		});
 	}

@@ -77,7 +77,7 @@ public abstract class NpcProtocols {
 		if (str == null || str.length() == 0) {
 			return null;
 		}
-		Class<?> c = (Class<?>) MinecraftReflection.getMinecraftClass("ChatComponentText");
+		Class<?> c = MinecraftReflection.getMinecraftClass("ChatComponentText");
 		try {
 			Constructor<?> ct = c.getDeclaredConstructor(String.class);
 			return ct.newInstance(str);

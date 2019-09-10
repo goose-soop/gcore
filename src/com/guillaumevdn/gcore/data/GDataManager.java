@@ -54,7 +54,7 @@ public class GDataManager extends DataManager implements Listener {
 						}
 						if (created != 0) {
 							// log
-							if (GCore.inst().getConfiguration() == null ? false : GCore.inst().getConfiguration().getBoolean("show_data_debug", true)) {
+							if (GCore.inst().getConfiguration() != null && GCore.inst().getConfiguration().getBoolean("show_data_debug", true)) {
 								GCore.inst().debug("Created " + created + " new default player data profile" + Utils.getPlural(created));
 							}
 							// push data if json

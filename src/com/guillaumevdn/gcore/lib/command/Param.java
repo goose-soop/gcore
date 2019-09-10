@@ -62,7 +62,7 @@ public class Param {
 
 	// methods
 	public boolean canUse(CommandSender sender) {
-		return (isPlayerOnly() ? Utils.instanceOf(sender, CommandSender.class) : true) && (getPermission() == null ? true : getPermission().has(sender));
+		return (! isPlayerOnly() || Utils.instanceOf(sender, CommandSender.class)) && (getPermission() == null || getPermission().has(sender));
 	}
 
 	@Override
@@ -101,12 +101,12 @@ public class Param {
 
 	public boolean ensureAuthorization(CommandCall call) {
 		// sender isn't a player, so return false
-		if (playerOnly ? !call.senderIsPlayer() : false) {
+		if (playerOnly && ! call.senderIsPlayer()) {
 			GLocale.MSG_GENERIC_NOTPLAYER.send(call.getSender(), "{plugin}", call.getPlugin().getName());
 			return false;
 		}
 		// sender doesn't have permission, so return false
-		if (permission == null ? false : !permission.has(call.getSender())) {
+		if (permission != null && ! permission.has(call.getSender())) {
 			GLocale.MSG_GENERIC_NOPERMISSION.send(call.getSender(), "{plugin}", call.getPlugin().getName());
 			return false;
 		}
@@ -167,7 +167,7 @@ public class Param {
 		return null;
 	}
 
-	public int getInt(CommandCall call) {
+	public Integer getInt(CommandCall call) {
 		String value = getString(call);
 		if (value != null) {
 			// valid number
@@ -179,10 +179,10 @@ public class Param {
 				GLocale.MSG_GENERIC_COMMAND_INVALIDINTPARAM.send(call.getSender(), "{plugin}", call.getPlugin().getName(), "{parameter}", "-" + toString(), "{value}", value);
 			}
 		}
-		return Integer.MIN_VALUE;
+		return null;
 	}
 
-	public double getDouble(CommandCall call) {
+	public Double getDouble(CommandCall call) {
 		String value = getString(call);
 		if (value != null) {
 			// valid number
@@ -194,7 +194,7 @@ public class Param {
 				GLocale.MSG_GENERIC_COMMAND_INVALIDDOUBLEPARAM.send(call.getSender(), "{plugin}", call.getPlugin().getName(), "{parameter}", "-" + toString(), "{value}", value);
 			}
 		}
-		return Double.MIN_VALUE;
+		return null;
 	}
 
 	public OfflinePlayer getOfflinePlayer(CommandCall call, boolean senderIfNone) {

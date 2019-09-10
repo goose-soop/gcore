@@ -78,7 +78,7 @@ public abstract class PrimitiveParseable<T> extends Parseable {
 	private Cache cache = null;
 	public T getParsedValue(Player parser) {
 		// return cache if has, and parser is null or shouldn't parse anything
-		if ((parser == null || parseableIndexes.isEmpty()) ? cache != null : false) {
+		if ((parser == null || parseableIndexes.isEmpty()) && cache != null) {
 			return cache.value;
 		}
 		// no value
@@ -186,7 +186,7 @@ public abstract class PrimitiveParseable<T> extends Parseable {
 	@Override
 	public List<String> describe(int depth) {
 		String spaces = Utils.copyString(" ", depth + 1);
-		List<String> val = value != null ? value : (defaultValue != null ? defaultValue : null);
+		List<String> val = value != null ? value : (defaultValue);
 		List<String> desc = Utils.emptyList();
 		String first = spaces + "§6> " + getId() + " :";
 		if (val == null) {

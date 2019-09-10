@@ -30,7 +30,7 @@ public class HighlightedString extends FrameAnimatedString
         int index = 0;
         while (index < context.length()) {
             if (context.charAt(index) != ' ') {
-                String highlighted = normalFormat + context.substring(0, index) + highlightFormat + context.charAt(index) + normalFormat + context.substring(index + 1, context.length());
+                String highlighted = normalFormat + context.substring(0, index) + highlightFormat + context.charAt(index) + normalFormat + context.substring(index + 1);
                 String whole = prefix + highlighted + suffix;
                 addFrame(whole);
             } else {

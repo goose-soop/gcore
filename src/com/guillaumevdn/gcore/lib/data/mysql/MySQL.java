@@ -23,13 +23,27 @@ public class MySQL {
 	}
 
 	// methods
+	private transient Connection connection = null;
+	private transient long lastQuery = 0L;
+
 	public Connection connect() throws SQLException {
-		return DriverManager.getConnection(url, usr, pwd);
+		if (connection != null && !connection.isClosed()) {
+			if (System.currentTimeMillis() - lastQuery > 5000L) {
+				try {
+					connection.close();
+				} catch (Throwable ignored) {}
+			}
+		}
+		if (connection == null || connection.isClosed()) {
+			connection = DriverManager.getConnection(url, usr, pwd);
+		}
+		return connection;
 	}
 
 	public boolean performUpdateQuery(Query query) {
 		try {
 			Connection connection = connect();
+			lastQuery = System.currentTimeMillis();
 			PreparedStatement statement = connection.prepareStatement(query.getQuery());
 			for (int i = 0; i < query.getStringParams().size(); i++) {
 				statement.setString(i + 1, query.getStringParams().get(i));
@@ -47,6 +61,7 @@ public class MySQL {
 	public ResultSet performGetQuery(Query query) {
 		try {
 			Connection connection = connect();
+			lastQuery = System.currentTimeMillis();
 			PreparedStatement statement = connection.prepareStatement(query.getQuery());
 			for (int i = 0; i < query.getStringParams().size(); i++) {
 				statement.setString(i + 1, query.getStringParams().get(i));

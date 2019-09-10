@@ -6,6 +6,6 @@ import org.bukkit.inventory.ItemStack;
 public interface ItemInput {
 
 	// methods
-	public void onChoose(Player player, ItemStack value);
+    void onChoose(Player player, ItemStack value);
 
 }

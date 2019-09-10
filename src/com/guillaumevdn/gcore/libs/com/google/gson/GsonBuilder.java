@@ -16,14 +16,6 @@
 
 package com.guillaumevdn.gcore.libs.com.google.gson;
 
-import static com.guillaumevdn.gcore.libs.com.google.gson.Gson.DEFAULT_COMPLEX_MAP_KEYS;
-import static com.guillaumevdn.gcore.libs.com.google.gson.Gson.DEFAULT_ESCAPE_HTML;
-import static com.guillaumevdn.gcore.libs.com.google.gson.Gson.DEFAULT_JSON_NON_EXECUTABLE;
-import static com.guillaumevdn.gcore.libs.com.google.gson.Gson.DEFAULT_LENIENT;
-import static com.guillaumevdn.gcore.libs.com.google.gson.Gson.DEFAULT_PRETTY_PRINT;
-import static com.guillaumevdn.gcore.libs.com.google.gson.Gson.DEFAULT_SERIALIZE_NULLS;
-import static com.guillaumevdn.gcore.libs.com.google.gson.Gson.DEFAULT_SPECIALIZE_FLOAT_VALUES;
-
 import java.lang.reflect.Type;
 import java.sql.Timestamp;
 import java.text.DateFormat;
@@ -40,6 +32,14 @@ import com.guillaumevdn.gcore.libs.com.google.gson.internal.bind.TreeTypeAdapter
 import com.guillaumevdn.gcore.libs.com.google.gson.internal.bind.TypeAdapters;
 import com.guillaumevdn.gcore.libs.com.google.gson.reflect.TypeToken;
 import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonReader;
+
+import static com.guillaumevdn.gcore.libs.com.google.gson.Gson.DEFAULT_COMPLEX_MAP_KEYS;
+import static com.guillaumevdn.gcore.libs.com.google.gson.Gson.DEFAULT_ESCAPE_HTML;
+import static com.guillaumevdn.gcore.libs.com.google.gson.Gson.DEFAULT_JSON_NON_EXECUTABLE;
+import static com.guillaumevdn.gcore.libs.com.google.gson.Gson.DEFAULT_LENIENT;
+import static com.guillaumevdn.gcore.libs.com.google.gson.Gson.DEFAULT_PRETTY_PRINT;
+import static com.guillaumevdn.gcore.libs.com.google.gson.Gson.DEFAULT_SERIALIZE_NULLS;
+import static com.guillaumevdn.gcore.libs.com.google.gson.Gson.DEFAULT_SPECIALIZE_FLOAT_VALUES;
 
 /**
  * <p>Use this builder to construct a {@link Gson} instance when you need to set configuration
@@ -102,6 +102,31 @@ public final class GsonBuilder {
    * {@link #create()}.
    */
   public GsonBuilder() {
+  }
+
+  /**
+   * Constructs a GsonBuilder instance from a Gson instance. The newly constructed GsonBuilder
+   * has the same configuration as the previously built Gson instance.
+   *
+   * @param gson the gson instance whose configuration should by applied to a new GsonBuilder.
+   */
+  GsonBuilder(Gson gson) {
+    this.excluder = gson.excluder;
+    this.fieldNamingPolicy = gson.fieldNamingStrategy;
+    this.instanceCreators.putAll(gson.instanceCreators);
+    this.serializeNulls = gson.serializeNulls;
+    this.complexMapKeySerialization = gson.complexMapKeySerialization;
+    this.generateNonExecutableJson = gson.generateNonExecutableJson;
+    this.escapeHtmlChars = gson.htmlSafe;
+    this.prettyPrinting = gson.prettyPrinting;
+    this.lenient = gson.lenient;
+    this.serializeSpecialFloatingPointValues = gson.serializeSpecialFloatingPointValues;
+    this.longSerializationPolicy = gson.longSerializationPolicy;
+    this.datePattern = gson.datePattern;
+    this.dateStyle = gson.dateStyle;
+    this.timeStyle = gson.timeStyle;
+    this.factories.addAll(gson.builderFactories);
+    this.hierarchyFactories.addAll(gson.builderHierarchyFactories);
   }
 
   /**
@@ -189,7 +214,7 @@ public final class GsonBuilder {
    *       .enableComplexMapKeySerialization()
    *       .create();
    *
-   *   Map<Point, String> original = new LinkedMap<Point, String>();
+   *   Map<Point, String> original = new LinkedHashMap<Point, String>();
    *   original.put(new Point(5, 6), "a");
    *   original.put(new Point(8, 8), "b");
    *   System.out.println(gson.toJson(original, type));
@@ -216,7 +241,7 @@ public final class GsonBuilder {
    *       .enableComplexMapKeySerialization()
    *       .create();
    *
-   *   Map<Point, String> original = new LinkedMap<Point, String>();
+   *   Map<Point, String> original = new LinkedHashMap<Point, String>();
    *   original.put(new Point(5, 6), "a");
    *   original.put(new Point(8, 8), "b");
    *   System.out.println(gson.toJson(original, type));
@@ -404,6 +429,7 @@ public final class GsonBuilder {
    * @since 1.2
    */
   public GsonBuilder setDateFormat(String pattern) {
+    // TODO(Joel): Make this fail fast if it is an invalid date format
     this.datePattern = pattern;
     return this;
   }
@@ -466,7 +492,7 @@ public final class GsonBuilder {
    * {@link InstanceCreator}, {@link JsonSerializer}, and a {@link JsonDeserializer} interfaces.
    * @return a reference to this {@code GsonBuilder} object to fulfill the "Builder" pattern
    */
-  
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public GsonBuilder registerTypeAdapter(Type type, Object typeAdapter) {
     $Gson$Preconditions.checkArgument(typeAdapter instanceof JsonSerializer<?>
         || typeAdapter instanceof JsonDeserializer<?>
@@ -512,7 +538,7 @@ public final class GsonBuilder {
    * @return a reference to this {@code GsonBuilder} object to fulfill the "Builder" pattern
    * @since 1.7
    */
-  
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public GsonBuilder registerTypeHierarchyAdapter(Class<?> baseType, Object typeAdapter) {
     $Gson$Preconditions.checkArgument(typeAdapter instanceof JsonSerializer<?>
         || typeAdapter instanceof JsonDeserializer<?>
@@ -561,17 +587,22 @@ public final class GsonBuilder {
     List<TypeAdapterFactory> factories = new ArrayList<TypeAdapterFactory>(this.factories.size() + this.hierarchyFactories.size() + 3);
     factories.addAll(this.factories);
     Collections.reverse(factories);
-    Collections.reverse(this.hierarchyFactories);
-    factories.addAll(this.hierarchyFactories);
+
+    List<TypeAdapterFactory> hierarchyFactories = new ArrayList<TypeAdapterFactory>(this.hierarchyFactories);
+    Collections.reverse(hierarchyFactories);
+    factories.addAll(hierarchyFactories);
+
     addTypeAdaptersForDate(datePattern, dateStyle, timeStyle, factories);
 
     return new Gson(excluder, fieldNamingPolicy, instanceCreators,
         serializeNulls, complexMapKeySerialization,
         generateNonExecutableJson, escapeHtmlChars, prettyPrinting, lenient,
-        serializeSpecialFloatingPointValues, longSerializationPolicy, factories);
+        serializeSpecialFloatingPointValues, longSerializationPolicy,
+        datePattern, dateStyle, timeStyle,
+        this.factories, this.hierarchyFactories, factories);
   }
 
-  
+  @SuppressWarnings("unchecked")
   private void addTypeAdaptersForDate(String datePattern, int dateStyle, int timeStyle,
       List<TypeAdapterFactory> factories) {
     DefaultDateTypeAdapter dateTypeAdapter;

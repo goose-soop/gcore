@@ -55,7 +55,7 @@ public class Logger {
 	}
 
 	public static void log(Level level, String prefix, String message, boolean color) {
-		if (level.equals(Level.DEBUG) && !(GCore.inst().getConfiguration() == null ? true : GCore.inst().getConfiguration().getBoolean("show_debug", true))) {
+		if (level.equals(Level.DEBUG) && !(GCore.inst().getConfiguration() == null || GCore.inst().getConfiguration().getBoolean("show_debug", true))) {
 			return;
 		}
 		Bukkit.getConsoleSender().sendMessage((color ? level.getColor() : "") + "[" + prefix + "] " + level.getPrefix() + message.replace("<", level.getVarColor()).replace(">", level.getColor()));

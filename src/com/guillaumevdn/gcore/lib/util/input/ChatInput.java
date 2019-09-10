@@ -5,6 +5,6 @@ import org.bukkit.entity.Player;
 public interface ChatInput {
 
 	// methods
-	public void onChat(Player player, String value);
+    void onChat(Player player, String value);
 
 }

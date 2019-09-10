@@ -42,12 +42,9 @@ public class Wrapper<T> {
 			return false;
 		Wrapper other = (Wrapper) obj;
 		if (value == null) {
-			if (other.value != null)
-				return false;
-		} else if (!value.equals(other.value))
-			return false;
-		return true;
-	}
+            return other.value == null;
+		} else return value.equals(other.value);
+    }
 
 	@Override
 	public String toString() {

@@ -147,7 +147,7 @@ public abstract class PathfindingNavigator implements Navigator {
 
 	// state
 	public static enum State {
-		WAITING, FINDING_PATH, TRAVELLING, DONE;
-	}
+		WAITING, FINDING_PATH, TRAVELLING, DONE
+    }
 
 }

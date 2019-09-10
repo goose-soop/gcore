@@ -10,13 +10,13 @@ import com.guillaumevdn.gcore.lib.npc.Npc;
 public interface Navigator {
 
 	// methods
-	public World getWorld();
-	public Point getStart();
-	public Location getCurrentStep();
-	public Point getTarget();
-	public List<Location> getPath();
-	public void start();
-	public void cancel();
-	public List<Npc> getAffected();
+    World getWorld();
+	Point getStart();
+	Location getCurrentStep();
+	Point getTarget();
+	List<Location> getPath();
+	void start();
+	void cancel();
+	List<Npc> getAffected();
 
 }

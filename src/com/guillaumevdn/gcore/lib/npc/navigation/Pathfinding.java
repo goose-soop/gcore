@@ -460,7 +460,7 @@ public abstract class Pathfinding {
 
 	// state
 	public static enum State {
-		WAITING, EXPLORING, OPTIMIZING, DONE;
-	}
+		WAITING, EXPLORING, OPTIMIZING, DONE
+    }
 
 }

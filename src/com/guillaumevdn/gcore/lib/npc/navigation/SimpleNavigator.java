@@ -102,7 +102,7 @@ public abstract class SimpleNavigator implements Navigator {
 
 	// state
 	public static enum State {
-		WAITING, TRAVELLING, DONE;
-	}
+		WAITING, TRAVELLING, DONE
+    }
 
 }

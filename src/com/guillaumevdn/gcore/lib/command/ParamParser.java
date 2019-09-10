@@ -5,6 +5,6 @@ import org.bukkit.command.CommandSender;
 public interface ParamParser<T> {
 
 	// methods
-	public T parse(CommandSender sender, Param parameter, String value);
+    T parse(CommandSender sender, Param parameter, String value);
 
 }

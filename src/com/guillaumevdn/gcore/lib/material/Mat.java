@@ -337,7 +337,7 @@ public class Mat implements Cloneable, Comparable<Mat> {
 	public static final Mat EMERALD = registerValue(new Mat(false, "EMERALD", "EMERALD"));
 	public static final Mat EMERALD_BLOCK = registerValue(new Mat(false, "EMERALD_BLOCK", "EMERALD_BLOCK"));
 	public static final Mat EMERALD_ORE = registerValue(new Mat(false, "EMERALD_ORE", "EMERALD_ORE"));
-	public static final Mat EMPTY_MAP = registerValue(new Mat(false, "MAP", "EMPTY_MAP"));
+	public static final Mat EMPTY_MAP = registerValue(new Mat(false, "EMPTY_MAP", "EMPTY_MAP"));
 	public static final Mat ENCHANTED_BOOK = registerValue(new Mat(false, "ENCHANTED_BOOK", "ENCHANTED_BOOK"));
 	public static final Mat ENCHANTED_GOLDEN_APPLE = registerValue(new Mat(false, "ENCHANTED_GOLDEN_APPLE", "GOLDEN_APPLE", 1));
 	public static final Mat ENCHANTING_TABLE = registerValue(new Mat(false, "ENCHANTING_TABLE", "ENCHANTMENT_TABLE"));
@@ -1147,9 +1147,18 @@ public class Mat implements Cloneable, Comparable<Mat> {
 	}
 
 	public boolean exists() {
-		return currentMaterial == null ? false : (currentMaterial.equals(Material.AIR) ? isAir() : true);
+		return currentMaterial != null && !isAir();
 	}
-
+	
+	public boolean canHaveItem() {
+		try {
+			ItemStack item = getNewCurrentStack();
+			return item != null && item.getType() != null && !item.getType().equals(Material.AIR);
+		} catch (Throwable ignored) {
+			return false;
+		}
+	}
+	
 	public boolean isAir() {
 		return equals(AIR) || equals(CAVE_AIR) || equals(VOID_AIR);
 	}
@@ -1166,11 +1175,11 @@ public class Mat implements Cloneable, Comparable<Mat> {
 
 	@Override
 	public boolean equals(Object obj) {
-		return Utils.instanceOf(obj, Mat.class) ? equals((Mat) obj, true) : false;
+		return Utils.instanceOf(obj, Mat.class) && equals((Mat) obj, true);
 	}
 
 	public boolean equals(Mat other, boolean durabilityCheck) {
-		return this.modernName.equals(other.modernName) && (durabilityCheck ? this.durability == other.durability : true);
+		return this.modernName.equals(other.modernName) && (! durabilityCheck || this.durability == other.durability);
 	}
 
 	@Override
@@ -1251,7 +1260,7 @@ public class Mat implements Cloneable, Comparable<Mat> {
 		else {
 			try {
 				Block.class.getMethod("setTypeIdAndData", int.class, byte.class, boolean.class)
-				.invoke(block, (int) Material.class.getMethod("getId").invoke(currentMaterial), legacyData > 0 ? (byte) legacyData : (byte) 0, false);
+				.invoke(block, Material.class.getMethod("getId").invoke(currentMaterial), legacyData > 0 ? (byte) legacyData : (byte) 0, false);
 			} catch (Throwable exception) {
 				exception.printStackTrace();
 				GCore.inst().error("Trying to set block with mat " + toString() + " but an unknown error occured");
@@ -1274,7 +1283,7 @@ public class Mat implements Cloneable, Comparable<Mat> {
 
 	// from
 	public static Mat fromItem(ItemStack item) {
-		return item == null ? AIR : fromMaterial(item.getType(), (int) item.getDurability(), ServerVersion.IS_1_13 ? 0 : item.getData().getData());
+		return item == null ? AIR : fromMaterial(item.getType(), item.getDurability(), ServerVersion.IS_1_13 ? 0 : item.getData().getData());
 	}
 
 	public static Mat fromBlock(Block block) {

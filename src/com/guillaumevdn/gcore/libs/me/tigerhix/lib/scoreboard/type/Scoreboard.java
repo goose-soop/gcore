@@ -53,7 +53,7 @@ public interface Scoreboard
 	 * Force update the scoreboard.
 	 */
 
-	public void update();
+    void update();
 
 	/**
 	 * Returns the holder of this scoreboard.

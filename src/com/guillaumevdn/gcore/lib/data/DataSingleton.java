@@ -24,7 +24,7 @@ public abstract class DataSingleton {
 					getDataManager().performMySQLUpdateQuery(getMySQLInitQuery());
 				}
 				if (callback != null) callback.callback();
-				if (GCore.inst().getConfiguration() == null ? false : GCore.inst().getConfiguration().getBoolean("show_data_debug", true)) {
+				if (GCore.inst().getConfiguration() != null && GCore.inst().getConfiguration().getBoolean("show_data_debug", true)) {
 					getDataManager().getPlugin().debug("Initialized " + DataSingleton.this.getClass().getSimpleName() + " for " + getDataManager().getClass().getSimpleName() + " (took " + (System.currentTimeMillis() - start) + " ms)");
 				}
 			} catch (Throwable exception) {
@@ -48,7 +48,7 @@ public abstract class DataSingleton {
 					mysqlPull();
 				}
 				if (callback != null) callback.callback();
-				if (GCore.inst().getConfiguration() == null ? false : GCore.inst().getConfiguration().getBoolean("show_data_debug", true)) {
+				if (GCore.inst().getConfiguration() != null && GCore.inst().getConfiguration().getBoolean("show_data_debug", true)) {
 					getDataManager().getPlugin().debug("Loaded " + DataSingleton.this.getClass().getSimpleName() + " for " + getDataManager().getClass().getSimpleName() + " (took " + (System.currentTimeMillis() - start) + " ms)");
 				}
 			} catch (Throwable exception) {
@@ -66,7 +66,7 @@ public abstract class DataSingleton {
 			} else if (getDataManager().getBackEnd().equals(BackEnd.MYSQL)) {
 				mysqlPush(params);
 			}
-			if (GCore.inst().getConfiguration() == null ? false : GCore.inst().getConfiguration().getBoolean("show_data_debug", true)) {
+			if (GCore.inst().getConfiguration() != null && GCore.inst().getConfiguration().getBoolean("show_data_debug", true)) {
 				getDataManager().getPlugin().debug("Saved " + DataSingleton.this.getClass().getSimpleName() + " for " + getDataManager().getClass().getSimpleName() + " (took " + (System.currentTimeMillis() - start) + " ms)");
 			}
 		} catch (Throwable exception) {
@@ -93,7 +93,7 @@ public abstract class DataSingleton {
 				} else if (getDataManager().getBackEnd().equals(BackEnd.MYSQL)) {
 					mysqlDelete(params);
 				}
-				if (GCore.inst().getConfiguration() == null ? false : GCore.inst().getConfiguration().getBoolean("show_data_debug", true)) {
+				if (GCore.inst().getConfiguration() != null && GCore.inst().getConfiguration().getBoolean("show_data_debug", true)) {
 					getDataManager().getPlugin().debug("Deleted " + DataSingleton.this.getClass().getSimpleName() + " for " + getDataManager().getClass().getSimpleName() + " (took " + (System.currentTimeMillis() - start) + " ms)");
 				}
 			} catch (Throwable exception) {

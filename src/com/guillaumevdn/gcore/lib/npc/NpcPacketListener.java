@@ -55,7 +55,7 @@ public class NpcPacketListener implements PacketListener {
 		PacketContainer packet = packetEvent.getPacket();
 		Player player = packetEvent.getPlayer();
 		if (packet.getType().equals(PacketType.Play.Client.USE_ENTITY)) {
-			int entityId = (int) packet.getIntegers().read(0);
+			int entityId = packet.getIntegers().read(0);
 			if (entityId < NpcProtocols.ENTITY_ID_BASE) {
 				return;
 			}

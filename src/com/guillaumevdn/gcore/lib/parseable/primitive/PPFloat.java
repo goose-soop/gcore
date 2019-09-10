@@ -41,9 +41,9 @@ public class PPFloat extends PrimitiveParseable<Float> {
 	@Override
 	protected void fillEditor(final EditorGUI gui, Player player, final ModifCallback onModif) {
 		// current, raw and delete
-		EditorGUI.fillItemCurrent(gui, player, this, 18, onModif);
+		EditorGUI.fillItemCurrent(gui, player, 18, this, onModif);
 		EditorGUI.fillItemRaw(gui, player, this, 21, getValue() == null || getValue().isEmpty() ? null : getValue().get(0), onModif);
-		EditorGUI.fillItemDelete(gui, player, this, 24, onModif);
+		EditorGUI.fillItemDelete(gui, player, 24, this, onModif);
 		// delta items
 		for (int i = 0; i < 9; ++i) fillDeltaItem(gui, player, (float) Math.pow(10, i == 3 ? 0 : i - 3), i, Mat.GREEN_WOOL, onModif);
 		for (int i = 0; i < 9; ++i) fillDeltaItem(gui, player, (float) -Math.pow(10, i == 3 ? 0 : i - 3), 9 + i, Mat.RED_WOOL, onModif);
@@ -68,9 +68,9 @@ public class PPFloat extends PrimitiveParseable<Float> {
 				} else {
 					setValue(getDefaultValue() != null && !getDefaultValue().isEmpty() ? Utils.asList(getDefaultValue()) : Utils.asList(min != null ? min.toString() : "0"));
 				}
-				onModif.callback(gui, player);
+				onModif.callback(null, gui, player);
 				// update current item
-				EditorGUI.fillItemCurrent(gui, player, PPFloat.this, 18, onModif);
+				EditorGUI.fillItemCurrent(gui, player, 18, PPFloat.this, onModif);
 			}
 		});
 	}

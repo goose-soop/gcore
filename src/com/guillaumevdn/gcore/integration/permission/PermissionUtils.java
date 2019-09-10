@@ -4,7 +4,7 @@ import org.bukkit.OfflinePlayer;
 
 public interface PermissionUtils {
 
-	public boolean init() throws Throwable;
-	public boolean has(OfflinePlayer player, String permission);
+	boolean init() throws Throwable;
+	boolean has(OfflinePlayer player, String permission);
 
 }

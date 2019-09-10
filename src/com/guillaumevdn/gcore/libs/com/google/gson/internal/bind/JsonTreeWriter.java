@@ -16,17 +16,16 @@
 
 package com.guillaumevdn.gcore.libs.com.google.gson.internal.bind;
 
-import java.io.IOException;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.guillaumevdn.gcore.libs.com.google.gson.JsonArray;
 import com.guillaumevdn.gcore.libs.com.google.gson.JsonElement;
 import com.guillaumevdn.gcore.libs.com.google.gson.JsonNull;
 import com.guillaumevdn.gcore.libs.com.google.gson.JsonObject;
 import com.guillaumevdn.gcore.libs.com.google.gson.JsonPrimitive;
 import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This writer creates a JsonElement.
@@ -53,7 +52,7 @@ public final class JsonTreeWriter extends JsonWriter {
   private String pendingName;
 
   /** the JSON element constructed by this writer. */
-  private JsonElement product = JsonNull.INSTANCE;
+  private JsonElement product = JsonNull.INSTANCE; // TODO: is this really what we want?;
 
   public JsonTreeWriter() {
     super(UNWRITABLE_WRITER);

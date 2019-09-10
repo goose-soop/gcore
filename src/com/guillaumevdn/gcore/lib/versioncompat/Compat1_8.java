@@ -150,7 +150,7 @@ public class Compat1_8 extends Compat {
 	public ItemStack setNbt(ItemStack item, Object nbt) {
 		if (item != null) {
 			net.minecraft.server.v1_8_R3.ItemStack itemNms = org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack.asNMSCopy(item);
-			itemNms.setTag((net.minecraft.server.v1_8_R3.NBTTagCompound) (nbt == null ? null : nbt));
+			itemNms.setTag((net.minecraft.server.v1_8_R3.NBTTagCompound) (nbt));
 			// return item
 			return org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack.asBukkitCopy(itemNms);
 		}

@@ -121,7 +121,7 @@ public abstract class EditorGUI extends GUI {
 	protected abstract void fill();
 
 	// static methods
-	public static void fillItemCurrent(final EditorGUI gui, Player player, final PrimitiveParseable<?> component, final int currentSlot, final ModifCallback onModif) {
+	public static void fillItemCurrent(final EditorGUI gui, Player player, final int currentSlot, final PrimitiveParseable<?> component, final ModifCallback onModif) {
 		fillItemCurrent(gui, player, component.getId(), component.describe(0), component.getEditorDescription(), component.getTypeName(), component.isMandatory(), component.getEditorIcon(), currentSlot, onModif);
 	}
 
@@ -144,10 +144,10 @@ public abstract class EditorGUI extends GUI {
 		});
 	}
 
-	public static void fillItemDelete(final EditorGUI gui, Player player, final Parseable component, final int deleteSlot, final ModifCallback onModif) {
-		fillItemDelete(gui, player, deleteSlot, onModif, new ModifCallback() {
+	public static <T extends Parseable> void fillItemDelete(final EditorGUI gui, Player player, final int deleteSlot, final Parseable component, final ModifCallback onModif) {
+		fillItemDelete(gui, player, deleteSlot, onModif, new ModifCallback(null) {
 			@Override
-			public void callback(EditorGUI from, Player player) {
+			protected void onModif(Object instance, EditorGUI from, Player player) {
 				delete(component);
 			}
 		});
@@ -158,8 +158,8 @@ public abstract class EditorGUI extends GUI {
 			@Override
 			protected void onClick(final Player player, final ClickType clickType, final int pageIndex) {
 				// delete value
-				onDelete.callback(gui, player);
-				onModif.callback(gui, player);
+				onDelete.callback(null, gui, player);
+				onModif.callback(null, gui, player);
 				// re-fill and open
 				gui.open(player);
 			}
@@ -214,7 +214,7 @@ public abstract class EditorGUI extends GUI {
 						// replace value
 						if (!value.replace(" ", "").equalsIgnoreCase("cancel")) {
 							onChange.callback(gui, player, value);
-							onModif.callback(gui, player);
+							onModif.callback(null, gui, player);
 						}
 						// re-fill and open
 						gui.open(player);
@@ -224,8 +224,8 @@ public abstract class EditorGUI extends GUI {
 		});
 	}
 
-	public static interface RawChangeCallback {
-		public void callback(EditorGUI from, Player player, String value);
+	public interface RawChangeCallback {
+		void callback(EditorGUI from, Player player, String value);
 	}
 
 }

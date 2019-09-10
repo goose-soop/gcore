@@ -53,7 +53,7 @@ public class StateSetting {
 			// not supported
 			Class<?> clazz;
 			try {
-				clazz = (Class<?>) Class.forName(type.dataClass);
+				clazz = Class.forName(type.dataClass);
 			} catch (Throwable ignored) {
 				GCore.inst().error("Can't set block state '" + type.name() + " " + setting + "' to block " + Mat.fromBlock(block) + ", not supported");
 				return;
@@ -379,16 +379,16 @@ public class StateSetting {
 
 	}
 
-	public static interface SettingDecoder {
-		public Object decode(String raw) throws Throwable;
+	public interface SettingDecoder {
+		Object decode(String raw) throws Throwable;
 	}
 
-	public static interface Applier {
-		public void apply(Object data, Object setting) throws Throwable;
+	public interface Applier {
+		void apply(Object data, Object setting) throws Throwable;
 	}
 
-	public static interface Checker {
-		public boolean has(Object data, Object setting) throws Throwable;
+	public interface Checker {
+		boolean has(Object data, Object setting) throws Throwable;
 	}
 
 }

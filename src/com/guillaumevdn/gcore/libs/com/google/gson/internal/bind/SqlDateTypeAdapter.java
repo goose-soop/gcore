@@ -16,11 +16,6 @@
 
 package com.guillaumevdn.gcore.libs.com.google.gson.internal.bind;
 
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-
 import com.guillaumevdn.gcore.libs.com.google.gson.Gson;
 import com.guillaumevdn.gcore.libs.com.google.gson.JsonSyntaxException;
 import com.guillaumevdn.gcore.libs.com.google.gson.TypeAdapter;
@@ -29,6 +24,10 @@ import com.guillaumevdn.gcore.libs.com.google.gson.reflect.TypeToken;
 import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonReader;
 import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonToken;
 import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonWriter;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 /**
  * Adapter for java.sql.Date. Although this class appears stateless, it is not.
@@ -38,7 +37,7 @@ import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonWriter;
  */
 public final class SqlDateTypeAdapter extends TypeAdapter<java.sql.Date> {
   public static final TypeAdapterFactory FACTORY = new TypeAdapterFactory() {
-     // we use a runtime check to make sure the 'T's equal
+    @SuppressWarnings("unchecked") // we use a runtime check to make sure the 'T's equal
     @Override public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
       return typeToken.getRawType() == java.sql.Date.class
           ? (TypeAdapter<T>) new SqlDateTypeAdapter() : null;

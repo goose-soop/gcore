@@ -16,9 +16,8 @@
 
 package com.guillaumevdn.gcore.libs.com.google.gson.internal;
 
-import java.io.IOException;
-
 import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonReader;
+import java.io.IOException;
 
 /**
  * Internal-only APIs of JsonReader available only to other classes in Gson.

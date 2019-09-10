@@ -12,9 +12,8 @@ public enum ProjectileType {
 	EXP_BOTTLE("THROWN_EXP_BOTTLE"),
 	ENDER_PEARL("ENDER_PEARL"),
 	TRIDENT("TRIDENT");
-	;
 
-	// base
+    // base
 	private String entityType;
 
 	private ProjectileType(String entityType) {

@@ -16,10 +16,10 @@
 
 package com.guillaumevdn.gcore.libs.com.google.gson;
 
+import com.guillaumevdn.gcore.libs.com.google.gson.internal.LinkedTreeMap;
+
 import java.util.Map;
 import java.util.Set;
-
-import com.guillaumevdn.gcore.libs.com.google.gson.internal.LinkedTreeMap;
 
 /**
  * A class representing an object type in Json. An object consists of name-value pairs where names
@@ -55,10 +55,7 @@ public final class JsonObject extends JsonElement {
    * @param value the member object.
    */
   public void add(String property, JsonElement value) {
-    if (value == null) {
-      value = JsonNull.INSTANCE;
-    }
-    members.put(property, value);
+    members.put(property, value == null ? JsonNull.INSTANCE : value);
   }
 
   /**
@@ -80,18 +77,18 @@ public final class JsonObject extends JsonElement {
    * @param value the string value associated with the member.
    */
   public void addProperty(String property, String value) {
-    add(property, createJsonElement(value));
+    add(property, value == null ? JsonNull.INSTANCE : new JsonPrimitive(value));
   }
 
   /**
    * Convenience method to add a primitive member. The specified value is converted to a
-   * JsonPrimitive of Addition.
+   * JsonPrimitive of Number.
    *
    * @param property name of the member.
    * @param value the number value associated with the member.
    */
   public void addProperty(String property, Number value) {
-    add(property, createJsonElement(value));
+    add(property, value == null ? JsonNull.INSTANCE : new JsonPrimitive(value));
   }
 
   /**
@@ -102,7 +99,7 @@ public final class JsonObject extends JsonElement {
    * @param value the number value associated with the member.
    */
   public void addProperty(String property, Boolean value) {
-    add(property, createJsonElement(value));
+    add(property, value == null ? JsonNull.INSTANCE : new JsonPrimitive(value));
   }
 
   /**
@@ -113,17 +110,7 @@ public final class JsonObject extends JsonElement {
    * @param value the number value associated with the member.
    */
   public void addProperty(String property, Character value) {
-    add(property, createJsonElement(value));
-  }
-
-  /**
-   * Creates the proper {@link JsonElement} object from the given {@code value} object.
-   *
-   * @param value the object to generate the {@link JsonElement} for
-   * @return a {@link JsonPrimitive} if the {@code value} is not null, otherwise a {@link JsonNull}
-   */
-  private JsonElement createJsonElement(Object value) {
-    return value == null ? JsonNull.INSTANCE : new JsonPrimitive(value);
+    add(property, value == null ? JsonNull.INSTANCE : new JsonPrimitive(value));
   }
 
   /**

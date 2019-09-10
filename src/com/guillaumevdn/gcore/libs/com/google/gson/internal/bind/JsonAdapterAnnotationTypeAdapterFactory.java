@@ -38,7 +38,7 @@ public final class JsonAdapterAnnotationTypeAdapterFactory implements TypeAdapte
     this.constructorConstructor = constructorConstructor;
   }
 
-  
+  @SuppressWarnings("unchecked")
   @Override
   public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> targetType) {
     Class<? super T> rawType = targetType.getRawType();
@@ -49,7 +49,7 @@ public final class JsonAdapterAnnotationTypeAdapterFactory implements TypeAdapte
     return (TypeAdapter<T>) getTypeAdapter(constructorConstructor, gson, targetType, annotation);
   }
 
-   // Casts guarded by conditionals.
+  @SuppressWarnings({ "unchecked", "rawtypes" }) // Casts guarded by conditionals.
   TypeAdapter<?> getTypeAdapter(ConstructorConstructor constructorConstructor, Gson gson,
       TypeToken<?> type, JsonAdapter annotation) {
     Object instance = constructorConstructor.get(TypeToken.get(annotation.value())).construct();

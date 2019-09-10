@@ -87,8 +87,8 @@ public class CPDate extends ContainerParseable {
 	}
 
 	public static enum Status {
-		BEFORE, NOW, AFTER, ERROR;
-	}
+		BEFORE, NOW, AFTER, ERROR
+    }
 
 	/**
 	 * Compare the current 'time during week' to this object (check if we're before, at, or after this object's 'time during week')

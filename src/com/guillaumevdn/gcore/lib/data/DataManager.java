@@ -92,7 +92,7 @@ public abstract class DataManager {
 
 	public void synchronize() {
 		innerSynchronize();
-		if (GCore.inst().getConfiguration() == null ? false : GCore.inst().getConfiguration().getBoolean("show_data_debug", true)) {
+		if (GCore.inst().getConfiguration() != null && GCore.inst().getConfiguration().getBoolean("show_data_debug", true)) {
 			plugin.debug("Synchronized data manager (using " + backEnd.toString() + ")");
 		}
 	}
@@ -163,17 +163,17 @@ public abstract class DataManager {
 	// data backend
 	public static enum BackEnd {
 		JSON,
-		MYSQL;
-	}
+		MYSQL
+    }
 
 	// callback
-	public static interface Callback {
-		public void callback();
+	public interface Callback {
+		void callback();
 	}
 
 	// mysql get callback
-	public static interface MySQLGetCallback {
-		public void callback(ResultSet set);
+	public interface MySQLGetCallback {
+		void callback(ResultSet set);
 	}
 
 }

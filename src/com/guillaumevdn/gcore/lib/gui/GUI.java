@@ -288,7 +288,7 @@ public class GUI implements Listener {
 		int pageIndex = -1;
 		for (Inventory page : pages) {
 			++pageIndex;
-			if (item.getSlot() == previousPageItemSlot ? pageIndex == 0 : (item.getSlot() == nextPageItemSlot ? pageIndex == pages.size() - 1 : true)) {
+			if (item.getSlot() == previousPageItemSlot ? pageIndex == 0 : (item.getSlot() != nextPageItemSlot || pageIndex == pages.size() - 1)) {
 				page.setItem(item.getSlot(), item.getGUIStack());
 			}
 		}
@@ -344,7 +344,7 @@ public class GUI implements Listener {
 		if (invName.length() > 32) {
 			int startIndex = invName.length() - 29;
 			if (startIndex > 0 && invName.charAt(startIndex - 1) == '�') startIndex++;
-			invName = "..." + invName.substring(startIndex, invName.length());
+			invName = "..." + invName.substring(startIndex);
 		}
 		if (invName.length() > 32) {
 			Logger.log(Level.WARNING, plugin.getName(), "Tried to register inventory with name '" + invName + "' (size " + invName.length() + ")");
@@ -355,7 +355,7 @@ public class GUI implements Listener {
 		pages.add(page);
 		// add persistent items
 		for (ClickeableItem item : persistentItems.values()) {
-			if (item.getSlot() == previousPageItemSlot ? index == 0 : (item.getSlot() == nextPageItemSlot ? index == pages.size() - 1 : true)) {
+			if (item.getSlot() == previousPageItemSlot ? index == 0 : (item.getSlot() != nextPageItemSlot || index == pages.size() - 1)) {
 				page.setItem(item.getSlot(), item.getGUIStack());
 			}
 		}
@@ -398,10 +398,10 @@ public class GUI implements Listener {
 		if (!disablePages) {
 			for (int index = 0; index < pages.size(); index++) {
 				Inventory page = pages.get(index);
-				ItemStack prev = index == 0 ? previousPageItemEmpty.getItemStack() : previousPageItem.getItemStack();
-				ItemStack post = index + 1 == pages.size() ? nextPageItemEmpty.getItemStack() : nextPageItem.getItemStack();
-				if (!Mat.fromItem(prev).isAir()) page.setItem(previousPageItemSlot, prev);
-				if (!Mat.fromItem(post).isAir()) page.setItem(nextPageItemSlot, post);
+				ItemStack prev = index == 0 ? (previousPageItemEmpty.getType().isAir() ? null : previousPageItemEmpty.getItemStack()) : (previousPageItem.getType().isAir() ? null : previousPageItem.getItemStack());
+				ItemStack post = index + 1 == pages.size() ? (nextPageItemEmpty.getType().isAir() ? null : nextPageItemEmpty.getItemStack()) : (nextPageItem.getType().isAir() ? null : nextPageItem.getItemStack());
+				if (prev != null && !Mat.fromItem(prev).isAir()) page.setItem(previousPageItemSlot, prev);
+				if (post != null && !Mat.fromItem(post).isAir()) page.setItem(nextPageItemSlot, post);
 			}
 		}
 		updateFirstSlot();

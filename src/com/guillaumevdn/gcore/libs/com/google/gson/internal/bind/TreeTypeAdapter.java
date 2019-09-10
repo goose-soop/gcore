@@ -16,9 +16,6 @@
 
 package com.guillaumevdn.gcore.libs.com.google.gson.internal.bind;
 
-import java.io.IOException;
-import java.lang.reflect.Type;
-
 import com.guillaumevdn.gcore.libs.com.google.gson.Gson;
 import com.guillaumevdn.gcore.libs.com.google.gson.JsonDeserializationContext;
 import com.guillaumevdn.gcore.libs.com.google.gson.JsonDeserializer;
@@ -33,6 +30,8 @@ import com.guillaumevdn.gcore.libs.com.google.gson.internal.Streams;
 import com.guillaumevdn.gcore.libs.com.google.gson.reflect.TypeToken;
 import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonReader;
 import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonWriter;
+import java.io.IOException;
+import java.lang.reflect.Type;
 
 /**
  * Adapts a Gson 1.x tree-style adapter as a streaming TypeAdapter. Since the
@@ -138,7 +137,7 @@ public final class TreeTypeAdapter<T> extends TypeAdapter<T> {
       this.hierarchyType = hierarchyType;
     }
 
-     // guarded by typeToken.equals() call
+    @SuppressWarnings("unchecked") // guarded by typeToken.equals() call
     @Override
     public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
       boolean matches = exactType != null
@@ -158,7 +157,7 @@ public final class TreeTypeAdapter<T> extends TypeAdapter<T> {
     @Override public JsonElement serialize(Object src, Type typeOfSrc) {
       return gson.toJsonTree(src, typeOfSrc);
     }
-    
+    @SuppressWarnings("unchecked")
     @Override public <R> R deserialize(JsonElement json, Type typeOfT) throws JsonParseException {
       return (R) gson.fromJson(json, typeOfT);
     }

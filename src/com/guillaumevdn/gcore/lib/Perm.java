@@ -46,11 +46,11 @@ public class Perm {
 	}
 
 	private boolean hasSender(CommandSender sender) {
-		return sender != null && (sender.isOp() || sender.hasPermission(name) || (parent == null ? false : parent.hasSender(sender)));
+		return sender != null && (sender.isOp() || sender.hasPermission(name) || (parent != null && parent.hasSender(sender)));
 	}
 
 	private boolean hasPlayer(OfflinePlayer player) {
-		return player != null && (player.isOnline() ? hasSender(player.getPlayer()) : (player.isOp() || GCore.inst().getPermissionHandler().has(player, name) || (parent == null ? false : parent.hasPlayer(player))));
+		return player != null && (player.isOnline() ? hasSender(player.getPlayer()) : (player.isOp() || GCore.inst().getPermissionHandler().has(player, name) || (parent != null && parent.hasPlayer(player))));
 	}
 
 }

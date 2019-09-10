@@ -37,8 +37,8 @@ public class PPText extends PrimitiveParseable<Text> {
 	@Override
 	protected void fillEditor(final EditorGUI gui, Player player, final ModifCallback onModif) {
 		// current and delete
-		EditorGUI.fillItemCurrent(gui, player, this, 20, onModif);
-		EditorGUI.fillItemDelete(gui, player, this, 24, onModif);
+		EditorGUI.fillItemCurrent(gui, player, 20, this, onModif);
+		EditorGUI.fillItemDelete(gui, player, 24, this, onModif);
 		// set line icons
 		if (getValue() != null) {
 			for (int i = 0; i < getValue().size(); ++i) {
@@ -56,7 +56,7 @@ public class PPText extends PrimitiveParseable<Text> {
 									// replace value
 									if (!value.replace(" ", "").equalsIgnoreCase("cancel")) {
 										getValue().set(index, value);
-										onModif.callback(gui, player);
+										onModif.callback(null, gui, player);
 									}
 									// re-fill and open
 									gui.open(player);
@@ -67,7 +67,7 @@ public class PPText extends PrimitiveParseable<Text> {
 						else if (clickType.isRightClick()) {
 							// delete value
 							getValue().remove(index);
-							onModif.callback(gui, player);
+							onModif.callback(null, gui, player);
 							// re-fill and open
 							gui.open(player);
 						}
@@ -85,7 +85,7 @@ public class PPText extends PrimitiveParseable<Text> {
 				} else {
 					getValue().add("new line");
 				}
-				onModif.callback(gui, player);
+				onModif.callback(null, gui, player);
 				// re-fill and open
 				gui.open(player);
 			}

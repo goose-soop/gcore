@@ -84,10 +84,8 @@ public class BlockCoords {
 			return false;
 		if (y != other.y)
 			return false;
-		if (z != other.z)
-			return false;
-		return true;
-	}
+        return z == other.z;
+    }
 
 	// methods
 	public double distance(int x, int y, int z) {

@@ -48,7 +48,7 @@ public abstract class EnchantListParseable<T extends Parseable> extends ListPars
 						delete.setValue(Boolean.FALSE);
 						// delete and callback
 						getElements().remove(element.getId());
-						onModif.callback(gui, player);
+						onModif.callback(null, gui, player);
 						// re-fill and open
 						gui.open(player);
 						return;
@@ -94,7 +94,7 @@ public abstract class EnchantListParseable<T extends Parseable> extends ListPars
 									GLocale.MSG_GENERIC_DUPLICATEELEMENT.send(player, "{id}", valName);
 								} else {
 									createElement(valName);
-									onModif.callback(gui, player);
+									onModif.callback(null, gui, player);
 								}
 								gui.open(player);// re-fill and open
 							}

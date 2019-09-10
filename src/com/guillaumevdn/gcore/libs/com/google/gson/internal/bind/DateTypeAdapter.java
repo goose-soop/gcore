@@ -16,22 +16,26 @@
 
 package com.guillaumevdn.gcore.libs.com.google.gson.internal.bind;
 
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.ParsePosition;
-import java.util.Date;
-import java.util.Locale;
-
 import com.guillaumevdn.gcore.libs.com.google.gson.Gson;
 import com.guillaumevdn.gcore.libs.com.google.gson.JsonSyntaxException;
 import com.guillaumevdn.gcore.libs.com.google.gson.TypeAdapter;
 import com.guillaumevdn.gcore.libs.com.google.gson.TypeAdapterFactory;
+import com.guillaumevdn.gcore.libs.com.google.gson.internal.JavaVersion;
+import com.guillaumevdn.gcore.libs.com.google.gson.internal.PreJava9DateFormatProvider;
 import com.guillaumevdn.gcore.libs.com.google.gson.internal.bind.util.ISO8601Utils;
 import com.guillaumevdn.gcore.libs.com.google.gson.reflect.TypeToken;
 import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonReader;
 import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonToken;
 import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonWriter;
+
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.ParsePosition;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * Adapter for Date. Although this class appears stateless, it is not.
@@ -41,16 +45,27 @@ import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonWriter;
  */
 public final class DateTypeAdapter extends TypeAdapter<Date> {
   public static final TypeAdapterFactory FACTORY = new TypeAdapterFactory() {
-     // we use a runtime check to make sure the 'T's equal
+    @SuppressWarnings("unchecked") // we use a runtime check to make sure the 'T's equal
     @Override public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
       return typeToken.getRawType() == Date.class ? (TypeAdapter<T>) new DateTypeAdapter() : null;
     }
   };
 
-  private final DateFormat enUsFormat
-      = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.DEFAULT, Locale.US);
-  private final DateFormat localFormat
-      = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.DEFAULT);
+  /**
+   * List of 1 or more different date formats used for de-serialization attempts.
+   * The first of them (default US format) is used for serialization as well.
+   */
+  private final List<DateFormat> dateFormats = new ArrayList<DateFormat>();
+
+  public DateTypeAdapter() {
+    dateFormats.add(DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.DEFAULT, Locale.US));
+    if (!Locale.getDefault().equals(Locale.US)) {
+      dateFormats.add(DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.DEFAULT));
+    }
+    if (JavaVersion.isJava9OrLater()) {
+      dateFormats.add(PreJava9DateFormatProvider.getUSDateTimeFormat(DateFormat.DEFAULT, DateFormat.DEFAULT));
+    }
+  }
 
   @Override public Date read(JsonReader in) throws IOException {
     if (in.peek() == JsonToken.NULL) {
@@ -61,13 +76,10 @@ public final class DateTypeAdapter extends TypeAdapter<Date> {
   }
 
   private synchronized Date deserializeToDate(String json) {
-    try {
-      return localFormat.parse(json);
-    } catch (ParseException ignored) {
-    }
-    try {
-      return enUsFormat.parse(json);
-    } catch (ParseException ignored) {
+    for (DateFormat dateFormat : dateFormats) {
+      try {
+        return dateFormat.parse(json);
+      } catch (ParseException ignored) {}
     }
     try {
     	return ISO8601Utils.parse(json, new ParsePosition(0));
@@ -81,7 +93,7 @@ public final class DateTypeAdapter extends TypeAdapter<Date> {
       out.nullValue();
       return;
     }
-    String dateFormatAsString = enUsFormat.format(value);
+    String dateFormatAsString = dateFormats.get(0).format(value);
     out.value(dateFormatAsString);
   }
   

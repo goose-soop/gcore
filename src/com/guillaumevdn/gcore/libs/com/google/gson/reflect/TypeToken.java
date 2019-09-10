@@ -16,15 +16,14 @@
 
 package com.guillaumevdn.gcore.libs.com.google.gson.reflect;
 
+import com.guillaumevdn.gcore.libs.com.google.gson.internal.$Gson$Types;
+import com.guillaumevdn.gcore.libs.com.google.gson.internal.$Gson$Preconditions;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.HashMap;
 import java.util.Map;
-
-import com.guillaumevdn.gcore.libs.com.google.gson.internal.$Gson$Preconditions;
-import com.guillaumevdn.gcore.libs.com.google.gson.internal.$Gson$Types;
 
 /**
  * Represents a generic type {@code T}. Java doesn't yet provide a way to
@@ -58,7 +57,7 @@ public class TypeToken<T> {
    * parameter in the anonymous class's type hierarchy so we can reconstitute it
    * at runtime despite erasure.
    */
-  
+  @SuppressWarnings("unchecked")
   protected TypeToken() {
     this.type = getSuperclassTypeParameter(getClass());
     this.rawType = (Class<? super T>) $Gson$Types.getRawType(type);
@@ -68,7 +67,7 @@ public class TypeToken<T> {
   /**
    * Unsafe. Constructs a type literal manually.
    */
-  
+  @SuppressWarnings("unchecked")
   TypeToken(Type type) {
     this.type = $Gson$Types.canonicalize($Gson$Preconditions.checkNotNull(type));
     this.rawType = (Class<? super T>) $Gson$Types.getRawType(this.type);

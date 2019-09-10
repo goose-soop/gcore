@@ -114,7 +114,7 @@ public class JsonMessage {
 					colors[i] = "{\"text\":\"\"}";
 				} else {
 					ChatColor color = ChatColor.getByChar(colors[i].substring(0, 1));
-					colors[i] = "{\"text\":\"" + colors[i].substring(1, colors[i].length()) + "\",\"color\":\"" + color.name().toLowerCase(Locale.US) + "\"}";
+					colors[i] = "{\"text\":\"" + colors[i].substring(1) + "\",\"color\":\"" + color.name().toLowerCase(Locale.US) + "\"}";
 				}
 				if (i + 1 != colors.length) colors[i] = colors[i] + ",";
 			}

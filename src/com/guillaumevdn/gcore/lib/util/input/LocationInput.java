@@ -6,6 +6,6 @@ import org.bukkit.entity.Player;
 public interface LocationInput {
 
 	// methods
-	public void onChoose(Player player, Location value);
+    void onChoose(Player player, Location value);
 
 }

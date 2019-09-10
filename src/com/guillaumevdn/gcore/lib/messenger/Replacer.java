@@ -106,7 +106,7 @@ public class Replacer {
 				foundMultiple = true;
 				int indexOf = line.indexOf(placeholder);
 				String prefix = line.substring(0, indexOf);
-				String suffix = line.substring(indexOf + placeholder.length(), line.length());
+				String suffix = line.substring(indexOf + placeholder.length());
 				List<String> temp = replacementsMultiple.get(placeholder);
 				for (int i = 0; i < temp.size(); i++) {
 					// apply single replacers and add line

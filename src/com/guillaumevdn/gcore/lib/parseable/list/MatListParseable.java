@@ -47,7 +47,7 @@ public abstract class MatListParseable<T extends Parseable> extends ListParseabl
 						delete.setValue(Boolean.FALSE);
 						// delete and callback
 						getElements().remove(element.getId());
-						onModif.callback(gui, player);
+						onModif.callback(null, gui, player);
 						// re-fill and open
 						gui.open(player);
 						return;
@@ -92,7 +92,7 @@ public abstract class MatListParseable<T extends Parseable> extends ListParseabl
 									GLocale.MSG_GENERIC_DUPLICATEELEMENT.send(player, "{id}", valName);
 								} else {
 									createElement(valName);
-									onModif.callback(gui, player);
+									onModif.callback(null, gui, player);
 								}
 								gui.open(player);// re-fill and open
 							}

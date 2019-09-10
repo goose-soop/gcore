@@ -47,8 +47,8 @@ public class PPMatList extends PrimitiveParseable<List<Mat>> {
 	@Override
 	protected void fillEditor(final EditorGUI gui, Player player, final ModifCallback onModif) {
 		// current and delete
-		EditorGUI.fillItemCurrent(gui, player, this, 20, onModif);
-		EditorGUI.fillItemDelete(gui, player, this, 24, onModif);
+		EditorGUI.fillItemCurrent(gui, player, 20, this, onModif);
+		EditorGUI.fillItemDelete(gui, player, 24, this, onModif);
 		// set line icons
 		if (getValue() != null) {
 			for (int i = 0; i < getValue().size(); ++i) {
@@ -73,9 +73,9 @@ public class PPMatList extends PrimitiveParseable<List<Mat>> {
 											getValue().set(index, value);
 										}
 									});
-									EditorGUI.fillItemDelete(subThis, player, 6, onModif, new ModifCallback() {
+									EditorGUI.fillItemDelete(subThis, player, 6, onModif, new ModifCallback(null) {
 										@Override
-										public void callback(EditorGUI from, Player player) {
+										protected void onModif(Object instance, EditorGUI from, Player player) {
 											getValue().remove(index);
 										}
 									});
@@ -89,14 +89,14 @@ public class PPMatList extends PrimitiveParseable<List<Mat>> {
 												protected void fill() {
 													// add values
 													for (final Mat val : Utils.asSortedList(Mat.values(), Utils.objectSorter)) {
-														if (!val.exists()) continue;
+														if (!val.exists() || !val.canHaveItem()) continue;
 														final String valName = val.getModernName();
 														setRegularItem(new EditorItem("value_" + valName, -1, val, "§6" + valName, null) {
 															@Override
 															protected void onClick(final Player player, final ClickType clickType, final int pageIndex) {
 																// replace value
 																getValue().set(index, valName);
-																onModif.callback(gui, player);
+																onModif.callback(null, gui, player);
 																// re-fill and open
 																subThis.open(player);
 															}
@@ -131,7 +131,7 @@ public class PPMatList extends PrimitiveParseable<List<Mat>> {
 						else if (clickType.isRightClick()) {
 							// delete value
 							getValue().remove(index);
-							onModif.callback(gui, player);
+							onModif.callback(null, gui, player);
 							// re-fill and open
 							gui.open(player);
 						}
@@ -149,7 +149,7 @@ public class PPMatList extends PrimitiveParseable<List<Mat>> {
 				} else {
 					getValue().add(Mat.GRASS_BLOCK.getModernName());
 				}
-				onModif.callback(gui, player);
+				onModif.callback(null, gui, player);
 				// re-fill and open
 				gui.open(player);
 			}

@@ -7,6 +7,6 @@ import com.guillaumevdn.gcore.lib.npc.Npc;
 public interface NpcInput {
 
 	// methods
-	public void onChoose(Player player, Npc value);
+    void onChoose(Player player, Npc value);
 
 }

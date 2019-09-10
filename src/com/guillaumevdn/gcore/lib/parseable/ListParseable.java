@@ -149,7 +149,7 @@ public abstract class ListParseable<T extends Parseable> extends Parseable {
 						delete.setValue(Boolean.FALSE);
 						// delete and callback
 						elements.remove(element.getId());
-						onModif.callback(gui, player);
+						onModif.callback(null, gui, player);
 						// re-fill and open
 						gui.open(player);
 						return;
@@ -194,7 +194,7 @@ public abstract class ListParseable<T extends Parseable> extends Parseable {
 								GLocale.MSG_GENERIC_DUPLICATEELEMENT.send(player, "{id}", value);
 							} else {
 								createElement(value);
-								onModif.callback(gui, player);
+								onModif.callback(null, gui, player);
 							}
 						}
 						gui.open(player);// re-fill and open

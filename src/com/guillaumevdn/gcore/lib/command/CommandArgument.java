@@ -105,7 +105,7 @@ public class CommandArgument {
 	}
 
 	public boolean canUse(CommandSender sender) {
-		return (isPlayerOnly() ? Utils.instanceOf(sender, CommandSender.class) : true) && (getPermission() == null ? true : getPermission().has(sender));
+		return (! isPlayerOnly() || Utils.instanceOf(sender, CommandSender.class)) && (getPermission() == null || getPermission().has(sender));
 	}
 
 	public List<String> getHelp(CommandSender sender) {
@@ -190,12 +190,12 @@ public class CommandArgument {
 			return true;
 		}
 		// sender isn't a player, so return false
-		if (playerOnly ? !call.senderIsPlayer() : false) {
+		if (playerOnly && ! call.senderIsPlayer()) {
 			GLocale.MSG_GENERIC_NOTPLAYER.send(call.getSender(), "{plugin}", plugin.getName());
 			return true;
 		}
 		// sender doesn't have permission, so return false
-		if (permission == null ? false : !permission.has(call.getSender())) {
+		if (permission != null && ! permission.has(call.getSender())) {
 			GLocale.MSG_GENERIC_NOPERMISSION.send(call.getSender(), "{plugin}", plugin.getName());
 			return true;
 		}

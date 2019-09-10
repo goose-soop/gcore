@@ -62,7 +62,6 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
@@ -232,7 +231,7 @@ public class Utils {
 
 	public static boolean isPluginEnabled(String name) {
 		Plugin plugin = getPlugin(name);
-		return plugin == null ? false : plugin.isEnabled();
+		return plugin != null && plugin.isEnabled();
 	}
 
 	// ------------------------------------------------------------
@@ -488,7 +487,7 @@ public class Utils {
 
 	public static String getClassActualName(Class<?> clazz) {
 		String name = clazz.getName();
-		return name.contains(".") ? name.substring(name.lastIndexOf(".") + 1, name.length()) : name;
+		return name.contains(".") ? name.substring(name.lastIndexOf(".") + 1) : name;
 	}
 
 	public static boolean hasOneSuper(Class<?> toCheck, Collection<? extends Class<?>> superclasses) {
@@ -756,7 +755,7 @@ public class Utils {
 	public static void resetLife(Player player)
 	{
 		player.resetMaxHealth();
-		player.setHealth(((Damageable) player).getMaxHealth());
+		player.setHealth(player.getMaxHealth());
 		player.setFoodLevel(20);
 	}
 
@@ -777,7 +776,7 @@ public class Utils {
 		if (allow) {
 			player.setAllowFlight(true);
 		} else {
-			player.setAllowFlight(player.getGameMode().equals(GameMode.CREATIVE) ? true : false);
+			player.setAllowFlight(player.getGameMode().equals(GameMode.CREATIVE));
 			player.setFlying(false);
 		}
 	}
@@ -1067,10 +1066,7 @@ public class Utils {
 		double minX = Math.min(x1, x2), maxX = Math.max(x1, x2);
 		double minY = Math.min(y1, y2), maxY = Math.max(y1, y2);
 		double minZ = Math.min(z1, z2), maxZ = Math.max(z1, z2);
-		if (loc.getBlockX() < minX || loc.getBlockX() > maxX || loc.getBlockZ() < minZ || loc.getBlockZ() > maxZ || (checkY && (loc.getBlockY() < minY || loc.getBlockY() > maxY))) {
-			return false;
-		}
-		return true;
+		return ! (loc.getBlockX() < minX) && ! (loc.getBlockX() > maxX) && ! (loc.getBlockZ() < minZ) && ! (loc.getBlockZ() > maxZ) && (! checkY || (! (loc.getBlockY() < minY) && ! (loc.getBlockY() > maxY)));
 	}
 
 	public static boolean isBlockInArea(BlockCoords block, BlockCoords p1, BlockCoords p2) {
@@ -1630,7 +1626,7 @@ public class Utils {
 		List<String> split = new ArrayList<String>();
 		for (String str : string.split(separator, allowEmpty ? -1 : 0)) {
 			str = str == null ? "" : str;
-			if (allowEmpty ? true : !str.isEmpty()) {
+			if (allowEmpty || ! str.isEmpty()) {
 				split.add(str == null ? "" : str);
 			}
 		}
@@ -1942,7 +1938,7 @@ public class Utils {
 
 	public static Pair<String, String> separateRootAtChar(String string, char separator) {
 		int index = string.indexOf(separator);
-		return index != -1 ? new Pair<String, String>(string.substring(0, index), string.substring(index + 1, string.length())) : new Pair<String, String>(string, null);
+		return index != -1 ? new Pair<String, String>(string.substring(0, index), string.substring(index + 1)) : new Pair<String, String>(string, null);
 	}
 
 	private static String lastInventoryName = null;
@@ -2086,7 +2082,7 @@ public class Utils {
 	public static boolean isNull(Object obj) {// TODO : what in the world is that thing ; edit : no, really, what the FUCK is that ???? WHERE ????
 		try {
 			obj.getClass();
-			return obj == null ? true : false;
+			return obj == null;
 		} catch (Throwable ignored) {
 			return true;
 		}
@@ -2101,11 +2097,11 @@ public class Utils {
 	}
 
 	public static <T> boolean instanceOf(T obj, Class<?> typeClass) {
-		return typeClass == null ? obj == null : (obj == null ? false : typeClass.isAssignableFrom(obj.getClass()));
+		return typeClass == null ? obj == null : (obj != null && typeClass.isAssignableFrom(obj.getClass()));
 	}
 
 	public static <T> boolean instanceOf(Class<?> objClass, Class<?> typeClass) {
-		return typeClass == null ? objClass == null : (objClass == null ? false : typeClass.isAssignableFrom(objClass));
+		return typeClass == null ? objClass == null : (objClass != null && typeClass.isAssignableFrom(objClass));
 	}
 
 	public static boolean isNumeric(String str) {
@@ -2415,9 +2411,23 @@ public class Utils {
 			return "/";
 		}
 		String str = "";
-		for (T t : list) str += String.valueOf(t) + "," + (spaces ? " " : "");
+		for (T t : list) str += t + "," + (spaces ? " " : "");
 		str = str.substring(0, str.length() - ("," + (spaces ? " " : "")).length());
 		return str;
+	}
+
+	public static <K, V> String asNiceString(Map<K, V> map, boolean spaces) {
+		if (map == null || map.isEmpty()) {
+			return "/";
+		}
+		StringBuilder builder = new StringBuilder();
+		Wrapper<Integer> i = new Wrapper<Integer>(-1);
+		map.forEach((k, v) -> {
+			builder.append(k + " : " + v);
+			i.setValue(i.getValue() + 1);
+			if (i.getValue() + 1 < map.size()) builder.append(spaces ? ", " : ",");
+		});
+		return builder.toString();
 	}
 
 	public static List<String> fromNiceString(String string, boolean spaces) {
@@ -2432,7 +2442,7 @@ public class Utils {
 			return "/";
 		}
 		String str = "";
-		for (T t : array) str += String.valueOf(t) + ", ";
+		for (T t : array) str += t + ", ";
 		str = str.substring(0, str.length() - ", ".length());
 		return spaces ? str : str.replace(" ", "");
 	}
@@ -2444,7 +2454,7 @@ public class Utils {
 		}
 
 		String str = "[ ";
-		for (T t : array) str += "'" + String.valueOf(t) + "', ";
+		for (T t : array) str += "'" + t + "', ";
 		str = str.substring(0, str.length() - ", ".length()) + " ]";
 		return str;
 	}
@@ -2456,7 +2466,7 @@ public class Utils {
 		}
 
 		String str = "[ ";
-		for (T t : list) str += "'" + String.valueOf(t) + "', ";
+		for (T t : list) str += "'" + t + "', ";
 		str = str.substring(0, str.length() - ", ".length()) + " ]";
 		return str;
 	}
@@ -2468,7 +2478,7 @@ public class Utils {
 		}
 
 		String str = "{ ";
-		for (K k : map.keySet()) str += "['" + String.valueOf(k) + "', '" + String.valueOf(map.get(k)) + "'], ";
+		for (K k : map.keySet()) str += "['" + k + "', '" + map.get(k) + "'], ";
 		str = str.substring(0, str.length() - ", ".length()) + " }";
 		return str;
 	}
@@ -2573,11 +2583,11 @@ public class Utils {
 	}
 
 	public static int getMillisInMinutes(long millis) {
-		return (int) (getMillisInSeconds(millis) / 60);
+		return getMillisInSeconds(millis) / 60;
 	}
 
 	public static int getMillisInHours(long millis) {
-		return (int) (getMillisInSeconds(millis) / 60);
+		return getMillisInSeconds(millis) / 60;
 	}
 
 	public static long getSecondsInTicks(int seconds) {

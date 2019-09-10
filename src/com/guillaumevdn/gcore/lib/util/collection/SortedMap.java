@@ -243,7 +243,7 @@ public class SortedMap<K, V> implements Cloneable {
 
 	// type enum
 	public enum Type {
-		KEY_SORTED, VALUE_SORTED, UNSORTED;
+		KEY_SORTED, VALUE_SORTED, UNSORTED
 	}
 
 	// order enum

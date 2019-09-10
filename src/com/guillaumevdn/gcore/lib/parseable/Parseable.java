@@ -135,12 +135,9 @@ public abstract class Parseable implements Comparable<Parseable>, Cloneable {
 			return false;
 		Parseable other = (Parseable) obj;
 		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		return true;
-	}
+            return other.id == null;
+		} else return id.equals(other.id);
+    }
 
 	// clone
 	protected Parseable() {

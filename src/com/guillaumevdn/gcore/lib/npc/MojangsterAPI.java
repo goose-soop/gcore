@@ -13,7 +13,7 @@ import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -41,14 +41,14 @@ public class MojangsterAPI {
 	public static HashMap<String, Boolean> getMojangStatus() {
 		final HashMap<String, Boolean> hashMap = new HashMap<String, Boolean>();
 		try {
-			final InputStream inputStream = ((HttpURLConnection) makeConnection(new URL("http://status.mojang.com/check"))).getInputStream();
+			final InputStream inputStream = makeConnection(new URL("http://status.mojang.com/check")).getInputStream();
 			try {
-				final JSONArray jsonArray = (JSONArray)new JSONParser().parse(readAll(new BufferedReader(new InputStreamReader(inputStream, Charset.forName("UTF-8")))));
+				final JSONArray jsonArray = (JSONArray)new JSONParser().parse(readAll(new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))));
 				for (int i = 0; i < jsonArray.size(); ++i) {
 					final JSONObject jsonObject = (JSONObject)jsonArray.get(i);
 					final String s = (String) jsonObject.keySet().iterator().next();
 					boolean b = false;
-					final String s2 = (String)jsonObject.get((Object)s);
+					final String s2 = (String)jsonObject.get(s);
 					switch (s2) {
 					case "green": {
 						b = true;
@@ -81,7 +81,7 @@ public class MojangsterAPI {
 		try {
 			InputStream inputStream = (makeConnection(new URL("http://api.mcplayerindex.com/raw/<uuid>/signed".replaceAll("<uuid>", uuid.toString().replaceAll("-", ""))))).getInputStream();
 			try {
-				JSONObject jsonObject = (JSONObject) new JSONParser().parse(readAll(new BufferedReader(new InputStreamReader(inputStream, Charset.forName("UTF-8")))));
+				JSONObject jsonObject = (JSONObject) new JSONParser().parse(readAll(new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))));
 				array[0] = jsonObject.get("name");
 				JSONArray jsonArray = (JSONArray)jsonObject.get("properties");
 				for (int i = 0; i < jsonArray.size(); ++i) {
@@ -136,7 +136,7 @@ public class MojangsterAPI {
 			}
 			InputStream inputStream = httpURLConnection.getInputStream();
 			try {
-				return (String)((JSONObject)((JSONArray)new JSONParser().parse(readAll(new BufferedReader(new InputStreamReader(inputStream, Charset.forName("UTF-8")))))).get(0)).get("name");
+				return (String)((JSONObject)((JSONArray)new JSONParser().parse(readAll(new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))))).get(0)).get("name");
 			}
 			finally {
 				inputStream.close();
@@ -176,10 +176,10 @@ public class MojangsterAPI {
 	private static Object getSessionService() {
 		Server server = Bukkit.getServer();
 		try {
-			Object invoke = server.getClass().getDeclaredMethod("getServer", (Class<?>[]) new Class[0]).invoke(server, new Object[0]);
+			Object invoke = server.getClass().getDeclaredMethod("getServer", new Class[0]).invoke(server);
 			for (Method method : invoke.getClass().getMethods()) {
 				if (method.getReturnType().getSimpleName().equalsIgnoreCase("MinecraftSessionService")) {
-					return method.invoke(invoke, new Object[0]);
+					return method.invoke(invoke);
 				}
 			}
 		}

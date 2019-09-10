@@ -195,11 +195,11 @@ public final class JsonArray extends JsonElement implements Iterable<JsonElement
   }
 
   /**
-   * convenience method to get this array as a {@link Addition} if it contains a single element.
+   * convenience method to get this array as a {@link Number} if it contains a single element.
    *
    * @return get this element as a number if it is single element array.
    * @throws ClassCastException if the element in the array is of not a {@link JsonPrimitive} and
-   * is not a valid Addition.
+   * is not a valid Number.
    * @throws IllegalStateException if the array has more than one element.
    */
   @Override

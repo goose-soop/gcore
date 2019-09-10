@@ -42,9 +42,9 @@ public class PPStateSetting extends PrimitiveParseable<StateSetting> {
 	@Override
 	protected void fillEditor(final EditorGUI gui, Player player, final ModifCallback onModif) {
 		// current, raw and delete
-		EditorGUI.fillItemCurrent(gui, player, this, 0, onModif);
+		EditorGUI.fillItemCurrent(gui, player, 0, this, onModif);
 		EditorGUI.fillItemRaw(gui, player, this, 4, getValue() == null || getValue().isEmpty() ? null : getValue().get(0), onModif);
-		EditorGUI.fillItemDelete(gui, player, this, 6, onModif);
+		EditorGUI.fillItemDelete(gui, player, 6, this, onModif);
 		// select
 		gui.setRegularItem(new EditorItem("control_item_select", 2, Mat.ENDER_CHEST, GLocale.GUI_GENERIC_EDITORENUMTYPESELECT.getLine(), GLocale.GUI_GENERIC_EDITORENUMSELECTLORE.getLines()) {
 			@Override
@@ -67,7 +67,7 @@ public class PPStateSetting extends PrimitiveParseable<StateSetting> {
 									} else {
 										setValue(Utils.asList(valName));
 									}
-									onModif.callback(gui, player);
+									onModif.callback(null, gui, player);
 									// re-fill and open
 									gui.open(player);
 								}
@@ -96,7 +96,7 @@ public class PPStateSetting extends PrimitiveParseable<StateSetting> {
 								getValue().set(0, curr.split(" ")[0] + " " + value);
 							}
 						}
-						onModif.callback(gui, player);
+						onModif.callback(null, gui, player);
 						// re-fill and open
 						gui.open(player);
 					}

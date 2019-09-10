@@ -16,7 +16,7 @@ public interface ParticleManager {
 	// Particle types
 	// ------------------------------------------------------------
 
-	public enum Type {
+	enum Type {
 
 		EXPLOSION_NORMAL("explode", "EXPLOSION_NORMAL"),
 		EXPLOSION_LARGE("largeexplode", "EXPLOSION_LARGE"),
@@ -103,17 +103,17 @@ public interface ParticleManager {
 	// Instance
 	// ------------------------------------------------------------
 
-	public ParticleManager INSTANCE = Utils.createParticleManagerCompat();
+	ParticleManager INSTANCE = Utils.createParticleManagerCompat();
 
 	// ------------------------------------------------------------
 	// Abstract
 	// ------------------------------------------------------------
 
-	public void send(ParticleManager.Type type, Location loc, float speed, int count, Collection<Player> players);
-	public void send(ParticleManager.Type type, Location loc, float speed, int count, Player player);
-	public void send(ParticleManager.Type type, Location loc, float speed, int count, World world);
-	public void sendColor(ParticleManager.Type type, Location loc, float speed, int count, Color color, Collection<Player> players);
-	public void sendColor(ParticleManager.Type type, Location loc, float speed, int count, Color color, Player player);
-	public void sendColor(ParticleManager.Type type, Location loc, float speed, int count, Color color, World world);
+	void send(ParticleManager.Type type, Location loc, float speed, int count, Collection<Player> players);
+	void send(ParticleManager.Type type, Location loc, float speed, int count, Player player);
+	void send(ParticleManager.Type type, Location loc, float speed, int count, World world);
+	void sendColor(ParticleManager.Type type, Location loc, float speed, int count, Color color, Collection<Player> players);
+	void sendColor(ParticleManager.Type type, Location loc, float speed, int count, Color color, Player player);
+	void sendColor(ParticleManager.Type type, Location loc, float speed, int count, Color color, World world);
 
 }

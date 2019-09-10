@@ -44,13 +44,13 @@ public abstract class UnsafeAllocator {
       final Method allocateInstance = unsafeClass.getMethod("allocateInstance", Class.class);
       return new UnsafeAllocator() {
         @Override
-        
+        @SuppressWarnings("unchecked")
         public <T> T newInstance(Class<T> c) throws Exception {
           assertInstantiable(c);
           return (T) allocateInstance.invoke(unsafe, c);
         }
       };
-    } catch (Throwable ignored) {
+    } catch (Exception ignored) {
     }
 
     // try dalvikvm, post-gingerbread
@@ -68,13 +68,13 @@ public abstract class UnsafeAllocator {
       newInstance.setAccessible(true);
       return new UnsafeAllocator() {
         @Override
-        
+        @SuppressWarnings("unchecked")
         public <T> T newInstance(Class<T> c) throws Exception {
           assertInstantiable(c);
           return (T) newInstance.invoke(null, c, constructorId);
         }
       };
-    } catch (Throwable ignored) {
+    } catch (Exception ignored) {
     }
 
     // try dalvikvm, pre-gingerbread
@@ -88,13 +88,13 @@ public abstract class UnsafeAllocator {
       newInstance.setAccessible(true);
       return new UnsafeAllocator() {
         @Override
-        
+        @SuppressWarnings("unchecked")
         public <T> T newInstance(Class<T> c) throws Exception {
           assertInstantiable(c);
           return (T) newInstance.invoke(null, c, Object.class);
         }
       };
-    } catch (Throwable ignored) {
+    } catch (Exception ignored) {
     }
 
     // give up

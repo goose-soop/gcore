@@ -107,7 +107,7 @@ public final class ReflectiveTypeAdapterFactory implements TypeAdapterFactory {
 			final Gson context, final Field field, final String name,
 			final TypeToken<?> fieldType, boolean serialize, boolean deserialize) {
 		final boolean isPrimitive = Primitives.isPrimitive(fieldType.getRawType());
-		// special casing primitives here saves ~5% on Android...
+		// special casing primitives here saves on Android...
 		JsonAdapter annotation = field.getAnnotation(JsonAdapter.class);
 		TypeAdapter<?> mapped = null;
 		if (annotation != null) {
@@ -119,7 +119,7 @@ public final class ReflectiveTypeAdapterFactory implements TypeAdapterFactory {
 
 		final TypeAdapter<?> typeAdapter = mapped;
 		return new ReflectiveTypeAdapterFactory.BoundField(name, serialize, deserialize) {
-			@SuppressWarnings({"unchecked", "rawtypes"}) // the type adapter and field type always agree
+			// the type adapter and field type always agree
 			@Override void write(JsonWriter writer, Object value)
 					throws IOException, IllegalAccessException {
 				Object fieldValue = field.get(value);

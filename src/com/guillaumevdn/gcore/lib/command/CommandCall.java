@@ -1,85 +1,84 @@
 package com.guillaumevdn.gcore.lib.command;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.guillaumevdn.gcore.GLocale;
-import com.guillaumevdn.gcore.lib.GPlugin;
+import com.guillaumevdn.gcore.lib.object.ObjectUtils;
 
+/**
+ * @author GuillaumeVDN
+ */
 public class CommandCall {
 
-	// base
-	private GPlugin plugin;
+	private Command command;
+	private Subcommand subcommand;
 	private CommandSender sender;
-	private String commandName;
+	private Player senderPlayer;
+	private String[] original;
 	private List<String> arguments;
-	private Map<String, String> parameters;
+	private Object[] argumentValues;
+	private List<String> parameters;
+	private boolean forTabComplete;
 
-	public CommandCall(GPlugin plugin, CommandSender sender, String commandName, List<String> arguments, Map<String, String> parameters) {
-		this.plugin = plugin;
+	public CommandCall(Command command, Subcommand subcommand, CommandSender sender, String[] original, List<String> arguments, List<String> parameters) {
+		this(command, subcommand, sender, original, arguments, parameters, false);
+	}
+
+	public CommandCall(Command command, Subcommand subcommand, CommandSender sender, String[] original, List<String> arguments, List<String> parameters, boolean forTabComplete) {
+		this.subcommand = subcommand;
 		this.sender = sender;
-		this.commandName = commandName;
-		this.arguments = Collections.unmodifiableList(arguments);
-		this.parameters = Collections.unmodifiableMap(parameters);
+		this.senderPlayer = ObjectUtils.castOrNull(sender, Player.class);
+		this.original = original;
+		this.arguments = arguments;
+		this.argumentValues = new Object[subcommand.getArguments().size()];
+		this.parameters = parameters;
+		this.forTabComplete = forTabComplete;
 	}
 
 	// get
-	public GPlugin getPlugin() {
-		return plugin;
+	public Command getCommand() {
+		return command;
+	}
+
+	public Subcommand getSubcommand() {
+		return subcommand;
 	}
 
 	public CommandSender getSender() {
 		return sender;
 	}
 
-	public Player getSenderAsPlayer() {
-		return (Player) sender;
+	public Player getSenderPlayer() {
+		return senderPlayer;
 	}
 
-	public boolean senderIsPlayer() {
-		return sender instanceof Player;
-	}
-
-	public boolean ensureSenderIsPlayer() {
-		// isn't player
-		if (!senderIsPlayer()) {
-			GLocale.MSG_GENERIC_NOTPLAYER.send(sender, "{plugin}", plugin.getName());
-			return false;
-		}
-		// is player
-		return true;
-	}
-
-	public String getCommandName() {
-		return commandName;
-	}
-
-	public String getAllArguments() {
-		return getAllArguments(0);
-	}
-
-	public String getAllArguments(int beginIndex) {
-		String result = "";
-		for (int i = beginIndex; i < arguments.size(); i++) {
-			result += " " + arguments.get(i);
-		}
-		if (result.length() > 0) {
-			result = result.substring(1);
-		}
-		return result;
+	public String[] getOriginal() {
+		return original;
 	}
 
 	public List<String> getArguments() {
 		return arguments;
 	}
 
-	// params
-	public Map<String, String> getParameters() {
+	public <T> T getArgumentValue(int index) {
+		return index < 0 || index >= argumentValues.length ? null : (T) argumentValues[index];
+	}
+
+	public List<String> getParameters() {
 		return parameters;
+	}
+
+	public boolean isForTabComplete() {
+		return forTabComplete;
+	}
+
+	// set
+	public void setArgumentValue(int index, Object value) {
+		if (index < argumentValues.length) {
+			argumentValues[index] = value;
+		}
 	}
 
 }

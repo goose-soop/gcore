@@ -1,0 +1,81 @@
+package com.guillaumevdn.gcore.lib.player;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.List;
+import java.util.UUID;
+
+import javax.net.ssl.HttpsURLConnection;
+
+import com.guillaumevdn.gcore.GCore;
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
+import com.mojang.util.UUIDTypeAdapter;
+
+/**
+ * @author GuillaumeVDN
+ */
+public final class MojangUtils {
+
+	public static UUID fetchUUID(String name) throws Throwable {
+		NameAnswer answer = jsonRequest("https://api.mojang.com/users/profiles/minecraft/" + name + "?at=" + (System.currentTimeMillis() / 1000L - 100L) + "&unsigned=false", NameAnswer.class);
+		if (answer.id != null) {
+			return answer.id;
+		}
+		throw new Error("No id found");
+	}
+
+	public static GameProfile fetchProfile(UUID uuid) throws Throwable {
+		ProfileAnswer answer = jsonRequest("https://sessionserver.mojang.com/session/minecraft/profile/" + UUIDTypeAdapter.fromUUID(uuid) + "?unsigned=false", ProfileAnswer.class);
+		if (answer.name == null) throw new Error("No name found");
+		if (answer.properties == null || answer.properties.isEmpty()) throw new Error("No properties found");
+		for (ProfileProperty property : answer.properties) {
+			if (property.name.equalsIgnoreCase("textures")) {
+				// find textures
+				if (property.value == null) throw new Error("No value found in textures property");
+				if (property.signature == null) throw new Error("No signature found in textures property");
+				// we good
+				GameProfile profile = new GameProfile(uuid, answer.name);
+				profile.getProperties().put("textures", new Property("textures", property.value, property.signature));
+				return profile;
+			}
+		}
+		throw new Error("No textures property found");
+	}
+
+	private static <T> T jsonRequest(String url, Class<T> answerType) throws Throwable {
+		HttpsURLConnection connection = (HttpsURLConnection) new URL(url).openConnection();
+		if (connection.getResponseCode() == HttpsURLConnection.HTTP_OK) {
+			// read json
+			String json = "";
+			BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+			for (String line; (line = reader.readLine()) != null; ) {
+				json += line;
+			}
+			// read answer
+			try {
+				return GCore.inst().getGson().fromJson(json, answerType);
+			} catch (Throwable exception) {
+				System.out.println("Raw json : " + json);
+				throw new Error("couldn't read answer", exception);
+			}
+		} else {
+			throw new Error("Reponse code " + connection.getResponseCode() + ", " + connection.getResponseMessage());
+		}
+	}
+
+	private static class NameAnswer {
+		private UUID id;
+	}
+
+	private static class ProfileAnswer {
+		private String name;
+		private List<ProfileProperty> properties;
+	}
+
+	private static class ProfileProperty {
+		private String name, value, signature;
+	}
+
+}

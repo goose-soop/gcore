@@ -1,0 +1,28 @@
+package com.guillaumevdn.gcore.lib.time.in;
+
+import java.time.LocalDateTime;
+
+/**
+ * @author GuillaumeVDN
+ */
+public abstract class TimeIn {
+
+	protected final int hour, minute;
+
+	public TimeIn(int hour, int minute) {
+		this.hour = hour;
+		this.minute = minute;
+	}
+
+	// get
+	public final int getHour() {
+		return hour;
+	}
+
+	public final int getMinute() {
+		return minute;
+	}
+
+	public abstract LocalDateTime getCurrent();
+
+}

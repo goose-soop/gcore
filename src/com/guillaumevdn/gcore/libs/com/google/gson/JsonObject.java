@@ -16,10 +16,10 @@
 
 package com.guillaumevdn.gcore.libs.com.google.gson;
 
-import com.guillaumevdn.gcore.libs.com.google.gson.internal.LinkedTreeMap;
-
 import java.util.Map;
 import java.util.Set;
+
+import com.guillaumevdn.gcore.libs.com.google.gson.internal.LinkedTreeMap;
 
 /**
  * A class representing an object type in Json. An object consists of name-value pairs where names

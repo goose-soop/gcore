@@ -428,7 +428,7 @@ public final class Gson {
    * @throws IllegalArgumentException if this GSON cannot serialize and
    *     deserialize {@code type}.
    */
-  @SuppressWarnings("unchecked")
+  
   public <T> TypeAdapter<T> getAdapter(TypeToken<T> type) {
     TypeAdapter<?> cached = typeTokenCache.get(type == null ? NULL_KEY_SURROGATE : type);
     if (cached != null) {
@@ -461,7 +461,7 @@ public final class Gson {
           return candidate;
         }
       }
-      throw new IllegalArgumentException("GSON (2.8.5) cannot handle " + type);
+      throw new IllegalArgumentException("GSON cannot handle " + type);
     } finally {
       threadCalls.remove(type);
 
@@ -504,8 +504,6 @@ public final class Gson {
    *  StatsTypeAdapterFactory stats = new StatsTypeAdapterFactory();
    *  Gson gson = new GsonBuilder().registerTypeAdapterFactory(stats).create();
    *  // Call gson.toJson() and fromJson methods on objects
-   *  System.out.println("Num JSON reads" + stats.numReads);
-   *  System.out.println("Num JSON writes" + stats.numWrites);
    *  }</pre>
    *  Note that this call will skip all factories registered before {@code skipPast}. In case of
    *  multiple TypeAdapterFactories registered it is up to the caller of this function to insure
@@ -690,7 +688,7 @@ public final class Gson {
    * {@code writer}.
    * @throws JsonIOException if there was a problem writing to the writer
    */
-  @SuppressWarnings("unchecked")
+  
   public void toJson(Object src, Type typeOfSrc, JsonWriter writer) throws JsonIOException {
     TypeAdapter<?> adapter = getAdapter(TypeToken.get(typeOfSrc));
     boolean oldLenient = writer.isLenient();
@@ -704,7 +702,7 @@ public final class Gson {
     } catch (IOException e) {
       throw new JsonIOException(e);
     } catch (AssertionError e) {
-      AssertionError error = new AssertionError("AssertionError (GSON 2.8.5): " + e.getMessage());
+      AssertionError error = new AssertionError("AssertionError : " + e.getMessage());
       error.initCause(e);
       throw error;
     } finally {
@@ -784,7 +782,7 @@ public final class Gson {
     } catch (IOException e) {
       throw new JsonIOException(e);
     } catch (AssertionError e) {
-      AssertionError error = new AssertionError("AssertionError (GSON 2.8.5): " + e.getMessage());
+      AssertionError error = new AssertionError("AssertionError : " + e.getMessage());
       error.initCause(e);
       throw error;
     } finally {
@@ -836,7 +834,7 @@ public final class Gson {
    * @throws JsonParseException if json is not a valid representation for an object of type typeOfT
    * @throws JsonSyntaxException if json is not a valid representation for an object of type
    */
-  @SuppressWarnings("unchecked")
+  
   public <T> T fromJson(String json, Type typeOfT) throws JsonSyntaxException {
     if (json == null) {
       return null;
@@ -890,7 +888,7 @@ public final class Gson {
    * @throws JsonSyntaxException if json is not a valid representation for an object of type
    * @since 1.2
    */
-  @SuppressWarnings("unchecked")
+  
   public <T> T fromJson(Reader json, Type typeOfT) throws JsonIOException, JsonSyntaxException {
     JsonReader jsonReader = newJsonReader(json);
     T object = (T) fromJson(jsonReader, typeOfT);
@@ -918,7 +916,7 @@ public final class Gson {
    * @throws JsonIOException if there was a problem writing to the Reader
    * @throws JsonSyntaxException if json is not a valid representation for an object of type
    */
-  @SuppressWarnings("unchecked")
+  
   public <T> T fromJson(JsonReader reader, Type typeOfT) throws JsonIOException, JsonSyntaxException {
     boolean isEmpty = true;
     boolean oldLenient = reader.isLenient();
@@ -942,10 +940,9 @@ public final class Gson {
     } catch (IllegalStateException e) {
       throw new JsonSyntaxException(e);
     } catch (IOException e) {
-      // TODO(inder): Figure out whether it is indeed right to rethrow this as JsonSyntaxException
       throw new JsonSyntaxException(e);
     } catch (AssertionError e) {
-      AssertionError error = new AssertionError("AssertionError (GSON 2.8.5): " + e.getMessage());
+      AssertionError error = new AssertionError("AssertionError : " + e.getMessage());
       error.initCause(e);
       throw error;
     } finally {
@@ -994,7 +991,7 @@ public final class Gson {
    * @throws JsonSyntaxException if json is not a valid representation for an object of type typeOfT
    * @since 1.3
    */
-  @SuppressWarnings("unchecked")
+  
   public <T> T fromJson(JsonElement json, Type typeOfT) throws JsonSyntaxException {
     if (json == null) {
       return null;

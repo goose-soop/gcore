@@ -16,6 +16,14 @@
 
 package com.guillaumevdn.gcore.libs.com.google.gson;
 
+import static com.guillaumevdn.gcore.libs.com.google.gson.Gson.DEFAULT_COMPLEX_MAP_KEYS;
+import static com.guillaumevdn.gcore.libs.com.google.gson.Gson.DEFAULT_ESCAPE_HTML;
+import static com.guillaumevdn.gcore.libs.com.google.gson.Gson.DEFAULT_JSON_NON_EXECUTABLE;
+import static com.guillaumevdn.gcore.libs.com.google.gson.Gson.DEFAULT_LENIENT;
+import static com.guillaumevdn.gcore.libs.com.google.gson.Gson.DEFAULT_PRETTY_PRINT;
+import static com.guillaumevdn.gcore.libs.com.google.gson.Gson.DEFAULT_SERIALIZE_NULLS;
+import static com.guillaumevdn.gcore.libs.com.google.gson.Gson.DEFAULT_SPECIALIZE_FLOAT_VALUES;
+
 import java.lang.reflect.Type;
 import java.sql.Timestamp;
 import java.text.DateFormat;
@@ -32,14 +40,6 @@ import com.guillaumevdn.gcore.libs.com.google.gson.internal.bind.TreeTypeAdapter
 import com.guillaumevdn.gcore.libs.com.google.gson.internal.bind.TypeAdapters;
 import com.guillaumevdn.gcore.libs.com.google.gson.reflect.TypeToken;
 import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonReader;
-
-import static com.guillaumevdn.gcore.libs.com.google.gson.Gson.DEFAULT_COMPLEX_MAP_KEYS;
-import static com.guillaumevdn.gcore.libs.com.google.gson.Gson.DEFAULT_ESCAPE_HTML;
-import static com.guillaumevdn.gcore.libs.com.google.gson.Gson.DEFAULT_JSON_NON_EXECUTABLE;
-import static com.guillaumevdn.gcore.libs.com.google.gson.Gson.DEFAULT_LENIENT;
-import static com.guillaumevdn.gcore.libs.com.google.gson.Gson.DEFAULT_PRETTY_PRINT;
-import static com.guillaumevdn.gcore.libs.com.google.gson.Gson.DEFAULT_SERIALIZE_NULLS;
-import static com.guillaumevdn.gcore.libs.com.google.gson.Gson.DEFAULT_SPECIALIZE_FLOAT_VALUES;
 
 /**
  * <p>Use this builder to construct a {@link Gson} instance when you need to set configuration
@@ -217,7 +217,6 @@ public final class GsonBuilder {
    *   Map<Point, String> original = new LinkedHashMap<Point, String>();
    *   original.put(new Point(5, 6), "a");
    *   original.put(new Point(8, 8), "b");
-   *   System.out.println(gson.toJson(original, type));
    * }</pre>
    * The above code prints this JSON object:<pre>  {@code
    *   {
@@ -244,7 +243,6 @@ public final class GsonBuilder {
    *   Map<Point, String> original = new LinkedHashMap<Point, String>();
    *   original.put(new Point(5, 6), "a");
    *   original.put(new Point(8, 8), "b");
-   *   System.out.println(gson.toJson(original, type));
    * }
    *
    * The JSON output would look as follows:
@@ -389,7 +387,7 @@ public final class GsonBuilder {
 
   /**
    * By default, Gson is strict and only accepts JSON as specified by
-   * <a href="http://www.ietf.org/rfc/rfc4627.txt">RFC 4627</a>. This option makes the parser
+   * <a href="http://www.ietf.org/rfc/rfc4627.txt">RFC 4627</a>. This option makes the replacer
    * liberal in what it accepts.
    *
    * @return a reference to this {@code GsonBuilder} object to fulfill the "Builder" pattern
@@ -429,7 +427,6 @@ public final class GsonBuilder {
    * @since 1.2
    */
   public GsonBuilder setDateFormat(String pattern) {
-    // TODO(Joel): Make this fail fast if it is an invalid date format
     this.datePattern = pattern;
     return this;
   }
@@ -492,7 +489,7 @@ public final class GsonBuilder {
    * {@link InstanceCreator}, {@link JsonSerializer}, and a {@link JsonDeserializer} interfaces.
    * @return a reference to this {@code GsonBuilder} object to fulfill the "Builder" pattern
    */
-  @SuppressWarnings({"unchecked", "rawtypes"})
+  
   public GsonBuilder registerTypeAdapter(Type type, Object typeAdapter) {
     $Gson$Preconditions.checkArgument(typeAdapter instanceof JsonSerializer<?>
         || typeAdapter instanceof JsonDeserializer<?>
@@ -538,7 +535,7 @@ public final class GsonBuilder {
    * @return a reference to this {@code GsonBuilder} object to fulfill the "Builder" pattern
    * @since 1.7
    */
-  @SuppressWarnings({"unchecked", "rawtypes"})
+  
   public GsonBuilder registerTypeHierarchyAdapter(Class<?> baseType, Object typeAdapter) {
     $Gson$Preconditions.checkArgument(typeAdapter instanceof JsonSerializer<?>
         || typeAdapter instanceof JsonDeserializer<?>
@@ -602,7 +599,7 @@ public final class GsonBuilder {
         this.factories, this.hierarchyFactories, factories);
   }
 
-  @SuppressWarnings("unchecked")
+  
   private void addTypeAdaptersForDate(String datePattern, int dateStyle, int timeStyle,
       List<TypeAdapterFactory> factories) {
     DefaultDateTypeAdapter dateTypeAdapter;

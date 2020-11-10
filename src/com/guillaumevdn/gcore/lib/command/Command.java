@@ -1,0 +1,334 @@
+package com.guillaumevdn.gcore.lib.command;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
+
+import com.guillaumevdn.gcore.TextGeneric;
+import com.guillaumevdn.gcore.lib.GPlugin;
+import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
+import com.guillaumevdn.gcore.lib.command.argument.Arg;
+import com.guillaumevdn.gcore.lib.command.argument.Argument;
+import com.guillaumevdn.gcore.lib.command.argument.ArgumentFixed;
+import com.guillaumevdn.gcore.lib.number.NumberUtils;
+import com.guillaumevdn.gcore.lib.object.NeedType;
+import com.guillaumevdn.gcore.lib.string.StringUtils;
+import com.guillaumevdn.gcore.lib.tuple.Pair;
+
+/**
+ * @author GuillaumeVDN
+ */
+public class Command implements CommandExecutor, TabCompleter {
+
+	private static final List<String> HELP_ALIASES = CollectionUtils.asUnmodifiableList("?", "help"/*, "halp", "aled", "JEANNE"*/);
+
+	private GPlugin plugin;
+	private String name;
+	private String helpName;
+	private List<Subcommand> subcommands = new ArrayList<>();
+	private Subcommand base;
+
+	public Command(GPlugin plugin, String name, String helpName, Subcommand base) {
+		this.name = name;
+		this.helpName = helpName;
+		this.plugin = plugin;
+		this.base = base;
+		if (base != null) {
+			for (Argument argument : base.getArguments()) {
+				if (argument instanceof ArgumentFixed) {
+					throw new IllegalArgumentException("base command can't have fixed arguments");
+				}
+			}
+		}
+	}
+
+	// get
+	public GPlugin getPlugin() {
+		return plugin;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public String getHelpName() {
+		return helpName;
+	}
+
+	public List<Subcommand> getSubcommands() {
+		return subcommands;
+	}
+
+	// set
+	public <S extends Subcommand> S setSubcommand(S subcommand) {
+		subcommands.add(subcommand);
+		return subcommand;
+	}
+
+	// do
+	public void showHelp(CommandSender sender) {
+		showHelp(sender, 1);
+	}
+
+	public void showHelp(CommandSender sender, int pageNumber) {
+		showHelp(sender, 17, pageNumber);
+	}
+
+	public void showHelp(CommandSender sender, int maxPageLines, int pageNumber) {
+		// get children help
+		List<String> available = new ArrayList<>();
+		if (base != null) {
+			List<String> tmp = base.buildHelp(this, true, sender);
+			if (tmp != null) {
+				available.addAll(tmp);
+			}
+		}
+		subcommands.forEach(sub -> {
+			List<String> tmp = sub.buildHelp(this, false, sender);
+			if (tmp != null) {
+				available.addAll(tmp);
+			}
+		});
+		// wow, such empty
+		if (available.isEmpty()) {
+			return;
+		}
+		// separate pages
+		List<List<String>> pages = new ArrayList<>();
+		List<String> currentPage = new ArrayList<>();
+		String prefix = TextGeneric.messageCommandHelpElementPrefix.parseLine();
+		for (String line : available) {
+			// it's a header, must we split ?
+			if (line.startsWith(prefix) && currentPage.size() >= maxPageLines) {
+				pages.add(currentPage);
+				currentPage = new ArrayList<>();
+			}
+			// add to current page
+			currentPage.add(line);
+		}
+		pages.add(currentPage);
+		// show
+		if (pageNumber < 1) pageNumber = 1;
+		if (pageNumber > pages.size()) {
+			TextGeneric.messageCommandHelpPageOutsideBounds.replace("{pages}", () -> pages.size()).replace("{plural}", () -> StringUtils.pluralize(pages.size())).send(sender);
+		} else {
+			final int pageNumberF = pageNumber; // come on you pepega
+			List<String> page = pages.get(pageNumber - 1);
+			String header = TextGeneric.messageCommandHelpHeader.replace("{prefix}", () -> "/" + helpName).replace("{page}", () -> pageNumberF).replace("{pages}", () -> pages.size()).parseLine();
+			String headerSeparator = "§7§m" + StringUtils.repeatString(" ", Math.abs(70 - header.length()) / 2);
+			page.add(0, headerSeparator + "§r " + header + " " + headerSeparator);
+			page.forEach(line -> sender.sendMessage(line));
+		}
+	}
+
+	// command
+	@Override
+	public boolean onCommand(CommandSender sender, org.bukkit.command.Command command, String label, String[] original) {
+		if (plugin.isReloading()) {
+			return true;
+		}
+		// decode arguments
+		List<String> arguments = new ArrayList<>();
+		List<String> parameters = new ArrayList<>();
+		for (int i = 0; i < original.length; ++i) {
+			String arg = original[i];
+			if (!arg.trim().isEmpty()) {
+				if (arg.startsWith("-")) {
+					parameters.add(arg.substring(1).toLowerCase());
+				} else {
+					arguments.add(arg);
+				}
+			}
+		}
+		// help
+		int helpPage = -1;
+		if (arguments.size() >= 1 && HELP_ALIASES.contains(arguments.get(arguments.size() - 1).toLowerCase())) {
+			arguments.remove(arguments.size() - 1);
+			helpPage = 1;
+		} else if (arguments.size() >= 2 && HELP_ALIASES.contains(arguments.get(arguments.size() - 2).toLowerCase())) {
+			Integer page = NumberUtils.integerOrNull(arguments.remove(arguments.size() - 1));
+			arguments.remove(arguments.size() - 1);
+			helpPage = page == null || page <= 1 ? 1 : page;
+		}
+		// find matching subcommand
+		Subcommand subcommand = base;
+		if (!arguments.isEmpty()) {
+			for (Subcommand sub : subcommands) {
+				if (sub.getAliases().contains(arguments.get(0).toLowerCase())) {
+					subcommand = sub;
+					arguments.remove(0);
+					break;
+				}
+			}
+		}
+		if (subcommand != null && (helpPage == -1 || !subcommand.equals(base))) {
+			// can't use subcommand
+			if (!subcommand.validateUse(sender)) {
+				return true;
+			}
+			// help
+			if (helpPage != -1) {
+				subcommand.buildHelp(this, subcommand == base, sender).forEach(line -> sender.sendMessage(line));
+				return true;
+			}
+			// parse arguments
+			CommandCall call = new CommandCall(this, subcommand, sender, original, arguments, parameters);
+			for (int i = 0; i < subcommand.getArguments().size(); ++i) {
+				Argument argument = subcommand.getArguments().get(i);
+				Object value = argument.consume(call);
+				// found
+				if (!argument.validateUse(sender)) {
+					return true;
+				}
+				call.setArgumentValue(i, value);
+			}
+			// incompatible arguments
+			for (List<Arg> incompatible : subcommand.getIncompatible()) {
+				Arg has1 = null;
+				for (Arg inc : incompatible) {
+					if (inc.has(call)) {
+						if (has1 == null) {
+							has1 = inc;
+						} else {
+							final Arg has1F = has1;
+							TextGeneric.messageCommandIncompatibleArguments.replace("{argument1}", () -> has1F.getName()).replace("{argument1}", () -> inc.getName()).send(sender);
+							return true;
+						}
+					}
+				}
+			}
+			// dependent arguments
+			for (Pair<Arg, List<Arg>> dependent : subcommand.getDependent()) {
+				if (dependent.getA().has(call)) {
+					for (Arg dep : dependent.getB()) {
+						if (!dep.has(call)) {
+							TextGeneric.messageCommandDependentArguments.replace("{argument1}", () -> dependent.getA().getName()).replace("{argument1}", () -> dep.getName()).send(sender);
+							return true;
+						}
+					}
+				}
+			}
+			// missing required arguments
+			for (Argument argument : subcommand.getArguments()) {
+				if (argument.getUsage() != null && argument.getNeed().equals(NeedType.REQUIRED) && argument.get(call) == null) {
+					List<String> found = subcommand.getArguments().stream()
+							.filter(arg -> arg.getUsage() != null && arg.get(call) != null)
+							.map(arg -> arg.getUsage().parseLine())
+							.collect(Collectors.toList());
+					(found.isEmpty() ? TextGeneric.messageCommandMissingArgument : TextGeneric.messageCommandMissingArgumentFound).replace("{argument}", () -> argument.getUsage().parseLines()).replace("{found}", () -> StringUtils.toTextString(", ", found)).send(sender);
+					return true;
+				}
+			}
+			// extra arguments
+			if (!call.getArguments().isEmpty()) {
+				TextGeneric.messageCommandUnnecessaryArguments.replace("{unnecessary}", () -> StringUtils.toTextString(" ", call.getArguments())).send(sender);
+				return true;
+			}
+			// perform subcommand
+			subcommand.perform(call);
+			return true;
+		}
+		// unknown subcommand
+		else {
+			// help
+			if (arguments.isEmpty()) {
+				showHelp(sender, helpPage);
+			} else {
+				TextGeneric.messageCommandUnknown.replace("{subcommand}", () -> arguments.get(0)).send(sender);
+			}
+			return true;
+		}
+	}
+
+	private final List<String> EMPTY_TAB_COMPLETE = CollectionUtils.asUnmodifiableList();
+
+	@Override
+	public List<String> onTabComplete(CommandSender sender, org.bukkit.command.Command command, String label, String[] original) {
+		if (plugin.isReloading()) {
+			return null;
+		}
+		// decode arguments
+		List<String> arguments = new ArrayList<>();
+		List<String> parameters = new ArrayList<>();
+		for (int i = 0; i < original.length; ++i) {
+			String arg = original[i];
+			if (!arg.trim().isEmpty()) {
+				if (arg.startsWith("-")) {
+					parameters.add(arg.substring(1).toLowerCase());
+				} else {
+					arguments.add(arg);
+				}
+			}
+		}
+		// help
+		if (arguments.stream().anyMatch(argument -> HELP_ALIASES.contains(argument.toLowerCase()))) {
+			return EMPTY_TAB_COMPLETE;
+		}
+		// find matching subcommand
+		Subcommand subcommand = null;
+		if (!arguments.isEmpty()) {
+			for (Subcommand sub : subcommands) {
+				if (sub.getAliases().contains(arguments.get(0).toLowerCase())) {
+					subcommand = sub;
+					arguments.remove(0);
+					break;
+				}
+			}
+		}
+		if (subcommand != null) {
+			// can't use subcommand
+			if (!subcommand.canUse(sender)) {
+				return EMPTY_TAB_COMPLETE;
+			}
+			// parse arguments
+			CommandCall call = new CommandCall(this, subcommand, sender, original, arguments, parameters, true);
+			for (int i = 0; i < subcommand.getArguments().size(); ++i) {
+				Argument argument = subcommand.getArguments().get(i);
+				Object value = argument.consume(call);
+				// found
+				if (!argument.canUse(sender)) {
+					return EMPTY_TAB_COMPLETE;
+				}
+				call.setArgumentValue(i, value);
+			}
+			// incompatible arguments
+			for (List<Arg> incompatible : subcommand.getIncompatible()) {
+				Arg has1 = null;
+				for (Arg inc : incompatible) {
+					if (inc.has(call)) {
+						if (has1 == null) {
+							has1 = inc;
+						} else {
+							return EMPTY_TAB_COMPLETE;
+						}
+					}
+				}
+			}
+			// suggest
+			return Stream.concat(
+					subcommand.getArguments().stream().filter(arg -> arg.canUse(sender) && arg.get(call) == null).map(arg -> arg.tabComplete(call)).filter(tabComplete -> tabComplete != null).flatMap(tabComplete -> tabComplete.stream()),
+					subcommand.getParameters().stream().filter(param -> !param.has(call)).flatMap(param -> param.getTabComplete().stream())
+					).collect(Collectors.toList());
+		}
+		// unknown subcommand
+		else {
+			// suggest all subcommands
+			if (arguments.isEmpty()) {
+				return subcommands.stream().filter(sub -> sub.canUse(sender)).map(sub -> sub.getAliases().get(0)).collect(Collectors.toList());
+			}
+			// suggest subcommand
+			if (arguments.size() == 1) {
+				String arg = arguments.get(0).toLowerCase();
+				return subcommands.stream().filter(sub -> sub.getAliases().stream().anyMatch(alias -> alias.startsWith(arg))).filter(sub -> sub.canUse(sender)).map(sub -> sub.getAliases().get(0)).collect(Collectors.toList());
+			}
+			// no suggestion :saperlipopette:
+			return EMPTY_TAB_COMPLETE;
+		}
+	}
+
+}

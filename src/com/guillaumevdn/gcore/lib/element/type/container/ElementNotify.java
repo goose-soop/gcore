@@ -1,0 +1,269 @@
+package com.guillaumevdn.gcore.lib.element.type.container;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Stream;
+
+import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
+
+import com.guillaumevdn.gcore.GCore;
+import com.guillaumevdn.gcore.TextEditorGeneric;
+import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
+import com.guillaumevdn.gcore.lib.compatibility.Compat;
+import com.guillaumevdn.gcore.lib.compatibility.bossbar.Bossbar;
+import com.guillaumevdn.gcore.lib.compatibility.bossbar.BossbarColor;
+import com.guillaumevdn.gcore.lib.compatibility.bossbar.BossbarCompat;
+import com.guillaumevdn.gcore.lib.compatibility.bossbar.BossbarFlag;
+import com.guillaumevdn.gcore.lib.compatibility.bossbar.BossbarStyle;
+import com.guillaumevdn.gcore.lib.compatibility.material.CommonMats;
+import com.guillaumevdn.gcore.lib.compatibility.material.Mat;
+import com.guillaumevdn.gcore.lib.compatibility.sound.Sound;
+import com.guillaumevdn.gcore.lib.element.editor.SlotPlacement;
+import com.guillaumevdn.gcore.lib.element.struct.Element;
+import com.guillaumevdn.gcore.lib.element.struct.Need;
+import com.guillaumevdn.gcore.lib.element.struct.container.ContainerElement;
+import com.guillaumevdn.gcore.lib.element.type.basic.ElementBossbarColor;
+import com.guillaumevdn.gcore.lib.element.type.basic.ElementBossbarFlagList;
+import com.guillaumevdn.gcore.lib.element.type.basic.ElementBossbarStyle;
+import com.guillaumevdn.gcore.lib.element.type.basic.ElementDouble;
+import com.guillaumevdn.gcore.lib.element.type.basic.ElementSound;
+import com.guillaumevdn.gcore.lib.element.type.basic.ElementString;
+import com.guillaumevdn.gcore.lib.element.type.basic.ElementText;
+import com.guillaumevdn.gcore.lib.string.Text;
+import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
+import com.guillaumevdn.gcore.lib.time.TimeUnit;
+import com.guillaumevdn.gcore.lib.time.duration.ElementDuration;
+
+/**
+ * @author GuillaumeVDN
+ */
+
+public class ElementNotify extends ContainerElement {
+
+	private ElementText message = addText("message", Need.optional(), TextEditorGeneric.descriptionNotifyMessage);
+	private ElementString actionbar = addString("actionbar", Need.optional(), TextEditorGeneric.descriptionNotifyActionbar);
+	private ElementDuration actionbarDuration = addDuration("actionbar_duration", Need.optional(), 10, TimeUnit.SECOND, TextEditorGeneric.descriptionNotifyActionbarDuration);
+
+	private ElementString bossbar = addString("bossbar", Need.optional(), SlotPlacement.START_ROW, TextEditorGeneric.descriptionNotifyBossbar);
+	private ElementBossbarColor bossbarColor = addBossbarColor("bossbar_color", Need.optional(BossbarColor.BLUE), TextEditorGeneric.descriptionNotifyBossbarColor);
+	private ElementBossbarStyle bossbarStyle = addBossbarStyle("bossbar_style", Need.optional(BossbarStyle.SOLID), TextEditorGeneric.descriptionNotifyBossbarStyle);
+	private ElementBossbarFlagList bossbarFlags = addBossbarFlagList("bossbar_flags", Need.optional(new ArrayList<>()), TextEditorGeneric.descriptionNotifyBossbarFlags);
+	private ElementDuration bossbarDuration = addDuration("bossbar_duration", Need.optional(), 10, TimeUnit.SECOND, TextEditorGeneric.descriptionNotifyBossbarDuration);
+
+	private ElementString title = addString("title", Need.optional(), SlotPlacement.START_ROW, TextEditorGeneric.descriptionNotifyTitle);
+	private ElementString titleSubtitle = addString("title_subtitle", Need.optional(), TextEditorGeneric.descriptionNotifyTitleSubtitle);
+	private ElementDuration titleFadeIn = addDuration("title_fade_in", Need.optional(), 10, TimeUnit.TICK, TextEditorGeneric.descriptionNotifyTitleFadeIn);
+	private ElementDuration titleDuration = addDuration("title_duration", Need.optional(), 4, TimeUnit.SECOND, TextEditorGeneric.descriptionNotifyTitleDuration);
+	private ElementDuration titleFadeOut = addDuration("title_fade_out", Need.optional(), 10, TimeUnit.TICK, TextEditorGeneric.descriptionNotifyTitleFadeOut);
+
+	private ElementSound sound = addSound("sound", Need.optional(), SlotPlacement.START_ROW, TextEditorGeneric.descriptionNotifySound);
+	private ElementDouble soundVolume = addDouble("sound_volume", Need.optional(1d), TextEditorGeneric.descriptionNotifySoundVolume);
+	private ElementDouble soundPitch = addDouble("sound_volume", Need.optional(1d), TextEditorGeneric.descriptionNotifySoundPitch);
+
+	public ElementNotify(Element parent, String id, Need need, Text editorDescription) {
+		super("notify", parent, id, need, editorDescription);
+	}
+
+	// get
+	public ElementText getMessage() {
+		return message;
+	}
+
+	public ElementString getActionbar() {
+		return actionbar;
+	}
+
+	public ElementDuration getActionbarDuration() {
+		return actionbarDuration;
+	}
+
+	public ElementString getBossbar() {
+		return bossbar;
+	}
+
+	public ElementBossbarColor getBossbarColor() {
+		return bossbarColor;
+	}
+
+	public ElementBossbarStyle getBossbarStyle() {
+		return bossbarStyle;
+	}
+
+	public ElementBossbarFlagList getBossbarFlags() {
+		return bossbarFlags;
+	}
+
+	public ElementDuration getBossbarDuration() {
+		return bossbarDuration;
+	}
+
+	public ElementString getTitle() {
+		return title;
+	}
+
+	public ElementString getTitleSubtitle() {
+		return titleSubtitle;
+	}
+
+	public ElementDuration getTitleFadeIn() {
+		return titleFadeIn;
+	}
+
+	public ElementDuration getTitleDuration() {
+		return titleDuration;
+	}
+
+	public ElementDuration getTitleFadeOut() {
+		return titleFadeOut;
+	}
+
+	public ElementSound getSound() {
+		return sound;
+	}
+
+	public ElementDouble getSoundVolume() {
+		return soundVolume;
+	}
+
+	public ElementDouble getSoundPitch() {
+		return soundPitch;
+	}
+
+	public boolean isNotifyEmpty() {
+		return !Stream.of(actionbar, bossbar, message, title, titleSubtitle, sound).anyMatch(elem -> elem.readContains());
+	}
+
+	// methods
+	private Map<Player, BukkitTask> lastActionbarTasks = new HashMap<>();
+	private Map<Player, Bossbar> lastBossbars = new HashMap<>();
+
+	public void stopLastActionbar(Player player) {
+		BukkitTask task = lastActionbarTasks.remove(player);
+		if (task != null) {
+			task.cancel();
+		}
+	}
+
+	public void stopLastBossbar(Player player) {
+		Bossbar bossbar = lastBossbars.remove(player);
+		if (bossbar != null) {
+			bossbar.stop();
+		}
+	}
+
+	public void sendAll(Collection<Player> players, Replacer replacer) {
+		if (!readContains()) return;
+		sendMessage(players, replacer);
+		sendActionbar(players, replacer);
+		sendBossbar(players, replacer, false);
+		sendTitle(players, replacer);
+		playSound(players, replacer);
+	}
+
+	public void sendMessage(Collection<Player> players, Replacer replacer) {
+		message.parse(replacer).ifPresentDo(text -> text.send(players));
+	}
+
+	public void sendActionbar(Collection<Player> players, Replacer replacer) {
+		sendActionbar(players, replacer, null);
+	}
+
+	public void sendActionbar(Collection<Player> players, Replacer replacer, Integer forceDurationTicks) {
+		actionbar.parse(replacer).ifPresentDo(actionbar -> {
+			int durationTicks = forceDurationTicks != null ? forceDurationTicks : (int) (actionbarDuration.parse(replacer).orElse(1000L) / 50L);
+			players.forEach(player -> {
+				// send actionbar
+				Compat.sendActionbar(player, actionbar);
+				// start task if needed
+				stopLastActionbar(player);
+				if (durationTicks < 50) {
+					// actually nvm : lastActionbarTasks.put(player, BukkitThread.ASYNC.operateLater(() -> Compat.sendActionbar(player, ""), Throwable::printStackTrace, durationTicks));
+				} else if (durationTicks > 50) {
+					lastActionbarTasks.put(player, new BukkitRunnable() { // use a bukkit task here so it can be cancelled easily too
+						private int remainingTicks = durationTicks;
+						private int ticksBeforeUpdate = 60;
+						@Override
+						public void run() {
+							if (--remainingTicks <= 0) {
+								cancel();
+								lastActionbarTasks.remove(player);
+								Compat.sendActionbar(player, "");
+								return;
+							}
+							if (--ticksBeforeUpdate <= 0) {
+								Compat.sendActionbar(player, actionbar);
+								ticksBeforeUpdate = 60;
+							}
+						}
+					}.runTaskTimerAsynchronously(GCore.inst(), 1L, 1L));
+				}
+			});
+		});
+	}
+
+	public void sendBossbar(Collection<Player> players, Replacer replacer, boolean noAutoProgress) {
+		sendBossbar(players, replacer, null, noAutoProgress);
+	}
+
+	public void sendBossbar(Collection<Player> players, Replacer replacer, Long forceDurationMillis, boolean noAutoProgress) {
+		directParseAndIfPresentDo("bossbar", "bossbar_color", "bossbar_style", "bossbar_flags", replacer, (String bossbar, BossbarColor color, BossbarStyle style, List<BossbarFlag> flags) -> {
+			players.forEach(player -> {
+				stopLastBossbar(player);
+				Bossbar instance;
+				Long bossbarDuration = forceDurationMillis != null ? forceDurationMillis : this.bossbarDuration.parse(replacer).orNull();
+				if (bossbarDuration != null) {
+					instance = BossbarCompat.sendTemp(bossbar, color, style, flags, CollectionUtils.asList(player), bossbarDuration, noAutoProgress);
+				} else {
+					instance = new Bossbar("notify_" + UUID.randomUUID(), bossbar, color, style, flags, 1f, CollectionUtils.asList(player));
+					instance.start();
+				}
+				lastBossbars.put(player, instance);
+			});
+		});
+	}
+
+	public void sendTitle(Collection<Player> players, Replacer replacer) {
+		sendTitle(players, replacer, null, null, null);
+	}
+
+	public void sendTitle(Collection<Player> players, Replacer replacer, Integer forceFadeInTicks, Integer forceDurationTicks, Integer forceFadeOutTicks) {
+		String title = this.title.parse(replacer).orNull();
+		String subtitle = this.titleSubtitle.parse(replacer).orNull();
+		if (title != null || subtitle != null) {
+			int fadeIn = forceFadeInTicks != null ? forceFadeInTicks : titleFadeIn.parse(replacer).orElse(0L).intValue() / 50;
+			int duration = forceDurationTicks != null ? forceDurationTicks : titleDuration.parse(replacer).orElse(20L).intValue() / 50;
+			int fadeOut = forceFadeOutTicks != null ? forceFadeOutTicks : titleFadeOut.parse(replacer).orElse(0L).intValue() / 50;
+			players.forEach(player -> Compat.sendTitle(player, title, subtitle, fadeIn, duration, fadeOut));
+		}
+	}
+
+	public void playSound(Collection<Player> players, Replacer replacer) {
+		directParseAndIfPresentDo("sound", "sound_volume", "sound_pitch", replacer, (Sound sound, Double volume, Double pitch) -> {
+			sound.play(players, volume.floatValue(), pitch.floatValue());
+		});
+	}
+
+	// editor
+	@Override
+	public Mat editorIconType() {
+		return CommonMats.REPEATER;
+	}
+
+	@Override
+	public List<String> editorCurrentValue() {
+		List<String> desc = new ArrayList<>();
+		message.parseGeneric().ifPresentDo(message -> desc.add("message : " + message));
+		bossbar.parseGeneric().ifPresentDo(bossbar -> desc.add("bossbar : " + bossbar));
+		title.parseGeneric().ifPresentDo(title -> desc.add("title : " + title));
+		titleSubtitle.parseGeneric().ifPresentDo(titleSubtitle -> desc.add("subtitle : " + titleSubtitle));
+		sound.parseGeneric().ifPresentDo(sound -> desc.add("sound : " + sound));
+		return !desc.isEmpty() ? desc : null;
+	}
+
+}

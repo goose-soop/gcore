@@ -16,13 +16,14 @@
 
 package com.guillaumevdn.gcore.libs.com.google.gson.stream;
 
-import com.guillaumevdn.gcore.libs.com.google.gson.internal.JsonReaderInternalAccess;
-import com.guillaumevdn.gcore.libs.com.google.gson.internal.bind.JsonTreeReader;
 import java.io.Closeable;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Arrays;
+
+import com.guillaumevdn.gcore.libs.com.google.gson.internal.JsonReaderInternalAccess;
+import com.guillaumevdn.gcore.libs.com.google.gson.internal.bind.JsonTreeReader;
 
 /**
  * Reads a JSON (<a href="http://www.ietf.org/rfc/rfc7159.txt">RFC 7159</a>)
@@ -33,7 +34,7 @@ import java.util.Arrays;
  * Within JSON objects, name/value pairs are represented by a single token.
  *
  * <h3>Parsing JSON</h3>
- * To create a recursive descent parser for your own JSON streams, first create
+ * To create a recursive descent replacer for your own JSON streams, first create
  * an entry point method that creates a {@code JsonReader}.
  *
  * <p>Next, create handler methods for each structure in your JSON text. You'll
@@ -53,8 +54,8 @@ import java.util.Arrays;
  * <p>When a nested object or array is encountered, delegate to the
  * corresponding handler method.
  *
- * <p>When an unknown name is encountered, strict parsers should fail with an
- * exception. Lenient parsers should call {@link #skipValue()} to recursively
+ * <p>When an unknown name is encountered, strict replacers should fail with an
+ * exception. Lenient replacers should call {@link #skipValue()} to recursively
  * skip the value's nested tokens, which may otherwise conflict.
  *
  * <p>If a value may be null, you should first check using {@link #peek()}.
@@ -83,7 +84,7 @@ import java.util.Arrays;
  *     }
  *   }
  * ]}</pre>
- * This code implements the parser for the above structure: <pre>   {@code
+ * This code implements the replacer for the above structure: <pre>   {@code
  *
  *   public List<Message> readJsonStream(InputStream in) throws IOException {
  *     JsonReader reader = new JsonReader(new InputStreamReader(in, "UTF-8"));
@@ -170,7 +171,7 @@ import java.util.Arrays;
  * precision loss, extremely large values should be written and read as strings
  * in JSON.
  *
- * <a name="nonexecuteprefix"/><h3>Non-Execute Prefix</h3>
+ * <a id="nonexecuteprefix"/><h3>Non-Execute Prefix</h3>
  * Web servers that serve private data using JSON may be vulnerable to <a
  * href="http://en.wikipedia.org/wiki/JSON#Cross-site_request_forgery">Cross-site
  * request forgery</a> attacks. In such an attack, a malicious site gains access
@@ -189,8 +190,6 @@ import java.util.Arrays;
  * @since 1.6
  */
 public class JsonReader implements Closeable {
-	/** The only non-execute prefix this parser permits */
-	private static final char[] NON_EXECUTE_PREFIX = ")]}'\n".toCharArray();
 	private static final long MIN_INCOMPLETE_INTEGER = Long.MIN_VALUE / 10;
 
 	private static final int PEEKED_NONE = 0;
@@ -295,10 +294,10 @@ public class JsonReader implements Closeable {
 	}
 
 	/**
-	 * Configure this parser to be liberal in what it accepts. By default,
-	 * this parser is strict and only accepts JSON as specified by <a
+	 * Configure this replacer to be liberal in what it accepts. By default,
+	 * this replacer is strict and only accepts JSON as specified by <a
 	 * href="http://www.ietf.org/rfc/rfc4627.txt">RFC 4627</a>. Setting the
-	 * parser to lenient causes it to ignore the following syntax errors:
+	 * replacer to lenient causes it to ignore the following syntax errors:
 	 *
 	 * <ul>
 	 *   <li>Streams that start with the <a href="#nonexecuteprefix">non-execute
@@ -328,7 +327,7 @@ public class JsonReader implements Closeable {
 	}
 
 	/**
-	 * Returns true if this parser is liberal in what it accepts.
+	 * Returns true if this replacer is liberal in what it accepts.
 	 */
 	public final boolean isLenient() {
 		return lenient;
@@ -819,6 +818,10 @@ public class JsonReader implements Closeable {
 			peekedString = null;
 		} else if (p == PEEKED_LONG) {
 			result = Long.toString(peekedLong);
+		} else if (p == PEEKED_TRUE) {
+			result = "true";
+		} else if (p == PEEKED_FALSE) {
+			result = "false";
 		} else if (p == PEEKED_NUMBER) {
 			result = new String(buffer, pos, peekedNumberLength);
 			pos += peekedNumberLength;
@@ -1037,7 +1040,6 @@ public class JsonReader implements Closeable {
 	/**
 	 * Returns an unquoted value as a string.
 	 */
-	@SuppressWarnings("fallthrough")
 	private String nextUnquotedValue() throws IOException {
 		StringBuilder builder = null;
 		int i = 0;
@@ -1450,7 +1452,7 @@ public class JsonReader implements Closeable {
 		return getClass().getSimpleName() + locationString();
 	}
 
-	protected String locationString() {
+	String locationString() {
 		int line = lineNumber + 1;
 		int column = pos - lineStart + 1;
 		return " at line " + line + " column " + column + " path " + getPath();
@@ -1572,18 +1574,18 @@ public class JsonReader implements Closeable {
 		nextNonWhitespace(true);
 		pos--;
 
-		if (pos + NON_EXECUTE_PREFIX.length > limit && !fillBuffer(NON_EXECUTE_PREFIX.length)) {
+		int p = pos;
+		if (p + 5 > limit && !fillBuffer(5)) {
 			return;
 		}
 
-		for (int i = 0; i < NON_EXECUTE_PREFIX.length; i++) {
-			if (buffer[pos + i] != NON_EXECUTE_PREFIX[i]) {
-				return; // not a security token!
-			}
+		char[] buf = buffer;
+		if(buf[p] != ')' || buf[p + 1] != ']' || buf[p + 2] != '}' || buf[p + 3] != '\'' || buf[p + 4] != '\n') {
+			return; // not a security token!
 		}
 
 		// we consumed a security token!
-		pos += NON_EXECUTE_PREFIX.length;
+		pos += 5;
 	}
 
 	static {

@@ -16,6 +16,12 @@
 
 package com.guillaumevdn.gcore.libs.com.google.gson.internal.bind;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Map;
+
 import com.guillaumevdn.gcore.libs.com.google.gson.JsonArray;
 import com.guillaumevdn.gcore.libs.com.google.gson.JsonElement;
 import com.guillaumevdn.gcore.libs.com.google.gson.JsonNull;
@@ -23,11 +29,6 @@ import com.guillaumevdn.gcore.libs.com.google.gson.JsonObject;
 import com.guillaumevdn.gcore.libs.com.google.gson.JsonPrimitive;
 import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonReader;
 import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonToken;
-import java.io.IOException;
-import java.io.Reader;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Arrays;
 
 /**
  * This reader walks the elements of a JsonElement as if it was coming from a
@@ -310,7 +311,8 @@ public final class JsonTreeReader extends JsonReader {
     return result.toString();
   }
 
-  protected String locationString() {
+  @SuppressWarnings("all")
+  private String locationString() {
     return " at path " + getPath();
   }
 }

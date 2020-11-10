@@ -8,16 +8,18 @@ import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.guillaumevdn.gcore.lib.gui.InventoryState;
+import com.guillaumevdn.gcore.lib.gui.PlayerInventoryState;
 
+/**
+ * @author GuillaumeVDN
+ */
 public class PlayerCraftedItemsEvent extends PlayerEvent {
 
-	// base
 	private CraftItemEvent event;
-	private InventoryState inventoryBefore, inventoryAfter;
+	private PlayerInventoryState inventoryBefore, inventoryAfter;
 	private Map<Integer, ItemStack> cost, crafted;
 
-	public PlayerCraftedItemsEvent(CraftItemEvent event, InventoryState inventoryBefore, InventoryState inventoryAfter, Map<Integer, ItemStack> cost, Map<Integer, ItemStack> crafted) {
+	public PlayerCraftedItemsEvent(CraftItemEvent event, PlayerInventoryState inventoryBefore, PlayerInventoryState inventoryAfter, Map<Integer, ItemStack> cost, Map<Integer, ItemStack> crafted) {
 		super((Player) event.getWhoClicked());
 		this.inventoryBefore = inventoryBefore;
 		this.inventoryAfter = inventoryAfter;
@@ -31,11 +33,11 @@ public class PlayerCraftedItemsEvent extends PlayerEvent {
 		return event;
 	}
 
-	public InventoryState getInventoryBefore() {
+	public PlayerInventoryState getInventoryBefore() {
 		return inventoryBefore;
 	}
 
-	public InventoryState getInventoryAfter() {
+	public PlayerInventoryState getInventoryAfter() {
 		return inventoryAfter;
 	}
 

@@ -16,6 +16,15 @@
 
 package com.guillaumevdn.gcore.libs.com.google.gson.internal.bind;
 
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.ParsePosition;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+
 import com.guillaumevdn.gcore.libs.com.google.gson.Gson;
 import com.guillaumevdn.gcore.libs.com.google.gson.JsonSyntaxException;
 import com.guillaumevdn.gcore.libs.com.google.gson.TypeAdapter;
@@ -28,15 +37,6 @@ import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonReader;
 import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonToken;
 import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonWriter;
 
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.ParsePosition;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-
 /**
  * Adapter for Date. Although this class appears stateless, it is not.
  * DateFormat captures its time zone and locale when it is created, which gives
@@ -45,7 +45,7 @@ import java.util.Locale;
  */
 public final class DateTypeAdapter extends TypeAdapter<Date> {
   public static final TypeAdapterFactory FACTORY = new TypeAdapterFactory() {
-    @SuppressWarnings("unchecked") // we use a runtime check to make sure the 'T's equal
+     // we use a runtime check to make sure the 'T's equal
     @Override public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
       return typeToken.getRawType() == Date.class ? (TypeAdapter<T>) new DateTypeAdapter() : null;
     }

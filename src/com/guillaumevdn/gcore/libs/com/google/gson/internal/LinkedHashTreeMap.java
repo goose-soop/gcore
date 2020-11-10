@@ -38,7 +38,7 @@ import java.util.Set;
  * LinkedHashMap classes.
  */
 public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements Serializable {
-  @SuppressWarnings({ "unchecked", "rawtypes" }) // to avoid Comparable<Comparable<Comparable<...>>>
+   // to avoid Comparable<Comparable<Comparable<...>>>
   private static final Comparator<Comparable> NATURAL_ORDER = new Comparator<Comparable>() {
     public int compare(Comparable a, Comparable b) {
       return a.compareTo(b);
@@ -56,7 +56,7 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
    * Create a natural order, empty tree map whose keys must be mutually
    * comparable and non-null.
    */
-  @SuppressWarnings("unchecked") // unsafe! this assumes K is comparable
+   // unsafe! this assumes K is comparable
   public LinkedHashTreeMap() {
     this((Comparator<? super K>) NATURAL_ORDER);
   }
@@ -68,13 +68,13 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
    * @param comparator the comparator to order elements with, or {@code null} to
    *     use the natural ordering.
    */
-  @SuppressWarnings({ "unchecked", "rawtypes" }) // unsafe! if comparator is null, this assumes K is comparable
+   // unsafe! if comparator is null, this assumes K is comparable
   public LinkedHashTreeMap(Comparator<? super K> comparator) {
     this.comparator = comparator != null
         ? comparator
         : (Comparator) NATURAL_ORDER;
     this.header = new Node<K, V>();
-    this.table = new Node[16]; // TODO: sizing/resizing policies
+    this.table = new Node[16];
     this.threshold = (table.length / 2) + (table.length / 4); // 3/4 capacity
   }
 
@@ -138,7 +138,7 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
 
     if (nearest != null) {
       // Micro-optimization: avoid polymorphic calls to Comparator.compare().
-      @SuppressWarnings("unchecked") // Throws a ClassCastException below if there's trouble.
+       // Throws a ClassCastException below if there's trouble.
       Comparable<Object> comparableKey = (comparator == NATURAL_ORDER)
           ? (Comparable<Object>) key
           : null;
@@ -196,7 +196,7 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
     return created;
   }
 
-  @SuppressWarnings("unchecked")
+  
   Node<K, V> findByObject(Object key) {
     try {
       return key != null ? find((K) key, false) : null;
@@ -508,7 +508,7 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
       return oldValue;
     }
 
-    @SuppressWarnings("rawtypes")
+    
     @Override public boolean equals(Object o) {
       if (o instanceof Entry) {
         Entry other = (Entry) o;
@@ -564,9 +564,8 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
    * twice as many trees, each of (approximately) half the previous size.
    */
   static <K, V> Node<K, V>[] doubleCapacity(Node<K, V>[] oldTable) {
-    // TODO: don't do anything if we're already at MAX_CAPACITY
     int oldCapacity = oldTable.length;
-    @SuppressWarnings("unchecked") // Arrays and generics don't get along.
+     // Arrays and generics don't get along.
     Node<K, V>[] newTable = new Node[oldCapacity * 2];
     AvlIterator<K, V> iterator = new AvlIterator<K, V>();
     AvlBuilder<K, V> leftBuilder = new AvlBuilder<K, V>();
@@ -664,8 +663,8 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
    * building trees whose size isn't a power of 2 minus 1.
    *
    * <p>Unlike rebuilding a tree from scratch, this approach requires no value
-   * comparisons. Using this class to create a tree of size <i>S</i> is
-   * {@code O(S)}.
+   * comparisons. Using this class to create a tree of size <i>suppl</i> is
+   * {@code O(suppl)}.
    */
   final static class AvlBuilder<K, V> {
     /** This stack is a singly linked list, linked by the 'parent' field. */

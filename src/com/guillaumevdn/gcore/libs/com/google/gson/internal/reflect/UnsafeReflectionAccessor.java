@@ -21,13 +21,15 @@ import java.lang.reflect.Method;
 
 import com.guillaumevdn.gcore.libs.com.google.gson.JsonIOException;
 
+import io.netty.channel.Channel.Unsafe;
+
 /**
  * An implementation of {@link ReflectionAccessor} based on {@link Unsafe}.
  * <p>
  * NOTE: This implementation is designed for Java 9. Although it should work with earlier Java releases, it is better to
  * use {@link PreJava9ReflectionAccessor} for them.
  */
-@SuppressWarnings({"unchecked", "rawtypes"})
+
 final class UnsafeReflectionAccessor extends ReflectionAccessor {
 
   private static Class unsafeClass;

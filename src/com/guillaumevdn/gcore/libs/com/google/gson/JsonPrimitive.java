@@ -16,10 +16,10 @@
 
 package com.guillaumevdn.gcore.libs.com.google.gson;
 
-import com.guillaumevdn.gcore.libs.com.google.gson.internal.$Gson$Preconditions;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+import com.guillaumevdn.gcore.libs.com.google.gson.internal.$Gson$Preconditions;
 import com.guillaumevdn.gcore.libs.com.google.gson.internal.LazilyParsedNumber;
 
 /**

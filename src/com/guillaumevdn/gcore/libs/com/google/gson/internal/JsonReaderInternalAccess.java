@@ -16,11 +16,12 @@
 
 package com.guillaumevdn.gcore.libs.com.google.gson.internal;
 
-import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonReader;
 import java.io.IOException;
 
+import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonReader;
+
 /**
- * Internal-only APIs of JsonReader available only to other classes in Gson.
+ * Handler-only APIs of JsonReader available only to other classes in Gson.
  */
 public abstract class JsonReaderInternalAccess {
   public static JsonReaderInternalAccess INSTANCE;

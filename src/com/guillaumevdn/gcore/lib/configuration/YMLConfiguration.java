@@ -1,941 +1,895 @@
 package com.guillaumevdn.gcore.lib.configuration;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.bukkit.Location;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.Potion;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.potion.PotionType;
 
-import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.lib.GPlugin;
-import com.guillaumevdn.gcore.lib.Logger;
-import com.guillaumevdn.gcore.lib.Logger.Level;
-import com.guillaumevdn.gcore.lib.gui.ItemData;
-import com.guillaumevdn.gcore.lib.material.Mat;
-import com.guillaumevdn.gcore.lib.messenger.Tab;
-import com.guillaumevdn.gcore.lib.messenger.Title;
-import com.guillaumevdn.gcore.lib.util.Utils;
-import com.guillaumevdn.gcore.lib.versioncompat.Compat;
+import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
+import com.guillaumevdn.gcore.lib.configuration.file.YMLFile;
+import com.guillaumevdn.gcore.lib.configuration.file.node.SectionNode;
+import com.guillaumevdn.gcore.lib.cost.Cost;
+import com.guillaumevdn.gcore.lib.economy.Currency;
+import com.guillaumevdn.gcore.lib.exception.ConfigError;
+import com.guillaumevdn.gcore.lib.number.NumberUtils;
+import com.guillaumevdn.gcore.lib.serialization.Serializer;
+import com.guillaumevdn.gcore.lib.serialization.adapter.type.AdapterItemStack;
+import com.guillaumevdn.gcore.lib.serialization.data.DataIO;
+import com.guillaumevdn.gcore.lib.string.StringUtils;
+import com.guillaumevdn.gcore.lib.tuple.GUIItemTriple;
+import com.guillaumevdn.gcore.lib.tuple.IntegerPair;
+import com.guillaumevdn.gcore.lib.tuple.ItemChancePair;
+import com.guillaumevdn.gcore.lib.validator.type.CollectionIntegerValidator;
+import com.guillaumevdn.gcore.lib.validator.type.DoubleValidator;
+import com.guillaumevdn.gcore.lib.validator.type.IntegerValidator;
+import com.guillaumevdn.gcore.lib.validator.type.ValueValidator;
 
 /**
- * Represents a YML configuration file.
+ * @author GuillaumeVDN
  */
-
-@SuppressWarnings("unused")
 public class YMLConfiguration {
 
-	// ------------------------------------------------------------
-	// Fields
-	// ------------------------------------------------------------
+	private GPlugin plugin;
+	private File file;
+	private YMLFile yml = new YMLFile(this);
+	private String logFilePath = null;
 
-	private transient GPlugin plugin;
-	transient YamlConfiguration yaml;
-	File file;
-	String headerComment = "";
+	public YMLConfiguration(GPlugin plugin, File file) {
+		this.plugin = plugin;
+		file.getParentFile().mkdirs();
+		this.logFilePath = file.getPath().replace("plugins" + File.separator, "").replace(plugin.getDataFolder().getName() + File.separator, "").replace(File.separator, "/");
+		this.file = file;
+		load();
+	}
 
+	// get
 	public GPlugin getPlugin() {
 		return plugin;
 	}
-
-	// ------------------------------------------------------------
-	// Constructor
-	// ------------------------------------------------------------
-
-	/**
-	 * @param plugin the plugin associated with this configuration
-	 * @param file the file
-	 * @param defaultResource the default path that will be extracted from the plugin if the file doesn't exists yet (can be null)
-	 * @param createIfNoDefault true if there is no file, no default resource, and the file must still be created anyway
-	 * @param load true if you wish to load the file contents (if exists) in the constructor
-	 */
-
-	public YMLConfiguration(GPlugin plugin, File file, String defaultResource, boolean createIfNoDefault, boolean load) {
-		this.plugin = plugin;
-		(this.file = file).getParentFile().mkdirs();
-		Utils.setDefaultResource(plugin, file, defaultResource, createIfNoDefault);
-		if (load && file.exists()) {
-			reload(false);
-		} else {
-			this.yaml = new YamlConfiguration();
-		}
-	}
-
-	// ------------------------------------------------------------
-	// Methods
-	// ------------------------------------------------------------
-
-	/**
-	 * @return the configuration's file
-	 */
 
 	public File getFile() {
 		return file;
 	}
 
-	@Deprecated
-	public void reload(boolean save) {
-		if (save) {
-			save();
-		} else {
-			reload();
-		}
+	public String getLogFilePath() {
+		return logFilePath;
 	}
 
-	/**
-	 * Reload the configuration from file
-	 */
-
-	public void reload() {
-		if (file.exists()) {
-			try {
-				load();
-			} catch (FileNotFoundException exception) {
-				exception.printStackTrace();
-				Logger.log(Level.SEVERE, GCore.inst(), "Could not load the file " + file.getName());
-			} catch (IOException exception) {
-				exception.printStackTrace();
-				Logger.log(Level.SEVERE, GCore.inst(), "Could not read lines of file " + file.getName());
-			}
-		}
+	public YMLFile getBackingYML() {
+		return yml;
 	}
 
-	/**
-	 * Check if the configuration contains a path
-	 * @param path the path
-	 * @return true if the configuration contains the path
-	 */
-
-	public boolean contains(String path) {
-		return yaml.contains(path.replace(" ", "").replace("\t", ""));
-	}
-
-	/**
-	 * Check if the configuration contains an integer in a path
-	 * @param path the path
-	 * @return true if the configurations contains an integer at this path
-	 */
-
-	public boolean containsInt(String path) {
-		return contains(path) && Utils.isInteger(getString(path, "-"));
-	}
-
-	/**
-	 * Get the keys of a section. Doesn't include default file (if there is any) keys.
-	 * @param sectionPath the path of the section
-	 * @param sort true if the keys must be sorted in alphanumerical order
-	 * @return the keys associated to the section (can be empty)
-	 */
-
-	public LinkedHashSet<String> getKeysForSection(String sectionPath, boolean sort) {
-		sectionPath = sectionPath.replace(" ", "").replace("\t", "");
-		LinkedHashSet<String> keys = new LinkedHashSet<String>();
-		if (yaml.contains(sectionPath) && yaml.isConfigurationSection(sectionPath)) {
-			if (sort) {
-				List<String> list = Utils.asList(yaml.getConfigurationSection(sectionPath).getKeys(false));
-				Collections.sort(list);
-				keys.addAll(list);
-			} else {
-				keys.addAll(yaml.getConfigurationSection(sectionPath).getKeys(false));
-			}
-		}
-		return keys;
-	}
-
-	/**
-	 * Check if a path is a configuration section.
-	 * @param sectionPath the path of the section
-	 * @return true if it's a configuration section
-	 */
-
-	public boolean isConfigurationSection(String sectionPath) {
-		return yaml.isConfigurationSection(sectionPath);
-	}
-
-	/**
-	 * Get a configuration section
-	 * @param sectionPath the path of the section
-	 * @return the section or null if it's not a configuration section
-	 */
-
-	public ConfigurationSection getConfigurationSection(String sectionPath) {
-		return isConfigurationSection(sectionPath) ? yaml.getConfigurationSection(sectionPath) : null;
-	}
-
-	/**
-	 * Copy things (deep, with sections as well)
-	 * @param path the first path
-	 * @param target the second path
-	 * @param remove must remove the first path content
-	 */
-
-	public void copy(String path, String target, boolean remove) {
-		if (contains(path)) {
-			// proceed section
-			if (isConfigurationSection(path)) {
-				for (String key : getKeysForSection(path, false)) {
-					copy(path + "." + key, target + "." + key, false);
-				}
-				if (remove) set(path, null);
-			}
-			// proceed value
-			else {
-				set(target, getObject(path, null));
-				if (remove) set(path, null);
-			}
-		}
-	}
-
-	/**
-	 * Get the values of a section. Doesn't include default file (if there is any) values.
-	 * @param sectionPath the path of the section
-	 * @return the values associated to the section
-	 */
-
-	public Map<String, Object> getValuesForSection(String sectionPath)
-	{
-		sectionPath = sectionPath.replace(" ", "").replace("\t", "");
-		Map<String, Object> values = new HashMap<String, Object>();
-
-		for (String key : getKeysForSection(sectionPath, false)) {
-			String path = sectionPath + "." + key;
-			values.put(path, getObject(path, null));
-		}
-
-		return values;
-	}
-
-	/**
-	 * Get a value from the configuration
-	 * @param path the path
-	 * @param def the default value
-	 * @return the associated value
-	 */
-
-	public Object getObject(String path, Object def) {
-		// has value
-		if (contains(path)) {
-			return yaml.get(path);
-		}
-		// doesn't contains
-		return def;
-	}
-
-	/**
-	 * Get a boolean from the configuration
-	 * @param path the path
-	 * @param def the default value
-	 * @return the associated value
-	 */
-
-	public boolean getBoolean(String path, boolean def) {
-		// has value
-		if (contains(path)) {
-			return yaml.getBoolean(path);
-		}
-		// doesn't contains
-		return def;
-	}
-
-	/**
-	 * Get an integer from the configuration
-	 * @param path the path
-	 * @param def the default value
-	 * @return the associated value
-	 */
-
-	public int getInt(String path, int def) {
-		// has value
-		if (contains(path)) {
-			return yaml.getInt(path);
-		}
-		// doesn't contains
-		return def;
-	}
-
-	/**
-	 * Get an long from the configuration
-	 * @param path the path
-	 * @param def the default value
-	 * @return the associated value
-	 */
-
-	public long getLong(String path, long def) {
-		// has value
-		if (contains(path)) {
-			return yaml.getLong(path);
-		}
-		// doesn't contains
-		return def;
-	}
-
-	/**
-	 * Get a byte from the configuration
-	 * @param path the path
-	 * @param def the default value
-	 * @return the associated value
-	 */
-
-	public byte getByte(String path, byte def) {
-		// has value
-		if (contains(path)) {
-			return (byte) yaml.getInt(path);
-		}
-		// doesn't contains
-		return def;
-	}
-
-	/**
-	 * Get a short from the configuration
-	 * @param path the path
-	 * @param def the default value
-	 * @return the associated value
-	 */
-
-	public short getShort(String path, short def) {
-		// has value
-		if (contains(path)) {
-			return (short) yaml.getInt(path);
-		}
-		// doesn't contains
-		return def;
-	}
-
-	/**
-	 * Get a double from the configuration
-	 * @param path the path
-	 * @param def the default value
-	 * @return the associated value
-	 */
-
-	public double getDouble(String path, double def) {
-		// has value
-		if (contains(path)) {
-			return yaml.getDouble(path);
-		}
-		// doesn't contains
-		return def;
-	}
-
-	/**
-	 * Get a float from the configuration
-	 * @param path the path
-	 * @param def the default value
-	 * @return the associated value
-	 */
-
-	public float getFloat(String path, float def) {
-		// has value
-		if (contains(path)) {
-			return (float) yaml.getDouble(path);
-		}
-		// doesn't contains
-		return def;
-	}
-
-	/**
-	 * Get a string from the configuration
-	 * @param path the path
-	 * @param def the default value
-	 * @return the associated value
-	 */
-
-	public String getString(String path, String def) {
-		// has value
-		if (contains(path)) {
-			return yaml.getString(path);
-		}
-		// doesn't contains
-		return def;
-	}
-
-	/**
-	 * Get a formatted string from the configuration
-	 * @param path the path
-	 * @param def the default value (unformatted)
-	 * @return the associated value
-	 */
-
-	public String getStringFormatted(String path, String def) {
-		return Utils.format(getString(path, def));
-	}
-
-	/**
-	 * Get a list from the configuration
-	 * @param path the path
-	 * @param def the default value
-	 * @return the associated value
-	 */
-
-	public List<String> getList(String path, List<String> def) {
-		return getList(path, def, false);
-	}
-
-	/**
-	 * Get a list from the configuration
-	 * @param path the path
-	 * @param def the default value
-	 * @param compact true if the list can be compact in config : 'value1,value2,value3'
-	 * @return the associated value
-	 */
-
-	public List<String> getList(String path, List<String> def, boolean compact) {
-		// has value
-		if (contains(path)) {
-			List<String> list = new ArrayList<String>();
-			Object get = yaml.get(path);
-			// list
-			if (get instanceof Collection<?>) {
-				for (Object obj : (Collection<?>) get) {
-					list.add(String.valueOf(obj));
-				}
-			} else {// string
-				String string = String.valueOf(get);
-				if (compact) {// compact
-					list.addAll(Utils.fromNiceString(string, false));
-				} else {// regular
-					list.add(string);
-				}
-			}
-			return list;
-		}
-		// doesn't contains
-		return def;
-	}
-
-	/**
-	 * Get a formatted list from the configuration
-	 * @param path the path
-	 * @param def the default value (unformatted)
-	 * @return the associated value
-	 */
-
-	public List<String> getListFormatted(String path, List<String> def) {
-		return getListFormatted(path, def, false);
-	}
-
-	/**
-	 * Get a formatted list from the configuration
-	 * @param path the path
-	 * @param def the default value (unformatted)
-	 * @param compact true if the list can be compact in config : 'value1,value2,value3'
-	 * @return the associated value
-	 */
-
-	public List<String> getListFormatted(String path, List<String> def, boolean compact) {
-		return Utils.format(getList(path, def, compact));
-	}
-
-	/**
-	 * Get a title from the configuration
-	 * @param path the path
-	 * @param def the default value
-	 * @return the associated value
-	 */
-	public Title getTitle(String path, Title def) {
-		return contains(path) ? new Title(this, path) : def;
-	}
-
-	/**
-	 * Get a tab from the configuration
-	 * @param path the path
-	 * @param def the default value
-	 * @return the associated value
-	 */
-	public Tab getTab(String path, Tab def) {
-		return contains(path) ? new Tab(this, path) : def;
-	}
-
-	/**
-	 * Get an enum element from the configuration
-	 * @param path the path
-	 * @param enumClass the enum class
-	 * @param def the default enum value (raw string name)
-	 * @return the associated value
-	 */
-
-	public <T extends Enum<T>> T getEnumValue(String path, Class<T> enumClass, String def) {
-		T result = Utils.valueOfOrNull(enumClass, getString(path, def));
-		return result == null ? Utils.valueOfOrNull(enumClass, def) : result;
-	}
-
-	/**
-	 * Get an enum element from the configuration
-	 * @param path the path
-	 * @param enumClass the enum class
-	 * @param def the default enum value
-	 * @return the associated value
-	 */
-
-	public <T extends Enum<T>> T getEnumValue(String path, Class<T> enumClass, T def) {
-		T result = Utils.valueOfOrNull(enumClass, getString(path, def == null ? null : def.name()));
-		return result == null ? def : result;
-	}
-
-	/**
-	 * Get a location from the configuration, with the WXYZ format
-	 * @param path the path
-	 * @param def the default value
-	 * @return the associated value
-	 */
-
-	public Location getLocationWXYZ(String path, Location def) {
-		return contains(path) ? Utils.unserializeWXYZLocation(getString(path, null)) : def;
-	}
-
-	/**
-	 * Get a material from the configuration
-	 * @param path the path
-	 * @param def the default value
-	 * @param durability the mat durability
-	 * @return the associated value
-	 */
-
-	public Mat getMat(String path, int durability, Mat def) {
-		return contains(path) ? Mat.valueOf(getString(path, null), durability) : def;
-	}
-
-	/**
-	 * Get an item from the configuration
-	 * @param path the path
-	 * @return the associated value
-	 */
-
-	public ItemData getItem(String path) {
-		String id = null;
-		if (isConfigurationSection(path)) id = getString(path + ".id", null);
-		if (id == null) {
-			int idIndex = path.lastIndexOf(".") + 1;
-			id = idIndex < 0 ? path : path.substring(idIndex);
-		}
-		return getItem(path, id, null);
-	}
-
-	/**
-	 * Get an item from the configuration
-	 * @param path the path
-	 * @param def the default value
-	 * @return the associated value
-	 */
-
-	public ItemData getItem(String path, ItemData def) {
-		String id = null;
-		if (isConfigurationSection(path)) id = getString(path + ".id", null);
-		if (id == null) {
-			int idIndex = path.lastIndexOf(".") + 1;
-			id = idIndex < 0 ? path : path.substring(idIndex + 1);
-		}
-		return getItem(path, id, def);
-	}
-
-	/**
-	 * Get an item from the configuration
-	 * @param path the path
-	 * @param id the item id
-	 * @param def the default value
-	 * @return the associated value
-	 */
-
-	public ItemData getItem(String path, String id, ItemData def) {
-		// doesn't contains
-		if (!contains(path)) {
-			return def;
-		}
-		// configuration section
-		if (isConfigurationSection(path)) {
-			// create
-			ItemData item;
-			if (contains(path + ".head_database_id")) {
-				String hdbId = getString(path + ".head_database_id", null);
-				ItemStack headStack = GCore.inst().getHeadDatabaseIntegration() != null ? GCore.inst().getHeadDatabaseIntegration().getItem(hdbId) : null;
-				if (headStack == null) {
-					Logger.log(Logger.Level.SEVERE, plugin, "Couldn't load head database item with id '" + hdbId + "', using item of type DIRT");
-					item = new ItemData(id);
-					item.setType(Mat.DIRT);
-				} else {
-					item = new ItemData(id, headStack);
-				}
-			} else {
-				item = new ItemData(id);
-			}
-
-			// settings
-			item.setSlot(getInt(path + ".slot", -1));
-			item.setChance(getDouble(path + ".chance", -1D));
-			item.setMaxAmount(getInt(path + ".max_amount", 0));
-			item.setEnabled(getBoolean(path + ".enabled", true));
-
-			// potion
-			if (contains(path + ".potion")) {
-				List<String> raw = Utils.split(",", getString(path + ".potion", null), false);
-				PotionType type = Utils.valueOfOrNull(PotionType.class, raw.get(0));
-				int level = Utils.isInteger(raw.get(1)) ? Integer.parseInt(raw.get(1)) : 1;
-				boolean extended = Boolean.parseBoolean(raw.get(2));
-				boolean splash = Boolean.parseBoolean(raw.get(3));
-				Potion potion = new Potion(type, level);
-				if (extended) potion.extend();
-				if (splash) potion.splash();
-				ItemStack it = potion.toItemStack(1);
-				item.setType(Mat.fromMaterial(it.getType(), it.getDurability(), 0));
-			}
-			/*// enchanted book
-			else if (contains(path + ".enchanted_book")) {
-				String enchantedBook = getString(path + ".enchanted_book");
-				item = new ItemStack(Material.ENCHANTED_BOOK);
-				EnchantmentStorageMeta meta = (EnchantmentStorageMeta) item.getItemMeta();
-				Enchantment enchant;
-				if (enchantedBook.equalsIgnoreCase("RANDOM")) {
-					enchant = Utils.random(Utils.asList(Enchantment.values()));
-				} else {
-					enchant = Utils.enchantmentOrNull(enchantedBook);
-				}
-				meta.addStoredEnchant(enchant, Utils.random(1, enchant.getMaxLevel()), true);
-				item.setItemMeta(meta);
-			}*/
-			// basic item
-			else {
-				item.setType(Mat.valueOf(getString(path + ".type", null), getInt(path + ".durability", 0)));
-			}
-
-			// nbt
-			String nbt = getString(path + ".nbt", null);
-			if (nbt != null) {
-				try {
-					// convert custom nbt to a base64 encoded string
-					if (nbt.toLowerCase().startsWith("custom:")) {
-						nbt = Compat.INSTANCE.serializeNbt(Compat.INSTANCE.parseMojangson(nbt.substring("custom:".length())));
-					}
-					// base64 nbt
-					item.setCustomNbt(Compat.INSTANCE.unserializeNbt(nbt));
-				} catch (Throwable exception) {
-					exception.printStackTrace();
-					GCore.inst().error("Couldn't load NBT for item " + id + " (" + getFile().getName() + ", " + path + ")");
-				}
-			}
-
-			// amount
-			item.setAmount(getInt(path + ".amount", 1));
-
-			// meta
-			item.setName(getStringFormatted(path + ".name", null));
-			item.setLore(getListFormatted(path + ".lore", null));
-
-			// enchants
-			List<String> enchants = getList(path + ".enchants", Utils.emptyList());
-			for (String enchant : enchants) {
-				try {
-					String[] raw = enchant.split(",");
-					Enchantment ench = Compat.INSTANCE.getEnchantment(raw[0]);
-					int level = Integer.parseInt(raw[1]);
-					item.setEnchant(ench, level);
-				} catch (Throwable ignored) {}
-			}
-
-			// effects
-			List<String> effects = getList(path + ".effects", Utils.emptyList());
-			for (String effect : effects) {
-				try {
-					String[] raw = effect.split(",");
-					PotionEffectType type = Utils.potionEffectTypeOrNull(raw[0]);
-					int amplifier = Integer.parseInt(raw[1]);
-					int duration = Integer.parseInt(raw[2]);
-					item.addPotionEffect(new PotionEffect(type, duration, amplifier));
-				} catch (Throwable ignored) {}
-			}
-
-			// unbreakable
-			if (getBoolean(path + ".unbreakable", false)) {
-				item.setUnbreakable(true);
-			}
-
-			// return
-			return item;
-		}
-		// not a configuration section
-		else {
-			String raw = getString(path, "");
-			List<String> split = Utils.split(" ", raw, true);
-			// [type] [amount]
-			if (split.size() == 2) {
-				try {
-					Mat type = Mat.valueOf(split.get(0), 0);
-					int amount = Integer.parseInt(split.get(2));
-					return new ItemData(id, -1, type, (short) 0, 1, null, null);
-				} catch (Throwable exception) {
-					exception.printStackTrace();
-					GCore.inst().error("Could not load item from '" + raw + "'");
-					return null;
-				}
-			}
-			// unknown model
-			return null;
-		}
-	}
-
-	/**
-	 * Get a list item from the configuration
-	 * @param path the path
-	 * @return the associated value
-	 */
-
-	public List<ItemData> getItems(String path) {
-		List<ItemData> items = new ArrayList<ItemData>();
-		for (String key : getKeysForSection(path, false)) {
-			items.add(getItem(path + "." + key));
-		}
-		return items;
-	}
-
-	// ----------------------------------------------------------------------
-	// Reading
-	// ----------------------------------------------------------------------
-
-	/**
-	 * Inner reload
-	 * @throws IOException 
-	 */
-
-	private void load() throws IOException {
-		new YMLReader(this).read();
-	}
-
-	// ----------------------------------------------------------------------
-	// Writer
-	// ----------------------------------------------------------------------
-
-	/**
-	 * Set the file's comment header
-	 */
-
-	public void setHeader(String... header)
-	{
-		this.headerComment = "";
-
-		for (String str : header) {
-			headerComment += "# " + str + "\n";
-		}
-
-		headerComment += "\n";
-	}
-
-	/**
-	 * Assign a value to a path
-	 * @param path the path
-	 * @param value the value
-	 */
-
-	public void set(String path, Object value) {
-		path = path.replace(" ", "").replace("\t", "");
-		// clear the entire file
-		if (value == null && path.isEmpty()) {
-			for (String key : getKeysForSection("", false)) {
-				yaml.set(key, null);
-			}
-		}
-		// set
-		else if (Utils.instanceOf(value, Set.class)) {
-			yaml.set(path, Utils.asList((Set<?>) value));
-		}
-		// value
-		else {
-			yaml.set(path, value);
-		}
-	}
-
-	/**
-	 * Assign a location to a path
-	 * @param path the path
-	 * @param location the location
-	 */
-
-	public void setLocation(String path, Location location) {
-		set(path, Utils.serializeWXYZLocation(location));// null checks are performed in the Utils method
-	}
-
-	/**
-	 * Assign an item to a path
-	 * @param path the path
-	 * @param item the item
-	 */
-
-	public void setItem(String path, ItemData item) {
-		setItem(path, item, false);
-	}
-
-	@Deprecated
-	public void setItem(String path, ItemData item, boolean saveId) {
-		// clear
-		set(path, null);
-		// null item
-		if (item == null) return;
-		// data
-		if (saveId && item.getId() != null && !item.getId().isEmpty()) set(path + ".id", item.getId());
-		if (item.getSlot() >= 0) set(path + ".slot", item.getSlot());
-		if (item.getChance() >= 0) set(path + ".chance", item.getChance());
-		// item (potion damage is saved in durability)
-		String type = item.getType().toString();
-		if (type.contains(":") || type.contains("(")) {
-			GCore.inst().warning("Exported mat '" + type + "'. Name '" + item.getType().getModernName() + ", legacy " + item.getType().getLegacyName() + "', toString() '" + item.getType().toString() + "', material '" + (item.getType().exists() ? "null" : String.valueOf(item.getType().getCurrentMaterial())) + "'. Please notify the developer with /gcore support");
-		}
-		set(path + ".type", type);
-		if (item.getType().getDurability() != (short) 0) set(path + ".durability", item.getType().getDurability());
-		if (item.isUnbreakable()) set(path + ".unbreakable", true);
-		// amount
-		set(path + ".amount", item.getAmount());
-		// meta
-		if (item.getName() != null) set(path + ".name", retranslateColorCodes(item.getName()));
-		if (item.getLore() != null && !item.getLore().isEmpty()) set(path + ".lore", retranslateColorCodes(item.getLore()));
-		// enchants
-		if (!item.getEnchants().isEmpty()) {
-			List<String> enchants = new ArrayList<String>();
-			for (Enchantment enchant : item.getEnchants().keySet()) {
-				enchants.add(enchant.getName() + "," + item.getEnchants().get(enchant));
-			}
-			set(path + ".enchants", enchants);
-		}
-		// nbt
+	// load/save
+	public void load() {
 		try {
-			if (item.getCustomNbt() != null) {
-				set(path + ".nbt", Compat.INSTANCE.serializeNbt(item.getCustomNbt()));
-			}
+			yml.read();
 		} catch (Throwable exception) {
-			exception.printStackTrace();
+			throw new Error("couldn't load config from file " + logFilePath, exception);
 		}
 	}
 
-	private List<String> retranslateColorCodes(List<String> list) {// TODO : do a proper Utils method and color codes list
-		for (int i = 0; i < list.size(); i++) {
-			list.set(i, retranslateColorCodes(list.get(i)));
-		}
-		return list;
-	}
-
-	private String retranslateColorCodes(String string) {// TODO : do a proper Utils method and color codes list
-		if (string.contains("§")) {
-			for (char c : Arrays.asList('1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'a', 'b', 'c', 'd', 'e', 'f')) {
-				if (string.contains("§" + c)) string = string.replace("§" + c, "&" + c);
-			}
-		}
-		return string;
-	}
-
-	// Save
-
-	/**
-	 * Save the file (override) with the keys/values of this object
-	 */
 	public void save() {
 		save(file);
 	}
 
-	/**
-	 * Save the file (override) with the keys/values of this object to a specific file
-	 */
 	public void save(File file) {
 		try {
-
-			// Resetting file
-			if (file.exists()) {
-				file.delete();
-				file.createNewFile();
-			} else {
-				file.getParentFile().mkdirs();
-			}
-
-			// Save file
-			yaml.save(file);
-
-			// Header
-			List<String> lines = new ArrayList<String>();
-			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
-			String ln = null;
-			while ((ln = reader.readLine()) != null) {
-				lines.add(ln);
-			}
-			reader.close();
-
-			OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8);
-
-			if (headerComment != null) {
-				writer.write(headerComment);
-			}
-
-			for (String line : lines) {
-				writer.write(line + "\n");
-			}
-
-			writer.close();
-
-		} catch (IOException exception) {
-			exception.printStackTrace();
-			Logger.log(Level.SEVERE, GCore.inst(), "Could not save the file while reloading " + file.getName());
-		}
-	}
-
-	// ----------------------------------------------------------------------
-	// Other utils
-	// ----------------------------------------------------------------------
-
-	public String getClassName(Class<?> className)
-	{
-		String all = className.getName();
-		String[] split = all.split("\\.");
-
-		if (split.length == 0) {
-			return all;
-		}
-
-		return split[split.length - 1];
-	}
-
-	private boolean isInteger(String str) {
-		try {
-			Integer.parseInt(str);
-			return true;
+			yml.write(file);
 		} catch (Throwable exception) {
-			return false;
+			throw new Error("couldn't save config to file " + logFilePath, exception);
 		}
 	}
 
-	private void replace(List<String> list, String str, String repl)
-	{
-		for (int i = 0; i < list.size(); i++) {
-			list.set(i, list.get(i).replace(str, repl));
-		}
+	public void print() {
+		yml.print();
 	}
 
-	private static int countChars(char ch, String str)
-	{
-		int result = 0;
+	// config
+	public boolean contains(String path) {
+		validatePath(path);
+		return yml.contains(path);
+	}
 
-		for (char c : str.toCharArray()) {
-			if (c == ch) {
-				result++;
+	public boolean isConfigurationSection(String path) {
+		return contains(path) && yml.isConfigurationSection(path);
+	}
+
+	// get section keys
+	public List<String> readMandatoryKeysForSection(String path) {
+		if (!isConfigurationSection(path)) {
+			throwMissing(path, "configuration section");
+		}
+		return readKeysForSection(path);
+	}
+
+	private static final List<String> EMPTY_KEYS = CollectionUtils.asUnmodifiableList();
+
+	public List<String> readKeysForSection(String path) {
+		if (isConfigurationSection(path)) {
+			return yml.getSectionNode(path).getConfigKeys();
+		}
+		return EMPTY_KEYS;
+	}
+
+	public List<Integer> readMandatoryNumberKeysForSection(String path, Integer continuityStart) {
+		return readMandatoryNumberKeysForSection(path, continuityStart, null);
+	}
+
+	public List<Integer> readMandatoryNumberKeysForSection(String path, Integer continuityStart, IntegerValidator validator) {
+		if (!isConfigurationSection(path)) {
+			throwMissing(path, "configuration section");
+		}
+		return readNumberKeysForSection(path, continuityStart, validator);
+	}
+
+	public List<Integer> readNumberKeysForSection(String path, Integer continuityStart) {
+		return readNumberKeysForSection(path, continuityStart, null);
+	}
+
+	public List<Integer> readNumberKeysForSection(String path, Integer continuityStart, IntegerValidator validator) {
+		// get keys
+		List<Integer> keys = new ArrayList<>();
+		if (isConfigurationSection(path)) {
+			for (String key : yml.getSectionNode(path).getConfigKeys()) {
+				Integer keyNumber = NumberUtils.integerOrNull(key);
+				if (keyNumber == null) {
+					throwError("key " + key + " must be a number at path " + path + "." + key);
+				}
+				keys.add(keyNumber);
 			}
 		}
-
-		return result;
+		// validate
+		if (validator != null) {
+			for (Integer key : keys) {
+				if (!validator.isValid(key)) {
+					throwError("Invalid key (" + validator.getMustBeDescription() + ") at path " + path + "." + key);
+				}
+			}
+		}
+		// continuity
+		if (continuityStart != null) {
+			// discontinuity found
+			Iterator<Integer> iterator = keys.iterator();
+			int expected = continuityStart - 1;
+			while (iterator.hasNext()) {
+				Integer found = iterator.next();
+				if (found != ++expected) {
+					throwError("missing key " + expected + " before " + found + " for section at path" + path);
+				}
+			}
+		}
+		// return
+		return keys;
 	}
+
+	// get object
+	public Object read(String path, Object def) {
+		return contains(path) ? doRead(path) : def;
+	}
+
+	public Object readMandatory(String path) {
+		if (!contains(path)) {
+			throwMissing(path, "object");
+		}
+		return doRead(path);
+	}
+
+	private Object doRead(String path) {
+		validatePath(path);
+		Object value = yml.getConfigValue(path);
+		return value;
+	}
+
+	// get object
+	public DataIO readObject(String path, boolean snakeCaseToCamelCase) {
+		return contains(path) /* this also validates the path */ ? getBackingYML().getSectionNode(path).toIO(snakeCaseToCamelCase) : null;
+	}
+
+	public DataIO readMandatoryObject(String path, boolean snakeCaseToCamelCase) {
+		if (!contains(path)) { // this also validates the path
+			throwMissing(path, "object IO");
+		}
+		return getBackingYML().getSectionNode(path).toIO(snakeCaseToCamelCase);
+	}
+
+	// get string
+	public String readStringNonEmptyStringOrNull(String path) {
+		String value = readString(path, null);
+		return value != null && !value.trim().isEmpty() ? value : null;
+	}
+
+	public String readString(String path, String def) {
+		return contains(path) ? doReadString(path) : def;
+	}
+
+	public String readMandatoryString(String path) {
+		if (!contains(path)) {
+			throwMissing(path, "text");
+		}
+		return doReadString(path);
+	}
+
+	protected String doReadString(String path) {
+		validatePath(path);
+		return StringUtils.format(yml.getConfigValueString(path));
+	}
+
+	// get boolean
+	public boolean readBoolean(String path, boolean def) {
+		return contains(path) ? doReadBoolean(path) : def;
+	}
+
+	public boolean readMandatoryBoolean(String path) {
+		if (!contains(path)) {
+			throwMissing(path, "boolean");
+		}
+		return doReadBoolean(path);
+	}
+
+	private boolean doReadBoolean(String path) {
+		validatePath(path);
+		return Boolean.parseBoolean(readString(path, null));
+	}
+
+	// get integer
+	public int readInteger(String path, int def) {
+		return readInteger(path, def, null);
+	}
+
+	public int readInteger(String path, int def, IntegerValidator validator) {
+		return contains(path) ? doReadInteger(path, validator) : def;
+	}
+
+	public int readMandatoryInteger(String path) {
+		return readMandatoryInteger(path, null);
+	}
+
+	public int readMandatoryInteger(String path, IntegerValidator validator) {
+		if (!contains(path)) {
+			throwMissing(path, "number");
+		}
+		return doReadInteger(path, validator);
+	}
+
+	private int doReadInteger(String path, IntegerValidator validator) {
+		validatePath(path);
+		Integer value = NumberUtils.integerOrNull(readString(path, null));
+		if (value == null) {
+			throwError("Invalid number at path " + path);
+		}
+		if (validator != null && !validator.isValid(value)) {
+			throwError("Invalid number (" + validator.getMustBeDescription() + ") at path " + path);
+		}
+		return value;
+	}
+
+	// get long
+	public long readLong(String path, long def) {
+		return contains(path) ? doReadLong(path) : def;
+	}
+
+	public long readMandatoryLong(String path) {
+		if (!contains(path)) {
+			throwMissing(path, "number");
+		}
+		return doReadLong(path);
+	}
+
+	private long doReadLong(String path) {
+		validatePath(path);
+		Long value = NumberUtils.longOrNull(readString(path, null));
+		if (value == null) {
+			throwError("Invalid number at path " + path);
+		}
+		return value;
+	}
+
+	// get double
+	public double readDouble(String path, double def) {
+		return readDouble(path, def, null);
+	}
+
+	public double readDouble(String path, double def, DoubleValidator validator) {
+		return contains(path) ? doReadDouble(path, validator) : def;
+	}
+
+	public double readMandatoryDouble(String path) {
+		return readMandatoryDouble(path, null);
+	}
+
+	public double readMandatoryDouble(String path, DoubleValidator validator) {
+		if (!contains(path)) {
+			throwMissing(path, "decimal number");
+		}
+		return doReadDouble(path, validator);
+	}
+
+	private double doReadDouble(String path, DoubleValidator validator) {
+		validatePath(path);
+		Double value = NumberUtils.doubleOrNull(readString(path, null));
+		if (value == null) {
+			throwError("Invalid number at path " + path);
+		}
+		if (validator != null && !validator.isValid(value)) {
+			throwError("Invalid decimal number (" + validator.getMustBeDescription() + ") at path " + path);
+		}
+		return value;
+	}
+
+	// value : get string list
+	public List<String> readStringList(String path, List<String> def) {
+		return contains(path) ? doReadStringList(path) : StringUtils.format(def);
+	}
+
+	public List<String> readMandatoryStringList(String path) {
+		if (!contains(path)) {
+			throwMissing(path, "text list");
+		}
+		return doReadStringList(path);
+	}
+
+	protected List<String> doReadStringList(String path) {
+		validatePath(path);
+		// get list
+		Object object = yml.getConfigValue(path);
+		List<String> value = new ArrayList<String>();
+		if (object != null) {
+			if (object instanceof List) {
+				for (Object obj : (List) object) {
+					value.add(String.valueOf(obj));
+				}
+			} else {
+				value.add(String.valueOf(object));
+			}
+		}
+		// format
+		value = StringUtils.format(value);
+		return value;
+	}
+
+	// value : get int list
+	public List<Integer> readIntegerList(String path, List<Integer> def) {
+		return readIntegerList(path, def, null);
+	}
+
+	public List<Integer> readIntegerList(String path, List<Integer> def, CollectionIntegerValidator validator) {
+		return contains(path) ? doReadIntegerList(path, validator) : def;
+	}
+
+	public List<Integer> readMandatoryIntegerList(String path) {
+		return readMandatoryIntegerList(path, null);
+	}
+
+	public List<Integer> readMandatoryIntegerList(String path, CollectionIntegerValidator validator) {
+		if (!contains(path)) {
+			throwMissing(path, "number list");
+		}
+		return doReadIntegerList(path, validator);
+	}
+
+	private List<Integer> doReadIntegerList(String path, CollectionIntegerValidator validator) {
+		validatePath(path);
+		// get list
+		Object object = yml.getConfigValue(path);
+		List<Integer> value = new ArrayList<Integer>();
+		if (object != null) {
+			if (object instanceof List) {
+				for (Object obj : (List) object) {
+					try {
+						value.add(Integer.parseInt(String.valueOf(obj)));
+					} catch (Throwable ignored) {
+						throwError("element " + String.valueOf(obj) + " is invalid for number list at path " + path);
+					}
+				}
+			} else {
+				try {
+					value.add(Integer.parseInt(String.valueOf(object)));
+				} catch (Throwable ignored) {
+					throwError("element " + String.valueOf(object) + " is invalid for number list at path " + path);
+				}
+			}
+		}
+		// validate
+		if (validator != null && !validator.isValid(value)) {
+			throwError("Invalid number list (" + validator.getMustBeDescription() + ") at path " + path);
+		}
+		return value;
+	}
+
+	// value : get value list
+	public <T> List<T> readSerializedList(String path, List<T> def, Class<T> typeClass) {
+		return contains(path) ? doReadSerializedList(path, typeClass) : def;
+	}
+
+	public <T> List<T> readMandatorySerializedList(String path, Class<T> typeClass) {
+		if (!contains(path)) {
+			throwMissing(path, StringUtils.getReadableName(typeClass).toLowerCase() + " list");
+		}
+		return doReadSerializedList(path, typeClass);
+	}
+
+	private <T> List<T> doReadSerializedList(String path, Class<T> typeClass) {
+		validatePath(path);
+		Serializer<T> serializer = Serializer.find(typeClass);
+		// get list
+		Object object = yml.getConfigValue(path);
+		List<T> value = null;
+		if (object != null) {
+			value = new ArrayList<>();
+			if (object instanceof List) {
+				for (Object obj : (List) object) {
+					try {
+						T valueObj = serializer.deserialize(String.valueOf(obj));
+						if (valueObj != null) {
+							value.add(valueObj);
+							continue;
+						}
+					} catch (Throwable ignored) {}
+					throwError("element " + obj + " is invalid for " + serializer.getTypeName() + " at path " + path);
+				}
+			} else label:{
+				try {
+					T valueObject = serializer.deserialize(String.valueOf(object));
+					if (valueObject != null) {
+						value.add(valueObject);
+						break label;
+					}
+				} catch (Throwable ignored) {}
+				throwError("element " + object + " is invalid for " + serializer.getTypeName() + " at path " + path);
+			}
+		}
+		return value;
+	}
+
+	// value : get enum list
+	public <T extends Enum<T>> List<T> readEnumList(String path, List<T> def, Class<T> enumClass) {
+		return contains(path) ? doReadEnumList(path, enumClass) : def;
+	}
+
+	public <T extends Enum<T>> List<T> readMandatoryEnumList(String path, Class<T> enumClass) {
+		if (!contains(path)) {
+			throwMissing(path, StringUtils.getReadableName(enumClass) + " list");
+		}
+		return doReadEnumList(path, enumClass);
+	}
+
+	private <T extends Enum<T>> List<T> doReadEnumList(String path, Class<T> enumClass) {
+		validatePath(path);
+		// get list
+		Object object = yml.getConfigValue(path);
+		List<T> value = new ArrayList<>();
+		Serializer<T> serializer = Serializer.ofEnum(enumClass);
+		if (object != null) {
+			if (object instanceof List) {
+				for (Object obj : (List) object) {
+					try {
+						T valueObj = serializer.deserialize(String.valueOf(obj));
+						if (valueObj != null) {
+							value.add(valueObj);
+							continue;
+						}
+					} catch (Throwable ignored) {}
+					throwError("element " + obj + " is invalid for " + serializer.getTypeName() + " at path " + path);
+				}
+			} else label:{
+				try {
+					T valueObject = serializer.deserialize(String.valueOf(object));
+					if (valueObject != null) {
+						value.add(valueObject);
+						break label;
+					}
+				} catch (Throwable ignored) {}
+				throwError("element " + object + " is invalid for " + serializer.getTypeName() + " at path " + path);
+			}
+		}
+		return value;
+	}
+
+	// value : get item list
+	public List<ItemStack> readItemList(String path, List<ItemStack> def) {
+		return contains(path) ? doReadItemList(path) : def;
+	}
+
+	public List<ItemStack> readMandatoryItemStackList(String path) {
+		if (!contains(path)) {
+			throwMissing(path, "item list");
+		}
+		return doReadItemList(path);
+	}
+
+	private List<ItemStack> doReadItemList(String path) {
+		validatePath(path);
+		// get items
+		List<ItemStack> value = new ArrayList<>();
+		for (String key : readKeysForSection(path)) {
+			try {
+				ItemStack item = readItemStack(path + "." + key, null);
+				if (item == null) {
+					throwError("element " + key + " is invalid for item list at path " + path);
+				}
+				value.add(item);
+			} catch (Throwable ignored) {
+				throwError("element " + key + " is invalid for item list at path " + path);
+			}
+		}
+		return value;
+	}
+
+	// value : get chance item list
+	public List<ItemChancePair> readItemChancePairList(String path, List<ItemChancePair> def) {
+		return contains(path) ? doReadItemChancePairList(path) : def;
+	}
+
+	public List<ItemChancePair> readMandatoryItemChancePairList(String path) {
+		if (!contains(path)) {
+			throwMissing(path, "chance item list");
+		}
+		return doReadItemChancePairList(path);
+	}
+
+	private List<ItemChancePair> doReadItemChancePairList(String path) {
+		validatePath(path);
+		// get items
+		List<ItemChancePair> value = new ArrayList<>();
+		for (String key : readKeysForSection(path)) {
+			try {
+				ItemChancePair item = doReadChanceItem(path + "." + key);
+				if (item == null) {
+					throwError("element " + key + " is invalid for item list at path " + path);
+				}
+				value.add(item);
+			} catch (Throwable exception) {
+				throwError("element " + key + " is invalid for item list at path " + path, exception);
+			}
+		}
+		return value;
+	}
+
+	// get locations item list
+	public List<GUIItemTriple> readGUIItemTripleList(String path, List<GUIItemTriple> def) {
+		return contains(path) ? doReadGUIItemTripleList(path) : def;
+	}
+
+	public List<GUIItemTriple> readMandatoryGUIItemTripleList(String path) {
+		if (!contains(path)) {
+			throwMissing(path, "icon/locations list");
+		}
+		return doReadGUIItemTripleList(path);
+	}
+
+	private List<GUIItemTriple> doReadGUIItemTripleList(String path) {
+		validatePath(path);
+		// get items
+		List<GUIItemTriple> value = new ArrayList<>();
+		for (String key : readKeysForSection(path)) {
+			try {
+				GUIItemTriple item = readMandatoryGUIItemTriple(path + "." + key);
+				if (item == null) {
+					throwError("element " + key + " is invalid for icon/locations list at path " + path);
+				}
+				value.add(item);
+			} catch (Throwable ignored) {
+				throwError("element " + key + " is invalid for icon/locations list at path " + path);
+			}
+		}
+		return value;
+	}
+
+	// get locations item
+	public GUIItemTriple readLocationsItem(String path, GUIItemTriple def) throws Throwable {
+		return contains(path) ? doReadGUIItemTriple(path, false) : def;
+	}
+
+	public GUIItemTriple readMandatoryGUIItemTriple(String path) throws Throwable {
+		if (!contains(path)) {
+			throwMissing(path, "icon/locations");
+		}
+		return doReadGUIItemTriple(path, true);
+	}
+
+	private GUIItemTriple doReadGUIItemTriple(String path, boolean mandatory) throws Throwable {
+		validatePath(path);
+		// get item
+		ItemStack item = mandatory ? readMandatoryItemStack(path + ".icon") : doReadItemStack(path + ".icon");
+		boolean persistent = readBoolean(path + ".persistent", false);
+		List<String> rawLocations = mandatory ? readMandatoryStringList(path + ".locations") : doReadStringList(path + ".locations");
+		List<IntegerPair> locations = new ArrayList<>();
+		for (String location : rawLocations) {
+			try {
+				String[] split = location.split(",");
+				if (split.length == 1) {
+					locations.add(IntegerPair.of(-1, Integer.parseInt(split[0])));
+				} else if (split.length == 2) {
+					locations.add(IntegerPair.of(Integer.parseInt(split[0]), Integer.parseInt(split[1])));
+				}
+			} catch (Throwable error) {
+				throwError("couldn't read location " + location + " at path " + path + ".locations");
+			}
+		}
+		GUIItemTriple value = new GUIItemTriple(item, persistent, locations);
+		return value;
+	}
+
+	// get chance item
+	public ItemChancePair readChanceItem(String path, ItemChancePair def) throws Throwable {
+		return contains(path) ? doReadChanceItem(path) : def;
+	}
+
+	public ItemChancePair readMandatoryChanceItem(String path) throws Throwable {
+		if (!contains(path)) {
+			throwMissing(path, "chance item");
+		}
+		return doReadChanceItem(path);
+	}
+
+	private ItemChancePair doReadChanceItem(String path) throws Throwable {
+		if (!contains(path)) {
+			return null;
+		}
+		if (!isConfigurationSection(path)) {
+			throwMissing(path, "chance item");
+		}
+		// read
+		ItemStack item = readItemStack(path, null);
+		int chance = readMandatoryInteger(path + ".chance");
+		return new ItemChancePair(item, chance);
+	}
+
+	// get item
+	public ItemStack readItemStack(String path, ItemStack def) throws Throwable {
+		return contains(path) ? doReadItemStack(path) : def;
+	}
+
+	public ItemStack readMandatoryItemStack(String path) throws Throwable {
+		if (!contains(path)) {
+			throwMissing(path, "item");
+		}
+		return doReadItemStack(path);
+	}
+
+	private ItemStack doReadItemStack(String path) throws Throwable {
+		if (!contains(path)) {
+			return null;
+		}
+		if (!isConfigurationSection(path)) {
+			throwError("missing item config section at path " + path);
+		}
+		// read config in DataIO and use the adapter so it's consistent for both config and json
+		DataIO data = readObject(path, true); // true to convert snake_case to camelCase because we're using that for json
+		return AdapterItemStack.INSTANCE.readCurrent(data);
+	}
+
+	// get cost
+	public Cost readCost(String path, Cost def) throws Throwable {
+		return contains(path) ? doReadCost(path) : def;
+	}
+
+	public Cost readMandatoryCost(String path) throws Throwable {
+		if (!contains(path)) {
+			throwMissing(path, "cost");
+		}
+		Cost cost = doReadCost(path);
+		// empty
+		if (cost.isEmpty()) {
+			throwError("cost at path " + path + " is empty");
+		}
+		return cost;
+	}
+
+	private Cost doReadCost(String path) throws Throwable {
+		if (!contains(path)) {
+			return null;
+		}
+		if (!contains(path)) {
+			throwMissing(path, "cost");
+		}
+		// read
+		Cost value = new Cost();
+		if (isConfigurationSection(path)) {
+			// single item
+			if (contains(path + ".item")) {
+				ItemStack item = readMandatoryItemStack(path + ".item");
+				String displayName = readString(path + ".item.display_name", null);
+				value.add(item, displayName);
+			}
+			// multiple items
+			else {
+				if (contains(path + ".items")) {
+					for (String itemId : readKeysForSection(path + ".items")) {
+						ItemStack item = readMandatoryItemStack(path + ".items." + itemId);
+						String displayName = readString(path + ".items." + itemId + ".display_name", null);
+						value.add(item, displayName);
+					}
+				}
+			}
+			// currencies
+			if (contains(path + ".currencies")) {
+				for (String currencyId : readKeysForSection(path + ".currencies")) {
+					Currency currency = Currency.safeValueOf(currencyId);
+					if (currency == null) throwError("invalid currency " + currencyId + " for cost config at path " + path);
+					double amount = readMandatoryDouble(path + ".currencies." + currencyId);
+					value.add(currency, amount);
+				}
+			}
+		}
+		// string, currency
+		else {
+			String[] raw = readString(path, null).split(" ");
+			Currency currency = null;
+			Double amount = null;
+			// specified currency
+			if (raw.length > 1) {
+				currency = Currency.safeValueOf(raw[0].trim());
+				if (currency == null) throwError("invalid currency " + raw[0].trim() + " for cost config at path " + path);
+				amount = NumberUtils.doubleOrNull(raw[1]);
+				if (amount == null) throwError("invalid amount " + raw[1].trim() + " for cost config at path " + path);
+			}
+			// no currency specified, use Vault
+			else {
+				currency = Currency.VAULT;
+				amount = NumberUtils.doubleOrNull(raw[0].trim());
+				if (amount == null) throwError("invalid amount " + raw[0].trim() + " for cost config at path " + path);
+			}
+			// load
+			value.add(currency, amount);
+		}
+		// return
+		return value;
+	}
+
+	// get value
+	public <T> T readValue(String path, T def, Serializer<T> serializer) {
+		return readValue(path, def, serializer, null);
+	}
+
+	public <T> T readValue(String path, T def, Serializer<T> serializer, ValueValidator<T> validator) {
+		return contains(path) ? doReadValue(path, serializer, validator) : def;
+	}
+
+	public <T> T readMandatoryValue(String path, Serializer<T> serializer) {
+		return readMandatoryValue(path, serializer, null);
+	}
+
+	public <T> T readMandatoryValue(String path, Serializer<T> serializer, ValueValidator<T> validator) {
+		if (!contains(path)) {
+			throwMissing(path, serializer.getTypeName());
+		}
+		return doReadValue(path, serializer, validator);
+	}
+
+	private <T> T doReadValue(String path, Serializer<T> serializer, ValueValidator<T> validator) {
+		validatePath(path);
+		String raw = readString(path, null);
+		T value = serializer.deserialize(raw);
+		if (value == null) {
+			throwError("Invalid " + serializer.getTypeName() + " at path " + path);
+		}
+		if (validator != null && !validator.isValid(value)) {
+			throwError("Invalid " + serializer.getTypeName() + " (" + validator.getMustBeDescription() + ") at path " + path);
+		}
+		return value;
+	}
+
+	// get enum
+	public <T extends Enum<T>> T readEnum(String path, T def, Class<T> enumClass) {
+		return readValue(path, def, Serializer.ofEnum(enumClass));
+	}
+
+	public <T extends Enum<T>> T readMandatoryEnum(String path, Class<T> enumClass) {
+		return readMandatoryValue(path, Serializer.ofEnum(enumClass));
+	}
+
+	// get location
+	public Location readLocation(String path, Location def) {
+		return readValue(path, def, Serializer.LOCATION);
+	}
+
+	public Location readMandatoryLocation(String path) {
+		return readMandatoryValue(path, Serializer.LOCATION);
+	}
+
+	// set
+	public void copy(String path, String targetPath) {
+		if (contains(path)) {
+			validatePath(targetPath);
+			cloneRec(path, targetPath, false);
+		}
+	}
+
+	public void move(String path, String targetPath) {
+		if (contains(path)) {
+			validatePath(targetPath);
+			cloneRec(path, targetPath, true);
+		}
+	}
+
+	private void cloneRec(String path, String target, boolean remove) {
+		// proceed section
+		if (isConfigurationSection(path)) {
+			for (String key : readKeysForSection(path)) {
+				cloneRec(path + "." + key, target + "." + key, false);
+			}
+			if (remove) write(path, null);
+		}
+		// proceed value
+		else {
+			write(target, read(path, null));
+			if (remove) write(path, null);
+		}
+	}
+
+	public void write(String path, Object value) {
+		if (path.startsWith(".")) {
+			path = path.substring(1); // just ignore blank, so we don't have to always worry about that (in migrations, for instance)
+		}
+		validatePath(path);
+		// remove
+		if (value == null) {
+			if (path.isEmpty()) {
+				for (String key : readKeysForSection("")) {
+					yml.set(key, null);
+				}
+			} else {
+				yml.set(path, null);
+			}
+		}
+		// set
+		else {
+			if (value instanceof ItemStack) {
+				try {
+					DataIO itemWriter = new DataIO();
+					AdapterItemStack.INSTANCE.write((ItemStack) value, itemWriter);
+					if (itemWriter.isEmpty()) {
+						yml.set(path, null);
+					} else {
+						SectionNode parent = path.contains(".") ? yml.mkdirs(path.substring(0, path.lastIndexOf('.'))) : yml.getBase();
+						String id = path.contains(".") ? path.substring(path.lastIndexOf('.') + 1) : path;
+						parent.setConfigNode(itemWriter.toYML(parent, id, true));
+					}
+				} catch (Throwable exception) {
+					exception.printStackTrace();
+				}
+			} else if (value instanceof Collection) {
+				Collection coll = (Collection) value;
+				yml.set(path, coll.isEmpty() ? new ArrayList<String>() : Serializer.find(coll.iterator().next().getClass()).serialize(coll));
+			} else {
+				Serializer serializer = Serializer.find(value.getClass());
+				yml.set(path, serializer.serialize(value));
+			}
+		}
+	}
+
+	// utils
+	public void validatePath(String path) {
+		if (StringUtils.hasChar(path, ' ') || StringUtils.hasChar(path, '\t') || path.trim().length() != path.length()) {
+			throwError("path '" + path + "' contains whitespaces");
+		}
+	}
+
+	// logs
+	public String buildMistakeErrorHeader() {
+		return "Configuration mistake in file " + logFilePath + " : ";
+	}
+
+	public String buildFormatErrorHeader() {
+		return "Formatting error in file " + logFilePath + " : ";
+	}
+
+	private void throwMissing(String path, String type) {
+		throw new ConfigError(buildMistakeErrorHeader() + "missing " + type + " at path " + path);
+	}
+
+	private void throwError(String message) {
+		throw new ConfigError(buildMistakeErrorHeader() + message);
+	}
+
+	private void throwError(String message, Throwable cause) {
+		throw new Error("Error when reading file " + logFilePath + " : " + message, cause);
+	}
+
 }

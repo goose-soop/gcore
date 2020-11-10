@@ -1,0 +1,191 @@
+package com.guillaumevdn.gcore.lib.string.placeholder;
+
+import java.util.List;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
+import javax.annotation.Nonnull;
+
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
+import com.guillaumevdn.gcore.lib.string.StringUtils;
+
+/**
+ * @author GuillaumeVDN
+ */
+public interface Replacer {
+
+	@Nonnull
+	ReplacerData getReplacerData();
+
+	// parsing
+	default String parse(String string) {
+		if (StringUtils.hasPlaceholders(string)) {
+			ReplacerData data = getReplacerData();
+			// parse custom replacer first, there might be placeholders needed in placeholder containers
+			if (data.getCustom() != null) {
+				string = data.getCustom().apply(string);
+			}
+			// then parse placeholder containers with player
+			if (data.getPlayer() != null) {
+				string = PlaceholderContainer.parseAll(string, data.getPlayer());
+			}
+		}
+		return string;
+	}
+
+	default List<String> parse(List<String> raw) {
+		return parse(raw, true);
+	}
+
+	default List<String> parse(List<String> raw, boolean clone) {
+		// - this method don't use the parse(String) method because otherwise multi-line placeholders are translated to one line
+		if (raw == null) {
+			return null;
+		}
+		ReplacerData data = getReplacerData();
+		// parse custom replacer first, there might be placeholders needed in placeholder containers
+		List<String> parsed;
+		if (data.getCustom() != null) {
+			parsed = data.getCustom().apply(raw, clone);
+		} else {
+			parsed = clone ? CollectionUtils.asList(raw) : raw;
+		}
+		// then parse placeholder containers with player
+		if (data.getPlayer() != null) {
+			for (int i = 0; i < parsed.size(); ++i) {
+				String r = parsed.get(i);
+				if (StringUtils.hasPlaceholders(r)) {
+					parsed.set(i, PlaceholderContainer.parseAll(r, data.getPlayer()));
+				}
+			}
+		}
+		return parsed;
+	}
+
+	default ItemStack parse(ItemStack item) {
+		ItemStack copy = item == null ? null : item.clone();
+		if (copy == null || !copy.hasItemMeta()) {
+			return copy;
+		}
+		ItemMeta meta = copy.getItemMeta();
+		if (!meta.hasDisplayName() && (!meta.hasLore() || meta.getLore().isEmpty())) {
+			return copy;
+		}
+		if (meta.hasDisplayName()) {
+			meta.setDisplayName(parse(meta.getDisplayName()));
+		}
+		if (meta.hasLore()) {
+			meta.setLore(parse(meta.getLore()));
+		}
+		copy.setItemMeta(meta);
+		return copy;
+	}
+
+	// alterer
+	default Replacer cloneReplacer() {
+		ReplacerData data = getReplacerData().clone();
+		return new Replacer() {
+			@Override
+			public ReplacerData getReplacerData() {
+				return data;
+			}
+		};
+	}
+
+	default Replacer with(Player player) {
+		getReplacerData().with(player);
+		return this;
+	}
+
+	default Replacer withPlayer(Supplier<Player> player) {
+		getReplacerData().withPlayer(player);
+		return this;
+	}
+
+	default Replacer with(Location location) {
+		getReplacerData().with(location);
+		return this;
+	}
+
+	default Replacer withLocation(Supplier<Location> location) {
+		getReplacerData().withLocation(location);
+		return this;
+	}
+
+	default Replacer with(String placeholder, Supplier<Object> replacer) {
+		getReplacerData().with(placeholder, replacer);
+		return this;
+	}
+
+	default Replacer with(Function<String, Object> customMatcher) {
+		getReplacerData().with(customMatcher);
+		return this;
+	}
+
+	default Replacer with(StringReplacer custom) {
+		getReplacerData().with(custom);
+		return this;
+	}
+
+	default Replacer with(Replacer other) {
+		if (other.getReplacerData().getPlayer() != null) {
+			getReplacerData().with(other.getReplacerData().getPlayer());
+		}
+		if (other.getReplacerData().getLocation() != null) {
+			getReplacerData().with(other.getReplacerData().getLocation());
+		}
+		getReplacerData().with(other.getReplacerData().getCustom());
+		return this;
+	}
+
+	// to string
+	default String describeReplacer() {
+		ReplacerData data = getReplacerData();
+		Location loc = data.getLocation();
+		return (data.getPlayer() != null ? "player " + data.getPlayer().getName() : "generic")
+				+ (loc != null ? "/location" : "")
+				+ (data.getCustom() != null ? "/custom" : "")
+				;
+	}
+
+	// creation
+	static final Replacer GENERIC = empty();
+
+	static Replacer empty() {
+		return new SimpleReplacer(new ReplacerData());
+	}
+
+	static Replacer of(Player player) {
+		return player == null ? empty() : new SimpleReplacer(new ReplacerData().with(player));  // do not cache players, since this method might be called to create a replacer with other things
+	}
+
+	static Replacer ofPlayer(Supplier<Player> player) {
+		return new SimpleReplacer(new ReplacerData().withPlayer(player));
+	}
+
+	static Replacer of(Location location) {
+		return new SimpleReplacer(new ReplacerData().with(location));
+	}
+
+	static Replacer ofLocation(Supplier<Location> location) {
+		return new SimpleReplacer(new ReplacerData().withLocation(location));
+	}
+
+	static Replacer of(String placeholder, Supplier<Object> replacer) {
+		return new SimpleReplacer(new ReplacerData().with(placeholder, replacer));
+	}
+
+	static Replacer of(Function<String, Object> customMatcher) {
+		return new SimpleReplacer(new ReplacerData().with(customMatcher));
+	}
+
+	static Replacer of(StringReplacer custom) {
+		return new SimpleReplacer(new ReplacerData().with(custom));
+	}
+
+}

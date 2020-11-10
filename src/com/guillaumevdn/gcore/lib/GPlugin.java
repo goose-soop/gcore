@@ -1,496 +1,756 @@
 package com.guillaumevdn.gcore.lib;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.lang.reflect.Constructor;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
-import org.bukkit.command.PluginCommand;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.event.server.PluginDisableEvent;
-import org.bukkit.event.server.PluginEnableEvent;
-import org.bukkit.plugin.Plugin;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.scheduler.BukkitWorker;
 
+import com.guillaumevdn.gcore.ConfigGCore;
 import com.guillaumevdn.gcore.GCore;
-import com.guillaumevdn.gcore.GLocale;
-import com.guillaumevdn.gcore.lib.Logger.Level;
-import com.guillaumevdn.gcore.lib.command.CommandArgument;
-import com.guillaumevdn.gcore.lib.command.CommandCall;
-import com.guillaumevdn.gcore.lib.command.CommandRoot;
+import com.guillaumevdn.gcore.lib.bukkit.BukkitThread;
+import com.guillaumevdn.gcore.lib.chat.JsonMessage;
+import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
+import com.guillaumevdn.gcore.lib.collection.LowerCaseHashMap;
+import com.guillaumevdn.gcore.lib.command.Command;
 import com.guillaumevdn.gcore.lib.configuration.YMLConfiguration;
-import com.guillaumevdn.gcore.lib.gui.GUI;
-import com.guillaumevdn.gcore.lib.integration.PluginIntegration;
-import com.guillaumevdn.gcore.lib.messenger.Messenger;
-import com.guillaumevdn.gcore.lib.messenger.Text;
-import com.guillaumevdn.gcore.lib.parseable.container.CPItem;
-import com.guillaumevdn.gcore.lib.util.ServerVersion;
-import com.guillaumevdn.gcore.lib.util.Utils;
-import com.guillaumevdn.gcore.libs.org.bstats.Metrics;
+import com.guillaumevdn.gcore.lib.configuration.file.YMLError;
+import com.guillaumevdn.gcore.lib.data.Board;
+import com.guillaumevdn.gcore.lib.exception.ConfigError;
+import com.guillaumevdn.gcore.lib.file.FileUtils;
+import com.guillaumevdn.gcore.lib.file.ResourceExtractor;
+import com.guillaumevdn.gcore.lib.function.ThrowableRunnable;
+import com.guillaumevdn.gcore.lib.gui.struct.GUI;
+import com.guillaumevdn.gcore.lib.integration.Integration;
+import com.guillaumevdn.gcore.lib.logging.Logger;
+import com.guillaumevdn.gcore.lib.migration.Migration;
+import com.guillaumevdn.gcore.lib.object.ObjectUtils;
+import com.guillaumevdn.gcore.lib.permission.PermissionContainer;
+import com.guillaumevdn.gcore.lib.plugin.PluginUtils;
+import com.guillaumevdn.gcore.lib.string.StringUtils;
+import com.guillaumevdn.gcore.lib.string.Text;
+import com.guillaumevdn.gcore.lib.string.TextFile;
+import com.guillaumevdn.gcore.libs.com.google.gson.Gson;
+import com.guillaumevdn.gcore.libs.com.google.gson.GsonBuilder;
 
-public abstract class GPlugin extends JavaPlugin implements Listener {
+/**
+ * @author GuillaumeVDN
+ */
+public abstract class GPlugin<C extends GPluginConfig, P extends PermissionContainer> extends JavaPlugin {
 
-	// ----------------------------------------------------------------------
-	// Abstract methods
-	// ----------------------------------------------------------------------
+	private final int spigotResourceId;
+	private final List<Class<? extends Migration>> migrations;
+	private final Class<C> configurationClass;
+	private C configuration = null;
+	private final Class<P> permissionContainerClass;
+	private P permissionContainer = null;
+	private final LowerCaseHashMap<TextFile> textFiles = new LowerCaseHashMap<>();
+	private final LowerCaseHashMap<Board> data = new LowerCaseHashMap<>();
+	private final LowerCaseHashMap<Command> commands = new LowerCaseHashMap<>();
+	private final LowerCaseHashMap<Listener> listeners = new LowerCaseHashMap<>();
+	private final LowerCaseHashMap<Task> tasks = new LowerCaseHashMap<>();
+	private final LowerCaseHashMap<Logger> loggers = new LowerCaseHashMap<>();
+	private final LowerCaseHashMap<GUI> guis = new LowerCaseHashMap<>();
+	private final LowerCaseHashMap<Integration> integrations = new LowerCaseHashMap<>();
+	private Logger mainLogger = new Logger(this, getName() + "-" + getDescription().getVersion(), true, true, 10000, false);  // define it temporarily for start
+	private boolean activated = false;
+	private Gson gson = createGsonBuilder().create();
+	private Gson prettyGson = createGsonBuilder().setPrettyPrinting().create();
 
-	protected abstract boolean preEnable();
-	protected abstract boolean innerReload();
-	protected abstract boolean enable();
-	protected abstract void disable();
-	protected abstract void unregisterData();
-	public abstract void resetData();
-	public abstract YMLConfiguration getConfiguration();
-
-	// ----------------------------------------------------------------------
-	// Misc methods
-	// ----------------------------------------------------------------------
-
-	// misc
-	public boolean isCore() {
-		return getName().equals("GCore");
+	public GsonBuilder createGsonBuilder() {
+		return FileUtils.createGsonBuilder();
 	}
 
-	@Override
-	public String toString() {
-		return getName();
+	public GPlugin(int spigotResourceId, Class<C> configurationClass, Class<P> permissionContainerClass, Class<? extends Migration>... migrations) {
+		this.spigotResourceId = spigotResourceId;
+		this.migrations = CollectionUtils.asUnmodifiableList(migrations);
+		this.configurationClass = configurationClass;
+		this.permissionContainerClass = permissionContainerClass;
 	}
-
-	// log
-	public void log(String message) {
-		log(Level.INFO, message);
-	}
-
-	public void warning(String message) {
-		log(Level.WARNING, message);
-	}
-
-	public void error(String message) {
-		log(Level.SEVERE, message);
-	}
-
-	public void success(String message) {
-		log(Level.SUCCESS, message);
-	}
-
-	public void debug(String message) {
-		log(Level.DEBUG, message);
-	}
-
-	public void log(Level level, String message) {
-		Logger.log(level, this, message);
-	}
-
-	public void messageInfo(Player player, String message) {
-		message(player, Messenger.Level.NORMAL_INFO, message);
-	}
-
-	public void messageSuccess(Player player, String message) {
-		message(player, Messenger.Level.NORMAL_SUCCESS, message);
-	}
-
-	public void messageWarning(Player player, String message) {
-		message(player, Messenger.Level.SEVERE_INFO, message);
-	}
-
-	public void messageError(Player player, String message) {
-		message(player, Messenger.Level.SEVERE_ERROR, message);
-	}
-
-	public void message(Player player, Messenger.Level level, String message) {
-		Messenger.send(player, level, getName(), message);
-	}
-
-	// ----------------------------------------------------------------------
-	// Fields
-	// ----------------------------------------------------------------------
-
-	// settings
-	protected boolean silentEnable = false;
-	protected boolean authorizationCheck = false;
-	protected int spigotResourceId = 0;
-
-	// fields
-	private boolean errorEnable = false;
-	private Metrics metrics;
-	private Map<String, CommandRoot> commands = new HashMap<String, CommandRoot>();
-	private List<PluginIntegration> pluginIntegration = new ArrayList<PluginIntegration>();
-	private Map<String, Class<? extends PluginIntegration>> awaitingPluginIntegration = new HashMap<String, Class<? extends PluginIntegration>>();
 
 	// get
-	public boolean errorEnable() {
-		return errorEnable;
+	public int getSpigotResourceId() {
+		return spigotResourceId;
 	}
 
-	protected void errorEnable(boolean errorEnable) {
-		this.errorEnable = errorEnable;
+	public final Class<C> getConfigurationClass() {
+		return configurationClass;
 	}
 
-	public Metrics getMetrics() {
-		return metrics;
+	public final C getConfiguration() {
+		return configuration;
 	}
 
-	public Map<String, CommandRoot> getCommands() {
-		return Collections.unmodifiableMap(commands);
+	public final Class<P> getPermissionContainerClass() {
+		return permissionContainerClass;
 	}
 
-	public List<PluginIntegration> getPluginIntegration() {
-		return Collections.unmodifiableList(pluginIntegration);
+	public final P getPermissionContainer() {
+		return permissionContainer;
 	}
 
-	// ----------------------------------------------------------------------
-	// Commands registration and plugin integration
-	// ----------------------------------------------------------------------
-
-	public void registerCommand(final CommandRoot command, final Perm adminPermission) {
-		registerCommand(command, adminPermission, false);
+	public final YMLConfiguration loadConfigurationFile(String path) {
+		return new YMLConfiguration(this, getDataFile(path));
 	}
 
-	public void registerCommand(final CommandRoot command, final Perm adminPermission, final boolean secondary) {
-		String commandName = command.getAliases().get(0).toLowerCase();
-		if (!commands.containsKey(commandName)) {
-			if (!secondary) {
-				// add default reload command if doesn't exist
-				if (command.getChild("reload") == null) {
-					command.addChild(new CommandArgument(this, Utils.asList("reload", "rl"), "reload the plugin", adminPermission, false) {
-						@Override
-						protected void perform(CommandCall call) {
-							long start = System.currentTimeMillis();
-							reload();
-							GLocale.MSG_GENERIC_RELOAD.send(call.getSender(), "{plugin}", getName(), "{time}", (System.currentTimeMillis() - start) + "ms");
-						}
-					});
-				}
-				// add default support command if doesn't exist
-				if (command.getChild("support") == null) {
-					command.addChild(new CommandArgument(this, Utils.asList("support", "bug", "bugreport", "report", "suggest", "discord"), "get support", adminPermission, false) {
-						@Override
-						protected void perform(CommandCall call) {
-							Messenger.send(call.getSender(), Messenger.Level.NORMAL_INFO, "GCore", "You can get help, report bugs and suggest features on my discord server ! :D");
-							Messenger.send(call.getSender(), Messenger.Level.NORMAL_INFO, "GCore", "http://www.guillaumevdn.com/plugins/discord/");
-						}
-					});
-				}
+	public final LowerCaseHashMap<TextFile> getTexts() {
+		return textFiles;
+	}
+
+	public final LowerCaseHashMap<Board> getData() {
+		return data;
+	}
+
+	public final File getDataFile(String path) {
+		return new File(getDataFolder() + "/" + path);
+	}
+
+	public final Map<String, Listener> getListeners() {
+		return Collections.unmodifiableMap(listeners);
+	}
+
+	public final Map<String, Task> getTasks() {
+		return Collections.unmodifiableMap(tasks);
+	}
+
+	public final Map<String, Logger> getLoggers() {
+		return Collections.unmodifiableMap(loggers);
+	}
+
+	public final Map<String, GUI> getGuis() {
+		return Collections.unmodifiableMap(guis);
+	}
+
+	public final Map<String, Integration> getIntegrations() {
+		return Collections.unmodifiableMap(integrations);
+	}
+
+	public final Integration getIntegration(String pluginName) {
+		return integrations.get(pluginName);
+	}
+
+	public final Logger getLogger(String id) {
+		return loggers.get(id);
+	}
+
+	public final Logger getMainLogger() {
+		return mainLogger;
+	}
+
+	public final boolean isActivated() {
+		return activated;
+	}
+
+	public final Gson getGson() {
+		return gson;
+	}
+
+	public final Gson getPrettyGson() {
+		return prettyGson;
+	}
+
+	// enable
+	private final boolean migrate() throws Throwable {
+		for (Class<? extends Migration> cls : migrations) {
+			if (!cls.newInstance().process()) {
+				return false;
 			}
-			// register
-			PluginCommand cmd = getCommand(commandName);
-			cmd.setExecutor(command);
-			cmd.setTabCompleter(command);
-			commands.put(commandName, command);
-		}
-	}
-
-	/**
-	 * Try to register and enable a plugin integration
-	 * @param pluginName the plugin name
-	 * @param integrationClass the integration class that will be instanciated (must have a constructor with a single String param)
-	 * @return the plugin integration instance, or null if didn't succeed
-	 */
-	public <T extends PluginIntegration> boolean registerPluginIntegration(String pluginName, Class<? extends T> integrationClass) {
-		return registerPluginIntegration(pluginName, integrationClass, null, null);
-	}
-
-	/**
-	 * Try to register and enable a plugin integration
-	 * @param pluginName the plugin name
-	 * @param integrationClass the integration class that will be instanciated (must have a constructor with a single String param)
-	 * @param minVersion the minimum required version, or null if none
-	 * @param maxVersion the maximum allowed version, or null if none
-	 * @return the plugin integration instance, or null if didn't succeed
-	 */
-	public <T extends PluginIntegration> boolean registerPluginIntegration(String pluginName, Class<T> integrationClass, ServerVersion minVersion, ServerVersion maxVersion) {
-		// min version
-		if (minVersion != null && ServerVersion.CURRENT.isLessThan(minVersion)) {
-			debug("Not integrating " + pluginName + " (minimum required version is " + minVersion.getName() + ")");
-			return false;
-		}
-		// max version
-		if (maxVersion != null && ServerVersion.CURRENT.isGreaterThan(maxVersion)) {
-			debug("Not integrating " + pluginName + " (maximum allowed version is " + maxVersion.getName() + ")");
-			return false;
-		}
-		// not installed
-		Plugin plugin = Utils.getPlugin(pluginName);
-		if (plugin == null) {
-			debug("Not integrating " + pluginName + " (not installed)");
-			return false;
-		}
-		// register
-		success("Registered " + pluginName + " integration");
-		// attempt to activate
-		try {
-			enableIntegrationNoCatch(pluginName, integrationClass);
-		}
-		// register to attempt when it's activated
-		catch (Throwable exception) {
-			exception.printStackTrace();
-			warning("Couldn't integrate " + pluginName + ", a new attempt will be made when it's enabled/reloaded");
-			if (getName().equals("QuestCreator")) warning("If this causes quests to not load on plugin activation, try to enable the delayed activation in config.yml");
-			awaitingPluginIntegration.put(pluginName, integrationClass);
 		}
 		return true;
 	}
 
-	private boolean enableIntegration(String pluginName, Class<? extends PluginIntegration> integrationClass) {
+	protected void registerTypes() {
+	}
+
+	protected void registerTexts() {
+	}
+
+	protected abstract File getDefaultTextsFolder();
+
+	protected void registerData() {
+	}
+
+	protected void preEnable() throws Throwable {
+	}
+
+	protected void enable() throws Throwable {
+	}
+
+	protected void registerAndEnableIntegrations() {
+	}
+
+	@Override
+	public void onEnable() {
+		activated = false;
 		try {
-			enableIntegrationNoCatch(pluginName, integrationClass);
+			// GCore isn't enabled
+			try {
+				if (!GCore.inst().equals(this) && !GCore.inst().isEnabled()) {
+					failEnable("GCore isn't enabled");
+					return;
+				}
+			} catch (Throwable exception) {
+				failEnable("Couldn't check if GCore is enabled", exception);
+				return;
+			}
+			// mark all migrations as done if there's no plugin folder
+			try {
+				if (!getDataFolder().exists()) {
+					for (Class<? extends Migration> cls : migrations) {
+						if (!cls.newInstance().markMade()) {
+							failEnable("Couldn't mark migration as made");
+						}
+					}
+				}
+			} catch (Throwable exception) {
+				failEnable("couldn't check for previous migrations", exception);
+				return;
+			}
+			// pre-enable
+			try {
+				preEnable();
+			} catch (Throwable exception) {
+				failEnable("couldn't check for previous migrations", exception);
+				return;
+			}
+			// migrate
+			try {
+				if (!migrate()) {
+					failEnable(null);
+					return;
+				}
+			} catch (Throwable exception) {
+				failEnable(null);
+				return;
+			}
+			// register types
+			registerTypes();
+			// register texts
+			try {
+				registerTexts();
+			} catch (Throwable exception) {
+				failEnable("Couldn't register texts", exception);
+				return;
+			}
+			// save default configs
+			try {
+				int savedConfig = new ResourceExtractor(this, new File(getDataFolder() + "/"), "resources/").extract(false, true);
+				if (savedConfig > 0) mainLogger.info("Saved " + StringUtils.pluralize(savedConfig + " default configuration file", savedConfig));
+			} catch (Throwable exception) {
+				failEnable("Couldn't extract default config file ", exception);
+				return;
+			}
+			// initialize texts file if has texts
+			if (!textFiles.isEmpty()) {
+				// extract default text files
+				File defaultFolder = getDefaultTextsFolder();
+				try {
+					if (defaultFolder.exists()) {
+						defaultFolder.delete();
+					}
+					defaultFolder.mkdirs();
+					new ResourceExtractor(this, defaultFolder, "resources/texts").extract(true, true);
+				} catch (Throwable exception) {
+					failEnable("Couldn't extract default text files", exception);
+					return;
+				}
+				// save default text files and load
+				try {
+					// missing files
+					File textsFolder = new File(getDataFolder() + "/texts/");
+					textsFolder.mkdirs();
+					new ResourceExtractor(this, textsFolder, "resources/texts").extract(false, true);
+				} catch (Throwable exception) {
+					failEnable("Couldn't extract default text files", exception);
+					return;
+				}
+			}
+			// register and enable integrations before configuration if this is not GCore : things in integrations might be needed to load config
+			if (!GCore.inst().equals(this)) {
+				try {
+					registerAndEnableIntegrations();
+				} catch (Throwable exception) {
+					failEnable("Couldn't enable integrations", exception);
+					return;
+				}
+			}
+			// load config
+			if (configurationClass != null) {
+				try {
+					Constructor<C> constructor = configurationClass.getDeclaredConstructor();
+					if (!constructor.isAccessible()) {
+						constructor.setAccessible(true);
+					}
+					configuration = constructor.newInstance();
+					configuration.load();
+				} catch (Throwable exception) {
+					if (exception instanceof ConfigError || exception instanceof YMLError) {
+						failEnable(exception.getMessage());
+					} else {
+						failEnable("Couldn't load configuration :", exception);
+					}
+					return;
+				}
+			}
+			// read texts
+			if (!readTexts(ConfigGCore.langId)) {
+				return;
+			}
+			// register and enable integrations after configuration if this is GCore : position/time frame types need CommonMats to load
+			if (GCore.inst().equals(this)) {
+				try {
+					registerAndEnableIntegrations();
+				} catch (Throwable exception) {
+					failEnable("Couldn't enable integrations", exception);
+					return;
+				}
+			}
+			// load permission container
+			if (permissionContainerClass != null) {
+				try {
+					Constructor<P> constructor = permissionContainerClass.getDeclaredConstructor();
+					if (!constructor.isAccessible()) {
+						constructor.setAccessible(true);
+					}
+					permissionContainer = constructor.newInstance();
+				} catch (Throwable exception) {
+					failEnable("Couldn't load permission container " + permissionContainerClass.getName(), exception);
+					return;
+				}
+			}
+			// register main logger
+			registerLogger(mainLogger = new Logger(this, getName() + "-" + getDescription().getVersion(), getConfiguration().logMainConsole(), getConfiguration().logMainFile(), 10000));
+			// register data
+			try {
+				registerData();
+			} catch (Throwable exception) {
+				failEnable("Couldn't register data", exception);
+				return;
+			}
+			// enable
+			try {
+				enable();
+			} catch (Throwable exception) {
+				if (exception.getMessage() == null || !exception.getMessage().equalsIgnoreCase("ignore")) {
+					failEnable("Couldn't enable", exception);
+				}
+				return;
+			}
+			// notify update and notify update listeners
+			notifyUpdate(Bukkit.getConsoleSender());
+			registerListener(new Listener() {
+				@EventHandler(priority = EventPriority.LOWEST)
+				public void event(PlayerJoinEvent event) {
+					if (permissionContainer.getAdminPermission().has(event.getPlayer())) {
+						notifyUpdate(event.getPlayer());
+					}
+				}
+			});
+			// start logger tasks
+			loggers.values().forEach(Logger::startSaving);
+			// initialize data boards
+			data.values().forEach(board -> board.initialize(BukkitThread.ASYNC, () -> board.startSaving()));
+			// register commands
+			commands.values().forEach(command -> getCommand(command.getName()).setExecutor(command));
+			// register listeners
+			listeners.values().forEach(listener -> {
+				Bukkit.getPluginManager().registerEvents(listener, this);
+			});
+			// start tasks
+			tasks.values().forEach(Task::start);
+			// mark as activated
+			activated = true;
+			Bukkit.getConsoleSender().sendMessage("§a[" + getName() + "-" + getDescription().getVersion() + "] Successfully enabled");
+		} catch (Throwable exception) {
+			failEnable("Couldn't enable", exception);
+		}
+	}
+
+	protected void failEnable(String log) { failEnable(log, null); }
+	protected void failEnable(String log, Throwable exception) {
+		activated = false;
+		if (log != null) {
+			try {
+				mainLogger.error(log, exception);
+				mainLogger.error("Disabling plugin");
+				mainLogger.saveFileIfPersistent();
+			} catch (Throwable ignored) {
+				ignored.printStackTrace();
+			}
+		}
+		setEnabled(false);
+	}
+
+	// disable
+	@Override
+	public void onDisable() {
+		onDisable0(BukkitThread.SYNC, null);
+	}
+
+	private void onDisable0(BukkitThread dataSaving, Runnable callback) {
+		activated = false;
+		// disable plugin
+		try {
+			disable();
+		} catch (Throwable exception) {
+			mainLogger.error("Couldn't disable plugin", exception);
+		}
+		try {
+			// unregister listeners
+			listeners.clear();
+			HandlerList.unregisterAll(this);
+			// unregister commands
+			CollectionUtils.clearForEach(commands, (id, command) -> getCommand(command.getName()).setExecutor(null));
+			// cancel tasks
+			CollectionUtils.clearForEach(tasks.values(), Task::stop);
+			Bukkit.getScheduler().cancelTasks(this); // make sure to cancel all tasks, future as well
+			// close and unregister GUIs
+			CollectionUtils.asList(guis.values()).forEach(gui -> gui.deactivate(true));
+			// disable integrations
+			CollectionUtils.clearForEach(integrations, (id, integration) -> integration.deactivate());
+			// save and cancel loggers
+			CollectionUtils.clearForEachThrowableIgnore(loggers.values(), logger -> {
+				logger.saveFileIfPersistent();
+				logger.stopSaving();
+			});
+		} catch (Throwable ignored) {}
+		// save data and stop saving
+		List<String> remainingToSave = data.entrySet().stream().filter(entry -> entry.getValue().mustSaveSomething()).map(entry -> entry.getKey()).collect(Collectors.toList());
+		CollectionUtils.clearForEach(data, (id, board) -> {
+			board.saveNeeded(dataSaving, () -> {
+				// callback if no more data boards to save
+				remainingToSave.remove(id);
+				if (callback != null && remainingToSave.isEmpty()) {
+					callback.run();
+				}
+			});
+			board.stopSaving();
+		});
+		// clear misc
+		textFiles.clear();
+		// unload config
+		configuration = null;
+		// callback instantly if no data boards
+		if (callback != null && remainingToSave.isEmpty()) {
+			callback.run();
+		}
+	}
+
+	protected void disable() throws Throwable {
+	}
+
+	// reload
+	private transient boolean reloading = false;
+
+	public boolean isReloading() {
+		return reloading;
+	}
+
+	public final boolean reload(ThrowableRunnable callback) {
+		if (reloading) {
+			return true;
+		}
+		try {
+			reloading = true;
+			onDisable0(BukkitThread.ASYNC, () -> {
+				try {
+					onEnable();
+					reloading = false;
+					if (callback != null) {
+						callback.run();
+					}
+				} catch (Throwable exception) {
+					exception.printStackTrace();
+					failEnable("Couldn't reload plugin", exception);
+					return;
+				}
+			});
 			return true;
 		} catch (Throwable exception) {
-			exception.printStackTrace();
-			error("Couldn't enable " + pluginName + " integration");
+			failEnable("Couldn't reload plugin", exception);
 			return false;
 		}
 	}
 
-	private void enableIntegrationNoCatch(String pluginName, Class<? extends PluginIntegration> integrationClass) throws Throwable {
-		PluginIntegration integration = integrationClass.getConstructor(String.class).newInstance(pluginName);
-		integration.enable();
-		pluginIntegration.add(integration);
-		success("Integrated " + pluginName);
-	}
-
-	@EventHandler(priority = EventPriority.HIGHEST)
-	public void event(PluginDisableEvent event) {
-		if (!event.getPlugin().equals(this)) {
-			for (PluginIntegration integration : pluginIntegration) {
-				if (integration.getPluginName().equalsIgnoreCase(event.getPlugin().getName())) {
-					integration.disable();
-					pluginIntegration.remove(integration);
-					awaitingPluginIntegration.put(integration.getPluginName(), integration.getClass());
-					success("Disabled " + integration.getPluginName() + " integration");
-					break;
-				}
-			}
+	// update notification
+	public final void notifyUpdate(CommandSender sender) {
+		// local is indev
+		Integer local = StringUtils.getUniqueVersionNumber(getDescription().getVersion());
+		if (local == null) {
+			sender.sendMessage("§dYou're using an in-development version of " + getName() + ", please make sure to update when it's released.");
 		}
-	}
-
-	@EventHandler(priority = EventPriority.HIGHEST)
-	public void event(PluginEnableEvent event) {
-		if (!event.getPlugin().equals(this)) {
-			for (String plugin : awaitingPluginIntegration.keySet()) {
-				if (plugin.equalsIgnoreCase(event.getPlugin().getName())) {
-					if (enableIntegration(plugin, awaitingPluginIntegration.get(plugin))) {
-						awaitingPluginIntegration.remove(plugin);
-					}
-					break;
-				}
-			}
-		}
-	}
-
-	// ----------------------------------------------------------------------
-	// On enable
-	// ----------------------------------------------------------------------
-
-	@Override
-	public void onEnable() {
-		long start = System.currentTimeMillis();
-
-		// error while enabling core
-		if (GCore.inst().errorEnable()) {
-			cancelEnable("An error occured while enabling GCore");
-			return;
-		}
-
-		// check if all dependencies are enabled
-		for (String depend : getDescription().getDepend()) {
-			if (!Utils.isPluginEnabled(depend)) {
-				cancelEnable("Plugin " + depend + " is required but isn't enabled");
-				return;
-			}
-		}
-
-		// pre enable
-		if (!preEnable()) {
-			return;
-		}
-
-		// ensure authorization
-		if (authorizationCheck) {
-			if (!Utils.ensureAuthorization(this)) {
-				cancelEnable(null);
-				return;
-			}
-		}
-
-		// enable
-		try {
-			enable();
-			Bukkit.getPluginManager().registerEvents(this, this);
-			debug("Successfully enabled");
-		} catch (Throwable exception) {
-			exception.printStackTrace();
-			cancelEnable("an unknown error occured while enabling");
-			return;
-		}
-
-		// metrics
-		try {
-			metrics = new Metrics(this);
-			debug("Using metrics : yes");
-		} catch (Throwable exception) {
-			exception.printStackTrace();
-			error("Could not initialize metrics");
-		}
-
-		// log
-		success(getDescription().getName() + " v" + getDescription().getVersion() + " is now enabled (took " + (System.currentTimeMillis() - start) + "ms) !" + (spigotResourceId > 0 && !isCore() ? " If you appreciate this plugin, you can support the author by rating the plugin 5-stars at www.spigotmc.org, being active on the community discord or share the plugin page to your friends ! <3" : ""));
-	}
-
-	protected void cancelEnable(String reason) {
-		if (reason != null) error("Aborting plugin activation : " + reason);
-		errorEnable = true;
-		Bukkit.getPluginManager().disablePlugin(this);
-	}
-
-	// ----------------------------------------------------------------------
-	// Reload
-	// ----------------------------------------------------------------------
-
-	public void reload() {
-		// clear all item cache
-		CPItem.clearAllCache();
-		// integration
-		for (PluginIntegration integration : pluginIntegration) {
-			try {
-				integration.disable();
-				integration.enable();
-				success("Reloaded " + integration.getPluginName() + " integration");				
-			} catch (Throwable exception) {
-				exception.printStackTrace();
-				error("Couldn't reload " + integration.getPluginName() + " integration");
-			}
-		}
-		// reload inner
-		innerReload();
-	}
-
-	public void reloadLocale(File localeFile) {
-		reloadLocale(Text.values(localeFile), localeFile);
-	}
-
-	public void reloadLocale(List<Text> values, File localeFile) {
-		// load locale messages
-		YMLConfiguration locale = new YMLConfiguration(this, localeFile, null, true, true);
-		for (Text msg : values) {
-			for (String lang : locale.getKeysForSection(msg.getId(), false)) {
-				msg.set(lang, locale.getObject(msg.getId() + "." + lang, null));
-			}
-		}
-		// save locale messages
-		locale = new YMLConfiguration(this, localeFile, null, true, false);
-		for (Text msg : values) {
-			Map<String, List<String>> langs = msg.getLangs();
-			for (String lang : Utils.asSortedList(langs.keySet(), String.CASE_INSENSITIVE_ORDER)) {
-				List<String> lines = langs.get(lang);
-				if (lines.isEmpty()) {
-					warning("Couldn't initialize locale message " + msg.getId() + "." + lang + " because it's empty");
+		// can show update notifications
+		else if (getConfiguration().updateNotification() && spigotResourceId > 0 && !equals(GCore.inst())) {
+			BukkitThread.ASYNC.operate(() -> {
+				String response = PluginUtils.getOfficialVersion(this);
+				// unknown server response
+				if (response.isEmpty() || response.equals("unknown_server") || response.equals("Invalid resource") || response.contains("?resource=id")) {
+					sender.sendMessage("§cCouldn't fetch the official version of " + getName() + " :(");
 				} else {
-					locale.set(msg.getId() + "." + lang, lines.size() > 1 ? Utils.replaceAll(lines, "§", "&") : lines.get(0).replace("§", "&"));
+					// can't parse official
+					Integer spigot = StringUtils.getUniqueVersionNumber(response);
+					if (spigot == null) {
+						sender.sendMessage("§cCouldn't parse the official version '" + response + "' of " + getName() + " :(");
+					} else {
+						// spigot is latest
+						if (spigot > local) {
+							if (sender instanceof Player) {
+								new JsonMessage()
+								.append("§dPlease make sure to ").build()
+								.append("§d§lupdate").setURL("https://www.spigotmc.org/resources/" + getSpigotResourceId() + "/updates/").build()
+								.append(" §dto " + getName() + " v" + response + " :)").build()
+								.send((Player) sender);
+							} else {
+								sender.sendMessage("§dPlease make sure to §d§lupdate §dto " + getName() + " v" + response + " :)");
+								sender.sendMessage("§dhttps://www.spigotmc.org/resources/" + getSpigotResourceId() + "/updates/");
+							}
+						}
+						// local is latest (indev)
+						else if (local > spigot) {
+							sender.sendMessage("§dYou're using an in-development version of " + getName() + ", please make sure to update when it's released.");
+						}
+					}
 				}
-			}
+			});
 		}
-		locale.save();
-		success("Loaded " + values.size() + " text" + Utils.getPlural(values.size()));
 	}
 
-	// ----------------------------------------------------------------------
-	// On disable
-	// ----------------------------------------------------------------------
+	// texts
+	public final void registerTextFile(TextFile textFile) {
+		textFiles.put(textFile.getFilePath(), textFile);
+	}
 
-	@Override
-	public void onDisable() {
-		// error while enabling
-		if (errorEnable) {
+	private boolean readTexts(String langId) throws Throwable {
+		File defaultFolder = getDefaultTextsFolder();
+		File langFolder = new File(getDataFolder() + "/texts/" + langId);
+		Bukkit.getConsoleSender().sendMessage("§a[" + getName() + "-" + getDescription().getVersion() + "] Loading texts...");
+		try {
+			if (langFolder.isDirectory()) {
+				for (TextFile<?> textFile : textFiles.values()) {
+					// read file
+					File langFile = new File(langFolder + "/" + textFile.getFilePath());
+					LowerCaseHashMap<List<String>> texts = readTextsFromFile(textFile.getValues().keySet(), langFile);
+					// mark texts as loaded and get missing texts to add to file
+					LowerCaseHashMap<Text> missing = new LowerCaseHashMap<>();
+					Set<String> missingDisplay = new HashSet<>();
+					for (String textId : textFile.getValues().keySet()) {
+						Text text = textFile.getValues().get(textId);
+						List<String> loadedLines = texts.get(textId);
+						if (loadedLines != null) {
+							text.setLines(loadedLines);
+						} else {
+							missing.put(textId, text);
+							missingDisplay.add(textId);
+						}
+					}
+					// load missing texts
+					if (!missing.isEmpty()) {
+						// read missing texts from file
+						String defaultLang = langId;
+						File defaultFile = new File(defaultFolder + "/" + defaultLang + "/" + textFile.getFilePath());
+						if (!defaultFile.exists()) {
+							defaultFile = new File(defaultFolder + "/" + (defaultLang = "en_US") + "/" + textFile.getFilePath());
+						}
+						if (defaultFile.exists()) {
+							// load default texts
+							LowerCaseHashMap<List<String>> missingTexts = readTextsFromFile(missing.keySet(), defaultFile);
+							if (!missingTexts.isEmpty()) {
+								missingTexts.forEach((missingTextId, defaultLines) -> {
+									Text text = missing.get(missingTextId);
+									text.setLines(defaultLines);
+								});
+							}
+							// log
+							mainLogger.warning("Loaded " + StringUtils.pluralizeAmountDesc("missing text", missing.size()) + " from default lang " + defaultLang + " for " + textFile.getFilePath() + (textFile.getFilePath().contains("editor") && ConfigGCore.dontLogMissingEditorTexts ? "" : " : " + StringUtils.toTextString(", ", missingDisplay)));
+						}
+					}
+					// save missing texts
+					// - actually don't do it ; it would pollute incomplete text files with english text
+					/*if (!missing.isEmpty()) {
+						// read missing texts from file
+						File defaultFile = new File(defaultFolder + "/" + langId + "/" + textFile.getFilePath());
+						if (!defaultFile.exists()) {
+							defaultFile = new File(defaultFolder + "/en_US/" + textFile.getFilePath());
+						}
+						if (defaultFile.exists()) {
+							// load default texts and write missing texts to file
+							LowerCaseHashMap<List<String>> missingTexts = readTextsFromFile(missing.keySet(), defaultFile);
+							if (!missingTexts.isEmpty()) {
+								YMLConfiguration config = new YMLConfiguration(this, langFile);
+								config.getBackingYML().getBase().addComment(CollectionUtils.asList("", "-------------------- UPDATED LINES --------------------", ""));
+								missingTexts.forEach((missingTextId, defaultLines) -> {
+									Text text = missing.get(missingTextId);
+									text.setLines(defaultLines);
+									config.write(missingTextId, defaultLines.size() == 1 ? defaultLines.get(0) : defaultLines);
+								});
+								config.save();
+							}
+							// log
+							mainLogger.info("Saved " + StringUtils.pluralizeAmountDesc("missing text", missing.size()) + " in " + langFile + " : " + StringUtils.toTextString(", ", missingDisplay));
+						}
+					}*/
+				}
+			}
+			return true;
+		} catch (Throwable exception) {
+			YMLError causeYML = ObjectUtils.findCauseOrNull(exception, YMLError.class);
+			ConfigError causeConfig = ObjectUtils.findCauseOrNull(exception, ConfigError.class);
+			failEnable(causeYML != null ? "Couldn't load texts from " + langFolder.getPath() + " : " + causeYML.getMessage() : (causeConfig != null ? causeConfig.getMessage() : "Couldn't load texts from " + langFolder.getPath()), causeYML != null || causeConfig != null ? null : exception);
+			return false;
+		}
+	}
+
+	private LowerCaseHashMap<List<String>> readTextsFromFile(Set<String> keys, File file) throws Throwable {
+		LowerCaseHashMap<List<String>> texts = new LowerCaseHashMap<>();
+		if (file.exists()) {
+			YMLConfiguration config = new YMLConfiguration(this, file);
+			for (String key : keys) {
+				List<String> value = config.readStringList(key, null);
+				if (value != null) {
+					texts.put(key, value);
+				}
+			}
+		}
+		return texts;
+	}
+
+	// commands
+	public final Command registerCommand(Command command) {
+		commands.put(command.getName(), command);
+		return command;
+	}
+
+	// data
+	public final <T extends Board> T registerDataBoard(T board) {
+		// already registered
+		if (data.containsKey(board.getId())) {
+			try {
+				return (T) data.get(board.getId());
+			} catch (Throwable ignored) {}
+		}
+		// register
+		data.put(board.getId(), board);
+		return board;
+	}
+
+	// listeners
+	public final void registerListener(Listener listener) {
+		registerListener(listener.getClass().getName(), listener);
+	}
+
+	public final void registerListener(String id, Listener listener) {
+		// unregistered
+		if (listeners.containsKey(id)) {
+			HandlerList.unregisterAll(listeners.remove(id));
+		}
+		// register
+		listeners.put(id, listener);
+		// start
+		if (isActivated()) {
+			Bukkit.getPluginManager().registerEvents(listener, this);
+		}
+	}
+
+	public final Listener stopListener(Class<? extends Listener> clazz) {
+		return stopListener(clazz.getName());
+	}
+
+	public final Listener stopListener(String id) {
+		Listener listener = listeners.remove(id);
+		if (listener != null) {
+			HandlerList.unregisterAll(listener);
+		}
+		return listener;
+	}
+
+	// tasks
+	public final Task registerTask(String id, boolean async, int ticksPeriod, ThrowableRunnable runner) {
+		// unregistered
+		if (tasks.containsKey(id)) {
+			tasks.remove(id).stop();
+		}
+		// register
+		Task task = new Task(this, id, async, ticksPeriod, runner);
+		tasks.put(id, task);
+		// start
+		if (isActivated()) {
+			task.start();
+		}
+		// done
+		return task;
+	}
+
+	public final Task stopTask(String id) {
+		Task task = tasks.remove(id);
+		if (task != null) {
+			task.stop();
+		}
+		return task;
+	}
+
+	// logger
+	public final void registerLogger(final Logger logger) {
+		// already registered
+		if (loggers.containsKey(logger.getId())) {
 			return;
 		}
+		// register
+		loggers.put(logger.getId(), logger);
+	}
 
-		// disable
-		try {
-			disable();
-			debug("Successfully disabled");
-		} catch (Throwable exception) {
-			exception.printStackTrace();
-			error("An unknown error occured while disabling");
-		}
-
-		// events
-		try {
-			HandlerList.unregisterAll((JavaPlugin) this);
-		} catch (Throwable exception) {
-			exception.printStackTrace();
-			error("An unknown error occured while unregistering listeners");
-		}
-
-		// cancel all tasks
-		try {
-			Bukkit.getScheduler().cancelTasks(this);
-			for (BukkitTask task : Utils.asList(Bukkit.getScheduler().getPendingTasks())) {
-				if (equals(task.getOwner())) {
-					task.cancel();
-				}
+	// GUI
+	public final void registerGUI(GUI gui) {
+		// already registered
+		GUI existing = guis.remove(gui.getId());
+		if (existing != null) {
+			if (existing.equals(gui)) {
+				return;
 			}
-			// try even much harder even though some async tasks will still be executed a few times while reloading :'(
-			for (BukkitWorker worker : Utils.asList(Bukkit.getScheduler().getActiveWorkers())) {
-				if (equals(worker.getOwner())) {
-					Bukkit.getScheduler().cancelTask(worker.getTaskId());
-				}
-			}
-		} catch (Throwable exception) {
-			exception.printStackTrace();
-			error("An unknown error occured while unregistering listeners");
+			existing.deactivate(true);
 		}
+		// register
+		guis.put(gui.getId(), gui);
+	}
 
-		// close GUIs
+	public final void unregisterGUI(GUI gui) {
+		guis.remove(gui.getId());
+	}
+
+	// integration
+	public final Integration registerAndEnableIntegration(Integration integration) {
+		// already registered
+		if (integrations.containsKey(integration.getPluginName())) {
+			integrations.remove(integration.getPluginName()).deactivate();
+		}
+		// register
+		integrations.put(integration.getPluginName(), integration);
+		// activate
 		try {
-			GUI.unregisterAll(this);
-		} catch (Throwable exception) {
-			exception.printStackTrace();
-			error("An unknown error occured while unregistering GUIs");
+			integration.activate();
+		} catch (Throwable error) {
+			getMainLogger().error("Couldn't enable integration for " + integration.getPluginName(), error);
 		}
+		return integration;
+	}
 
-		// integration
-		try {
-			for (PluginIntegration integration : pluginIntegration) {
-				integration.disable();
-				debug("Unregistered " + integration.getPluginName() + " integration");
-			}
-			pluginIntegration.clear();
-		} catch (Throwable exception) {
-			exception.printStackTrace();
-			error("An unknown error occured while disabling plugin integration");
-		}
-
-		// data
-		try {
-			unregisterData();
-		} catch (Throwable exception) {
-			exception.printStackTrace();
-			error("An unknown error occured while disabling unregistering data");
-		}
-
-		// unregister commands
-		try {
-			for (CommandRoot command : commands.values()) {
-				getCommand(command.getAliases().get(0)).setExecutor(null);
-			}
-			commands.clear();
-		} catch (Throwable exception) {
-			exception.printStackTrace();
-			error("An unknown error occured while disabling unregistering commands");
-		}
-
-		// log
-		success(getDescription().getName() + " v" + getDescription().getVersion() + " is now disabled.");
+	public final void unregisterAndDeactivateIntegration(Integration integration) {
+		// unregister
+		integrations.remove(integration.getPluginName());
+		// deactivate
+		integration.deactivate();
 	}
 
 }

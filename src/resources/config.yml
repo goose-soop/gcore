@@ -1,0 +1,249 @@
+# ----------------------------------------------------------------------------------------------------
+# Configuration file for GCore
+# More information can be found in the documentation
+# ----------------------------------------------------------------------------------------------------
+
+# --------------------------------------------------
+# Data
+# --------------------------------------------------
+
+# MySQL configuration (if you don't configure any data board to use MySQL, then it's not useful
+
+#mysql:
+#  host: 'database.my_server.com:25565'
+#  name: 'database_name'
+#  user: 'username'
+#  pass: 'pwd'
+#  args: '&useSSL=false'
+
+# Data back-end (NONE, JSON or MYSQL ; default is JSON if not specified)
+data_backend:
+  gcore_statistics_v8: JSON
+  gcore_users_npcs_v8: JSON
+
+# Log settings (errors will be shown in console no matter what)
+log:
+  # Main logger
+  main:
+    console: true
+    file: true
+  # Data loggers
+  data:
+    gcore_statistics_v8:
+      console: false
+      file: false
+
+# --------------------------------------------------
+# Commands
+# --------------------------------------------------
+
+# Aliases
+commands_aliases:
+  plugins: [plugins,pl]
+  reload: [reload,rl]
+  export: [export]
+  itemread: [itemread,ir]
+
+# --------------------------------------------------
+# Variants
+# --------------------------------------------------
+
+# Materials
+materials:
+  # Should the materials file be regenerated on startup
+  # Set it to false to customize it
+  # [!] It is discouraged to make change to "regular" blocks, such as AIR/WATER/LAVA/DIRT/COBBLESTONE/vanilla tools/...,
+  #     because some plugins will more than likely attempt to use them. For AIR/WATER/LAVA/..., it is VERY discouraged.
+  #     Bugs caused by those changes (such as world block replacement or item loss) will be disregarded.
+  # [!] Beware that materials won't be updated automatically anymore if set to false
+  #     You should know that all the combinations in the materials file obviously haven't all been tested individually
+  #     They be fixed over time when users report bugs, so it is highly recommended to leave this option enabled to get those fixes automatically in future updates.
+  regenerate_file: true
+  # Should any material that's not registered in the materials file be allowed
+  # Set this to true if your server uses non-vanilla materials
+  # [!] Not recommended if it's not the case
+  lenient: false
+
+# Sounds
+sounds:
+  # Should the sounds file be regenerated on startup
+  # Set it to false to customize it
+  # [!] Beware that sounds won't be updated automatically anymore if set to false
+  #     You should know that all the combinations in the sounds file obviously haven't all been tested individually
+  #     They be fixed over time when users report bugs, so it is highly recommended to leave this option enabled to get those fixes automatically in future updates.
+  regenerate_file: true
+
+# Particles
+particles:
+  # Should the particles file be regenerated on startup
+  # Set it to false to customize it
+  # [!] Beware that particles won't be updated automatically anymore if set to false
+  #     You should know that all the combinations in the particles file obviously haven't all been tested individually
+  #     They be fixed over time when users report bugs, so it is highly recommended to leave this option enabled to get those fixes automatically in future updates.
+  regenerate_file: true
+
+# --------------------------------------------------
+# Currencies
+# --------------------------------------------------
+
+currencies:
+  VAULT:
+    #format_multiplier: 0.1
+    format_decimal_precision: 2
+    format_single: '{amount}$'
+    format_multiple: '{amount}$'
+    icon:
+      type: PAPER
+      name: '{formatted_amount}'
+      enchantments:
+        DURABILITY: 1
+      hide_flags: true
+
+# --------------------------------------------------
+# Miscalleneous
+# --------------------------------------------------
+
+# Update notification
+# If you turn this off, please make sure to visit the plugin page on spigot every once in a while ; some updates can be really important.
+update_notification: true
+
+# Lang folder name
+lang: en_US
+
+# Unknown placeholder result
+unknown_placeholder_result: '/'
+
+# Number formatting
+number_formatting_decimals: 2
+number_formatting_separate_thousands: ','
+number_formatting_big_numbers: true # turns 10,000,000 into "10 million", for instance
+
+# Console log levels colors
+console_log_level_colors:
+  INFO: GREEN
+  WARNING: YELLOW
+  ERROR: RED
+  DEBUG: LIGHT_PURPLE
+
+# Custom time zone
+#custom_time_zone: 'Europe/Brussels'
+
+# Allow hooking into ProtocolLib to create packet-based GUIs
+# Unless you're experiencing unfixable issues with it, I strongly advise you to keep this enabled
+allow_protocol_guis: true
+
+# Don't log which editor texts are missing on load
+dont_log_missing_editor_texts: true
+
+# Debug logs for item and NBT creation/matching
+logspam_item_nbt: false
+
+# --------------------------------------------------
+# GUI
+# --------------------------------------------------
+
+# How often should items with placeholders be updated in an opened GUI
+gui_items_refresh_seconds_placeholder: 30
+
+# GUI items
+gui_items:
+  # Back item
+  back:
+    type: ARROW
+    name: '&7Back'
+  # Previous item
+  previous_page:
+    type: ARROW
+    name: '&7Previous page'
+  # Next page
+  next_page:
+    type: ARROW
+    name: '&7Next page'
+
+# Confirm GUI
+confirm_gui:
+  type: CHEST_3_ROW
+  item_yes:
+    locations: 12
+    icon:
+      type: GREEN_WOOL
+      name: '&aConfirm'
+  item_no:
+    locations: 14
+    icon:
+      type: RED_WOOL
+      name: '&cCancel'
+  contents:
+    1:
+      locations: [0,1,2,3,4,5,6,7,8,9,18,17,18,19,20,21,22,23,24,25,26]
+      persistent: true
+      icon:
+        type: GRAY_STAINED_GLASS_PANE
+        name: ' '
+
+# GUI type control slots
+gui_type_slots:
+  CHEST_1_ROW:
+    back: 0
+    previous_page: 7
+    next_page: 8
+  CHEST_2_ROW:
+    back: 9
+    previous_page: 16
+    next_page: 17
+  CHEST_3_ROW:
+    back: 18
+    previous_page: 25
+    next_page: 26
+  CHEST_4_ROW:
+    back: 27
+    previous_page: 34
+    next_page: 35
+  CHEST_5_ROW:
+    back: 36
+    previous_page: 43
+    next_page: 44
+  CHEST_6_ROW:
+    back: 45
+    previous_page: 52
+    next_page: 53
+  DISPENSER:
+    back: 6
+    previous_page: 7
+    next_page: 8
+  ANVIL:
+    back: -1
+    previous_page: -1
+    next_page: -1
+  BEACON:
+    back: -1
+    previous_page: -1
+    next_page: -1
+  BLAST_FURNACE:
+    back: -1
+    previous_page: -1
+    next_page: -1
+  BREWING_STAND:
+    back: -1
+    previous_page: -1
+    next_page: -1
+  CRAFTING:
+    back: -1
+    previous_page: -1
+    next_page: -1
+  ENCHANTMENT:
+    back: -1
+    previous_page: -1
+    next_page: -1
+  FURNACE:
+    back: -1
+    previous_page: -1
+    next_page: -1
+  GRINDSTONE:
+    back: -1
+    previous_page: -1
+    next_page: -1
+  HOPPER:
+    back: -1
+    previous_page: -1
+    next_page: -1

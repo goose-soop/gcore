@@ -1,0 +1,78 @@
+package com.guillaumevdn.gcore.lib.configuration.file.node;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
+import com.guillaumevdn.gcore.lib.string.StringUtils;
+
+/**
+ * @author GuillaumeVDN
+ */
+public class ListValueNode extends ConfigNode {
+
+	private List<String> value;
+	private boolean compact, ez;
+	private String trailingComment;
+
+	public ListValueNode(SectionNode parent, String id, List<String> value, boolean compact, boolean ez, String trailingComment) {
+		super(parent, id);
+		this.value = value;
+		this.compact = compact;
+		this.ez = ez;
+		this.trailingComment = trailingComment;
+	}
+
+	// get
+	public List<String> getValue() {
+		return value;
+	}
+
+	public boolean isCompact() {
+		return compact;
+	}
+
+	public boolean isEz() {
+		return ez;
+	}
+
+	public String getTrailingComment() {
+		return trailingComment;
+	}
+
+	// set
+	public void setValue(List<String> value) {
+		if (value == null) throw new IllegalArgumentException("value can't be null");
+		this.value = CollectionUtils.asList(value);
+	}
+
+	// write
+	@Override
+	public void write(Appendable writer) throws Throwable {
+		String prefix = getPrefix();
+		if (value.isEmpty()) {
+			writer.append(prefix + getId() + ": []" + (trailingComment != null ? "  #" + trailingComment : "") + "\n");
+		} else if (compact || (!ez && value.size() == 1 && !value.get(0).contains(",") && value.get(0).length() < 25 && StringUtils.unformat(value.get(0)).length() == value.get(0).length())) {
+			writer.append(prefix + getId() + ": [" + StringUtils.toTextString(",", StringUtils.retranslateColorCodesCopy(value.stream().map(line -> SingleValueNode.wrapValueToWrite(line)).collect(Collectors.toList()))) + "]" + (trailingComment != null ? "  #" + trailingComment : "") + "\n");
+		} else if (ez) {
+			writer.append(prefix + getId() + ": |-" + (trailingComment != null ? "  #" + trailingComment : "") + "\n");
+			String linePrefix = prefix + "  ";
+			for (String line : StringUtils.retranslateColorCodesCopy(value)) {
+				writer.append(linePrefix + line + "\n");
+			}
+		} else {
+			writer.append(prefix + getId() + ":" + (trailingComment != null ? "  #" + trailingComment : "") + "\n");
+			String linePrefix = prefix + "  - ";
+			for (String line : StringUtils.retranslateColorCodesCopy(value)) {
+				writer.append(linePrefix + SingleValueNode.wrapValueToWrite(line) + "\n");
+			}
+		}
+	}
+
+	// clone
+	@Override
+	public ListValueNode clone(SectionNode parent) {
+		return new ListValueNode(parent, getId(), CollectionUtils.asList(value), compact, ez, trailingComment);
+	}
+
+}

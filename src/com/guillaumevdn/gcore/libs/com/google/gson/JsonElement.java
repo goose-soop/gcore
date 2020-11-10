@@ -16,12 +16,13 @@
 
 package com.guillaumevdn.gcore.libs.com.google.gson;
 
-import com.guillaumevdn.gcore.libs.com.google.gson.internal.Streams;
-import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+
+import com.guillaumevdn.gcore.libs.com.google.gson.internal.Streams;
+import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonWriter;
 
 /**
  * A class representing an element of Json. It could either be a {@link JsonObject}, a

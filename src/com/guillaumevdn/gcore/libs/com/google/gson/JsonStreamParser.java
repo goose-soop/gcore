@@ -28,7 +28,7 @@ import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonToken;
 import com.guillaumevdn.gcore.libs.com.google.gson.stream.MalformedJsonException;
 
 /**
- * A streaming parser that allows reading of multiple {@link JsonElement}s from the specified reader
+ * A streaming replacer that allows reading of multiple {@link JsonElement}s from the specified reader
  * asynchronously.
  * 
  * <p>This class is conditionally thread-safe (see Item 70, Effective Java second edition). To
@@ -36,11 +36,11 @@ import com.guillaumevdn.gcore.libs.com.google.gson.stream.MalformedJsonException
  * synchronization. For example:
  * 
  * <pre>
- * JsonStreamParser parser = new JsonStreamParser("['first'] {'second':10} 'third'");
+ * JsonStreamParser replacer = new JsonStreamParser("['first'] {'second':10} 'third'");
  * JsonElement element;
- * synchronized (parser) {  // synchronize on an object shared by threads
- *   if (parser.hasNext()) {
- *     element = parser.next();
+ * synchronized (replacer) {  // synchronize on an object shared by threads
+ *   if (replacer.hasNext()) {
+ *     element = replacer.next();
  *   }
  * }
  * </pre>
@@ -50,7 +50,7 @@ import com.guillaumevdn.gcore.libs.com.google.gson.stream.MalformedJsonException
  * @since 1.4
  */
 public final class JsonStreamParser implements Iterator<JsonElement> {
-  private final JsonReader parser;
+  private final JsonReader replacer;
   private final Object lock;
 
   /**
@@ -66,8 +66,8 @@ public final class JsonStreamParser implements Iterator<JsonElement> {
    * @since 1.4
    */
   public JsonStreamParser(Reader reader) {
-    parser = new JsonReader(reader);
-    parser.setLenient(true);
+    replacer = new JsonReader(reader);
+    replacer.setLenient(true);
     lock = new Object();
   }
   
@@ -84,7 +84,7 @@ public final class JsonStreamParser implements Iterator<JsonElement> {
     }
     
     try {
-      return Streams.parse(parser);
+      return Streams.parse(replacer);
     } catch (StackOverflowError e) {
       throw new JsonParseException("Failed parsing JSON source to Json", e);
     } catch (OutOfMemoryError e) {
@@ -102,7 +102,7 @@ public final class JsonStreamParser implements Iterator<JsonElement> {
   public boolean hasNext() {
     synchronized (lock) {
       try {
-        return parser.peek() != JsonToken.END_DOCUMENT;
+        return replacer.peek() != JsonToken.END_DOCUMENT;
       } catch (MalformedJsonException e) {
         throw new JsonSyntaxException(e);
       } catch (IOException e) {

@@ -16,6 +16,9 @@
 
 package com.guillaumevdn.gcore.libs.com.google.gson.internal;
 
+import static com.guillaumevdn.gcore.libs.com.google.gson.internal.$Gson$Preconditions.checkArgument;
+import static com.guillaumevdn.gcore.libs.com.google.gson.internal.$Gson$Preconditions.checkNotNull;
+
 import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.lang.reflect.GenericArrayType;
@@ -25,10 +28,12 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
-import java.util.*;
-
-import static com.guillaumevdn.gcore.libs.com.google.gson.internal.$Gson$Preconditions.checkArgument;
-import static com.guillaumevdn.gcore.libs.com.google.gson.internal.$Gson$Preconditions.checkNotNull;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Properties;
 
 /**
  * Static methods for working with types.
@@ -179,7 +184,6 @@ public final class $Gson$Types {
         return false;
       }
 
-      // TODO: save a .clone() call
       ParameterizedType pa = (ParameterizedType) a;
       ParameterizedType pb = (ParameterizedType) b;
       return equal(pa.getOwnerType(), pb.getOwnerType())
@@ -321,11 +325,10 @@ public final class $Gson$Types {
      * extend Hashtable<Object, Object>.
      */
     if (context == Properties.class) {
-      return new Type[] { String.class, String.class }; // TODO: test subclasses of Properties!
+      return new Type[] { String.class, String.class };
     }
 
     Type mapType = getSupertype(context, contextRawType, Map.class);
-    // TODO: strip wildcards?
     if (mapType instanceof ParameterizedType) {
       ParameterizedType mapParameterizedType = (ParameterizedType) mapType;
       return mapParameterizedType.getActualTypeArguments();

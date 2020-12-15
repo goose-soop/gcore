@@ -28,14 +28,21 @@ public final class MetaTropicalFishBucket {
 		TropicalFishBucketMeta meta = ObjectUtils.castOrNull(itemMeta, TropicalFishBucketMeta.class); // might be null if exact match is false
 		TropicalFishBucketMeta ref = ObjectUtils.castOrNull(referenceMeta, TropicalFishBucketMeta.class);
 		if (ref == null) return true;
+		// variant
+		if (check.isExact() && meta.hasVariant() != ref.hasVariant()) {
+			return false;
+		}
+		if (!ref.hasVariant()) {
+			return true;
+		}
 		// body color
-		if (check.isExact() && !Objects.deepEquals(meta.getBodyColor(), ref.getBodyColor())) return false;
+		if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getBodyColor(), ref.getBodyColor()))) return false;
 		else if (!check.isExact() && ref.getBodyColor() != null && (meta == null || !ref.getBodyColor().equals(meta.getBodyColor()))) return false;
 		// pattern color
-		if (check.isExact() && !Objects.deepEquals(meta.getPatternColor(), ref.getPatternColor())) return false;
+		if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getPatternColor(), ref.getPatternColor()))) return false;
 		else if (!check.isExact() && ref.getPatternColor() != null && (meta == null || !ref.getPatternColor().equals(meta.getPatternColor()))) return false;
 		// pattern
-		if (check.isExact() && !Objects.deepEquals(meta.getPattern(), ref.getPattern())) return false;
+		if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getPattern(), ref.getPattern()))) return false;
 		else if (!check.isExact() && ref.getPattern() != null && (meta == null || !ref.getPattern().equals(meta.getPattern()))) return false;
 		// seems good
 		return true;

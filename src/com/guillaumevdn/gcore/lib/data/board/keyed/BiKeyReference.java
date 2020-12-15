@@ -9,7 +9,7 @@ import com.guillaumevdn.gcore.lib.object.ObjectUtils;
  */
 public class BiKeyReference<K, K2> extends KeyReference<K> {
 
-	private K2 key2;
+	private final K2 key2;
 
 	public BiKeyReference(K key, K2 key2) {
 		super(key);
@@ -17,7 +17,7 @@ public class BiKeyReference<K, K2> extends KeyReference<K> {
 	}
 
 	// get
-	public K2 getKey2() {
+	public final K2 getKey2() {
 		return key2;
 	}
 

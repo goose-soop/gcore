@@ -79,21 +79,24 @@ public class ProtocolHandler extends Handler {
 
 	@Override
 	public ItemStack getPageItem(int pageIndex, int slot) {
-		return getPage(pageIndex).getItems().get(slot);
+		Window page = getPage(pageIndex);
+		return page == null ? null : page.getItems().get(slot);
 	}
 
 	// set
 	@Override
 	public void setPageItem(int pageIndex, int slot, ItemStack item) {
 		Window page = getPage(pageIndex);
-		page.getItems().put(slot, item);
-		ProtocolPackets.SET_SLOT.process(page.getViewers(), page.getId(), slot, item);
+		if (page != null) {
+			page.getItems().put(slot, item);
+			ProtocolPackets.SET_SLOT.process(page.getViewers(), page.getId(), slot, item);
+		}
 	}
 
 	@Override
 	public void clearPageItem(int pageIndex, int slot) {
 		Window page = getPage(pageIndex);
-		if (page.getItems().remove(slot) != null) {
+		if (page != null && page.getItems().remove(slot) != null) {
 			ProtocolPackets.SET_SLOT.process(page.getViewers(), page.getId(), slot, null);
 		}
 	}
@@ -101,8 +104,10 @@ public class ProtocolHandler extends Handler {
 	@Override
 	public void clearPage(int pageIndex) {
 		Window page = pages.remove(pageIndex);
-		page.getItems().clear();
-		ProtocolPackets.SET_WINDOW_ITEMS.process(page.getViewers(), page);
+		if (page != null) {
+			page.getItems().clear();
+			ProtocolPackets.SET_WINDOW_ITEMS.process(page.getViewers(), page);
+		}
 	}
 
 	@Override

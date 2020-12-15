@@ -2,10 +2,9 @@ package com.guillaumevdn.gcore;
 
 import java.io.File;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Bukkit;
@@ -28,6 +27,8 @@ import com.guillaumevdn.gcore.lib.economy.Currency;
 import com.guillaumevdn.gcore.lib.exception.ConfigError;
 import com.guillaumevdn.gcore.lib.file.FileUtils;
 import com.guillaumevdn.gcore.lib.function.ThrowableSupplier;
+import com.guillaumevdn.gcore.lib.gui.element.ElementGUI;
+import com.guillaumevdn.gcore.lib.gui.element.item.type.GUIItemTypes;
 import com.guillaumevdn.gcore.lib.gui.struct.GUIType;
 import com.guillaumevdn.gcore.lib.location.position.PositionTypes;
 import com.guillaumevdn.gcore.lib.logging.LogLevel;
@@ -36,7 +37,6 @@ import com.guillaumevdn.gcore.lib.particlescript.ParticleScript;
 import com.guillaumevdn.gcore.lib.particlescript.ParticleScriptDecoder;
 import com.guillaumevdn.gcore.lib.string.StringUtils;
 import com.guillaumevdn.gcore.lib.time.frame.TimeFrameTypes;
-import com.guillaumevdn.gcore.lib.tuple.GUIItemTriple;
 
 /**
  * @author GuillaumeVDN
@@ -70,6 +70,14 @@ public class ConfigGCore extends GPluginConfig {
 	public static boolean dontLogMissingEditorTexts;
 	public static boolean logspamItemNbt;
 
+	public static ZoneId timeZone() {
+		return customTimeZone != null ? customTimeZone : ZoneId.systemDefault();
+	}
+
+	public static ZonedDateTime timeNow() {
+		return ZonedDateTime.now(timeZone());
+	}
+
 	public static void logspamItemNbt(ThrowableSupplier<String> line) {
 		logspamItemNbt(null, line);
 	}
@@ -89,20 +97,22 @@ public class ConfigGCore extends GPluginConfig {
 	}
 
 	public static String formatDate(long epoch) {
-		return DateTimeFormatter.ofPattern(TextGeneric.dateTimeFormat.parseLine()).format(LocalDateTime.ofInstant(Instant.ofEpochMilli(epoch), customTimeZone != null ? customTimeZone : ZoneId.systemDefault()));
+		return formatDate(ZonedDateTime.ofInstant(Instant.ofEpochMilli(epoch), timeZone()));
+	}
+
+	public static String formatDate(ZonedDateTime timeZoneAware) {
+		return DateTimeFormatter.ofPattern(TextGeneric.dateTimeFormat.parseLine()).format(timeZoneAware);
 	}
 
 	// gui
-	public static int guiItemRefreshSecondsPlaceholders = 30;
+	public static int guiItemRefreshTicksPlaceholders = 30 * 20;
+	public static int dynamicBorderRefreshTicks = 5;
 
 	public static ItemStack backItem;
 	public static ItemStack previousPageItem;
 	public static ItemStack nextPageItem;
 
-	public static GUIType guiConfirmType;
-	public static GUIItemTriple guiConfirmItemYes;
-	public static GUIItemTriple guiConfirmItemNo;
-	public static List<GUIItemTriple> guiConfirmContent;
+	public static ElementGUI guiConfirm;
 
 	// load
 	@Override
@@ -160,6 +170,7 @@ public class ConfigGCore extends GPluginConfig {
 		// types
 		GCore.inst().timeFrameTypes = new TimeFrameTypes();
 		GCore.inst().positionTypes = new PositionTypes();
+		GCore.inst().guiItemTypes = new GUIItemTypes();
 		particleScripts = new LowerCaseHashMap<>();
 		loadParticleScripts(GCore.inst().getDataFile("particle_scripts/"));
 		Currency.values().forEach(Currency::enable);
@@ -197,14 +208,11 @@ public class ConfigGCore extends GPluginConfig {
 			GCore.inst().getMySQLConnector().setMysql(new MySQL(url, usr, pwd));
 		}
 		// gui
-		guiItemRefreshSecondsPlaceholders = baseConfig.readMandatoryInteger("gui_items_refresh_seconds_placeholder");
+		guiItemRefreshTicksPlaceholders = baseConfig.readMandatoryInteger("gui_items_refresh_ticks_placeholder");
+		dynamicBorderRefreshTicks = baseConfig.readInteger("dynamic_border_refresh_ticks", 5);
 		backItem = baseConfig.readMandatoryItemStack("gui_items.back");
 		previousPageItem = baseConfig.readMandatoryItemStack("gui_items.previous_page");
 		nextPageItem = baseConfig.readMandatoryItemStack("gui_items.next_page");
-		guiConfirmType = baseConfig.readMandatoryEnum("confirm_gui.type", GUIType.class);
-		guiConfirmItemYes = baseConfig.readMandatoryGUIItemTriple("confirm_gui.item_yes");
-		guiConfirmItemNo = baseConfig.readMandatoryGUIItemTriple("confirm_gui.item_no");
-		guiConfirmContent = baseConfig.readGUIItemTripleList("confirm_gui.contents", new ArrayList<>());
 		for (String rawType : baseConfig.readKeysForSection("gui_type_slots")) {
 			GUIType type = ObjectUtils.safeValueOf(rawType, GUIType.class);
 			if (type != null) {
@@ -216,6 +224,7 @@ public class ConfigGCore extends GPluginConfig {
 				if (nextPage >= -1 && nextPage < type.getSize()) type.setNextPageItemSlot(nextPage);
 			}
 		}
+		guiConfirm = loadGUI("guis/SYSTEM_confirm.yml", "confirm", "cancel");
 		// add missing default options to config
 		if (!baseConfig.contains("allow_protocol_guis")) {
 			baseConfig.write("allow_protocol_guis", true);
@@ -241,6 +250,20 @@ public class ConfigGCore extends GPluginConfig {
 	public static <V extends Variants> V loadVariants(V variants) {
 		variants.reload(GCore.inst().getDataFile(variants.getTypeName() + "s.yml"), "resources/" + variants.getTypeName() + "s.yml");
 		return variants;
+	}
+
+	protected final ElementGUI loadGUI(String filePath, String... requiredItems) throws Throwable {
+		File file = GCore.inst().getDataFile(filePath);
+		ElementGUI gui = new ElementGUI(file, FileUtils.getSimpleName(file), true);
+		gui.read();
+		if (requiredItems != null) {
+			for (String required : requiredItems) {
+				if (!gui.getContent(required).isPresent()) {
+					throw new ConfigError("missing content item '" + required + "' in " + filePath + "'");
+				}
+			}
+		}
+		return gui;
 	}
 
 }

@@ -234,14 +234,15 @@ public final class ItemUtils {
 		if (item == reference) return true;
 		// type
 		Mat type = Mat.fromItem(item).orElse(null);
-		ConfigGCore.logspamItemNbt(null, () -> "Item match ; type " + type + ", ref " + Mat.fromItem(reference).orNull());
-		if (!Objects.deepEquals(type, Mat.fromItem(reference).orNull())) {
+		Mat refType = Mat.fromItem(reference).orNull();
+		ConfigGCore.logspamItemNbt(null, () -> "Item match ; type " + type + ", ref " + refType);
+		if ((type == null && refType == null) || !Objects.deepEquals(type, refType)) {
 			return false;
 		}
 		// durability
 		int itemDura = Compat.getDurability(item);
-		int referenceDura = Compat.getDurability(item);
-		ConfigGCore.logspamItemNbt(null, () -> "Item match ; durability");
+		int referenceDura = Compat.getDurability(reference);
+		ConfigGCore.logspamItemNbt(null, () -> "Item match ; durability, item " + itemDura + ", ref " + referenceDura);
 		if (check.mustHaveSameDurability() && itemDura != referenceDura) {
 			return false;
 		} else {
@@ -383,7 +384,7 @@ public final class ItemUtils {
 		if (name != null || lore != null) {
 			ItemMeta meta = item.getItemMeta();
 			if (name != null) meta.setDisplayName(StringUtils.format(name));
-			if (lore != null) meta.setLore(StringUtils.format(lore));
+			if (lore != null) meta.setLore(StringUtils.formatCopy(lore));
 			item.setItemMeta(meta);
 		}
 		return item;

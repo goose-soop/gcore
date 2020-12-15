@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -30,15 +31,17 @@ public final class Scoreboard {
 	private int updateTicks = 20;
 	private boolean active = false;
 	private Consumer<ScoreboardBuilder> updater;
+	private Supplier<Boolean> taskPreProcessor;
 
 	private Set<ScoreboardEntry> currentEntries = new HashSet<>();
 	private Map<Integer, Team> teams = new HashMap<>();
 	private org.bukkit.scoreboard.Scoreboard bukkit;
 	private Objective objective;
 
-	public Scoreboard(GPlugin plugin, Player holder, Consumer<ScoreboardBuilder> updater, int updateTicks) {
+	public Scoreboard(GPlugin plugin, Player holder, Consumer<ScoreboardBuilder> updater, Supplier<Boolean> taskPreProcessor, int updateTicks) {
 		this.player = holder;
 		this.updater = updater;
+		this.taskPreProcessor = taskPreProcessor;
 		this.plugin = plugin;
 		this.updateTicks = updateTicks;
 	}
@@ -76,6 +79,7 @@ public final class Scoreboard {
 	public void stop() {
 		if (!active) return;
 		active = false;
+
 		// stop updating
 		plugin.stopTask("scoreboard_" + id);
 
@@ -86,11 +90,11 @@ public final class Scoreboard {
 			}
 			// unregister
 			for (Team team : teams.values()) {
-				try { team.unregister(); } catch (IllegalStateException ignored) {}
+				try { team.unregister(); } catch (Throwable ignored) {}
 			}
 			teams.clear();
-			try { objective.unregister(); } catch (IllegalStateException ignored) {}
-			try { bukkit.clearSlot(DisplaySlot.SIDEBAR); } catch (IllegalStateException ignored) {}
+			try { objective.unregister(); } catch (Throwable ignored) {}
+			try { bukkit.clearSlot(DisplaySlot.SIDEBAR); } catch (Throwable ignored) {}
 		});
 	}
 
@@ -100,15 +104,20 @@ public final class Scoreboard {
 			return;
 		}
 
+		// preprocessor
+		if (taskPreProcessor != null && !taskPreProcessor.get()) {
+			return;
+		}
+
 		// maybe the scoreboard was unregistered for some reason : restart it
 		try {
 			objective.getDisplayName();  // this throws an IllegalStateException if the component is unregistered
-		} catch (IllegalStateException ignored) {
+		} catch (Throwable ignored) {
 			stop();
 			start();
 		}
 
-		// build lines
+		// build
 		ScoreboardBuilder builder = new ScoreboardBuilder();
 		updater.accept(builder);
 

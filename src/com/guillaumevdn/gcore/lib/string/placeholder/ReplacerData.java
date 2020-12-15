@@ -1,6 +1,5 @@
 package com.guillaumevdn.gcore.lib.string.placeholder;
 
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import javax.annotation.Nonnull;
@@ -63,14 +62,30 @@ public final class ReplacerData {
 		return this;
 	}
 
-	public ReplacerData with(Function<String, Object> customMatcher) {
-		custom.with(customMatcher);
+	public ReplacerData with(String customMatcherDesc, CustomMatcher customMatcher) {
+		custom.with(customMatcherDesc, customMatcher);
+		return this;
+	}
+
+	public ReplacerData replaceCustom(String customMatcherDesc, CustomMatcher customMatcher) {
+		custom.replaceCustom(customMatcherDesc, customMatcher);
 		return this;
 	}
 
 	public ReplacerData with(StringReplacer custom) {
-		custom.with(custom);
+		this.custom.with(custom);
 		return this;
+	}
+
+	public ReplacerData formatNumbers(boolean formatNumbers) {
+		this.custom.formatNumbers(formatNumbers);
+		return this;
+	}
+
+	// str
+	@Override
+	public String toString() {
+		return "player " + getPlayer() + ", location " + getLocation() + ", custom " + custom.toString();
 	}
 
 	// clone

@@ -11,7 +11,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import com.guillaumevdn.gcore.lib.object.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
@@ -31,6 +30,7 @@ import com.guillaumevdn.gcore.lib.function.ThrowableTriConsumer;
 import com.guillaumevdn.gcore.lib.function.TriConsumer;
 import com.guillaumevdn.gcore.lib.number.NumberUtils;
 import com.guillaumevdn.gcore.lib.object.ObjectUtils;
+import com.guillaumevdn.gcore.lib.object.Optional;
 import com.guillaumevdn.gcore.lib.wrapper.WrapperBoolean;
 
 /**
@@ -82,6 +82,18 @@ public final class CollectionUtils {
 
 	public static LowerCaseArrayList asLowercaseList(Collection<String> elements) {
 		LowerCaseArrayList list = new LowerCaseArrayList();
+		elements.forEach(element -> list.add(element));
+		return list;
+	}
+
+	public static LowerCaseHashSet asLowercaseSet(String... elements) {
+		LowerCaseHashSet list = new LowerCaseHashSet();
+		for (String element : elements) list.add(element);
+		return list;
+	}
+
+	public static LowerCaseHashSet asLowercaseSet(Collection<String> elements) {
+		LowerCaseHashSet list = new LowerCaseHashSet();
 		elements.forEach(element -> list.add(element));
 		return list;
 	}
@@ -261,8 +273,12 @@ public final class CollectionUtils {
 
 	// iterate
 	public static <T> void iterate(Collection<T> collection, TriConsumer<Iterator<T>, T, WrapperBoolean> consumer) {
+		iterate(collection.iterator(), consumer);
+	}
+
+	public static <T> void iterate(Iterator<T> iterator, TriConsumer<Iterator<T>, T, WrapperBoolean> consumer) {
 		WrapperBoolean breaker = WrapperBoolean.of(false);
-		for (Iterator<T> iterator = collection.iterator(); iterator.hasNext(); ) {
+		while (iterator.hasNext()) {
 			consumer.accept(iterator, iterator.next(), breaker);
 			if (breaker.get()) {
 				return;
@@ -337,6 +353,9 @@ public final class CollectionUtils {
 	}
 
 	public static <T> boolean contentEquals(Collection<? extends T> c1, Collection<? extends T> c2, boolean sameOrder) {
+		if (c1 == null || c2 == null) {
+			return c1 == c2;
+		}
 		if (c1.size() != c2.size()) {
 			return false;
 		}
@@ -485,27 +504,9 @@ public final class CollectionUtils {
 		Iterator<? extends T> iterator = collection.iterator();
 		while (iterator.hasNext()) {
 			current.add(iterator.next());
-			if (iterator.hasNext() && current.size() >= splitSize) {
+			if (iterator.hasNext() && current.size() == splitSize) {
 				split.add(current);
 				current = new ArrayList<>();
-			}
-		}
-		return split;
-	}
-
-	public static <T> List<Set<T>> split(Set<? extends T> collection, int splitSize) {
-		if (splitSize < 1) {
-			throw new Error("split size must be at least 1");
-		}
-		Set<T> current = new HashSet<>();
-		List<Set<T>> split = new ArrayList<>();
-		split.add(current);
-		Iterator<? extends T> iterator = collection.iterator();
-		while (iterator.hasNext()) {
-			current.add(iterator.next());
-			if (iterator.hasNext() && current.size() >= splitSize) {
-				split.add(current);
-				current = new HashSet<>();
 			}
 		}
 		return split;

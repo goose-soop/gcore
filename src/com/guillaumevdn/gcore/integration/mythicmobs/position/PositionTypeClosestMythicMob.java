@@ -1,5 +1,6 @@
 package com.guillaumevdn.gcore.integration.mythicmobs.position;
 
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.bukkit.Location;
@@ -35,6 +36,11 @@ public abstract class PositionTypeClosestMythicMob extends PositionType {
 
 	// parse
 	@Override
+	public boolean mustCache(ElementPosition position) {
+		return false;
+	}
+
+	@Override
 	public final Position doParse(ElementPosition position, Replacer replacer) throws ParsingError {
 		Location mobLocation = findMatching(position, replacer);
 		return mobLocation == null ? null : doParseMob(position, mobLocation, replacer);
@@ -49,9 +55,10 @@ public abstract class PositionTypeClosestMythicMob extends PositionType {
 		}
 		Stream<ActiveMob> stream = MythicMobs.inst().getMobManager().getActiveMobs().stream();
 		// filter by type
-		position.parseElementAsList("mobs", MythicMob.class, replacer).ifPresentDo(mobs -> {
-			stream.filter(mob -> mobs.stream().anyMatch(type -> type.equals(mob.getType())));
-		});
+		List<MythicMob> mobs = position.parseElementAsList("mobs", MythicMob.class, replacer).orNull();
+		if (mobs != null) {
+			stream = stream.filter(mob -> mobs.stream().anyMatch(type -> type.equals(mob.getType())));
+		}
 		// sort and find first
 		return stream
 				.map(mob -> mob.getEntity() == null || mob.getEntity().getBukkitEntity() == null ? null : mob.getEntity().getBukkitEntity().getLocation())

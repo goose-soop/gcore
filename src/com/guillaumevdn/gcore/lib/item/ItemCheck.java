@@ -28,7 +28,7 @@ public enum ItemCheck {
 	private boolean mustHaveSameDurability, musntBeMoreDamaged, nameContains, loreContains;
 
 	ItemCheck() {
-		this.mustHaveSameDurability = ordinal() == 0 || name().contains("SameDurability");
+		this.mustHaveSameDurability = name().equals("ExactSame") || name().contains("SameDurability");
 		this.musntBeMoreDamaged = name().contains("NotMoreDamaged");
 		this.nameContains = name().contains("NameContains");
 		this.loreContains = name().contains("LoreContains");

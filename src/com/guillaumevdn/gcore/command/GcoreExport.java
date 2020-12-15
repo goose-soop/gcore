@@ -4,7 +4,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -104,7 +103,7 @@ public final class GcoreExport extends Subcommand {
 			TextGCore.messageGcoreExportCouldnt.replace("{file}", () -> f).send(call.getSender());
 		}
 		// zip
-		File target = new File(GCore.inst().getDataFolder().getParentFile() + "/GCore_" + LOCALDATETIME_FORMAT.format(LocalDateTime.now()) + ".zip");
+		File target = new File(GCore.inst().getDataFolder().getParentFile() + "/GCore_" + LOCALDATETIME_FORMAT.format(ConfigGCore.timeNow()) + ".zip");
 		FileUtils.zip(temp, target);
 		FileUtils.delete(temp);
 		// done

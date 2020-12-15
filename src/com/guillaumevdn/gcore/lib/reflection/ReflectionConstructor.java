@@ -4,7 +4,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Parameter;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 import com.guillaumevdn.gcore.lib.object.ObjectUtils;
 import com.guillaumevdn.gcore.lib.string.StringUtils;
@@ -36,7 +35,12 @@ public class ReflectionConstructor {
 				break;
 			}
 		}
-		if (constructor == null) throw new NoSuchMethodException("Class " + clazz + ", params " + StringUtils.toTextString(", ", (Object[]) params));
+		if (constructor == null) {
+			Reflection.logAndRethrowError(new NoSuchMethodException(),
+					"Class " + clazz
+					+ "\nParameters '" + StringUtils.toTextString(", ", (Object[]) params) + "'"
+					);
+		};
 	}
 
 	// get
@@ -51,15 +55,23 @@ public class ReflectionConstructor {
 			Object result = constructor.newInstance(params);
 			return result == null ? null : ReflectionObject.of(result);
 		} catch (Throwable exception) {
-			throw new InstantiationException("Class " + constructor.getDeclaringClass() + ", params " + StringUtils.toTextString(", ", (Object[]) params) + ", constructor params " + StringUtils.toTextString(", ", (Object[]) constructor.getParameters()));
+			Reflection.logAndRethrowError(exception,
+					"Class " + constructor.getDeclaringClass()
+					+ "\nParameters '" + StringUtils.toTextString(", ", (Object[]) params) + "'"
+					+ "\nConstructor parameters '" + StringUtils.toTextString(", ", (Object[]) constructor.getParameters())
+					);
+			return null;
 		}
 	}
 
 	// cache
 	private static Map<Integer, ReflectionConstructor> cache = new HashMap<>();
 
-	public static ReflectionConstructor of(Class<?> clazz, Class... params) throws Throwable {
-		int hash = Objects.hash(clazz, params);
+	public static ReflectionConstructor of(Class<?> clazz, Class<?>... params) throws Throwable {
+		// hash by class name
+		int hash = clazz.getName().hashCode();
+		for (Class<?> param : params) hash = 31 * hash + (param == null ? 0 : param.getName().hashCode());
+		// construct
 		ReflectionConstructor method = cache.get(hash);
 		if (method == null) {
 			cache.put(hash, method = new ReflectionConstructor(clazz, params));

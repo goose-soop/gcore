@@ -16,8 +16,7 @@ public class PermissionGCore extends PermissionContainer {
 		instance = this;
 	}
 
-	public final Permission gcore = set(null, "gcore");
-	public final Permission gcoreAdmin = setAdmin(gcore, "admin");
-	public final Permission gcoreBypassCommandRestrictions = set(gcore, "bypass_command_restrictions");
+	public final Permission gcoreAdmin = setAdmin("gcore.admin");
+	public final Permission gcoreBypassCommandRestrictions = set("gcore.bypass_command_restrictions");
 
 }

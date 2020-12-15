@@ -2,6 +2,7 @@ package com.guillaumevdn.gcore.lib.command.argument;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -49,34 +50,35 @@ public class ArgumentPlayer extends Argument<Player> implements PlayerArgument {
 		if (senderIfNone && getPermission() != null && !getPermission().has(call.getSender())) {
 			return call.getSenderPlayer();
 		}
-		Player player = null;
-		main: for (int i = 0; i < call.getArguments().size(); ++i) {
+		for (int i = 0; i < call.getArguments().size(); ++i) {
 			String arg = call.getArguments().get(i).toLowerCase();
-			// online
-			player = Bukkit.getPlayer(arg);
-			if (player != null) {
-				call.getArguments().remove(i);
-				break main;
-			}
-			// match something
-			for (Player pl : PlayerUtils.getOnline()) {
-				if (pl.getName().toLowerCase().startsWith(arg)) {
-					player = pl;
-					call.getArguments().remove(i);
-					break main;
+			// exact
+			Player value = exactMatch(arg);
+			if (value == null) {
+				List<Player> matches = partialMatches(arg).collect(Collectors.toList());
+				if (matches.size() == 1) {
+					value = matches.get(0);
 				}
 			}
+			if (value != null) {
+				call.getArguments().remove(i);
+				return value;
+			}
 		}
-		return player != null ? player : (senderIfNone && !call.isForTabComplete() ? call.getSenderPlayer() : null);
+		return senderIfNone && !call.isForTabComplete() ? call.getSenderPlayer() : null;
+	}
+
+	protected Player exactMatch(String arg) {
+		return Bukkit.getPlayer(arg);
+	}
+
+	protected Stream<? extends Player> partialMatches(String arg) {
+		return PlayerUtils.getOnlineStream().filter(pl -> pl.getName().toLowerCase().startsWith(arg));
 	}
 
 	@Override
 	public List<String> tabComplete(CommandCall call) {
-		return tabCompleteOnline(this);
-	}
-
-	public static List<String> tabCompleteOnline(Argument argument) {
-		return PlayerUtils.getOnline().stream().map(pl -> pl.getName()).sorted(String::compareTo).collect(Collectors.toList());
+		return PlayerUtils.getOnlineStream().map(pl -> pl.getName()).sorted(String::compareTo).collect(Collectors.toList());
 	}
 
 }

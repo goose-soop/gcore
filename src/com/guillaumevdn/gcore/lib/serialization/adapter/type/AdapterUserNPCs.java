@@ -56,22 +56,22 @@ public final class AdapterUserNPCs extends DataAdapter<UserNPCs> {
 	public UserNPCs read(int version, DataIO reader) throws Throwable {
 		if (version == 1) {
 			UUID uuid = reader.readSerialized("uuid", UUID.class);
-			Map<Integer, UserNPC> npcs = reader.readMapOrThrow("npcs", Integer.class, (key, r) -> {
+			Map<Integer, UserNPC> npcs = reader.readSameMapOrThrow("npcs", Integer.class, (key, r) -> {
 				Integer id = NumberUtils.integerOrNull(key);
-				return id == null ? null : r.readObjectOrThrow(key, data -> {
-					Boolean shown = r.readBoolean("shown");
-					String name = r.readString("name");
-					String skinData = r.readString("skinData");
-					String skinSignature = r.readString("skinSignature");
-					Location location = r.readSerialized("location", Location.class);
-					Double targetDistance = r.readDouble("targetDistance");
-					List<NPCStatus> status = r.readSerializedList("status", NPCStatus.class);
-					ItemStack heldItem = r.readItem("heldItem");
-					ItemStack heldItemOff = r.readItem("heldItemOff");
-					ItemStack boots = r.readItem("leggings");
-					ItemStack leggings = r.readItem("leggings");
-					ItemStack chestplate = r.readItem("chestplate");
-					ItemStack helmet = r.readItem("helmet");
+				return id == null ? null : r.readObjectOrThrow(key, npcReader -> {
+					Boolean shown = npcReader.readBoolean("shown");
+					String name = npcReader.readString("name");
+					String skinData = npcReader.readString("skinData");
+					String skinSignature = npcReader.readString("skinSignature");
+					Location location = npcReader.readSerialized("location", Location.class);
+					Double targetDistance = npcReader.readDouble("targetDistance");
+					List<NPCStatus> status = npcReader.readSerializedList("status", NPCStatus.class);
+					ItemStack heldItem = npcReader.readItem("heldItem");
+					ItemStack heldItemOff = npcReader.readItem("heldItemOff");
+					ItemStack boots = npcReader.readItem("leggings");
+					ItemStack leggings = npcReader.readItem("leggings");
+					ItemStack chestplate = npcReader.readItem("chestplate");
+					ItemStack helmet = npcReader.readItem("helmet");
 					UserNPC npc = new UserNPC(id);
 					npc.saveNonDefault(null, null, shown, name, skinData, skinSignature, location, targetDistance, status, heldItem, heldItemOff, boots, leggings, chestplate, helmet);
 					return npc;

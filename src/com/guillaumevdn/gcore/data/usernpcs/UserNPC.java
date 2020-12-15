@@ -161,49 +161,45 @@ public final class UserNPC {
 	}
 
 	// set
-	public void cleanDefaults(ElementNPC config, Replacer replacer) {
-		saveNonDefault(config, replacer, shown, name, skinData, skinSignature, location, targetDistance, status, heldItem, heldItemOff, boots, leggings, chestplate, helmet);
-	}
-
 	public void saveNonDefault(ElementNPC config, Replacer replacer, Boolean shown, String name, String skinData, String skinSignature, Location location, Double targetDistance, List<NPCStatus> status, ItemStack heldItem, ItemStack heldItemOff, ItemStack boots, ItemStack leggings, ItemStack chestplate, ItemStack helmet) {
 		if (shown != null) {
-			this.shown = shown == config.getShown().parse(replacer).orNull() ? null : shown;
+			this.shown = config != null && shown == config.getShown().parse(replacer).orNull() ? null : shown;
 		}
 		if (name != null) {
-			this.name = name.equalsIgnoreCase(config.getName().parse(replacer).orNull()) ? null : name;
+			this.name = config != null && name.equalsIgnoreCase(config.getName().parse(replacer).orNull()) ? null : name;
 		}
 		if (skinData != null) {
-			this.skinData = skinData.equalsIgnoreCase(config.getSkinData().parse(replacer).orNull()) ? null : skinData;
+			this.skinData = config != null && skinData.equalsIgnoreCase(config.getSkinData().parse(replacer).orNull()) ? null : skinData;
 		}
 		if (skinSignature != null) {
-			this.skinSignature = skinSignature.equalsIgnoreCase(config.getSkinSignature().parse(replacer).orNull()) ? null : skinSignature;
+			this.skinSignature = config != null && skinSignature.equalsIgnoreCase(config.getSkinSignature().parse(replacer).orNull()) ? null : skinSignature;
 		}
 		if (location != null) {
-			this.location = location.equals(config.getLocation().parse(replacer).orNull()) ? null : location;
+			this.location = config != null && location.equals(config.getLocation().parse(replacer).orNull()) ? null : location;
 		}
 		if (targetDistance != null) {
-			this.targetDistance = targetDistance.equals(config.getTargetDistance().parse(replacer).orNull()) ? null : targetDistance;
+			this.targetDistance = config != null && targetDistance.equals(config.getTargetDistance().parse(replacer).orNull()) ? null : targetDistance;
 		}
 		if (status != null) {
-			this.status = CollectionUtils.contentEquals(status, config.getStatus().parse(replacer).orEmptyList(), false) ? null : status;
+			this.status = config != null && CollectionUtils.contentEquals(status, config.getStatus().parse(replacer).orEmptyList(), false) ? null : status;
 		}
 		if (heldItem != null) {
-			this.heldItem = ItemUtils.match(heldItem, config.getHeldItem().parse(replacer).orNull(), ItemCheck.ExactSame) ? null : heldItem;
+			this.heldItem = config != null && ItemUtils.match(heldItem, config.getHeldItem().parse(replacer).orNull(), ItemCheck.ExactSame) ? null : heldItem;
 		}
 		if (heldItemOff != null) {
-			this.heldItemOff = ItemUtils.match(heldItemOff, config.getHeldItemOff().parse(replacer).orNull(), ItemCheck.ExactSame) ? null : heldItemOff;
+			this.heldItemOff = config != null && ItemUtils.match(heldItemOff, config.getHeldItemOff().parse(replacer).orNull(), ItemCheck.ExactSame) ? null : heldItemOff;
 		}
 		if (boots != null) {
-			this.boots = ItemUtils.match(boots, config.getBoots().parse(replacer).orNull(), ItemCheck.ExactSame) ? null : boots;
+			this.boots = config != null && ItemUtils.match(boots, config.getBoots().parse(replacer).orNull(), ItemCheck.ExactSame) ? null : boots;
 		}
 		if (leggings != null) {
-			this.leggings = ItemUtils.match(leggings, config.getLeggings().parse(replacer).orNull(), ItemCheck.ExactSame) ? null : leggings;
+			this.leggings = config != null && ItemUtils.match(leggings, config.getLeggings().parse(replacer).orNull(), ItemCheck.ExactSame) ? null : leggings;
 		}
 		if (chestplate != null) {
-			this.chestplate = ItemUtils.match(chestplate, config.getChestplate().parse(replacer).orNull(), ItemCheck.ExactSame) ? null : chestplate;
+			this.chestplate = config != null && ItemUtils.match(chestplate, config.getChestplate().parse(replacer).orNull(), ItemCheck.ExactSame) ? null : chestplate;
 		}
 		if (helmet != null) {
-			this.helmet = ItemUtils.match(helmet, config.getHelmet().parse(replacer).orNull(), ItemCheck.ExactSame) ? null : helmet;
+			this.helmet = config != null && ItemUtils.match(helmet, config.getHelmet().parse(replacer).orNull(), ItemCheck.ExactSame) ? null : helmet;
 		}
 	}
 

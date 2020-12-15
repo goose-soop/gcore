@@ -106,6 +106,7 @@ public abstract class KeyedBoard<K, V, R extends KeyReference<K>> extends Board 
 				callback.run();
 			}
 		}, () -> {
+			toSave.removeAll(references);
 			if (DataBackEnd.MYSQL.equals(getBackEnd())) {
 				remotePullElementsMySQL(references);
 			} else if (DataBackEnd.JSON.equals(getBackEnd())) {

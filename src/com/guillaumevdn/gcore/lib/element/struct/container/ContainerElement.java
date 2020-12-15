@@ -17,6 +17,9 @@ import com.guillaumevdn.gcore.lib.element.struct.Element;
 import com.guillaumevdn.gcore.lib.element.struct.Need;
 import com.guillaumevdn.gcore.lib.element.struct.map.AbstractMapElement;
 import com.guillaumevdn.gcore.lib.element.struct.parsing.ParseableElement;
+import com.guillaumevdn.gcore.lib.element.struct.parsing.ParsingError;
+import com.guillaumevdn.gcore.lib.element.type.basic.ElementBiome;
+import com.guillaumevdn.gcore.lib.element.type.basic.ElementBiomeList;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementBoolean;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementBossbarColor;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementBossbarFlag;
@@ -64,6 +67,7 @@ import com.guillaumevdn.gcore.lib.element.type.basic.ElementPotionEffectTypeList
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementPotionExtra;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementPotionType;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementProjectileType;
+import com.guillaumevdn.gcore.lib.element.type.basic.ElementProjectileTypeList;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementRegainReasonList;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementSound;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementString;
@@ -185,6 +189,14 @@ public abstract class ContainerElement extends AbstractMapElement<String, Elemen
 	public final <T> T directParseOrNull(String id, Replacer replacer) {
 		Optional<T> parsed = parseElementAs(id, replacer);
 		return parsed.orNull();
+	}
+
+	public final <T> T directParseNoCatchOrThrowParsingNull(String id, Replacer replacer) throws ParsingError {
+		ParseableElement<T> element = getElementAs(id);
+		if (element == null) {
+			throw new ParsingError(null, "didn't find element '" + id + "'");
+		}
+		return element.parseNoCatchOrThrowParsingNull(replacer);
 	}
 
 	public final <T> T directParseOrElse(String id, Replacer replacer, T def) {
@@ -366,6 +378,10 @@ public abstract class ContainerElement extends AbstractMapElement<String, Elemen
 
 	public final ElementBlockStateList addBlockStateList(String id, Need need, Text editorDescription) { return add(new ElementBlockStateList(this, id, need, editorDescription)); }
 	public final ElementBlockStateList addBlockStateList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementBlockStateList(this, id, need, editorDescription)); }
+	public final ElementBiome addBiome(String id, Need need, Text editorDescription) { return add(new ElementBiome(this, id, need, editorDescription)); }
+	public final ElementBiome addBiome(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementBiome(this, id, need, editorDescription)); }
+	public final ElementBiomeList addBiomeList(String id, Need need, Text editorDescription) { return add(new ElementBiomeList(this, id, need, editorDescription)); }
+	public final ElementBiomeList addBiomeList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementBiomeList(this, id, need, editorDescription)); }
 	public final ElementBoolean addBoolean(String id, Need need, Text editorDescription) { return add(new ElementBoolean(this, id, need, editorDescription)); }
 	public final ElementBoolean addBoolean(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementBoolean(this, id, need, editorDescription)); }
 	public final ElementBossbarColor addBossbarColor(String id, Need need, Text editorDescription) { return add(new ElementBossbarColor(this, id, need, editorDescription)); }
@@ -526,6 +542,8 @@ public abstract class ContainerElement extends AbstractMapElement<String, Elemen
 	public final ElementPotionType addPotionType(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementPotionType(this, id, need, editorDescription)); }
 	public final ElementProjectileType addProjectileType(String id, Need need, Text editorDescription) { return add(new ElementProjectileType(this, id, need, editorDescription)); }
 	public final ElementProjectileType addProjectileType(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementProjectileType(this, id, need, editorDescription)); }
+	public final ElementProjectileTypeList addProjectileTypeList(String id, Need need, Text editorDescription) { return add(new ElementProjectileTypeList(this, id, need, editorDescription)); }
+	public final ElementProjectileTypeList addProjectileTypeList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementProjectileTypeList(this, id, need, editorDescription)); }
 	public final ElementRegainReasonList addRegainReasonList(String id, Need need, Text editorDescription) { return add(new ElementRegainReasonList(this, id, need, editorDescription)); }
 	public final ElementRegainReasonList addRegainReasonList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementRegainReasonList(this, id, need, editorDescription)); }
 	public final ElementRelativeLocation addRelativeLocation(String id, Need need, Text editorDescription) { return add(new ElementRelativeLocation(this, id, need, editorDescription)); }

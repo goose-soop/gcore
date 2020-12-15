@@ -26,6 +26,7 @@ import com.guillaumevdn.gcore.lib.chat.JsonMessage;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.collection.LowerCaseHashMap;
 import com.guillaumevdn.gcore.lib.command.Command;
+import com.guillaumevdn.gcore.lib.compatibility.bossbar.Bossbar;
 import com.guillaumevdn.gcore.lib.configuration.YMLConfiguration;
 import com.guillaumevdn.gcore.lib.configuration.file.YMLError;
 import com.guillaumevdn.gcore.lib.data.Board;
@@ -64,6 +65,7 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 	private final LowerCaseHashMap<Task> tasks = new LowerCaseHashMap<>();
 	private final LowerCaseHashMap<Logger> loggers = new LowerCaseHashMap<>();
 	private final LowerCaseHashMap<GUI> guis = new LowerCaseHashMap<>();
+	private final LowerCaseHashMap<Bossbar> bossbars = new LowerCaseHashMap<>();
 	private final LowerCaseHashMap<Integration> integrations = new LowerCaseHashMap<>();
 	private Logger mainLogger = new Logger(this, getName() + "-" + getDescription().getVersion(), true, true, 10000, false);  // define it temporarily for start
 	private boolean activated = false;
@@ -132,6 +134,10 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 
 	public final Map<String, GUI> getGuis() {
 		return Collections.unmodifiableMap(guis);
+	}
+
+	public Map<String, Bossbar> getBossbars() {
+		return Collections.unmodifiableMap(bossbars);
 	}
 
 	public final Map<String, Integration> getIntegrations() {
@@ -419,6 +425,8 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 			Bukkit.getScheduler().cancelTasks(this); // make sure to cancel all tasks, future as well
 			// close and unregister GUIs
 			CollectionUtils.asList(guis.values()).forEach(gui -> gui.deactivate(true));
+			// unregister bossbars
+			CollectionUtils.asList(bossbars.values()).forEach(bar -> bar.stop());
 			// disable integrations
 			CollectionUtils.clearForEach(integrations, (id, integration) -> integration.deactivate());
 			// save and cancel loggers
@@ -490,7 +498,7 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 		// local is indev
 		Integer local = StringUtils.getUniqueVersionNumber(getDescription().getVersion());
 		if (local == null) {
-			sender.sendMessage("§dYou're using an in-development version of " + getName() + ", please make sure to update when it's released.");
+			sender.sendMessage("§dYou're using an in-development version of " + getName() + ", please make sure to update when it releases.");
 		}
 		// can show update notifications
 		else if (getConfiguration().updateNotification() && spigotResourceId > 0 && !equals(GCore.inst())) {
@@ -510,17 +518,17 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 							if (sender instanceof Player) {
 								new JsonMessage()
 								.append("§dPlease make sure to ").build()
-								.append("§d§lupdate").setURL("https://www.spigotmc.org/resources/" + getSpigotResourceId() + "/updates/").build()
+								.append("§l§5update").setURL("https://www.spigotmc.org/resources/" + getSpigotResourceId() + "/updates/").build()
 								.append(" §dto " + getName() + " v" + response + " :)").build()
 								.send((Player) sender);
 							} else {
-								sender.sendMessage("§dPlease make sure to §d§lupdate §dto " + getName() + " v" + response + " :)");
+								sender.sendMessage("§dPlease make sure to §l§5update §dto " + getName() + " v" + response + " :)");
 								sender.sendMessage("§dhttps://www.spigotmc.org/resources/" + getSpigotResourceId() + "/updates/");
 							}
 						}
 						// local is latest (indev)
 						else if (local > spigot) {
-							sender.sendMessage("§dYou're using an in-development version of " + getName() + ", please make sure to update when it's released.");
+							sender.sendMessage("§dYou're using an in-development version of " + getName() + ", please make sure to update when it releases.");
 						}
 					}
 				}
@@ -727,6 +735,24 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 
 	public final void unregisterGUI(GUI gui) {
 		guis.remove(gui.getId());
+	}
+
+	// bossbar
+	public final void registerBossbar(Bossbar bar) {
+		// already registered
+		Bossbar existing = bossbars.remove(bar.getId());
+		if (existing != null) {
+			if (existing.equals(bar)) {
+				return;
+			}
+			existing.stop();
+		}
+		// register
+		bossbars.put(bar.getId(), bar);
+	}
+
+	public final void unregisterBossbar(Bossbar bar) {
+		bossbars.remove(bar.getId());
 	}
 
 	// integration

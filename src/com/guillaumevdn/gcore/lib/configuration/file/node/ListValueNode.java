@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
+import com.guillaumevdn.gcore.lib.number.NumberUtils;
 import com.guillaumevdn.gcore.lib.string.StringUtils;
 
 /**
@@ -52,7 +53,7 @@ public class ListValueNode extends ConfigNode {
 		String prefix = getPrefix();
 		if (value.isEmpty()) {
 			writer.append(prefix + getId() + ": []" + (trailingComment != null ? "  #" + trailingComment : "") + "\n");
-		} else if (compact || (!ez && value.size() == 1 && !value.get(0).contains(",") && value.get(0).length() < 25 && StringUtils.unformat(value.get(0)).length() == value.get(0).length())) {
+		} else if (shouldWriteCompact()) {
 			writer.append(prefix + getId() + ": [" + StringUtils.toTextString(",", StringUtils.retranslateColorCodesCopy(value.stream().map(line -> SingleValueNode.wrapValueToWrite(line)).collect(Collectors.toList()))) + "]" + (trailingComment != null ? "  #" + trailingComment : "") + "\n");
 		} else if (ez) {
 			writer.append(prefix + getId() + ": |-" + (trailingComment != null ? "  #" + trailingComment : "") + "\n");
@@ -67,6 +68,14 @@ public class ListValueNode extends ConfigNode {
 				writer.append(linePrefix + SingleValueNode.wrapValueToWrite(line) + "\n");
 			}
 		}
+	}
+
+	private boolean shouldWriteCompact() {
+		if (compact) return true;
+		if (ez) return false;
+		if (value.stream().allMatch(elem -> NumberUtils.longOrNull(elem) != null || NumberUtils.doubleOrNull(elem) != null)) return true;
+		if (value.size() == 1 && !value.get(0).contains(",") && value.get(0).length() < 25 && StringUtils.unformat(value.get(0)).length() == value.get(0).length()) return true;
+		return false;
 	}
 
 	// clone

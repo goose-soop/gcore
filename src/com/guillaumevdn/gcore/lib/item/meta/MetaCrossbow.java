@@ -25,14 +25,17 @@ import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
 public final class MetaCrossbow {
 
 	public static boolean match(ItemMeta itemMeta, ItemMeta referenceMeta, ItemCheck check) {
-		CrossbowMeta meta = ObjectUtils.castOrNull(itemMeta, CrossbowMeta.class); // might be null if exact match is false
+		CrossbowMeta meta = ObjectUtils.castOrNull(itemMeta, CrossbowMeta.class);  // might be null if exact match is false
 		CrossbowMeta ref = ObjectUtils.castOrNull(referenceMeta, CrossbowMeta.class);
 		if (ref == null) return true;
 		// charged projectiles
 		if (check.isExact()) {
+			if (meta.hasChargedProjectiles() != meta.hasChargedProjectiles()) return false;  // parce qu'on rappelle que .getChargedProjectiles est @NotNull mais qu'il est null quand même :CringeHarold: #956
+			if (!ref.hasChargedProjectiles()) return true;
 			if (meta.getChargedProjectiles().size() != ref.getChargedProjectiles().size()) return false;
 		} else {
-			if (ref.getChargedProjectiles().size() > 0 && (meta == null || meta.getChargedProjectiles().size() == 0)) return false;
+			if (ref.hasChargedProjectiles() && (meta == null || !meta.hasChargedProjectiles())) return false;
+			if (!ref.hasChargedProjectiles()) return true;
 		}
 		main: for (ItemStack refProjectile : ref.getChargedProjectiles()) {
 			for (ItemStack projectile : meta.getChargedProjectiles()) {

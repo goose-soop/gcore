@@ -20,7 +20,10 @@ public class ReflectionField {
 			clazz = clazz.getSuperclass();
 		}
 		if (field == null) {
-			throw new NoSuchFieldException("Class " + original.getName() + ", name " + name);
+			Reflection.logAndRethrowError(new NoSuchFieldException(),
+					"Class " + original
+					+ "\nName '" + name + "'"
+					);
 		}
 	}
 
@@ -38,15 +41,24 @@ public class ReflectionField {
 
 	/** @return this object, for chaining convenience because it's cool */
 	public ReflectionField set(Object object, Object value) throws Throwable {
-		if (!field.isAccessible()) {
-			field.setAccessible(true);
+		try {
+			if (!field.isAccessible()) {
+				field.setAccessible(true);
+			}
+			if (Modifier.isFinal(field.getModifiers())) {
+				Field modifiersField = Field.class.getDeclaredField("modifiers");
+				modifiersField.setAccessible(true);
+				modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+			}
+			field.set(object, value);
+		} catch (Throwable throwable) {
+			Reflection.logAndRethrowError(new NoSuchFieldException(),
+					"Class " + field.getDeclaringClass()
+					+ "\nName '" + field.getName() + "'"
+					+ "\nValue '" + value + "'"
+					+ "\nValue class '" + (value == null ? "null" : value.getClass()) + "'"
+					);
 		}
-		if (Modifier.isFinal(field.getModifiers())) {
-			Field modifiersField = Field.class.getDeclaredField("modifiers");
-			modifiersField.setAccessible(true);
-			modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-		}
-		field.set(object, value);
 		return this;
 	}
 

@@ -117,14 +117,14 @@ public class SortedHashMap<K, V> implements Cloneable {
 	/**
 	 * @return an immutable set of keys for this map, eventually sorted depending on this map type
 	 */
-	public List<K> keySet() {
-		return keySet(Function.identity());
+	public List<K> keys() {
+		return keys(Function.identity());
 	}
 
 	/**
 	 * @return an immutable set of keys for this map, eventually sorted depending on this map type
 	 */
-	public <T> List<T> keySet(Function<K, T> mapper) {
+	public <T> List<T> keys(Function<K, T> mapper) {
 		return Collections.unmodifiableList(map.keySet().stream().sorted(keyComparator).map(mapper).collect(Collectors.toList()));
 	}
 
@@ -174,7 +174,7 @@ public class SortedHashMap<K, V> implements Cloneable {
 	 */
 	public List<V> values() {
 		List<V> list = new ArrayList<V>();
-		for (K k : keySet()) {
+		for (K k : keys()) {
 			list.add(get(k));
 		}
 		return Collections.unmodifiableList(list);
@@ -186,7 +186,7 @@ public class SortedHashMap<K, V> implements Cloneable {
 			return "{}";
 		}
 		String str = "{ ";
-		for (K k : keySet()) {
+		for (K k : keys()) {
 			V v = get(k);
 			str += "[" + (k == null ? "null" : k.toString()) + ", " + (v == null ? "null" : v.toString()) + "], ";
 		}
@@ -211,7 +211,7 @@ public class SortedHashMap<K, V> implements Cloneable {
 			return false;
 		}
 		SortedHashMap<K, V> other = (SortedHashMap<K, V>) obj;
-		return other.type.equals(type) && other.order.equals(order) && other.keySet().equals(keySet());
+		return other.type.equals(type) && other.order.equals(order) && other.keys().equals(keys());
 	}
 
 	@Override
@@ -223,7 +223,7 @@ public class SortedHashMap<K, V> implements Cloneable {
 
 	// methods
 	public K getKeyByValue(V value) {
-		for (K key : keySet()) {
+		for (K key : keys()) {
 			if (get(key).equals(value)) {
 				return key;
 			}
@@ -233,7 +233,7 @@ public class SortedHashMap<K, V> implements Cloneable {
 
 	public K getKeyAt(int index) {
 		if (index < 0 || index >= map.size()) throw new IndexOutOfBoundsException("index " + index + ", size " + map.size());
-		Iterator<K> iterator = keySet().iterator();
+		Iterator<K> iterator = keys().iterator();
 		int i = -1;
 		while (iterator.hasNext()) {
 			K key = iterator.next();
@@ -254,7 +254,7 @@ public class SortedHashMap<K, V> implements Cloneable {
 
 	public int indexOf(K key) {
 		int i = -1;
-		for (K k : keySet()) {
+		for (K k : keys()) {
 			++i;
 			if (key == null ? k == null : key.equals(k)) {
 				return i;
@@ -265,7 +265,7 @@ public class SortedHashMap<K, V> implements Cloneable {
 
 	public void forEach(BiConsumer<K, V> action) {
 		Objects.requireNonNull(action);
-		keySet().forEach(key -> {
+		keys().forEach(key -> {
 			action.accept(key, get(key));
 		});
 	}

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
-import com.guillaumevdn.gcore.lib.object.Optional;
 import java.util.function.BiConsumer;
 
 import org.bukkit.inventory.ItemStack;
@@ -14,8 +13,8 @@ import com.guillaumevdn.gcore.TextEditorGeneric;
 import com.guillaumevdn.gcore.WorkerGCore;
 import com.guillaumevdn.gcore.lib.compatibility.material.CommonMats;
 import com.guillaumevdn.gcore.lib.compatibility.material.Mat;
-import com.guillaumevdn.gcore.lib.element.editor.EnumSelectorGUI;
 import com.guillaumevdn.gcore.lib.element.editor.EditorGUI;
+import com.guillaumevdn.gcore.lib.element.editor.EnumSelectorGUI;
 import com.guillaumevdn.gcore.lib.element.struct.Element;
 import com.guillaumevdn.gcore.lib.element.struct.Need;
 import com.guillaumevdn.gcore.lib.element.struct.map.AbstractMapElement;
@@ -24,6 +23,7 @@ import com.guillaumevdn.gcore.lib.gui.struct.ClickCall.ClickType;
 import com.guillaumevdn.gcore.lib.gui.struct.GUIItem;
 import com.guillaumevdn.gcore.lib.item.ItemUtils;
 import com.guillaumevdn.gcore.lib.number.NumberUtils;
+import com.guillaumevdn.gcore.lib.object.Optional;
 import com.guillaumevdn.gcore.lib.string.StringUtils;
 import com.guillaumevdn.gcore.lib.string.Text;
 

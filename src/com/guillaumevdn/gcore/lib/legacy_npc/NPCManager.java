@@ -31,7 +31,8 @@ import com.guillaumevdn.gcore.lib.bukkit.BukkitThread;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.configuration.YMLConfiguration;
 import com.guillaumevdn.gcore.lib.data.board.keyed.KeyReference;
-import com.guillaumevdn.gcore.lib.legacy_npc.navigation.Navigator;
+import com.guillaumevdn.gcore.lib.legacy_npc.navigation.navigator.Navigator;
+import com.guillaumevdn.gcore.lib.legacy_npc.navigation.navigator.NavigatorResult;
 import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
 
 public class NPCManager implements Listener {
@@ -85,7 +86,7 @@ public class NPCManager implements Listener {
 	public List<Navigator> getNavigators(NPC npc) {
 		List<Navigator> result = new ArrayList<Navigator>();
 		for (Navigator navigator : navigators) {
-			if (navigator.getAffected().contains(npc)) {
+			if (navigator.getNpcs().contains(npc)) {
 				result.add(navigator);
 			}
 		}
@@ -132,7 +133,7 @@ public class NPCManager implements Listener {
 		}
 	}
 
-	public boolean spawnNpc(Player player, int id, Location forcedLocation) {
+	public boolean spawnNpc(Player player, int id) {
 		// already spawned : attempt to spawn it again, we never know :think: timmy said it bugged sometimes
 		NPC npc = getNpc(player, id);
 		if (npc != null) {
@@ -201,7 +202,7 @@ public class NPCManager implements Listener {
 							npc.update();
 						}
 					}
-				} catch (ConcurrentModificationException ignored) {} // QC #505, only on reconnect so don't care
+				} catch (ConcurrentModificationException ignored) {} // BG #505, only on reconnect so don't care
 			}
 		}.runTaskTimer(GCore.inst(), 100L, 2L));
 		// listeners
@@ -216,7 +217,7 @@ public class NPCManager implements Listener {
 		}
 		// cancel navigations
 		for (Navigator navigator : navigators) {
-			navigator.cancel();
+			navigator.end(NavigatorResult.CANCEL);
 		}
 		navigators.clear();
 		// despawn npcs

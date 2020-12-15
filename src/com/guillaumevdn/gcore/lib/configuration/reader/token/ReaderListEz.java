@@ -31,7 +31,7 @@ public class ReaderListEz implements ThrowableFunction<ReaderContext, Boolean> {
 				s = s.substring(context.getIndentLevel().length());
 			}
 			/*  actually ignore extra indentation for this, lines are trimmed anyway
-			if (s.charAt(0) == ' ') {
+			if (!s.isEmpty() && s.charAt(0) == ' ') {
 				context.throwIndentError(peek, listIndent.length(), false);
 			}*/
 			// read lines

@@ -1,6 +1,6 @@
 package com.guillaumevdn.gcore.lib.time.in;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.Month;
 
 /**
@@ -27,8 +27,8 @@ public class TimeInYear extends TimeIn {
 	}
 
 	@Override
-	public LocalDateTime getCurrent() {
-		return LocalDateTime.now().with(month).withDayOfMonth(dayOfMonth).withHour(hour).withMinute(minute).withSecond(0).withNano(0);
+	public ZonedDateTime getCurrent() {
+		return ZonedDateTime.now().with(month).withDayOfMonth(dayOfMonth).withHour(hour).withMinute(minute).withSecond(0).withNano(0);
 	}
 
 }

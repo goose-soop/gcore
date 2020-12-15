@@ -38,6 +38,8 @@ public final class MigrationV8Data extends Migration {
 		return true;  // if not made yet
 	}
 
+	private final Gson gson = getPlugin().createGsonBuilder().create();
+	private final Gson prettyGson = getPlugin().createGsonBuilder().setPrettyPrinting().create();
 	private InstantMySQL mysql = null;
 
 	@Override
@@ -63,11 +65,11 @@ public final class MigrationV8Data extends Migration {
 		if (config.readString("data_backend.gcore_statistics_v8", "JSON").equalsIgnoreCase("MYSQL")) {
 			// connect
 			attemptOperation("connecting to MySQL", BackupBehavior.NONE, () -> {
-				String host = config.readMandatoryString("data.mysql.host");
-				String name = config.readMandatoryString("data.mysql.name");
-				String usr = config.readMandatoryString("data.mysql.user");
-				String pwd = config.readMandatoryString("data.mysql.pass");
-				String customArgs = config.readString("data.mysql.args", "");
+				String host = config.readMandatoryString("mysql.host");
+				String name = config.readMandatoryString("mysql.name");
+				String usr = config.readMandatoryString("mysql.user");
+				String pwd = config.readMandatoryString("mysql.pass");
+				String customArgs = config.readString("mysql.args", "");
 				String url = "jdbc:mysql://" + host + "/" + name + "?allowMultiQueries=true" + customArgs;
 				mysql = new InstantMySQL(url, usr, pwd);
 			});
@@ -97,7 +99,7 @@ public final class MigrationV8Data extends Migration {
 						uuid = migrateUserInfo(set.getString("id"));
 						UserNPCs user = migrateUserData(uuid, set.getString("data"), null, npcsConfig);
 						// write
-						mysql.performUpdateQuery(getPlugin(), new Query("INSERT INTO `gcore_users_npcs_v8`(`user_uuid`,`data`) VALUES (?, ?);", uuid, getPlugin().getGson().toJson(user)));
+						mysql.performUpdateQuery(getPlugin(), new Query("INSERT INTO `gcore_users_npcs_v8`(`user_uuid`,`data`) VALUES (?, ?);", uuid, gson.toJson(user)));
 						countMod();
 					} catch (Throwable exception) {
 						error("Couldn't convert saved user NPCs for " + uuid + ", skipping", exception);
@@ -112,11 +114,11 @@ public final class MigrationV8Data extends Migration {
 		else {
 			// statistics
 			attemptOperation("copying JSON statistics", BackupBehavior.NONE, () -> {
-				File srcStatistics = new File(getPlugin().getDataFolder().getParentFile() + "/GCore_v7_backup/data/statistics.json");
+				File srcStatistics = new File(getPlugin().getDataFolder().getParentFile() + "/GCore_backup_on_v7/data/statistics.json");
 				if (srcStatistics.exists()) {
 					File targetRoot = getPlugin().getDataFile("data_v8/statistics/");
 					try {
-						V7Statistics v7 = getPlugin().getGson().fromJson(new FileReader(srcStatistics), V7Statistics.class);
+						V7Statistics v7 = gson.fromJson(new FileReader(srcStatistics), V7Statistics.class);
 						if (v7.stats != null) {
 							for (String stat : v7.stats.keySet()) {
 								log("Copying statistic " + stat + "...");
@@ -134,7 +136,7 @@ public final class MigrationV8Data extends Migration {
 			});
 			// statistics
 			attemptOperation("converting JSON users NPCs board", BackupBehavior.NONE, () -> {
-				File srcUsers = new File(getPlugin().getDataFolder().getParentFile() + "/GCore_v7_backup/userdata");
+				File srcUsers = new File(getPlugin().getDataFolder().getParentFile() + "/GCore_backup_on_v7/userdata");
 				if (srcUsers.exists()) {
 					File targetUsersNPCs = new File(getPlugin().getDataFolder() + "/data_v8/users_npcs");
 					for (File userRoot : srcUsers.listFiles()) {
@@ -202,7 +204,7 @@ public final class MigrationV8Data extends Migration {
 	}
 
 	private UUID migrateUserInfo(String userInfo) {
-		if (userInfo == null) { // might happen
+		if (userInfo == null) {  // might happen
 			return null;
 		}
 		int index = userInfo.indexOf('_');
@@ -212,9 +214,9 @@ public final class MigrationV8Data extends Migration {
 	private void toJson(Object object, File file) throws IOException {
 		file.getParentFile().mkdirs();
 		file.createNewFile();
-		FileWriter writer = new FileWriter(file);
-		getPlugin().getPrettyGson().toJson(object, writer);
-		writer.close();
+		try (FileWriter writer = new FileWriter(file)) {
+			prettyGson.toJson(object, writer);
+		}
 	}
 
 }

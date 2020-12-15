@@ -64,7 +64,7 @@ public class ElementNotify extends ContainerElement {
 
 	private ElementSound sound = addSound("sound", Need.optional(), SlotPlacement.START_ROW, TextEditorGeneric.descriptionNotifySound);
 	private ElementDouble soundVolume = addDouble("sound_volume", Need.optional(1d), TextEditorGeneric.descriptionNotifySoundVolume);
-	private ElementDouble soundPitch = addDouble("sound_volume", Need.optional(1d), TextEditorGeneric.descriptionNotifySoundPitch);
+	private ElementDouble soundPitch = addDouble("sound_pitch", Need.optional(1d), TextEditorGeneric.descriptionNotifySoundPitch);
 
 	public ElementNotify(Element parent, String id, Need need, Text editorDescription) {
 		super("notify", parent, id, need, editorDescription);
@@ -157,6 +157,10 @@ public class ElementNotify extends ContainerElement {
 		}
 	}
 
+	public void sendAll(Player player, Replacer replacer) {
+		sendAll(CollectionUtils.asList(player), replacer);
+	}
+
 	public void sendAll(Collection<Player> players, Replacer replacer) {
 		if (!readContains()) return;
 		sendMessage(players, replacer);
@@ -218,9 +222,9 @@ public class ElementNotify extends ContainerElement {
 				Bossbar instance;
 				Long bossbarDuration = forceDurationMillis != null ? forceDurationMillis : this.bossbarDuration.parse(replacer).orNull();
 				if (bossbarDuration != null) {
-					instance = BossbarCompat.sendTemp(bossbar, color, style, flags, CollectionUtils.asList(player), bossbarDuration, noAutoProgress);
+					instance = BossbarCompat.sendTemp(getSuperElement().getPlugin(), bossbar, color, style, flags, CollectionUtils.asList(player), bossbarDuration, noAutoProgress);
 				} else {
-					instance = new Bossbar("notify_" + UUID.randomUUID(), bossbar, color, style, flags, 1f, CollectionUtils.asList(player));
+					instance = new Bossbar(getSuperElement().getPlugin(), "notify_" + UUID.randomUUID(), bossbar, color, style, flags, 1f, CollectionUtils.asList(player));
 					instance.start();
 				}
 				lastBossbars.put(player, instance);

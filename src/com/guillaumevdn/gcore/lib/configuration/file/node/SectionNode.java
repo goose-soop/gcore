@@ -214,7 +214,7 @@ public class SectionNode extends ConfigNode {
 				if (node instanceof SectionNode) {
 					data.writeObject(maybeToCamelCase(key, snakeCaseToCamelCase), ((SectionNode) node).toIO(snakeCaseToCamelCase));
 				} else if (node instanceof ListValueNode) {
-					data.writeSerializedList(maybeToCamelCase(key, snakeCaseToCamelCase), StringUtils.format(((ListValueNode) node).getValue()));
+					data.writeSerializedList(maybeToCamelCase(key, snakeCaseToCamelCase), StringUtils.formatCopy(((ListValueNode) node).getValue()));
 				} else if (node instanceof SingleValueNode) {
 					// attempt to cast value into number, or just write the value as it is
 					String value = ((SingleValueNode) node).getValue();

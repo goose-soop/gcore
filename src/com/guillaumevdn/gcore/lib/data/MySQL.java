@@ -7,9 +7,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 
 import com.guillaumevdn.gcore.lib.GPlugin;
+import com.guillaumevdn.gcore.lib.function.ThrowableConsumer;
 import com.guillaumevdn.gcore.lib.object.ObjectUtils;
+import com.guillaumevdn.gcore.lib.string.StringUtils;
 import com.guillaumevdn.gcore.lib.wrapper.WrapperInteger;
 
 /**
@@ -33,26 +36,27 @@ public final class MySQL {
 	}
 
 	public boolean performUpdateQuery(GPlugin plugin, Query query) {
-		try {
-			if (!query.isEmpty()) {
-				prepareStatement(query).executeUpdate();
-				return true;
+		if (!query.isEmpty()) {
+			try (Connection conn = connect(); PreparedStatement statement = prepareStatement(query)) {
+				statement.executeUpdate();
+			} catch (Throwable exception) {
+				printQueryError(plugin, query, exception);
+				return false;
 			}
-		} catch (Throwable exception) {
-			printQueryError(plugin, query, exception);
 		}
-		return false;
+		return true;
 	}
 
-	public ResultSet performGetQuery(GPlugin plugin, Query query) {
-		try {
-			if (!query.isEmpty()) {
-				return prepareStatement(query).executeQuery();
+	public boolean performGetQuery(GPlugin plugin, Query query, ThrowableConsumer<ResultSet> syncProcessor) {
+		if (!query.isEmpty()) {
+			try (Connection conn = connect(); PreparedStatement statement = prepareStatement(query); ResultSet set = statement.executeQuery()) {
+				syncProcessor.accept(set);
+			} catch (Throwable exception) {
+				printQueryError(plugin, query, exception);
+				return false;
 			}
-		} catch (Throwable exception) {
-			printQueryError(plugin, query, exception);
 		}
-		return null;
+		return true;
 	}
 
 	private PreparedStatement prepareStatement(Query query) throws SQLException {
@@ -84,15 +88,19 @@ public final class MySQL {
 	}
 
 	private void printQueryError(GPlugin plugin, Query query, Throwable exception) {
-		plugin.getMainLogger().error("Couldn't perform MySQL query", exception);
-		System.out.println("\n--------- QUERY PARTS ----------");
+		String rng = StringUtils.generateRandomAlphanumericString(5);
+		plugin.getMainLogger().error("Couldn't perform MySQL query (" + rng + ")", exception);
+		String out = "\n--------- QUERY PARTS (" + rng + ") ----------";
 		WrapperInteger i = WrapperInteger.of(0);
-		query.getParts().entrySet().forEach(entry -> {
-			System.out.println(i.alter(1) + " ----------");
-			System.out.println(entry.getKey());	
-			entry.getValue().forEach(param -> System.out.println("? " + String.valueOf(param)));
-		});
-		System.out.println("\n--------------------------------");
+		for (Entry<String, List<Object>> entry : query.getParts().entrySet()) {
+			out += i.alter(1) + " ----------\n";
+			out += entry.getKey() + "\n";
+			for (Object param : entry.getValue()) {
+				out += "? " + String.valueOf(param) + "\n";
+			}
+		}
+		System.out.println(out + "\n--------------------------------");
+		System.out.flush();
 	}
 
 }

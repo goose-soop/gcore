@@ -108,6 +108,22 @@ public enum TextEditorGeneric implements TextEnumElement {
 	descriptionItemsNeededTake,
 	descriptionItemsNeededErrorMessage,
 
+	// gui
+	descriptionGuiName,
+	descriptionGuiType,
+	descriptionGuiContents,
+
+	descriptionGuiItemType,
+	descriptionGuiItemIcon,
+	descriptionGuiItemLocations,
+	descriptionGuiItemPersistent,
+	descriptionGuiItemClickSound,
+	descriptionGuiItemOverrideClicks,
+
+	descriptionGuiItemDynamicBorderLinearOnCount,
+	descriptionGuiItemDynamicBorderLinearIconOn,
+	descriptionGuiItemDynamicBorderLinearIconOff,
+
 	// position
 	descriptionPositionType,
 
@@ -115,9 +131,11 @@ public enum TextEditorGeneric implements TextEnumElement {
 	descriptionPositionTypeClosestEntityNames,
 	descriptionPositionTypeClosestEntityColors,
 	descriptionPositionTypeCitizensNPCRelative,
+	descriptionPositionTypeCitizensNPCRelativeNames,
 	descriptionPositionTypeClosestMythicMobMobs,
 
 	descriptionPositionTypeWorld,
+	descriptionPositionTypeBiomes,
 	descriptionPositionTypeSingleLocation,
 	descriptionPositionTypeRelativeSingleLocation,
 	descriptionPositionTypePointTolerance,

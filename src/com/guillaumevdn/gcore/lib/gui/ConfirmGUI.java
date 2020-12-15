@@ -1,50 +1,33 @@
 package com.guillaumevdn.gcore.lib.gui;
 
 import java.util.List;
-import java.util.UUID;
 
 import org.bukkit.entity.Player;
 
 import com.guillaumevdn.gcore.ConfigGCore;
-import com.guillaumevdn.gcore.TextGeneric;
 import com.guillaumevdn.gcore.lib.GPlugin;
-import com.guillaumevdn.gcore.lib.gui.struct.GUI;
-import com.guillaumevdn.gcore.lib.gui.struct.GUIItem;
-import com.guillaumevdn.gcore.lib.item.ItemUtils;
+import com.guillaumevdn.gcore.lib.gui.struct.active.modified.ActiveModifiedConfigElementGUI;
+import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
 
 /**
  * @author GuillaumeVDN
  */
-public class ConfirmGUI extends GUI {
+public class ConfirmGUI extends ActiveModifiedConfigElementGUI {
 
-	private List<String> confirmLore;
-	private Runnable confirm;
-	private Runnable cancel;
+	private Runnable doCancel;
 
-	public ConfirmGUI(GPlugin owner, List<String> confirmLore, Runnable confirm, Runnable cancel) {
-		super(owner, "confirm_" + UUID.randomUUID().toString().split("-")[0], TextGeneric.guiConfirmName.parseLine(), ConfigGCore.guiConfirmType, null);
-		this.confirmLore = confirmLore;
-		this.confirm = confirm;
-		this.cancel = cancel;
-	}
-
-	// fill
-	@Override
-	protected boolean doFill() {
-		// confirm items
-		setItem(new GUIItem("yes", ConfigGCore.guiConfirmItemYes.getC(), ItemUtils.addToLore(ConfigGCore.guiConfirmItemYes.getA().clone(), confirmLore), call -> {
-			cancel = null;
+	public ConfirmGUI(GPlugin owner, Replacer replacer, List<String> confirmLore, Runnable doConfirm, Runnable doCancel) {
+		super(ConfigGCore.guiConfirm, replacer, null);
+		setPlugin(owner);
+		modifyItem("confirm", icon -> Replacer.of("{confirm}", () -> confirmLore).parse(icon), call -> {
+			ConfirmGUI.this.doCancel = null;
 			deactivate(true);
-			confirm.run();
-		}), ConfigGCore.guiConfirmItemYes.getB());
-		setItem(new GUIItem("no", ConfigGCore.guiConfirmItemNo, call -> {
-			cancel();
-			deactivate(true);
-		}), ConfigGCore.guiConfirmItemNo.getB());
-		// add content
-		ConfigGCore.guiConfirmContent.forEach(triple -> setItem(new GUIItem("content_" + UUID.randomUUID().toString().split("-")[0], triple), triple.getB()));
-		// done
-		return true;
+			doConfirm.run();
+		});
+		modifyItem("cancel", call -> {
+			deactivate(true);  // this will trigger onDeactivate(), so cancel() too
+		});
+		this.doCancel = doCancel;
 	}
 
 	@Override
@@ -58,21 +41,20 @@ public class ConfirmGUI extends GUI {
 	}
 
 	private void cancel() {
-		if (cancel != null) {
-			Runnable cancel = this.cancel;
-			this.cancel = null;  // in the cancel runnable might be something like "reopen another GUI" -> and that will trigger "onClose", that will trigger cancel() again, ect ; so prevent that
-			cancel.run();
+		if (doCancel != null) {
+			Runnable doCancel = this.doCancel;
+			this.doCancel = null;  // in the cancel runnable might be something like "reopen another GUI" -> and that will trigger "onClose", that will trigger cancel() again, ect ; so prevent that
+			doCancel.run();
 		}
 	}
 
 	// static
-	public static void performOrConfirm(GPlugin owner, boolean mustConfirm, Player player, List<String> confirmLore, Runnable confirm, Runnable cancel) {
+	public static void performOrConfirm(GPlugin owner, boolean mustConfirm, Player player, List<String> confirmLore, Runnable doConfirm, Runnable doCancel) {
 		if (mustConfirm) {
-			new ConfirmGUI(owner, confirmLore, confirm, cancel).openFor(player);
+			new ConfirmGUI(owner, Replacer.of(player), confirmLore, doConfirm, doCancel).openFor(player);
 		} else {
-			confirm.run();
+			doConfirm.run();
 		}
 	}
-
 
 }

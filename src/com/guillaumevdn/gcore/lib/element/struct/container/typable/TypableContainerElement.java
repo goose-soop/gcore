@@ -34,6 +34,14 @@ public abstract class TypableContainerElement<T extends TypableElementType> exte
 		return type;
 	}
 
+	public final void changeType(T newType) {
+		T previousType = type.parseGeneric().orNull();
+		if (previousType != null) previousType.clearElements(this);
+		type.setValue(CollectionUtils.asList(type.getSerializer().serialize(newType)));
+		newType.fillTypeSpecificElements(this);
+		onTypeChange(previousType, newType);
+	}
+
 	public final T getType() {
 		T type = this.type.parseGeneric().orNull();
 		if (type == null) { // fix type, a null type can't happen !

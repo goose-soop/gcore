@@ -115,6 +115,10 @@ public class ElementDuration extends ParseableContainerElement<Long> {
 	// parse
 	@Override
 	public Long doParse(Replacer replacer) throws ParsingError {
+		// don't contain and optional, means it's null : don't throw parsing errors
+		if (!readContains() && getNeed().equals(NeedType.OPTIONAL) && time.getDefaultValue() == null && unit.getDefaultValue() == null) {
+			return null;
+		}
 		int time = this.time.parseNoCatchOrThrowParsingNull(replacer);
 		TimeUnit unit = this.unit.parseNoCatchOrThrowParsingNull(replacer);
 		return unit.toMillis(time);

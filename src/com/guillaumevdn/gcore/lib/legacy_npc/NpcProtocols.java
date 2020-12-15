@@ -242,9 +242,8 @@ public final class NpcProtocols {
 			if (changeLook) {
 				Pair<Float, Float> look = NPC.getTargetLook(previous.clone().add(0d, 1d, 0d), location.clone().add(0d, 1d, 0d));
 				byte yawAngle = (byte) (look.getA() / 360d * 256d);
-				byte pitchAngle = (byte) (look.getB() / 360d * 256d);
 				packet.getBytes().write(0, yawAngle);
-				packet.getBytes().write(1, pitchAngle);
+				packet.getBytes().write(1, (byte) 0);
 				rotationPacket = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.ENTITY_HEAD_ROTATION);
 				rotationPacket.getIntegers().write(0, entityId);
 				rotationPacket.getBytes().write(0, yawAngle);
@@ -269,7 +268,7 @@ public final class NpcProtocols {
 			// send look packet eventually, if the y difference is less than 0.5 block
 			if (Math.abs(previous.getY() - location.getY()) < 0.5d) {
 				Pair<Float, Float> look = NPC.getTargetLook(previous.clone().add(0d, 1d, 0d), location.clone().add(0d, 1d, 0d));
-				sendTarget(player, entityId, look.getA(), look.getB());
+				sendTarget(player, entityId, look.getA(), 0);
 			}
 		} else {
 			// create packet
@@ -284,7 +283,7 @@ public final class NpcProtocols {
 			// send look packet eventually, if the y difference is less than 0.5 block
 			if (Math.abs(previous.getY() - location.getY()) < 0.5d) {
 				Pair<Float, Float> look = NPC.getTargetLook(previous.clone().add(0d, 1d, 0d), location.clone().add(0d, 1d, 0d));
-				sendTarget(player, entityId, look.getA(), look.getB());
+				sendTarget(player, entityId, look.getA(), (byte) 0);
 			}
 		}
 	}

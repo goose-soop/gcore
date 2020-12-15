@@ -2,6 +2,7 @@ package com.guillaumevdn.gcore.lib.economy;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.plugin.RegisteredServiceProvider;
 
 import com.guillaumevdn.gcore.lib.reflection.ReflectionObject;
 
@@ -20,7 +21,8 @@ public class CurrencyVault extends Currency {
 	@Override
 	protected boolean initialize() throws Throwable {
 		Class<?> economyClass = Class.forName("net.milkbowl.vault.economy.Economy");
-		economy = ReflectionObject.of(Bukkit.getServicesManager().getRegistration(economyClass)).invokeMethod("getProvider");
+		RegisteredServiceProvider reg = Bukkit.getServicesManager().getRegistration(economyClass);
+		economy = reg == null ? null : ReflectionObject.of(reg).invokeMethod("getProvider");
 		return economy != null;
 	}
 

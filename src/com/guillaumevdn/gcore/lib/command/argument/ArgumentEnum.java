@@ -1,6 +1,8 @@
 package com.guillaumevdn.gcore.lib.command.argument;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.command.CommandCall;
@@ -13,7 +15,7 @@ import com.guillaumevdn.gcore.lib.string.Text;
 /**
  * @author GuillaumeVDN
  */
-public class ArgumentEnum<E extends Enum<E>> extends Argument<E> {
+public class ArgumentEnum<E extends Enum<E>> extends PartialArgument<E> {
 
 	private Class<E> enumClass;
 	private List<String> tabComplete;
@@ -30,33 +32,18 @@ public class ArgumentEnum<E extends Enum<E>> extends Argument<E> {
 
 	// do
 	@Override
-	public E consume(CommandCall call) {
-		if (call.getArguments().size() < 2) {
-			return null;
-		}
-		E value = null;
-		main: for (int i = 0; i < call.getArguments().size(); ++i) {
-			String arg = call.getArguments().get(i).toLowerCase();
-			// exact
-			value = ObjectUtils.safeValueOf(call.getArguments().get(i), enumClass);
-			if (value != null) {
-				call.getArguments().remove(i);
-				break main;
-			}
-			// match something
-			for (E e : enumClass.getEnumConstants()) {
-				if (e.name().toLowerCase().startsWith(arg)) {
-					value = e;
-					call.getArguments().remove(i);
-					break main;
-				}
-			}
-		}
-		return value;
+	protected E exactMatch(CommandCall call, String arg) {
+		return ObjectUtils.safeValueOf(arg, enumClass);
+	}
+
+	@Override
+	protected Stream<E> partialMatches(CommandCall call, String arg) {
+		return Arrays.stream(enumClass.getEnumConstants()).filter(e -> e.name().toLowerCase().startsWith(arg));
 	}
 
 	@Override
 	public List<String> tabComplete(CommandCall call) {
 		return tabComplete;
 	}
+
 }

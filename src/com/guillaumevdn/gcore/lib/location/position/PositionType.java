@@ -18,4 +18,8 @@ public abstract class PositionType extends TypableElementType<ElementPosition> {
 
 	public abstract Position doParse(ElementPosition position, @Nonnull Replacer replacer) throws ParsingError;
 
+	public boolean mustCache(ElementPosition position) {
+		return true;
+	}
+
 }

@@ -1,17 +1,22 @@
 package com.guillaumevdn.gcore.lib.command.argument;
 
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import com.guillaumevdn.gcore.WorkerGCore;
 import com.guillaumevdn.gcore.lib.command.CommandCall;
 import com.guillaumevdn.gcore.lib.object.NeedType;
 import com.guillaumevdn.gcore.lib.permission.Permission;
 import com.guillaumevdn.gcore.lib.player.PlayerUtils;
 import com.guillaumevdn.gcore.lib.string.Text;
+import com.guillaumevdn.gcore.lib.tuple.Pair;
 
 /**
  * @author GuillaumeVDN
@@ -49,30 +54,46 @@ public class ArgumentOfflinePlayer extends Argument<OfflinePlayer> implements Pl
 		if (senderIfNone && getPermission() != null && !getPermission().has(call.getSender())) {
 			return call.getSenderPlayer();
 		}
-		OfflinePlayer player = null;
-		main: for (int i = 0; i < call.getArguments().size(); ++i) {
+		for (int i = 0; i < call.getArguments().size(); ++i) {
 			String arg = call.getArguments().get(i).toLowerCase();
-			// offline
-			player = Bukkit.getOfflinePlayer(arg);
-			if (player != null) {
-				call.getArguments().remove(i);
-				break main;
-			}
-			// online
-			for (Player pl : PlayerUtils.getOnline()) {
-				if (pl.getName().toLowerCase().startsWith(arg)) {
-					player = pl;
-					call.getArguments().remove(i);
-					break main;
+			// exact
+			OfflinePlayer value = exactMatch(arg);
+			if (value == null) {
+				List<OfflinePlayer> matches = partialMatches(arg).collect(Collectors.toList());
+				if (matches.size() == 1) {
+					value = matches.get(0);
 				}
 			}
+			if (value != null) {
+				call.getArguments().remove(i);
+				return value;
+			}
 		}
-		return player != null ? player : (senderIfNone && !call.isForTabComplete() ? call.getSenderPlayer() : null);
+		return senderIfNone && !call.isForTabComplete() ? call.getSenderPlayer() : null;
+	}
+
+	protected OfflinePlayer exactMatch(String arg) {
+		Player online = Bukkit.getPlayer(arg);
+		if (online != null) {
+			return online;
+		}
+		Pair<UUID, String> offline = WorkerGCore.inst().getOfflinePlayer(arg);
+		if (offline != null) {
+			OfflinePlayer player = Bukkit.getOfflinePlayer(offline.getA());
+			if (player != null && player.getLastPlayed() != 0L) {
+				return player;
+			}
+		}
+		return null;
+	}
+
+	protected Stream<? extends OfflinePlayer> partialMatches(String arg) {
+		return PlayerUtils.getOnlineStream().filter(pl -> pl.getName().toLowerCase().startsWith(arg));
 	}
 
 	@Override
 	public List<String> tabComplete(CommandCall call) {
-		return ArgumentPlayer.tabCompleteOnline(this);
+		return Stream.concat(PlayerUtils.getOnlineStream().map(pl -> pl.getName()), WorkerGCore.inst().getOfflinePlayersNames()).sorted(String::compareTo).collect(Collectors.toList());
 	}
 
 }

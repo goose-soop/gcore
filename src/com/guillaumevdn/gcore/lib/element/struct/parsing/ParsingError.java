@@ -25,8 +25,6 @@ public class ParsingError extends Exception {
 		this.element = element;
 	}
 
-	// FIXME : use those logging methods everywhere logs are needed, instead of the other logging methods
-
 	// send error
 	public void send(Player player) {
 		TextEditorGeneric.messageCantImportValue.replace("{error}", () -> getMessage()).send(player);

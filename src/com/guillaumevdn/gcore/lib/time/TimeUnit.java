@@ -10,11 +10,11 @@ public enum TimeUnit {
 	MILLISECOND(millis -> millis),
 	TICK(ticks -> ticks * 50L),
 	SECOND(seconds -> seconds * 1000L),
-	MINUTE(minutes -> minutes * 60000L),
-	HOUR(hours -> hours * 3600000L),
-	DAY(days -> days * 8640000L),
-	WEEK(weeks -> weeks * 60480000L),
-	MONTH(months -> months * 2678400000L);
+	MINUTE(minutes -> SECOND.toMillis(minutes * 60L)),
+	HOUR(hours -> MINUTE.toMillis(hours * 60L)),
+	DAY(days -> HOUR.toMillis(days * 24L)),
+	WEEK(weeks -> DAY.toMillis(weeks * 7L)),
+	MONTH(months -> WEEK.toMillis(months * 31L));
 
 	// base
 	private Function<Long, Long> toMillis;

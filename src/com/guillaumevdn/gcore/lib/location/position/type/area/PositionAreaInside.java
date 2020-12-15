@@ -10,6 +10,7 @@ import com.guillaumevdn.gcore.lib.block.BlockState;
 import com.guillaumevdn.gcore.lib.compatibility.material.Mat;
 import com.guillaumevdn.gcore.lib.location.LocationUtils;
 import com.guillaumevdn.gcore.lib.location.position.Position;
+import com.guillaumevdn.gcore.lib.number.MinMaxDouble;
 
 /**
  * @author GuillaumeVDN
@@ -45,6 +46,11 @@ public class PositionAreaInside implements Position {
 	@Override
 	public Location findRandom() {
 		return LocationUtils.findRandomInArea(a, b);
+	}
+
+	@Override
+	public MinMaxDouble getRandomSolidAndFreeAboveYBounds() {
+		return MinMaxDouble.of(a.getY(), b.getY());
 	}
 
 	@Override

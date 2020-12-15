@@ -22,6 +22,10 @@ public final class TextElement implements Text {
 		this(new ArrayList<>());
 	}
 
+	public TextElement(String line) {
+		this(CollectionUtils.asList(line));
+	}
+
 	public TextElement(List<String> lines) {
 		setLines(lines);
 	}

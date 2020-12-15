@@ -27,7 +27,7 @@ public final class MetaKnowledgeBook {
 		KnowledgeBookMeta ref = ObjectUtils.castOrNull(referenceMeta, KnowledgeBookMeta.class);
 		if (ref == null) return true;
 		// pages
-		if (check.isExact() && (meta.hasRecipes() != ref.hasRecipes() || !CollectionUtils.contentEquals(meta.getRecipes(), ref.getRecipes()))) return false;
+		if (check.isExact() && (meta == null || meta.hasRecipes() != ref.hasRecipes() || !CollectionUtils.contentEquals(meta.getRecipes(), ref.getRecipes()))) return false;
 		else if (!check.isExact() && ref.hasRecipes() && (meta == null || !meta.hasRecipes() || !CollectionUtils.contentEquals(meta.getRecipes(), ref.getRecipes()))) return false;
 		// seems good
 		return true;

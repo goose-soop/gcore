@@ -28,7 +28,7 @@ public final class MetaLeatherArmor {
 		LeatherArmorMeta ref = ObjectUtils.castOrNull(referenceMeta, LeatherArmorMeta.class);
 		if (ref == null) return true;
 		// color
-		if (check.isExact() && !Objects.deepEquals(meta.getColor(), ref.getColor())) return false;
+		if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getColor(), ref.getColor()))) return false;
 		else if (!check.isExact() && ref.getColor() != null && (meta == null || ref.getColor().equals(meta.getColor()))) return false;
 		// seems good
 		return true;

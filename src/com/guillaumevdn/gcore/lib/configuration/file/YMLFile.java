@@ -82,6 +82,7 @@ public class YMLFile {
 
 	public ConfigNode getConfigNode(String path) {
 		if (path.isEmpty()) return base;
+		if (path.charAt(0) == '.') path = path.substring(1);
 		List<String> split = StringUtils.split(path, ".", -1);
 		SectionNode node = base;
 		String id = null;

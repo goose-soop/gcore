@@ -41,7 +41,7 @@ public class ArgumentPairEnumDouble<E extends Enum<E>> extends Argument<Pair<E, 
 				if (nb != null) {
 					call.getArguments().remove(i);
 					call.getArguments().remove(i);
-					Pair.of(e, nb);
+					return Pair.of(e, nb);
 				}
 			}
 		}

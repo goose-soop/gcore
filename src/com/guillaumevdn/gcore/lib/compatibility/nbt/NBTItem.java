@@ -65,6 +65,7 @@ public class NBTItem extends NBTCompound {
 			"enchantments",
 			// potions
 			"CustomPotionEffects",
+			"Potion",
 			// written book
 			"author",
 			"title",

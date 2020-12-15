@@ -48,7 +48,7 @@ public class ReaderValueDevelopedWeak implements ThrowableFunction<ReaderContext
 				valueIndent += context.getIndentLevel();
 				s = s.substring(context.getIndentLevel().length());
 			}
-			if (s.charAt(0) == ' ') {
+			if (!s.isEmpty() && s.charAt(0) == ' ') {
 				if (wrapping != null) { // if started with wrapping, we must have a weak value
 					/*  actually ignore extra indentation for this, lines are trimmed anyway
 					context.throwIndentError(peek, valueIndent.length(), false);

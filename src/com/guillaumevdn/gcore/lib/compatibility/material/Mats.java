@@ -1,7 +1,6 @@
 package com.guillaumevdn.gcore.lib.compatibility.material;
 
 import java.util.List;
-import com.guillaumevdn.gcore.lib.object.Optional;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -17,6 +16,7 @@ import com.guillaumevdn.gcore.lib.compatibility.variants.Variants;
 import com.guillaumevdn.gcore.lib.exception.ConfigError;
 import com.guillaumevdn.gcore.lib.logic.ComparisonType;
 import com.guillaumevdn.gcore.lib.object.ObjectUtils;
+import com.guillaumevdn.gcore.lib.object.Optional;
 
 /**
  * @author GuillaumeVDN

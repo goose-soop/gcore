@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -17,6 +18,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 import com.guillaumevdn.gcore.lib.bukkit.BukkitThread;
 import com.guillaumevdn.gcore.lib.chat.JsonMessage;
+import com.guillaumevdn.gcore.lib.collection.LowerCaseHashMap;
 import com.guillaumevdn.gcore.lib.compatibility.Version;
 import com.guillaumevdn.gcore.lib.compatibility.material.CommonMats;
 import com.guillaumevdn.gcore.lib.legacy_npc.NPCManager;
@@ -52,6 +54,25 @@ public class WorkerGCore {
 
 	public NPCManager getNpcManager() {
 		return npcManager;
+	}
+
+	// offline players
+	private LowerCaseHashMap<Pair<UUID, String>> offlinePlayersUUIDs = new LowerCaseHashMap<>();
+
+	public void registerOfflinePlayer(String name, UUID uuid) {
+		offlinePlayersUUIDs.put(name, Pair.of(uuid, name));
+	}
+
+	public Pair<UUID, String> getOfflinePlayer(String name) {
+		return offlinePlayersUUIDs.get(name);
+	}
+
+	public Stream<String> getOfflinePlayersNamesLowercase() {
+		return offlinePlayersUUIDs.keySet().stream();
+	}
+
+	public Stream<String> getOfflinePlayersNames() {
+		return offlinePlayersUUIDs.values().stream().map(Pair::getB);
 	}
 
 	// await inputs
@@ -151,29 +172,47 @@ public class WorkerGCore {
 
 	// game profile / skull items
 	private Map<UUID, GameProfile> profileCache = new HashMap<>();
+	private final GameProfile DEFAULT_PROFILE = fromTexture(UUID.randomUUID(), "Steve", "ewogICJ0aW1lc3RhbXAiIDogMTYwODAzMTQ1MTk2MSwKICAicHJvZmlsZUlkIiA6ICJlYzU2MTUzOGYzZmQ0NjFkYWZmNTA4NmIyMjE1NGJjZSIsCiAgInByb2ZpbGVOYW1lIiA6ICJBbGV4IiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzFhNGFmNzE4NDU1ZDRhYWI1MjhlN2E2MWY4NmZhMjVlNmEzNjlkMTc2OGRjYjEzZjdkZjMxOWE3MTNlYjgxMGIiCiAgICB9CiAgfQp9", "J4QNnTc0p9NbhK5zkD5pd+N2lKtH/0y884MOFQyxVGcUYDuSaa5XkkoLBTe/iaOICjarfwd1gLgNNg8XqAW3imb7bsOlN1D+3A3POkjlrdTKgLqFU9ouGwhdhh6rbMa6Sz6Ir6b8bgbeniEKYQxzOjyLbZwaDfJgXycPuQ7dnXiycVrgMYAcSHv3FH/K2Fm4RfjeIWJctWWsgpZdxmX9E0o83LEKlqEH6bT1aMTVnWJDRcak9A/OR6iSwz6ABrsWzARtlwi10mVwZUEQovByOo+UHxGfQErWm6kXbn7U/faDI3Gfq3ovvP/KyhGjB64gYQN0OWFt99N8FM+jWnPuRxVZlH0jx0Sxe2PGPvNy/lwD4gDbJfKScMSsapYZqbTenZ4QakqPVfGYI23JdQMC3IcTjuz4hHlKNjF+AgGZEqz/gDyKUT+95eOJH+8Kr0+KCzmKaL2zKY1/or7zcCsaeAyY/M+trfr6nARfFVBInHVYLHkOPkRSj3xvjNKW1sP4szJvxhQ/V968ipydRTlnQ67H8J8Laz5TDxxB2uQlRkGi6bvk1T7LSNNY/GSTovJVatR9adxTjbndby+DmrfFb666XjZ6kJshwEsudnQs2BU/jG9zi3tvCKoma/d6LbcSr2hfSYCl+ErWCFDSuVB4zJZa5rOLGW2Ea5s1ePFeHiM=");
 
 	public void fetchProfile(UUID ownerUUID, String ownerName, String skinData, String skinSignature, Consumer<GameProfile> callback) {
 		// has data
 		if (skinData != null) {
-			GameProfile profile = new GameProfile(ownerUUID != null ? ownerUUID : UUID.randomUUID(), ownerName != null ? ownerName : "SomeGuy");
-			profile.getProperties().put("textures", skinSignature != null ? new Property("textures", skinData, skinSignature) : new Property("textures", skinData));
-			callback.accept(profile);
+			callback.accept(fromTexture(ownerUUID, ownerName, skinData, skinSignature));
 		}
 		// no data
 		else if (ownerUUID != null || ownerName != null) {
 			// maybe fix UUID if player connected once
 			if (ownerUUID == null) {
 				OfflinePlayer pl = Bukkit.getOfflinePlayer(ownerName);
-				if (pl != null) {
+				if (pl != null && pl.getLastPlayed() > 0L) {
 					ownerUUID = pl.getUniqueId();
 				}
 			}
+			// cached
+			GameProfile cached = profileCache.get(ownerUUID);
+			if (cached != null) {
+				callback.accept(cached);
+				return;
+			}
 			// find by UUID or fetch name
+			Consumer<UUID> fetcher = uuid -> {
+				BukkitThread.ASYNC.operate(() -> {
+					GameProfile profile = MojangUtils.fetchProfile(uuid);  // nullable
+					if (profile == null) {
+						profile = DEFAULT_PROFILE;
+					}
+					profileCache.put(uuid, profile);
+					callback.accept(profile);
+				}, error -> {
+					error.printStackTrace();
+					callback.accept(null);
+				});
+			};
 			if (ownerUUID != null) {
-				fetchProfile(ownerUUID, callback);
+				fetcher.accept(ownerUUID);
 			} else {
 				BukkitThread.ASYNC.operate(() -> {
-					fetchProfile(MojangUtils.fetchUUID(ownerName), callback);
+					fetcher.accept(MojangUtils.fetchUUID(ownerName));
 				}, error -> {
 					error.printStackTrace();
 					callback.accept(null);
@@ -182,57 +221,26 @@ public class WorkerGCore {
 		}
 	}
 
-	private void fetchProfile(UUID ownerUUID, Consumer<GameProfile> callback) {
-		GameProfile cached = profileCache.get(ownerUUID);
-		if (cached != null) {
-			callback.accept(cached);
-		} else {
-			UUID uuid = ownerUUID;  // Widega
-			BukkitThread.ASYNC.operate(() -> {
-				GameProfile profile = MojangUtils.fetchProfile(uuid); // not null
-				profileCache.put(uuid, profile);
-			}, error -> {
-				error.printStackTrace();
-				callback.accept(null);
-			});
-		}
+	private GameProfile fromTexture(UUID ownerUUID, String ownerName, String skinData, String skinSignature) {
+		GameProfile profile = new GameProfile(ownerUUID != null ? ownerUUID : UUID.randomUUID(), ownerName != null ? ownerName : "SomeGuy");
+		profile.getProperties().put("textures", skinSignature != null ? new Property("textures", skinData, skinSignature) : new Property("textures", skinData));
+		return profile;
 	}
 
 	public void buildPlayerHead(OfflinePlayer owner, String name, List<String> lore, Consumer<ItemStack> done) {
-		// is cached
-		GameProfile cached = profileCache.get(owner.getUniqueId());
-		if (cached != null) {
-			ItemStack item = buildPlayerHead(owner, cached, name, lore);
-			if (item != null) {
-				done.accept(item);
-			}
-			return;
-		}
-		// not cached, fetch it
-		BukkitThread.ASYNC.operate(() -> {
+		fetchProfile(owner.getUniqueId(), owner.getName(), null, null, profile -> {
 			try {
-				GameProfile profile = MojangUtils.fetchProfile(owner.getUniqueId()); // not null
-				profileCache.put(owner.getUniqueId(), profile);
-				done.accept(buildPlayerHead(owner, profile, name, lore));
+				ItemStack item = CommonMats.PLAYER_HEAD.newStack();
+				SkullMeta meta = (SkullMeta) item.getItemMeta();
+				ReflectionObject.of(meta).setField("profile", profile);
+				if (name != null) meta.setDisplayName(name);
+				if (lore != null) meta.setLore(lore);
+				item.setItemMeta(meta);
+				done.accept(item);
 			} catch (Throwable error) {
-				GCore.inst().getMainLogger().error("An error occured when fetching game profile to build head item for " + owner.getName(), error);
+				GCore.inst().getMainLogger().error("An error occured when building head item for " + owner.getName(), error);
 			}
 		});
-	}
-
-	private ItemStack buildPlayerHead(OfflinePlayer owner, GameProfile profile, String name, List<String> lore) {
-		try {
-			ItemStack item = CommonMats.PLAYER_HEAD.newStack();
-			SkullMeta meta = (SkullMeta) item.getItemMeta();
-			ReflectionObject.of(meta).setField("profile", profile);
-			if (name != null) meta.setDisplayName(name);
-			if (lore != null) meta.setLore(lore);
-			item.setItemMeta(meta);
-			return item;
-		} catch (Throwable error) {
-			GCore.inst().getMainLogger().error("An error occured when building head item for " + owner.getName(), error);
-			return null;
-		}
 	}
 
 	// static

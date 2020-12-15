@@ -1,14 +1,15 @@
 package com.guillaumevdn.gcore.lib.compatibility.particle;
 
 import java.util.Collection;
-import com.guillaumevdn.gcore.lib.object.Optional;
 
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import com.guillaumevdn.gcore.ConfigGCore;
+import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.compatibility.variants.Variant;
+import com.guillaumevdn.gcore.lib.object.Optional;
 
 /**
  * @author GuillaumeVDN
@@ -27,19 +28,23 @@ public class Particle extends Variant<ParticleData> {
 
 	// methods
 	public void send(Player player, Location location) {
-		send(player, location, null, 1, 0f);
+		send(player, location, null, null, 1, 0f);
 	}
 
 	public void send(Player player, Location location, int count) {
-		send(player, location, null, count, 0f);
+		send(player, location, null, null, count, 0f);
 	}
 
 	public void send(Player player, Location location, int count, float speed) {
-		send(player, location, null, count, speed);
+		send(player, location, null, null, count, speed);
 	}
 
-	public void send(Player player, Location location, Color color, int count, float speed) {
-		send(player, location, color, count, speed);
+	public void send(Player player, Location location, Color color, Integer noteColor, int count, float speed) {
+		send(CollectionUtils.asList(player), location, color, noteColor, count, speed);
+	}
+
+	public void send(Player player, Location location, Color color, Float redstoneColorScale, Integer noteColor, int count, float speed) {
+		send(CollectionUtils.asList(player), location, color, redstoneColorScale, noteColor, count, speed);
 	}
 
 	public void send(Collection<Player> players, Location location) {
@@ -55,7 +60,11 @@ public class Particle extends Variant<ParticleData> {
 	}
 
 	public void send(Collection<Player> players, Location location, Color color, Integer noteColor, int count, float speed) {
-		ParticleCompat.sendParticle(players, location, this, color, noteColor, count, speed);
+		send(players, location, color, 1f, noteColor, count, speed);
+	}
+
+	public void send(Collection<Player> players, Location location, Color color, Float redstoneColorScale, Integer noteColor, int count, float speed) {
+		ParticleCompat.sendParticle(players, location, this, color, redstoneColorScale, noteColor, count, speed);
 	}
 
 	// static

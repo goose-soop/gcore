@@ -1,6 +1,6 @@
 package com.guillaumevdn.gcore.lib.time.frame;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import com.guillaumevdn.gcore.TextEditorGeneric;
 import com.guillaumevdn.gcore.lib.element.struct.Element;
@@ -26,15 +26,15 @@ public class ElementTimeFrame extends TypableContainerElement<TimeFrameType> {
 	}
 
 	// match
-	public Pair<LocalDateTime, LocalDateTime> getActive(Replacer replacer) {
+	public Pair<ZonedDateTime, ZonedDateTime> getActive(Replacer replacer) {
 		return getBounds(replacer, 0);
 	}
 
-	public Pair<LocalDateTime, LocalDateTime> getNext(Replacer replacer) {
+	public Pair<ZonedDateTime, ZonedDateTime> getNext(Replacer replacer) {
 		return getBounds(replacer, 1);
 	}
 
-	public Pair<LocalDateTime, LocalDateTime> getBounds(Replacer replacer, int offset) {
+	public Pair<ZonedDateTime, ZonedDateTime> getBounds(Replacer replacer, int offset) {
 		return getType().getBounds(this, replacer, offset);
 	}
 

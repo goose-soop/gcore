@@ -24,6 +24,11 @@ public class PositionTypePlayerRelativeCylinderOutside extends PositionType {
 
 	// elements
 	@Override
+	public boolean mustCache(ElementPosition position) {
+		return false;
+	}
+
+	@Override
 	protected void doFillTypeSpecificElements(ElementPosition position) {
 		position.addRelativeLocation("center", Need.optional(), TextEditorGeneric.descriptionPositionTypeCylinderCenter);
 		position.addDouble("radius", Need.required(), 1, TextEditorGeneric.descriptionPositionTypeCylinderRadius);

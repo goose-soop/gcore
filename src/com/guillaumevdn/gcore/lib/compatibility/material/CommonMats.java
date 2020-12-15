@@ -47,6 +47,7 @@ public final class CommonMats {
 	public static final Mat GOLD_BLOCK = Mat.firstFromIdOrDataName("GOLD_BLOCK").get();
 	public static final Mat GOLD_INGOT = Mat.firstFromIdOrDataName("GOLD_INGOT").get();
 	public static final Mat GOLD_NUGGET = Mat.firstFromIdOrDataName("GOLD_NUGGET").get();
+	public static final Mat GRASS_BLOCK = Mat.firstFromIdOrDataName("GRASS_BLOCK").get();
 	public static final Mat GRAY_DYE = Mat.firstFromIdOrDataName("GRAY_DYE").get();
 	public static final Mat GRAY_WOOL = Mat.firstFromIdOrDataName("GRAY_WOOL").get();
 	public static final Mat LIME_DYE = Mat.firstFromIdOrDataName("LIME_DYE").get();
@@ -80,6 +81,7 @@ public final class CommonMats {
 	public static final Mat RED_WOOL = Mat.firstFromIdOrDataName("RED_WOOL").get();
 	public static final Mat REPEATER = Mat.firstFromIdOrDataName("REPEATER").get();
 	public static final Mat SADDLE = Mat.firstFromIdOrDataName("SADDLE").get();
+	public static final Mat GRAY_STAINED_GLASS_PANE = Mat.firstFromIdOrDataName("GRAY_STAINED_GLASS_PANE").get();
 	public static final Mat STICK = Mat.firstFromIdOrDataName("STICK").get();
 	public static final Mat TNT = Mat.firstFromIdOrDataName("TNT").get();
 	public static final Mat TORCH = Mat.firstFromIdOrDataName("TORCH").get();

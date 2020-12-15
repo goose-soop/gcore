@@ -11,6 +11,7 @@ import com.guillaumevdn.gcore.lib.compatibility.material.Mat;
 import com.guillaumevdn.gcore.lib.location.LocationUtils;
 import com.guillaumevdn.gcore.lib.location.PointTolerance;
 import com.guillaumevdn.gcore.lib.location.position.Position;
+import com.guillaumevdn.gcore.lib.number.MinMaxDouble;
 
 /**
  * @author GuillaumeVDN
@@ -66,6 +67,11 @@ public class PositionSingle implements Position {
 			return null;
 		}
 		return location;
+	}
+
+	@Override
+	public MinMaxDouble getRandomSolidAndFreeAboveYBounds() {
+		return MinMaxDouble.of(location.getY(), location.getY());
 	}
 
 	@Override

@@ -27,7 +27,7 @@ public final class MetaSpawnEgg {
 		SpawnEggMeta ref = ObjectUtils.castOrNull(referenceMeta, SpawnEggMeta.class);
 		if (ref == null) return true;
 		// author
-		if (check.isExact() && !Objects.deepEquals(meta.getSpawnedType(), ref.getSpawnedType())) return false;
+		if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getSpawnedType(), ref.getSpawnedType()))) return false;
 		else if (!check.isExact() && ref.getSpawnedType() != null && (meta == null || !ref.getSpawnedType().equals(meta.getSpawnedType()))) return false;
 		// seems good
 		return true;

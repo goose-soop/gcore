@@ -1,7 +1,6 @@
 package com.guillaumevdn.gcore.data.usernpcs;
 
 import java.io.File;
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -61,6 +60,19 @@ public class BoardUsersNPCs extends UniKeyedBoardRemote<UUID, UserNPCs> {
 		}
 	}
 
+	public void createAndSpawnDefault(Player player, UserNPCs user, ElementNPC npcConfig, Replacer replacer) {
+		// get npc id
+		Integer npcId = NumberUtils.integerOrNull(npcConfig.getId());
+		if (npcId == null) return;
+		// add data if hasn't
+		UserNPC userNpc = user.getNPC(npcId);
+		if (userNpc == null) {
+			user.updateNpc(npcId, new UserNPC(npcId));
+		}
+		// add npc if shown (shown check is made in method so just call it)
+		NPCManager.inst().spawnNpc(player, npcId);
+	}
+
 	@Override
 	protected void onPulledElements(BukkitThread thread, Set<KeyReference<UUID>> references) {
 		references.forEach(ref -> {
@@ -79,20 +91,7 @@ public class BoardUsersNPCs extends UniKeyedBoardRemote<UUID, UserNPCs> {
 			NPCManager.ifPresent(manager -> {
 				Replacer replacer = Replacer.of(player);
 				for (ElementNPC npcConfig : manager.getNPCsConfig().values()) {
-					// get npc id
-					Integer npcId = NumberUtils.integerOrNull(npcConfig.getId());
-					if (npcId == null) continue;
-					// add data if hasn't
-					UserNPC userNpc = user.getNPC(npcId);
-					if (userNpc == null) {
-						user.updateNpc(npcId, new UserNPC(npcId));
-					}
-					// clean defaults if has
-					else {
-						userNpc.cleanDefaults(npcConfig, replacer);
-					}
-					// add npc if shown (shown check is made in method so just call it)
-					manager.spawnNpc(player, npcId, null);
+					createAndSpawnDefault(player, user, npcConfig, replacer);
 				}
 			});
 		});
@@ -147,13 +146,13 @@ public class BoardUsersNPCs extends UniKeyedBoardRemote<UUID, UserNPCs> {
 
 	@Override
 	protected void remoteInitMySQL() throws Throwable {
-		GCore.inst().getMySQLConnector().performUpdateQuery(getPlugin(), ""
+		GCore.inst().getMySQLConnector().performUpdateQuery(getPlugin(), new Query(""
 				+ "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + "("
 				+ "`user_uuid` CHAR(36) NOT NULL,"
 				+ "`data` LONGTEXT NOT NULL,"
 				+ "PRIMARY KEY(`user_uuid`)"
 				+ ") ENGINE=InnoDB DEFAULT CHARSET=?;"
-				, "utf8"
+				, "utf8")
 				);
 	}
 
@@ -166,55 +165,50 @@ public class BoardUsersNPCs extends UniKeyedBoardRemote<UUID, UserNPCs> {
 	protected void remotePullElementsMySQL(Set<KeyReference<UUID>> references) throws Throwable {
 		List<UUID> keys = new ArrayList<>();
 		references.forEach(ref -> keys.add(ref.getKey()));
-		ResultSet set = GCore.inst().getMySQLConnector().performGetQuery(getPlugin(), Query.buildSelectKeysIn(TABLE_NAME, "user_uuid", keys, Serializer.UUID));
-		while (set.next()) {
-			UUID uuid = UUID.fromString(set.getString("user_uuid")); // row can't contain an invalid UUID, since the query above was built from a valid UUID object
-			String rawData = set.getString("data");
-			try {
-				UserNPCs user = GCore.inst().getGson().fromJson(rawData, UserNPCs.class);
-				if (user == null) {
-					getLogger().warning("Found invalid user NPC data for '" + uuid + "' in database, skipped it");
-					continue;
-				}
-				cache.put(uuid, user);
-			} catch (Throwable exception) {
-				exception.printStackTrace();
-			}
-		}
+		GCore.inst().getMySQLConnector().performGetQuery(getPlugin(), Query.buildSelectKeysIn(TABLE_NAME, "user_uuid", keys, Serializer.UUID),
+				set -> {
+					while (set.next()) {
+						UUID uuid = UUID.fromString(set.getString("user_uuid")); // row can't contain an invalid UUID, since the query above was built from a valid UUID object
+						String rawData = set.getString("data");
+						try {
+							UserNPCs user = GCore.inst().getGson().fromJson(rawData, UserNPCs.class);
+							if (user == null) {
+								getLogger().warning("Found invalid user NPC data for '" + uuid + "' in database, skipped it");
+								continue;
+							}
+							cache.put(uuid, user);
+						} catch (Throwable exception) {
+							exception.printStackTrace();
+						}
+					}
+				});
 	}
 
 	@Override
-	protected void remotePushElementsMySQL(Set<KeyReference<UUID>> references) throws Throwable {
-		if (references.isEmpty()) return; // let's avoid deleting the whole table just because there's no WHERE clause
-		Query query = buildRemoteDeleteElementsMySQLQuery(references);
-		List<Set<KeyReference<UUID>>> splitElements = CollectionUtils.split(references, 999); // multiple VALUES are limited to 1000 elements ; https://stackoverflow.com/questions/452859/inserting-multiple-rows-in-a-single-sql-query#comment22032805_452934
-		for (Set<KeyReference<UUID>> splitElement : splitElements) {
-			query.add("INSERT INTO " + TABLE_NAME + "(`user_uuid`,`data`) VALUES ");
+	protected void remotePushElementsMySQL(Set<KeyReference<UUID>> refs) throws Throwable {
+		if (refs.isEmpty()) return; // let's avoid deleting the whole table just because there's no WHERE clause
+		for (List<KeyReference<UUID>> references : CollectionUtils.split(refs, 999)) {  // multiple VALUES are limited to 1000 elements ; https://stackoverflow.com/questions/452859/inserting-multiple-rows-in-a-single-sql-query#comment22032805_452934
+			Query query = new Query("INSERT INTO " + TABLE_NAME + "(`user_uuid`,`data`) VALUES ");
 			int i = -1;
-			for (KeyReference<UUID> reference : splitElement) {
-				String comma = (++i + 1 < splitElement.size() ? "," : "");
+			for (KeyReference<UUID> reference : references) {
+				String comma = (++i + 1 < references.size() ? "," : "");
 				query.add("(?,?)" + comma, reference.getKey(), GCore.inst().getGson().toJson(getCachedValue(reference.getKey())));
 			}
-			query.add(";");
+			query.add(" ON DUPLICATE KEY UPDATE `data`=VALUES(`data`);");
+			GCore.inst().getMySQLConnector().performUpdateQuery(getPlugin(), query);
 		}
-		GCore.inst().getMySQLConnector().performUpdateQuery(getPlugin(), query);
 	}
 
 	@Override
 	protected void remoteDeleteElementsMySQL(Set<KeyReference<UUID>> references) throws Throwable {
 		if (references.isEmpty()) return; // let's avoid deleting the whole table just because there's no WHERE clause
-		GCore.inst().getMySQLConnector().performUpdateQuery(getPlugin(), buildRemoteDeleteElementsMySQLQuery(references));
-	}
-
-	private Query buildRemoteDeleteElementsMySQLQuery(Set<KeyReference<UUID>> references) {
-		if (references.isEmpty()) return null; // let's avoid deleting the whole table just because there's no WHERE clause ; this shouldn't happen since this method is private but better be juuust a little more sure
 		Query query = new Query("DELETE FROM " + TABLE_NAME + " ");
 		int i = -1;
 		for (KeyReference<UUID> reference : references) {
 			query.add((++i == 0 ? "WHERE" : "OR") + " (`user_uuid`=?)", reference.getKey());
 		}
 		query.add(";");
-		return query;
+		GCore.inst().getMySQLConnector().performUpdateQuery(getPlugin(), query);
 	}
 
 }

@@ -1,7 +1,6 @@
 package com.guillaumevdn.gcore.lib.string.placeholder;
 
 import java.util.List;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import javax.annotation.Nonnull;
@@ -67,8 +66,8 @@ public interface Replacer {
 		return parsed;
 	}
 
-	default ItemStack parse(ItemStack item) {
-		ItemStack copy = item == null ? null : item.clone();
+	default ItemStack parse(ItemStack original) {
+		ItemStack copy = original == null ? null : original.clone();
 		if (copy == null || !copy.hasItemMeta()) {
 			return copy;
 		}
@@ -122,8 +121,13 @@ public interface Replacer {
 		return this;
 	}
 
-	default Replacer with(Function<String, Object> customMatcher) {
-		getReplacerData().with(customMatcher);
+	default Replacer with(String customMatcherDesc, CustomMatcher customMatcher) {
+		getReplacerData().with(customMatcherDesc, customMatcher);
+		return this;
+	}
+
+	default Replacer replaceCustom(String customMatcherDesc, CustomMatcher customMatcher) {
+		getReplacerData().replaceCustom(customMatcherDesc, customMatcher);
 		return this;
 	}
 
@@ -140,6 +144,11 @@ public interface Replacer {
 			getReplacerData().with(other.getReplacerData().getLocation());
 		}
 		getReplacerData().with(other.getReplacerData().getCustom());
+		return this;
+	}
+
+	default Replacer formatNumbers(boolean formatNumbers) {
+		getReplacerData().formatNumbers(formatNumbers);
 		return this;
 	}
 
@@ -180,8 +189,8 @@ public interface Replacer {
 		return new SimpleReplacer(new ReplacerData().with(placeholder, replacer));
 	}
 
-	static Replacer of(Function<String, Object> customMatcher) {
-		return new SimpleReplacer(new ReplacerData().with(customMatcher));
+	static Replacer of(String customMatcherDesc, CustomMatcher customMatcher) {
+		return new SimpleReplacer(new ReplacerData().with(customMatcherDesc, customMatcher));
 	}
 
 	static Replacer of(StringReplacer custom) {

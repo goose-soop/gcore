@@ -45,26 +45,26 @@ public final class MetaPotion {
 				if (!baseMeta.getType().equals(baseRef.getType())) return false;
 				if (baseMeta.isExtended() != baseRef.isExtended()) return false;
 				if (baseMeta.isUpgraded() != baseRef.isUpgraded()) return false;
+			} else {
+				if (baseRef.isExtended() && !baseMeta.isExtended()) return false;
+				if (baseRef.isUpgraded() && !baseMeta.isUpgraded()) return false;
 			}
 		}
 		// color
 		if (Version.ATLEAST_1_12) {
-			if (check.isExact() && !Objects.deepEquals(meta.getColor(), ref.getColor())) return false;
+			if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getColor(), ref.getColor()))) return false;
 			else if (!check.isExact() && ref.getColor() != null && (meta == null || ref.getColor().equals(meta.getColor()))) return false;
 		}
 		// effects
 		if (check.isExact()) {
 			if (meta.hasCustomEffects() != ref.hasCustomEffects() || meta.getCustomEffects().size() != ref.getCustomEffects().size()) return false;
 		} else {
-			if (ref.hasCustomEffects() && (meta == null || meta.hasCustomEffects())) return false;
+			if (ref.hasCustomEffects() && (meta == null || !meta.hasCustomEffects())) return false;
 		}
-		main: for (PotionEffect refEffect : ref.getCustomEffects()) {
-			for (PotionEffect effect : meta.getCustomEffects()) {
-				if (effect.equals(refEffect)) {
-					continue main;
-				}
+		for (PotionEffect refEffect : ref.getCustomEffects()) {
+			if (!meta.getCustomEffects().stream().anyMatch(metaEffect -> metaEffect.getType().equals(refEffect.getType()))) {  // just check type ; extended/upgraded will have been checked above
+				return false;
 			}
-			return false;
 		}
 		// seems good
 		return true;

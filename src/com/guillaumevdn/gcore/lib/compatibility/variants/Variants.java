@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import com.guillaumevdn.gcore.lib.object.Optional;
 
 import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.lib.collection.ReverseSplitLowerCaseMap;
@@ -16,6 +15,7 @@ import com.guillaumevdn.gcore.lib.exception.ConfigError;
 import com.guillaumevdn.gcore.lib.file.FileUtils;
 import com.guillaumevdn.gcore.lib.logic.ComparisonType;
 import com.guillaumevdn.gcore.lib.object.ObjectUtils;
+import com.guillaumevdn.gcore.lib.object.Optional;
 
 /**
  * @author GuillaumeVDN
@@ -113,7 +113,7 @@ public abstract class Variants<V extends Variant, DE extends Enum<DE>, D extends
 		if (file.exists() && regenerate) {
 			try {
 				file.delete();
-				FileUtils.saveDefaultResource(file, defaultResource, true);
+				FileUtils.saveDefaultResource(GCore.inst(), defaultResource, file, true);
 			} catch (Throwable exception) {
 				throw new Error("an unknown error occured while regenerating file " + file, exception);
 			}

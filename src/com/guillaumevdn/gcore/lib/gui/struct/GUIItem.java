@@ -12,7 +12,6 @@ import org.bukkit.inventory.ItemStack;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.compatibility.sound.Sound;
 import com.guillaumevdn.gcore.lib.gui.struct.ClickCall.ClickType;
-import com.guillaumevdn.gcore.lib.tuple.GUIItemTriple;
 import com.guillaumevdn.gcore.lib.tuple.IntegerPair;
 
 /**
@@ -22,34 +21,22 @@ public class GUIItem {
 
 	private final String id;
 	private ItemStack item;
-	private final List<IntegerPair> preferredLocations;
-	private List<IntegerPair> locations = new ArrayList<>(); // <page, slot>
+	private List<IntegerPair> preferredLocations;
+	private List<IntegerPair> locations = new ArrayList<>();  // <page, slot>
 	private Consumer<ClickCall> clickPerformer;
 	private Sound clickSound;
 	private Map<ClickType, Consumer<ClickCall>> overrideClicks;
-
-	public GUIItem(String id, GUIItemTriple item) {
-		this(id, item.getC(), item.getA(), null, null, null);
-	}
-
-	public GUIItem(String id, GUIItemTriple item, Consumer<ClickCall> clickPerformer) {
-		this(id, item.getC(), item.getA(), clickPerformer, null, null);
-	}
-
-	public GUIItem(String id, GUIItemTriple item, Consumer<ClickCall> clickPerformer, Sound clickSound, Map<ClickType, Consumer<ClickCall>> overrideClicks) {
-		this(id, item.getC(), item.getA(), clickPerformer, clickSound, overrideClicks);
-	}
 
 	public GUIItem(String id, ItemStack item) {
 		this(id, null, item, null, null, null);
 	}
 
 	public GUIItem(String id, ItemStack item, Consumer<ClickCall> clickPerformer) {
-		this(id, null, item, clickPerformer, null, null);
+		this(id, null, item, null, null, clickPerformer);
 	}
 
-	public GUIItem(String id, ItemStack item, Consumer<ClickCall> clickPerformer, Sound clickSound, Map<ClickType, Consumer<ClickCall>> overrideClicks) {
-		this(id, null, item, clickPerformer, clickSound, overrideClicks);
+	public GUIItem(String id, ItemStack item, Sound clickSound, Map<ClickType, Consumer<ClickCall>> overrideClicks, Consumer<ClickCall> clickPerformer) {
+		this(id, null, item, clickSound, overrideClicks, clickPerformer);
 	}
 
 	public GUIItem(String id, int preferredSlot, ItemStack item) {
@@ -57,11 +44,11 @@ public class GUIItem {
 	}
 
 	public GUIItem(String id, int preferredSlot, ItemStack item, Consumer<ClickCall> clickPerformer) {
-		this(id, CollectionUtils.asList(IntegerPair.of(-1, preferredSlot)), item, clickPerformer, null, null);
+		this(id, CollectionUtils.asList(IntegerPair.of(-1, preferredSlot)), item, null, null, clickPerformer);
 	}
 
-	public GUIItem(String id, int preferredSlot, ItemStack item, Consumer<ClickCall> clickPerformer, Sound clickSound, Map<ClickType, Consumer<ClickCall>> overrideClicks) {
-		this(id, CollectionUtils.asList(IntegerPair.of(-1, preferredSlot)), item, clickPerformer, clickSound, overrideClicks);
+	public GUIItem(String id, int preferredSlot, ItemStack item, Sound clickSound, Map<ClickType, Consumer<ClickCall>> overrideClicks, Consumer<ClickCall> clickPerformer) {
+		this(id, CollectionUtils.asList(IntegerPair.of(-1, preferredSlot)), item, clickSound, overrideClicks, clickPerformer);
 	}
 
 	public GUIItem(String id, List<IntegerPair> preferredLocations, ItemStack item) {
@@ -69,10 +56,10 @@ public class GUIItem {
 	}
 
 	public GUIItem(String id, List<IntegerPair> preferredLocations, ItemStack item, Consumer<ClickCall> clickPerformer) {
-		this(id, preferredLocations, item, clickPerformer, null, null);
+		this(id, preferredLocations, item, null, null, clickPerformer);
 	}
 
-	public GUIItem(String id, List<IntegerPair> preferredLocations, ItemStack item, Consumer<ClickCall> clickPerformer, Sound clickSound, Map<ClickType, Consumer<ClickCall>> overrideClicks) {
+	public GUIItem(String id, List<IntegerPair> preferredLocations, ItemStack item, Sound clickSound, Map<ClickType, Consumer<ClickCall>> overrideClicks, Consumer<ClickCall> clickPerformer) {
 		this.id = id;
 		this.item = item;
 		this.preferredLocations = preferredLocations == null ? new ArrayList<>() : preferredLocations.stream().distinct().collect(Collectors.toList());
@@ -124,6 +111,10 @@ public class GUIItem {
 	// set
 	public final void setItem(ItemStack item) {
 		this.item = item;
+	}
+
+	public void setPreferredLocations(List<IntegerPair> preferredLocations) {
+		this.preferredLocations = preferredLocations;
 	}
 
 	public void setLocations(List<IntegerPair> locations) {

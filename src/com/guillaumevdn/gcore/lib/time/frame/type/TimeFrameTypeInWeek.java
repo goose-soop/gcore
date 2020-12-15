@@ -1,7 +1,7 @@
 package com.guillaumevdn.gcore.lib.time.frame.type;
 
 import java.time.DayOfWeek;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import com.guillaumevdn.gcore.TextEditorGeneric;
 import com.guillaumevdn.gcore.lib.element.struct.Need;
@@ -26,7 +26,7 @@ public class TimeFrameTypeInWeek extends TimeFrameTypeIn<TimeInWeek> {
 	}
 
 	@Override
-	protected LocalDateTime minusOnePeriod(LocalDateTime time) {
+	protected ZonedDateTime minusOnePeriod(ZonedDateTime time) {
 		return time.minusWeeks(1);
 	}
 

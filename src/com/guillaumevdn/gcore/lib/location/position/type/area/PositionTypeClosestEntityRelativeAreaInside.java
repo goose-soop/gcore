@@ -35,6 +35,11 @@ public class PositionTypeClosestEntityRelativeAreaInside extends PositionType {
 
 	// parse
 	@Override
+	public boolean mustCache(ElementPosition position) {
+		return false;
+	}
+
+	@Override
 	public Position doParse(ElementPosition position, Replacer replacer) throws ParsingError {
 		Entity entity = PositionTypeClosestEntityRelativeSingle.findMatching(position, replacer);
 		if (entity == null) return null;

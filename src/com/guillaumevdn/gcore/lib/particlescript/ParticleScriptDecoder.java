@@ -1,8 +1,6 @@
 package com.guillaumevdn.gcore.lib.particlescript;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -12,6 +10,7 @@ import java.util.Map;
 import com.guillaumevdn.gcore.lib.GPlugin;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.compatibility.particle.Particle;
+import com.guillaumevdn.gcore.lib.file.FileUtils;
 import com.guillaumevdn.gcore.lib.string.StringUtils;
 
 /**
@@ -47,8 +46,8 @@ public class ParticleScriptDecoder {
 	public void decode() throws Throwable {
 		// read lines without comments
 		List<String> lines = new ArrayList<>();
-		BufferedReader reader = new BufferedReader(new FileReader(file));
-		for (String line; (line = reader.readLine()) != null; ) {
+		List<String> fileLines = FileUtils.readLines(file);
+		for (String line : fileLines) {
 			int commentIndex = line.indexOf('#');
 			if (commentIndex != -1) {
 				line = line.substring(0, commentIndex);
@@ -58,7 +57,6 @@ public class ParticleScriptDecoder {
 				lines.add(line);
 			}
 		}
-		reader.close();
 		// find indent
 		String firstIndented = lines.stream().filter(elem -> elem.startsWith(" ")).findFirst().orElse(null);
 		int indentLevel = firstIndented != null ? StringUtils.countLeadingChar(firstIndented, ' ') : 2;

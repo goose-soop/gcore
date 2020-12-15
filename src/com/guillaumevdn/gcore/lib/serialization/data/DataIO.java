@@ -18,6 +18,7 @@ import org.bukkit.inventory.ItemStack;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.collection.LowerCaseArrayList;
 import com.guillaumevdn.gcore.lib.collection.LowerCaseHashMap;
+import com.guillaumevdn.gcore.lib.collection.LowerCaseHashSet;
 import com.guillaumevdn.gcore.lib.configuration.file.node.SectionNode;
 import com.guillaumevdn.gcore.lib.function.ThrowableBiFunction;
 import com.guillaumevdn.gcore.lib.function.ThrowableConsumer;
@@ -106,9 +107,9 @@ public final class DataIO {
 		}
 	}
 
-	public <T> void writeSerializedList(String key, List<T> list) {
+	public <T> void writeSerializedList(String key, Collection<T> list) {
 		if (list != null && !list.isEmpty()) {
-			Serializer<T> serializer = Serializer.find(list.get(0));
+			Serializer<T> serializer = Serializer.find(list.iterator().next());
 			objects.put(key, list.stream().map(elem -> serializer.serialize(elem)).collect(Collectors.toList()));
 		}
 	}
@@ -200,9 +201,12 @@ public final class DataIO {
 			T t = ObjectUtils.castOrNull(value, typeClass);
 			if (t == null) {
 				try {
-					return Serializer.find(typeClass).deserialize(value.toString());
+					t = Serializer.find(typeClass).deserialize(value.toString());
 				} catch (Throwable exception) {
 					throw new IllegalStateException("expected " + typeClass + " but found " + value.getClass() + " for " + key + ", and couldn't deserialize it", exception);
+				}
+				if (t == null) {
+					throw new NullPointerException("deserializing '" + value.toString() + "' created a null value");
 				}
 			}
 			return t;
@@ -273,7 +277,7 @@ public final class DataIO {
 		return data != null ? deserializer.apply(data) : null;
 	}
 
-	public <K, V> Map<K, V> readMap(String key, Class<K> keyClass, BiFunction<String, DataIO, V> valueDeserializer) {
+	public <K, V> Map<K, V> readSameMap(String key, Class<K> keyClass, BiFunction<String, DataIO, V> valueDeserializer) {
 		return readObject(key, data -> {
 			Map<K, V> map = new HashMap<>();
 			Serializer<K> keySerializer = Serializer.find(keyClass);
@@ -288,7 +292,25 @@ public final class DataIO {
 		});
 	}
 
-	public <K, V> Map<K, V> readMapOrThrow(String key, Class<K> keyClass, ThrowableBiFunction<String, DataIO, V> valueDeserializer) throws Throwable {
+	public <K, V> Map<K, V> readSubMap(String key, Class<K> keyClass, BiFunction<String, DataIO, V> valueDeserializer) {
+		return readObject(key, data -> {
+			Map<K, V> map = new HashMap<>();
+			Serializer<K> keySerializer = Serializer.find(keyClass);
+			data.getKeys().forEach(rawK -> {
+				DataIO kd = data.readObject(rawK);
+				if (kd != null) {
+					K k = keySerializer.deserialize(rawK);
+					V value = valueDeserializer.apply(rawK, kd);
+					if (k != null && value != null) {
+						map.put(k, value);
+					}
+				}
+			});
+			return map;
+		});
+	}
+
+	public <K, V> Map<K, V> readSameMapOrThrow(String key, Class<K> keyClass, ThrowableBiFunction<String, DataIO, V> valueDeserializer) throws Throwable {
 		return readObjectOrThrow(key, data -> {
 			Map<K, V> map = new HashMap<>();
 			Serializer<K> keySerializer = Serializer.find(keyClass);
@@ -303,7 +325,25 @@ public final class DataIO {
 		});
 	}
 
-	public <V> LowerCaseHashMap<V> readLowercaseMap(String key, BiFunction<String, DataIO, V> valueDeserializer) {
+	public <K, V> Map<K, V> readSubMapOrThrow(String key, Class<K> keyClass, ThrowableBiFunction<String, DataIO, V> valueDeserializer) throws Throwable {
+		return readObjectOrThrow(key, data -> {
+			Map<K, V> map = new HashMap<>();
+			Serializer<K> keySerializer = Serializer.find(keyClass);
+			for (String rawK : data.getKeys()) {
+				DataIO kd = data.readObject(rawK);
+				if (kd != null) {
+					K k = keySerializer.deserialize(rawK);
+					V value = valueDeserializer.apply(rawK, kd);
+					if (k != null && value != null) {
+						map.put(k, value);
+					}
+				}
+			}
+			return map;
+		});
+	}
+
+	public <V> LowerCaseHashMap<V> readSameLowercaseMap(String key, BiFunction<String, DataIO, V> valueDeserializer) {
 		return readObject(key, data -> {
 			LowerCaseHashMap<V> map = new LowerCaseHashMap<>();
 			data.getKeys().forEach(k -> {
@@ -312,6 +352,34 @@ public final class DataIO {
 					map.put(k, value);
 				}
 			});
+			return map;
+		});
+	}
+
+	public <V> LowerCaseHashMap<V> readSubLowercaseMap(String key, BiFunction<String, DataIO, V> valueDeserializer) {
+		return readObject(key, data -> {
+			LowerCaseHashMap<V> map = new LowerCaseHashMap<>();
+			data.getKeys().forEach(k -> {
+				DataIO kd = data.readObject(k);
+				V value = kd == null ? null : valueDeserializer.apply(k, kd);
+				if (value != null) {
+					map.put(k, value);
+				}
+			});
+			return map;
+		});
+	}
+
+	public <V> LowerCaseHashMap<V> readSubLowercaseMapOrThrow(String key, ThrowableBiFunction<String, DataIO, V> valueDeserializer) throws Throwable {
+		return readObjectOrThrow(key, data -> {
+			LowerCaseHashMap<V> map = new LowerCaseHashMap<>();
+			for (String k : data.getKeys()) {
+				DataIO kd = data.readObject(k);
+				V value = kd == null ? null : valueDeserializer.apply(k, kd);
+				if (value != null) {
+					map.put(k, value);
+				}
+			}
 			return map;
 		});
 	}
@@ -333,10 +401,30 @@ public final class DataIO {
 		return null;
 	}
 
+	public <T> Set<T> readSerializedSet(String key, Class<T> clazz) {
+		return readSerializedSet(key, Serializer.find(clazz)::deserialize);
+	}
+
+	public <T> Set<T> readSerializedSet(String key, Function<String, T> deserialized) {
+		List<String> list = (List<String>) objects.get(key);
+		if (list != null) {
+			return list.stream().map(raw -> deserialized.apply(raw)).filter(elem -> elem != null).collect(Collectors.toSet());
+		}
+		return null;
+	}
+
 	public LowerCaseArrayList readLowerCaseList(String key) {
 		List<String> list = (List<String>) objects.get(key);
 		if (list != null) {
 			return CollectionUtils.asLowercaseList(list);
+		}
+		return null;
+	}
+
+	public LowerCaseHashSet readLowerCaseSet(String key) {
+		List<String> list = (List<String>) objects.get(key);
+		if (list != null) {
+			return CollectionUtils.asLowercaseSet(list);
 		}
 		return null;
 	}

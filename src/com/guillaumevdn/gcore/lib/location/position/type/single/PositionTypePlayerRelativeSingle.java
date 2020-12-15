@@ -25,6 +25,11 @@ public class PositionTypePlayerRelativeSingle extends PositionType {
 
 	// elements
 	@Override
+	public boolean mustCache(ElementPosition position) {
+		return false;
+	}
+
+	@Override
 	protected void doFillTypeSpecificElements(ElementPosition position) {
 		position.addRelativeLocation("location", Need.optional(), TextEditorGeneric.descriptionPositionTypeRelativeSingleLocation);
 		position.addPointTolerance("point_tolerance", Need.optional(PointTolerance.LENIENT), TextEditorGeneric.descriptionPositionTypePointTolerance);

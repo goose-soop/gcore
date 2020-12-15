@@ -1,6 +1,7 @@
 package com.guillaumevdn.gcore.lib.item.meta;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -28,18 +29,18 @@ public final class MetaBook {
 		BookMeta ref = ObjectUtils.castOrNull(referenceMeta, BookMeta.class);
 		if (ref == null) return true;
 		// author
-		if (check.isExact() && (meta.hasAuthor() != ref.hasAuthor() || !meta.getAuthor().equals(ref.getAuthor()))) return false;
-		else if (!check.isExact() && ref.hasAuthor() && (meta == null || !meta.hasAuthor() || !meta.getAuthor().equals(ref.getAuthor()))) return false;
+		if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getAuthor(), ref.getAuthor()))) return false;
+		else if (!check.isExact() && ref.hasAuthor() && (meta == null || !Objects.deepEquals(meta.getAuthor(), ref.getAuthor()))) return false;
 		// title
-		if (check.isExact() && (meta.hasTitle() != ref.hasTitle() || !meta.getTitle().equals(ref.getTitle()))) return false;
-		else if (!check.isExact() && ref.hasTitle() && (meta == null || !meta.hasTitle() || !meta.getTitle().equals(ref.getTitle()))) return false;
+		if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getTitle(), ref.getTitle()))) return false;
+		else if (!check.isExact() && ref.hasTitle() && (meta == null || !Objects.deepEquals(meta.getTitle(), ref.getTitle()))) return false;
 		// author
 		if (Version.ATLEAST_1_9) {
-			if (check.isExact() && (meta.hasGeneration() != ref.hasGeneration() || !meta.getGeneration().equals(ref.getGeneration()))) return false;
-			else if (!check.isExact() && ref.hasGeneration() && (meta == null || !meta.hasGeneration() || !meta.getGeneration().equals(ref.getGeneration()))) return false;
+			if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getGeneration(), ref.getGeneration()))) return false;
+			else if (!check.isExact() && ref.hasGeneration() && (meta == null || !Objects.deepEquals(meta.getGeneration(), ref.getGeneration()))) return false;
 		}
 		// pages
-		if (check.isExact() && (meta.hasPages() != ref.hasPages() || !CollectionUtils.contentEquals(meta.getPages(), ref.getPages()))) return false;
+		if (check.isExact() && (meta == null || meta.hasPages() != ref.hasPages() || !CollectionUtils.contentEquals(meta.getPages(), ref.getPages()))) return false;
 		else if (!check.isExact() && ref.hasPages() && (meta == null || !meta.hasPages() || !CollectionUtils.contentEquals(meta.getPages(), ref.getPages()))) return false;
 		// seems good
 		return true;

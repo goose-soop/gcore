@@ -41,4 +41,10 @@ public class IntegrationSerializer<T> {
 		Serializer.unregister(typeClass);
 	}
 
+	// obj
+	@Override
+	public String toString() {
+		return typeClass.getName();
+	}
+
 }

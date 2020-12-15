@@ -240,7 +240,47 @@ descriptionItemsNeededTake: |
 descriptionItemsNeededErrorMessage: |
   &7Un message envoyé si le joueur n'a pas les items requis
 
-# -------------------- Location --------------------
+# -------------------- GUI --------------------
+
+descriptionGuiName: |
+  &7Le nom de ce GUI
+
+descriptionGuiType: |
+  &7Le type de ce GUI
+
+descriptionGuiContents: |
+  &7Le contenu de ce GUI
+
+descriptionGuiItemType: |
+  &7Type d'item
+
+descriptionGuiItemIcon: |
+  &7L'icône à afficher (si le type sélectionné n'en génère pas un automatiquement)
+
+descriptionGuiItemLocations: |
+  &7Les emplacements de cet item
+  &7Chaque élément doit être formatté comme &epage,slot &7ou bien juste &eslot &7(la première page libre sera prise)
+  &7Si cet item est persistant, les numéros de pages ne sont pas nécessaires et seront ignorés
+
+descriptionGuiItemPersistent: |
+  &7Pour rendre cet item persistant (présent sur toutes les pages aux mêmes endroits)
+
+descriptionGuiItemClickSound: |
+  &7Pour jouer un son quand le joueur clique sur cet item
+
+descriptionGuiItemOverrideClicks: |
+  &7Pour spécifier des types de clic qui auront des effets différents que ceux initialement prévus par le type de l'objet
+
+descriptionGuiItemDynamicBorderLinearOnCount: |
+  &7Le nombre d'items qui devraient être actifs au même moment.
+
+descriptionGuiItemDynamicBorderLinearIconOn: |
+  &7L'icône pour les items actifs.
+
+descriptionGuiItemDynamicBorderLinearIconOff: |
+  &7L'icône pour les items inactifs.
+
+# -------------------- Position --------------------
 
 descriptionPositionType: |
   &7Le type de position
@@ -260,12 +300,19 @@ descriptionPositionTypeClosestEntityColors: |
 descriptionPositionTypeCitizensNPCRelative: |
   &7Le NPC auquel il faut se rapporter
 
+descriptionPositionTypeCitizensNPCRelativeName: |
+  &7Le NPC auquel il faut se rapporter, par noms
+  &7Utiliser uniquement si plusieurs NPCs ont le même nom pour prendre le plus proche avec l'un des noms
+
 descriptionPositionTypeClosestMythicMobMobs: |
   &7Les mobs MythicMobs autorisés
   &7Laisser vide pour tout autoriser
 
 descriptionPositionTypeWorld: |
   &0Le Monde
+
+descriptionPositionTypeBiome: |
+  &7Les biomes acceptés
 
 descriptionPositionTypeSingleLocation: |
   &7La location unique

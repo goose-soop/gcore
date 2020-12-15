@@ -8,6 +8,7 @@ import org.bukkit.entity.Projectile;
 public enum ProjectileType {
 
 	ARROW("ARROW"),
+	SPECTRAL_ARROW("SPECTRAL_ARROW"),
 	EGG("EGG"),
 	SNOWBALL("SNOWBALL"),
 	FIREBALL("FIREBALL"),

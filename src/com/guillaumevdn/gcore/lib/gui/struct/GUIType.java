@@ -17,16 +17,16 @@ public enum GUIType {
 	CHEST_4_ROW("minecraft:container", "GENERIC_9X4", 36, 36, 26, title -> Bukkit.createInventory(null, 36, title)),
 	CHEST_5_ROW("minecraft:container", "GENERIC_9X5", 45, 45, 35, title -> Bukkit.createInventory(null, 45, title)),
 	CHEST_6_ROW("minecraft:container", "GENERIC_9X6", 54, 54, 44, title -> Bukkit.createInventory(null, 54, title)),
-	DISPENSER("minecraft:dispenser", "GENERIC_3X3", 9, 9, 8, title -> Bukkit.createInventory(null, InventoryType.DISPENSER)),
-	ANVIL("minecraft:anvil", "ANVIL", 3, 0, 2, title -> Bukkit.createInventory(null, InventoryType.ANVIL)),
-	BEACON("minecraft:beacon", "BEACON", 1, 1, 0, title -> Bukkit.createInventory(null, InventoryType.BEACON)),
-	BLAST_FURNACE(null, "BLAST_FURNACE", 3, 3, 2, title -> Bukkit.createInventory(null, InventoryType.BLAST_FURNACE)),
-	BREWING_STAND("minecraft:brewing_stand", "BREWING_STAND", 5, 5, 4, title -> Bukkit.createInventory(null, InventoryType.BREWING)),
-	CRAFTING("minecraft:crafting_table", "CRAFTING", 1, 0, 00, title -> Bukkit.createInventory(null, InventoryType.CRAFTING)),
-	ENCHANTMENT("minecraft:enchanting_table", "ENCHANTMENT", 2, 0, 1, title -> Bukkit.createInventory(null, InventoryType.ENCHANTING)),
-	FURNACE("minecraft:furnace", "FURNACE", 3, 3, 2, title -> Bukkit.createInventory(null, InventoryType.FURNACE)),
-	GRINDSTONE(null, "GRINDSTONE", 3, 3, 2, title -> Bukkit.createInventory(null, InventoryType.GRINDSTONE)),
-	HOPPER(null, "HOPPER", 5, 5, 4, title -> Bukkit.createInventory(null, InventoryType.HOPPER))
+	DISPENSER("minecraft:dispenser", "GENERIC_3X3", 9, 9, 8, title -> Bukkit.createInventory(null, InventoryType.DISPENSER, title)),
+	ANVIL("minecraft:anvil", "ANVIL", 3, 0, 2, title -> Bukkit.createInventory(null, InventoryType.ANVIL, title)),
+	BEACON("minecraft:beacon", "BEACON", 1, 1, 0, title -> Bukkit.createInventory(null, InventoryType.BEACON, title)),
+	BLAST_FURNACE(null, "BLAST_FURNACE", 3, 3, 2, title -> Bukkit.createInventory(null, InventoryType.BLAST_FURNACE, title)),
+	BREWING_STAND("minecraft:brewing_stand", "BREWING_STAND", 5, 5, 4, title -> Bukkit.createInventory(null, InventoryType.BREWING, title)),
+	CRAFTING("minecraft:crafting_table", "CRAFTING", 1, 0, 00, title -> Bukkit.createInventory(null, InventoryType.CRAFTING, title)),
+	ENCHANTMENT("minecraft:enchanting_table", "ENCHANTMENT", 2, 0, 1, title -> Bukkit.createInventory(null, InventoryType.ENCHANTING, title)),
+	FURNACE("minecraft:furnace", "FURNACE", 3, 3, 2, title -> Bukkit.createInventory(null, InventoryType.FURNACE, title)),
+	GRINDSTONE(null, "GRINDSTONE", 3, 3, 2, title -> Bukkit.createInventory(null, InventoryType.GRINDSTONE, title)),
+	HOPPER(null, "HOPPER", 5, 5, 4, title -> Bukkit.createInventory(null, InventoryType.HOPPER, title))
 	;
 
 	private String pre114ContainerId, containerId;

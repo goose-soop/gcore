@@ -22,10 +22,10 @@ import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.compatibility.material.CommonMats;
 import com.guillaumevdn.gcore.lib.compatibility.material.Mat;
 import com.guillaumevdn.gcore.lib.gui.struct.ClickCall;
+import com.guillaumevdn.gcore.lib.gui.struct.ClickCall.ClickType;
 import com.guillaumevdn.gcore.lib.gui.struct.GUI;
 import com.guillaumevdn.gcore.lib.gui.struct.GUIItem;
 import com.guillaumevdn.gcore.lib.gui.struct.GUIType;
-import com.guillaumevdn.gcore.lib.gui.struct.ClickCall.ClickType;
 import com.guillaumevdn.gcore.lib.item.ItemUtils;
 import com.guillaumevdn.gcore.lib.serialization.Serializer;
 import com.guillaumevdn.gcore.lib.tuple.Pair;
@@ -34,6 +34,8 @@ import com.guillaumevdn.gcore.lib.tuple.Pair;
  * @author GuillaumeVDN
  */
 public class EnumSelectorGUI<V> extends GUI {
+
+	private static final Set<String> INVISIBLE_MATERIALS = CollectionUtils.asSet("ACACIA_WALL_SIGN", "ATTACHED_MELON_STEM", "ATTACHED_PUMPKIN_STEM", "BAMBOO_SAPLING", "BEETROOTS", "BIRCH_WALL_SIGN", "BLACK_WALL_BANNER", "BLUE_WALL_BANNER", "BRAIN_CORAL_WALL_FAN", "BROWN_WALL_BANNER", "BUBBLE_COLUMN", "BUBBLE_CORAL_WALL_FAN", "CARROTS", "COCOA", "CREEPER_WALL_HEAD", "CRIMSON_WALL_SIGN", "CYAN_WALL_BANNER", "DARK_OAK_WALL_SIGN", "DEAD_BRAIN_CORAL_WALL_FAN", "DEAD_BUBBLE_CORAL_WALL_FAN", "DEAD_FIRE_CORAL_WALL_FAN", "DEAD_HORN_CORAL_WALL_FAN", "DEAD_TUBE_CORAL_WALL_FAN", "DRAGON_WALL_HEAD", "END_GATEWAY", "END_PORTAL", "FIRE", "FIRE_CORAL_WALL_FAN", "FROSTED_ICE", "GRAY_WALL_BANNER", "HORN_CORAL_WALL_FAN", "JUNGLE_WALL_SIGN", "KELP_PLANT", "LAVA", "LIGHT_BLUE_WALL_BANNER", "LIME_WALL_BANNER", "LIGHT_GRAY_WALL_BANNER", "MAGENTA_WALL_BANNER", "MELON_STEM", "MOVING_PISTON", "NETHER_PORTAL", "OAK_WALL_SIGN", "ORANGE_WALL_BANNER", "PINK_WALL_BANNER", "PISTON_HEAD", "PLAYER_WALL_HEAD", "POTATOES", "POTTED_ACACIA_SAPLING", "POTTED_ALLIUM", "POTTED_AZURE_BLUET", "POTTED_BIRCH_SAPLING", "POTTED_BLUE_ORCHID", "POTTED_BROWN_MUSHROOM", "POTTED_CACTUS", "POTTED_CORNFLOWER", "POTTED_CRIMSON_FUNGUS", "POTTED_CRIMSON_ROOTS", "POTTED_DANDELION", "POTTED_DARK_OAK_SAPLING", "POTTED_DEAD_BUSH", "POTTED_FERN", "POTTED_JUNGLE_SAPLING", "POTTED_LILY_OF_THE_VALLEY", "POTTED_OAK_SAPLING", "POTTED_ORANGE_TULIP", "POTTED_OXEYE_DAISY", "POTTED_PINK_TULIP", "POTTED_POPPY", "POTTED_RED_MUSHROOM", "POTTED_RED_TULIP", "POTTED_SPRUCE_SAPLING", "POTTED_WARPED_FUNGUS", "POTTED_WARPED_ROOTS", "POTTED_WHITE_TULIP", "POTTED_WITHER_ROSE", "PUMPKIN_STEM", "PURPLE_WALL_BANNER", "REDSTONE_WALL_TORCH", "REDSTONE_WIRE", "RED_WALL_BANNER", "SKELETON_WALL_SKULL", "SOUL_FIRE", "SOUL_WALL_TORCH", "SPRUCE_WALL_SIGN", "STATIONARY_LAVA", "STATIONARY_WATER", "SWEET_BERRY_BUSH", "TALL_SEAGRASS", "TRIPWIRE", "TUBE_CORAL_WALL_FAN", "TWISTING_VINES_PLANT", "WALL_TORCH", "WARPED_WALL_SIGN", "WATER", "WEEPING_VINES_PLANT", "WHITE_WALL_BANNER", "WITHER_SKELETON_WALL_SKULL", "YELLOW_WALL_BANNER", "ZOMBIE_WALL_HEAD");
 
 	private Serializer<V> serializer;
 	private List<V> values;
@@ -59,7 +61,7 @@ public class EnumSelectorGUI<V> extends GUI {
 		for (V value : (valuesIcons != null ? valuesIcons.keySet() : values)) {
 			try {
 				String valueName = customGetValueName != null ? customGetValueName.apply(value) : serializer.serialize(value);
-				Mat valueIconType = value instanceof Mat ? (Mat) value : (valuesIcons != null ? valuesIcons.get(value) : this.icon);
+				Mat valueIconType = value instanceof Mat ? (INVISIBLE_MATERIALS.contains(valueName) ? CommonMats.BEDROCK : (Mat) value) : (valuesIcons != null ? valuesIcons.get(value) : this.icon);
 				ItemStack valueIcon = ItemUtils.createItem(valueIconType, "§6" + valueName, null);
 				if (valueIcon != null) {
 					setRegularItem(new GUIItem("element_" + valueName, ItemUtils.addAllFlags(valueIcon), call -> success(call.getClicker(), value)));
@@ -99,7 +101,7 @@ public class EnumSelectorGUI<V> extends GUI {
 		}));
 		return true;
 	}
-	
+
 	@Override
 	public void onPlayerInventoryClick(Player clicker, int slot, ItemStack item, ClickType clickType, int clickPageIndex) {
 		if (serializer.getTypeClass().equals(Mat.class)) {
@@ -130,6 +132,13 @@ public class EnumSelectorGUI<V> extends GUI {
 	}
 
 	private void success(Player clicker, V value) {
+		/*try (BufferedWriter writer = new BufferedWriter(new FileWriter(new File("C:/Users/vande/Desktop/w.txt"), true))) {
+			writer.write("\"" + value + "\", ");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return;
+		 */
 		Pair<Consumer<V>, Runnable> awaiting = this.awaiting.remove(clicker.getUniqueId());
 		if (awaiting != null) {
 			awaiting.getA().accept(value);

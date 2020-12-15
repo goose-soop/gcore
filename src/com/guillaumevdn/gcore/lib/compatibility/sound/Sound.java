@@ -1,7 +1,6 @@
 package com.guillaumevdn.gcore.lib.compatibility.sound;
 
 import java.util.Collection;
-import com.guillaumevdn.gcore.lib.object.Optional;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -10,6 +9,7 @@ import org.bukkit.entity.Player;
 
 import com.guillaumevdn.gcore.ConfigGCore;
 import com.guillaumevdn.gcore.lib.compatibility.variants.Variant;
+import com.guillaumevdn.gcore.lib.object.Optional;
 
 /**
  * @author GuillaumeVDN

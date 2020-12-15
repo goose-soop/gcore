@@ -40,6 +40,10 @@ public enum TextGeneric implements TextEnumElement {
 	numberMillion,
 	numberBillion,
 	numberTrillion,
+	durationFormatS,
+	durationFormatMS,
+	durationFormatHMS,
+	durationFormatDHMS,
 
 	// cost
 	messageMustHaveCurrency,

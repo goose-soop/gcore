@@ -29,6 +29,7 @@ public enum Version {
 
 	MC_1_16_R1("1.16", "v1_16_R1"),
 	MC_1_16_R2(CollectionUtils.asList("1.16.2", "1.16.3"), "v1_16_R2"), // TODO : remove support for old when 1.17 comes out
+	MC_1_16_R3("1.16.4", "v1_16_R3"),
 	;
 
 	public static final Version CURRENT = VersionUtils.getCurrent();

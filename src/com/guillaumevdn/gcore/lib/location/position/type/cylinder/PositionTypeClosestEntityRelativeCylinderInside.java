@@ -26,6 +26,11 @@ public class PositionTypeClosestEntityRelativeCylinderInside extends PositionTyp
 
 	// elements
 	@Override
+	public boolean mustCache(ElementPosition position) {
+		return false;
+	}
+
+	@Override
 	protected void doFillTypeSpecificElements(ElementPosition position) {
 		position.addEntityTypeList("entity_types", Need.optional(), TextEditorGeneric.descriptionPositionTypeClosestEntityTypes);
 		position.addStringList("entity_names", Need.optional(), TextEditorGeneric.descriptionPositionTypeClosestEntityNames);

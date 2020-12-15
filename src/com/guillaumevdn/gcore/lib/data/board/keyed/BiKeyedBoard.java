@@ -29,12 +29,12 @@ public abstract class BiKeyedBoard<K, K2, V> extends KeyedBoard<K, Map<K2, V>, B
 
 	public final void pullKeys(BukkitThread thread, Set<KeyReference<K>> references, ThrowableRunnable callback) {
 		operate(thread, "pull board keys", () -> {
-			toSave.removeIf(ref -> references.contains(ref.getKey()));
 			onPullKeys(references);
 			if (callback != null) {
 				callback.run();
 			}
 		}, () -> {
+			toSave.removeIf(ref -> references.contains(ref.getKey()));
 			if (DataBackEnd.MYSQL.equals(getBackEnd())) {
 				remotePullKeysMySQL(references);
 			} else if (DataBackEnd.JSON.equals(getBackEnd())) {

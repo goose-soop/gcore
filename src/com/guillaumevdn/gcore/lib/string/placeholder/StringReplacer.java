@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -23,7 +22,9 @@ public final class StringReplacer {
 	private static final Pattern PATTERN = Pattern.compile("\\{(.*?)\\}");
 
 	private LowerCaseHashMap<Supplier<Object>> exactMatch = new LowerCaseHashMap<>();
-	private Function<String, Object> customMatcher = null;
+	private CustomMatcher customMatcher = null;
+	private String customMatcherDesc = null;
+	private boolean formatNumbers = true;
 
 	private StringReplacer() {
 	}
@@ -39,24 +40,37 @@ public final class StringReplacer {
 		return this;
 	}
 
-	public StringReplacer with(Function<String, Object> customMatcher) {
+	public StringReplacer with(String customMatcherDesc, CustomMatcher customMatcher) {
 		if (this.customMatcher == null) {
 			this.customMatcher = customMatcher;
+			this.customMatcherDesc = customMatcherDesc;
 		} else {
-			Function<String, Object> prevMatcher = this.customMatcher;
+			CustomMatcher prevMatcher = this.customMatcher;
 			this.customMatcher = str -> {
-				Object prevResult = prevMatcher.apply(str);
-				return prevResult != null ? prevResult : customMatcher.apply(str);
+				Object prevResult = prevMatcher.applyCheckOverflow(str);
+				return prevResult != null ? prevResult : customMatcher.applyCheckOverflow(str);
 			};
+			this.customMatcherDesc = customMatcherDesc + " > " + this.customMatcherDesc;
 		}
+		return this;
+	}
+
+	public StringReplacer replaceCustom(String customMatcherDesc, CustomMatcher customMatcher) {
+		this.customMatcher = customMatcher;
+		this.customMatcherDesc = customMatcherDesc;
 		return this;
 	}
 
 	public StringReplacer with(StringReplacer replacer) {
 		exactMatch.putAll(replacer.exactMatch);
 		if (replacer.customMatcher != null) {
-			with(replacer.customMatcher);
+			with(replacer.customMatcherDesc, replacer.customMatcher);
 		}
+		return this;
+	}
+
+	public StringReplacer formatNumbers(boolean formatNumbers) {
+		this.formatNumbers = formatNumbers;
 		return this;
 	}
 
@@ -87,28 +101,10 @@ public final class StringReplacer {
 				match = exactMatcher.get();
 				if (match == null) throw new NullPointerException("exact match returned null for '" + placeholder + "'");
 			} else if (customMatcher != null) {
-				match = customMatcher.apply(placeholder);
-			}
-			// process match
-			String replacement = "";
-			if (match == null) {
-				replacement = placeholder; //"?" + placeholder.substring(1, placeholder.length() - 1) + "?";
-			} else if (match instanceof Double) {
-				double doubleMatch = ((Double) match).doubleValue();
-				int intMatch = (int) doubleMatch;
-				if (intMatch == doubleMatch) {
-					replacement = "" + intMatch;
-				} else {
-					replacement = "" + NumberUtils.round(doubleMatch, 2);
-				}
-			} else if (match instanceof Collection<?>) {
-				replacement = StringUtils.toTextString(", ", (Collection<?>) match);
-			} else if (match instanceof Object[]) {
-				replacement = StringUtils.toTextString(", ", (Object[]) match);
-			} else {
-				replacement = match.toString();
+				match = customMatcher.applyCheckOverflow(placeholder);
 			}
 			// replace in string
+			String replacement = match == null ? placeholder : StringUtils.replacementToString(match, formatNumbers);
 			matcher.appendReplacement(result, replacement);
 		}
 		// done
@@ -148,7 +144,7 @@ public final class StringReplacer {
 					match = exactMatcher.get();
 					if (match == null) throw new NullPointerException("exact match returned null for '" + placeholder + "'");
 				} else if (customMatcher != null) {
-					match = customMatcher.apply(placeholder);
+					match = customMatcher.applyCheckOverflow(placeholder);
 				}
 				// match is a collection
 				Collection<?> collectionMatch = null;
@@ -193,24 +189,11 @@ public final class StringReplacer {
 					}
 				}
 				// match isn't a collection, process it
-				String replacement = "";
-				if (match == null) {
-					replacement = placeholder; //"?" + placeholder.substring(1, placeholder.length() - 1) + "?";
-				} else if (match instanceof Double) {
-					double doubleMatch = ((Double) match).doubleValue();
-					int intMatch = (int) doubleMatch;
-					if (intMatch == doubleMatch) {
-						replacement = "" + intMatch;
-					} else {
-						replacement = "" + NumberUtils.round(doubleMatch, 2);
-					}
-				} else {
-					replacement = match.toString();
-				}
+				String replacement = match == null ? placeholder : StringUtils.replacementToString(match, formatNumbers);
 				// replace in string
 				resultLine = prefix + replacement + suffix;
 				offset += replacement.length() - placeholder.length();
-				// however, if no prefix, no suffit and empty replacement, skip line
+				// however, if no prefix, no suffix and empty replacement, skip line
 				if (resultLine.isEmpty()) {
 					result.remove(i); // remove from list and decrement index to reprocess
 					--i;
@@ -227,8 +210,8 @@ public final class StringReplacer {
 	// object
 	@Override
 	public String toString() {
-		return "(" + StringUtils.toTextString(" -- ", exactMatch.keySet())
-		+ (customMatcher == null ? "" : " -- with custom matcher")
+		return "(" + StringUtils.toTextString(", ", exactMatch.keySet())
+		+ (customMatcher == null ? "" : " -- custom : " + customMatcherDesc)
 		+ ")";
 	}
 
@@ -241,8 +224,8 @@ public final class StringReplacer {
 		return new StringReplacer().with(placeholder, replacer);
 	}
 
-	public static StringReplacer of(Function<String, Object> customMatcher) {
-		return new StringReplacer().with(customMatcher);
+	public static StringReplacer of(String customMatcherDesc, CustomMatcher customMatcher) {
+		return new StringReplacer().with(customMatcherDesc, customMatcher);
 	}
 
 }

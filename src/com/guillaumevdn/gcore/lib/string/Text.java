@@ -1,13 +1,13 @@
 package com.guillaumevdn.gcore.lib.string;
 
 import java.util.List;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.guillaumevdn.gcore.lib.player.PlayerUtils;
+import com.guillaumevdn.gcore.lib.string.placeholder.CustomMatcher;
 import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
 
 /**
@@ -75,8 +75,8 @@ public interface Text {
 		return new ReplacingText(this).replace(placeholder, replacer);
 	}
 
-	default ReplacingText replace(Function<String, Object> customMatcher) {
-		return new ReplacingText(this).replace(customMatcher);
+	default ReplacingText replace(String customMatcherDesc, CustomMatcher customMatcher) {
+		return new ReplacingText(this).replace(customMatcherDesc, customMatcher);
 	}
 
 	class ReplacingText {
@@ -103,8 +103,8 @@ public interface Text {
 			return this;
 		}
 
-		public ReplacingText replace(Function<String, Object> customMatcher) {
-			this.replacer.with(customMatcher);
+		public ReplacingText replace(String customMatcherDesc, CustomMatcher customMatcher) {
+			this.replacer.with(customMatcherDesc, customMatcher);
 			return this;
 		}
 

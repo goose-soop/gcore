@@ -12,7 +12,7 @@ import com.guillaumevdn.gcore.lib.number.NumberUtils;
 import com.guillaumevdn.gcore.lib.reflection.Reflection;
 import com.guillaumevdn.gcore.lib.reflection.ReflectionEnum;
 import com.guillaumevdn.gcore.lib.reflection.ReflectionObject;
-import com.guillaumevdn.gcore.lib.reflection.procedure.ReflectionProcedureSeptaConsumer;
+import com.guillaumevdn.gcore.lib.reflection.procedure.ReflectionProcedureOctoConsumer;
 
 /**
  * @author GuillaumeVDN
@@ -21,8 +21,8 @@ public final class ParticleCompat {
 
 	// send particle
 	private static final int[] emptyData = new int[0];
-	private static final ReflectionProcedureSeptaConsumer<Collection<Player>, Location, Particle, Color, Integer, Integer, Float> SEND_PARTICLE = new ReflectionProcedureSeptaConsumer<Collection<Player>, Location, Particle, Color, Integer, Integer, Float>()
-			.setIf(Version.ATLEAST_1_13, (players, location, particle, color, noteColor, count, speed) -> {
+	private static final ReflectionProcedureOctoConsumer<Collection<Player>, Location, Particle, Color, Float, Integer, Integer, Float> SEND_PARTICLE = new ReflectionProcedureOctoConsumer<Collection<Player>, Location, Particle, Color, Float, Integer, Integer, Float>()
+			.setIf(Version.ATLEAST_1_13, (players, location, particle, color, redstoneColorScale, noteColor, count, speed) -> {
 				ReflectionEnum particleEnum = Reflection.getEnum("org.bukkit.Particle");
 				ReflectionObject particleBukkit = particleEnum.safeValueOf(particle.getData().getDataName());
 				if (particleBukkit == null) {
@@ -35,6 +35,13 @@ public final class ParticleCompat {
 							player.spawnParticle(particleBukkit.get(), location.getX(), location.getY(), location.getZ(), count, 0f, 0f, 0f, note);
 						});
 					}
+					// redstone
+					else if (particle.getData().getDataName().equals("REDSTONE")) {
+						org.bukkit.Particle.DustOptions data = new org.bukkit.Particle.DustOptions(color, redstoneColorScale);
+						players.forEach(player -> {
+							player.spawnParticle(particleBukkit.get(), location.getX(), location.getY(), location.getZ(), 0, (0f), (0f), (0f), 0f, data);
+						});
+					}
 					// not a note
 					else {
 						boolean useColor = color != null && particle.getData().isColorable();
@@ -44,10 +51,11 @@ public final class ParticleCompat {
 											(!useColor ? 0f : color.getRed()), (!useColor ? 0f : color.getGreen()), (!useColor ? 0f : color.getBlue()),
 											useColor ? 1f : speed);
 						});
+
 					}
 				}
 			})
-			.orIf(Version.ATLEAST_1_8, (players, location, particle, color, noteColor, count, speed) -> {
+			.orIf(Version.ATLEAST_1_8, (players, location, particle, color, redstoneColorScale, noteColor, count, speed) -> {
 				ReflectionEnum particleEnum = Reflection.getNmsEnum("EnumParticle");
 				ReflectionObject particleNms = particleEnum.safeValueOf(particle.getData().getDataName());
 				if (particleNms == null) {
@@ -77,7 +85,7 @@ public final class ParticleCompat {
 					}
 				}
 			})
-			.orElse((players, location, particle, color, noteColor, count, speed) -> {
+			.orElse((players, location, particle, color, redstoneColorScale, noteColor, count, speed) -> {
 				// note
 				if (particle.getData().isMusicNote()) {
 					float note = NumberUtils.isInRange(noteColor, 0, 24) ? (float) noteColor : NumberUtils.random(0f, 24f);
@@ -101,7 +109,11 @@ public final class ParticleCompat {
 			});
 
 	public static void sendParticle(Collection<Player> players, Location location, Particle particle, Color color, Integer noteColor, int count, float speed) {
-		SEND_PARTICLE.process(players, location, particle, color, noteColor, count, speed);
+		sendParticle(players, location, particle, color, 1f, noteColor, count, speed);
+	}
+
+	public static void sendParticle(Collection<Player> players, Location location, Particle particle, Color color, Float redstoneColorScale, Integer noteColor, int count, float speed) {
+		SEND_PARTICLE.process(players, location, particle, color, redstoneColorScale, noteColor, count, speed);
 	}
 
 }

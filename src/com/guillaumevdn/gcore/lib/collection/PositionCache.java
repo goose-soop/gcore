@@ -17,7 +17,7 @@ public final class PositionCache<V> {
 	}
 
 	public boolean contains(int x, int y, int z) {
-		return getY(x, z).containsKey(z);
+		return getY(x, z).containsKey(y);
 	}
 
 	public V computeIfAbsent(int x, int y, int z, Supplier<V> ifAbsent) {
@@ -30,6 +30,10 @@ public final class PositionCache<V> {
 
 	public void remove(int x, int y, int z) {
 		getY(x, z).remove(y);
+	}
+
+	public void clear() {
+		map.clear();
 	}
 
 	private Map<Integer, V> getY(int x, int z) {

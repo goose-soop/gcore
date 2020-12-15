@@ -45,14 +45,10 @@ public abstract class ElementTypableElementType<T extends TypableElementType> ex
 			});
 			EnumSelectorGUI.openSelector(call.getClicker(), false, getSerializer(), () -> types, value -> {
 				// set value and update parent elements
-				T previousType = parseGeneric().orNull();
-				setValue(CollectionUtils.asList(getSerializer().serialize(value)));
 				try {
 					if (getParent() != null) {
 						TypableContainerElement<T> parent = (TypableContainerElement<T>) getParent();
-						if (previousType != null) previousType.clearElements(parent);
-						value.fillTypeSpecificElements(parent);
-						parent.onTypeChange(previousType, value);
+						parent.changeType(value);
 					}
 				} catch (ClassCastException ignored) {}
 				// reopen GUI (that refreshes it since it's an editor GUI)

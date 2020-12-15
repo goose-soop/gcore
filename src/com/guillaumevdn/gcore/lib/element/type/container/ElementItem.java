@@ -39,6 +39,7 @@ import com.guillaumevdn.gcore.lib.item.meta.MetaFireworkEffect;
 import com.guillaumevdn.gcore.lib.item.meta.MetaLeatherArmor;
 import com.guillaumevdn.gcore.lib.item.meta.MetaPotion;
 import com.guillaumevdn.gcore.lib.item.meta.MetaSkull;
+import com.guillaumevdn.gcore.lib.object.NeedType;
 import com.guillaumevdn.gcore.lib.serialization.Serializer;
 import com.guillaumevdn.gcore.lib.serialization.adapter.type.AdapterItemStack;
 import com.guillaumevdn.gcore.lib.serialization.adapter.type.AdapterNBTCompound;
@@ -228,7 +229,7 @@ public class ElementItem extends ParseableContainerElement<ItemStack> {
 		try {
 			DataIO nbtWriter = new DataIO();
 			AdapterNBTCompound.INSTANCE.write(new NBTItem(value), nbtWriter);
-			nbt.setValue(nbtWriter.isEmpty() ? null : nbtWriter.toYML(null, "nbt", true));
+			nbt.setValue(nbtWriter.isEmpty() ? null : nbtWriter.toYML(null, "nbt", false));
 		} catch (Throwable exception) {
 			clicker.sendMessage("§cCouldn't save NBT tags of this item, see console for a detailed error.");
 			exception.printStackTrace();
@@ -238,10 +239,14 @@ public class ElementItem extends ParseableContainerElement<ItemStack> {
 	// parsing
 	@Override
 	public ItemStack doParse(Replacer replacer) throws ParsingError {
+		// don't contain and optional, means it's null : don't throw parsing errors
+		if (!readContains() && getNeed().equals(NeedType.OPTIONAL)) {
+			return null;
+		}
 		// wrap in DataIO and then use the adapter, so it's consistent with json/config
 		DataIO data = new DataIO();
 		data.write("type", type.parseNoCatchOrThrowParsingNull(replacer));
-		data.write("durability", type.parseNoCatch(replacer).orNull());
+		data.write("durability", durability.parseNoCatch(replacer).orNull());
 		if (amount != null) {
 			data.write("amount", amount.parseNoCatch(replacer).orNull());
 		} else {

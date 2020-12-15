@@ -34,7 +34,7 @@ public class PositionTypeWorldguardRegionOutside extends PositionType {
 	// parse
 	@Override
 	public Position doParse(ElementPosition position, Replacer replacer) throws ParsingError {
-		WGRegion region = position.getElementAs("world", ElementWorldguardRegion.class).parseNoCatchOrThrowParsingNull(replacer);
+		WGRegion region = position.getElementAs("region", ElementWorldguardRegion.class).parseNoCatchOrThrowParsingNull(replacer);
 		Pair<Point, Point> bounds = WorldGuardCompat.getRegionBounds(region.getWorld(), region.getRegionId());
 		return new PositionAreaOutside(bounds.getA().toLocation(), bounds.getB().toLocation());
 	}

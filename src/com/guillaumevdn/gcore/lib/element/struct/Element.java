@@ -108,7 +108,7 @@ public abstract class Element implements IElement, Comparable<Element> {
 
 	@Override
 	public final int compareTo(Element other) {
-		return id.compareTo(other.id);
+		return StringUtils.compareAlphabeticallyWithNumbersIgnoreCase(id, other.id);
 	}
 
 	@Override

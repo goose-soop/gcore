@@ -37,7 +37,7 @@ public class GUI {
 	}
 
 	// base
-	private final GPlugin plugin;
+	private GPlugin plugin;
 	private final String id;
 	private final String name;
 	private final GUIType type;
@@ -84,10 +84,6 @@ public class GUI {
 		this.regularItemSlots = regularItemSlots;
 		this.fromCall = fromCall;
 		if (fromCall != null && type.getBackItemSlot() != -1) regularItemSlots.remove((Integer) (this.backItemSlot = type.getBackItemSlot()));
-		/*
-		obviously, don't do that ; that's handled
-		if (type.getPreviousPageItemSlot() != -1) regularItemSlots.remove((Integer) type.getPreviousPageItemSlot());
-		if (type.getNextPageItemSlot() != -1) regularItemSlots.remove((Integer) type.getNextPageItemSlot());*/
 		this.handler = ConfigGCore.allowProtocolGUIs && PluginUtils.isPluginEnabled("ProtocolLib") ? new ProtocolHandler(this) : new VanillaHandler(this);
 	}
 
@@ -148,6 +144,11 @@ public class GUI {
 		return handler.getViewerPage(player);
 	}
 
+	// set
+	protected void setPlugin(GPlugin plugin) {  // this can be useful, for the confirm GUI for instance
+		this.plugin = plugin;
+	}
+
 	// items
 	public GUIItem getRegularItem(int pageIndex, int slot) {
 		for (GUIItem item : regularItems.values()) {
@@ -187,23 +188,30 @@ public class GUI {
 			}
 		}
 		// remove if existing
-		removeRegularItem(item);
-		// get locations
-		List<IntegerPair> locations = new ArrayList<>();
-		if (item.getPreferredLocations().isEmpty()) {
-			IntegerPair location = findOrCreateFreeForRegular(-1, -1);
-			if (location == null) {
-				GCore.inst().getMainLogger().error("can't set regular item " + item.getId() + " in GUI " + getId() + ", no location found");
-			} else {
-				locations.add(location);
-			}
-		} else {
-			for (IntegerPair preferredLocation : item.getPreferredLocations()) {
-				IntegerPair location = findOrCreateFreeForRegular(preferredLocation.getA(), preferredLocation.getB());
+		GUIItem previous = removeRegularItem(item);
+		List<IntegerPair> locations;
+		// get locations from previous if existing
+		if (previous != null && !previous.getLocations().isEmpty()) {
+			locations = previous.getLocations();
+		}
+		// recalculate locations otherwise
+		else {
+			locations = new ArrayList<>();
+			if (item.getPreferredLocations().isEmpty()) {
+				IntegerPair location = findOrCreateFreeForRegular(-1, -1);
 				if (location == null) {
-					GCore.inst().getMainLogger().error("can't set regular item " + item.getId() + " in GUI " + getId() + ", no location found for preferred " + preferredLocation.toString());
+					GCore.inst().getMainLogger().error("can't set regular item " + item.getId() + " in GUI " + getId() + ", no location found");
 				} else {
 					locations.add(location);
+				}
+			} else {
+				for (IntegerPair preferredLocation : item.getPreferredLocations()) {
+					IntegerPair location = findOrCreateFreeForRegular(preferredLocation.getA(), preferredLocation.getB());
+					if (location == null) {
+						GCore.inst().getMainLogger().error("can't set regular item " + item.getId() + " in GUI " + getId() + ", no location found for preferred " + preferredLocation.toString());
+					} else {
+						locations.add(location);
+					}
 				}
 			}
 		}
@@ -216,6 +224,11 @@ public class GUI {
 		item.setLocations(locations);
 	}
 
+	@Deprecated
+	public void sendPageItem(IntegerPair location, ItemStack item) {
+		handler.setPageItem(location, item);
+	}
+
 	public void setPersistentItem(GUIItem item) {
 		// invalid item
 		if (Mat.isVoid(item.getItem())) {
@@ -226,7 +239,7 @@ public class GUI {
 			throw new IllegalArgumentException("can't set persistent item " + item.getId() + " in GUI " + getId() + ", no slot found");
 		}
 		for (IntegerPair preferredLocation : item.getLocations()) {
-			if (preferredLocation.getA() != -1) {
+			if (preferredLocation.getA() > 0) {
 				throw new IllegalArgumentException("can't set persistent item " + item.getId() + " in GUI " + getId() + ", no preferred page can be specified");
 			} else if (preferredLocation.getB() < 0 /* no -1 for persistent items */ || preferredLocation.getB() >= type.getSize()) {
 				throw new IllegalArgumentException("can't set persistent item " + item.getId() + " in GUI " + getId() + ", preferred slot " + preferredLocation.getB() + " is outside bounds (-1 to " + (type.getSize() - 1) + ")");
@@ -267,8 +280,8 @@ public class GUI {
 		item.setLocations(locations);
 	}
 
-	public boolean removeRegularItem(GUIItem item) {
-		return removeRegularItem(item.getId()) != null;
+	public GUIItem removeRegularItem(GUIItem item) {
+		return removeRegularItem(item.getId());
 	}
 
 	public GUIItem removeRegularItem(String itemId) {
@@ -296,6 +309,14 @@ public class GUI {
 		return item;
 	}
 
+	public void removeItem(GUIItem item, boolean persistent) {
+		if (persistent) {
+			removePersistentItem(item);
+		} else {
+			removeRegularItem(item);
+		}
+	}
+
 	public void clear() {
 		handler.clear();
 		persistentItems.clear();
@@ -303,7 +324,11 @@ public class GUI {
 	}
 
 	// page
-	public int createPage() {
+	public final int getPageCount() {
+		return handler.getPageCount();
+	}
+
+	public final int createPage() {
 		// create page
 		handler.createPage();
 		int pageIndex = handler.getPageCount() - 1;
@@ -347,11 +372,11 @@ public class GUI {
 		return pageIndex;
 	}
 
-	public IntegerPair findOrCreateFreeForRegular(int preferredPageIndex, int preferredSlot) {
+	public final IntegerPair findOrCreateFreeForRegular(int preferredPageIndex, int preferredSlot) {
 		return doFindOrCreateFreeForRegular(preferredPageIndex, preferredSlot, false);
 	}
 
-	private IntegerPair doFindOrCreateFreeForRegular(int preferredPageIndex, int preferredSlot, boolean createdPage) {
+	private final IntegerPair doFindOrCreateFreeForRegular(int preferredPageIndex, int preferredSlot, boolean createdPage) {
 		// has a preferred page
 		if (preferredPageIndex >= 0) {
 			// force create pages until count is reached
@@ -394,7 +419,7 @@ public class GUI {
 		return null;
 	}
 
-	public boolean isSlotFreeForRegular(int pageIndex, int slot) {
+	public final boolean isSlotFreeForRegular(int pageIndex, int slot) {
 		// no page
 		if (pageIndex >= handler.getPageCount()) {
 			return false;
@@ -407,7 +432,7 @@ public class GUI {
 		if (type.getPreviousPageItemSlot() != -1 && pageIndex > 0 && slot == type.getPreviousPageItemSlot()) {
 			return false;
 		}
-		if (type.getNextPageItemSlot() != -1 && pageIndex + 1 < handler.getPageCount() && slot == type.getNextPageItemSlot()) {
+		if (type.getNextPageItemSlot() != -1 && (pageIndex == 0 || pageIndex + 1 < handler.getPageCount()) && slot == type.getNextPageItemSlot()) {
 			return false;
 		}
 		if (backItemSlot != -1 && slot == backItemSlot) {
@@ -458,7 +483,8 @@ public class GUI {
 
 	/** @return true if the GUI was opened */
 	public final boolean refillAndOpenFor(Player player) {
-		return refill() && openFor(player, 0);
+		int currentPage = getViewerPage(player);
+		return refill() && openFor(player, currentPage == -1 ? 0 : currentPage);
 	}
 
 	/** @return true if the GUI was opened */
@@ -505,8 +531,11 @@ public class GUI {
 			}
 		}
 		// invalid page
-		if (pageIndex >= handler.getPageCount()) {
+		/*if (pageIndex >= handler.getPageCount()) {
 			throw new IllegalArgumentException("can't open GUI " + getId() + ", page index " + pageIndex + " is outside bounds");
+		}*/
+		if (pageIndex >= handler.getPageCount()) {
+			pageIndex = handler.getPageCount() - 1;
 		}
 		// open page
 		handler.openPage(player, pageIndex);

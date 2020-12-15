@@ -6,6 +6,7 @@ package com.guillaumevdn.gcore.lib.player;
 public enum PhysicalClickType {
 
 	RIGHT_CLICK,
-	LEFT_CLICK;
+	LEFT_CLICK,
+	PHYSICAL;
 
 }

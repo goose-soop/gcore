@@ -2,9 +2,9 @@ package com.guillaumevdn.gcore.lib.data;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
 
 import com.guillaumevdn.gcore.lib.GPlugin;
+import com.guillaumevdn.gcore.lib.function.ThrowableConsumer;
 
 /**
  * @author GuillaumeVDN
@@ -36,28 +36,12 @@ public class MySQLConnector {
 	}
 
 	// methods
-	public boolean performUpdateQuery(GPlugin plugin, String query, Object... params) {
-		return performUpdateQuery(plugin, new Query(query, params));
-	}
-
-	public boolean performUpdateQuery(GPlugin plugin, String query, Collection<?> params) {
-		return performUpdateQuery(plugin, new Query(query, params));
-	}
-
 	public boolean performUpdateQuery(GPlugin plugin, Query query) {
 		return canConnect ? mysql.performUpdateQuery(plugin, query) : false;
 	}
 
-	public ResultSet performGetQuery(GPlugin plugin, String query, Object... params) {
-		return performGetQuery(plugin, new Query(query, params));
-	}
-
-	public ResultSet performGetQuery(GPlugin plugin, String query, Collection<?> params) {
-		return performGetQuery(plugin, new Query(query, params));
-	}
-
-	public ResultSet performGetQuery(GPlugin plugin, Query query) {
-		return canConnect ? mysql.performGetQuery(plugin, query) : null;
+	public boolean performGetQuery(GPlugin plugin, Query query, ThrowableConsumer<ResultSet> syncProcessor) {
+		return canConnect ? mysql.performGetQuery(plugin, query, syncProcessor) : false;
 	}
 
 }

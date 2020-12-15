@@ -23,6 +23,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.guillaumevdn.gcore.ConfigGCore;
+import com.guillaumevdn.gcore.TextGeneric;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.compatibility.Version;
 import com.guillaumevdn.gcore.lib.number.NumberUtils;
@@ -80,20 +81,24 @@ public final class StringUtils {
 	/**
 	 * @return the same list but formatted
 	 */
-	public static List<String> format(List<String> list) {
+	public static void format(List<String> list) {
 		if (list != null) {
 			for (int i = 0; i < list.size(); ++i) {
 				list.set(i, format(list.get(i)));
 			}
 		}
-		return list;
 	}
 
 	/**
 	 * @return a formatted copy of the list
 	 */
 	public static List<String> formatCopy(List<String> list) {
-		return list == null ? null : format(CollectionUtils.asList(list));
+		if (list == null) {
+			return null;
+		}
+		List<String> copy = CollectionUtils.asList(list);
+		format(copy);
+		return copy;
 	}
 
 	public static String unformat(String string) {
@@ -208,7 +213,6 @@ public final class StringUtils {
 	}
 
 	// numbers
-	private static final BigDecimal THOUSAND = new BigDecimal("1000");
 	private static final BigDecimal MILLION = new BigDecimal("1000000");
 	private static final BigDecimal BILLION = new BigDecimal("1000000000");
 	private static final BigDecimal TRILLION = new BigDecimal("1000000000000");
@@ -218,7 +222,7 @@ public final class StringUtils {
 	}
 
 	public static String formatNumber(double number) {
-		String[] split = new BigDecimal(Math.abs(number)).setScale(ConfigGCore.numberFormattingDecimals, RoundingMode.HALF_UP).toPlainString().split("\\.");
+		String[] split = new BigDecimal(Math.abs(number)).setScale(ConfigGCore.numberFormattingDecimals, RoundingMode.HALF_DOWN).toPlainString().split("\\.");
 		BigDecimal integer = new BigDecimal(split[0]);
 		// big numbers
 		String suffix = "";
@@ -235,18 +239,19 @@ public final class StringUtils {
 			}
 		}
 		// separate thousands
-		String integerFormat;
-		if (ConfigGCore.numberFormattingSeparateThousands == null) {
-			integerFormat = integer.toPlainString();
-		} else {
+		String integerFormat = integer.toPlainString();
+		if (ConfigGCore.numberFormattingSeparateThousands != null) {
+			String todo = integerFormat;
 			integerFormat = "";
-			while (integer.compareTo(THOUSAND) >= 0) {
-				integerFormat += ConfigGCore.numberFormattingSeparateThousands + "000";
+			while (todo.length() > 3) {
+				integerFormat = ConfigGCore.numberFormattingSeparateThousands + todo.substring(todo.length() - 3) + integerFormat;
+				todo = todo.substring(0, todo.length() - 3);
 			}
-			integerFormat = integer.toPlainString() + integerFormat;
+			integerFormat = todo + integerFormat;
 		}
 		// done
-		return (number < 0d ? "-" : "") + integerFormat + (split.length == 2 ? "." + split[1] : "") + suffix;
+		Integer decimals = split.length == 2 ? NumberUtils.integerOrNull(split[1]) : null;
+		return (number < 0d ? "-" : "") + integerFormat + (decimals != null && decimals != 0 ? "." + split[1] : "") + suffix;
 	}
 
 	// time
@@ -257,20 +262,42 @@ public final class StringUtils {
 	}
 
 	public static String formatDurationMillis(long millis) {
+		return formatDurationSeconds((int) (millis / 1000L), 0f);
+	}
+
+	public static String formatDurationMillisWithSecondDecimals(long millis) {
 		int seconds = (int) (millis / 1000L);
 		float secondsDecimals = (float) (((double) (millis % 1000L)) / 1000d);
 		return formatDurationSeconds(seconds, secondsDecimals);
 	}
 
+	public static String formatDurationSeconds(int seconds) {
+		return formatDurationSeconds(seconds, 0f);
+	}
+
 	public static String formatDurationSeconds(int seconds, float secondsDecimals) {
 		if (seconds < 60) {
-			return twoDigitString(seconds % 60) + (secondsDecimals > 0f ? toTextStringDecimals(secondsDecimals, 2) : "") + "s";
+			return TextGeneric.durationFormatS
+					.replace("{seconds}", () -> twoDigitString(seconds % 60) + (secondsDecimals > 0f ? toTextStringDecimals(secondsDecimals, 2) : ""))
+					.parseLine();
 		} else if (seconds < 3600) {
-			return ((seconds % 3600) / 60) + "m" + twoDigitString(seconds % 60) + (secondsDecimals > 0f ? toTextStringDecimals(secondsDecimals, 2) : "") + "s";
+			return TextGeneric.durationFormatMS
+					.replace("{minutes}", () -> twoDigitString((seconds % 3600) / 60))
+					.replace("{seconds}", () -> twoDigitString(seconds % 60) + (secondsDecimals > 0f ? toTextStringDecimals(secondsDecimals, 2) : ""))
+					.parseLine();
 		} else if (seconds < 86400) {
-			return (seconds / 3600) + "h" + ((seconds % 3600) / 60) + "m" + twoDigitString(seconds = seconds % 60) + (secondsDecimals > 0f ? toTextStringDecimals(secondsDecimals, 2) : "") + "s";
+			return TextGeneric.durationFormatHMS
+					.replace("{hours}", () -> twoDigitString(seconds / 3600))
+					.replace("{minutes}", () -> twoDigitString((seconds % 3600) / 60))
+					.replace("{seconds}", () -> twoDigitString(seconds % 60) + (secondsDecimals > 0f ? toTextStringDecimals(secondsDecimals, 2) : ""))
+					.parseLine();
 		} else {
-			return (seconds / 86400) + "j" + (Math.abs((seconds / 86400 * 24) - (seconds / 3600))) + "h" + ((seconds % 3600) / 60) + "m" + twoDigitString(seconds = seconds % 60) + (secondsDecimals > 0f ? toTextStringDecimals(secondsDecimals, 2) : "") + "s";
+			return TextGeneric.durationFormatDHMS
+					.replace("{days}", () -> twoDigitString(seconds / 86400))
+					.replace("{hours}", () -> twoDigitString((seconds % 86400) / 3600))
+					.replace("{minutes}", () -> twoDigitString((seconds % 3600) / 60))
+					.replace("{seconds}", () -> twoDigitString(seconds % 60) + (secondsDecimals > 0f ? toTextStringDecimals(secondsDecimals, 2) : ""))
+					.parseLine();
 		}
 	}
 
@@ -282,6 +309,23 @@ public final class StringUtils {
 		} else {
 			return String.valueOf(number);
 		}
+	}
+
+	// object
+	public static String replacementToString(Object object, boolean formatNumbers) {
+		if (object == null) {
+			return null;
+		}
+		if (object instanceof Integer) {
+			return !formatNumbers ? ((Integer) object).toString() : formatNumber(((Integer) object).intValue());
+		} else if (object instanceof Double) {
+			return !formatNumbers ? BigDecimal.valueOf((Double) object).toPlainString() : formatNumber(((Double) object).doubleValue());
+		} else if (object instanceof Collection<?>) {
+			return toTextString(", ", (Collection<?>) object);
+		} else if (object instanceof Object[]) {
+			return toTextString(", ", (Object[]) object);
+		}
+		return object.toString();
 	}
 
 	// alphanumeric

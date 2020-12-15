@@ -1,7 +1,8 @@
 package com.guillaumevdn.gcore.lib.time.frame.type;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
+import com.guillaumevdn.gcore.ConfigGCore;
 import com.guillaumevdn.gcore.lib.compatibility.material.CommonMats;
 import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
 import com.guillaumevdn.gcore.lib.time.frame.ElementTimeFrame;
@@ -25,22 +26,22 @@ public abstract class TimeFrameTypeIn<T extends TimeIn> extends TimeFrameType {
 	}
 
 	@Override
-	public Pair<LocalDateTime, LocalDateTime> getBounds(ElementTimeFrame frame, Replacer replacer, int offset) {
-		LocalDateTime start = (frame.getElement("start").orNull().readContains() ? ((ElementTimeIn<T>) frame.getElementAs("start")).parse(replacer).orElse(defaultStart) : defaultStart).getCurrent();
-		LocalDateTime end = (frame.getElement("end").orNull().readContains() ? ((ElementTimeIn<T>) frame.getElementAs("end")).parse(replacer).orElse(defaultEnd) : defaultEnd).getCurrent();
+	public Pair<ZonedDateTime, ZonedDateTime> getBounds(ElementTimeFrame frame, Replacer replacer, int offset) {
+		ZonedDateTime start = (frame.getElement("start").orNull().readContains() ? ((ElementTimeIn<T>) frame.getElementAs("start")).parse(replacer).orElse(defaultStart) : defaultStart).getCurrent();
+		ZonedDateTime end = (frame.getElement("end").orNull().readContains() ? ((ElementTimeIn<T>) frame.getElementAs("end")).parse(replacer).orElse(defaultEnd) : defaultEnd).getCurrent();
 		// start is before end : regular start/end times
 		if (start.isBefore(end)) {
 		}
 		// start is after end : check which part of the week we're in, and adjust start/end times
 		else {
-			LocalDateTime now = LocalDateTime.now();
-			if (now.isBefore(end)) { // we're before end time ; set start time to last period
+			ZonedDateTime now = ConfigGCore.timeNow();
+			if (now.isBefore(end)) {  // we're before end time ; set start time to last period
 				start = minusOnePeriod(start);
 			}
 		}
 		// ensure is in current period if has no offset
 		if (offset == 0) {
-			LocalDateTime now = LocalDateTime.now();
+			ZonedDateTime now = ConfigGCore.timeNow();
 			if (now.isBefore(start) || now.isAfter(end)) {
 				return null;
 			}
@@ -53,6 +54,6 @@ public abstract class TimeFrameTypeIn<T extends TimeIn> extends TimeFrameType {
 		return Pair.of(start, end);
 	}
 
-	protected abstract LocalDateTime minusOnePeriod(LocalDateTime time);
+	protected abstract ZonedDateTime minusOnePeriod(ZonedDateTime start);
 
 }

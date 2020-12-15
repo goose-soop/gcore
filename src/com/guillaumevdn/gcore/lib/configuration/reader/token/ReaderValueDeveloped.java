@@ -31,7 +31,7 @@ public class ReaderValueDeveloped implements ThrowableFunction<ReaderContext, Bo
 				s = s.substring(context.getIndentLevel().length());
 			}
 			/*  actually ignore extra indentation for this, lines are trimmed anyway
-			if (s.charAt(0) == ' ') {
+			if (!s.isEmpty() && s.charAt(0) == ' ') {
 				context.throwIndentError(peek, valueIndent.length(), false);
 			}*/
 			// read lines

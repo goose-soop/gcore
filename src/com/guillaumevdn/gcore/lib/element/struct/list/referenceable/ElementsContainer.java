@@ -1,17 +1,17 @@
 package com.guillaumevdn.gcore.lib.element.struct.list.referenceable;
 
 import java.io.File;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import com.guillaumevdn.gcore.lib.object.Optional;
+import java.util.stream.Collectors;
 
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import com.guillaumevdn.gcore.ConfigGCore;
 import com.guillaumevdn.gcore.TextEditorGeneric;
 import com.guillaumevdn.gcore.WorkerGCore;
 import com.guillaumevdn.gcore.lib.GPlugin;
@@ -28,7 +28,9 @@ import com.guillaumevdn.gcore.lib.gui.struct.ClickCall;
 import com.guillaumevdn.gcore.lib.gui.struct.ClickCall.ClickType;
 import com.guillaumevdn.gcore.lib.gui.struct.GUIItem;
 import com.guillaumevdn.gcore.lib.item.ItemUtils;
+import com.guillaumevdn.gcore.lib.object.Optional;
 import com.guillaumevdn.gcore.lib.string.StringUtils;
+import com.guillaumevdn.gcore.lib.tuple.IntegerPair;
 
 /**
  * @author GuillaumeVDN
@@ -111,7 +113,7 @@ public abstract class ElementsContainer<V extends SuperElement> {
 			// load element
 			V elem = createElement(file, id);
 			elem.read();
-			elements.put(elem.getId(), elem);
+			setElement(elem);
 			// notify loading errors
 			if (!elem.getLoadErrors().isEmpty()) {
 				getPlugin().getMainLogger().error("Errors were found when loading " + getTypeName() + " " + id + " :", true);
@@ -127,16 +129,28 @@ public abstract class ElementsContainer<V extends SuperElement> {
 		}
 	}
 
+	public final void setElement(V element) {
+		elements.put(element.getId(), element);
+	}
+
 	protected abstract V createElement(File file, String id);
 
 	public final void delete(V element) {
+		delete(element, true);
+	}
+
+	public final void delete(V element, boolean moveToDeleted) {
 		elements.remove(element.getId());
 		File ownFile = element.getOwnFile();
 		if (ownFile != null) {
 			if (ownFile.exists()) {
-				File newFile = new File(baseFolder + "/deleted/" + DELETE_FILE_LOCALDATETIME_FORMAT.format(LocalDateTime.now()) + "_" + element.getId() + ".ymlr");
-				newFile.getParentFile().mkdirs();
-				if (!ownFile.renameTo(newFile)) {
+				if (moveToDeleted) {
+					File newFile = new File(baseFolder + "/deleted/" + DELETE_FILE_LOCALDATETIME_FORMAT.format(ConfigGCore.timeNow()) + "_" + element.getId() + ".ymlr");
+					newFile.getParentFile().mkdirs();
+					if (!ownFile.renameTo(newFile)) {
+						FileUtils.delete(ownFile);
+					}
+				} else {
 					FileUtils.delete(ownFile);
 				}
 			}
@@ -155,8 +169,9 @@ public abstract class ElementsContainer<V extends SuperElement> {
 			@Override
 			protected boolean doFill() {
 				// values
+				int page = 0;
 				int slot = -1;
-				for (V element : elements.values()) {
+				for (V element : elements.values().stream().sorted().collect(Collectors.toList())) {
 					// build icon
 					ItemStack icon = element.editorIcon();
 					ItemMeta meta = icon.getItemMeta();
@@ -165,8 +180,13 @@ public abstract class ElementsContainer<V extends SuperElement> {
 					lore.addAll(TextEditorGeneric.controlDelete.parseLines());
 					meta.setLore(lore);
 					icon.setItemMeta(meta);
+					// build location
+					if (++slot > getType().getRegularItemSlotsEnd()) {
+						++page;
+						slot = 0;
+					}
 					// set item
-					setRegularItem(new GUIItem("element_" + element.getId(), ++slot, icon, call -> {
+					setRegularItem(new GUIItem("element_" + element.getId(), CollectionUtils.asList(IntegerPair.of(page, slot)), icon, call -> {
 						// control drop : delete
 						if (call.getType().equals(ClickType.CONTROL_DROP)) {
 							delete(element);

@@ -2,7 +2,7 @@ package com.guillaumevdn.gcore.data;
 
 import java.io.File;
 import java.io.FileReader;
-import java.sql.ResultSet;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -78,7 +78,7 @@ public class BoardStatistics extends BiKeyedBoardRemote<Statistic, UUID, Double>
 
 	@Override
 	protected void remoteInitMySQL() throws Throwable {
-		GCore.inst().getMySQLConnector().performUpdateQuery(getPlugin(), ""
+		GCore.inst().getMySQLConnector().performUpdateQuery(getPlugin(), new Query(""
 				+ "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + "("
 				+ "`key` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,"
 				+ "`statistic` VARCHAR(100) NOT NULL,"
@@ -87,7 +87,7 @@ public class BoardStatistics extends BiKeyedBoardRemote<Statistic, UUID, Double>
 				+ "PRIMARY KEY(`key`)"
 				+ ") ENGINE=InnoDB DEFAULT CHARSET=?;"
 				, "utf8"
-				);
+				));
 	}
 
 	// pull
@@ -121,47 +121,48 @@ public class BoardStatistics extends BiKeyedBoardRemote<Statistic, UUID, Double>
 	}
 
 	private void remotePullElementsMySQL(Query query, Runnable beforeSetProcessing) throws Throwable {
-		ResultSet set = GCore.inst().getMySQLConnector().performGetQuery(getPlugin(), query);
-		if (beforeSetProcessing != null) {
-			beforeSetProcessing.run();
-		}
-		Set<String> skippedStats = new HashSet<>();
-		while (set.next()) {
-			String id = set.getString("statistic");
-			Statistic stat = Statistic.safeValueOf(id);
-			if (stat == null) {
-				if (skippedStats.add(id)) {
-					getLogger().warning("Found unknown statistic '" + id + "' in database, skipped it");
-				}
-				continue;
-			}
-			String rawUUID = set.getString("user_uuid");
-			UUID uuid = ObjectUtils.uuidOrNull(rawUUID);
-			if (uuid == null) {
-				getLogger().warning("Found invalid user UUID '" + rawUUID + "' in database, skipped it");
-				continue;
-			}
-			double value = set.getDouble("value");
-			cache.compute(stat, (s, o) -> new HashMap<>()).put(uuid, value);
-		}
+		GCore.inst().getMySQLConnector().performGetQuery(getPlugin(), query,
+				set -> {
+					if (beforeSetProcessing != null) {
+						beforeSetProcessing.run();
+					}
+					Set<String> skippedStats = new HashSet<>();
+					while (set.next()) {
+						String id = set.getString("statistic");
+						Statistic stat = Statistic.safeValueOf(id);
+						if (stat == null) {
+							if (skippedStats.add(id)) {
+								getLogger().warning("Found unknown statistic '" + id + "' in database, skipped it");
+							}
+							continue;
+						}
+						String rawUUID = set.getString("user_uuid");
+						UUID uuid = ObjectUtils.uuidOrNull(rawUUID);
+						if (uuid == null) {
+							getLogger().warning("Found invalid user UUID '" + rawUUID + "' in database, skipped it");
+							continue;
+						}
+						double value = set.getDouble("value");
+						cache.computeIfAbsent(stat, __ -> new HashMap<>()).put(uuid, value);
+					}
+				});
 	}
 
 	// push
 	@Override
-	protected void remotePushElementsMySQL(Set<BiKeyReference<Statistic, UUID>> references) throws Throwable {
-		if (references.isEmpty()) return; // let's avoid deleting the whole table just because there's no WHERE clause
-		Query query = buildRemoteDeleteElementsMySQLQuery(references);
-		List<Set<BiKeyReference<Statistic, UUID>>> splitElements = CollectionUtils.split(references, 999); // multiple VALUES are limited to 1000 elements ; https://stackoverflow.com/questions/452859/inserting-multiple-rows-in-a-single-sql-query#comment22032805_452934
-		for (Set<BiKeyReference<Statistic, UUID>> splitElement : splitElements) {
+	protected void remotePushElementsMySQL(Set<BiKeyReference<Statistic, UUID>> refs) throws Throwable {
+		if (refs.isEmpty()) return;  // let's avoid deleting the whole table just because there's no WHERE clause
+		for (List<BiKeyReference<Statistic, UUID>> references : CollectionUtils.split(refs, 999)) {  // multiple VALUES are limited to 1000 elements ; https://stackoverflow.com/questions/452859/inserting-multiple-rows-in-a-single-sql-query#comment22032805_452934
+			Query query = buildRemoteDeleteElementsMySQLQuery(references);
 			query.add("INSERT INTO " + TABLE_NAME + "(`statistic`,`user_uuid`,`value`) VALUES ");
 			int i = -1;
-			for (BiKeyReference<Statistic, UUID> reference : splitElement) {
-				String comma = (++i + 1 < splitElement.size() ? "," : "");
+			for (BiKeyReference<Statistic, UUID> reference : references) {
+				String comma = (++i + 1 < references.size() ? "," : "");
 				query.add("(?,?,?)" + comma, reference.getKey(), reference.getKey2(), getCachedValue(reference.getKey(), reference.getKey2()));
 			}
 			query.add(";");
+			GCore.inst().getMySQLConnector().performUpdateQuery(getPlugin(), query);
 		}
-		GCore.inst().getMySQLConnector().performUpdateQuery(getPlugin(), query);
 	}
 
 	// delete
@@ -171,7 +172,7 @@ public class BoardStatistics extends BiKeyedBoardRemote<Statistic, UUID, Double>
 		GCore.inst().getMySQLConnector().performUpdateQuery(getPlugin(), buildRemoteDeleteElementsMySQLQuery(references));
 	}
 
-	private Query buildRemoteDeleteElementsMySQLQuery(Set<BiKeyReference<Statistic, UUID>> references) {
+	private Query buildRemoteDeleteElementsMySQLQuery(Collection<BiKeyReference<Statistic, UUID>> references) {
 		if (references.isEmpty()) return null; // let's avoid deleting the whole table just because there's no WHERE clause ; this shouldn't happen since this method is private but better be juuust a little more sure
 		Query query = new Query("DELETE FROM " + TABLE_NAME + " ");
 		int i = -1;

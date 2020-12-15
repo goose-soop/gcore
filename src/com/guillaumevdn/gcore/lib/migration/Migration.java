@@ -15,6 +15,7 @@ import com.guillaumevdn.gcore.lib.function.ThrowableConsumer;
 import com.guillaumevdn.gcore.lib.function.ThrowableRunnable;
 import com.guillaumevdn.gcore.lib.function.ThrowableTriConsumer;
 import com.guillaumevdn.gcore.lib.logging.Logger;
+import com.guillaumevdn.gcore.lib.string.StringUtils;
 import com.guillaumevdn.gcore.migration.YMLMigrationReading;
 import com.guillaumevdn.gcore.migration.YMLMigrationWriting;
 
@@ -35,7 +36,7 @@ public abstract class Migration {
 		this.mustBackup = backupName != null;
 		this.migrationName = migrationName;
 		this.pluginFolder = plugin.getDataFolder();
-		this.backupFolder = new File(pluginFolder.getParentFile() + "/" + plugin.getName() + "_" + backupName + "_backup");
+		this.backupFolder = new File(pluginFolder.getParentFile() + "/" + plugin.getName() + "_backup_on_" + backupName);
 		this.successFile = plugin.getDataFile(successFilePath);
 		this.hardlockFile = new File(pluginFolder + "/hardlock");
 		this.logger = new Logger(plugin, plugin.getName() + "-migration", true, false, -1, false);
@@ -84,6 +85,10 @@ public abstract class Migration {
 		error(line, null);
 	}
 
+	public final void debug(String line) {
+		logger.debug(line);
+	}
+
 	public final void error(String line, Throwable cause) {
 		logger.error(line, cause);
 	}
@@ -122,7 +127,7 @@ public abstract class Migration {
 		if (cause != null) {
 			logger.error("STACKTRACE :", cause);
 		}
-		if (backupError) {
+		if (mustBackup) {
 			logger.error("BACKUP STATE : " + (backupError ?
 					"wanted to " + backup.name().toLowerCase() + ", but couldn't ; " + (hardlock ? "the plugin won't try to migrate again until you fix it manually" : "please do it manually")
 					: backup.name().toLowerCase() + "d"));
@@ -130,7 +135,7 @@ public abstract class Migration {
 				logger.error("BACKUP STACKTRACE :", backupStackTrace);
 			}
 		}
-		log("=============================================================");
+		debug("=============================================================");
 	}
 
 	// migrate
@@ -167,7 +172,7 @@ public abstract class Migration {
 			return true;
 		}
 		// log start
-		log("=============== PROCESSING " + migrationName + " =================");
+		debug("=============== PROCESSING " + migrationName + " =================");
 		// backup
 		if (mustBackup) {
 			try {
@@ -196,7 +201,7 @@ public abstract class Migration {
 		success("------------ SUCCESS OF " + migrationName + " -------------");
 		success("MOD COUNT : " + modCount);
 		success("BACKUP STATE : not deleting, just in case something went wrong");
-		log("=============================================================");
+		debug("=============================================================");
 		return true;
 	}
 
@@ -207,7 +212,7 @@ public abstract class Migration {
 			int count = modCount;
 			runnable.run();
 			if (count != modCount) {
-				log("> ... made " + (modCount - count) + " for operation : " + operation);
+				log("> ... made " + StringUtils.pluralizeAmountDesc("modification", modCount - count));
 			}
 		} catch (Throwable exception) {
 			if (exception instanceof SilentFail) {
@@ -240,7 +245,7 @@ public abstract class Migration {
 		});
 	}
 
-	protected final void attemptDirectYMLFilesOperation(String operation, String elementTypeName, BackupBehavior backupOnFail, File src, ThrowableConsumer<YMLConfiguration> processor, String... ignoreElements) throws Throwable {
+	public final void attemptDirectYMLFilesOperation(String operation, String elementTypeName, BackupBehavior backupOnFail, File src, ThrowableConsumer<YMLConfiguration> processor, String... ignoreElements) throws Throwable {
 		attemptOperation(operation, backupOnFail, () -> {
 			doFileOperation(operation, elementTypeName, src, backupOnFail, filterYMLIfNotOneOf(ignoreElements), file -> {
 				YMLConfiguration config = new YMLConfiguration(getPlugin(), file);
@@ -273,7 +278,7 @@ public abstract class Migration {
 				int count = modCount;
 				processor.accept(src);
 				if (count != modCount) {
-					log("> ... made " + (modCount - count) + " for " + elementTypeName + " " + element);
+					log("> ... made " + StringUtils.pluralizeAmountDesc("modification", modCount - count) + " for " + elementTypeName + " " + element);
 				}
 			} catch (Throwable exception) {
 				if (exception instanceof SilentFail) {
@@ -310,7 +315,7 @@ public abstract class Migration {
 					processor.accept(config, path + "." + element, target);
 					if (count != modCount) {
 						target.save();
-						log("> ... made " + (modCount - count) + " for " + elementTypeName + " " + element);
+						log("> ... made " + StringUtils.pluralizeAmountDesc("modification", modCount - count) + " for " + elementTypeName + " " + element);
 					}
 				} catch (Throwable exception) {
 					if (exception instanceof SilentFail) {

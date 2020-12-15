@@ -1,7 +1,8 @@
 package com.guillaumevdn.gcore.lib.time.frame.type;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
+import com.guillaumevdn.gcore.ConfigGCore;
 import com.guillaumevdn.gcore.TextEditorGeneric;
 import com.guillaumevdn.gcore.lib.compatibility.material.CommonMats;
 import com.guillaumevdn.gcore.lib.element.struct.Need;
@@ -31,7 +32,7 @@ public class TimeFrameTypeLimited extends TimeFrameType {
 
 	// get
 	@Override
-	public Pair<LocalDateTime, LocalDateTime> getBounds(ElementTimeFrame frame, Replacer replacer, int offset) {
+	public Pair<ZonedDateTime, ZonedDateTime> getBounds(ElementTimeFrame frame, Replacer replacer, int offset) {
 		// offset isn't allowed
 		if (offset != 0) {
 			return null;
@@ -42,13 +43,13 @@ public class TimeFrameTypeLimited extends TimeFrameType {
 		if (startTime == null || endTime == null) {
 			return null;
 		}
-		LocalDateTime start = startTime.getCurrent();
-		LocalDateTime end = endTime.getCurrent();
+		ZonedDateTime start = startTime.getCurrent();
+		ZonedDateTime end = endTime.getCurrent();
 		if (start.isAfter(end)) {
 			return null;
 		}
 		// not in bounds
-		LocalDateTime now = LocalDateTime.now();
+		ZonedDateTime now = ConfigGCore.timeNow();
 		if (now.isBefore(start) || now.isAfter(end)) {
 			return null;
 		}

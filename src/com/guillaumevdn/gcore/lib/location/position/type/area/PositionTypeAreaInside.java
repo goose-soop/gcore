@@ -36,5 +36,4 @@ public class PositionTypeAreaInside extends PositionType {
 		return new PositionAreaInside(a, b);
 	}
 
-
 }

@@ -2,6 +2,7 @@ package com.guillaumevdn.gcore.lib.command;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.bukkit.command.CommandSender;
 
@@ -9,6 +10,7 @@ import com.guillaumevdn.gcore.TextGeneric;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.command.argument.Arg;
 import com.guillaumevdn.gcore.lib.command.argument.Argument;
+import com.guillaumevdn.gcore.lib.command.argument.ArgumentDouble;
 import com.guillaumevdn.gcore.lib.command.argument.ArgumentEnum;
 import com.guillaumevdn.gcore.lib.command.argument.ArgumentFixed;
 import com.guillaumevdn.gcore.lib.command.argument.ArgumentInteger;
@@ -96,6 +98,10 @@ public abstract class Subcommand extends UsageRestriction {
 	public final ArgumentInteger addArgumentInteger(NeedType need, boolean playerOnly, Permission permission, Text usage, TabCompleteMode mode) {
 		return addArgument(new ArgumentInteger(need, playerOnly, permission, usage, mode));
 	}
+	
+	public final ArgumentDouble addArgumentDouble(NeedType need, boolean playerOnly, Permission permission, Text usage, TabCompleteMode mode) {
+		return addArgument(new ArgumentDouble(need, playerOnly, permission, usage, mode));
+	}
 
 	public final Parameter addParameter(boolean playerOnly, Permission permission, String... aliases) {
 		Parameter parameter = new Parameter(playerOnly, permission, aliases);
@@ -114,7 +120,15 @@ public abstract class Subcommand extends UsageRestriction {
 	// do
 	public abstract void perform(CommandCall call);
 
-	// help
+	// help/text
+	public void logMissingArgument(Argument argument, CommandCall call) {
+		List<String> found = getArguments().stream()
+				.filter(arg -> arg.getUsage() != null && arg.get(call) != null)
+				.map(arg -> arg.getUsage().parseLine())
+				.collect(Collectors.toList());
+		(found.isEmpty() ? TextGeneric.messageCommandMissingArgument : TextGeneric.messageCommandMissingArgumentFound).replace("{argument}", () -> argument.getUsage().parseLines()).replace("{found}", () -> StringUtils.toTextString(", ", found)).send(call.getSender());
+	}
+
 	public String buildUsage(Command parent, boolean isBase, CommandSender sender) {
 		String colorArgumentOptional = TextGeneric.messageCommandHelpColorArgumentOptional.parseLine();
 		String colorArgumentRequired = TextGeneric.messageCommandHelpColorArgumentRequired.parseLine();

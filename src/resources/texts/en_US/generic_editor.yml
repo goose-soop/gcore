@@ -240,7 +240,48 @@ descriptionItemsNeededTake: |
 descriptionItemsNeededErrorMessage: |
   &7A message sent if the player doesn't have the required items
 
-# -------------------- Location --------------------
+# -------------------- GUI --------------------
+
+descriptionGuiName: |
+  &7The name of the GUI
+
+descriptionGuiType: |
+  &7The type of the GUI
+
+descriptionGuiContents: |
+  &7The contents of the GUI
+
+descriptionGuiItemType: |
+  &7Type of item
+
+descriptionGuiItemIcon: |
+  &7The icon to display (if the selected type don't generate one automatically)
+
+descriptionGuiItemLocations: |
+  &7The locations for this item
+  &7Each element must be formatted as &epage,slot &7or just &eslot &7(first available page will be taken)
+  &7If this setting is empty, the first available page and slot will be taken
+  &7If this item is persistent, page numbers are not needed and will be ignored
+
+descriptionGuiItemPersistent: |
+  &7To make this item persistent (same slot for every page, if multiple pages)
+
+descriptionGuiItemClickSound: |
+  &7To play a sound when the player clicks this item
+
+descriptionGuiItemOverrideClicks: |
+  &7To specify click types that will have different effects than the initial object's type
+
+descriptionGuiItemDynamicBorderLinearOnCount: |
+  &7The amount of items that should be active at the same time.
+
+descriptionGuiItemDynamicBorderLinearIconOn: |
+  &7The icon for active items.
+
+descriptionGuiItemDynamicBorderLinearIconOff: |
+  &7The icon for inactive items.
+
+# -------------------- Position --------------------
 
 descriptionPositionType: |
   &7The position type
@@ -260,12 +301,19 @@ descriptionPositionTypeClosestEntityColors: |
 descriptionPositionTypeCitizensNPCRelative: |
   &7The NPC to relate to
 
+descriptionPositionTypeCitizensNPCRelativeNames: |
+  &7The NPC to relate to, by names
+  &7Use this only if multiple NPCs have the same name and you want to use the closest one with one matching name
+
 descriptionPositionTypeClosestMythicMobMobs: |
   &7The MythicMobs mobs that are allowed
   &7Leave it empty to allow any mob
 
 descriptionPositionTypeWorld: |
   &7The world
+
+descriptionPositionTypeBiome: |
+  &7The accepted biomes
 
 descriptionPositionTypeSingleLocation: |
   &7The single location

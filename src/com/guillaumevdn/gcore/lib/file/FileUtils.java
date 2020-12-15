@@ -25,6 +25,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 
 import com.guillaumevdn.gcore.GCore;
+import com.guillaumevdn.gcore.lib.GPlugin;
 import com.guillaumevdn.gcore.lib.compatibility.nbt.NBTCompound;
 import com.guillaumevdn.gcore.lib.serialization.Serializer;
 import com.guillaumevdn.gcore.lib.serialization.adapter.type.AdapterItemStack;
@@ -60,11 +61,14 @@ public final class FileUtils {
 		return builder;
 	}
 
-	public static boolean saveDefaultResource(File file, String defaultResource, boolean createIfNoDefault) throws IOException {
-		file.getParentFile().mkdirs();
-		if (!file.exists() && defaultResource != null) {
-			try (InputStream in = GCore.inst().getResource(defaultResource)) {
-				try (OutputStream out = new FileOutputStream(file)) {
+	public static boolean saveDefaultResource(GPlugin plugin, String defaultResource, File target, boolean createIfNoDefault) throws IOException {
+		target.getParentFile().mkdirs();
+		if (!target.exists() && defaultResource != null) {
+			try (InputStream in = plugin.getResource(defaultResource)) {
+				if (in == null) {
+					throw new IllegalArgumentException("there's no default resource '" + defaultResource + "'");
+				}
+				try (OutputStream out = new FileOutputStream(target)) {
 					byte[] buf = new byte['?'];
 					int len;
 					while ((len = in.read(buf)) > 0) {
@@ -73,15 +77,15 @@ public final class FileUtils {
 				}
 				return true;
 			} catch (Throwable exception) {
-				throw new IOException("couldn't set default resource to file " + file.getName(), exception);
+				throw new IOException("couldn't set default resource to file " + target.getName(), exception);
 			}
 		}
-		if (!file.exists() && createIfNoDefault) {
+		if (!target.exists() && createIfNoDefault) {
 			try {
-				file.createNewFile();
+				target.createNewFile();
 				return true;
 			} catch (IOException exception) {
-				throw new IOException("couldn't create file " + file.getName(), exception);
+				throw new IOException("couldn't create file " + target.getName(), exception);
 			}
 		}
 		return false;
@@ -146,7 +150,7 @@ public final class FileUtils {
 				doCopy(sub, new File(dest + "/" + sub.getName()), ignorePathsContaining);
 			}
 		} else {
-			dest.createNewFile();
+			reset(dest);
 			try (FileInputStream fis = new FileInputStream(src);
 					FileChannel input = fis.getChannel();
 					FileOutputStream fos = new FileOutputStream(dest);

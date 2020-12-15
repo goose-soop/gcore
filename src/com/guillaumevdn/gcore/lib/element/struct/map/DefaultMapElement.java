@@ -2,7 +2,6 @@ package com.guillaumevdn.gcore.lib.element.struct.map;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.guillaumevdn.gcore.lib.object.Optional;
 import java.util.function.BiConsumer;
 
 import org.bukkit.inventory.ItemStack;
@@ -17,6 +16,7 @@ import com.guillaumevdn.gcore.lib.gui.struct.ClickCall;
 import com.guillaumevdn.gcore.lib.gui.struct.ClickCall.ClickType;
 import com.guillaumevdn.gcore.lib.gui.struct.GUIItem;
 import com.guillaumevdn.gcore.lib.item.ItemUtils;
+import com.guillaumevdn.gcore.lib.object.Optional;
 import com.guillaumevdn.gcore.lib.string.Text;
 
 /**

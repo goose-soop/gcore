@@ -30,7 +30,7 @@ public class ElementPosition extends TypableContainerElement<PositionType> imple
 
 	@Override
 	public ParsedCache<Position> getCache() {
-		return hasParseableLocations() ? null : cache;
+		return hasParseableLocations() || !getType().mustCache(this) ? null : cache;
 	}
 
 	@Override

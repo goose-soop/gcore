@@ -1,6 +1,7 @@
 package com.guillaumevdn.gcore.lib.item.meta;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.bukkit.DyeColor;
@@ -33,8 +34,8 @@ public final class MetaBanner {
 		if (ref == null) return true;
 		// base color (<1.13, now stored as material type)
 		if (!Version.ATLEAST_1_13) {
-			if (check.isExact() && (!meta.getBaseColor().equals(ref.getBaseColor()))) return false;
-			else if (!check.isExact() && ref.getBaseColor() != null && (meta == null || !meta.getBaseColor().equals(ref.getBaseColor()))) return false;
+			if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getBaseColor(), ref.getBaseColor()))) return false;
+			else if (!check.isExact() && ref.getBaseColor() != null && (meta == null || !Objects.deepEquals(meta.getBaseColor(), ref.getBaseColor()))) return false;
 		}
 		// patterns
 		if (check.isExact()) {

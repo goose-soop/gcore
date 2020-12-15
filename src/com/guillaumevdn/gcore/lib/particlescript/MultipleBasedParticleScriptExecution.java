@@ -40,18 +40,19 @@ public class MultipleBasedParticleScriptExecution<K> {
 		locationSupplier.get().forEach((key, location) -> {
 			// update location
 			locations.put(key, location);
-			// maybe init execution, then update it
+			// maybe init execution
 			ParticleScriptExecution exec = executions.computeIfAbsent(key, __ -> new ParticleScriptExecution(script, autoLoop) {
 				@Override
 				public Location getBaseLocation() {
 					return locations.get(key); // will be reset every time this class' update() is called so we get it from the map (only one execution instance will be created)
 				}
 			});
-			boolean done = exec.update(players, isAsync);
 			// maybe update script if it changed
-			if (done && !exec.getScript().equals(script)) {
+			if (!exec.getScript().equals(script)) {
 				exec.setScript(script);
 			}
+			// update execution
+			exec.update(players, isAsync);
 		});
 	}
 

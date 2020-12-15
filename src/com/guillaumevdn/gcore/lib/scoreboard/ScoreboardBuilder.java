@@ -8,7 +8,7 @@ import java.util.stream.Stream;
 /**
  * @author GuillaumeVDN
  */
-public class ScoreboardBuilder {
+public final class ScoreboardBuilder {
 
 	private String title = null;
 	private List<String> entries = new ArrayList<>();
@@ -23,8 +23,9 @@ public class ScoreboardBuilder {
 	}
 
 	// set
-	public void setTitle(String title) {
+	public ScoreboardBuilder title(String title) {
 		this.title = title.length() > 32 ? title.substring(0, 32) : title;
+		return this;
 	}
 
 	public ScoreboardBuilder add(String text) {

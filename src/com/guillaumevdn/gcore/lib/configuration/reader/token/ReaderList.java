@@ -29,7 +29,7 @@ public class ReaderList implements ThrowableFunction<ReaderContext, Boolean> {
 					listIndent += context.getIndentLevel();
 					s = s.substring(context.getIndentLevel().length());
 				}
-				if (s.charAt(0) == ' ') {
+				if (!s.isEmpty() && s.charAt(0) == ' ') {
 					context.throwIndentError(peek, listIndent.length(), false);
 				}
 				// read list

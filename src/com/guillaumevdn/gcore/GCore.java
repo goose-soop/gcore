@@ -2,8 +2,12 @@ package com.guillaumevdn.gcore;
 
 import java.io.File;
 
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
+
 import com.guillaumevdn.gcore.command.GcoreExport;
 import com.guillaumevdn.gcore.command.GcoreItemRead;
+import com.guillaumevdn.gcore.command.GcoreNpcReset;
 import com.guillaumevdn.gcore.command.GcorePlugins;
 import com.guillaumevdn.gcore.command.GcoreReload;
 import com.guillaumevdn.gcore.data.BoardStatistics;
@@ -17,9 +21,9 @@ import com.guillaumevdn.gcore.lib.GPlugin;
 import com.guillaumevdn.gcore.lib.chat.AwaitingChatListeners;
 import com.guillaumevdn.gcore.lib.chat.VanillaChatListeners;
 import com.guillaumevdn.gcore.lib.command.Command;
-import com.guillaumevdn.gcore.lib.compatibility.bossbar.Bossbar;
 import com.guillaumevdn.gcore.lib.data.MySQLConnector;
 import com.guillaumevdn.gcore.lib.event.CustomEventsListeners;
+import com.guillaumevdn.gcore.lib.gui.element.item.type.GUIItemTypes;
 import com.guillaumevdn.gcore.lib.integration.Integration;
 import com.guillaumevdn.gcore.lib.integration.IntegrationListeners;
 import com.guillaumevdn.gcore.lib.location.AwaitingItemListeners;
@@ -30,9 +34,11 @@ import com.guillaumevdn.gcore.lib.serialization.adapter.type.AdapterUserNPCs;
 import com.guillaumevdn.gcore.lib.string.TextFile;
 import com.guillaumevdn.gcore.lib.time.frame.TimeFrameTypes;
 import com.guillaumevdn.gcore.libs.com.google.gson.GsonBuilder;
-import com.guillaumevdn.gcore.listeners.ConnectionEvent;
+import com.guillaumevdn.gcore.listeners.ConnectionEvents;
 import com.guillaumevdn.gcore.migration.v8_0.config.MigrationV8Config;
 import com.guillaumevdn.gcore.migration.v8_0.data.MigrationV8Data;
+import com.guillaumevdn.gcore.migration.v8_5.MigrationV8_5;
+import com.guillaumevdn.gcore.migration.v8_9.MigrationV8_9;
 
 /**
  * @author GuillaumeVDN
@@ -43,7 +49,11 @@ public final class GCore extends GPlugin<ConfigGCore, PermissionGCore> {
 	public static GCore inst() { return instance; }
 
 	public GCore() {
-		super(24180, ConfigGCore.class, PermissionGCore.class, MigrationV8Config.class, MigrationV8Data.class);
+		super(24180, ConfigGCore.class, PermissionGCore.class,
+				MigrationV8Config.class, MigrationV8Data.class,
+				MigrationV8_5.class,
+				MigrationV8_9.class
+				);
 		instance = this;
 	}
 
@@ -65,6 +75,7 @@ public final class GCore extends GPlugin<ConfigGCore, PermissionGCore> {
 	// base
 	TimeFrameTypes timeFrameTypes = null;
 	PositionTypes positionTypes = null;
+	GUIItemTypes guiItemTypes = null;
 
 	private MySQLConnector mysqlConnector = new MySQLConnector();
 	private WorkerGCore worker;
@@ -75,6 +86,10 @@ public final class GCore extends GPlugin<ConfigGCore, PermissionGCore> {
 
 	public PositionTypes getPositionTypes() {
 		return positionTypes;
+	}
+
+	public GUIItemTypes getGUIItemTypes() {
+		return guiItemTypes;
 	}
 
 	public MySQLConnector getMySQLConnector() {
@@ -89,7 +104,7 @@ public final class GCore extends GPlugin<ConfigGCore, PermissionGCore> {
 	@Override
 	protected void registerTypes() {
 		Serializer.init();
-		// don't init time frame / position types here, they need CommonMats
+		// don't init time types here, they need CommonMats
 	}
 
 	@Override
@@ -119,8 +134,15 @@ public final class GCore extends GPlugin<ConfigGCore, PermissionGCore> {
 
 	@Override
 	protected void enable() throws Throwable {
-		// avoid some linkage errors
+		// avoid some class errors
 		getClassLoader().loadClass("com.guillaumevdn.gcore.lib.player.PlayerUtils");
+
+		try {  // those occur with GCoreLegacy for some reason
+			getClassLoader().loadClass("com.comphenix.protocol.wrappers.WrappedSignedProperty");
+		} catch (ClassNotFoundException ignored) {}
+		try {
+			com.guillaumevdn.gcore.lib.legacy_npc.NpcProtocols.inst().getDefaultHumanEntityMetadata();
+		} catch (Throwable ignored) {}
 
 		// try to connect to mysql
 		try {
@@ -133,10 +155,19 @@ public final class GCore extends GPlugin<ConfigGCore, PermissionGCore> {
 		}
 
 		// init worker
+		getMainLogger().info("Initializing worker and caches");
 		worker = new WorkerGCore();
+		for (OfflinePlayer player : Bukkit.getOfflinePlayers()) {
+			worker.registerOfflinePlayer(player.getName(), player.getUniqueId());
+		}
+
+		// integrations
+		getMainLogger().info("Registering integrations");
+		registerAndEnableIntegration(new Integration<>(this, "DeluxeChat", IntegrationDeluxeChat.class));
 
 		// listeners
-		registerListener(new ConnectionEvent());
+		getMainLogger().info("Initializing tasks and listeners");
+		registerListener(new ConnectionEvents());
 		registerListener(new VanillaChatListeners());
 		registerListener(new AwaitingChatListeners());
 		registerListener(new AwaitingLocationListeners());
@@ -144,15 +175,13 @@ public final class GCore extends GPlugin<ConfigGCore, PermissionGCore> {
 		registerListener(new CustomEventsListeners());
 		registerListener(new IntegrationListeners());
 
-		// integrations
-		registerAndEnableIntegration(new Integration<>(this, "DeluxeChat", IntegrationDeluxeChat.class));
-
 		// gcore command
 		Command commandGcore = registerCommand(new Command(this, "gcore", "gcore", null));
 		commandGcore.setSubcommand(new GcoreReload());
 		commandGcore.setSubcommand(new GcorePlugins());
 		commandGcore.setSubcommand(new GcoreExport());
 		commandGcore.setSubcommand(new GcoreItemRead());
+		commandGcore.setSubcommand(new GcoreNpcReset());
 	}
 
 	@Override
@@ -160,7 +189,6 @@ public final class GCore extends GPlugin<ConfigGCore, PermissionGCore> {
 		if (worker != null && worker.getNpcManager() != null) {
 			worker.getNpcManager().disable();
 		}
-		Bossbar.stopAllActive();
 	}
 
 }

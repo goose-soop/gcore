@@ -26,6 +26,11 @@ public final class NumberUtils {
 		}
 	}
 
+	public static int integerOrElse(Object raw, int def) {
+		Integer integer = integerOrNull(raw);
+		return integer != null ? integer : def;
+	}
+
 	public static List<Integer> integersIn(String... raw) {
 		return integersIn(Stream.of(raw)).collect(Collectors.toList());
 	}
@@ -47,6 +52,10 @@ public final class NumberUtils {
 	}
 
 	public static int square(int nb) {
+		return nb * nb;
+	}
+
+	public static double square(double nb) {
 		return nb * nb;
 	}
 

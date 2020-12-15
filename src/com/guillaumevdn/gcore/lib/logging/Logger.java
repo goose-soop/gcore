@@ -9,16 +9,18 @@ import java.io.LineNumberReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
+import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.bukkit.Bukkit;
 
+import com.guillaumevdn.gcore.ConfigGCore;
 import com.guillaumevdn.gcore.lib.GPlugin;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.exception.ConfigError;
@@ -65,7 +67,7 @@ public class Logger {
 		return new File(plugin.getDataFolder() + "/logs/" + id + ".log");
 	}
 
-	public File getArchiveFile(LocalDateTime date) {
+	public File getArchiveFile(ZonedDateTime date) {
 		return new File(plugin.getDataFolder() + "/logs_archives/" + id + "-" + date.format(LOCALDATETIME_FORMAT) + ".log");
 	}
 
@@ -114,34 +116,40 @@ public class Logger {
 		log(LogLevel.DEBUG, line, true, true, null);
 	}
 
-	private transient Map<String, Long> lastLogged = new HashMap<>();
+	private transient Map<String, Long> lastLogged = new ConcurrentHashMap<>();  // #925, concurrent mod exception
 
 	public void log(LogLevel level, String line, boolean printIdInConsole, Throwable trace) {
 		log(level, line, printIdInConsole, true, trace);
 	}
 
 	public void log(LogLevel level, String line, boolean printIdInConsole, boolean ignoreAntiSpam, Throwable trace) {
-		// already logged recently
-		if (antiSpam && !ignoreAntiSpam) {
-			if (System.currentTimeMillis() - lastLogged.computeIfAbsent(line, __ -> 0L) < 5000L) {
-				return;
+		try {
+			// already logged recently
+			if (antiSpam && !ignoreAntiSpam) {
+				if (System.currentTimeMillis() - lastLogged.computeIfAbsent(line, __ -> 0L) < 5000L) {
+					return;
+				}
+				lastLogged.put(line, System.currentTimeMillis());
 			}
-			lastLogged.put(line, System.currentTimeMillis());
-		}
-		// log to console
-		if (isLogConsole() || level.equals(LogLevel.ERROR)) {
-			Bukkit.getConsoleSender().sendMessage(level.getConsoleColor() + (printIdInConsole ? "[" + id + "] " : "") + (trace != null && trace instanceof ConfigError ? line + ", " + trace.getMessage() : line));
-			if (trace != null && !(trace instanceof ConfigError)) {
-				trace.printStackTrace();
+			// log to console
+			if (isLogConsole() || level.equals(LogLevel.ERROR)) {
+				Bukkit.getConsoleSender().sendMessage(level.getConsoleColor() + (printIdInConsole ? "[" + id + "] " : "") + (trace != null && trace instanceof ConfigError ? line + ", " + trace.getMessage() : line));
+				if (trace != null && !(trace instanceof ConfigError)) {
+					trace.printStackTrace();
+				}
 			}
-		}
-		// log to file
-		if (logFile) {
-			linesToSave.add("[" + DATE_FORMAT.format(Calendar.getInstance().getTime()) + "] [" + level.getFilePrefix() + "] " + line);
-			if (trace != null && !(trace instanceof ConfigError)) {
-				StringWriter writer = new StringWriter();
-				trace.printStackTrace(new PrintWriter(writer));
-				linesToSave.add(writer.toString());
+			// log to file
+			if (logFile) {
+				linesToSave.add("[" + DATE_FORMAT.format(Calendar.getInstance().getTime()) + "] [" + level.getFilePrefix() + "] " + line);
+				if (trace != null && !(trace instanceof ConfigError)) {
+					StringWriter writer = new StringWriter();
+					trace.printStackTrace(new PrintWriter(writer));
+					linesToSave.add(writer.toString());
+				}
+			}
+		} catch (Throwable logError) {
+			if (!(logError instanceof ConcurrentModificationException)) {
+				logError.printStackTrace();
 			}
 		}
 	}
@@ -178,7 +186,7 @@ public class Logger {
 				writer.close();
 				// maybe file has too many lines, so archive it
 				if (newLineCount > fileLineLimit) {
-					File archiveFile = getArchiveFile(LocalDateTime.now());
+					File archiveFile = getArchiveFile(ConfigGCore.timeNow());
 					FileUtils.delete(archiveFile);
 					file.renameTo(archiveFile);
 				}

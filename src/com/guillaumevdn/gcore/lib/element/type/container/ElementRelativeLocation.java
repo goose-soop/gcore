@@ -11,6 +11,7 @@ import com.guillaumevdn.gcore.lib.compatibility.material.Mat;
 import com.guillaumevdn.gcore.lib.element.struct.Element;
 import com.guillaumevdn.gcore.lib.element.struct.Need;
 import com.guillaumevdn.gcore.lib.element.struct.container.ParseableContainerElement;
+import com.guillaumevdn.gcore.lib.element.struct.parsing.ParsedCache;
 import com.guillaumevdn.gcore.lib.element.struct.parsing.ParsingError;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementDouble;
 import com.guillaumevdn.gcore.lib.string.Text;
@@ -61,6 +62,11 @@ public class ElementRelativeLocation extends ParseableContainerElement<Location>
 	}
 
 	// parse
+	@Override
+	public ParsedCache<Location> getCache() {
+		return null;  // don't cache obviously since this relies on volatile data
+	}
+
 	@Override
 	public Location doParse(Replacer replacer) throws ParsingError {
 		Location relativeTo = replacer.getReplacerData().getLocationOrPlayer();

@@ -15,7 +15,7 @@ import com.guillaumevdn.gcore.lib.string.StringUtils;
  * @author GuillaumeVDN
  */
 public final class Query {
-	
+
 	private LinkedHashMap<String, List<Object>> parts = new LinkedHashMap<>();
 
 	public Query() {
@@ -74,37 +74,6 @@ public final class Query {
 			params.add(keySerializer.serialize(key));
 		});
 		return new Query("SELECT * FROM `" + tableName + "` WHERE `" + keyRowName + "` IN (" + StringUtils.repeatStringSeparated("?", ",", params.size()) + ");", params);
-	}
-
-	public static Query buildDeleteAll(String tableName) {
-		return new Query("DELETE FROM `" + tableName + "`;");
-	}
-
-	public static <K> Query buildDeleteWhereKeysIn(String tableName, String keyRowName, Collection<K> keys, Serializer<K> keySerializer) {
-		if (keys.isEmpty()) {
-			return new Query();
-		}
-		List<String> serializedKeys = new ArrayList<>();
-		keys.forEach(key -> {
-			serializedKeys.add(keySerializer.serialize(key));
-		});
-		return buildDeleteWhereKeysIn(tableName, keyRowName, serializedKeys);
-	}
-
-	public static <K> Query buildDeleteWhereKeysIn(String tableName, String keyRowName, Collection<String> keys) {
-		if (keys.isEmpty()) {
-			return new Query();
-		}
-		return new Query("DELETE FROM `" + tableName + "` WHERE `" + keyRowName + "` IN (" + StringUtils.repeatStringSeparated("?", ",", keys.size()) + ");", keys);
-	}
-
-	public static <K> Query buildDeleteWhereEqualsAndKeysIn(String tableName, String equalsRowName, String equalsValue, String keyRowName, Collection<String> keys) {
-		if (keys.isEmpty()) {
-			return new Query();
-		}
-		List<String> params = CollectionUtils.asList(keys);
-		params.add(0, equalsValue);
-		return new Query("DELETE FROM `" + tableName + "` WHERE `" + equalsRowName + "`=? AND `" + keyRowName + "` IN (" + StringUtils.repeatStringSeparated("?", ",", keys.size()) + ");", params);
 	}
 
 }

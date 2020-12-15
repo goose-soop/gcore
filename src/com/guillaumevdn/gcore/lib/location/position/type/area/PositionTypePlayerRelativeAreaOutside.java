@@ -23,6 +23,11 @@ public class PositionTypePlayerRelativeAreaOutside extends PositionType {
 
 	// elements
 	@Override
+	public boolean mustCache(ElementPosition position) {
+		return false;
+	}
+
+	@Override
 	protected void doFillTypeSpecificElements(ElementPosition position) {
 		position.addRelativeLocation("bound1", Need.required(), TextEditorGeneric.descriptionPositionTypeRelativeBound1);
 		position.addRelativeLocation("bound2", Need.required(), TextEditorGeneric.descriptionPositionTypeRelativeBound2);

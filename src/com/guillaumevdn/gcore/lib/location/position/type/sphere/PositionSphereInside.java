@@ -10,6 +10,7 @@ import com.guillaumevdn.gcore.lib.block.BlockState;
 import com.guillaumevdn.gcore.lib.compatibility.material.Mat;
 import com.guillaumevdn.gcore.lib.location.LocationUtils;
 import com.guillaumevdn.gcore.lib.location.position.Position;
+import com.guillaumevdn.gcore.lib.number.MinMaxDouble;
 
 /**
  * @author GuillaumeVDN
@@ -22,6 +23,14 @@ public class PositionSphereInside implements Position {
 	public PositionSphereInside(Location center, double radius) {
 		this.center = center;
 		this.radius = radius;
+	}
+	
+	public Location getCenter() {
+		return center;
+	}
+	
+	public double getRadius() {
+		return radius;
 	}
 
 	// methods
@@ -46,6 +55,11 @@ public class PositionSphereInside implements Position {
 	@Override
 	public Location findRandom() {
 		return LocationUtils.findRandomInSphere(center, 0d, radius);
+	}
+
+	@Override
+	public MinMaxDouble getRandomSolidAndFreeAboveYBounds() {
+		return MinMaxDouble.of(center.getY() - radius, center.getY() + radius);
 	}
 
 	@Override

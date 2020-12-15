@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -60,7 +59,10 @@ public class ReflectionMethod {
 			}
 		}
 		if (method == null) {
-			throw new NoSuchMethodException("Class " + original.getName() + ", name " + name + ", params " + StringUtils.toTextString(", ", CollectionUtils.asList(params).stream().map(param -> param == null ? "null" : param.getName())));
+			Reflection.logAndRethrowError(new NoSuchMethodException(),
+					"Class " + original
+					+ "\nParameters '" + StringUtils.toTextString(", ", CollectionUtils.asList(params).stream().map(param -> param == null ? "null" : param.getName())) + "'"
+					);
 		}
 	}
 
@@ -85,12 +87,13 @@ public class ReflectionMethod {
 		try {
 			return ReflectionObject.of(method.invoke(object, params));
 		} catch (IllegalArgumentException exception) {
-			if (exception.getMessage() != null && exception.getMessage().equalsIgnoreCase("argument type mismatch")) {
-				throw new IllegalArgumentException("argument type mismatch, method "
-						+ StringUtils.toTextString(", ", CollectionUtils.asList(method.getParameters()).stream().map(param -> param.getType())) + ", sent "
-						+ StringUtils.toTextString(", ", Stream.of(params)));
-			}
-			throw exception;
+			Reflection.logAndRethrowError(exception,
+					"Class " + method.getDeclaringClass()
+					+ "\nName " + method.getName()
+					+ "\nParameters '" + StringUtils.toTextString(", ", Stream.of(params))
+					+ "\nMethod parameters '" + StringUtils.toTextString(", ", CollectionUtils.asList(method.getParameters()).stream().map(param -> param.getType())) + "'"
+					);
+			return null;
 		}
 	}
 
@@ -98,7 +101,11 @@ public class ReflectionMethod {
 	private static Map<Integer, ReflectionMethod> cache = new HashMap<>();
 
 	public static ReflectionMethod of(Class<?> original, String name, List<Class<?>> params) throws Throwable {
-		int hash = Objects.hash(original, name, params);
+		// hash by class name
+		int hash = original.getName().hashCode();
+		hash = hash * 31 + name.hashCode();
+		for (Class<?> param : params) hash = 31 * hash + (param == null ? 0 : param.getName().hashCode());
+		// construct
 		ReflectionMethod method = cache.get(hash);
 		if (method == null) {
 			cache.put(hash, method = new ReflectionMethod(original, name, params));

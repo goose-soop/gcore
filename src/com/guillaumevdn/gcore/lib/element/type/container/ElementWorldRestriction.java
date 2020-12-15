@@ -51,6 +51,21 @@ public class ElementWorldRestriction extends ParseableContainerElement<List<Worl
 		return result;
 	}
 
+	public boolean isAllowed(World world, Replacer replacer) {
+		if (!readContains()) {
+			return true;
+		}
+		List<World> whitelist = this.whitelist.parse(replacer).orNull();
+		if (whitelist != null && !whitelist.isEmpty()) {
+			return whitelist.contains(world);
+		}
+		List<World> blacklist = this.blacklist.parse(replacer).orNull();
+		if (blacklist != null && !blacklist.isEmpty()) {
+			return !blacklist.contains(world);
+		}
+		return true;
+	}
+
 	// editor
 	@Override
 	public Mat editorIconType() {

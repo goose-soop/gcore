@@ -21,8 +21,6 @@ import com.guillaumevdn.gcore.lib.serialization.Serializer;
 import com.guillaumevdn.gcore.lib.serialization.adapter.type.AdapterItemStack;
 import com.guillaumevdn.gcore.lib.serialization.data.DataIO;
 import com.guillaumevdn.gcore.lib.string.StringUtils;
-import com.guillaumevdn.gcore.lib.tuple.GUIItemTriple;
-import com.guillaumevdn.gcore.lib.tuple.IntegerPair;
 import com.guillaumevdn.gcore.lib.tuple.ItemChancePair;
 import com.guillaumevdn.gcore.lib.validator.type.CollectionIntegerValidator;
 import com.guillaumevdn.gcore.lib.validator.type.DoubleValidator;
@@ -323,7 +321,7 @@ public class YMLConfiguration {
 
 	// value : get string list
 	public List<String> readStringList(String path, List<String> def) {
-		return contains(path) ? doReadStringList(path) : StringUtils.format(def);
+		return contains(path) ? doReadStringList(path) : StringUtils.formatCopy(def);
 	}
 
 	public List<String> readMandatoryStringList(String path) {
@@ -348,7 +346,7 @@ public class YMLConfiguration {
 			}
 		}
 		// format
-		value = StringUtils.format(value);
+		StringUtils.format(value);
 		return value;
 	}
 
@@ -551,21 +549,21 @@ public class YMLConfiguration {
 	}
 
 	// get locations item list
-	public List<GUIItemTriple> readGUIItemTripleList(String path, List<GUIItemTriple> def) {
+	/*public List<ElementGUIItem> readGUIItemTripleList(String path, List<ElementGUIItem> def) {
 		return contains(path) ? doReadGUIItemTripleList(path) : def;
 	}
 
-	public List<GUIItemTriple> readMandatoryGUIItemTripleList(String path) {
+	public List<ElementGUIItem> readMandatoryGUIItemTripleList(String path) {
 		if (!contains(path)) {
 			throwMissing(path, "icon/locations list");
 		}
 		return doReadGUIItemTripleList(path);
 	}
 
-	private List<GUIItemTriple> doReadGUIItemTripleList(String path) {
+	private List<ElementGUIItem> doReadGUIItemTripleList(String path) {
 		validatePath(path);
 		// get items
-		List<GUIItemTriple> value = new ArrayList<>();
+		List<ElementGUIItem> value = new ArrayList<>();
 		for (String key : readKeysForSection(path)) {
 			try {
 				GUIItemTriple item = readMandatoryGUIItemTriple(path + "." + key);
@@ -613,7 +611,7 @@ public class YMLConfiguration {
 		}
 		GUIItemTriple value = new GUIItemTriple(item, persistent, locations);
 		return value;
-	}
+	}*/
 
 	// get chance item
 	public ItemChancePair readChanceItem(String path, ItemChancePair def) throws Throwable {
@@ -794,38 +792,54 @@ public class YMLConfiguration {
 	}
 
 	// set
+	public void copyFrom(YMLConfiguration src, String srcPath, String targetPath) {
+		write(targetPath, null);
+		if (src.contains(srcPath)) {
+			// proceed section
+			if (src.isConfigurationSection(srcPath)) {
+				for (String key : src.readKeysForSection(srcPath)) {
+					copyFrom(src, srcPath + "." + key, targetPath + "." + key);
+				}
+			}
+			// proceed value
+			else {
+				write(targetPath, src.read(srcPath, null));
+			}
+		}
+	}
+
 	public void copy(String path, String targetPath) {
 		if (contains(path)) {
 			validatePath(targetPath);
-			cloneRec(path, targetPath, false);
+			copyRec(path, targetPath, false);
 		}
 	}
 
 	public void move(String path, String targetPath) {
 		if (contains(path)) {
 			validatePath(targetPath);
-			cloneRec(path, targetPath, true);
+			copyRec(path, targetPath, true);
 		}
 	}
 
-	private void cloneRec(String path, String target, boolean remove) {
+	private void copyRec(String path, String target, boolean removeSrc) {
 		// proceed section
 		if (isConfigurationSection(path)) {
 			for (String key : readKeysForSection(path)) {
-				cloneRec(path + "." + key, target + "." + key, false);
+				copyRec(path + "." + key, target + "." + key, false);
 			}
-			if (remove) write(path, null);
+			if (removeSrc) write(path, null);
 		}
 		// proceed value
 		else {
 			write(target, read(path, null));
-			if (remove) write(path, null);
+			if (removeSrc) write(path, null);
 		}
 	}
 
 	public void write(String path, Object value) {
 		if (path.startsWith(".")) {
-			path = path.substring(1); // just ignore blank, so we don't have to always worry about that (in migrations, for instance)
+			path = path.substring(1);  // just ignore blank, so we don't have to always worry about that (in migrations, for instance)
 		}
 		validatePath(path);
 		// remove

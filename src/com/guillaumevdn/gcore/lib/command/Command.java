@@ -3,7 +3,6 @@ package com.guillaumevdn.gcore.lib.command;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -196,7 +195,7 @@ public class Command implements CommandExecutor, TabCompleter {
 							has1 = inc;
 						} else {
 							final Arg has1F = has1;
-							TextGeneric.messageCommandIncompatibleArguments.replace("{argument1}", () -> has1F.getName()).replace("{argument1}", () -> inc.getName()).send(sender);
+							TextGeneric.messageCommandIncompatibleArguments.replace("{argument1}", () -> has1F.getName()).replace("{argument2}", () -> inc.getName()).send(sender);
 							return true;
 						}
 					}
@@ -207,7 +206,7 @@ public class Command implements CommandExecutor, TabCompleter {
 				if (dependent.getA().has(call)) {
 					for (Arg dep : dependent.getB()) {
 						if (!dep.has(call)) {
-							TextGeneric.messageCommandDependentArguments.replace("{argument1}", () -> dependent.getA().getName()).replace("{argument1}", () -> dep.getName()).send(sender);
+							TextGeneric.messageCommandDependentArguments.replace("{argument1}", () -> dependent.getA().getName()).replace("{argument2}", () -> dep.getName()).send(sender);
 							return true;
 						}
 					}
@@ -216,11 +215,7 @@ public class Command implements CommandExecutor, TabCompleter {
 			// missing required arguments
 			for (Argument argument : subcommand.getArguments()) {
 				if (argument.getUsage() != null && argument.getNeed().equals(NeedType.REQUIRED) && argument.get(call) == null) {
-					List<String> found = subcommand.getArguments().stream()
-							.filter(arg -> arg.getUsage() != null && arg.get(call) != null)
-							.map(arg -> arg.getUsage().parseLine())
-							.collect(Collectors.toList());
-					(found.isEmpty() ? TextGeneric.messageCommandMissingArgument : TextGeneric.messageCommandMissingArgumentFound).replace("{argument}", () -> argument.getUsage().parseLines()).replace("{found}", () -> StringUtils.toTextString(", ", found)).send(sender);
+					subcommand.logMissingArgument(argument, call);
 					return true;
 				}
 			}
@@ -309,11 +304,36 @@ public class Command implements CommandExecutor, TabCompleter {
 					}
 				}
 			}
-			// suggest
-			return Stream.concat(
-					subcommand.getArguments().stream().filter(arg -> arg.canUse(sender) && arg.get(call) == null).map(arg -> arg.tabComplete(call)).filter(tabComplete -> tabComplete != null).flatMap(tabComplete -> tabComplete.stream()),
-					subcommand.getParameters().stream().filter(param -> !param.has(call)).flatMap(param -> param.getTabComplete().stream())
-					).collect(Collectors.toList());
+			// don't suggest new arguments if previous argument couldn't be parsed
+			String previous = original.length < 3 /* 2 would check the subcommand alias */ ? "" : original[original.length - 2];
+			if (!previous.isEmpty() && previous.charAt(0) != '-' && arguments.contains(previous) /* still contains means it can't be parsed */) {
+				return EMPTY_TAB_COMPLETE;
+			}
+			// -
+			String current = original[original.length - 1];
+			// suggesting parameter
+			if (!current.isEmpty() && current.charAt(0) == '-') {
+				String p = current.substring(1);
+				List<String> suggest = subcommand.getParameters().stream().filter(param -> p.isEmpty() || param.getAliases().stream().anyMatch(alias -> alias.startsWith(p))).filter(param -> !param.has(call)).flatMap(param -> param.getTabComplete().stream()).collect(Collectors.toList());
+				if (suggest.size() <= 1) {
+					return EMPTY_TAB_COMPLETE;  // most likely found param or incorrect param, either way don't suggest new arguments because there's no space
+				}
+				return suggest;  // only suggest params if start with hyphen
+			}
+			// not a parameter
+			else {
+				// don't suggest new arguments if there's no space behind an argument we just successfully parsed
+				if (!current.isEmpty() && !arguments.contains(current)) {
+					return EMPTY_TAB_COMPLETE;
+				}
+				// suggest stuff
+				List<String> suggest = new ArrayList<>();
+				if (current.isEmpty()) {
+					suggest.addAll(subcommand.getParameters().stream().filter(param -> !param.has(call)).flatMap(param -> param.getTabComplete().stream()).collect(Collectors.toList()));
+				}
+				suggest.addAll(subcommand.getArguments().stream().filter(arg -> arg.canUse(sender) && arg.get(call) == null).map(arg -> arg.tabComplete(call)).filter(tabComplete -> tabComplete != null).flatMap(tabComplete -> tabComplete.stream()).collect(Collectors.toList()));
+				return suggest;
+			}
 		}
 		// unknown subcommand
 		else {

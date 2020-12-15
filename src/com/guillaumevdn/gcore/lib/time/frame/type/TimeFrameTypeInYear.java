@@ -1,6 +1,6 @@
 package com.guillaumevdn.gcore.lib.time.frame.type;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.Month;
 
 import com.guillaumevdn.gcore.TextEditorGeneric;
@@ -26,7 +26,7 @@ public class TimeFrameTypeInYear extends TimeFrameTypeIn<TimeInYear> {
 	}
 
 	@Override
-	protected LocalDateTime minusOnePeriod(LocalDateTime time) {
+	protected ZonedDateTime minusOnePeriod(ZonedDateTime time) {
 		return time.minusYears(1);
 	}
 

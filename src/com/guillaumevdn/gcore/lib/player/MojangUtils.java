@@ -2,10 +2,12 @@ package com.guillaumevdn.gcore.lib.player;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 import java.util.UUID;
 
+import javax.annotation.Nullable;
 import javax.net.ssl.HttpsURLConnection;
 
 import com.guillaumevdn.gcore.GCore;
@@ -18,32 +20,38 @@ import com.mojang.util.UUIDTypeAdapter;
  */
 public final class MojangUtils {
 
+	@Nullable
 	public static UUID fetchUUID(String name) throws Throwable {
 		NameAnswer answer = jsonRequest("https://api.mojang.com/users/profiles/minecraft/" + name + "?at=" + (System.currentTimeMillis() / 1000L - 100L) + "&unsigned=false", NameAnswer.class);
+		if (answer == null) return null;
 		if (answer.id != null) {
 			return answer.id;
 		}
 		throw new Error("No id found");
 	}
 
+	@Nullable
 	public static GameProfile fetchProfile(UUID uuid) throws Throwable {
-		ProfileAnswer answer = jsonRequest("https://sessionserver.mojang.com/session/minecraft/profile/" + UUIDTypeAdapter.fromUUID(uuid) + "?unsigned=false", ProfileAnswer.class);
+		String suuid = UUIDTypeAdapter.fromUUID(uuid);
+		ProfileAnswer answer = jsonRequest("https://sessionserver.mojang.com/session/minecraft/profile/" + suuid + "?unsigned=false", ProfileAnswer.class);
+		if (answer == null) return null;
 		if (answer.name == null) throw new Error("No name found");
-		if (answer.properties == null || answer.properties.isEmpty()) throw new Error("No properties found");
+		if (answer.properties == null || answer.properties.isEmpty()) throw new Error("No properties found (" + suuid + ")");
 		for (ProfileProperty property : answer.properties) {
 			if (property.name.equalsIgnoreCase("textures")) {
 				// find textures
-				if (property.value == null) throw new Error("No value found in textures property");
-				if (property.signature == null) throw new Error("No signature found in textures property");
+				if (property.value == null) throw new Error("No value found in textures property (" + suuid + ")");
+				if (property.signature == null) throw new Error("No signature found in textures property (" + suuid + ")");
 				// we good
 				GameProfile profile = new GameProfile(uuid, answer.name);
 				profile.getProperties().put("textures", new Property("textures", property.value, property.signature));
 				return profile;
 			}
 		}
-		throw new Error("No textures property found");
+		throw new Error("No textures property found (" + suuid + ")");
 	}
 
+	@Nullable
 	private static <T> T jsonRequest(String url, Class<T> answerType) throws Throwable {
 		HttpsURLConnection connection = (HttpsURLConnection) new URL(url).openConnection();
 		if (connection.getResponseCode() == HttpsURLConnection.HTTP_OK) {
@@ -58,10 +66,12 @@ public final class MojangUtils {
 				return GCore.inst().getGson().fromJson(json, answerType);
 			} catch (Throwable exception) {
 				System.out.println("Raw json : " + json);
-				throw new Error("couldn't read answer", exception);
+				throw new Error("couldn't read answer, for " + url, exception);
 			}
+		} else if (connection.getResponseCode() == HttpURLConnection.HTTP_NO_CONTENT) {
+			return null;
 		} else {
-			throw new Error("Reponse code " + connection.getResponseCode() + ", " + connection.getResponseMessage());
+			throw new Error("Reponse code " + connection.getResponseCode() + ", " + connection.getResponseMessage() + ", for " + url);
 		}
 	}
 

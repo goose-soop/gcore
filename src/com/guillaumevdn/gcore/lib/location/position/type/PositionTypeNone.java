@@ -13,6 +13,7 @@ import com.guillaumevdn.gcore.lib.element.struct.parsing.ParsingError;
 import com.guillaumevdn.gcore.lib.location.position.ElementPosition;
 import com.guillaumevdn.gcore.lib.location.position.Position;
 import com.guillaumevdn.gcore.lib.location.position.PositionType;
+import com.guillaumevdn.gcore.lib.number.MinMaxDouble;
 import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
 
 /**
@@ -42,6 +43,10 @@ public class PositionTypeNone extends PositionType {
 			}
 			@Override
 			public Location findRandom() {
+				return null;
+			}
+			@Override
+			public MinMaxDouble getRandomSolidAndFreeAboveYBounds() {
 				return null;
 			}
 			@Override

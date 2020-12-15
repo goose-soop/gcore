@@ -1,9 +1,10 @@
 package com.guillaumevdn.gcore.lib.permission;
 
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 
 import com.guillaumevdn.gcore.lib.GPlugin;
+import com.guillaumevdn.gcore.lib.collection.LowerCaseHashMap;
 
 /**
  * @author GuillaumeVDN
@@ -11,7 +12,7 @@ import com.guillaumevdn.gcore.lib.GPlugin;
 public abstract class PermissionContainer {
 
 	private final GPlugin plugin;
-	private final Map<String, Permission> permissions = new HashMap<>();
+	private final LowerCaseHashMap<Permission> permissions = new LowerCaseHashMap<>();
 	private Permission admin = null;
 
 	public PermissionContainer(GPlugin plugin) {
@@ -24,7 +25,7 @@ public abstract class PermissionContainer {
 	}
 
 	public final Map<String, Permission> getPermissions() {
-		return permissions;
+		return Collections.unmodifiableMap(permissions);
 	}
 
 	public final Permission getAdminPermission() {
@@ -33,14 +34,14 @@ public abstract class PermissionContainer {
 	}
 
 	// set
-	public final Permission setAdmin(Permission parent, String name) {
+	public final Permission setAdmin(String name) {
 		if (admin != null) throw new IllegalStateException();
-		return admin = set(parent, name);
+		return admin = set(name);
 	}
 
-	public final Permission set(Permission parent, String name) {
-		Permission permission = new Permission(parent, name);
-		permissions.put(permission.getFullName(), permission);
+	public final Permission set(String name) {
+		Permission permission = new Permission(name);
+		permissions.put(name, permission);
 		return permission;
 	}
 

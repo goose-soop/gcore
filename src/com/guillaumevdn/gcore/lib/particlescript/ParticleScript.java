@@ -53,9 +53,7 @@ public class ParticleScript {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) return true;
-		ParticleScript other = ObjectUtils.castOrNull(obj, ParticleScript.class);
-		return other != null && other.id.equals(id);
+		return ObjectUtils.equals(obj, ParticleScript.class, other -> other.id.equals(id));
 	}
 
 }

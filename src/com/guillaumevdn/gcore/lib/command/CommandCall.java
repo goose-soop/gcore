@@ -62,6 +62,10 @@ public class CommandCall {
 		return arguments;
 	}
 
+	public Object[] getArgumentValues() {
+		return argumentValues;
+	}
+
 	public <T> T getArgumentValue(int index) {
 		return index < 0 || index >= argumentValues.length ? null : (T) argumentValues[index];
 	}

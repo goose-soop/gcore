@@ -16,7 +16,7 @@ import com.guillaumevdn.gcore.lib.reflection.ReflectionObject;
  * Original code : https://github.com/confuser/BarAPI
  */
 public final class FakeDragon {
-	
+
 	private Bossbar bossbar;
 	private Player player;
 	private transient ReflectionObject dragon = null;
@@ -45,7 +45,7 @@ public final class FakeDragon {
 	public void sendSpawn() throws Throwable {
 		Location loc = getLocation();
 		ReflectionObject world = ReflectionObject.of(getPlayer().getWorld()).invokeMethod("getHandle");
-		dragon = Reflection.newNmsInstance("EntityEnderDragon", world.get());
+		dragon = Reflection.newNmsInstance("EntityEnderDragon", new Object[] { world.get() });
 		dragon.invokeMethod("setLocation", loc.getX(), loc.getY(), loc.getZ(), loc.getPitch(), loc.getYaw());
 		dragon.invokeMethod("setInvisible", true);
 		dragon.invokeMethod("setCustomName", getBossbar().getTitle());

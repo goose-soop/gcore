@@ -40,6 +40,10 @@ import com.guillaumevdn.gcore.lib.element.struct.list.referenceable.ElementsCont
 import com.guillaumevdn.gcore.lib.element.type.basic.LinearObject;
 import com.guillaumevdn.gcore.lib.element.type.basic.LinearObjectType;
 import com.guillaumevdn.gcore.lib.gui.ItemFlag;
+import com.guillaumevdn.gcore.lib.gui.element.item.overrideclick.OverrideClick;
+import com.guillaumevdn.gcore.lib.gui.element.item.overrideclick.OverrideClickType;
+import com.guillaumevdn.gcore.lib.gui.element.item.type.GUIItemType;
+import com.guillaumevdn.gcore.lib.gui.element.item.type.GUIItemTypes;
 import com.guillaumevdn.gcore.lib.location.Point;
 import com.guillaumevdn.gcore.lib.location.position.PositionType;
 import com.guillaumevdn.gcore.lib.location.position.PositionTypes;
@@ -309,16 +313,12 @@ public abstract class Serializer<T> {
 
 	public static final Serializer<TimeFrameType> TIME_FRAME_TYPE = ofTypable(TimeFrameType.class, () -> TimeFrameTypes.inst());
 	public static final Serializer<PositionType> POSITION_TYPE = ofTypable(PositionType.class, () -> PositionTypes.inst());
+	public static final Serializer<GUIItemType> GUI_ITEM_TYPE = ofTypable(GUIItemType.class, () -> GUIItemTypes.inst());
 	public static final Serializer<Currency> CURRENCY = of(Currency.class, value -> value.getId(), string -> Currency.safeValueOf(string));
 	public static final Serializer<ParticleScript> PARTICLE_SCRIPT = of(ParticleScript.class, value -> value.getId(), string -> ConfigGCore.particleScripts.get(string));
 	public static final Serializer<ItemFlag> ITEM_FLAG = ofEnum(ItemFlag.class);
-	public static final Serializer<Permission> PERMISSION = of(Permission.class, value -> value.getFullName(), string -> {
-		Permission perm = null;
-		for (String part : StringUtils.split(string, ".", -1)) {
-			perm = new Permission(perm, part);
-		}
-		return perm;
-	});
+	public static final LinearSerializer<OverrideClickType, OverrideClick> OVERRIDE_CLICK = Serializer.ofLinear(Serializer.ofEnum(OverrideClickType.class), OverrideClick.class, (type, params) -> new OverrideClick(type, params));
+	public static final Serializer<Permission> PERMISSION = of(Permission.class, value -> value.getName(), string -> new Permission(string));
 	public static final Serializer<Point> POINT = of(Point.class,
 			value -> value.getWorld().getName() + "," + value.getX() + "," + value.getY() + "," + value.getZ(),
 			string -> {

@@ -23,6 +23,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.ExpBottleEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
@@ -45,6 +46,7 @@ import com.guillaumevdn.gcore.lib.compatibility.material.Mat;
 import com.guillaumevdn.gcore.lib.gui.InventoryState;
 import com.guillaumevdn.gcore.lib.gui.PlayerInventoryState;
 import com.guillaumevdn.gcore.lib.object.ObjectUtils;
+import com.guillaumevdn.gcore.lib.player.PhysicalClickType;
 import com.guillaumevdn.gcore.lib.tuple.Pair;
 
 /**
@@ -53,6 +55,18 @@ import com.guillaumevdn.gcore.lib.tuple.Pair;
 public final class CustomEventsListeners implements Listener {
 
 	private final Object __VALUE = new Object();
+
+	// item interact
+	@EventHandler(ignoreCancelled = false, priority = EventPriority.LOWEST)
+	public void eventItemInteract(PlayerInteractEvent event) {
+		if (!Mat.isVoid(event.getItem())) {
+			PlayerInteractItemEvent evt = new PlayerInteractItemEvent(event, event.getItem(), PhysicalClickType.valueOf(event.getAction().toString().replace("_BLOCK", "").replace("_AIR", "")));
+			Bukkit.getPluginManager().callEvent(evt);
+			if (!event.isCancelled() && evt.isCancelled()) {
+				event.setCancelled(true);
+			}
+		}
+	}
 
 	// block fire
 	private WeakHashMap<Player, Block> ignitedBlocks = new WeakHashMap<>();
@@ -133,6 +147,14 @@ public final class CustomEventsListeners implements Listener {
 		}
 	}
 
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+	public void event(EntityDeathEvent event) {
+		Player killer = event.getEntity().getKiller();
+		if (killer != null && !killer.equals(event.getEntity())) {
+			Bukkit.getPluginManager().callEvent(new PlayerKillEntityEvent(event, killer, event.getEntity()));
+		}
+	}
+
 	// potion throw
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
 	public void event(PotionSplashEvent og) {
@@ -150,7 +172,7 @@ public final class CustomEventsListeners implements Listener {
 	public void event(ExpBottleEvent og) {
 		Player player = ObjectUtils.castOrNull(og.getEntity().getShooter(), Player.class);
 		if (player != null) {
-			PlayerItemThrowEvent event = new PlayerItemThrowEvent(player, og.getEntity().getItem(), og.getEntity().getLocation());
+			PlayerItemThrowEvent event = new PlayerItemThrowEvent(player, Version.ATLEAST_1_13 ? og.getEntity().getItem() : Mat.firstFromIdOrDataName("EXPERIENCE_BOTTLE").get().newStack(), og.getEntity().getLocation());
 			Bukkit.getPluginManager().callEvent(event);
 			if (event.isCancelled()) {
 				og.setExperience(0);
@@ -164,7 +186,7 @@ public final class CustomEventsListeners implements Listener {
 	public void event(PlayerEggThrowEvent og) {
 		Player player = ObjectUtils.castOrNull(og.getEgg().getShooter(), Player.class);
 		if (player != null) {
-			PlayerItemThrowEvent event = new PlayerItemThrowEvent(player, og.getEgg().getItem(), og.getEgg().getLocation());
+			PlayerItemThrowEvent event = new PlayerItemThrowEvent(player, Version.ATLEAST_1_13 ? og.getEgg().getItem() : Mat.firstFromIdOrDataName("EGG").get().newStack(), og.getEgg().getLocation());
 			Bukkit.getPluginManager().callEvent(event);
 			if (event.isCancelled()) {
 				og.setHatching(false);
@@ -217,7 +239,7 @@ public final class CustomEventsListeners implements Listener {
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
 	public void eventContainerManipulation(InventoryClickEvent clickEvent) {
 		// build initial state
-		if (clickEvent.getClickedInventory() == null || !clickEvent.getClickedInventory().equals(clickEvent.getView().getTopInventory())) {
+		if (clickEvent.getClickedInventory() == null || clickEvent.getView().getTopInventory() == null) {
 			return;
 		}
 		InventoryState initialState = new InventoryState(clickEvent.getView().getTopInventory(), 0, clickEvent.getView().getTopInventory().getContents().length - 1);

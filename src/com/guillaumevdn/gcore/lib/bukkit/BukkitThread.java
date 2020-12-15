@@ -22,7 +22,7 @@ public enum BukkitThread {
 	private final boolean isSync = !name().contains("ASYNC");
 
 	public void operate(ThrowableRunnable callable) {
-		operate(callable, Throwable::printStackTrace);
+		operate(callable, null);
 	}
 
 	public void operate(ThrowableRunnable callable, Consumer<Throwable> onError) {

@@ -207,4 +207,13 @@ public final class Reflection {
 		}
 	}
 
+	// error
+	public static void logAndRethrowError(Throwable exception, String log) throws Error {
+		final String id = StringUtils.generateRandomAlphanumericString(10);
+		System.out.println("---- Reflection error " + id + " ----\n" + log);
+		exception.printStackTrace(System.out);
+		System.out.flush();
+		throw new Error(id, exception);
+	}
+
 }

@@ -1,6 +1,7 @@
 package com.guillaumevdn.gcore.lib.item.meta;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.UUID;
 
 import org.bukkit.inventory.meta.ItemMeta;
@@ -29,9 +30,9 @@ public final class MetaSkull {
 		SkullMeta meta = ObjectUtils.castOrNull(itemMeta, SkullMeta.class); // might be null if exact match is false
 		SkullMeta ref = ObjectUtils.castOrNull(referenceMeta, SkullMeta.class);
 		if (ref == null) return true;
-		// author
-		if (check.isExact() && (meta.hasOwner() != ref.hasOwner() || !meta.getOwner().equals(ref.getOwner()))) return false;
-		else if (!check.isExact() && ref.hasOwner() && (meta == null || !meta.hasOwner() || !meta.getOwner().equals(ref.getOwner()))) return false;
+		// owner
+		if (check.isExact() && (meta == null || meta.hasOwner() != ref.hasOwner() || !Objects.deepEquals(meta.getOwner(), ref.getOwner()))) return false;
+		else if (!check.isExact() && ref.hasOwner() && (meta == null || !meta.hasOwner() || !Objects.deepEquals(meta.getOwner(), ref.getOwner()))) return false;
 		// seems good
 		return true;
 	}

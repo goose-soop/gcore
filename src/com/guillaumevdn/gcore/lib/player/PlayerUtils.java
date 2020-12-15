@@ -72,6 +72,8 @@ public final class PlayerUtils {
 			return playerOnline == null ? player.isOp() : hasPermission0(playerOnline, permission);
 		} else if (target instanceof UUID) {
 			return hasPermission(Bukkit.getOfflinePlayer((UUID) target), permission);
+		} else if (target instanceof Replacer) {
+			return hasPermission(((Replacer) target).getReplacerData().getPlayer(), permission);
 		}
 		return false;
 	}
@@ -85,7 +87,7 @@ public final class PlayerUtils {
 			return;
 		}
 		if (message.trim().isEmpty()) {
-			return; // ignore strings that are completely empty (no format code &r)
+			return;  // ignore strings that are completely empty (no format code &r)
 		}
 		if (target instanceof CommandSender) {
 			CommandSender targetSender = (CommandSender) target;
@@ -96,11 +98,17 @@ public final class PlayerUtils {
 				sendMessage(sub, message, cc, onlyCC);
 			}
 		} else if (target instanceof OfflinePlayer) {
-			sendMessage(((OfflinePlayer) target).getPlayer(), message, cc, onlyCC);
+			OfflinePlayer offline = (OfflinePlayer) target;
+			Player online = offline.getPlayer();
+			if (online != null) {
+				sendMessage(online, message, cc, onlyCC);
+			} else {
+				if (cc != null) cc.sendMessage(message + (onlyCC ? TextGeneric.messageSilentCC : TextGeneric.messageCC).replace("{og}", () -> offline.getName()).parseLine());
+			}
 		} else if (target instanceof CommandCall) {
 			sendMessage(((CommandCall) target).getSender(), message, cc, onlyCC);
 		} else if (target instanceof UUID) {
-			sendMessage(Bukkit.getPlayer((UUID) target), message, cc, onlyCC);
+			sendMessage(Bukkit.getOfflinePlayer((UUID) target), message, cc, onlyCC);
 		} else if (target instanceof Replacer) {
 			sendMessage(((Replacer) target).getReplacerData().getPlayer(), message, cc, onlyCC);
 		} else {

@@ -158,7 +158,7 @@ public final class AdapterItemStack extends DataAdapter<ItemStack> {
 				}
 			}
 			// enchantments
-			Map<Enchantment, Integer> enchantments = reader.readMap("enchantments", Enchantment.class, (raw, d) -> d.readInteger(raw));
+			Map<Enchantment, Integer> enchantments = reader.readSameMap("enchantments", Enchantment.class, (raw, d) -> d.readInteger(raw));
 			if (enchantments != null) {
 				if (meta == null) meta = item.getItemMeta();
 				for (Entry<Enchantment, Integer> enchantment : enchantments.entrySet()) {

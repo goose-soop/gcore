@@ -1,6 +1,6 @@
 package com.guillaumevdn.gcore.lib.time.in;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 /**
  * @author GuillaumeVDN
@@ -13,8 +13,8 @@ public class TimeInDay extends TimeIn {
 
 	// get
 	@Override
-	public LocalDateTime getCurrent() {
-		return LocalDateTime.now().withHour(hour).withMinute(minute).withSecond(0).withNano(0);
+	public ZonedDateTime getCurrent() {
+		return ZonedDateTime.now().withHour(hour).withMinute(minute).withSecond(0).withNano(0);
 	}
 
 }

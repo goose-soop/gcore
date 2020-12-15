@@ -2,7 +2,9 @@ package com.guillaumevdn.gcore.lib.object;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Objects;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -42,6 +44,10 @@ public final class Optional<T> {
 		return value != null ? value : (def != null ? def.get() : null);
 	}
 
+	public Optional<T> orElseOptional(Optional<T> def) {
+		return value != null ? this : def;
+	}
+
 	public T orElse(T def) {
 		return value != null ? value : def;
 	}
@@ -67,8 +73,16 @@ public final class Optional<T> {
 	}
 
 	// do
+	public <R> Optional<R> ifPresentMapCastOrNull(Class<R> castClass) {
+		return isPresent() ? of(ObjectUtils.castOrNull(value, castClass)) : empty();
+	}
+
 	public <R> Optional<R> ifPresentMap(Function<T, R> mapper) {
 		return isPresent() ? of(mapper.apply(value)) : empty();
+	}
+
+	public <R> Optional<R> ifPresentMapOptional(Function<T, Optional<R>> mapper) {
+		return isPresent() ? mapper.apply(value) : empty();
 	}
 
 	public OptionalIfPresentFail ifPresentDo(Consumer<T> ifPresent) {
@@ -82,13 +96,19 @@ public final class Optional<T> {
 	}
 
 	public <E> OptionalIfPresentFail ifPresentForEach(Consumer<E> ifPresent) {
-		Collection<E> coll = (Collection<E>) value;
-		if (coll != null) {
-			for (E elem : coll) {
-				ifPresent.accept(elem);
-			}
+		if (value != null) {
+			Collection<E> coll = (Collection<E>) value;
+			coll.forEach(ifPresent);
 		}
-		return new OptionalIfPresentFail(coll != null);
+		return new OptionalIfPresentFail(value != null);
+	}
+
+	public <K, V> OptionalIfPresentFail ifPresentMapForEach(BiConsumer<K, V> ifPresent) {
+		if (value != null) {
+			Map<K, V> map = (Map<K, V>) value;
+			map.forEach(ifPresent);
+		}
+		return new OptionalIfPresentFail(value != null);
 	}
 
 	public <X extends Throwable> T orThrow(Supplier<X> builder) throws X {

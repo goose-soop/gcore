@@ -1,6 +1,7 @@
 package com.guillaumevdn.gcore.lib.item.meta;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
@@ -26,8 +27,8 @@ public final class MetaFireworkEffect {
 		FireworkEffectMeta ref = ObjectUtils.castOrNull(referenceMeta, FireworkEffectMeta.class);
 		if (ref == null) return true;
 		// effect
-		if (check.isExact() && (meta.hasEffect() != ref.hasEffect() || !meta.getEffect().equals(ref.getEffect()))) return false;
-		else if (!check.isExact() && ref.hasEffect() && (meta == null || !meta.hasEffect() || !meta.getEffect().equals(ref.getEffect()))) return false;
+		if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getEffect(), ref.getEffect()))) return false;
+		else if (!check.isExact() && ref.hasEffect() && (meta == null || !Objects.deepEquals(meta.getEffect(), ref.getEffect()))) return false;
 		// seems good
 		return true;
 	}

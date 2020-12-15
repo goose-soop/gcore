@@ -47,12 +47,13 @@ public class ReflectionFakeEnum {
 	}
 
 	// cache
-	private static Map<Class, ReflectionFakeEnum> cache = new HashMap<>();
+	private static Map<Integer, ReflectionFakeEnum> cache = new HashMap<>();
 
 	public static ReflectionFakeEnum of(Class<?> enumClass) throws Throwable {
-		ReflectionFakeEnum method = cache.get(enumClass);
+		// hash by class name
+		ReflectionFakeEnum method = cache.get(enumClass.getName().hashCode());
 		if (method == null) {
-			cache.put(enumClass, method = new ReflectionFakeEnum(enumClass));
+			cache.put(enumClass.getName().hashCode(), method = new ReflectionFakeEnum(enumClass));
 		}
 		return method;
 	}

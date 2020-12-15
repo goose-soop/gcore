@@ -4,10 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -17,7 +15,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
-import com.guillaumevdn.gcore.GCore;
+import com.guillaumevdn.gcore.lib.GPlugin;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.reflection.ReflectionObject;
 import com.guillaumevdn.gcore.lib.wrapper.WrapperInteger;
@@ -25,8 +23,9 @@ import com.guillaumevdn.gcore.lib.wrapper.WrapperInteger;
 /**
  * @author GuillaumeVDN
  */
-public class Bossbar {
+public final class Bossbar {
 
+	private GPlugin plugin;
 	private String id;
 	private String title;
 	private BossbarColor color;
@@ -35,7 +34,8 @@ public class Bossbar {
 	private double progress;
 	private Set<Player> players;
 
-	public Bossbar(String id, String title, BossbarColor color, BossbarStyle style, Collection<BossbarFlag> flags, double progress, Collection<Player> players) {
+	public Bossbar(GPlugin plugin, String id, String title, BossbarColor color, BossbarStyle style, Collection<BossbarFlag> flags, double progress, Collection<Player> players) {
+		this.plugin = plugin;
 		this.id = id;
 		this.title = title.length() > 64 ? title.substring(0, 64) : title;
 		this.color = color;
@@ -45,6 +45,10 @@ public class Bossbar {
 	}
 
 	// get
+	public GPlugin getPlugin() {
+		return plugin;
+	}
+
 	public String getId() {
 		return id;
 	}
@@ -118,13 +122,17 @@ public class Bossbar {
 		return instances;
 	}
 
+	public ReflectionObject getInstance(Player player) {
+		return instances == null ? null : instances.get(player);
+	}
+
 	public void startTempAutoProgress(int ticks, boolean noAutoProgress) {
 		start();
 		if (noAutoProgress) {
 			setProgress(1d);
 		}
 		WrapperInteger remainingTicks = WrapperInteger.of(ticks);
-		GCore.inst().registerTask("bossbar_temp_autoprogress_" + id, true, 1, () -> {
+		plugin.registerTask("bossbar_temp_autoprogress_" + id, true, 1, () -> {
 			if (remainingTicks.alter(-1) <= 0) {
 				stop();
 			} else if (!noAutoProgress) {
@@ -137,10 +145,10 @@ public class Bossbar {
 		if (instances != null) {
 			stop();
 		}
-		active.add(this);
+		plugin.registerBossbar(this);
 		instances = new HashMap<>();
 		players.forEach(player -> BossbarCompat.addPlayer(this, player));
-		GCore.inst().registerListener("bossbar_" + id, new Listener() {
+		plugin.registerListener("bossbar_" + id, new Listener() {
 			@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 			public void event(PlayerQuitEvent event) {
 				removePlayer(event.getPlayer());
@@ -165,16 +173,9 @@ public class Bossbar {
 			players.forEach(player -> BossbarCompat.removePlayer(this, player));
 			instances = null;
 		}
-		active.remove(this);
-		GCore.inst().stopListener("bossbar_" + id);
-		GCore.inst().stopTask("bossbar_temp_autoprogress_" + id);
-	}
-
-	// instances
-	private static Set<Bossbar> active = new HashSet<>();
-
-	public static void stopAllActive() {
-		active.stream().collect(Collectors.toList()).forEach(Bossbar::stop);
+		plugin.unregisterBossbar(this);
+		plugin.stopListener("bossbar_" + id);
+		plugin.stopTask("bossbar_temp_autoprogress_" + id);
 	}
 
 }

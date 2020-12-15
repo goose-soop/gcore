@@ -1,6 +1,6 @@
 package com.guillaumevdn.gcore.lib.time.in;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 /**
  * @author GuillaumeVDN
@@ -23,6 +23,6 @@ public abstract class TimeIn {
 		return minute;
 	}
 
-	public abstract LocalDateTime getCurrent();
+	public abstract ZonedDateTime getCurrent();
 
 }

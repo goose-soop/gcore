@@ -57,6 +57,10 @@ public class PositionTypeBiomes extends PositionType {
 				return null;
 			}
 			@Override
+			public int findSafeRandomMaxY() {
+				return 0;
+			}
+			@Override
 			public MinMaxDouble getRandomSolidAndFreeAboveYBounds() {
 				return null;
 			}

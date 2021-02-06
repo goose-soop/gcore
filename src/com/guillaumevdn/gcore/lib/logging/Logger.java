@@ -6,13 +6,12 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.LineNumberReader;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +24,7 @@ import com.guillaumevdn.gcore.lib.GPlugin;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.exception.ConfigError;
 import com.guillaumevdn.gcore.lib.file.FileUtils;
+import com.guillaumevdn.gcore.lib.reflection.Reflection;
 import com.guillaumevdn.gcore.lib.string.StringUtils;
 
 /**
@@ -39,7 +39,7 @@ public class Logger {
 	private String id;
 	private boolean logConsole, logFile, antiSpam;
 	private int fileLineLimit;
-	private List<String> linesToSave = new ArrayList<>();
+	private List<String> linesToSave = Collections.synchronizedList(new ArrayList<>());
 
 	public Logger(GPlugin plugin, String id, boolean logConsole, boolean logFile, int fileLineLimit) {
 		this(plugin, id, logConsole, logFile, fileLineLimit, true);
@@ -142,9 +142,7 @@ public class Logger {
 			if (logFile) {
 				linesToSave.add("[" + DATE_FORMAT.format(Calendar.getInstance().getTime()) + "] [" + level.getFilePrefix() + "] " + line);
 				if (trace != null && !(trace instanceof ConfigError)) {
-					StringWriter writer = new StringWriter();
-					trace.printStackTrace(new PrintWriter(writer));
-					linesToSave.add(writer.toString());
+					linesToSave.add(Reflection.stackTraceToString(trace));
 				}
 			}
 		} catch (Throwable logError) {
@@ -182,7 +180,9 @@ public class Logger {
 				// write lines
 				FileUtils.ensureExistence(file);
 				BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
-				CollectionUtils.clearForEachThrowable(linesToSave, line -> writer.write(line + "\n"));
+				synchronized (linesToSave) {
+					CollectionUtils.clearForEachThrowable(linesToSave, line -> writer.write(line + "\n"));
+				}
 				writer.close();
 				// maybe file has too many lines, so archive it
 				if (newLineCount > fileLineLimit) {

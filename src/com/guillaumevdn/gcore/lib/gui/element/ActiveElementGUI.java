@@ -3,7 +3,7 @@ package com.guillaumevdn.gcore.lib.gui.element;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-import com.guillaumevdn.gcore.lib.gui.element.item.element.ElementGUIItem;
+import com.guillaumevdn.gcore.lib.gui.element.item.ElementGUIItem;
 import com.guillaumevdn.gcore.lib.gui.struct.ClickCall;
 import com.guillaumevdn.gcore.lib.gui.struct.GUIType;
 import com.guillaumevdn.gcore.lib.gui.struct.active.ActiveGUI;

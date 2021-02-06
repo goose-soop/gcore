@@ -1,6 +1,7 @@
 package com.guillaumevdn.gcore.lib.element.type.basic;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.potion.PotionEffectType;
@@ -113,7 +114,7 @@ public class LinearObject<T extends LinearObjectType> {
 		String found = getValidArgument(index);
 		PotionEffectType value = ObjectUtils.potionEffectTypeOrNull(found);
 		if (value != null) return value;
-		throw new IllegalArgumentException("type " + type.name() + " needed a potion effect for argument " + (index + 1) + " (found '" + found + "') (arguments : " + arguments + ")");
+		throw new IllegalArgumentException("type " + type.name() + " needed a potion effect for argument " + (index + 1) + " (found '" + found + "') (arguments : " + arguments + " ; available : " + StringUtils.toTextString(",", Arrays.stream(PotionEffectType.values()).map(PotionEffectType::getName)) + ")");
 	}
 
 	public ParticleScript getValidParticleScriptArgument(int index) {

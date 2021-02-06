@@ -1,4 +1,4 @@
-package com.guillaumevdn.gcore.lib.gui.element.item.element;
+package com.guillaumevdn.gcore.lib.gui.element.item;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,7 +23,7 @@ import com.guillaumevdn.gcore.lib.gui.element.item.type.GUIItemTypes;
 import com.guillaumevdn.gcore.lib.gui.struct.ClickCall;
 import com.guillaumevdn.gcore.lib.gui.struct.ClickCall.ClickType;
 import com.guillaumevdn.gcore.lib.gui.struct.active.ActiveGUI;
-import com.guillaumevdn.gcore.lib.gui.struct.active.ActiveHolderItem;
+import com.guillaumevdn.gcore.lib.gui.struct.active.ActiveItemHolder;
 import com.guillaumevdn.gcore.lib.gui.struct.active.ItemHolder;
 import com.guillaumevdn.gcore.lib.string.Text;
 import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
@@ -75,7 +75,7 @@ public class ElementGUIItem extends TypableContainerElement<GUIItemType> {
 		}
 		// add override clicks
 		Map<ClickType, Consumer<ClickCall>> result = new HashMap<>();
-		getOverrideClicks().parse(replacer).orEmptyMap().forEach((click, action) -> { // don't ignore NONE type, even for the default element ; the dude choose to set it that way, maybe he wants to cancel the effects of the TYPE
+		getOverrideClicks().parse(replacer).orEmptyMap().forEach((click, action) -> {  // don't ignore NONE type, even for the default element ; the dude choose to set it that way, maybe he wants to cancel the effects of the TYPE
 			Consumer<ClickCall> handler = action.getType().buildHandler(action);
 			if (handler != null) {
 				result.put(click, handler);
@@ -85,13 +85,13 @@ public class ElementGUIItem extends TypableContainerElement<GUIItemType> {
 		ElementOverrideClick def = getOverrideClicks().getDefaultElement().orNull();
 		OverrideClick parsedDef = def == null ? null : def.parse(replacer).orNull();
 		Consumer<ClickCall> defHandler = parsedDef == null ? null : parsedDef.getType().buildHandler(parsedDef);
-		if (defHandler != null) { // don't ignore NONE type, even for the default element ; the dude choose to set it that way, maybe he wants to cancel the effects of the TYPE
+		if (defHandler != null) {  // don't ignore NONE type, even for the default element ; the dude choose to set it that way, maybe he wants to cancel the effects of the TYPE
 			for (ClickType click : ClickType.values()) {
 				result.computeIfAbsent(click, __ -> defHandler);
 			}
 		}
 		// cache if no parseable locations
-		if (!hasParseableLocations()) {
+		if (!overrideClicks.hasParseableLocations()) {
 			overrideClicksCache = result;
 		}
 		// done
@@ -117,12 +117,12 @@ public class ElementGUIItem extends TypableContainerElement<GUIItemType> {
 	public ItemHolder getHolder() {
 		return holderCache != null ? holderCache : (holderCache = new ItemHolder(getId()) {
 			@Override
-			public boolean getPersistent(Replacer replacer) {
-				return ElementGUIItem.this.getPersistent().parse(replacer).orElse(false);
+			public boolean parsePersistent(ActiveGUI instance) {
+				return ElementGUIItem.this.getPersistent().parse(instance.getReplacer()).orElse(false);
 			}
 			@Override
-			public ActiveHolderItem newActive(ActiveGUI gui) throws ParsingError {
-				return ElementGUIItem.this.getType().newActive(gui, this, ElementGUIItem.this, gui.getReplacer());
+			public ActiveItemHolder newActive(ActiveGUI gui) {
+				return ElementGUIItem.this.getType().newActive(gui, this, ElementGUIItem.this);
 			}
 		});
 	}

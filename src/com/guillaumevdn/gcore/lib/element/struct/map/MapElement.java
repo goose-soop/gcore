@@ -82,7 +82,10 @@ public abstract class MapElement<K, V extends Element> extends AbstractMapElemen
 			K key = null;
 			try {
 				key = getKeySerializer().deserialize(elementId);
-			} catch (Throwable ignored) {}
+			} catch (Throwable ignored) {
+				/*ignored.printStackTrace();
+				System.out.println("element id " + elementId + ", type serializer " + getKeySerializer());*/
+			}
 			if (key == null) {
 				getSuperElement().addLoadError("key " + elementId + " at path " + path + " isn't a valid " + getKeySerializer().getTypeName());
 			}

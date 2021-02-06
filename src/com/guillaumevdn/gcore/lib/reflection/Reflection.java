@@ -1,5 +1,9 @@
 package com.guillaumevdn.gcore.lib.reflection;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -214,6 +218,20 @@ public final class Reflection {
 		exception.printStackTrace(System.out);
 		System.out.flush();
 		throw new Error(id, exception);
+	}
+
+	public static String stackTraceToString(Throwable exception) {
+		try (StringWriter writer = new StringWriter()) {
+			exception.printStackTrace(new PrintWriter(writer));
+			return writer.toString();
+		} catch (IOException ignored) {
+			return null;
+		}
+	}
+
+	public static boolean stackTraceContainsIgnoreCase(Throwable exception, String... containsOne) {
+		String trace = stackTraceToString(exception).toLowerCase();
+		return Arrays.stream(containsOne).anyMatch(contains -> trace.contains(contains.toLowerCase()));
 	}
 
 }

@@ -24,7 +24,7 @@ public final class WorldGuardCompat {
 	// get region
 	private static final ReflectionProcedureBiFunction<World, String, Object> GET_REGION = new ReflectionProcedureBiFunction<World, String, Object>()
 			.setIf(Version.ATLEAST_1_13, (world, regionId) -> {
-				Object bukkitWorld = Reflection.newInstance("com.sk89q.worldedit.bukkit.BukkitWorld", world);
+				Object bukkitWorld = Reflection.newInstance("com.sk89q.worldedit.bukkit.BukkitWorld", world).justGet();
 				return Reflection.invokeMethod("com.sk89q.worldguard.WorldGuard", "getInstance", null).invokeMethod("getPlatform").invokeMethod("getRegionContainer").invokeMethod("get", bukkitWorld).invokeMethod("getRegion", regionId);
 			})
 			.orElse((world, regionId) -> ReflectionObject.ofPlugin("WorldGuard").invokeMethod("getRegionContainer").invokeMethod("get", world).invokeMethod("getRegion", regionId).orNull());
@@ -36,7 +36,7 @@ public final class WorldGuardCompat {
 	// get regions
 	private static final ReflectionProcedureFunction<World, Collection<String>> GET_REGIONS = new ReflectionProcedureFunction<World, Collection<String>>()
 			.setIf(Version.ATLEAST_1_13, (world) -> {
-				Object bukkitWorld = Reflection.newInstance("com.sk89q.worldedit.bukkit.BukkitWorld", world);
+				Object bukkitWorld = Reflection.newInstance("com.sk89q.worldedit.bukkit.BukkitWorld", world).justGet();
 				Map<String, ?> map = Reflection.invokeMethod("com.sk89q.worldguard.WorldGuard", "getInstance", null).invokeMethod("getPlatform").invokeMethod("getRegionContainer").invokeMethod("get", bukkitWorld).invokeMethod("getRegions").get();
 				return map == null ? null : CollectionUtils.asList(map.keySet());
 			})
@@ -55,7 +55,7 @@ public final class WorldGuardCompat {
 				ReflectionObject region = ReflectionObject.ofOrNull(getRegion(world, regionId));
 				if (region == null) return null;
 				ReflectionObject regionMin = region.invokeMethod("getMinimumPoint");
-				ReflectionObject regionMax = region.invokeMethod("getMaximumPoints");
+				ReflectionObject regionMax = region.invokeMethod("getMaximumPoint");
 				Point min = new Point(world.getName(), regionMin.invokeMethod("getX").get(), regionMin.invokeMethod("getY").get(), regionMin.invokeMethod("getZ").get());
 				Point max = new Point(world.getName(), regionMax.invokeMethod("getX").get(), regionMax.invokeMethod("getY").get(), regionMax.invokeMethod("getZ").get());
 				return Pair.of(min, max);

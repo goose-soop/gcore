@@ -1,4 +1,4 @@
-package com.guillaumevdn.gcore.lib.gui.element.item.element;
+package com.guillaumevdn.gcore.lib.gui.element.item;
 
 import com.guillaumevdn.gcore.lib.compatibility.material.CommonMats;
 import com.guillaumevdn.gcore.lib.compatibility.material.Mat;

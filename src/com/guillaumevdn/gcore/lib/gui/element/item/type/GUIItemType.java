@@ -1,17 +1,15 @@
 package com.guillaumevdn.gcore.lib.gui.element.item.type;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
 import com.guillaumevdn.gcore.TextEditorGeneric;
 import com.guillaumevdn.gcore.lib.compatibility.material.Mat;
 import com.guillaumevdn.gcore.lib.element.struct.Need;
 import com.guillaumevdn.gcore.lib.element.struct.container.typable.TypableElementType;
-import com.guillaumevdn.gcore.lib.element.struct.parsing.ParsingError;
-import com.guillaumevdn.gcore.lib.gui.element.item.element.ElementGUIItem;
+import com.guillaumevdn.gcore.lib.gui.element.item.ElementGUIItem;
 import com.guillaumevdn.gcore.lib.gui.struct.active.ActiveGUI;
-import com.guillaumevdn.gcore.lib.gui.struct.active.ActiveHolderItem;
+import com.guillaumevdn.gcore.lib.gui.struct.active.ActiveItemHolder;
 import com.guillaumevdn.gcore.lib.gui.struct.active.ItemHolder;
-import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
 
 /**
  * @author GuillaumeVDN
@@ -35,7 +33,7 @@ public abstract class GUIItemType extends TypableElementType<ElementGUIItem> {
 	}
 
 	// build
-	@Nullable
-	public abstract ActiveHolderItem newActive(ActiveGUI gui, ItemHolder holder, ElementGUIItem item, Replacer replacer) throws ParsingError;
+	@Nonnull
+	public abstract ActiveItemHolder newActive(ActiveGUI instance, ItemHolder holder, ElementGUIItem element);
 
 }

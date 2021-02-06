@@ -50,6 +50,7 @@ public final class CommonMats {
 	public static final Mat GRASS_BLOCK = Mat.firstFromIdOrDataName("GRASS_BLOCK").get();
 	public static final Mat GRAY_DYE = Mat.firstFromIdOrDataName("GRAY_DYE").get();
 	public static final Mat GRAY_WOOL = Mat.firstFromIdOrDataName("GRAY_WOOL").get();
+	public static final Mat LEVER = Mat.firstFromIdOrDataName("LEVER").get();
 	public static final Mat LIME_DYE = Mat.firstFromIdOrDataName("LIME_DYE").get();
 	public static final Mat GREEN_WOOL = Mat.firstFromIdOrDataName("GREEN_WOOL").get();
 	public static final Mat GUNPOWDER = Mat.firstFromIdOrDataName("GUNPOWDER").get();

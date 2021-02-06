@@ -136,6 +136,8 @@ public final class GCore extends GPlugin<ConfigGCore, PermissionGCore> {
 	protected void enable() throws Throwable {
 		// avoid some class errors
 		getClassLoader().loadClass("com.guillaumevdn.gcore.lib.player.PlayerUtils");
+		getClassLoader().loadClass("com.guillaumevdn.gcore.lib.data.Query");
+		getClassLoader().loadClass("com.guillaumevdn.gcore.lib.function.ThrowableConsumer");
 
 		try {  // those occur with GCoreLegacy for some reason
 			getClassLoader().loadClass("com.comphenix.protocol.wrappers.WrappedSignedProperty");

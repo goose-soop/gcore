@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 
 import com.guillaumevdn.gcore.lib.block.BlockState;
 import com.guillaumevdn.gcore.lib.compatibility.material.Mat;
+import com.guillaumevdn.gcore.lib.location.LocationUtils;
 import com.guillaumevdn.gcore.lib.number.MinMaxDouble;
 
 /**
@@ -29,6 +30,21 @@ public interface Position {
 	// random
 	boolean canFindRandom();
 	Location findRandom();
+	int findSafeRandomMaxY();
+
+	default Location findMaybeSafeRandom(int entityHeight, int maxTries) {
+		if (!canFindRandom()) {
+			return null;
+		}
+		int maxY = findSafeRandomMaxY();
+		for (int tries = 0; tries <= maxTries; ++tries) {
+			Location random = LocationUtils.trySafeize(findRandom(), maxY, entityHeight);
+			if (random != null) {
+				return random;
+			}
+		}
+		return findRandom();
+	}
 
 	// random solid and free above
 	MinMaxDouble getRandomSolidAndFreeAboveYBounds();

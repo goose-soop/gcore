@@ -50,6 +50,11 @@ public class PositionSphereOutside implements Position {
 	}
 
 	@Override
+	public int findSafeRandomMaxY() {
+		return center.getBlockY() + ((int) radius) * 2;
+	}
+
+	@Override
 	public MinMaxDouble getRandomSolidAndFreeAboveYBounds() {
 		return MinMaxDouble.of(0d, 255d);
 	}

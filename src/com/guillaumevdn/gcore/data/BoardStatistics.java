@@ -79,7 +79,7 @@ public class BoardStatistics extends BiKeyedBoardRemote<Statistic, UUID, Double>
 	@Override
 	protected void remoteInitMySQL() throws Throwable {
 		GCore.inst().getMySQLConnector().performUpdateQuery(getPlugin(), new Query(""
-				+ "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + "("
+				+ "CREATE TABLE IF NOT EXISTS `" + TABLE_NAME + "`("
 				+ "`key` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,"
 				+ "`statistic` VARCHAR(100) NOT NULL,"
 				+ "`user_uuid` CHAR(36) NOT NULL,"
@@ -93,13 +93,13 @@ public class BoardStatistics extends BiKeyedBoardRemote<Statistic, UUID, Double>
 	// pull
 	@Override
 	protected void remotePullAllMySQL() throws Throwable {
-		remotePullElementsMySQL(new Query("SELECT * FROM " + TABLE_NAME + ";"), () -> cache.clear());
+		remotePullElementsMySQL(new Query("SELECT * FROM `" + TABLE_NAME + "`;"), () -> cache.clear());
 	}
 
 	@Override
 	protected void remotePullElementsMySQL(Set<BiKeyReference<Statistic, UUID>> references) throws Throwable {
 		if (references.isEmpty()) return;
-		Query query = new Query("SELECT * FROM " + TABLE_NAME + " ");
+		Query query = new Query("SELECT * FROM `" + TABLE_NAME + "` ");
 		int i = -1;
 		for (BiKeyReference<Statistic, UUID> ref : references) {
 			query.add((++i == 0 ? "WHERE" : "OR") + " (`statistic`=? AND `user_uuid`=?)", ref.getKey(), ref.getKey2());
@@ -111,7 +111,7 @@ public class BoardStatistics extends BiKeyedBoardRemote<Statistic, UUID, Double>
 	@Override
 	protected void remotePullKeysMySQL(Set<KeyReference<Statistic>> references) throws Throwable {
 		if (references.isEmpty()) return;
-		Query query = new Query("SELECT * FROM " + TABLE_NAME + " ");
+		Query query = new Query("SELECT * FROM `" + TABLE_NAME + "` ");
 		int i = -1;
 		for (KeyReference<Statistic> ref : references) {
 			query.add((++i == 0 ? "WHERE" : "OR") + " (`statistic`=?)", ref.getKey());
@@ -154,7 +154,7 @@ public class BoardStatistics extends BiKeyedBoardRemote<Statistic, UUID, Double>
 		if (refs.isEmpty()) return;  // let's avoid deleting the whole table just because there's no WHERE clause
 		for (List<BiKeyReference<Statistic, UUID>> references : CollectionUtils.split(refs, 999)) {  // multiple VALUES are limited to 1000 elements ; https://stackoverflow.com/questions/452859/inserting-multiple-rows-in-a-single-sql-query#comment22032805_452934
 			Query query = buildRemoteDeleteElementsMySQLQuery(references);
-			query.add("INSERT INTO " + TABLE_NAME + "(`statistic`,`user_uuid`,`value`) VALUES ");
+			query.add("INSERT INTO `" + TABLE_NAME + "`(`statistic`,`user_uuid`,`value`) VALUES ");
 			int i = -1;
 			for (BiKeyReference<Statistic, UUID> reference : references) {
 				String comma = (++i + 1 < references.size() ? "," : "");
@@ -174,7 +174,7 @@ public class BoardStatistics extends BiKeyedBoardRemote<Statistic, UUID, Double>
 
 	private Query buildRemoteDeleteElementsMySQLQuery(Collection<BiKeyReference<Statistic, UUID>> references) {
 		if (references.isEmpty()) return null; // let's avoid deleting the whole table just because there's no WHERE clause ; this shouldn't happen since this method is private but better be juuust a little more sure
-		Query query = new Query("DELETE FROM " + TABLE_NAME + " ");
+		Query query = new Query("DELETE FROM `" + TABLE_NAME + "` ");
 		int i = -1;
 		for (BiKeyReference<Statistic, UUID> reference : references) {
 			query.add((++i == 0 ? "WHERE" : "OR") + " (`statistic`=? AND `user_uuid`=?)", reference.getKey(), reference.getKey2());

@@ -4,6 +4,8 @@ import com.guillaumevdn.gcore.lib.bukkit.BukkitThread;
 import com.guillaumevdn.gcore.lib.integration.Integration;
 import com.guillaumevdn.gcore.lib.integration.IntegrationInstance;
 
+import me.clip.placeholderapi.PlaceholderAPIPlugin;
+
 /**
  * @author GuillaumeVDN
  */
@@ -28,7 +30,13 @@ public class IntegrationInstancePlaceholderAPI extends IntegrationInstance {
 	@Override
 	public void deactivate() {
 		BukkitThread.SYNC.operate(() -> {
-			expansion.unregister();
+			try {
+				try {
+					expansion.unregister();
+				} catch (Throwable ignored) {
+					PlaceholderAPIPlugin.getInstance().getLocalExpansionManager().unregister(expansion);  // it seems to bug sometimes for some reason if we use expansion.unregister() directly
+				}
+			} catch (Throwable ignored) {}  // come on man
 			expansion = null;
 		});
 	}

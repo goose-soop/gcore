@@ -120,9 +120,11 @@ public final class DataIO {
 		return node;
 	}
 
+	private static final Set<String> IGNORE_SNAKECASE = CollectionUtils.asSet("nbt", "enchantments");
+
 	private void objectToYML(String id, Object object, SectionNode node, boolean camelCaseToSnakeCase) {
 		if (object instanceof DataIO) {
-			sectionToYML(id, (DataIO) object, node, !id.equalsIgnoreCase("nbt") && camelCaseToSnakeCase);
+			sectionToYML(id, (DataIO) object, node, !IGNORE_SNAKECASE.contains(id.toLowerCase()) && camelCaseToSnakeCase);
 		} else if (object instanceof List) {
 			List list = (List) object;
 			if (!list.isEmpty()) {

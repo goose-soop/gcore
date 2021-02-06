@@ -89,6 +89,7 @@ public abstract class Variants<V extends Variant, DE extends Enum<DE>, D extends
 			for (V mat : values.values()) {
 				if (mat.getData().getDataName().equalsIgnoreCase(string)) {
 					result = Optional.of(mat);
+					break;
 				}
 			}
 			byDataNameQueryCache.put(string, result != null ? result : (result = Optional.empty()));
@@ -165,7 +166,7 @@ public abstract class Variants<V extends Variant, DE extends Enum<DE>, D extends
 		// any version
 		if (string.startsWith("?")) {
 			string = string.substring(1).trim();
-			version = Version.ANY;
+			version = Version.UNKNOWN;
 			comparison = ComparisonType.MORE_OR_EQUALS;
 		}
 		// specified version

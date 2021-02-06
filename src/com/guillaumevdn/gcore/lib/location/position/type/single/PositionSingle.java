@@ -62,6 +62,11 @@ public class PositionSingle implements Position {
 	}
 
 	@Override
+	public int findSafeRandomMaxY() {
+		return location.getBlockY() + 5;
+	}
+
+	@Override
 	public Location findClosestTo(Location loc) {
 		if (!loc.getWorld().equals(location.getWorld())) {
 			return null;

@@ -174,7 +174,7 @@ public class WorkerGCore {
 	private Map<UUID, GameProfile> profileCache = new HashMap<>();
 	private final GameProfile DEFAULT_PROFILE = fromTexture(UUID.randomUUID(), "Steve", "ewogICJ0aW1lc3RhbXAiIDogMTYwODAzMTQ1MTk2MSwKICAicHJvZmlsZUlkIiA6ICJlYzU2MTUzOGYzZmQ0NjFkYWZmNTA4NmIyMjE1NGJjZSIsCiAgInByb2ZpbGVOYW1lIiA6ICJBbGV4IiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzFhNGFmNzE4NDU1ZDRhYWI1MjhlN2E2MWY4NmZhMjVlNmEzNjlkMTc2OGRjYjEzZjdkZjMxOWE3MTNlYjgxMGIiCiAgICB9CiAgfQp9", "J4QNnTc0p9NbhK5zkD5pd+N2lKtH/0y884MOFQyxVGcUYDuSaa5XkkoLBTe/iaOICjarfwd1gLgNNg8XqAW3imb7bsOlN1D+3A3POkjlrdTKgLqFU9ouGwhdhh6rbMa6Sz6Ir6b8bgbeniEKYQxzOjyLbZwaDfJgXycPuQ7dnXiycVrgMYAcSHv3FH/K2Fm4RfjeIWJctWWsgpZdxmX9E0o83LEKlqEH6bT1aMTVnWJDRcak9A/OR6iSwz6ABrsWzARtlwi10mVwZUEQovByOo+UHxGfQErWm6kXbn7U/faDI3Gfq3ovvP/KyhGjB64gYQN0OWFt99N8FM+jWnPuRxVZlH0jx0Sxe2PGPvNy/lwD4gDbJfKScMSsapYZqbTenZ4QakqPVfGYI23JdQMC3IcTjuz4hHlKNjF+AgGZEqz/gDyKUT+95eOJH+8Kr0+KCzmKaL2zKY1/or7zcCsaeAyY/M+trfr6nARfFVBInHVYLHkOPkRSj3xvjNKW1sP4szJvxhQ/V968ipydRTlnQ67H8J8Laz5TDxxB2uQlRkGi6bvk1T7LSNNY/GSTovJVatR9adxTjbndby+DmrfFb666XjZ6kJshwEsudnQs2BU/jG9zi3tvCKoma/d6LbcSr2hfSYCl+ErWCFDSuVB4zJZa5rOLGW2Ea5s1ePFeHiM=");
 
-	public void fetchProfile(UUID ownerUUID, String ownerName, String skinData, String skinSignature, Consumer<GameProfile> callback) {
+	private void fetchProfile(UUID ownerUUID, String ownerName, String skinData, String skinSignature, Consumer<GameProfile> callback) {
 		// has data
 		if (skinData != null) {
 			callback.accept(fromTexture(ownerUUID, ownerName, skinData, skinSignature));
@@ -228,19 +228,31 @@ public class WorkerGCore {
 	}
 
 	public void buildPlayerHead(OfflinePlayer owner, String name, List<String> lore, Consumer<ItemStack> done) {
-		fetchProfile(owner.getUniqueId(), owner.getName(), null, null, profile -> {
-			try {
-				ItemStack item = CommonMats.PLAYER_HEAD.newStack();
-				SkullMeta meta = (SkullMeta) item.getItemMeta();
-				ReflectionObject.of(meta).setField("profile", profile);
-				if (name != null) meta.setDisplayName(name);
-				if (lore != null) meta.setLore(lore);
-				item.setItemMeta(meta);
-				done.accept(item);
-			} catch (Throwable error) {
-				GCore.inst().getMainLogger().error("An error occured when building head item for " + owner.getName(), error);
-			}
-		});
+		Consumer<UUID> run = uuid -> {
+			fetchProfile(uuid, owner.getName(), null, null, profile -> {
+				try {
+					ItemStack item = CommonMats.PLAYER_HEAD.newStack();
+					SkullMeta meta = (SkullMeta) item.getItemMeta();
+					ReflectionObject.of(meta).setField("profile", profile);
+					if (name != null) meta.setDisplayName(name);
+					if (lore != null) meta.setLore(lore);
+					item.setItemMeta(meta);
+					done.accept(item);
+				} catch (Throwable error) {
+					GCore.inst().getMainLogger().error("An error occured when building head item for " + owner.getName(), error);
+				}
+			});
+		};
+		if (!Bukkit.getOnlineMode()) {  // fetch UUID by name if it's an offline server, to get the correct skin
+			BukkitThread.ASYNC.operate(() -> {
+				UUID uuid = MojangUtils.fetchUUID(owner.getName());
+				run.accept(uuid != null ? uuid : owner.getUniqueId());
+			});
+		} else {
+			run.accept(owner.getUniqueId());
+		}
+
+
 	}
 
 	// static

@@ -366,13 +366,14 @@ public class GUI {
 		});
 		// update existing items
 		existing.forEach(existingItem -> {
+			existingItem.setLocations(new ArrayList<>());
 			setRegularItem(existingItem);
 		});
 		// we good
 		return pageIndex;
 	}
 
-	public final IntegerPair findOrCreateFreeForRegular(int preferredPageIndex, int preferredSlot) {
+	private final IntegerPair findOrCreateFreeForRegular(int preferredPageIndex, int preferredSlot) {
 		return doFindOrCreateFreeForRegular(preferredPageIndex, preferredSlot, false);
 	}
 

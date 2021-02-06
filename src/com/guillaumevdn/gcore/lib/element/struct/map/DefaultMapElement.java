@@ -46,6 +46,11 @@ public abstract class DefaultMapElement<K, V extends Element> extends MapElement
 		return Optional.of(defaultElement);
 	}
 
+	@Override
+	public boolean hasParseableLocations() {
+		return super.hasParseableLocations() || defaultElement == null || defaultElement.hasParseableLocations();
+	}
+
 	// loading and saving
 	@Override
 	protected void doRead() throws Throwable {

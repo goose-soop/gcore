@@ -138,6 +138,9 @@ dont_log_missing_editor_texts: true
 # Debug logs for item and NBT creation/matching
 logspam_item_nbt: false
 
+# Set this to ASYNC if you see issues in timings due to tasks in CustomEventsListener
+custom_events_thread: SYNC
+
 # --------------------------------------------------
 # GUI
 # --------------------------------------------------

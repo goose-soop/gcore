@@ -1,20 +1,27 @@
 package com.guillaumevdn.gcore.lib.event;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
-import org.bukkit.event.player.PlayerEvent;
 
 /**
  * @author GuillaumeVDN
  */
-public class PlayerSpawnedEntityEvent extends PlayerEvent {
+public class PlayerSpawnedEntityEvent extends Event {
 
+	private Player player;
 	private LivingEntity entity;
 
 	public PlayerSpawnedEntityEvent(Player player, LivingEntity entity) {
-		super(player);
+		super(!Bukkit.isPrimaryThread());
+		this.player = player;
 		this.entity = entity;
+	}
+	
+	public Player getPlayer() {
+		return player;
 	}
 
 	public LivingEntity getEntity() {

@@ -31,7 +31,9 @@ public final class ObjectUtils {
 					return value;
 				}
 			}
-		} catch (Throwable ignored) {}
+		} catch (Throwable ignored) {
+			ignored.printStackTrace();  // because why the heck does it happen sometimes ? :CringeHarold:
+		}
 		return null;
 	}
 
@@ -59,12 +61,18 @@ public final class ObjectUtils {
 			return null;
 		}
 		try {
+			Enchantment ench = Enchantment.getByName(name.toUpperCase());
+			if (ench != null) {
+				return ench;
+			}
 			for (Enchantment value : Enchantment.values()) {
-				if (value.getName().equalsIgnoreCase(name)) {
+				if (value != null /* seems to happen sometimes for some dank reason ??? */ && value.getName().equalsIgnoreCase(name)) {
 					return value;
 				}
 			}
-		} catch (Throwable ignored) {}
+		} catch (Throwable ignored) {
+			ignored.printStackTrace();  // because why the heck does it happen sometimes ? :CringeHarold:
+		}
 		return null;
 	}
 
@@ -73,12 +81,18 @@ public final class ObjectUtils {
 			return null;
 		}
 		try {
+			PotionEffectType eff = PotionEffectType.getByName(name.toUpperCase());
+			if (eff != null) {
+				return eff;
+			}
 			for (PotionEffectType value : PotionEffectType.values()) {
-				if (value.getName().equalsIgnoreCase(name)) {
+				if (value != null /* seems to happen sometimes for some dank reason ??? */ && name.equalsIgnoreCase(value.getName())) {
 					return value;
 				}
 			}
-		} catch (Throwable ignored) {}
+		} catch (Throwable ignored) {
+			ignored.printStackTrace();  // because why the heck does it happen sometimes ? :CringeHarold:
+		}
 		return null;
 	}
 

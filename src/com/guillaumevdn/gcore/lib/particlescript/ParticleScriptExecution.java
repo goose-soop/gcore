@@ -95,32 +95,36 @@ public class ParticleScriptExecution {
 	 * @return true if this execution is over
 	 */
 	public boolean update(Collection<Player> players, boolean isAsync) {
-		// must wait
-		if (--ticksToWait > 0) {
-			return false;
-		}
-		// get base location (and end if invalid)
-		Location baseLocation = getBaseLocation();
-		if (baseLocation == null) {
-			return true;
-		}
-		// reset base location variables (it might have moved)
-		setVariable("baseX", baseLocation.getX());
-		setVariable("baseY", baseLocation.getY());
-		setVariable("baseZ", baseLocation.getZ());
-		// execute operations
-		for (;;) {
-			// done for this execution
-			if (++operationIndex >= script.getOperations().size()) {
-				if (autoLoop) {
-					reset();
-				}
+		try {
+			// must wait
+			if (--ticksToWait > 0) {
+				return false;
+			}
+			// get base location (and end if invalid)
+			Location baseLocation = getBaseLocation();
+			if (baseLocation == null) {
 				return true;
 			}
-			// perform next operation
-			if ((ticksToWait = script.getOperations().get(operationIndex).perform(this, players, isAsync)) > 0) {
-				return false;  // must wait
+			// reset base location variables (it might have moved)
+			setVariable("baseX", baseLocation.getX());
+			setVariable("baseY", baseLocation.getY());
+			setVariable("baseZ", baseLocation.getZ());
+			// execute operations
+			for (;;) {
+				// done for this execution
+				if (++operationIndex >= script.getOperations().size()) {
+					if (autoLoop) {
+						reset();
+					}
+					return true;
+				}
+				// perform next operation
+				if ((ticksToWait = script.getOperations().get(operationIndex).perform(this, players, isAsync)) > 0) {
+					return false;  // must wait
+				}
 			}
+		} catch (Throwable ignored) {
+			return false;  // sometimes an error appears, on startup and such, but it apparently has no impact on players
 		}
 	}
 
@@ -135,7 +139,8 @@ public class ParticleScriptExecution {
 		try {
 			return NumberUtils.calculateExpression(parsed);
 		} catch (Throwable exception) {
-			script.getPlugin().getMainLogger().error("Couldn't parse mathematical expression '" + parsed + "' (raw '" + raw + "') (" + exception.getMessage() + ")");
+			//script.getPlugin().getMainLogger().error("Couldn't parse mathematical expression '" + parsed + "' (raw '" + raw + "') (" + exception.getMessage() + ")");
+			// - just don't print this anymore, it shows for invalid stuff
 			return null;
 		}
 	}

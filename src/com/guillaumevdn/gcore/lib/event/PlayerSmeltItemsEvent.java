@@ -25,6 +25,7 @@ public class PlayerSmeltItemsEvent extends Event {
 	private Map<Integer, ItemStack> cost, smelt;
 
 	public PlayerSmeltItemsEvent(FurnaceSmeltEvent event, UUID player, Furnace furnace, InventoryState inventoryBefore, InventoryState inventoryAfter, Map<Integer, ItemStack> cost, Map<Integer, ItemStack> smelt) {
+		super(!Bukkit.isPrimaryThread());
 		this.event = event;
 		this.player = player;
 		this.furnace = furnace;

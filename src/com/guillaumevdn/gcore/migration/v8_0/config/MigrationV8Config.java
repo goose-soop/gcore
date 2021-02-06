@@ -52,22 +52,32 @@ public final class MigrationV8Config extends Migration {
 		// init serializers
 		Serializer.BANNER_PATTERN.getGsonAdapter();
 
-		// make sure all .yml files can be loaded with our new replacer
-		attemptFilesOperation("making sure all files can be loaded by the new YAML replacer", "file", BackupBehavior.RESTORE, getPluginFolder(), FILTER_YML,
+		// make sure all .yml files can be loaded with our new parser
+		List<String> errors = new ArrayList<>();
+		attemptFilesOperation("making sure all files can be loaded by the new YAML parser", "file", BackupBehavior.RESTORE, getPluginFolder(), FILTER_YML,
 				file -> {
 					try {
 						new YMLConfiguration(getPlugin(), file);
 					} catch (Throwable cause) {
 						YMLError causeYML = ObjectUtils.findCauseOrNull(cause, YMLError.class);
 						YMLError causeConfig = ObjectUtils.findCauseOrNull(cause, YMLError.class);
-						List<String> errors = CollectionUtils.asList("This file can't be loaded with the new YAML replacer : " + file.getPath());
+						List<String> errs = CollectionUtils.asList("This file can't be loaded with the new YAML parser : " + file.getPath());
 						if (causeYML != null || causeConfig != null) {
-							errors.add((causeYML != null ? causeYML : causeConfig).getMessage());
+							errs.add((causeYML != null ? causeYML : causeConfig).getMessage());
+							errors.addAll(errs);
+						} else {
+							fail(errs, cause, BackupBehavior.RESTORE);
+							throw new SilentFail();
 						}
-						fail(errors, causeYML != null || causeConfig != null ? null : cause, BackupBehavior.RESTORE);
-						throw new SilentFail();
 					}
 				});
+
+		attemptOperation("making sure all files can be loaded by the new YAML parser", BackupBehavior.RESTORE, () -> {
+			if (!errors.isEmpty()) {
+				fail(errors, null, BackupBehavior.RESTORE);
+				throw new SilentFail();
+			}
+		});
 
 		// copy the old files in the GCoreLegacy directory
 		if (Stream.of("SupremeShops", "BettingGames", "Potatoes", "CustomCommands", "GParticles", "GSlotMachine").anyMatch(pl -> new File(getPluginFolder().getParentFile() + "/" + pl).exists())) {

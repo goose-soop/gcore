@@ -66,14 +66,17 @@ public final class GcoreExport extends Subcommand {
 		// copy latest logs
 		File logRoot = new File(Bukkit.getWorldContainer() + "/logs");
 		int logCount = 0;
-		for (File logFile : Stream.of(logRoot.listFiles()).sorted((a, b) -> -a.compareTo(b)).collect(Collectors.toList())) {
-			if (++logCount > 3) break;
-			File f = new File(temp + "/log_" + logFile.getName());
-			try {
-				FileUtils.copy(logFile, f);
-			} catch (IOException exception) {
-				exception.printStackTrace();
-				TextGCore.messageGcoreExportCouldnt.replace("{file}", () -> f).send(call.getSender());
+		File[] arr = logRoot.listFiles();
+		if (arr != null) {  // happens
+			for (File logFile : Stream.of(arr).sorted((a, b) -> -a.compareTo(b)).collect(Collectors.toList())) {
+				if (++logCount > 3) break;
+				File f = new File(temp + "/log_" + logFile.getName());
+				try {
+					FileUtils.copy(logFile, f);
+				} catch (IOException exception) {
+					exception.printStackTrace();
+					TextGCore.messageGcoreExportCouldnt.replace("{file}", () -> f).send(call.getSender());
+				}
 			}
 		}
 		// create server info file

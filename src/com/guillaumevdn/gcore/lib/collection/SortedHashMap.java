@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import com.guillaumevdn.gcore.lib.object.ObjectUtils;
@@ -151,6 +152,10 @@ public class SortedHashMap<K, V> implements Cloneable {
 
 	public void putAll(Map<? extends K, ? extends V> putAll) {
 		map.putAll(putAll);
+	}
+
+	public V computeIfAbsent(K key, Supplier<V> ifAbsent) {
+		return map.computeIfAbsent(key, __ -> ifAbsent.get());
 	}
 
 	/**

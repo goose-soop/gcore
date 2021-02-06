@@ -3,12 +3,10 @@ package com.guillaumevdn.gcore.lib.legacy_npc.navigation.pathfinding;
 import org.bukkit.Location;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.guillaumevdn.gcore.lib.compatibility.particle.Particle;
-import com.guillaumevdn.gcore.lib.player.PlayerUtils;
 import com.guillaumevdn.gcore.lib.legacy_npc.navigation.NPCConfig;
 import com.guillaumevdn.gcore.lib.legacy_npc.navigation.pathfinding.movement.Movement;
-import com.guillaumevdn.gcore.lib.legacy_npc.navigation.pathfinding.path.Path;
 import com.guillaumevdn.gcore.lib.legacy_npc.navigation.pathfinding.path.ExploringPathPoint;
+import com.guillaumevdn.gcore.lib.legacy_npc.navigation.pathfinding.path.Path;
 
 /**
  * @author GuillaumeVDN
@@ -46,7 +44,7 @@ final class PathfindingTask extends BukkitRunnable {
 				// mark the new point to be ignored ; we don't want a path to re-check it later (this avoids loops)
 				finder.ignore(movement.getTarget());
 				// FIXME : setting for pathfinding
-				Particle.fromId("VILLAGER_ANGRY").orNull().send(PlayerUtils.getOnline(), movement.getTarget().toLocation(finder.getWorld()));  // FIXME : remove
+				//Particle.fromId("VILLAGER_ANGRY").orNull().send(PlayerUtils.getOnline(), movement.getTarget().toLocation(finder.getWorld()));  // FIXME : remove
 				// maybe we're done ?
 				if (finder.getTolerance().match(movement.getTarget().toLocation(finder.getWorld()), targetLocation)) {
 					finder.end(PathfindingResult.SUCCESS);

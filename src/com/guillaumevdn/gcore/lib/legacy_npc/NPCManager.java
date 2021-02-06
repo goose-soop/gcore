@@ -245,7 +245,7 @@ public class NPCManager implements Listener {
 		// load npcs
 		elementsNpcs.clear();
 		YMLConfiguration config = GCore.inst().loadConfigurationFile("npcs.yml");
-		for (int id : config.readNumberKeysForSection("npcs", 1)) {
+		for (int id : config.readNumberKeysForSection("npcs", null)) {
 			ElementNPC npc = new ElementNPC("" + id);
 			npc.read();
 			elementsNpcs.put(id, npc);

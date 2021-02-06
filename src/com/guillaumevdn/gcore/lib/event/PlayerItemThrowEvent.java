@@ -1,28 +1,35 @@
 package com.guillaumevdn.gcore.lib.event;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
+import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
-import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.inventory.ItemStack;
 
 /**
  * Potion, exp bottles, ...
  * @author GuillaumeVDN
  */
-public class PlayerItemThrowEvent extends PlayerEvent implements Cancellable {
+public class PlayerItemThrowEvent extends Event implements Cancellable {
 
+	private Player player;
 	private ItemStack item;
 	private Location location;
 
 	public PlayerItemThrowEvent(Player player, ItemStack item, Location location) {
-		super(player);
+		super(!Bukkit.isPrimaryThread());
+		this.player = player;
 		this.item = item;
 		this.location = location;
 	}
 
 	// get
+	public Player getPlayer() {
+		return player;
+	}
+	
 	public ItemStack getItem() {
 		return item;
 	}

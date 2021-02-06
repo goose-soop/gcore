@@ -61,7 +61,7 @@ public abstract class AbstractMapElement<K, V extends IElement> extends Element 
 	}
 
 	@Override
-	public final boolean hasParseableLocations() {
+	public boolean hasParseableLocations() {
 		for (V element : elements.values()) {
 			if (element.hasParseableLocations()) {
 				return true;

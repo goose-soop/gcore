@@ -8,11 +8,12 @@ import org.bukkit.entity.Player;
 
 import com.guillaumevdn.gcore.TextEditorGeneric;
 import com.guillaumevdn.gcore.lib.block.BlockState;
+import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.compatibility.material.CommonMats;
 import com.guillaumevdn.gcore.lib.compatibility.material.Mat;
 import com.guillaumevdn.gcore.lib.element.struct.Need;
 import com.guillaumevdn.gcore.lib.element.struct.parsing.ParsingError;
-import com.guillaumevdn.gcore.lib.element.type.basic.ElementWorld;
+import com.guillaumevdn.gcore.lib.element.type.basic.ElementWorldList;
 import com.guillaumevdn.gcore.lib.location.position.ElementPosition;
 import com.guillaumevdn.gcore.lib.location.position.Position;
 import com.guillaumevdn.gcore.lib.location.position.PositionType;
@@ -22,33 +23,33 @@ import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
 /**
  * @author GuillaumeVDN
  */
-public class PositionTypeWorld extends PositionType {
+public class PositionTypeWorlds extends PositionType {
 
-	public PositionTypeWorld(String id) {
+	public PositionTypeWorlds(String id) {
 		super(id, CommonMats.MINECART);
 	}
 
 	// elements
 	@Override
 	protected void doFillTypeSpecificElements(ElementPosition position) {
-		position.addWorld("world", Need.required(), TextEditorGeneric.descriptionPositionTypeWorld);
+		position.addWorldList("worlds", Need.required(), TextEditorGeneric.descriptionPositionTypeWorld);
 	}
 
 	// parse
 	@Override
 	public Position doParse(ElementPosition position, Replacer replacer) throws ParsingError {
-		World world = position.getElementAs("world", ElementWorld.class).parseNoCatchOrThrowParsingNull(replacer);
+		List<World> worlds = position.getElementAs("worlds", ElementWorldList.class).parseNoCatchOrThrowParsingNull(replacer);
 		return new Position() {
 			@Override
 			public boolean match(Location loc) {
 				if (loc == null) {
 					return false;
 				}
-				return loc.getWorld().equals(world);
+				return worlds.contains(loc.getWorld());
 			}
 			@Override
 			public World getWorld() {
-				return world;
+				return CollectionUtils.random(worlds);
 			}
 			@Override
 			public boolean canFindRandom() {
@@ -59,12 +60,16 @@ public class PositionTypeWorld extends PositionType {
 				return null;
 			}
 			@Override
+			public int findSafeRandomMaxY() {
+				return 0;
+			}
+			@Override
 			public MinMaxDouble getRandomSolidAndFreeAboveYBounds() {
 				return null;
 			}
 			@Override
 			public Location findClosestTo(Location loc) {
-				if (!loc.getWorld().equals(world)) {
+				if (!worlds.contains(loc.getWorld())) {
 					return null;
 				}
 				return loc;

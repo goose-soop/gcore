@@ -2,10 +2,11 @@ package com.guillaumevdn.gcore.lib.event;
 
 import java.util.Map;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.guillaumevdn.gcore.lib.gui.InventoryState;
@@ -13,14 +14,14 @@ import com.guillaumevdn.gcore.lib.gui.InventoryState;
 /**
  * @author GuillaumeVDN
  */
-public class PlayerManipulatedContainerEvent extends PlayerEvent {
+public class PlayerManipulatedContainerEvent extends Event {
 
 	private InventoryClickEvent event;
 	private InventoryState containerBefore, containerAfter;
 	private Map<Integer, ItemStack> removed, added;
 
 	public PlayerManipulatedContainerEvent(InventoryClickEvent event, InventoryState containerBefore, InventoryState containerAfter, Map<Integer, ItemStack> removed, Map<Integer, ItemStack> added) {
-		super((Player) event.getWhoClicked());
+		super(!Bukkit.isPrimaryThread());
 		this.containerBefore = containerBefore;
 		this.containerAfter = containerAfter;
 		this.event = event;
@@ -29,6 +30,10 @@ public class PlayerManipulatedContainerEvent extends PlayerEvent {
 	}
 
 	// get
+	public Player getPlayer() {
+		return (Player) event.getWhoClicked();
+	}
+
 	public InventoryClickEvent getEvent() {
 		return event;
 	}

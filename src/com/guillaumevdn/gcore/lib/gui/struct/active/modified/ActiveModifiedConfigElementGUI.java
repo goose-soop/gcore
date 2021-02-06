@@ -43,10 +43,6 @@ public class ActiveModifiedConfigElementGUI extends ActiveElementGUI {
 				return iconModifier != null ? iconModifier.apply(icon) : icon;
 			}
 			@Override
-			protected long forceRefreshDelayTicks() {
-				return forceRefreshDelayTicks != null ? forceRefreshDelayTicks : super.forceRefreshDelayTicks();
-			}
-			@Override
 			protected void onClick(ClickCall call) {
 				if (onClick != null) {
 					onClick.accept(call);

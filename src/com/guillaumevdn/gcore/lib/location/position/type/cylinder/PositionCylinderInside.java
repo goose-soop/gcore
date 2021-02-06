@@ -56,6 +56,11 @@ public class PositionCylinderInside implements Position {
 	}
 
 	@Override
+	public int findSafeRandomMaxY() {
+		return 255;
+	}
+
+	@Override
 	public MinMaxDouble getRandomSolidAndFreeAboveYBounds() {
 		return MinMaxDouble.of(0d, 255d);
 	}

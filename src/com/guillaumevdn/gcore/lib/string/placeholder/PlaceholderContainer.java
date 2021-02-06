@@ -191,4 +191,17 @@ public class PlaceholderContainer implements Comparable<PlaceholderContainer> {
 		return null;  // no match;
 	}));
 
+	public static final PlaceholderContainerBrackets ROUND = register(new PlaceholderContainerBrackets("mathround", 1001, false, CollectionUtils.asList("§7Math round : §8{mathround:places,EXPRESSION}"), (placeholderContent, player) -> {
+		if (placeholderContent.toLowerCase().startsWith("mathround:")) {
+			String content = placeholderContent.substring("mathround:".length());
+			int index = content.indexOf(',');
+			if (index != -1) {
+				int places = NumberUtils.integerOrElse(content.substring(0, index), 0);
+				double calc = NumberUtils.calculateExpression(content.substring(index + 1));
+				return "" + NumberUtils.round(calc, places);
+			}
+		}
+		return null;  // no match;
+	}));
+
 }

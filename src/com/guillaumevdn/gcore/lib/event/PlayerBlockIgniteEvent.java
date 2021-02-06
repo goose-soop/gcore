@@ -1,26 +1,32 @@
 package com.guillaumevdn.gcore.lib.event;
 
+import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
+import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.block.BlockIgniteEvent;
-import org.bukkit.event.player.PlayerEvent;
 
 /**
  * @author GuillaumeVDN
  */
-public class PlayerBlockIgniteEvent extends PlayerEvent implements Cancellable {
+public class PlayerBlockIgniteEvent extends Event implements Cancellable {
 
 	private BlockIgniteEvent event;
 	private Block onFire;
 
 	public PlayerBlockIgniteEvent(BlockIgniteEvent event, Block onFire) {
-		super(event.getPlayer());
+		super(!Bukkit.isPrimaryThread());
 		this.event = event;
 		this.onFire = onFire;
 	}
 
 	// get
+	public Player getPlayer() {
+		return event.getPlayer();
+	}
+
 	public BlockIgniteEvent getEvent() {
 		return event;
 	}

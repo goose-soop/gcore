@@ -20,7 +20,7 @@ public class EditorGUI extends GUI {
 	}
 
 	public EditorGUI(GPlugin plugin, String title, ClickCall fromCall) {
-		super(plugin, "editor_" + StringUtils.generateRandomAlphanumericString(10), fromCall == null ? title : fromCall.getGUI().getName() + "/" + title, GUIType.CHEST_6_ROW, fromCall);
+		super(plugin, "editor_" + StringUtils.generateRandomAlphanumericString(10), fromCall == null || fromCall.getGUI() == null /* can happen due to /qc edit <editor> */ ? title : fromCall.getGUI().getName() + "/" + title, GUIType.CHEST_6_ROW, fromCall);
 	}
 
 	/** @return true if the GUI was opened */

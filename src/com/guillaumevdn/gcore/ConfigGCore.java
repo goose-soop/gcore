@@ -12,6 +12,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
 
 import com.guillaumevdn.gcore.lib.GPluginConfig;
+import com.guillaumevdn.gcore.lib.bukkit.BukkitThread;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.collection.LowerCaseHashMap;
 import com.guillaumevdn.gcore.lib.compatibility.material.CommonMats;
@@ -69,6 +70,7 @@ public class ConfigGCore extends GPluginConfig {
 	public static boolean allowProtocolGUIs;
 	public static boolean dontLogMissingEditorTexts;
 	public static boolean logspamItemNbt;
+	public static BukkitThread customEventsThread;
 
 	public static ZoneId timeZone() {
 		return customTimeZone != null ? customTimeZone : ZoneId.systemDefault();
@@ -197,6 +199,7 @@ public class ConfigGCore extends GPluginConfig {
 		allowProtocolGUIs = baseConfig.readBoolean("allow_protocol_guis", true);
 		dontLogMissingEditorTexts = baseConfig.readBoolean("dont_log_missing_editor_texts", true);
 		logspamItemNbt = baseConfig.readBoolean("logspam_item_nbt", false);
+		customEventsThread = baseConfig.readEnum("custom_events_thread", BukkitThread.SYNC, BukkitThread.class);
 		// data
 		if (baseConfig.contains("mysql")) {
 			String host = baseConfig.readMandatoryString("mysql.host");

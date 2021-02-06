@@ -15,7 +15,7 @@ import com.guillaumevdn.gcore.lib.element.struct.Need;
 import com.guillaumevdn.gcore.lib.element.struct.SuperElement;
 import com.guillaumevdn.gcore.lib.element.struct.container.ContainerElement;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementString;
-import com.guillaumevdn.gcore.lib.gui.element.item.element.ElementGUIItem;
+import com.guillaumevdn.gcore.lib.gui.element.item.ElementGUIItem;
 import com.guillaumevdn.gcore.lib.gui.struct.ClickCall;
 import com.guillaumevdn.gcore.lib.gui.struct.ElementGUIType;
 import com.guillaumevdn.gcore.lib.gui.struct.GUIType;

@@ -38,7 +38,7 @@ public enum TokenType {
 	public static final List<TokenType> NOT_IDENTIFIABLE = CollectionUtils.asList(LINE_BREAK, COMMENT);
 	public static final List<TokenType> IDENTIFIABLE = CollectionUtils.asList(SECTION_EMPTY, LIST_COMPACT, LIST_EZ, LIST, VALUE_DEVELOPED, VALUE_DEVELOPED_WEAK, VALUE, SECTION);
 
-	private ThrowableFunction<ReaderContext, Boolean> reader; // return true to start checking the first token type again
+	private ThrowableFunction<ReaderContext, Boolean> reader;  // return true to start checking the first token type again
 
 	TokenType(ThrowableFunction<ReaderContext, Boolean> reader) {
 		this.reader = reader;

@@ -1,6 +1,7 @@
 package com.guillaumevdn.gcore.lib.particlescript;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -17,7 +18,7 @@ public class MultipleBasedParticleScriptExecution<K> {
 	private final Supplier<Map<K, Location>> locationSupplier;
 	private final boolean autoLoop;
 	private Map<K, Location> locations = new HashMap<>();
-	private Map<K, ParticleScriptExecution> executions = new HashMap<>();
+	private Map<K, ParticleScriptExecution> executions = Collections.synchronizedMap(new HashMap<>());
 
 	public MultipleBasedParticleScriptExecution(ParticleScript script, Supplier<Map<K, Location>> locationSupplier, boolean autoLoop) {
 		this.script = script;

@@ -1,5 +1,6 @@
 package com.guillaumevdn.gcore.lib.event;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
@@ -17,6 +18,7 @@ public class PlayerDamageEntityEvent extends Event implements Cancellable {
 	private Entity damaged;
 
 	public PlayerDamageEntityEvent(EntityDamageByEntityEvent event, Player damager, Entity damaged) {
+		super(!Bukkit.isPrimaryThread());
 		this.event = event;
 		this.damager = damager;
 		this.damaged = damaged;

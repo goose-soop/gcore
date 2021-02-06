@@ -48,7 +48,11 @@ public final class NumberUtils {
 	}
 
 	public static List<Integer> range(int includedStart, int includedEnd) {
-		return Stream.iterate(includedStart, i -> i + 1).limit(includedEnd - includedStart + 1).collect(Collectors.toList());
+		return rangeStream(includedStart, includedEnd).collect(Collectors.toList());
+	}
+
+	public static Stream<Integer> rangeStream(int includedStart, int includedEnd) {
+		return Stream.iterate(includedStart, i -> i + 1).limit(includedEnd - includedStart + 1);
 	}
 
 	public static int square(int nb) {
@@ -166,7 +170,7 @@ public final class NumberUtils {
 			double parse() {
 				nextChar();
 				double x = parseExpression();
-				if (pos < str.length()) throw new CalculationError("when parsing expression '" + expression + "', unexpected character '" + (char) ch + "'");
+				if (pos < str.length()) throw new CalculationError("when parsing expression '" + expression + "', unexpected character '" + new Character((char) ch).toString() + "'");
 				return x;
 			}
 

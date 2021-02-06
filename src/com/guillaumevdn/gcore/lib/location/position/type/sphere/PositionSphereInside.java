@@ -24,11 +24,11 @@ public class PositionSphereInside implements Position {
 		this.center = center;
 		this.radius = radius;
 	}
-	
+
 	public Location getCenter() {
 		return center;
 	}
-	
+
 	public double getRadius() {
 		return radius;
 	}
@@ -55,6 +55,11 @@ public class PositionSphereInside implements Position {
 	@Override
 	public Location findRandom() {
 		return LocationUtils.findRandomInSphere(center, 0d, radius);
+	}
+
+	@Override
+	public int findSafeRandomMaxY() {
+		return center.getBlockY() + (int) radius;
 	}
 
 	@Override

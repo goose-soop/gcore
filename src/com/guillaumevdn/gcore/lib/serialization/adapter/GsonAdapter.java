@@ -35,7 +35,7 @@ public class GsonAdapter<T> extends TypeAdapter<T> {
 		try {
 			adapter.write(value, data);
 		} catch (Throwable exception) {
-			throw new IOException(exception);
+			throw new IOException("error with adapter " + adapter.getType().getSimpleName(), exception);
 		}
 		writeObject(writer, data);
 	}

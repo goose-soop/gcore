@@ -1,26 +1,32 @@
 package com.guillaumevdn.gcore.lib.event;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
+import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
-import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerFishEvent;
 
 /**
  * @author GuillaumeVDN
  */
-public class PlayerItemFishEvent extends PlayerEvent implements Cancellable {
+public class PlayerItemFishEvent extends Event implements Cancellable {
 
 	private PlayerFishEvent event;
 	private Item caught;
 
 	public PlayerItemFishEvent(PlayerFishEvent event, Item caught) {
-		super(event.getPlayer());
+		super(!Bukkit.isPrimaryThread());
 		this.event = event;
 		this.caught = caught;
 	}
 
 	// get
+	public Player getPlayer() {
+		return event.getPlayer();
+	}
+
 	public PlayerFishEvent getEvent() {
 		return event;
 	}

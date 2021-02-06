@@ -23,11 +23,18 @@ public final class MojangUtils {
 	@Nullable
 	public static UUID fetchUUID(String name) throws Throwable {
 		NameAnswer answer = jsonRequest("https://api.mojang.com/users/profiles/minecraft/" + name + "?at=" + (System.currentTimeMillis() / 1000L - 100L) + "&unsigned=false", NameAnswer.class);
-		if (answer == null) return null;
-		if (answer.id != null) {
-			return answer.id;
+		if (answer != null && answer.trimmedUUID != null) {  // content and uuid found
+			StringBuilder builder = new StringBuilder(36);
+			char[] ch = answer.trimmedUUID.toCharArray();
+			for (int i = 0; i < ch.length; ++i) {
+				if (i == 8 || i == 13 || i == 18 || i == 23) {
+					builder.append('-');
+				}
+				builder.append(ch[i]);
+			}
+			return UUID.fromString(builder.toString());
 		}
-		throw new Error("No id found");
+		return null;  // no content or no uuid
 	}
 
 	@Nullable
@@ -76,7 +83,7 @@ public final class MojangUtils {
 	}
 
 	private static class NameAnswer {
-		private UUID id;
+		private String trimmedUUID;
 	}
 
 	private static class ProfileAnswer {

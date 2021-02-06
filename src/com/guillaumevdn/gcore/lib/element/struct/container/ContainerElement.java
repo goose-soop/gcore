@@ -46,6 +46,8 @@ import com.guillaumevdn.gcore.lib.element.type.basic.ElementEntityTypeList;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementFireworkEffectType;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementFloat;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementFloatList;
+import com.guillaumevdn.gcore.lib.element.type.basic.ElementHorseColorList;
+import com.guillaumevdn.gcore.lib.element.type.basic.ElementHorseStyleList;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementInteger;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementIntegerList;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementInventoryTypeList;
@@ -169,7 +171,7 @@ public abstract class ContainerElement extends AbstractMapElement<String, Elemen
 		return element != null ? element.parse(replacer) : Optional.empty();
 	}
 
-	public final <T> Optional<T> parseElementAs(String id, Class<T> elementClass, Replacer replacer) {
+	public final <T> Optional<T> parseElementAs(String id, Class<T> contentClass, Replacer replacer) {
 		ParseableElement<T> element = getElementAs(id);
 		return element != null ? element.parse(replacer) : Optional.empty();
 	}
@@ -462,6 +464,10 @@ public abstract class ContainerElement extends AbstractMapElement<String, Elemen
 	public final ElementFloatList addFloatList(String id, Need need, float min, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementFloatList(this, id, need, min, editorDescription)); }
 	public final ElementFloatList addFloatList(String id, Need need, float min, float max, Text editorDescription) { return add(new ElementFloatList(this, id, need, min, max, editorDescription)); }
 	public final ElementFloatList addFloatList(String id, Need need, float min, float max, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementFloatList(this, id, need, min, max, editorDescription)); }
+	public final ElementHorseColorList addHorseColorList(String id, Need need, Text editorDescription) { return add(new ElementHorseColorList(this, id, need, editorDescription)); }
+	public final ElementHorseColorList addHorseColorList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementHorseColorList(this, id, need, editorDescription)); }
+	public final ElementHorseStyleList addHorseStyleList(String id, Need need, Text editorDescription) { return add(new ElementHorseStyleList(this, id, need, editorDescription)); }
+	public final ElementHorseStyleList addHorseStyleList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementHorseStyleList(this, id, need, editorDescription)); }
 	public final ElementInteger addInteger(String id, Need need, Text editorDescription) { return add(new ElementInteger(this, id, need, editorDescription)); }
 	public final ElementInteger addInteger(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementInteger(this, id, need, editorDescription)); }
 	public final ElementInteger addInteger(String id, Need need, int min, Text editorDescription) { return add(new ElementInteger(this, id, need, min, editorDescription)); }

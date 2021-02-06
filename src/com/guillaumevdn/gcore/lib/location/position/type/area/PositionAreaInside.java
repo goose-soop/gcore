@@ -44,6 +44,11 @@ public class PositionAreaInside implements Position {
 	}
 
 	@Override
+	public int findSafeRandomMaxY() {
+		return Math.max(a.getBlockY(), b.getBlockY());
+	}
+
+	@Override
 	public Location findRandom() {
 		return LocationUtils.findRandomInArea(a, b);
 	}

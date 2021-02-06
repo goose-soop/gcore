@@ -4,7 +4,7 @@ import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.lib.element.struct.container.typable.TypableElementTypes;
 import com.guillaumevdn.gcore.lib.location.position.type.PositionTypeBiomes;
 import com.guillaumevdn.gcore.lib.location.position.type.PositionTypeNone;
-import com.guillaumevdn.gcore.lib.location.position.type.PositionTypeWorld;
+import com.guillaumevdn.gcore.lib.location.position.type.PositionTypeWorlds;
 import com.guillaumevdn.gcore.lib.location.position.type.area.PositionTypeAreaInside;
 import com.guillaumevdn.gcore.lib.location.position.type.area.PositionTypeAreaOutside;
 import com.guillaumevdn.gcore.lib.location.position.type.area.PositionTypeClosestEntityRelativeAreaInside;
@@ -41,7 +41,7 @@ public final class PositionTypes extends TypableElementTypes<PositionType> {
 	// types
 	public final PositionTypeNone 									NONE 										= register(new PositionTypeNone("NONE"));
 
-	public final PositionTypeWorld		 							WORLD 										= register(new PositionTypeWorld("WORLD"));
+	public final PositionTypeWorlds		 							WORLDS 										= register(new PositionTypeWorlds("WORLDS"));
 	public final PositionTypeBiomes		 							BIOMES 										= register(new PositionTypeBiomes("BIOMES"));
 
 	public final PositionTypeSingle 								SINGLE 										= register(new PositionTypeSingle("SINGLE"));

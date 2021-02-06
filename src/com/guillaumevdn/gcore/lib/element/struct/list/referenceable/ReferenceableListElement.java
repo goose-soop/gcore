@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -45,9 +46,7 @@ public abstract class ReferenceableListElement<T extends Element> extends Abstra
 	}
 
 	public final List<T> getActualValues() {
-		List<T> values = new ArrayList<>();
-		values().forEach(node -> values.add(node.getValue()));
-		return Collections.unmodifiableList(values);
+		return Collections.unmodifiableList(values().stream().map(Node::getValue).filter(v -> v != null).collect(Collectors.toList()));
 	}
 
 	public final Optional<T> getActualValue(String key) {

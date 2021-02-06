@@ -1,10 +1,12 @@
 package com.guillaumevdn.gcore.lib.gui.internal.vanilla;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.Inventory;
@@ -14,7 +16,6 @@ import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.gui.internal.Handler;
 import com.guillaumevdn.gcore.lib.gui.struct.GUI;
 import com.guillaumevdn.gcore.lib.object.ObjectUtils;
-import com.guillaumevdn.gcore.lib.wrapper.WrapperInteger;
 
 /**
  * @author GuillaumeVDN
@@ -42,16 +43,16 @@ public class VanillaHandler extends Handler {
 	// get
 	@Override
 	public Map<Player, Integer> getViewers() {
-		WrapperInteger index = WrapperInteger.of(-1);
-		return CollectionUtils.asMap(map -> pages.forEach(page -> {
-			int pageIndex = index.alter(1);
-			page.getViewers().forEach(pl -> {
+		Map<Player, Integer> viewers = new HashMap<>();
+		for (int i = 0; i < pages.size(); ++i) {  // ConcurrentModificationException ?
+			for (HumanEntity pl : pages.get(i).getViewers()) {
 				Player player = ObjectUtils.castOrNull(pl, Player.class);
 				if (player != null) {
-					map.put(player, pageIndex);
+					viewers.put(player, i);
 				}
-			});
-		}));
+			}
+		}
+		return viewers;
 	}
 
 	@Override

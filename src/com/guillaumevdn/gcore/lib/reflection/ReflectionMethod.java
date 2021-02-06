@@ -61,6 +61,7 @@ public class ReflectionMethod {
 		if (method == null) {
 			Reflection.logAndRethrowError(new NoSuchMethodException(),
 					"Class " + original
+					+ "\nName '" + name + "'"
 					+ "\nParameters '" + StringUtils.toTextString(", ", CollectionUtils.asList(params).stream().map(param -> param == null ? "null" : param.getName())) + "'"
 					);
 		}

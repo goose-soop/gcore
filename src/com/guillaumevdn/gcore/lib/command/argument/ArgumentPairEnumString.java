@@ -36,8 +36,10 @@ public class ArgumentPairEnumString<E extends Enum<E>> extends Argument<Pair<E, 
 			if (i + 1 >= call.getArguments().size()) break;
 			E e = ObjectUtils.safeValueOf(call.getArguments().get(i), enumClass);
 			if (e != null) {
+				String value = call.getArguments().get(i + 1);
 				call.getArguments().remove(i);
-				return Pair.of(e, call.getArguments().remove(i));
+				call.getArguments().remove(i);
+				return Pair.of(e, value);
 			}
 		}
 		return null;
@@ -51,4 +53,5 @@ public class ArgumentPairEnumString<E extends Enum<E>> extends Argument<Pair<E, 
 		}
 		return result;
 	}
+
 }

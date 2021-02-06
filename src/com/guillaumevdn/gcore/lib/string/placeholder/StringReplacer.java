@@ -155,7 +155,7 @@ public final class StringReplacer {
 				}
 				if (collectionMatch != null) {
 					// if collection match is empty or single, skip it and eventually process is later ; this avoids suffix being put on the next line even though the replacing value is only one line
-					if (collectionMatch.isEmpty()) {
+					if (collectionMatch.isEmpty() || collectionMatch.iterator().next().equals("")) {
 						match = "";
 						collectionMatch = null;
 					} else if (collectionMatch.size() == 1) {
@@ -195,7 +195,7 @@ public final class StringReplacer {
 				offset += replacement.length() - placeholder.length();
 				// however, if no prefix, no suffix and empty replacement, skip line
 				if (resultLine.isEmpty()) {
-					result.remove(i); // remove from list and decrement index to reprocess
+					result.remove(i);  // remove from list and decrement index to reprocess
 					--i;
 					continue main;
 				}

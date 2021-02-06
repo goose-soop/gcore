@@ -2,6 +2,7 @@ package com.guillaumevdn.gcore.lib.gui.element.item.type;
 
 import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.lib.element.struct.container.typable.TypableElementTypes;
+import com.guillaumevdn.gcore.lib.gui.element.item.type.border.TypeDynamicBorderLinear;
 
 /**
  * @author GuillaumeVDN

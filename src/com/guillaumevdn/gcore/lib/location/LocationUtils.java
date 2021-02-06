@@ -5,11 +5,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Nullable;
+
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
 import com.guillaumevdn.gcore.lib.block.BlockState;
+import com.guillaumevdn.gcore.lib.collection.PositionCache;
 import com.guillaumevdn.gcore.lib.compatibility.material.Mat;
 import com.guillaumevdn.gcore.lib.number.MinMaxDouble;
 import com.guillaumevdn.gcore.lib.number.MinMaxInteger;
@@ -209,6 +213,28 @@ public final class LocationUtils {
 		if (blockStates != null) {
 			blockStates.forEach(state -> state.getType().set(state, block));
 		}
+	}
+
+	// safety
+	@Nullable
+	public static Location trySafeize(Location base, int maxY, int entityHeight) {
+		PositionCache<Mat> cache = new PositionCache<>(1, 1, maxY - base.getBlockY() + 1);
+		main: for (Block block = base.getBlock(); block.getY() <= maxY; block = block.getRelative(BlockFace.UP)) {
+			final Block bl = block;  // pepega
+			// look for a solid base
+			if (!cache.computeIfAbsent(0, block.getY(), 0, () -> Mat.fromBlock(bl).orNull()).getData().isTraversable()) {
+				// ensure there's space above
+				for (int i = 1; i <= entityHeight; ++i) {
+					final Block b = block.getRelative(0, i, 0);
+					if (!cache.computeIfAbsent(0, b.getY(), 0, () -> Mat.fromBlock(b).orNull()).getData().isTraversable()) {
+						continue main;
+					}
+				}
+				// we're good
+				return bl.getLocation().clone().add(.5d, 0d, .5d);
+			}
+		}
+		return null;
 	}
 
 }

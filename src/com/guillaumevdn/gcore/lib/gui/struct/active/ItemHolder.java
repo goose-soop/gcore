@@ -2,8 +2,7 @@ package com.guillaumevdn.gcore.lib.gui.struct.active;
 
 import java.util.Objects;
 
-import com.guillaumevdn.gcore.lib.element.struct.parsing.ParsingError;
-import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
+import javax.annotation.Nonnull;
 
 /**
  * @author GuillaumeVDN
@@ -21,12 +20,13 @@ public abstract class ItemHolder {
 		return id;
 	}
 
-	public boolean getPersistent(Replacer replacer) {
+	public boolean parsePersistent(ActiveGUI gui) {
 		return false;
 	}
 
 	// do
-	public abstract ActiveHolderItem newActive(ActiveGUI gui) throws ParsingError;
+	@Nonnull
+	public abstract ActiveItemHolder newActive(ActiveGUI gui);
 
 	// object
 	@Override

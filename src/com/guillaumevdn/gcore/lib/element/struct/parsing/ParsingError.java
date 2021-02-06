@@ -31,23 +31,27 @@ public class ParsingError extends Exception {
 	}
 
 	public static void print(Throwable error, IElement element) {
-		ParsingError pe = ObjectUtils.castOrNull(error, ParsingError.class);
-		if (pe != null) {
-			if (pe.element != null) {
-				element = pe.element;
+		try {
+			ParsingError pe = ObjectUtils.castOrNull(error, ParsingError.class);
+			if (pe != null) {
+				if (pe.element != null) {
+					element = pe.element;
+				}
+				if (error.getCause() != null) {  // sometimes we create a dummy ParsingError with a cause when we're forced to catch something
+					error = error.getCause();
+				}
 			}
-			if (error.getCause() != null) {  // sometimes we create a dummy ParsingError with a cause when we're forced to catch something
-				error = error.getCause();
+			pe = ObjectUtils.castOrNull(error, ParsingError.class);
+			if (error instanceof ParsingError) {
+				if (pe.element != null) {
+					element = pe.element;
+				}
+				element.getSuperElement().getPlugin().getMainLogger().error(ParsingError.buildErrorAtPathInFile(error.getMessage(), element));
+			} else {
+				element.getSuperElement().getPlugin().getMainLogger().error(ParsingError.buildUnexpectedHeaderErrorAtPathInFile(error.getMessage(), element), error);
 			}
-		}
-		pe = ObjectUtils.castOrNull(error, ParsingError.class);
-		if (error instanceof ParsingError) {
-			if (pe.element != null) {
-				element = pe.element;
-			}
-			element.getSuperElement().getPlugin().getMainLogger().error(ParsingError.buildErrorAtPathInFile(error.getMessage(), element));
-		} else {
-			element.getSuperElement().getPlugin().getMainLogger().error(ParsingError.buildUnexpectedHeaderErrorAtPathInFile(error.getMessage(), element), error);
+		} catch (Throwable ignored) {
+			error.printStackTrace();  // just print the error if anything happens (element has no super element, or whatever)  #1095
 		}
 	}
 

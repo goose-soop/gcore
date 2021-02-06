@@ -222,36 +222,40 @@ public final class StringUtils {
 	}
 
 	public static String formatNumber(double number) {
-		String[] split = new BigDecimal(Math.abs(number)).setScale(ConfigGCore.numberFormattingDecimals, RoundingMode.HALF_DOWN).toPlainString().split("\\.");
-		BigDecimal integer = new BigDecimal(split[0]);
-		// big numbers
-		String suffix = "";
-		if (ConfigGCore.numberFormattingBigNumbers) {
-			if (integer.compareTo(TRILLION) >= 0) {
-				suffix = " trillion";
-				integer = integer.divide(TRILLION);
-			} else if (integer.compareTo(BILLION) >= 0) {
-				suffix = " billion";
-				integer = integer.divide(BILLION);
-			} else if (integer.compareTo(MILLION) >= 0) {
-				suffix = " million";
-				integer = integer.divide(MILLION);
+		try {
+			String[] split = new BigDecimal(Math.abs(number)).setScale(ConfigGCore.numberFormattingDecimals, RoundingMode.HALF_DOWN).toPlainString().split("\\.");
+			BigDecimal integer = new BigDecimal(split[0]);
+			// big numbers
+			String suffix = "";
+			if (ConfigGCore.numberFormattingBigNumbers) {
+				if (integer.compareTo(TRILLION) >= 0) {
+					suffix = " trillion";
+					integer = integer.divide(TRILLION);
+				} else if (integer.compareTo(BILLION) >= 0) {
+					suffix = " billion";
+					integer = integer.divide(BILLION);
+				} else if (integer.compareTo(MILLION) >= 0) {
+					suffix = " million";
+					integer = integer.divide(MILLION);
+				}
 			}
-		}
-		// separate thousands
-		String integerFormat = integer.toPlainString();
-		if (ConfigGCore.numberFormattingSeparateThousands != null) {
-			String todo = integerFormat;
-			integerFormat = "";
-			while (todo.length() > 3) {
-				integerFormat = ConfigGCore.numberFormattingSeparateThousands + todo.substring(todo.length() - 3) + integerFormat;
-				todo = todo.substring(0, todo.length() - 3);
+			// separate thousands
+			String integerFormat = integer.toPlainString();
+			if (ConfigGCore.numberFormattingSeparateThousands != null) {
+				String todo = integerFormat;
+				integerFormat = "";
+				while (todo.length() > 3) {
+					integerFormat = ConfigGCore.numberFormattingSeparateThousands + todo.substring(todo.length() - 3) + integerFormat;
+					todo = todo.substring(0, todo.length() - 3);
+				}
+				integerFormat = todo + integerFormat;
 			}
-			integerFormat = todo + integerFormat;
+			// done
+			Integer decimals = split.length == 2 ? NumberUtils.integerOrNull(split[1]) : null;
+			return (number < 0d ? "-" : "") + integerFormat + (decimals != null && decimals != 0 ? "." + split[1] : "") + suffix;
+		} catch (NumberFormatException ignored) {  // #1110
+			return "" + number;
 		}
-		// done
-		Integer decimals = split.length == 2 ? NumberUtils.integerOrNull(split[1]) : null;
-		return (number < 0d ? "-" : "") + integerFormat + (decimals != null && decimals != 0 ? "." + split[1] : "") + suffix;
 	}
 
 	// time
@@ -276,7 +280,9 @@ public final class StringUtils {
 	}
 
 	public static String formatDurationSeconds(int seconds, float secondsDecimals) {
-		if (seconds < 60) {
+		if (seconds < 0) {
+			return ConfigGCore.unknownPlaceholderResult;
+		} else if (seconds < 60) {
 			return TextGeneric.durationFormatS
 					.replace("{seconds}", () -> twoDigitString(seconds % 60) + (secondsDecimals > 0f ? toTextStringDecimals(secondsDecimals, 2) : ""))
 					.parseLine();
@@ -442,7 +448,7 @@ public final class StringUtils {
 		return toTextString(separator, CollectionUtils.asList(objects));
 	}
 
-	public static String toTextString(String separator, Stream stream) {
+	public static String toTextString(String separator, Stream<?> stream) {
 		StringBuilder builder = new StringBuilder();
 		stream.forEachOrdered(elem -> {
 			toTextStringObject(elem, builder);

@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -121,6 +122,9 @@ public final class FileUtils {
 			Files.createFile(file.toPath());
 			return true;
 		} catch (Throwable exception) {
+			if (exception instanceof FileAlreadyExistsException) {
+				return true;
+			}
 			GCore.inst().getMainLogger().error("Couldn't create file " + file, exception);
 			return false;
 		}

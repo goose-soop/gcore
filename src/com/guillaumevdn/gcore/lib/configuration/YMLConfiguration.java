@@ -9,6 +9,7 @@ import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
 
+import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.lib.GPlugin;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.configuration.file.YMLFile;
@@ -43,6 +44,12 @@ public class YMLConfiguration {
 		this.logFilePath = file.getPath().replace("plugins" + File.separator, "").replace(plugin.getDataFolder().getName() + File.separator, "").replace(File.separator, "/");
 		this.file = file;
 		load();
+	}
+
+	YMLConfiguration() {  // fake one
+		this.plugin = GCore.inst();
+		this.logFilePath = "";
+		this.file = GCore.inst().getDataFile("data_v8/defaults/whatever.yml");
 	}
 
 	// get

@@ -21,6 +21,7 @@ import com.guillaumevdn.gcore.lib.data.Query;
 import com.guillaumevdn.gcore.lib.legacy_npc.ElementNPC;
 import com.guillaumevdn.gcore.lib.migration.BackupBehavior;
 import com.guillaumevdn.gcore.lib.migration.Migration;
+import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
 import com.guillaumevdn.gcore.libs.com.google.gson.Gson;
 import com.guillaumevdn.gcore.migration.v8_0.config.MigrationV8Config;
 
@@ -54,7 +55,7 @@ public final class MigrationV8Data extends Migration {
 
 		attemptOperation("loading NPCs", BackupBehavior.NONE, () -> {
 			YMLConfiguration npcsConfigFile = getPlugin().loadConfigurationFile("npcs.yml");
-			for (int id : npcsConfigFile.readNumberKeysForSection("npcs", 1)) {
+			for (int id : npcsConfigFile.readNumberKeysForSection("npcs", null)) {
 				ElementNPC npc = new ElementNPC("" + id);
 				npc.read();
 				npcsConfig.put(id, npc);
@@ -193,7 +194,7 @@ public final class MigrationV8Data extends Migration {
 				}
 				// save npc if there's non-default data
 				UserNPC userNPC = new UserNPC(npcId);
-				userNPC.saveNonDefault(npcConfig, null, npc.shown, npc.name, npc.skinData, npc.skinSignature, npc.location, npc.targetDistance, npc.status, heldItem, heldItemOff, boots, leggings, chestplate, helmet);
+				userNPC.saveNonDefault(npcConfig, Replacer.GENERIC, npc.shown, npc.name, npc.skinData, npc.skinSignature, npc.location, npc.targetDistance, npc.status, heldItem, heldItemOff, boots, leggings, chestplate, helmet);
 				if (!userNPC.isEmpty()) {
 					npcs.put(npcId, userNPC);
 				}

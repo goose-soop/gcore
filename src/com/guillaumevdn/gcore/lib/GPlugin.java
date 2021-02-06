@@ -26,6 +26,7 @@ import com.guillaumevdn.gcore.lib.chat.JsonMessage;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.collection.LowerCaseHashMap;
 import com.guillaumevdn.gcore.lib.command.Command;
+import com.guillaumevdn.gcore.lib.compatibility.Version;
 import com.guillaumevdn.gcore.lib.compatibility.bossbar.Bossbar;
 import com.guillaumevdn.gcore.lib.configuration.YMLConfiguration;
 import com.guillaumevdn.gcore.lib.configuration.file.YMLError;
@@ -241,6 +242,16 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 			} catch (Throwable exception) {
 				failEnable(null);
 				return;
+			}
+			// log version if GCore
+			if (GCore.inst().equals(this)) {
+				if (Version.CURRENT.equals(Version.UNSUPPORTED)) {
+					getMainLogger().warning("Couldn't find registered server version ; using UNSUPPORTED with found package name " + Version.CURRENT.getPackageName());
+				} else if (Version.CURRENT.equals(Version.UNKNOWN)) {
+					getMainLogger().error("Couldn't find server version");
+				} else {
+					getMainLogger().info("Found server version " + Version.CURRENT);
+				}
 			}
 			// register types
 			registerTypes();

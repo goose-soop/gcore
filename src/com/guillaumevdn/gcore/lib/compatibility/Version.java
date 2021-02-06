@@ -12,7 +12,7 @@ public enum Version {
 
 	// values ; versions are checked from bottom to top so it'll take latest if necessary
 
-	ANY("ANY", null),
+	UNKNOWN("UNKNOWN", null),
 
 	MC_1_7_R1("1.7.2", "v1_7_R1"),
 	MC_1_7_R3("1.7.9", "v1_7_R3"),
@@ -28,12 +28,14 @@ public enum Version {
 	MC_1_15_R1("1.15", "v1_15_R1"),
 
 	MC_1_16_R1("1.16", "v1_16_R1"),
-	MC_1_16_R2(CollectionUtils.asList("1.16.2", "1.16.3"), "v1_16_R2"), // TODO : remove support for old when 1.17 comes out
-	MC_1_16_R3("1.16.4", "v1_16_R3"),
+	MC_1_16_R2(CollectionUtils.asList("1.16.2", "1.16.3"), "v1_16_R2"),
+	MC_1_16_R3(CollectionUtils.asList("1.16.4", "1.16.5"), "v1_16_R3"),
+
+	UNSUPPORTED("UNSUPPORTED", null)  // this will be used if we find a package name that's not listed above (a not yet updated newer version most likely)
 	;
 
 	public static final Version CURRENT = VersionUtils.getCurrent();
-	public static final boolean IS_1_7 = CURRENT.getNames().get(0).contains("1.7");
+	public static final boolean IS_1_7 = CURRENT.names.get(0).contains("1.7");
 	public static final boolean ATLEAST_1_7_2 = CURRENT.isMoreOrEqualsTo(MC_1_7_R1);
 	public static final boolean ATLEAST_1_7_9 = CURRENT.isMoreOrEqualsTo(MC_1_7_R3);
 	public static final boolean ATLEAST_1_7_10 = CURRENT.isMoreOrEqualsTo(MC_1_7_R4);
@@ -48,7 +50,7 @@ public enum Version {
 	public static final boolean ATLEAST_1_16 = CURRENT.isMoreOrEqualsTo(MC_1_16_R1);
 
 	private List<String> names;
-	private String packageName;
+	String packageName;
 
 	Version(String name, String packageName) {
 		this(CollectionUtils.asList(name), packageName);
@@ -60,10 +62,6 @@ public enum Version {
 	}
 
 	// get
-	public List<String> getNames() {
-		return names;
-	}
-
 	public String getPackageName() {
 		return packageName;
 	}

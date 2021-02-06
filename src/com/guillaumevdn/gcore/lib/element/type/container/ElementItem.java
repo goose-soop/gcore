@@ -78,7 +78,7 @@ public class ElementItem extends ParseableContainerElement<ItemStack> {
 		amount = !allowAmount ? null : addInteger("amount", Need.optional(1), TextEditorGeneric.descriptionItemAmount);
 		// meta
 		unbreakable = addBoolean("unbreakable", Need.optional(false), SlotPlacement.START_ROW, TextEditorGeneric.descriptionItemUnbreakable);
-		customModelData = !Version.ATLEAST_1_14 ? null : addInteger("custom_model_data", Need.optional(1), TextEditorGeneric.descriptionItemCustomModelData);
+		customModelData = !Version.ATLEAST_1_14 ? null : addInteger("custom_model_data", Need.optional(), TextEditorGeneric.descriptionItemCustomModelData);
 		enchantments = addEnchantmentLevelMap("enchantments", Need.optional(), TextEditorGeneric.descriptionItemEnchantments);
 		flags = addItemFlagList("flags", Need.optional(), TextEditorGeneric.descriptionItemFlags);
 		name = addString("name", Need.optional(), TextEditorGeneric.descriptionItemName);

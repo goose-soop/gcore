@@ -36,7 +36,8 @@ public class PositionTypeWorldguardRegionInside extends PositionType {
 	public Position doParse(ElementPosition position, Replacer replacer) throws ParsingError {
 		WGRegion region = position.getElementAs("region", ElementWorldguardRegion.class).parseNoCatchOrThrowParsingNull(replacer);
 		Pair<Point, Point> bounds = WorldGuardCompat.getRegionBounds(region.getWorld(), region.getRegionId());
-		return new PositionAreaInside(bounds.getA().toLocation(), bounds.getB().toLocation());
+		//System.out.println("region " + region.getWorld() + "/" + region.getRegionId() + ", bounds " + bounds + ", region " + WorldGuardCompat.getRegion(region.getWorld(), region.getRegionId()));
+		return bounds == null || bounds.getA() == null || bounds.getB() == null ? null : new PositionAreaInside(bounds.getA().toLocation(), bounds.getB().toLocation());
 	}
 
 }

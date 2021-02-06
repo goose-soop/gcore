@@ -39,7 +39,7 @@ import org.bukkit.inventory.BrewerInventory;
 import org.bukkit.inventory.FurnaceInventory;
 import org.bukkit.inventory.ItemStack;
 
-import com.guillaumevdn.gcore.lib.bukkit.BukkitThread;
+import com.guillaumevdn.gcore.ConfigGCore;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.compatibility.Version;
 import com.guillaumevdn.gcore.lib.compatibility.material.Mat;
@@ -244,7 +244,7 @@ public final class CustomEventsListeners implements Listener {
 		}
 		InventoryState initialState = new InventoryState(clickEvent.getView().getTopInventory(), 0, clickEvent.getView().getTopInventory().getContents().length - 1);
 		// delay
-		BukkitThread.SYNC.operateLater(() -> {
+		ConfigGCore.customEventsThread.operateLater(() -> {
 			if (!clickEvent.isCancelled()) {
 				// get new state and given/received
 				InventoryState newState = new InventoryState(clickEvent.getView().getTopInventory(), 0, clickEvent.getView().getTopInventory().getContents().length - 1);
@@ -266,7 +266,7 @@ public final class CustomEventsListeners implements Listener {
 		Player player = (Player) craftEvent.getWhoClicked();
 		PlayerInventoryState initialState = new PlayerInventoryState(player, craftEvent.getView().getTopInventory(), 1, 2, 3, 4, 5, 6, 7, 8, 9);
 		// delay
-		BukkitThread.SYNC.operateLater(() -> {
+		ConfigGCore.customEventsThread.operateLater(() -> {
 			if (!craftEvent.isCancelled()) {
 				// get new state and given/received
 				PlayerInventoryState newState = new PlayerInventoryState(player, craftEvent.getView().getTopInventory(), 1, 2, 3, 4, 5, 6, 7, 8, 9);
@@ -275,7 +275,7 @@ public final class CustomEventsListeners implements Listener {
 				Map<Integer, ItemStack> added = changes.getB();
 				// call craft event
 				if (!(removed.isEmpty() && added.isEmpty())) {
-					Bukkit.getPluginManager().callEvent(new PlayerCraftedItemsEvent(craftEvent, initialState, newState, removed, added));
+					Bukkit.getPluginManager().callEvent(new PlayerCraftedItemsEvent(craftEvent, removed, added));
 				}
 			}
 		}, null, 1);
@@ -296,7 +296,7 @@ public final class CustomEventsListeners implements Listener {
 		// build initial state
 		PlayerInventoryState initialState = new PlayerInventoryState(player, villager.getInventory(), 0, 1);
 		// delay
-		BukkitThread.SYNC.operateLater(() -> {
+		ConfigGCore.customEventsThread.operateLater(() -> {
 			if (!event.isCancelled()) {
 				// get new state and given/received
 				PlayerInventoryState newState = new PlayerInventoryState(player, villager.getInventory(), 0, 1);
@@ -305,7 +305,7 @@ public final class CustomEventsListeners implements Listener {
 				Map<Integer, ItemStack> added = changes.getB();
 				// call trade event
 				if (!(removed.isEmpty() && added.isEmpty())) {
-					Bukkit.getPluginManager().callEvent(new PlayerTradedVillagerEvent(villager, event, initialState, newState, removed, added));
+					Bukkit.getPluginManager().callEvent(new PlayerTradedVillagerEvent(villager, event, removed, added));
 				}
 			}
 		}, null, 1);
@@ -320,7 +320,7 @@ public final class CustomEventsListeners implements Listener {
 			// build initial state
 			BrewerInventory inv = (BrewerInventory) event.getView().getTopInventory();
 			Player player = (Player) event.getWhoClicked();
-			BukkitThread.SYNC.operateLater(() -> {
+			ConfigGCore.customEventsThread.operateLater(() -> {
 				if (!event.isCancelled()) {
 					InventoryState newState = new InventoryState(inv, 0, 4);
 					brewingStandInventories.put(inv.getHolder().getBlock(), new BrewingStandData(player.getUniqueId(), newState));
@@ -335,16 +335,17 @@ public final class CustomEventsListeners implements Listener {
 		BrewingStandData data = stand == null ? null : brewingStandInventories.remove(stand.getBlock());
 		if (data != null) {
 			// delay
-			BukkitThread.SYNC.operateLater(() -> {
+			ConfigGCore.customEventsThread.operateLater(() -> {
 				if (!event.isCancelled()) {
 					// get new state and given/received
 					InventoryState newState = new InventoryState(event.getContents(), 0, 4);
 					Pair<Map<Integer, ItemStack>, Map<Integer, ItemStack>> changes = data.currentState.findChanges(newState);
-					Map<Integer, ItemStack> removed = changes.getA();
 					Map<Integer, ItemStack> added = changes.getB();
 					// call brew event
-					if (!(removed.isEmpty() && added.isEmpty())) {
-						Bukkit.getPluginManager().callEvent(new PlayerBrewPotionsEvent(event, data.player, stand, data.currentState, newState, removed, added));
+					if (!added.isEmpty()) {
+						for (int slot : added.keySet()) {
+							Bukkit.getPluginManager().callEvent(new PlayerBrewPotionEvent(event, data.player, stand, slot, added.get(slot)));
+						}
 					}
 					// update state
 					brewingStandInventories.put(stand.getBlock(), new BrewingStandData(data.player, newState));
@@ -367,14 +368,15 @@ public final class CustomEventsListeners implements Listener {
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
 	public void eventFurnaceBurning(InventoryClickEvent event) {
-		if (event.getView().getTopInventory() != null && event.getView().getTopInventory().getType().toString().contains("FURNACE")) {
+		if (event.getView().getTopInventory() != null && (event.getView().getTopInventory().getType().toString().contains("FURNACE") || event.getView().getTopInventory().getType().toString().contains("SMOKER"))) {
 			// build initial state
 			FurnaceInventory inv = (FurnaceInventory) event.getView().getTopInventory();
 			Player player = (Player) event.getWhoClicked();
-			BukkitThread.SYNC.operateLater(() -> {
+			Block block = inv.getHolder().getBlock();  // keep this here otherwise an async error might be thrown
+			ConfigGCore.customEventsThread.operateLater(() -> {
 				if (!event.isCancelled()) {
 					InventoryState newState = new InventoryState(inv, 0, 2);
-					furnaceInventories.put(inv.getHolder().getBlock(), new FurnaceData(player.getUniqueId(), newState));
+					furnaceInventories.put(block, new FurnaceData(player.getUniqueId(), newState));
 				}
 			}, null, 1);
 		}
@@ -386,7 +388,7 @@ public final class CustomEventsListeners implements Listener {
 		FurnaceData data = furnace == null ? null : furnaceInventories.remove(furnace.getBlock());
 		if (data != null) {
 			// delay
-			BukkitThread.SYNC.operateLater(() -> {
+			ConfigGCore.customEventsThread.operateLater(() -> {
 				if (!event.isCancelled()) {
 					// get new state and given/received
 					InventoryState newState = new InventoryState(furnace.getInventory(), 0, 2);
@@ -415,7 +417,7 @@ public final class CustomEventsListeners implements Listener {
 
 	// items repairing
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-	public void event(InventoryClickEvent event) {
+	public void eventAnvil(InventoryClickEvent event) {
 		// ensure we're repairing
 		Player player = ObjectUtils.castOrNull(event.getWhoClicked(), Player.class);
 		if (player == null) return;
@@ -429,13 +431,40 @@ public final class CustomEventsListeners implements Listener {
 		ItemStack repairing = event.getView().getTopInventory().getContents()[2];
 		if (!Mat.fromItem(cost1).equals(Mat.fromItem(cost2)) || !Mat.fromItem(cost2).equals(Mat.fromItem(repairing))) return;
 		// call event
-		BukkitThread.SYNC.operateLater(() -> {
+		ConfigGCore.customEventsThread.operateLater(() -> {
 			if (!event.isCancelled()) {
-				Bukkit.getPluginManager().callEvent(new PlayerRepairItemEvent(event, player, cost1, cost2, repairing));
+				Bukkit.getPluginManager().callEvent(new PlayerRepairItemEvent(event, cost1, cost2, repairing));
 			}
 		}, null, 1);
 	}
 
+	// smithing table
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+	public void eventSmithingTable(InventoryClickEvent event) {
+		if (!Version.ATLEAST_1_16) return;
+		// ensure we're using the smithing table
+		Player player = ObjectUtils.castOrNull(event.getWhoClicked(), Player.class);
+		if (player == null) return;
+		if (event instanceof CraftItemEvent) return;
+		if (event.getView().getTopInventory() == null) return;
+		if (!event.getView().getTopInventory().getType().equals(InventoryType.SMITHING)) return;
+		if (event.getRawSlot() != 2) return;
+		// delay
+		PlayerInventoryState initialState = new PlayerInventoryState(player, event.getView().getTopInventory(), 0, 1, 2);
+		ConfigGCore.customEventsThread.operateLater(() -> {
+			if (!event.isCancelled()) {
+				// get new state and given/received
+				PlayerInventoryState newState = new PlayerInventoryState(player, event.getView().getTopInventory(), 0, 1, 2);
+				Pair<Map<Integer, ItemStack>, Map<Integer, ItemStack>> changes = initialState.findChanges(newState);
+				Map<Integer, ItemStack> removed = changes.getA();
+				Map<Integer, ItemStack> added = changes.getB();
+				// call craft event
+				if (!(removed.isEmpty() && added.isEmpty())) {
+					Bukkit.getPluginManager().callEvent(new PlayerCraftedItemsEvent(event, removed, added));
+				}
+			}
+		}, null, 1);
+	}
 
 }
 

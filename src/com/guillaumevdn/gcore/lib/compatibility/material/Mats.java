@@ -1,6 +1,8 @@
 package com.guillaumevdn.gcore.lib.compatibility.material;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -29,33 +31,49 @@ public final class Mats extends Variants<Mat, MatExtra, MatData> {
 
 	// get
 	public Optional<Mat> fromItem(ItemStack item) {
-		// has existing
-		Optional<Mat> mat = fromIdOrDataName(item.getType().name());
-		if (mat.isPresent()) {
-			return mat;
-		}
-		// create lenient
-		Mat lenient = ConfigGCore.mats.createIfLenient(item.getType(), Compat.getLegacyData(item));
-		if (lenient != null) {
-			return Optional.of(lenient);
-		}
-		// none
-		return Optional.empty();
+		return from(item.getType(), Compat.getLegacyData(item));
 	}
 
 	public Optional<Mat> fromBlock(Block block) {
-		// has existing
-		Optional<Mat> mat = fromIdOrDataName(block.getType().name());
-		if (mat.isPresent()) {
-			return mat;
+		return from(block.getType(), Compat.getLegacyData(block));
+	}
+
+	private final Map<String, Optional<Mat>> byIdAndDataQueryCache = new HashMap<>();
+
+	private Optional<Mat> from(Material type, int legacyData) {
+		String typeName = type.name();
+		String queryId = typeName + "-" + legacyData;
+		// <1.13 ; check legacy data even if it's 0, because otherwise it'll take the first matching name (even if data is not 0 in config) ; example ACACIA_WOOD which is LOG_2:0 would be detected as any LOG_2, for instance DARK_OAK_WOOD even if it's LOG_2:1
+		if (!Version.ATLEAST_1_13) {
+			Optional<Mat> result = byIdAndDataQueryCache.get(queryId);
+			if (result == null) {
+				for (Mat mat : values()) {
+					if (mat.getData().getDataName().equalsIgnoreCase(typeName) && mat.getData().getLegacyData() == legacyData) {
+						result = Optional.of(mat);
+						byIdAndDataQueryCache.put(queryId, result);
+						return result;
+					}
+				}
+			}
+			if (result != null) {
+				return result;
+			}
+		}
+		// >=1.13
+		else {
+			Optional<Mat> mat = fromIdOrDataName(typeName);  // this will cache an empty optional if none found
+			if (mat.isPresent() || !isLenient()) {
+				return mat;
+			}
 		}
 		// create lenient
-		Mat lenient = ConfigGCore.mats.createIfLenient(block.getType(), Compat.getLegacyData(block));
-		if (lenient != null) {
-			return Optional.of(lenient);
+		Mat lenient = ConfigGCore.mats.createIfLenient(type, legacyData);
+		Optional<Mat> result = lenient != null ? Optional.of(lenient) : Optional.empty();
+		// cache result if legacy
+		if (!Version.ATLEAST_1_13) {
+			byIdAndDataQueryCache.put(queryId, result);
 		}
-		// none
-		return Optional.empty();
+		return result;
 	}
 
 	// load

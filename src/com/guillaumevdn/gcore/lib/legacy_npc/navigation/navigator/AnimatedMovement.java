@@ -26,7 +26,7 @@ public final class AnimatedMovement {
 		this.ticks = ticks;
 	}
 
-	// get
+	// ----- get
 	public List<Movement> getMovementsToRecheck() {
 		return movementsToRecheck;
 	}

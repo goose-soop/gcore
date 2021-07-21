@@ -3,14 +3,13 @@ package com.guillaumevdn.gcore.lib.reflection;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
+import com.guillaumevdn.gcore.lib.concurrency.RWHashMap;
 import com.guillaumevdn.gcore.lib.object.ObjectUtils;
 import com.guillaumevdn.gcore.lib.string.StringUtils;
 
@@ -71,12 +70,12 @@ public class ReflectionMethod {
 		return clazz != null && !clazz.isPrimitive() && !clazz.equals(Object.class) /*&& !clazz.equals(Enum.class) actually allow enum classes, we want sometimes to get the name() method*/;
 	}
 
-	// get
+	// ----- get
 	public Method getMethod() {
 		return method;
 	}
 
-	// methods
+	// ----- methods
 	public ReflectionObject invoke(Object object, Collection params) throws Throwable {
 		return invoke(object, params.toArray(new Object[params.size()]));
 	}
@@ -98,8 +97,8 @@ public class ReflectionMethod {
 		}
 	}
 
-	// cache
-	private static Map<Integer, ReflectionMethod> cache = new HashMap<>();
+	// ----- valuesCache
+	private static RWHashMap<Integer, ReflectionMethod> cache = new RWHashMap<>();
 
 	public static ReflectionMethod of(Class<?> original, String name, List<Class<?>> params) throws Throwable {
 		// hash by class name

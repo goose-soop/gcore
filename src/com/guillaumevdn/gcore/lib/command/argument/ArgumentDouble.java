@@ -22,7 +22,7 @@ public class ArgumentDouble extends Argument<Double> {
 		this.tabComplete = mode.complete().collect(Collectors.toList());
 	}
 
-	// do
+	// ----- do
 	@Override
 	public Double consume(CommandCall call) {
 		if (call.getArguments().isEmpty()) {

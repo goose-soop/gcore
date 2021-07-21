@@ -12,7 +12,7 @@ public class MinMaxInteger {
 		this.max = Math.max(a, b);
 	}
 
-	// get
+	// ----- get
 	public int getMin() {
 		return min;
 	}
@@ -21,7 +21,7 @@ public class MinMaxInteger {
 		return max;
 	}
 
-	// static
+	// ----- static
 	public static MinMaxInteger of(int a, int b) {
 		return new MinMaxInteger(a, b);
 	}

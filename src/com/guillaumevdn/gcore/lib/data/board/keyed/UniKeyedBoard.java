@@ -1,6 +1,5 @@
 package com.guillaumevdn.gcore.lib.data.board.keyed;
 
-import java.util.Collection;
 import java.util.Set;
 
 import com.guillaumevdn.gcore.lib.GPlugin;
@@ -16,23 +15,8 @@ public abstract class UniKeyedBoard<K, V> extends KeyedBoard<K, V, KeyReference<
 	}
 
 	// ----------------------------------------------------------------------------------------------------
-	// data
+	// ----- data
 	// ----------------------------------------------------------------------------------------------------
-
-	@Override
-	public V getCachedValue(K key) {
-		return super.getCachedValue(key);
-	}
-
-	@Override
-	public V getCachedValue(KeyReference<K> key) {
-		return super.getCachedValue(key);
-	}
-
-	@Override
-	public Collection<V> getCachedValues(Set<KeyReference<K>> refs) {
-		return super.getCachedValues(refs);
-	}
 
 	@Override
 	public void removeElementsFromCache(Set<KeyReference<K>> references) {

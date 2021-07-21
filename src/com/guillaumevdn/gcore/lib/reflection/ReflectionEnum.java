@@ -1,7 +1,6 @@
 package com.guillaumevdn.gcore.lib.reflection;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.guillaumevdn.gcore.lib.concurrency.RWHashMap;
 
 /**
  * @author GuillaumeVDN
@@ -14,12 +13,12 @@ public class ReflectionEnum {
 		this.enumClass = enumClass;
 	}
 
-	// get
+	// ----- get
 	public Class<?> getEnumClass() {
 		return enumClass;
 	}
 
-	// methods
+	// ----- methods
 	public ReflectionObject valueOf(String valueName) throws Throwable {
 		for (Object value : enumClass.getEnumConstants()) {
 			if (valueName.equalsIgnoreCase(ReflectionObject.of(value).invokeMethod("name").get())) {
@@ -29,15 +28,11 @@ public class ReflectionEnum {
 		throw new NoSuchFieldException(valueName);
 	}
 
-	public ReflectionObject safeValueOf(String valueName) throws Throwable {
+	public ReflectionObject safeValueOf(String valueName) {
 		try {
 			return valueOf(valueName);
 		} catch (Throwable exception) {
-			if (exception instanceof NoSuchFieldException && valueName.equals(exception.getMessage())) {
-				return null;
-			} else {
-				throw exception;
-			}
+			return ReflectionObject.of(null);
 		}
 	}
 
@@ -45,8 +40,8 @@ public class ReflectionEnum {
 		return enumClass.getEnumConstants();
 	}
 
-	// cache
-	private static Map<Integer, ReflectionEnum> cache = new HashMap<>();
+	// ----- valuesCache
+	private static RWHashMap<Integer, ReflectionEnum> cache = new RWHashMap<>();
 
 	public static ReflectionEnum of(Class<?> enumClass) throws Throwable {
 		// hash by class name

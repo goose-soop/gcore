@@ -21,6 +21,7 @@ import com.guillaumevdn.gcore.lib.element.type.basic.ElementPotionType;
 import com.guillaumevdn.gcore.lib.element.type.container.ElementItem;
 import com.guillaumevdn.gcore.lib.element.type.list.ElementPotionEffectList;
 import com.guillaumevdn.gcore.lib.item.ItemCheck;
+import com.guillaumevdn.gcore.lib.item.ItemReference;
 import com.guillaumevdn.gcore.lib.item.PotionExtra;
 import com.guillaumevdn.gcore.lib.object.ObjectUtils;
 import com.guillaumevdn.gcore.lib.serialization.Serializer;
@@ -33,39 +34,43 @@ import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
  */
 public final class MetaPotion {
 
-	public static boolean match(ItemMeta itemMeta, ItemMeta referenceMeta, ItemCheck check) {
-		PotionMeta meta = ObjectUtils.castOrNull(itemMeta, PotionMeta.class); // might be null if exact match is false
-		PotionMeta ref = ObjectUtils.castOrNull(referenceMeta, PotionMeta.class);
-		if (ref == null) return true;
+	public static boolean match(ItemMeta itemMeta, ItemReference reference, ItemCheck check) {
+		if (!reference.hasMeta(PotionMeta.class)) return true;
+		PotionMeta meta = ObjectUtils.castOrNull(itemMeta, PotionMeta.class);  // might be null if exact match is false
+
 		// base
 		if (Version.ATLEAST_1_9) {
 			org.bukkit.potion.PotionData baseMeta = meta == null ? null : meta.getBasePotionData();
-			org.bukkit.potion.PotionData baseRef = ref.getBasePotionData();
+			org.bukkit.potion.PotionData baseRef = reference.getBasePotionData();
+			if (baseMeta == null) return false;
+			if (!baseMeta.getType().equals(baseRef.getType())) return false;
 			if (check.isExact()) {
-				if (!baseMeta.getType().equals(baseRef.getType())) return false;
 				if (baseMeta.isExtended() != baseRef.isExtended()) return false;
 				if (baseMeta.isUpgraded() != baseRef.isUpgraded()) return false;
 			} else {
-				if (baseRef.isExtended() && !baseMeta.isExtended()) return false;
-				if (baseRef.isUpgraded() && !baseMeta.isUpgraded()) return false;
+				if (baseRef.isExtended() && (baseMeta == null || !baseMeta.isExtended())) return false;
+				if (baseRef.isUpgraded() && (baseMeta == null || !baseMeta.isUpgraded())) return false;
 			}
 		}
+
 		// color
 		if (Version.ATLEAST_1_12) {
-			if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getColor(), ref.getColor()))) return false;
-			else if (!check.isExact() && ref.getColor() != null && (meta == null || ref.getColor().equals(meta.getColor()))) return false;
+			if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getColor(), reference.getPotionColor()))) return false;
+			else if (!check.isExact() && reference.getPotionColor() != null && (meta == null || reference.getPotionColor().equals(meta.getColor()))) return false;
 		}
+
 		// effects
 		if (check.isExact()) {
-			if (meta.hasCustomEffects() != ref.hasCustomEffects() || meta.getCustomEffects().size() != ref.getCustomEffects().size()) return false;
+			if (meta.hasCustomEffects() != reference.hasPotionCustomEffects() || meta.getCustomEffects().size() != reference.getPotionCustomEffects().size()) return false;
 		} else {
-			if (ref.hasCustomEffects() && (meta == null || !meta.hasCustomEffects())) return false;
+			if (reference.hasPotionCustomEffects() && (meta == null || !meta.hasCustomEffects())) return false;
 		}
-		for (PotionEffect refEffect : ref.getCustomEffects()) {
+		for (PotionEffect refEffect : reference.getPotionCustomEffects()) {
 			if (!meta.getCustomEffects().stream().anyMatch(metaEffect -> metaEffect.getType().equals(refEffect.getType()))) {  // just check type ; extended/upgraded will have been checked above
 				return false;
 			}
 		}
+
 		// seems good
 		return true;
 	}

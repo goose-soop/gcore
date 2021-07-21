@@ -7,7 +7,7 @@ import java.util.function.Supplier;
  */
 public class ReflectionProcedureSupplier<T> extends ReflectionProcedure<Supplier<T>, ReflectionProcedureSupplier<T>> {
 
-	// methods
+	// ----- methods
 	public T process() {
 		Supplier<T> function = get();
 		if (function != null) {

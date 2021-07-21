@@ -23,7 +23,7 @@ public class GsonAdapter<T> extends TypeAdapter<T> {
 		this.adapter = serializer;
 	}
 
-	// write
+	// ----- write
 	@Override
 	public void write(JsonWriter writer, T value) throws IOException {
 		if (value == null) {
@@ -99,7 +99,7 @@ public class GsonAdapter<T> extends TypeAdapter<T> {
 		}
 	}
 
-	// read
+	// ----- read
 	@Override
 	public T read(JsonReader reader) throws IOException {
 		if (reader.peek().equals(JsonToken.NULL)) {

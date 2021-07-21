@@ -13,6 +13,7 @@ import com.guillaumevdn.gcore.lib.element.struct.Need;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementColor;
 import com.guillaumevdn.gcore.lib.element.type.container.ElementItem;
 import com.guillaumevdn.gcore.lib.item.ItemCheck;
+import com.guillaumevdn.gcore.lib.item.ItemReference;
 import com.guillaumevdn.gcore.lib.object.ObjectUtils;
 import com.guillaumevdn.gcore.lib.serialization.Serializer;
 import com.guillaumevdn.gcore.lib.serialization.data.DataIO;
@@ -23,13 +24,14 @@ import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
  */
 public final class MetaLeatherArmor {
 
-	public static boolean match(ItemMeta itemMeta, ItemMeta referenceMeta, ItemCheck check) {
-		LeatherArmorMeta meta = ObjectUtils.castOrNull(itemMeta, LeatherArmorMeta.class); // might be null if exact match is false
-		LeatherArmorMeta ref = ObjectUtils.castOrNull(referenceMeta, LeatherArmorMeta.class);
-		if (ref == null) return true;
+	public static boolean match(ItemMeta itemMeta, ItemReference reference, ItemCheck check) {
+		if (!reference.hasMeta(LeatherArmorMeta.class)) return true;
+		LeatherArmorMeta meta = ObjectUtils.castOrNull(itemMeta, LeatherArmorMeta.class);  // might be null if exact match is false
+
 		// color
-		if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getColor(), ref.getColor()))) return false;
-		else if (!check.isExact() && ref.getColor() != null && (meta == null || ref.getColor().equals(meta.getColor()))) return false;
+		if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getColor(), reference.getArmorColor()))) return false;
+		else if (!check.isExact() && reference.getArmorColor() != null && (meta == null || reference.getArmorColor().equals(meta.getColor()))) return false;
+
 		// seems good
 		return true;
 	}

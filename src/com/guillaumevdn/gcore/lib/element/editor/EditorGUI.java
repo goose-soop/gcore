@@ -15,18 +15,18 @@ import com.guillaumevdn.gcore.lib.string.StringUtils;
  */
 public class EditorGUI extends GUI {
 
-	public EditorGUI(IElement element, ClickCall fromCall) {
-		super(element.getSuperElement().getPlugin(), "editor_" + StringUtils.generateRandomAlphanumericString(10) + (element == null ? "" : "_" + element.getClass().getSimpleName()), fromCall == null ? element.getId() : fromCall.getGUI().getName() + "/" + element.getId(), GUIType.CHEST_6_ROW, fromCall);
+	public EditorGUI(IElement element, ClickCall fromCall /* used just for title computation */) {
+		super(element.getSuperElement().getPlugin(), "editor_" + StringUtils.generateRandomAlphanumericString(10) + (element == null ? "" : "_" + element.getClass().getSimpleName()), fromCall == null ? element.getId() : fromCall.getGUI().getName() + "/" + element.getId(), GUIType.CHEST_6_ROW, fromCall == null ? new Option[0] : new Option[] { Option.AUTO_BACK_ITEM });
 	}
 
-	public EditorGUI(GPlugin plugin, String title, ClickCall fromCall) {
-		super(plugin, "editor_" + StringUtils.generateRandomAlphanumericString(10), fromCall == null || fromCall.getGUI() == null /* can happen due to /qc edit <editor> */ ? title : fromCall.getGUI().getName() + "/" + title, GUIType.CHEST_6_ROW, fromCall);
+	public EditorGUI(GPlugin plugin, String title, ClickCall fromCall /* used just for title computation */) {
+		super(plugin, "editor_" + StringUtils.generateRandomAlphanumericString(10), fromCall == null || fromCall.getGUI() == null /* can happen due to /qc edit <editor> */ ? title : fromCall.getGUI().getName() + "/" + title, GUIType.CHEST_6_ROW, fromCall == null ? new Option[0] : new Option[] { Option.AUTO_BACK_ITEM });
 	}
 
 	/** @return true if the GUI was opened */
 	@Override
-	public final boolean openFor(Player player, int pageIndex) {
-		return refill() && super.openFor(player, pageIndex);
+	public final boolean openFor(Player player, int pageIndex, ClickCall fromCall) {
+		return refill() && super.openFor(player, pageIndex, fromCall);
 	}
 
 }

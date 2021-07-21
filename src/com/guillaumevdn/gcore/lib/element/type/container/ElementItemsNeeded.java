@@ -1,19 +1,20 @@
 package com.guillaumevdn.gcore.lib.element.type.container;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.WeakHashMap;
+
+import javax.annotation.Nullable;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import com.guillaumevdn.gcore.TextEditorGeneric;
-import com.guillaumevdn.gcore.lib.bukkit.BukkitThread;
 import com.guillaumevdn.gcore.lib.compatibility.material.CommonMats;
 import com.guillaumevdn.gcore.lib.compatibility.material.Mat;
+import com.guillaumevdn.gcore.lib.concurrency.RWHashMap;
+import com.guillaumevdn.gcore.lib.concurrency.RWWeakHashMap;
 import com.guillaumevdn.gcore.lib.element.struct.Element;
 import com.guillaumevdn.gcore.lib.element.struct.Need;
 import com.guillaumevdn.gcore.lib.element.struct.container.ContainerElement;
@@ -42,7 +43,7 @@ public class ElementItemsNeeded extends ContainerElement {
 		super("items needed", parent, id, need, editorDescription);
 	}
 
-	// get
+	// ----- get
 	public ElementItemMatchList getItems() {
 		return items;
 	}
@@ -67,8 +68,19 @@ public class ElementItemsNeeded extends ContainerElement {
 		return errorMessage;
 	}
 
-	// ref
-	private WeakHashMap<Object, Map<Player, List<ItemMatch>>> matchingItems = new WeakHashMap<>();
+	// ----- ref
+	private RWWeakHashMap<Object, RWWeakHashMap<Player, RWHashMap<ItemMatch, Integer>>> matchingItems = new RWWeakHashMap<>();  // kind of dirty, but this avoid re-checking for matches/locations when taking items later OR when willing to check which items match
+
+	@Nullable
+	public RWWeakHashMap<Player, RWHashMap<ItemMatch, Integer>> lastMatches(Object ref) {
+		return matchingItems.get(ref);
+	}
+
+	@Nullable
+	public Map<ItemMatch, Integer> lastMatches(Object ref, Player player) {
+		Map<Player, RWHashMap<ItemMatch, Integer>> matches = matchingItems.get(ref);
+		return matches != null ? matches.get(player) : null;
+	}
 
 	public boolean match(Object ref, Replacer replacer, List<UUID> players, List<Player> playersOnline) {
 		return match(ref, replacer, players, playersOnline, true);
@@ -90,7 +102,7 @@ public class ElementItemsNeeded extends ContainerElement {
 		if (neededCount <= 0) {
 			for (Player player : playersOnline) {
 				for (ItemMatch item : items) {
-					if (ItemUtils.has(player, item.getItem(), item.getGoal(), item.getCheck())) {
+					if (ItemUtils.has(player, item.getReference(), item.getGoal(), item.getCheck())) {
 						return false;
 					}
 				}
@@ -98,7 +110,6 @@ public class ElementItemsNeeded extends ContainerElement {
 			return true;
 		}
 		// check players
-		boolean take = getTake().parse(replacer).orElse(false);
 		boolean inHand = getInHand().parse(replacer).orElse(false);
 		for (Player player : playersOnline) {
 			// in hand : look for first matching item in his hand
@@ -107,17 +118,18 @@ public class ElementItemsNeeded extends ContainerElement {
 				// invalid slot : don't match anyways
 				Integer slot = getInHandSlot().parse(replacer).orNull();
 				if (slot != null && slot >= 0 && slot <= 8 && slot != player.getInventory().getHeldItemSlot()) {
+					continue;
 				}
 				// no specific slot, or it maches
 				else {
 					ItemStack playerInHand = player.getItemInHand();
 					if (playerInHand != null) {
 						for (ItemMatch item : items) {
-							if (ItemUtils.match(playerInHand, item.getItem(), item.getCheck()) && playerInHand.getAmount() >= item.getGoal()) {
-								if (take) {
-									matchingItems.computeIfAbsent(ref, __ -> new HashMap<>()).computeIfAbsent(player, __ -> new ArrayList<>()).add(item);
+							if (ItemUtils.match(playerInHand, item.getReference(), item.getCheck())) {
+								setMatch(ref, player, item, playerInHand.getAmount());
+								if (playerInHand.getAmount() >= item.getGoal()) {
+									neededCount = 0;
 								}
-								neededCount = 0;
 								break;
 							}
 						}
@@ -126,11 +138,10 @@ public class ElementItemsNeeded extends ContainerElement {
 			}
 			// not in hand : look for all matching items in his inventory
 			else {
-				for (ItemMatch match : items) {
-					if (ItemUtils.has(player, match.getItem(), match.getGoal(), match.getCheck())) {
-						if (take) {
-							matchingItems.computeIfAbsent(ref, __ -> new HashMap<>()).computeIfAbsent(player, __ -> new ArrayList<>()).add(match);
-						}
+				for (ItemMatch item : items) {
+					int count = ItemUtils.countMax(player, item.getReference(), item.getCheck(), item.getGoal());
+					setMatch(ref, player, item, count);
+					if (count >= item.getGoal()) {
 						if (--neededCount == 0) {
 							break;
 						}
@@ -149,17 +160,21 @@ public class ElementItemsNeeded extends ContainerElement {
 		return true;
 	}
 
+	private void setMatch(Object ref, Player player, ItemMatch item, int count) {
+		matchingItems.computeIfAbsent(ref, __ -> new RWWeakHashMap<>()).computeIfAbsent(player, __ -> new RWHashMap<>()).put(item, count > item.getGoal() ? item.getGoal() : count);
+	}
+
 	public void takeIfNeeded(Object ref, Replacer replacer, List<Player> players) {
-		Map<Player, List<ItemMatch>> items = matchingItems.remove(ref);
-		if (items != null) {
+		RWWeakHashMap<Player, RWHashMap<ItemMatch, Integer>> items = matchingItems.remove(ref);
+		if (items != null && getTake().parse(replacer).orElse(false)) {
 			boolean inHand = getInHand().parse(replacer).orElse(false);
-			BukkitThread.SYNC.operate(() -> {
+			getSuperElement().getPlugin().operateSync(() -> {
 				players.forEach(player -> {
-					List<ItemMatch> playerMatches = items.remove(player);
+					RWHashMap<ItemMatch, Integer> playerMatches = items.remove(player);
 					if (playerMatches != null) {
 						// in hand : replace item on his hand
 						if (inHand) {
-							ItemMatch item = playerMatches.get(0);
+							ItemMatch item = playerMatches.streamResultKeys(s -> s.findFirst().orElse(null));
 							ItemStack playerInHand = player.getItemInHand();
 							if (playerInHand.getAmount() > item.getGoal()) {
 								playerInHand.setAmount(playerInHand.getAmount() - item.getGoal());
@@ -170,7 +185,9 @@ public class ElementItemsNeeded extends ContainerElement {
 						}
 						// not in hand : take all needed items
 						else {
-							playerMatches.forEach(match -> ItemUtils.take(player, match.getItem(), match.getGoal(), match.getCheck(), false));
+							playerMatches.forEach((match, __) -> {
+								ItemUtils.take(player, match.getReference(), match.getGoal(), match.getCheck(), false);
+							});
 						}
 						player.updateInventory();
 					}
@@ -179,7 +196,7 @@ public class ElementItemsNeeded extends ContainerElement {
 		}
 	}
 
-	// editor
+	// ----- editor
 	@Override
 	public Mat editorIconType() {
 		return CommonMats.APPLE;

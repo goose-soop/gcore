@@ -2,6 +2,7 @@ package com.guillaumevdn.gcore.lib.element.struct.map;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 import com.guillaumevdn.gcore.TextEditorGeneric;
 import com.guillaumevdn.gcore.lib.collection.SerializerLowerCaseLinkedHashMap;
@@ -31,7 +32,7 @@ public abstract class AbstractMapElement<K, V extends IElement> extends Element 
 		this.elements = new SerializerLowerCaseLinkedHashMap<>(keySerializer);
 	}
 
-	// get
+	// ----- get
 	protected final Serializer<K> getKeySerializer() {
 		return keySerializer;
 	}
@@ -60,6 +61,10 @@ public abstract class AbstractMapElement<K, V extends IElement> extends Element 
 		return Optional.of(elements.get(key));
 	}
 
+	public Optional<V> findElement(Predicate<V> predicate) {
+		return Optional.of(elements.valuesStream().filter(predicate).findFirst().orElse(null));
+	}
+
 	@Override
 	public boolean hasParseableLocations() {
 		for (V element : elements.values()) {
@@ -75,7 +80,7 @@ public abstract class AbstractMapElement<K, V extends IElement> extends Element 
 		return isEmpty();
 	}
 
-	// add/remove
+	// ----- add/remove
 	/** @eturn the value parameter */
 	protected V add(K key, V value) {
 		if (value instanceof Element && !equals(((Element) value).getParent())) throw new IllegalStateException("added elements must be children of this element");
@@ -97,7 +102,7 @@ public abstract class AbstractMapElement<K, V extends IElement> extends Element 
 		elements.clear();
 	}
 
-	// editor
+	// ----- editor
 	@Override
 	public List<String> editorCurrentValue() {
 		return size() == 0 ? null : (size() <= 1 ? TextEditorGeneric.elementElementCountSingle.parseLines() : TextEditorGeneric.elementElementCountPlural.replace("{count}", () -> size()).parseLines());

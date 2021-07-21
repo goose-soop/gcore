@@ -10,6 +10,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import com.guillaumevdn.gcore.TextEditorGeneric;
 import com.guillaumevdn.gcore.WorkerGCore;
 import com.guillaumevdn.gcore.lib.compatibility.material.CommonMats;
+import com.guillaumevdn.gcore.lib.configuration.file.node.SectionNode;
+import com.guillaumevdn.gcore.lib.configuration.file.node.SectionNode.SectionNodeType;
 import com.guillaumevdn.gcore.lib.element.editor.EditorGUI;
 import com.guillaumevdn.gcore.lib.element.struct.Element;
 import com.guillaumevdn.gcore.lib.element.struct.Need;
@@ -18,7 +20,6 @@ import com.guillaumevdn.gcore.lib.gui.struct.ClickCall;
 import com.guillaumevdn.gcore.lib.gui.struct.ClickCall.ClickType;
 import com.guillaumevdn.gcore.lib.gui.struct.GUIItem;
 import com.guillaumevdn.gcore.lib.item.ItemUtils;
-import com.guillaumevdn.gcore.lib.number.NumberUtils;
 import com.guillaumevdn.gcore.lib.string.StringUtils;
 import com.guillaumevdn.gcore.lib.string.Text;
 
@@ -27,11 +28,15 @@ import com.guillaumevdn.gcore.lib.string.Text;
  */
 public abstract class ListElement<T extends Element> extends MapElement<String, T> {
 
-	public ListElement(String elementTypeName, Element parent, String id, Need need, Text editorDescription) {
+	private final boolean allowCompactNestedWrite;
+
+	public ListElement(String elementTypeName, boolean allowCompactNestedWrite, Element parent, String id, Need need, Text editorDescription) {
 		super(String.class, "list of " + elementTypeName, true, parent, id, need, editorDescription);
+		this.allowCompactNestedWrite = allowCompactNestedWrite;
 	}
 
-	// add/remove
+	// ----- add/remove
+
 	public final T add(T element) {
 		return add(element.getId(), element);
 	}
@@ -44,18 +49,37 @@ public abstract class ListElement<T extends Element> extends MapElement<String, 
 	}
 
 	public final T createElement() {
-		// generate numeric id
-		Integer highest = null;
-		for (T value : values()) {
-			Integer nb = NumberUtils.integerOrNull(value.getId());
-			if (nb != null && (highest == null || nb > highest)) {
-				highest = nb;
+		int i = 0;
+		String key;
+		do {
+			key = StringUtils.alphabeticCountFor(++i);
+		} while (getElement(key).isPresent());
+		return createElement(key);
+	}
+
+	// ----- element
+
+	@Override
+	protected void doWrite() throws Throwable {
+		final boolean existed = readContains(); //getSuperElement().getConfiguration().getBackingYML().getSectionNode(getConfigurationPath()) != null;  // do not override existing section types ; make it a compact nested map only if it wasn't written before
+
+		getSuperElement().getConfiguration().write(getConfigurationPath(), null);
+		if (!isEmpty()) {
+			SectionNode node = null;
+			if (!existed && allowCompactNestedWrite) {  
+				node = getSuperElement().getConfiguration().getBackingYML().mkdirs(getConfigurationPath(), SectionNodeType.COMPACT_NESTED_MAP);
+				node.setSingleValue("_____TO_BE_REMOVED_____", "value", null);  // when we call element.write() below, it sets the path to null ; thus, it clears the parent section, anihilating our hopes that it'll be a compact nested map
+			}
+			for (T element : values()) {
+				element.write();
+			}
+			if (node != null) {
+				node.removeConfigNode("_____TO_BE_REMOVED_____");
 			}
 		}
-		if (highest == null) highest = 0;
-		// create
-		return createElement("" + highest);
 	}
+
+	// ----- editor
 
 	@Override
 	public EditorGUI editorGUI(ClickCall fromCall) {
@@ -94,15 +118,15 @@ public abstract class ListElement<T extends Element> extends MapElement<String, 
 						T element = createAndAddElement();
 						getSuperElement().onEditorChange(element);
 						// reopen GUI (that refreshes it since it's an editor GUI)
-						call.getGUI().openFor(call.getClicker(), call.getPageIndex());
+						call.reopenGUI();
 					}
 					// right-click : manually enter id
 					else if (call.getType().equals(ClickType.RIGHT)) {
 						editorAskKeyAndCreateAndAddElement(call, (elementId, element) -> {
 							getSuperElement().onEditorChange(element);
 							// reopen GUI (that refreshes it since it's an editor GUI)
-							call.getGUI().openFor(call.getClicker(), call.getPageIndex());
-						}, () -> call.getGUI().openFor(call.getClicker(), call.getPageIndex()));
+							call.reopenGUI();
+						}, () -> call.reopenGUI());
 					}
 				}));
 				// done

@@ -45,7 +45,7 @@ public class NPC {
 		}
 	}
 
-	// get
+	// ----- get
 	public ElementNPC getData() {
 		return NPCManager.inst().getNpcConfig(id);
 	}
@@ -94,12 +94,12 @@ public class NPC {
 		return spawned;
 	}
 
-	// set
+	// ----- set
 	public void setTargetDistance(double targetDistance) {
 		this.targetDistance = targetDistance;
 	}
 
-	// methods
+	// ----- methods
 	/** @return the update result */
 	public UpdateResult update() {
 		// dead player or invalid world/location, must despawn
@@ -128,7 +128,7 @@ public class NPC {
 		SPAWNED, DESPAWNED, TARGETED_PLAYER, NONE
 	}
 
-	// methods : spawn/despawn
+	// ----- methods : spawn/despawn
 	/** @return true if it was spawned, false if it was already spawned */
 	public boolean spawn() {
 		// already spawned
@@ -165,8 +165,8 @@ public class NPC {
 		return true;
 	}
 
-	// methods : location
-	// https://wiki.vg/Protocol#Player_Look
+	// ----- methods : location
+	// ----- https://wiki.vg/Protocol#Player_Look
 	public void target(Location target) {
 		Pair<Float, Float> look = getTargetLook(location.clone().add(0d, 1.8d, 0d), target);
 		target(look.getA(), look.getB());
@@ -182,7 +182,7 @@ public class NPC {
 		double yaw = -Math.atan2(dx, dz) / Math.PI * 180d;
 		if (yaw < 0) yaw = 360d + yaw;
 		double pitch = -Math.asin(dy / r) / Math.PI * 180d;
-		return new Pair<Float, Float>((float) yaw, (float) pitch);
+		return Pair.of((float) yaw, (float) pitch);
 	}
 
 	public void target(double yaw, double pitch) {
@@ -228,7 +228,7 @@ public class NPC {
 		}
 	}
 
-	// methods : status
+	// ----- methods : status
 	private void updateStatus() {
 		// update status
 		Map<Integer, Object> map = CollectionUtils.asMap(0, NPCStatus.getMasked(status.toArray(new NPCStatus[status.size()])));
@@ -251,7 +251,7 @@ public class NPC {
 		}
 	}
 
-	// methods : equipment
+	// ----- methods : equipment
 	/**
 	 * @param slot the item slot (0 to 5)
 	 * @param item the item stack
@@ -298,7 +298,7 @@ public class NPC {
 		}
 	}
 
-	// methods : misc
+	// ----- methods : misc
 	public void rename(String name) {
 		this.name = name;
 		// update player
@@ -318,7 +318,7 @@ public class NPC {
 		NpcProtocols.inst().sendAnimation(player, getEntityId(), animation);
 	}
 
-	// equals
+	// ----- equals
 	@Override
 	public int hashCode() {
 		final int prime = 31;

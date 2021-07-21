@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.guillaumevdn.gcore.ConfigGCore;
+import com.guillaumevdn.gcore.lib.compatibility.Version;
 import com.guillaumevdn.gcore.lib.compatibility.nbt.NBTBase;
 import com.guillaumevdn.gcore.lib.compatibility.nbt.NBTCompound;
 import com.guillaumevdn.gcore.lib.compatibility.nbt.NBTItem;
@@ -47,7 +48,7 @@ public final class AdapterNBTCompound extends DataAdapter<NBTCompound> {
 			}
 			// value
 			else if (!type.equals(NBTType.UNKNOWN)) {
-				writer.write(key, nbt.getObject(key));
+				writer.write(key, nbt.get(type, key));
 			}
 		}
 	}
@@ -89,7 +90,7 @@ public final class AdapterNBTCompound extends DataAdapter<NBTCompound> {
 	}
 
 	private NBTCompound readCompound(NBTBase parent, String name, int depth, DataIO reader) throws Throwable {
-		NBTCompound nbt = new NBTCompound(parent, name, depth, Reflection.newNmsInstance("NBTTagCompound"));
+		NBTCompound nbt = new NBTCompound(parent, name, depth, Reflection.newNmsInstance((Version.REMAPPED ? "nbt." : "") + "NBTTagCompound"));
 		ConfigGCore.logspamItemNbt(nbt, () -> "Compound " + name + ", keys " + reader.getKeys());
 		for (String key : reader.getKeys()) {
 			DataType type = reader.getType(key);
@@ -121,7 +122,7 @@ public final class AdapterNBTCompound extends DataAdapter<NBTCompound> {
 				Object value = reader.readUnknown(key);
 				ConfigGCore.logspamItemNbt(nbt, () -> " Value " + value);
 				if (value != null) {
-					nbt.setObject(key, value);
+					nbt.set(key, value);
 				}
 			}
 		}

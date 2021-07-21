@@ -1,11 +1,12 @@
 package com.guillaumevdn.gcore.lib.compatibility;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -22,18 +23,21 @@ import com.guillaumevdn.gcore.lib.reflection.procedure.ReflectionProcedureFuncti
 import com.guillaumevdn.gcore.lib.reflection.procedure.ReflectionProcedureSexaConsumer;
 import com.guillaumevdn.gcore.lib.reflection.procedure.ReflectionProcedureTriConsumer;
 
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
+
 /**
  * @author GuillaumeVDN
  */
 public final class Compat {
 
-	// create chat component
+	// ----- create chat component
 	private static final ReflectionProcedureFunction<String, ReflectionObject> CREATE_CHAT_COMPONENT = new ReflectionProcedureFunction<String, ReflectionObject>()
 			.setIf(Version.IS_1_7, string -> {
 				return Reflection.invokeNmsMethod("ChatSerializer", "a", null, "{\"text\": \"" + string + "\"}");
 			})
 			.orElse(string -> {
-				return Reflection.invokeNmsMethod("IChatBaseComponent$ChatSerializer", "a", null, "{\"text\": \"" + string + "\"}");
+				return Reflection.invokeNmsMethod((Version.REMAPPED ? "network.chat." : "") + "IChatBaseComponent$ChatSerializer", "a", null, "{\"text\": \"" + string + "\"}");
 			})
 			;
 
@@ -45,9 +49,12 @@ public final class Compat {
 		return string == null || string.isEmpty() ? null : createChatComponent(string).get();
 	}
 
-	// send title
+	// ----- send title
 	private static final ReflectionProcedureSexaConsumer<Player, String, String, Integer, Integer, Integer> SEND_TITLE = new ReflectionProcedureSexaConsumer<Player, String, String, Integer, Integer, Integer>()
-			.setIf(Version.ATLEAST_1_8, (player, title, subtitle, fadeIn, duration, fadeOut) -> {
+			.setIf(Version.ATLEAST_1_17, (player, title, subtitle, fadeIn, duration, fadeOut) -> {
+				player.sendTitle(title, subtitle, fadeIn, duration, fadeOut);
+			})
+			.orIf(Version.ATLEAST_1_8, (player, title, subtitle, fadeIn, duration, fadeOut) -> {
 				ReflectionEnum enumTitleAction = Reflection.getNmsEnum("PacketPlayOutTitle$EnumTitleAction");
 				Reflection.sendNmsPacket(player, "PacketPlayOutTitle", enumTitleAction.valueOf("TIMES").get(), null, fadeIn, duration, fadeOut);
 				if (subtitle != null) Reflection.sendNmsPacket(player, "PacketPlayOutTitle", enumTitleAction.valueOf("SUBTITLE").get(), createChatComponent(subtitle).get());
@@ -67,27 +74,38 @@ public final class Compat {
 		SEND_TITLE.process(player, title, subtitle, fadeIn, duration, fadeOut);
 	}
 
-	// send actionbar
+	// ----- send actionbar
 	private static final ReflectionProcedureBiConsumer<Player, String> SEND_ACTIONBAR = new ReflectionProcedureBiConsumer<Player, String>()
-			.setIf(Version.ATLEAST_1_8, (player, actionbar) -> {
-				Reflection.sendNmsPacket(player, "PacketPlayOutChat", createChatComponent(actionbar).get(), (byte) 2);
+			.setIf(Version.ATLEAST_1_17, (player, actionbar) -> {
+				player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(actionbar));
 			})
-			.setIf(Version.ATLEAST_1_11, (player, actionbar) -> {
+			.orIf(Version.ATLEAST_1_11, (player, actionbar) -> {
 				ReflectionEnum enumTitleAction = Reflection.getNmsEnum("PacketPlayOutTitle$EnumTitleAction");
 				Reflection.sendNmsPacket(player, "PacketPlayOutTitle", enumTitleAction.valueOf("ACTIONBAR").justGet(), createChatComponent(actionbar).justGet());
-			});
+			})
+			.orIf(Version.ATLEAST_1_8, (player, actionbar) -> {
+				Reflection.sendNmsPacket(player, "PacketPlayOutChat", createChatComponent(actionbar).get(), (byte) 2);
+			})
+			;
 
 	public static void sendActionbar(Player player, String actionbar) {
 		SEND_ACTIONBAR.process(player, actionbar);
 	}
 
-	// send json message
+	// ----- send json message
 	private static final ReflectionProcedureBiConsumer<Collection<Player>, String> SEND_JSON_CHAT = new ReflectionProcedureBiConsumer<Collection<Player>, String>()
 			.setIf(Version.IS_1_7, (players, json) -> {
 				Object component = Reflection.invokeNmsMethod("ChatSerializer", "a", null, json).get();
 				Reflection.sendNmsPacket(players, "PacketPlayOutChat", component);
 			})
-			.setIf(Version.ATLEAST_1_16, (players, json) -> {
+			.orIf(Version.ATLEAST_1_17, (players, json) -> {
+				ReflectionEnum messageTypeEnum = Reflection.getNmsEnum("network.chat.ChatMessageType");
+				Object component = Reflection.invokeNmsMethod("network.chat.IChatBaseComponent$ChatSerializer", "a", null, json).get();
+				for (Player pl : players) {
+					Reflection.sendNmsPacket(pl, "network.protocol.game.PacketPlayOutChat", component, messageTypeEnum.valueOf("CHAT").get(), pl.getUniqueId());
+				}
+			})
+			.orIf(Version.ATLEAST_1_16, (players, json) -> {
 				ReflectionEnum messageTypeEnum = Reflection.getNmsEnum("ChatMessageType");
 				Object component = Reflection.invokeNmsMethod("IChatBaseComponent$ChatSerializer", "a", null, json).get();
 				for (Player pl : players) {
@@ -104,9 +122,15 @@ public final class Compat {
 		SEND_JSON_CHAT.process(players, json);
 	}
 
-	// change tab
+	// ----- change tab
 	private static final ReflectionProcedureTriConsumer<Player, String, String> CHANGE_TAB = new ReflectionProcedureTriConsumer<Player, String, String>()
-			.set((player, header, footer) -> {
+			.setIf(Version.ATLEAST_1_17, (player, header, footer) -> {
+				Reflection.sendNmsPacket(player, Reflection.newNmsInstance("network.protocol.game.PacketPlayOutPlayerListHeaderFooter")
+						.setField("a", createChatComponent(header).get())
+						.setField("b", createChatComponent(footer).get())
+						.get());
+			})
+			.orElse((player, header, footer) -> {
 				Reflection.sendNmsPacket(player, Reflection.newNmsInstance("PacketPlayOutPlayerListHeaderFooter")
 						.setField(Version.ATLEAST_1_13 ? "header" : "a", createChatComponent(header).get())
 						.setField(Version.ATLEAST_1_13 ? "footer" : "b", createChatComponent(footer).get())
@@ -117,7 +141,7 @@ public final class Compat {
 		CHANGE_TAB.process(player, header, footer);
 	}
 
-	// set durability
+	// ----- set durability
 	private static final ReflectionProcedureBiFunction<ItemStack, Integer, ItemStack> SET_DURABILITY = new ReflectionProcedureBiFunction<ItemStack, Integer, ItemStack>()
 			.setIf(Version.ATLEAST_1_14, (item, durability) -> {
 				ItemMeta meta = item.getItemMeta();
@@ -138,7 +162,7 @@ public final class Compat {
 		return SET_DURABILITY.process(item, durability);
 	}
 
-	// set data
+	// ----- set data
 	private static final ReflectionProcedureBiFunction<ItemStack, Integer, ItemStack> SET_LEGACY_DATA = new ReflectionProcedureBiFunction<ItemStack, Integer, ItemStack>()
 			.setIf(Version.ATLEAST_1_13, (item, durability) -> item)
 			.orElse((item, data) -> {
@@ -151,7 +175,7 @@ public final class Compat {
 		return SET_LEGACY_DATA.process(item, durability);
 	}
 
-	// get durability
+	// ----- get durability
 	private static final ReflectionProcedureFunction<ItemStack, Integer> GET_DURABILITY = new ReflectionProcedureFunction<ItemStack, Integer>()
 			.setIf(Version.ATLEAST_1_13, (item) -> {
 				ItemMeta meta = item.getItemMeta();
@@ -164,7 +188,7 @@ public final class Compat {
 		return GET_DURABILITY.process(item);
 	}
 
-	// get legacy data
+	// ----- get legacy data
 	private static final ReflectionProcedureFunction<ItemStack, Integer> GET_LEGACY_DATA = new ReflectionProcedureFunction<ItemStack, Integer>()
 			.setIf(Version.ATLEAST_1_13, (item) -> 0)
 			.orElse((item) -> (int) ReflectionObject.of(item).invokeMethod("getData").invokeMethod("getData").get(byte.class));
@@ -174,23 +198,26 @@ public final class Compat {
 	}
 
 	private static final ReflectionProcedureFunction<Block, Integer> GET_LEGACY_DATA_BLOCK = new ReflectionProcedureFunction<Block, Integer>()
-			.setIf(Version.ATLEAST_1_13, (item) -> 0)
+			.setIf(Version.ATLEAST_1_13, block -> 0)
 			.orElse(block -> (int) ReflectionObject.of(block).invokeMethod("getData").get(byte.class));
 
 	public static int getLegacyData(Block block) {
 		return GET_LEGACY_DATA_BLOCK.process(block);
 	}
 
-	// add item flags
+	private static final ReflectionProcedureFunction<BlockState, Integer> GET_LEGACY_DATA_BLOCK_STATE = new ReflectionProcedureFunction<BlockState, Integer>()
+			.setIf(Version.ATLEAST_1_13, block -> 0)
+			.orElse(block -> (int) ReflectionObject.of(block).invokeMethod("getRawData").get(byte.class));
+
+	public static int getLegacyData(BlockState block) {
+		return GET_LEGACY_DATA_BLOCK_STATE.process(block);
+	}
+
+	// ----- add item flags
 	private static final ReflectionProcedureBiConsumer<ItemMeta, Collection<ItemFlag>> ADD_ITEM_FLAGS = new ReflectionProcedureBiConsumer<ItemMeta, Collection<ItemFlag>>()
 			.setIf(Version.ATLEAST_1_8, (meta, flags) -> {
-				ReflectionEnum enumBukkitItemFlag = Reflection.getEnum("org.bukkit.inventory.ItemFlag");
-				Object[] array = (Object[]) Array.newInstance(enumBukkitItemFlag.getEnumClass(), flags.size());
-				int i = -1;
-				for (ItemFlag flag : flags) {
-					array[++i] = enumBukkitItemFlag.safeValueOf(flag.name()).get();
-				}
-				ReflectionObject.of(meta).invokeMethodArray("addItemFlags", array);
+				List<org.bukkit.inventory.ItemFlag> list = flags.stream().map(flag -> ObjectUtils.safeValueOf(flag.name(), org.bukkit.inventory.ItemFlag.class)).filter(obj -> obj != null).collect(Collectors.toList());
+				meta.addItemFlags(list.toArray(new org.bukkit.inventory.ItemFlag[list.size()]));
 			});
 
 	public static void addItemFlags(ItemMeta meta, ItemFlag... flags) {
@@ -201,7 +228,7 @@ public final class Compat {
 		ADD_ITEM_FLAGS.process(meta, flags);
 	}
 
-	// get item flags
+	// ----- get item flags
 	private static final ReflectionProcedureFunction<ItemMeta, List<ItemFlag>> GET_ITEM_FLAGS = new ReflectionProcedureFunction<ItemMeta, List<ItemFlag>>()
 			.setIf(Version.ATLEAST_1_7_10, meta -> {
 				List<ItemFlag> result = new ArrayList<>();
@@ -218,7 +245,7 @@ public final class Compat {
 		return GET_ITEM_FLAGS.process(meta, new ArrayList<>());
 	}
 
-	// set unbreakable
+	// ----- set unbreakable
 	private static final ReflectionProcedureBiConsumer<ItemMeta, Boolean> SET_UNBREAKABLE = new ReflectionProcedureBiConsumer<ItemMeta, Boolean>()
 			.setIf(Version.ATLEAST_1_7_10, (meta, unbreakable) -> {
 				ReflectionObject.of(meta).invokeMethod("spigot").invokeMethod("setUnbreakable", unbreakable.booleanValue());
@@ -231,7 +258,7 @@ public final class Compat {
 		SET_UNBREAKABLE.process(meta, unbreakable);
 	}
 
-	// get unbreakable
+	// ----- get unbreakable
 	private static final ReflectionProcedureFunction<ItemMeta, Boolean> IS_UNBREAKABLE = new ReflectionProcedureFunction<ItemMeta, Boolean>()
 			.setIf(Version.ATLEAST_1_7_10, (meta) -> {
 				return ReflectionObject.of(meta).invokeMethod("spigot").invokeMethod("isUnbreakable").get();

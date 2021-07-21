@@ -24,7 +24,7 @@ public class PositionTypeClosestEntityRelativeCylinderInside extends PositionTyp
 		super(id, CommonMats.ZOMBIE_HEAD);
 	}
 
-	// elements
+	// ----- elements
 	@Override
 	public boolean mustCache(ElementPosition position) {
 		return false;
@@ -39,7 +39,7 @@ public class PositionTypeClosestEntityRelativeCylinderInside extends PositionTyp
 		position.addDouble("radius", Need.required(), 1, TextEditorGeneric.descriptionPositionTypeCylinderRadius);
 	}
 
-	// parse
+	// ----- parse
 	@Override
 	public Position doParse(ElementPosition position, Replacer replacer) throws ParsingError {
 		Entity entity = PositionTypeClosestEntityRelativeSingle.findMatching(position, replacer);

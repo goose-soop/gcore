@@ -24,7 +24,7 @@ public class ElementDynmapMarker extends ContainerElement {
 		super("dynmap marker", parent, id, need, editorDescription);
 	}
 
-	// get
+	// ----- get
 	public ElementLocation getLocation() {
 		return location;
 	}
@@ -33,7 +33,7 @@ public class ElementDynmapMarker extends ContainerElement {
 		return text;
 	}
 
-	// editor
+	// ----- editor
 	@Override
 	public Mat editorIconType() {
 		return CommonMats.CLOCK;

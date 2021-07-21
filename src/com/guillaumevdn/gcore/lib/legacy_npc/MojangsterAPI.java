@@ -30,14 +30,14 @@ import com.google.common.collect.LinkedHashMultimap;
 
 public class MojangsterAPI {
 
-	// static base
+	// ----- static base
 	public static final String NAME_TO_SKIN = "http://minotar.net/helm/<player>/16.png";
 	public static final String UUID_TO_PROPERTY = "http://api.mcplayerindex.com/raw/<uuid>/signed";
 	public static final String UUID_TO_NAME = " https://api.mojang.com/user/profiles/<uuid>/names";
 	public static final String NAME_TO_UUID = "https://api.mojang.com/users/profiles/minecraft/<player>";
 	public static final String MOJANG_STATUS = "http://status.mojang.com/check";
 
-	// static methods
+	// ----- static methods
 	public static HashMap<String, Boolean> getMojangStatus() {
 		final HashMap<String, Boolean> hashMap = new HashMap<String, Boolean>();
 		try {
@@ -147,7 +147,7 @@ public class MojangsterAPI {
 		}
 	}
 
-	// static utils
+	// ----- static utils
 	private static String readAll(Reader reader) throws IOException {
 		StringBuilder sb = new StringBuilder();
 		int read;
@@ -168,8 +168,8 @@ public class MojangsterAPI {
 		openConnection.setUseCaches(false);
 		openConnection.setDefaultUseCaches(false);
 		openConnection.addRequestProperty("User-Agent", "Mozilla/5.0");
-		openConnection.addRequestProperty("Cache-Control", "no-cache, no-store, must-revalidate");
-		openConnection.addRequestProperty("Pragma", "no-cache");
+		openConnection.addRequestProperty("Cache-Control", "no-valuesCache, no-store, must-revalidate");
+		openConnection.addRequestProperty("Pragma", "no-valuesCache");
 		return openConnection;
 	}
 

@@ -2,9 +2,8 @@ package com.guillaumevdn.gcore.lib.reflection;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Parameter;
-import java.util.HashMap;
-import java.util.Map;
 
+import com.guillaumevdn.gcore.lib.concurrency.RWHashMap;
 import com.guillaumevdn.gcore.lib.object.ObjectUtils;
 import com.guillaumevdn.gcore.lib.string.StringUtils;
 
@@ -43,12 +42,12 @@ public class ReflectionConstructor {
 		};
 	}
 
-	// get
+	// ----- get
 	public Constructor getConstructor() {
 		return constructor;
 	}
 
-	// methods
+	// ----- methods
 	public ReflectionObject newInstance(Object... params) throws Throwable {
 		try {
 			if (!constructor.isAccessible()) constructor.setAccessible(true);
@@ -64,8 +63,8 @@ public class ReflectionConstructor {
 		}
 	}
 
-	// cache
-	private static Map<Integer, ReflectionConstructor> cache = new HashMap<>();
+	// ----- valuesCache
+	private static RWHashMap<Integer, ReflectionConstructor> cache = new RWHashMap<>();
 
 	public static ReflectionConstructor of(Class<?> clazz, Class<?>... params) throws Throwable {
 		// hash by class name

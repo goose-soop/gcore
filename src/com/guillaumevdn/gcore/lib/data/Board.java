@@ -13,7 +13,7 @@ import com.guillaumevdn.gcore.lib.logging.Logger;
  */
 public abstract class Board {
 
-	private final GPlugin plugin;
+	private final GPlugin<?, ?> plugin;
 	private final String id;
 	private final BoardType boardType;
 	private final int saveDelayTicks;
@@ -27,10 +27,10 @@ public abstract class Board {
 		this.boardType = boardType;
 		this.saveDelayTicks = saveDelayTicks;
 		String loggerId = "data-" + id;
-		plugin.registerLogger(logger = new Logger(plugin, plugin.getName() + "-" + loggerId, plugin.getConfiguration().logDataConsole(this), plugin.getConfiguration().logDataFile(this), 50000));
+		plugin.registerLogger(logger = new Logger(plugin, plugin.getName() + "-" + loggerId, plugin.getConfiguration().logDataConsole(this), plugin.getConfiguration().logDataFile(this)));
 	}
 
-	// get
+	// ----- get
 	public final GPlugin getPlugin() {
 		return plugin;
 	}
@@ -67,7 +67,7 @@ public abstract class Board {
 	}
 
 	// ----------------------------------------------------------------------------------------------------
-	// saving
+	// ----- saving
 	// ----------------------------------------------------------------------------------------------------
 
 	public final void startSaving() {
@@ -87,7 +87,7 @@ public abstract class Board {
 	public abstract boolean mustSaveSomething();
 
 	// ----------------------------------------------------------------------------------------------------
-	// data
+	// ----- data
 	// ----------------------------------------------------------------------------------------------------
 
 	public final void initialize(BukkitThread thread, ThrowableRunnable callback) {
@@ -135,7 +135,7 @@ public abstract class Board {
 	}
 
 	// ----------------------------------------------------------------------------------------------------
-	// remote
+	// ----- remote
 	// ----------------------------------------------------------------------------------------------------
 
 	protected abstract void remoteInitJson() throws Throwable;
@@ -156,7 +156,7 @@ public abstract class Board {
 		}
 		// perform
 		final long start = System.currentTimeMillis();
-		thread.operate(() -> {
+		plugin.operate(thread, () -> {
 			try {
 				runner.run();
 			} catch (Throwable ignored) {

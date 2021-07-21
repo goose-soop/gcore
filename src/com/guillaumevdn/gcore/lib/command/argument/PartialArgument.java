@@ -21,7 +21,7 @@ public abstract class PartialArgument<T> extends Argument<T> {
 		super(need, playerOnly, permission, usage);
 	}
 
-	// do
+	// ----- do
 	@Override
 	public final T consume(CommandCall call) {
 		if (call.getArguments().isEmpty()) {

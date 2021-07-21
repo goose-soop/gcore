@@ -9,11 +9,13 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 import com.guillaumevdn.gcore.TextEditorGeneric;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
+import com.guillaumevdn.gcore.lib.compatibility.Version;
 import com.guillaumevdn.gcore.lib.element.editor.SlotPlacement;
 import com.guillaumevdn.gcore.lib.element.struct.Need;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementString;
 import com.guillaumevdn.gcore.lib.element.type.container.ElementItem;
 import com.guillaumevdn.gcore.lib.item.ItemCheck;
+import com.guillaumevdn.gcore.lib.item.ItemReference;
 import com.guillaumevdn.gcore.lib.object.ObjectUtils;
 import com.guillaumevdn.gcore.lib.reflection.ReflectionObject;
 import com.guillaumevdn.gcore.lib.serialization.data.DataIO;
@@ -26,13 +28,14 @@ import com.mojang.authlib.properties.Property;
  */
 public final class MetaSkull {
 
-	public static boolean match(ItemMeta itemMeta, ItemMeta referenceMeta, ItemCheck check) {
-		SkullMeta meta = ObjectUtils.castOrNull(itemMeta, SkullMeta.class); // might be null if exact match is false
-		SkullMeta ref = ObjectUtils.castOrNull(referenceMeta, SkullMeta.class);
-		if (ref == null) return true;
+	public static boolean match(ItemMeta itemMeta, ItemReference reference, ItemCheck check) {
+		if (!reference.hasMeta(SkullMeta.class)) return true;
+		SkullMeta meta = ObjectUtils.castOrNull(itemMeta, SkullMeta.class);  // might be null if exact match is false
+
 		// owner
-		if (check.isExact() && (meta == null || meta.hasOwner() != ref.hasOwner() || !Objects.deepEquals(meta.getOwner(), ref.getOwner()))) return false;
-		else if (!check.isExact() && ref.hasOwner() && (meta == null || !meta.hasOwner() || !Objects.deepEquals(meta.getOwner(), ref.getOwner()))) return false;
+		if (check.isExact() && (meta == null || meta.hasOwner() != reference.hasOwner() || !Objects.deepEquals(meta.getOwner(), reference.getOwner()))) return false;
+		else if (!check.isExact() && reference.hasOwner() && (meta == null || !meta.hasOwner() || !Objects.deepEquals(meta.getOwner(), reference.getOwner()))) return false;
+
 		// seems good
 		return true;
 	}
@@ -57,16 +60,20 @@ public final class MetaSkull {
 	public static void read(ItemMeta itemMeta, DataIO reader) throws Throwable {
 		SkullMeta meta = ObjectUtils.castOrNull(itemMeta, SkullMeta.class);
 		if (meta != null) {
-			UUID id = reader.readUUID("ownerId");
+			UUID uuid = reader.readUUID("ownerId");
 			String name = reader.readString("ownerName");
 			String data = reader.readString("skinData");
 			String signature = reader.readString("skinSignature");
-			if (data != null || id != null || name != null) {  // either we build it from data or we rebuild it from a name
-				GameProfile profile = new GameProfile(id == null && name == null ? UUID.randomUUID() : id, name);
+			if (data != null || uuid != null || name != null) {  // either we build it from data or we rebuild it from a name
+				GameProfile profile = new GameProfile(uuid == null && name == null ? UUID.randomUUID() : uuid, name);
 				if (data != null) {
 					profile.getProperties().put("textures", signature != null ? new Property("textures", data, signature) : new Property("textures", data));
 				}
-				ReflectionObject.of(itemMeta).setField("profile", profile);
+				if (Version.ATLEAST_1_15) {
+					ReflectionObject.of(itemMeta).invokeVoidMethod("setProfile", profile);  // there's another field "serializedProfile"
+				} else {
+					ReflectionObject.of(itemMeta).setField("profile", profile);
+				}
 			}
 		}
 	}

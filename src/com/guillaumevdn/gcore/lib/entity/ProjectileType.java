@@ -16,19 +16,19 @@ public enum ProjectileType {
 	ENDER_PEARL("ENDER_PEARL"),
 	TRIDENT("TRIDENT");
 
-	// base
+	// ----- base
 	private String entityType;
 
 	private ProjectileType(String entityType) {
 		this.entityType = entityType;
 	}
 
-	// get
+	// ----- get
 	public String getEntityType() {
 		return entityType;
 	}
 
-	// static
+	// ----- static
 	public static ProjectileType fromProjectile(Projectile projectile) {
 		if (projectile != null) {
 			String entityType = projectile.getType().name();

@@ -3,7 +3,7 @@ package com.guillaumevdn.gcore.lib.configuration.file.node;
 import java.util.List;
 
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
-import com.guillaumevdn.gcore.lib.number.NumberUtils;
+import com.guillaumevdn.gcore.lib.configuration.reader.YMLReader;
 import com.guillaumevdn.gcore.lib.string.StringUtils;
 
 /**
@@ -29,7 +29,7 @@ public class SingleValueNode extends ConfigNode {
 		setValueWithLineBreaks(valueWithLineBreaks);
 	}
 
-	// get
+	// ----- get
 	public String getValue() {
 		return StringUtils.toTextString(" ", valueWithLineBreaks);
 	}
@@ -42,7 +42,7 @@ public class SingleValueNode extends ConfigNode {
 		return trailingComment;
 	}
 
-	// set
+	// ----- set
 	public void setValueString(String value) {
 		if (value == null) throw new IllegalArgumentException("value can't be null");
 		// find line length limit
@@ -70,11 +70,11 @@ public class SingleValueNode extends ConfigNode {
 		this.valueWithLineBreaks = value;
 	}
 
-	// print
+	// ----- print
 	public void print() {
 		String prefix = getPrefix();
 		if (valueWithLineBreaks.size() == 1) {
-			System.out.println(getDepthLevel() + " " + prefix + getId() + ": " + wrapValueToWrite(StringUtils.retranslateColorCodes(valueWithLineBreaks.get(0))) + (trailingComment != null ? " #" + trailingComment : ""));
+			System.out.println(getDepthLevel() + " " + prefix + getId() + ": " + YMLReader.wrapValueToWrite(StringUtils.retranslateColorCodes(valueWithLineBreaks.get(0))) + (trailingComment != null ? " #" + trailingComment : ""));
 		} else {
 			System.out.println(getDepthLevel() + " " + prefix + getId() + ": >" + (trailingComment != null ? " #" + trailingComment : ""));
 			for (String line : StringUtils.retranslateColorCodes(valueWithLineBreaks)) {
@@ -83,47 +83,35 @@ public class SingleValueNode extends ConfigNode {
 		}
 	}
 
-	// write
+	// ----- write
 	@Override
-	public void write(Appendable writer) throws Throwable {
+	public void write(Appendable writer, WriteType type) throws Throwable {
 		String prefix = getPrefix();
+
+		if (type.writePrefix()) writer.append(prefix);
+		if (type.writeId()) writer.append(YMLReader.wrapIdToWrite(getId()) + ": ");
+
 		if (valueWithLineBreaks.size() == 1) {
-			writer.append(prefix + getId() + ": " + wrapValueToWrite(StringUtils.retranslateColorCodes(valueWithLineBreaks.get(0))) + (trailingComment != null ? " #" + trailingComment : "") + "\n");
+			writer.append(YMLReader.wrapValueToWrite(StringUtils.retranslateColorCodes(valueWithLineBreaks.get(0))) + (trailingComment != null ? " #" + trailingComment : "") + "\n");
 		} else {
-			writer.append(prefix + getId() + ": >" + (trailingComment != null ? " #" + trailingComment : "") + "\n");
+			writer.append(">" + (trailingComment != null ? " #" + trailingComment : "") + "\n");
 			for (String line : StringUtils.retranslateColorCodes(valueWithLineBreaks)) {
 				writer.append(prefix + "  " + line + "\n");
 			}
 		}
 	}
 
-	// utils
-	public static String wrapValueToWrite(String value) {
-		// empty
-		if (value == null || value.isEmpty()) {
-			return "''";
+	@Override
+	public void writeInCompact(Appendable writer, boolean compactParent) throws Throwable {
+		String value = "";
+		for (String v : valueWithLineBreaks) {
+			value += v + " ";
 		}
-		// primitive
-		Double dbl = NumberUtils.doubleOrNull(value);
-		if (dbl != null) {
-			return StringUtils.getDoubleFormat(3).format(dbl);
-		}
-		if (NumberUtils.doubleOrNull(value) != null || NumberUtils.integerOrNull(value) != null || NumberUtils.longOrNull(value) != null || value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false")) {
-			return value;
-		}
-		// contains :
-		if (value.contains(":")) {
-			return "'" + value.replace("'", "''") + "'";
-		}
-		// starting or ending with a non-alphanumeric character
-		if (!StringUtils.isAlphanumeric(value.charAt(0)) || (value.length() != 1 && !StringUtils.isAlphanumeric(value.charAt(value.length() - 1)))) {
-			return "'" + value.replace("'", "''") + "'";
-		}
-		// don't wrap
-		return value;
+		value = value.trim();
+		writer.append(YMLReader.wrapIdToWrite(getId()) + ": " + YMLReader.wrapValueToWrite(StringUtils.retranslateColorCodes(value)));
 	}
 
-	// clone
+	// ----- clone
 	@Override
 	public SingleValueNode clone(SectionNode parent) {
 		return new SingleValueNode(parent, getId(), valueWithLineBreaks, trailingComment);

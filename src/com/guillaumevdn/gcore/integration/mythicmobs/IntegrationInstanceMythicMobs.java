@@ -29,7 +29,7 @@ public class IntegrationInstanceMythicMobs extends IntegrationInstance {
 		registerSerializer(MythicMob.class, value -> value.getInternalName(), string -> MythicMobs.inst().getMobManager().getMythicMob(string));
 	}
 
-	// activation
+	// ----- activation
 	private Map<String, Class<? extends PositionType>> types = CollectionUtils.asMap(
 			"CLOSEST_MYTHICMOB_RELATIVE_AREA_INSIDE", PositionTypeClosestMythicMobRelativeAreaInside.class,
 			"CLOSEST_MYTHICMOB_RELATIVE_AREA_OUTSIDE", PositionTypeClosestMythicMobRelativeAreaOutside.class,

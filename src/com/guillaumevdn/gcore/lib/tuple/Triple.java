@@ -13,17 +13,17 @@ public class Triple<A, B, C> {
 	private B b;
 	private C c;
 
-	public Triple() {
+	private Triple() {
 		this(null, null, null);
 	}
 
-	public Triple(A a, B b, C c) {
+	private Triple(A a, B b, C c) {
 		this.a = a;
 		this.b = b;
 		this.c = c;
 	}
 
-	// get
+	// ----- get
 	public A getA() {
 		return a;
 	}
@@ -36,7 +36,7 @@ public class Triple<A, B, C> {
 		return c;
 	}
 
-	// set
+	// ----- set
 	public void setA(A a) {
 		this.a = a;
 	}
@@ -49,7 +49,7 @@ public class Triple<A, B, C> {
 		this.c = c;
 	}
 
-	// object
+	// ----- object
 	@Override
 	public String toString() {
 		return "(" + String.valueOf(a) + "," + String.valueOf(b) + "," + String.valueOf(c) + ")";
@@ -67,7 +67,7 @@ public class Triple<A, B, C> {
 		return other != null && Objects.deepEquals(a, other.a) && Objects.deepEquals(b, other.b) && Objects.deepEquals(c, other.c);
 	}
 
-	// static
+	// ----- static
 	public static <A, B, C> Triple<A, B, C> of(A a, B b, C c) {
 		return new Triple<>(a, b, c);
 	}

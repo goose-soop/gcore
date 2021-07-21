@@ -28,13 +28,13 @@ public abstract class PositionTypeClosestMythicMob extends PositionType {
 		super(id, CommonMats.DIAMOND_SWORD);
 	}
 
-	// elements
+	// ----- elements
 	@Override
 	protected void doFillTypeSpecificElements(ElementPosition position) {
 		position.add(new ElementMythicMobsMobList(position, "mobs", Need.optional(), TextEditorGeneric.descriptionPositionTypeClosestMythicMobMobs));
 	}
 
-	// parse
+	// ----- parse
 	@Override
 	public boolean mustCache(ElementPosition position) {
 		return false;

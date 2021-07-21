@@ -1,9 +1,7 @@
 package com.guillaumevdn.gcore.lib.gui.internal.vanilla;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
@@ -12,7 +10,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
+import com.guillaumevdn.gcore.lib.concurrency.RWHashMap;
 import com.guillaumevdn.gcore.lib.gui.internal.Handler;
 import com.guillaumevdn.gcore.lib.gui.struct.GUI;
 import com.guillaumevdn.gcore.lib.object.ObjectUtils;
@@ -29,7 +27,8 @@ public class VanillaHandler extends Handler {
 		super(gui);
 	}
 
-	// activation
+	// ----- activation
+
 	@Override
 	public void activate() {
 		Bukkit.getPluginManager().registerEvents(events, getGUI().getPlugin());	
@@ -40,10 +39,11 @@ public class VanillaHandler extends Handler {
 		HandlerList.unregisterAll(events);
 	}
 
-	// get
+	// ----- get
+
 	@Override
-	public Map<Player, Integer> getViewers() {
-		Map<Player, Integer> viewers = new HashMap<>();
+	public RWHashMap<Player, Integer> getViewers() {
+		RWHashMap<Player, Integer> viewers = new RWHashMap<>();
 		for (int i = 0; i < pages.size(); ++i) {  // ConcurrentModificationException ?
 			for (HumanEntity pl : pages.get(i).getViewers()) {
 				Player player = ObjectUtils.castOrNull(pl, Player.class);
@@ -88,7 +88,8 @@ public class VanillaHandler extends Handler {
 		return pages.indexOf(inventory);
 	}
 
-	// set
+	// ----- set
+
 	@Override
 	public void setPageItem(int pageIndex, int slot, ItemStack item) {
 		getPage(pageIndex).setItem(slot, item);
@@ -106,11 +107,12 @@ public class VanillaHandler extends Handler {
 
 	@Override
 	public void clear() {
-		CollectionUtils.clearForEach(pages, Inventory::clear);
+		pages.forEach(Inventory::clear);
 		pages.clear();
 	}
 
-	// do
+	// ----- do
+
 	@Override
 	public void createPage() {
 		pages.add(getGUI().getType().createVanilla(getGUI().getName()));
@@ -124,8 +126,26 @@ public class VanillaHandler extends Handler {
 	@Override
 	public void close(Player player) {
 		if (player.getOpenInventory() != null && pages.contains(player.getOpenInventory().getTopInventory())) {
-			player.closeInventory();
+			getGUI().getPlugin().operateSync(() -> player.closeInventory());
 		}
+	}
+
+	// ----- click
+
+	private boolean switchingPage = false;
+
+	@Override
+	protected void beforeSwitchPage() {
+		switchingPage = true;
+	}
+
+	@Override
+	public void onClose(Player player) {
+		if (switchingPage) {  // when switching pages, we close the old one ; don't trigger 'onClose'
+			switchingPage = false;
+			return;
+		}
+		super.onClose(player);
 	}
 
 }

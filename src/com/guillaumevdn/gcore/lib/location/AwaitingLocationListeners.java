@@ -10,9 +10,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 
+import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.TextGeneric;
 import com.guillaumevdn.gcore.WorkerGCore;
-import com.guillaumevdn.gcore.lib.bukkit.BukkitThread;
 import com.guillaumevdn.gcore.lib.chat.PlayerChatEvent;
 import com.guillaumevdn.gcore.lib.string.StringUtils;
 import com.guillaumevdn.gcore.lib.tuple.Pair;
@@ -36,7 +36,7 @@ public class AwaitingLocationListeners implements Listener {
 				Pair<Consumer<Location>, Runnable> awaitingLocation = WorkerGCore.inst().consumeAwaitingLocations(player);
 				if (awaitingLocation != null) {
 					if (awaitingLocation.getB() != null) {
-						BukkitThread.SYNC.operate(() -> awaitingLocation.getB().run());
+						GCore.inst().operateSync(() -> awaitingLocation.getB().run());
 					}
 				}
 			}

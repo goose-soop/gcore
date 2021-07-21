@@ -19,5 +19,5 @@ public interface MapSupplier<K, V> {
 	default Map<K, V> get() {
 		return get(new HashMap<>());
 	}
-	
+
 }

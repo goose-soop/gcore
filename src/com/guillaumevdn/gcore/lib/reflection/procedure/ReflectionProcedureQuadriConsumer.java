@@ -7,7 +7,7 @@ import com.guillaumevdn.gcore.lib.function.ThrowableQuadriConsumer;
  */
 public class ReflectionProcedureQuadriConsumer<A, B, C, D> extends ReflectionProcedure<ThrowableQuadriConsumer<A, B, C, D>, ReflectionProcedureQuadriConsumer<A, B, C, D>> {
 
-	// methods
+	// ----- methods
 	public void process(A a, B b, C c, D d) {
 		ThrowableQuadriConsumer<A, B, C, D> function = get();
 		if (function != null) {

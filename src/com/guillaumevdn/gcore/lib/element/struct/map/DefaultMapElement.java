@@ -34,7 +34,7 @@ public abstract class DefaultMapElement<K, V extends Element> extends MapElement
 		super(keyClass, typeName, overrideTypeName, parent, id, need, editorDescription);
 	}
 
-	// get
+	// ----- get
 	@Override
 	public Optional<V> getElement(K key) {
 		Optional<V> val = super.getElement(key);
@@ -51,7 +51,7 @@ public abstract class DefaultMapElement<K, V extends Element> extends MapElement
 		return super.hasParseableLocations() || defaultElement == null || defaultElement.hasParseableLocations();
 	}
 
-	// loading and saving
+	// ----- loading and saving
 	@Override
 	protected void doRead() throws Throwable {
 		String path = getConfigurationPath();
@@ -93,7 +93,7 @@ public abstract class DefaultMapElement<K, V extends Element> extends MapElement
 		}
 	}
 
-	// editor
+	// ----- editor
 	@Override
 	public EditorGUI editorGUI(ClickCall fromCall) {
 		EditorGUI editor = new EditorGUI(this, fromCall) {
@@ -155,15 +155,15 @@ public abstract class DefaultMapElement<K, V extends Element> extends MapElement
 						editorAskKeyAndCreateAndAddElement(call, (key, value) -> {
 							getSuperElement().onEditorChange(DefaultMapElement.this);
 							// reopen GUI (that refreshes it since it's an editor GUI)
-							call.getGUI().openFor(call.getClicker(), call.getPageIndex());
-						}, () -> call.getGUI().openFor(call.getClicker(), call.getPageIndex()));
+							call.reopenGUI();
+						}, () -> call.reopenGUI());
 					}
 					// right-click : create default
 					else if (call.getType().equals(ClickType.RIGHT)) {
 						defaultElement = createDefaultElement("DEFAULT");
 						getSuperElement().onEditorChange(DefaultMapElement.this);
 						// reopen GUI (that refreshes it since it's an editor GUI)
-						call.getGUI().openFor(call.getClicker(), call.getPageIndex());
+						call.reopenGUI();
 					}
 				}));
 				// done

@@ -18,7 +18,7 @@ import com.guillaumevdn.gcore.lib.string.StringUtils;
  */
 public class ParticleScriptDecoder {
 
-	// base
+	// ----- base
 	private final GPlugin plugin;
 	private final File file;
 	private final ParticleScript script;
@@ -29,7 +29,7 @@ public class ParticleScriptDecoder {
 		this.script = new ParticleScript(plugin, id);
 	}
 
-	// get
+	// ----- get
 	public final GPlugin getPlugin() {
 		return plugin;
 	}
@@ -42,7 +42,7 @@ public class ParticleScriptDecoder {
 		return script;
 	}
 
-	// decode
+	// ----- decode
 	public void decode() throws Throwable {
 		// read lines without comments
 		List<String> lines = new ArrayList<>();

@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -32,7 +33,7 @@ public final class Mat extends Variant<MatData> {
 		this.skull = data.getDataName().contains("HEAD") || data.getDataName().contains("SKULL");
 	}
 
-	// get
+	// ----- get
 	public boolean canHaveItem() {
 		try {
 			return !isVoid(newStack());
@@ -57,7 +58,7 @@ public final class Mat extends Variant<MatData> {
 		return item == null || item.getType() == null || AIR_TYPES.contains(item.getType().name());
 	}
 
-	// item stack
+	// ----- item stack
 	public ItemStack newStack() {
 		return MatCompatItem.createStack(this);
 	}
@@ -66,7 +67,7 @@ public final class Mat extends Variant<MatData> {
 		return item == null ? isAir() : MatCompatItem.match(item, this);
 	}
 
-	// block
+	// ----- block
 	public void setBlock(Block block) {
 		MatCompatBlock.setBlock(block, this);
 	}
@@ -79,13 +80,13 @@ public final class Mat extends Variant<MatData> {
 		return block == null ? isAir() : MatCompatBlock.match(block, this);
 	}
 
-	// object
+	// ----- object
 	@Override
 	public Mat clone() {
 		return new Mat(getId(), getData().clone());
 	}
 
-	// static
+	// ----- static
 	public static Collection<Mat> values() {
 		return ConfigGCore.mats.values();
 	}
@@ -103,6 +104,10 @@ public final class Mat extends Variant<MatData> {
 	}
 
 	public static OptionalMat fromBlock(Block block) {
+		return block == null ? OptionalMat.empty() : new OptionalMat(block.getType().name(), ConfigGCore.mats.fromBlock(block).orNull());
+	}
+
+	public static OptionalMat fromBlock(BlockState block) {
 		return block == null ? OptionalMat.empty() : new OptionalMat(block.getType().name(), ConfigGCore.mats.fromBlock(block).orNull());
 	}
 
@@ -127,8 +132,8 @@ public final class Mat extends Variant<MatData> {
 			return mat != null ? mat : def;
 		}
 
-		public Mat orNull() {
-			return orElse(null);
+		public Mat orAir() {
+			return orElse(CommonMats.AIR);
 		}
 
 		public boolean isPresent() {
@@ -137,6 +142,11 @@ public final class Mat extends Variant<MatData> {
 
 		public static OptionalMat empty() {
 			return new OptionalMat("null", null);
+		}
+		
+		@Override
+		public String toString() {
+			return "" + mat;
 		}
 
 		@Override

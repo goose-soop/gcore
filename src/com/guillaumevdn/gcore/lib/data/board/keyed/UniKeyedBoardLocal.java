@@ -17,12 +17,8 @@ public abstract class UniKeyedBoardLocal<K, V> extends UniKeyedBoard<K, V> {
 	}
 
 	// ----------------------------------------------------------------------------------------------------
-	// get
+	// ----- get
 	// ----------------------------------------------------------------------------------------------------
-
-	public final V getCachedValue(K key) {
-		return cache.get(key);
-	}
 
 	public final void forPresentValue(K key, Consumer<V> ifValue) {
 		forValue(key, ifValue, null);
@@ -42,7 +38,7 @@ public abstract class UniKeyedBoardLocal<K, V> extends UniKeyedBoard<K, V> {
 	}
 
 	// ----------------------------------------------------------------------------------------------------
-	// set
+	// ----- set
 	// ----------------------------------------------------------------------------------------------------
 
 	public final V putValue(K key, V value) {

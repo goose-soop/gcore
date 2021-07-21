@@ -17,11 +17,14 @@ import com.guillaumevdn.gcore.lib.tuple.Pair;
  */
 public class PlayerInventoryState {
 
-	// static base
+	// ----- static base
 	public static final Integer OTHER_SLOTS_DIFF = -10;
 
-	private Inventory otherInventory;
+	private Inventory otherInventory = null;
 	private Map<Integer, ItemStack> items = new HashMap<>();
+
+	public PlayerInventoryState() {
+	}
 
 	public PlayerInventoryState(Player player) {
 		this(player, null, (Collection<Integer>) null);
@@ -56,7 +59,7 @@ public class PlayerInventoryState {
 		}
 	}
 
-	// get
+	// ----- get
 	public Inventory getOtherInventory() {
 		return otherInventory;
 	}
@@ -65,7 +68,7 @@ public class PlayerInventoryState {
 		return items;
 	}
 
-	// compare
+	// ----- compare
 	public Pair<Map<Integer, ItemStack>, Map<Integer, ItemStack>> findChanges(PlayerInventoryState newState) {
 		return InventoryState.findChanges(items, newState.items);
 	}

@@ -28,7 +28,7 @@ import com.guillaumevdn.gcore.migration.v8_0.config.MigrationV8Config;
 
 public class V7ItemData {
 
-	// fields
+	// ----- fields
 	public Mat type;
 	public int durability = 0;
 	public int amount = 1;
@@ -40,7 +40,7 @@ public class V7ItemData {
 	public boolean unbreakable = false;
 	public boolean hideFlags = false;
 
-	// methods
+	// ----- methods
 	public ItemStack toItemStack() throws Throwable {
 		DataIO data = new DataIO();
 		data.write("version", 1);
@@ -81,7 +81,7 @@ public class V7ItemData {
 
 	}
 
-	// serialization
+	// ----- serialization
 	public static class GsonAdapter extends TypeAdapter<V7ItemData> {
 
 		@Override
@@ -101,7 +101,7 @@ public class V7ItemData {
 						item.hideFlags = reader.nextBoolean();
 					} else if (name.equalsIgnoreCase("type")) {
 						String[] split = reader.nextString().split(",", -1);
-						Mat type = Mat.firstFromIdOrDataName(split[0]).orNull();
+						Mat type = Mat.firstFromIdOrDataName(split[0]).orElse(null);
 						if (type != null && type.canHaveItem()) {
 							Integer matDura = NumberUtils.integerOrNull(split[1]);
 							if (matDura != null && matDura != 0) {

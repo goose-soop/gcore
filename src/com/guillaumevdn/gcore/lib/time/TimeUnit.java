@@ -16,14 +16,14 @@ public enum TimeUnit {
 	WEEK(weeks -> DAY.toMillis(weeks * 7L)),
 	MONTH(months -> WEEK.toMillis(months * 31L));
 
-	// base
+	// ----- base
 	private Function<Long, Long> toMillis;
 
 	TimeUnit(Function<Long, Long> toMillis) {
 		this.toMillis = toMillis;
 	}
 
-	// do
+	// ----- do
 	public long toMillis(long duration) {
 		return toMillis.apply(duration);
 	}

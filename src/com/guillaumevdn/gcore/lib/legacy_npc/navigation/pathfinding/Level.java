@@ -11,9 +11,9 @@ import com.guillaumevdn.gcore.lib.legacy_npc.navigation.pathfinding.movement.Mov
  */
 public class Level {
 
-	// FIXME : default those in config
+	// ----- FIXME : default those in config
 
-	// FIXME : implement this (this will be in the animation/navigation part)
+	// ----- FIXME : implement this (this will be in the animation/navigation part)
 
 	/**
 	 * Default values :
@@ -59,7 +59,7 @@ public class Level {
 		this.pauseIfAngle = pauseIfAngle;
 	}
 
-	// get
+	// ----- get
 	public Optional<List<SpeedType>> getPreferredSpeeds(MovementType type) {
 		return Optional.of(preferredSpeeds.get(type));
 	}

@@ -117,7 +117,7 @@ public enum BlockStateType implements LinearObjectType {
 		}
 	}
 
-	// get
+	// ----- get
 	@Override
 	public boolean requireParam() {
 		return true;
@@ -127,8 +127,8 @@ public enum BlockStateType implements LinearObjectType {
 		return icon;
 	}
 
-	// check
-	public boolean has(BlockState blockState, Block block) {
+	// ----- check
+	public boolean has(BlockState blockState, org.bukkit.block.BlockState block) {
 		// not supported
 		if (dataClass == null) {
 			GCore.inst().getMainLogger().error("Can't check block state '" + name() + " " + StringUtils.toTextString(" ", blockState.getArguments()) + "', it's not supported on version " + Version.CURRENT);
@@ -136,7 +136,7 @@ public enum BlockStateType implements LinearObjectType {
 		}
 		try {
 			// invalid state
-			ReflectionObject state = ReflectionObject.of(block.getState());
+			ReflectionObject state = ReflectionObject.of(block);
 			ReflectionObject data = state.get() == null ? null : state.invokeMethod(Version.ATLEAST_1_13 ? "getBlockData" : "getData");
 			if (data == null || !ObjectUtils.instanceOf(data.justGet(), dataClass)) {
 				return false;
@@ -149,7 +149,7 @@ public enum BlockStateType implements LinearObjectType {
 		}
 	}
 
-	// set
+	// ----- set
 	public void set(BlockState blockState, Block block) {
 		// not supported
 		if (dataClass == null) {

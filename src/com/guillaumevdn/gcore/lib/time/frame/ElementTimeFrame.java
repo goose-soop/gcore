@@ -25,7 +25,7 @@ public class ElementTimeFrame extends TypableContainerElement<TimeFrameType> {
 		return add(new ElementTimeFrameType(this, "type", TextEditorGeneric.descriptionTimeFrameType));
 	}
 
-	// match
+	// ----- match
 	public Pair<ZonedDateTime, ZonedDateTime> getActive(Replacer replacer) {
 		return getBounds(replacer, 0);
 	}

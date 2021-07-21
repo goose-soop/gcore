@@ -4,17 +4,16 @@ package com.guillaumevdn.gcore.lib.tuple;
  * @author GuillaumeVDN
  */
 public class BooleanPair extends Pair<Boolean, Boolean> {
-
 	
-	public BooleanPair() {
+	protected BooleanPair() {
 		super();
 	}
 
-	public BooleanPair(Boolean a, Boolean b) {
+	protected BooleanPair(Boolean a, Boolean b) {
 		super(a, b);
 	}
 
-	// static
+	// ----- static
 	public static BooleanPair of(Boolean a, Boolean b) {
 		return new BooleanPair(a, b);
 	}

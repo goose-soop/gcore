@@ -37,7 +37,7 @@ public class ElementWorldguardRegion extends ElementAbstractEnum<WGRegion> {
 		this.world = world;
 	}
 
-	// get
+	// ----- get
 	public ElementWorld getWorld() {
 		return world;
 	}

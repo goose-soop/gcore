@@ -11,18 +11,18 @@ public class Wrapper<T> {
 		this.value = value;
 	}
 
-	// get
+	// ----- get
 	public T get() {
 		return value;
 	}
 
-	// set
+	// ----- set
 	public T set(T value) {
 		this.value = value;
 		return value;
 	}
 
-	// object
+	// ----- object
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -53,7 +53,7 @@ public class Wrapper<T> {
 		return String.valueOf(value);
 	}
 
-	// static
+	// ----- static
 	public static <T> Wrapper<T> of(T value) {
 		return new Wrapper<>(value);
 	}

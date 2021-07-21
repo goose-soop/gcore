@@ -281,6 +281,9 @@ descriptionGuiItemDynamicBorderLinearIconOn: |
 descriptionGuiItemDynamicBorderLinearIconOff: |
   &7The icon for inactive items.
 
+descriptionGuiItemDynamicBorderLinearRefreshTicks: |
+  &7The update delay (in ticks)
+
 # -------------------- Position --------------------
 
 descriptionPositionType: |
@@ -548,6 +551,9 @@ descriptionTimeFrameLimitedStart: |
 
 descriptionTimeFrameLimitedEnd: |
   &7End time
+
+descriptionTimeFrameRepeatPeriodDuration: |
+  &7The period duration
 
 # -------------------- Messages --------------------
 

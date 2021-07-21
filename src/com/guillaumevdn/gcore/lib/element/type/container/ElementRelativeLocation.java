@@ -48,7 +48,7 @@ public class ElementRelativeLocation extends ParseableContainerElement<Location>
 		return desc.isEmpty() ? null : desc;
 	}
 
-	// get
+	// ----- get
 	public ElementDouble getHorizontalAngle() {
 		return horizontalAngle;
 	}
@@ -61,10 +61,10 @@ public class ElementRelativeLocation extends ParseableContainerElement<Location>
 		return verticalOffset;
 	}
 
-	// parse
+	// ----- parse
 	@Override
 	public ParsedCache<Location> getCache() {
-		return null;  // don't cache obviously since this relies on volatile data
+		return null;  // don't valuesCache obviously since this relies on volatile data
 	}
 
 	@Override
@@ -90,7 +90,7 @@ public class ElementRelativeLocation extends ParseableContainerElement<Location>
 		return new Location(relativeTo.getWorld(), x, y, z);
 	}
 
-	// editor
+	// ----- editor
 	@Override
 	public Mat editorIconType() {
 		return CommonMats.REPEATER;

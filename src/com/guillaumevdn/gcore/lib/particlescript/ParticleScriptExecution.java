@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+import com.guillaumevdn.gcore.lib.GPlugin;
 import com.guillaumevdn.gcore.lib.number.NumberUtils;
 
 /**
@@ -13,7 +14,8 @@ import com.guillaumevdn.gcore.lib.number.NumberUtils;
  */
 public class ParticleScriptExecution {
 
-	// base
+	// ----- base
+	private GPlugin plugin;
 	private ParticleScript script;
 	private final boolean autoLoop;
 	private int operationIndex;
@@ -26,8 +28,8 @@ public class ParticleScriptExecution {
 	 * Same as calling {@link #ParticleScriptExecution(ParticleScript, Location)} with a null fixedBaseLocation argument
 	 * @param script the particle script
 	 */
-	public ParticleScriptExecution(ParticleScript script, boolean autoLoop) {
-		this(script, null, autoLoop);
+	public ParticleScriptExecution(GPlugin plugin, ParticleScript script, boolean autoLoop) {
+		this(plugin, script, null, autoLoop);
 	}
 
 	/**
@@ -35,14 +37,19 @@ public class ParticleScriptExecution {
 	 * @param script the particle script
 	 * @param fixedBaseLocation the fixed base location ; if this is null (because the location is volatile), you'll have to override method {@link #getBaseLocation()}
 	 */
-	public ParticleScriptExecution(ParticleScript script, Location fixedBaseLocation, boolean autoLoop) {
+	public ParticleScriptExecution(GPlugin plugin, ParticleScript script, Location fixedBaseLocation, boolean autoLoop) {
+		this.plugin = plugin;
 		this.script = script;
 		this.fixedBaseLocation = fixedBaseLocation;
 		this.autoLoop = autoLoop;
 		reset();
 	}
 
-	// get
+	// ----- get
+	public final GPlugin getPlugin() {
+		return plugin;
+	}
+
 	public final ParticleScript getScript() {
 		return script;
 	}
@@ -63,7 +70,7 @@ public class ParticleScriptExecution {
 		return variables.getOrDefault(name.toLowerCase(), 0d);
 	}
 
-	// set
+	// ----- set
 	public void setScript(ParticleScript script) {
 		this.script = script;
 	}
@@ -80,7 +87,7 @@ public class ParticleScriptExecution {
 		variables.put(name.toLowerCase(), value);
 	}
 
-	// methods
+	// ----- methods
 	public void reset() {
 		// indexes
 		operationIndex = -1;

@@ -12,24 +12,28 @@ import com.guillaumevdn.gcore.lib.element.struct.list.ListElement;
 import com.guillaumevdn.gcore.lib.element.struct.parsing.ParseableListElement;
 import com.guillaumevdn.gcore.lib.element.struct.parsing.ParsedCache;
 import com.guillaumevdn.gcore.lib.element.type.container.ElementItem;
+import com.guillaumevdn.gcore.lib.element.type.container.ElementItemMode;
 import com.guillaumevdn.gcore.lib.string.Text;
 
 /**
  * @author GuillaumeVDN
  */
 public class ElementItemList extends ListElement<ElementItem> implements ParseableListElement<ItemStack, ElementItem> {
+	
+	private final ElementItemMode mode;
 
-	public ElementItemList(Element parent, String id, Need need, Text editorDescription) {
-		super("item", parent, id, need, editorDescription);
+	public ElementItemList(Element parent, String id, Need need, ElementItemMode mode, Text editorDescription) {
+		super("item", true, parent, id, need, editorDescription);
+		this.mode = mode;
 	}
 
-	// element
+	// ----- element
 	@Override
 	protected ElementItem createElement(String elementId) {
-		return new ElementItem(this, elementId, Need.optional(), null);
+		return new ElementItem(this, elementId, Need.optional(), mode, null);
 	}
 
-	// parsing
+	// ----- parsing
 	private ParsedCache<List<ItemStack>> cache = new ParsedCache<>();
 
 	@Override
@@ -42,7 +46,7 @@ public class ElementItemList extends ListElement<ElementItem> implements Parseab
 		cache.clear();
 	}
 
-	// editor
+	// ----- editor
 	@Override
 	public Mat editorIconType() {
 		return CommonMats.GOLDEN_APPLE;

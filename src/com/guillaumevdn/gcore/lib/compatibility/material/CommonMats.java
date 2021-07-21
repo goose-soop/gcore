@@ -98,7 +98,7 @@ public final class CommonMats {
 
 	public static void init() {
 		try {
-			NOCHECK = ConfigGCore.mats.createElement("NOCHECK", new MatData(Version.CURRENT, ComparisonType.EQUALS, "NOCHECK", null, 0, null));
+			NOCHECK = ConfigGCore.mats.createElement("NOCHECK", new MatData(Version.CURRENT, ComparisonType.EQUALS, "NOCHECK", null, -1, null, null));
 		} catch (Throwable exception) {
 			NOCHECK = null;
 			GCore.inst().getMainLogger().error("Couldn't initialize NOCHECK material, please report this :", exception);

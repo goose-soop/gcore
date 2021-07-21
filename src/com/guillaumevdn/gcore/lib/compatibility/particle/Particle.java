@@ -20,13 +20,13 @@ public class Particle extends Variant<ParticleData> {
 		super(id, data);
 	}
 
-	// object
+	// ----- object
 	@Override
 	public Particle clone() {
 		return new Particle(getId(), getData().clone());
 	}
 
-	// methods
+	// ----- methods
 	public void send(Player player, Location location) {
 		send(player, location, null, null, 1, 0f);
 	}
@@ -37,6 +37,10 @@ public class Particle extends Variant<ParticleData> {
 
 	public void send(Player player, Location location, int count, float speed) {
 		send(player, location, null, null, count, speed);
+	}
+	
+	public void send(Player player, Location location, float offx, float offy, float offz) {
+		send(CollectionUtils.asList(player), location, null, 1f, null, 1, 0f, offx, offy, offz);
 	}
 
 	public void send(Player player, Location location, Color color, Integer noteColor, int count, float speed) {
@@ -64,10 +68,14 @@ public class Particle extends Variant<ParticleData> {
 	}
 
 	public void send(Collection<Player> players, Location location, Color color, Float redstoneColorScale, Integer noteColor, int count, float speed) {
-		ParticleCompat.sendParticle(players, location, this, color, redstoneColorScale, noteColor, count, speed);
+		send(players, location, color, redstoneColorScale, noteColor, count, speed, 0f, 0f, 0f);
 	}
 
-	// static
+	public void send(Collection<Player> players, Location location, Color color, Float redstoneColorScale, Integer noteColor, int count, float speed, float offx, float offy, float offz) {
+		ParticleCompat.sendParticle(players, location, this, color, redstoneColorScale, noteColor, count, speed, offx, offy, offz);
+	}
+
+	// ----- static
 	public static Collection<Particle> values() {
 		return ConfigGCore.particles.values();
 	}

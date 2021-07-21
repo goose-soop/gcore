@@ -13,19 +13,18 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.UUID;
-import java.util.function.BiConsumer;
+import java.util.WeakHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
+import javax.annotation.Nullable;
 
+import com.guillaumevdn.gcore.lib.concurrency.RWHashSet;
 import com.guillaumevdn.gcore.lib.function.MapSupplier;
-import com.guillaumevdn.gcore.lib.function.ThrowableConsumer;
+import com.guillaumevdn.gcore.lib.function.QuadriConsumer;
 import com.guillaumevdn.gcore.lib.function.ThrowableTriConsumer;
 import com.guillaumevdn.gcore.lib.function.TriConsumer;
 import com.guillaumevdn.gcore.lib.number.NumberUtils;
@@ -38,7 +37,7 @@ import com.guillaumevdn.gcore.lib.wrapper.WrapperBoolean;
  */
 public final class CollectionUtils {
 
-	// create collection
+	// ----- create collection
 	public static <T> List<T> asList(Consumer<List<T>> filler) {
 		List<T> list = new ArrayList<>();
 		filler.accept(list);
@@ -186,6 +185,17 @@ public final class CollectionUtils {
 		return collection.stream().collect(Collectors.toSet());
 	}
 
+	@SafeVarargs
+	public static <T> RWHashSet<T> asRWSet(T... objects) {
+		RWHashSet<T> list = new RWHashSet<>();
+		if (objects != null) {
+			for (T obj : objects) {
+				list.add(obj);
+			}
+		}
+		return list;
+	}
+
 	public static <T> Set<T> asSortedSet(Collection<? extends T> collection, Comparator<T> comparator) {
 		TreeSet<T> set = new TreeSet<T>(comparator);
 		if (collection != null) {
@@ -200,13 +210,17 @@ public final class CollectionUtils {
 		return list;
 	}
 
-	public static <K, V> Map<K, V> asMap(Object... objects) {
-		Map<K, V> map = new HashMap<>();
+	// ----- map
+	private static <K, V, M extends Map<K, V>> M doAsMap(M map, Object... objects) {
 		for (int i = 0; i < objects.length; ++i) {
 			if (i + 1 >= objects.length) break;
 			map.put((K) objects[i], (V) objects[++i]);
 		}
 		return map;
+	}
+
+	public static <K, V> Map<K, V> asMap(Object... objects) {
+		return doAsMap(new HashMap<K, V>(), objects);
 	}
 
 	public static <K, V> Map<K, V> asMap(Map<K, V> map) {
@@ -224,21 +238,15 @@ public final class CollectionUtils {
 	}
 
 	public static <V> LowerCaseHashMap<V> asLowerCaseMap(Object... objects) {
-		LowerCaseHashMap<V> map = new LowerCaseHashMap<>();
-		for (int i = 0; i < objects.length; ++i) {
-			if (i + 1 >= objects.length) break;
-			map.put((String) objects[i], (V) objects[++i]);
-		}
-		return map;
+		return doAsMap(new LowerCaseHashMap<V>(), objects);
 	}
 
 	public static <K, V> LinkedHashMap<K, V> asLinkedMap(Object... objects) {
-		LinkedHashMap<K, V> map = new LinkedHashMap<>();
-		for (int i = 0; i < objects.length; ++i) {
-			if (i + 1 >= objects.length) break;
-			map.put((K) objects[i], (V) objects[++i]);
-		}
-		return map;
+		return doAsMap(new LinkedHashMap<K, V>(), objects);
+	}
+
+	public static <K, V> WeakHashMap<K, V> asWeakMap(Object... objects) {
+		return doAsMap(new WeakHashMap<K, V>(), objects);
 	}
 
 	public static <K, V> Map<K, V> asUnmodifiableMap(Object... objects) {
@@ -249,7 +257,13 @@ public final class CollectionUtils {
 		return Collections.unmodifiableMap(asLowerCaseMap(objects));
 	}
 
-	// random
+	@Nullable
+	public static <K, K2, V> Map<K2, V> remapKeys(@Nullable Map<K, V> map, Function<K, K2> mapper) {
+		if (map == null) return null;
+		return asMap(r -> map.forEach((k, v) -> r.put(mapper.apply(k), v)));
+	}
+
+	// ----- random
 	public static <T> T random(List<? extends T> list) {
 		return randomOptional(list).orNull();
 	}
@@ -271,28 +285,42 @@ public final class CollectionUtils {
 		return list.isEmpty() ? Optional.empty() : Optional.of(list.get(NumberUtils.random(0, list.size() - 1)));
 	}
 
-	// iterate
-	public static <T> void iterate(Collection<T> collection, TriConsumer<Iterator<T>, T, WrapperBoolean> consumer) {
+	// ----- iterate
+	public static <K, V> void iterateMap(Map<K, V> map, QuadriConsumer<K, V, WrapperBoolean, WrapperBoolean> consumer) {
+		iterate(map.entrySet().iterator(), (entry, remover, breaker) -> consumer.accept(entry.getKey(), entry.getValue(), remover, breaker));
+	}
+
+	public static <T> void iterate(Collection<T> collection, TriConsumer<T, WrapperBoolean, WrapperBoolean> consumer) {
 		iterate(collection.iterator(), consumer);
 	}
 
-	public static <T> void iterate(Iterator<T> iterator, TriConsumer<Iterator<T>, T, WrapperBoolean> consumer) {
+	public static <T> void iterate(Iterator<T> iterator, TriConsumer<T, WrapperBoolean, WrapperBoolean> consumer) {
+		WrapperBoolean remover = WrapperBoolean.of(false);
 		WrapperBoolean breaker = WrapperBoolean.of(false);
 		while (iterator.hasNext()) {
-			consumer.accept(iterator, iterator.next(), breaker);
+			consumer.accept(iterator.next(), remover, breaker);
+			if (remover.get()) {
+				iterator.remove();
+				remover.set(false);
+			}
 			if (breaker.get()) {
 				return;
 			}
 		}
 	}
 
-	public static <T> void iterateCatching(Collection<T> collection, ThrowableTriConsumer<Iterator<T>, T, WrapperBoolean> consumer) {
+	public static <T> void iterateCatching(Collection<T> collection, ThrowableTriConsumer<T, WrapperBoolean, WrapperBoolean> consumer) {
+		WrapperBoolean remover = WrapperBoolean.of(false);
 		WrapperBoolean breaker = WrapperBoolean.of(false);
 		for (Iterator<T> iterator = collection.iterator(); iterator.hasNext(); ) {
 			try {
-				consumer.accept(iterator, iterator.next(), breaker);
+				consumer.accept(iterator.next(), remover, breaker);
 			} catch (Throwable exception) {
 				exception.printStackTrace();
+			}
+			if (remover.get()) {
+				iterator.remove();
+				remover.set(false);
 			}
 			if (breaker.get()) {
 				return;
@@ -300,13 +328,18 @@ public final class CollectionUtils {
 		}
 	}
 
-	public static <T> void iterateNonNull(Collection<T> collection, TriConsumer<Iterator<T>, T, WrapperBoolean> consumer) {
+	public static <T> void iterateNonNull(Collection<T> collection, TriConsumer<T, WrapperBoolean, WrapperBoolean> consumer) {
 		if (collection != null) {
+			WrapperBoolean remover = WrapperBoolean.of(false);
 			WrapperBoolean breaker = WrapperBoolean.of(false);
 			for (Iterator<T> iterator = collection.iterator(); iterator.hasNext(); ) {
 				T next = iterator.next();
 				if (next != null) {
-					consumer.accept(iterator, next, breaker);
+					consumer.accept(next, remover, breaker);
+					if (remover.get()) {
+						iterator.remove();
+						remover.set(false);
+					}
 					if (breaker.get()) {
 						return;
 					}
@@ -315,13 +348,18 @@ public final class CollectionUtils {
 		}
 	}
 
-	public static <T> void iterateNonNullValues(Map<?, T> collection, TriConsumer<Iterator<T>, T, WrapperBoolean> consumer) {
+	public static <T> void iterateNonNullValues(Map<?, T> collection, TriConsumer<T, WrapperBoolean, WrapperBoolean> consumer) {
 		if (collection != null) {
+			WrapperBoolean remover = WrapperBoolean.of(false);
 			WrapperBoolean breaker = WrapperBoolean.of(false);
 			for (Iterator<T> iterator = collection.values().iterator(); iterator.hasNext(); ) {
 				T next = iterator.next();
 				if (next != null) {
-					consumer.accept(iterator, next, breaker);
+					consumer.accept(next, remover, breaker);
+					if (remover.get()) {
+						iterator.remove();
+						remover.set(false);
+					}
 					if (breaker.get()) {
 						return;
 					}
@@ -330,7 +368,7 @@ public final class CollectionUtils {
 		}
 	}
 
-	// equals/contains
+	// ----- equals/contains
 	public static <K, V> boolean contentEquals(Map<? extends K, ? extends V> m1, Map<? extends K, ? extends V> m2) {
 		if (m1.size() != m2.size()) {
 			return false;
@@ -422,54 +460,7 @@ public final class CollectionUtils {
 		return diff;
 	}
 
-	// clear
-	public static <T> void clearForEach(Collection<? extends T> collection, Consumer<T> consumer) {
-		collection.forEach(consumer);
-		collection.clear();
-	}
-
-	public static <T> void clearForEachThrowable(Collection<? extends T> collection, ThrowableConsumer<T> consumer) throws Throwable {
-		for (T t : collection) {
-			consumer.accept(t);
-		}
-		collection.clear();
-	}
-
-	public static <T> void clearForEachThrowableIgnore(Collection<? extends T> collection, ThrowableConsumer<T> consumer) {
-		for (T t : collection) {
-			try {
-				consumer.accept(t);
-			} catch (Throwable ignored) {}
-		}
-		collection.clear();
-	}
-
-	public static void clearForEachOnline(Collection<UUID> collection, Consumer<Player> consumer) {
-		collection.forEach(uuid -> {
-			Player player = Bukkit.getPlayer(uuid);
-			if (player != null) {
-				consumer.accept(player);
-			}
-		});
-		collection.clear();
-	}
-
-	public static <K, V> void clearForEach(Map<K, V> map, BiConsumer<K, V> consumer) {
-		map.forEach((key, value) -> consumer.accept(key, value));
-		map.clear();
-	}
-
-	public static <V> void clearForEachOnline(Map<UUID, V> map, BiConsumer<Player, V> consumer) {
-		map.forEach((uuid, value) -> {
-			Player player = Bukkit.getPlayer(uuid);
-			if (player != null) {
-				consumer.accept(player, value);
-			}
-		});
-		map.clear();
-	}
-
-	// misc
+	// ----- misc
 	public static <T> void addIfNotNull(Collection<T> collection, T element) {
 		if (element != null) {
 			collection.add(element);
@@ -494,22 +485,27 @@ public final class CollectionUtils {
 		}
 	}
 
-	public static <T> List<List<T>> split(Collection<? extends T> collection, int splitSize) {
+	/* @return a singleton list containing the same collection if less than split size, or multiple new collections otherwise */
+	public static <T> List<Collection<T>> splitCollection(Collection<T> collection, int splitSize) {
 		if (splitSize < 1) {
 			throw new Error("split size must be at least 1");
 		}
-		List<T> current = new ArrayList<>();
-		List<List<T>> split = new ArrayList<>();
-		split.add(current);
-		Iterator<? extends T> iterator = collection.iterator();
-		while (iterator.hasNext()) {
-			current.add(iterator.next());
-			if (iterator.hasNext() && current.size() == splitSize) {
-				split.add(current);
-				current = new ArrayList<>();
+		List<Collection<T>> result = new ArrayList<>();
+		if (collection.size() <= splitSize) {  // only one
+			result.add(collection);
+		} else {  // must split
+			List<T> current = new ArrayList<>();
+			result.add(current);
+			Iterator<? extends T> iterator = collection.iterator();
+			while (iterator.hasNext()) {
+				current.add(iterator.next());
+				if (iterator.hasNext() && current.size() >= splitSize) {
+					current = new ArrayList<>();
+					result.add(current);
+				}
 			}
 		}
-		return split;
+		return result;
 	}
 
 }

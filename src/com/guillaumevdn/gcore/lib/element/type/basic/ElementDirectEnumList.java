@@ -15,7 +15,7 @@ public class ElementDirectEnumList<E extends Enum<E>> extends ElementEnumList<E>
 		super(enumClass, parent, id, need, editorDescription);
 	}
 
-	// get
+	// ----- get
 	@Override
 	public Mat editorIconType() {
 		return CommonMats.ENDER_CHEST;

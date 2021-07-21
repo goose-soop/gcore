@@ -19,7 +19,7 @@ public abstract class Variant<D extends VariantData> implements Comparable<Varia
 		this.nocheck = id.equalsIgnoreCase("NOCHECK");
 	}
 
-	// get
+	// ----- get
 	public final String getId() {
 		return id;
 	}
@@ -27,8 +27,12 @@ public abstract class Variant<D extends VariantData> implements Comparable<Varia
 	public final D getData() {
 		return data;
 	}
+	
+	public final boolean isNoCheck() {
+		return nocheck;
+	}
 
-	// object
+	// ----- object
 	@Override
 	public final String toString() {
 		return id;

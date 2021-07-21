@@ -39,10 +39,10 @@ public abstract class Migration {
 		this.backupFolder = new File(pluginFolder.getParentFile() + "/" + plugin.getName() + "_backup_on_" + backupName);
 		this.successFile = plugin.getDataFile(successFilePath);
 		this.hardlockFile = new File(pluginFolder + "/hardlock");
-		this.logger = new Logger(plugin, plugin.getName() + "-migration", true, false, -1, false);
+		this.logger = new Logger(plugin, plugin.getName() + "-migration", true, false, false);
 	}
 
-	// get
+	// ----- get
 	public final GPlugin getPlugin() {
 		return plugin;
 	}
@@ -67,12 +67,12 @@ public abstract class Migration {
 		return modCount;
 	}
 
-	// set
+	// ----- set
 	public final void countMod() {
 		++modCount;
 	}
 
-	// log
+	// ----- log
 	public final void log(String line) {
 		logger.warning(line);
 	}
@@ -138,13 +138,17 @@ public abstract class Migration {
 		debug("=============================================================");
 	}
 
-	// migrate
+	// ----- migrate
 	public boolean wasMade() {
 		return successFile.exists();
 	}
 
 	public boolean markMade() {
-		return FileUtils.reset(successFile);
+		return FileUtils.ensureExistence(successFile);
+	}
+
+	public boolean markNotMade() {
+		return FileUtils.delete(successFile);
 	}
 
 	/** @return true if the migration should proceed */
@@ -205,7 +209,7 @@ public abstract class Migration {
 		return true;
 	}
 
-	// operation
+	// ----- operation
 	public final void attemptOperation(String operation, BackupBehavior backupOnFail, ThrowableRunnable runnable) throws Throwable {
 		log("Attempting operation : " + operation);
 		try {

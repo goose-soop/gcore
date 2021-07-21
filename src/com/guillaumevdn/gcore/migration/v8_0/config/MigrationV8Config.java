@@ -17,6 +17,7 @@ import com.guillaumevdn.gcore.lib.compatibility.nbt.NBTList;
 import com.guillaumevdn.gcore.lib.configuration.YMLConfiguration;
 import com.guillaumevdn.gcore.lib.configuration.file.YMLError;
 import com.guillaumevdn.gcore.lib.configuration.file.node.SectionNode;
+import com.guillaumevdn.gcore.lib.configuration.file.node.SectionNode.SectionNodeType;
 import com.guillaumevdn.gcore.lib.file.FileUtils;
 import com.guillaumevdn.gcore.lib.file.ResourceExtractor;
 import com.guillaumevdn.gcore.lib.migration.BackupBehavior;
@@ -108,7 +109,7 @@ public final class MigrationV8Config extends Migration {
 				YMLConfiguration config = new YMLConfiguration(getPlugin(), new File(getPluginFolder() + "/config.yml"));
 				// data
 				if (oldConfig.contains("data.mysql.host")) {
-					config.getBackingYML().getBase().insertBeforeFirstConfigNode(new SectionNode(config.getBackingYML().getBase(), "mysql", null));
+					config.getBackingYML().getBase().insertBeforeFirstConfigNode(new SectionNode(config.getBackingYML().getBase(), "mysql", SectionNodeType.REGULAR, null));
 					config.write("mysql.host", oldConfig.readString("data.mysql.host", null));
 					config.write("mysql.name", oldConfig.readString("data.mysql.name", null));
 					config.write("mysql.user", oldConfig.readString("data.mysql.user", null));
@@ -194,6 +195,9 @@ public final class MigrationV8Config extends Migration {
 	}
 
 	public static String millisToDuration(long milliseconds) {
+		if (milliseconds < 0L) {
+			return null;
+		}
 		if (milliseconds < 1000L || milliseconds % 1000L != 0L) {
 			return milliseconds + " MILLISECOND";
 		} else if (milliseconds / 1000L % 60L != 0L) {

@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.BiFunction;
+
+import javax.annotation.Nullable;
 
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
@@ -14,14 +17,17 @@ import com.guillaumevdn.gcore.lib.GPlugin;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.configuration.file.YMLFile;
 import com.guillaumevdn.gcore.lib.configuration.file.node.SectionNode;
-import com.guillaumevdn.gcore.lib.cost.Cost;
-import com.guillaumevdn.gcore.lib.economy.Currency;
+import com.guillaumevdn.gcore.lib.element.struct.Element;
+import com.guillaumevdn.gcore.lib.element.struct.Need;
+import com.guillaumevdn.gcore.lib.element.type.container.ElementNotify;
 import com.guillaumevdn.gcore.lib.exception.ConfigError;
 import com.guillaumevdn.gcore.lib.number.NumberUtils;
+import com.guillaumevdn.gcore.lib.reflection.Reflection;
 import com.guillaumevdn.gcore.lib.serialization.Serializer;
 import com.guillaumevdn.gcore.lib.serialization.adapter.type.AdapterItemStack;
 import com.guillaumevdn.gcore.lib.serialization.data.DataIO;
 import com.guillaumevdn.gcore.lib.string.StringUtils;
+import com.guillaumevdn.gcore.lib.string.Text;
 import com.guillaumevdn.gcore.lib.tuple.ItemChancePair;
 import com.guillaumevdn.gcore.lib.validator.type.CollectionIntegerValidator;
 import com.guillaumevdn.gcore.lib.validator.type.DoubleValidator;
@@ -37,6 +43,7 @@ public class YMLConfiguration {
 	private File file;
 	private YMLFile yml = new YMLFile(this);
 	private String logFilePath = null;
+	private Error creationStackTrace = null;
 
 	public YMLConfiguration(GPlugin plugin, File file) {
 		this.plugin = plugin;
@@ -46,13 +53,15 @@ public class YMLConfiguration {
 		load();
 	}
 
-	YMLConfiguration() {  // fake one
-		this.plugin = GCore.inst();
-		this.logFilePath = "";
+	YMLConfiguration(GPlugin plugin) {  // fake one
+		this.plugin = plugin;
+		this.logFilePath = "fake configuration";
+		creationStackTrace = new Error();
+		creationStackTrace.fillInStackTrace();
 		this.file = GCore.inst().getDataFile("data_v8/defaults/whatever.yml");
 	}
 
-	// get
+	// ----- get
 	public GPlugin getPlugin() {
 		return plugin;
 	}
@@ -65,11 +74,15 @@ public class YMLConfiguration {
 		return logFilePath;
 	}
 
+	public Error getCreationStackTrace() {
+		return creationStackTrace;
+	}
+
 	public YMLFile getBackingYML() {
 		return yml;
 	}
 
-	// load/save
+	// ----- load/save
 	public void load() {
 		try {
 			yml.read();
@@ -78,7 +91,7 @@ public class YMLConfiguration {
 		}
 	}
 
-	public void save() {
+	public final void save() {
 		save(file);
 	}
 
@@ -94,7 +107,7 @@ public class YMLConfiguration {
 		yml.print();
 	}
 
-	// config
+	// ----- config
 	public boolean contains(String path) {
 		validatePath(path);
 		return yml.contains(path);
@@ -104,7 +117,7 @@ public class YMLConfiguration {
 		return contains(path) && yml.isConfigurationSection(path);
 	}
 
-	// get section keys
+	// ----- get section keys
 	public List<String> readMandatoryKeysForSection(String path) {
 		if (!isConfigurationSection(path)) {
 			throwMissing(path, "configuration section");
@@ -116,9 +129,16 @@ public class YMLConfiguration {
 
 	public List<String> readKeysForSection(String path) {
 		if (isConfigurationSection(path)) {
-			return yml.getSectionNode(path).getConfigKeys();
+			return yml.getSectionNode(path).getConfigKeys();  // this creates a new list
 		}
 		return EMPTY_KEYS;
+	}
+
+	public List<String> readKeysForSectionCopyIfEmpty(String path) {
+		if (isConfigurationSection(path)) {
+			return yml.getSectionNode(path).getConfigKeys();  // this creates a new list
+		}
+		return new ArrayList<>();
 	}
 
 	public List<Integer> readMandatoryNumberKeysForSection(String path, Integer continuityStart) {
@@ -172,7 +192,7 @@ public class YMLConfiguration {
 		return keys;
 	}
 
-	// get object
+	// ----- get object
 	public Object read(String path, Object def) {
 		return contains(path) ? doRead(path) : def;
 	}
@@ -190,19 +210,19 @@ public class YMLConfiguration {
 		return value;
 	}
 
-	// get object
+	// ----- get object
 	public DataIO readObject(String path, boolean snakeCaseToCamelCase) {
-		return contains(path) /* this also validates the path */ ? getBackingYML().getSectionNode(path).toIO(snakeCaseToCamelCase) : null;
+		return contains(path) /* this also validates the path */ ? getBackingYML().getSectionNode(path).toIO(snakeCaseToCamelCase, null) : null;
 	}
 
 	public DataIO readMandatoryObject(String path, boolean snakeCaseToCamelCase) {
 		if (!contains(path)) { // this also validates the path
 			throwMissing(path, "object IO");
 		}
-		return getBackingYML().getSectionNode(path).toIO(snakeCaseToCamelCase);
+		return getBackingYML().getSectionNode(path).toIO(snakeCaseToCamelCase, null);
 	}
 
-	// get string
+	// ----- get string
 	public String readStringNonEmptyStringOrNull(String path) {
 		String value = readString(path, null);
 		return value != null && !value.trim().isEmpty() ? value : null;
@@ -224,7 +244,7 @@ public class YMLConfiguration {
 		return StringUtils.format(yml.getConfigValueString(path));
 	}
 
-	// get boolean
+	// ----- get boolean
 	public boolean readBoolean(String path, boolean def) {
 		return contains(path) ? doReadBoolean(path) : def;
 	}
@@ -241,7 +261,7 @@ public class YMLConfiguration {
 		return Boolean.parseBoolean(readString(path, null));
 	}
 
-	// get integer
+	// ----- get integer
 	public int readInteger(String path, int def) {
 		return readInteger(path, def, null);
 	}
@@ -273,7 +293,7 @@ public class YMLConfiguration {
 		return value;
 	}
 
-	// get long
+	// ----- get long
 	public long readLong(String path, long def) {
 		return contains(path) ? doReadLong(path) : def;
 	}
@@ -294,7 +314,7 @@ public class YMLConfiguration {
 		return value;
 	}
 
-	// get double
+	// ----- get double
 	public double readDouble(String path, double def) {
 		return readDouble(path, def, null);
 	}
@@ -326,7 +346,7 @@ public class YMLConfiguration {
 		return value;
 	}
 
-	// value : get string list
+	// ----- value : get string list
 	public List<String> readStringList(String path, List<String> def) {
 		return contains(path) ? doReadStringList(path) : StringUtils.formatCopy(def);
 	}
@@ -357,7 +377,37 @@ public class YMLConfiguration {
 		return value;
 	}
 
-	// value : get int list
+	// ----- value : get text
+	public Text readText(String path, Text def) {
+		return contains(path) ? doReadText(path) : (def == null ? null : Text.of(def.getCurrentLines()));
+	}
+
+	public Text readMandatoryText(String path) {
+		if (!contains(path)) {
+			throwMissing(path, "text");
+		}
+		return doReadText(path);
+	}
+
+	protected Text doReadText(String path) {
+		validatePath(path);
+		// get list
+		Object object = yml.getConfigValue(path);
+		List<String> lines = new ArrayList<String>();
+		if (object != null) {
+			if (object instanceof List) {
+				for (Object obj : (List) object) {
+					lines.add(String.valueOf(obj));
+				}
+			} else {
+				lines.add(String.valueOf(object));
+			}
+		}
+		// build text
+		return Text.of(lines);
+	}
+
+	// ----- value : get int list
 	public List<Integer> readIntegerList(String path, List<Integer> def) {
 		return readIntegerList(path, def, null);
 	}
@@ -406,7 +456,7 @@ public class YMLConfiguration {
 		return value;
 	}
 
-	// value : get value list
+	// ----- value : get value list
 	public <T> List<T> readSerializedList(String path, List<T> def, Class<T> typeClass) {
 		return contains(path) ? doReadSerializedList(path, typeClass) : def;
 	}
@@ -451,7 +501,7 @@ public class YMLConfiguration {
 		return value;
 	}
 
-	// value : get enum list
+	// ----- value : get enum list
 	public <T extends Enum<T>> List<T> readEnumList(String path, List<T> def, Class<T> enumClass) {
 		return contains(path) ? doReadEnumList(path, enumClass) : def;
 	}
@@ -464,38 +514,11 @@ public class YMLConfiguration {
 	}
 
 	private <T extends Enum<T>> List<T> doReadEnumList(String path, Class<T> enumClass) {
-		validatePath(path);
-		// get list
-		Object object = yml.getConfigValue(path);
-		List<T> value = new ArrayList<>();
 		Serializer<T> serializer = Serializer.ofEnum(enumClass);
-		if (object != null) {
-			if (object instanceof List) {
-				for (Object obj : (List) object) {
-					try {
-						T valueObj = serializer.deserialize(String.valueOf(obj));
-						if (valueObj != null) {
-							value.add(valueObj);
-							continue;
-						}
-					} catch (Throwable ignored) {}
-					throwError("element " + obj + " is invalid for " + serializer.getTypeName() + " at path " + path);
-				}
-			} else label:{
-				try {
-					T valueObject = serializer.deserialize(String.valueOf(object));
-					if (valueObject != null) {
-						value.add(valueObject);
-						break label;
-					}
-				} catch (Throwable ignored) {}
-				throwError("element " + object + " is invalid for " + serializer.getTypeName() + " at path " + path);
-			}
-		}
-		return value;
+		return doReadValueList(path, serializer);
 	}
 
-	// value : get item list
+	// ----- value : get item list
 	public List<ItemStack> readItemList(String path, List<ItemStack> def) {
 		return contains(path) ? doReadItemList(path) : def;
 	}
@@ -525,7 +548,7 @@ public class YMLConfiguration {
 		return value;
 	}
 
-	// value : get chance item list
+	// ----- value : get chance item list
 	public List<ItemChancePair> readItemChancePairList(String path, List<ItemChancePair> def) {
 		return contains(path) ? doReadItemChancePairList(path) : def;
 	}
@@ -555,7 +578,7 @@ public class YMLConfiguration {
 		return value;
 	}
 
-	// get locations item list
+	// ----- get locations item list
 	/*public List<ElementGUIItem> readGUIItemTripleList(String path, List<ElementGUIItem> def) {
 		return contains(path) ? doReadGUIItemTripleList(path) : def;
 	}
@@ -585,7 +608,7 @@ public class YMLConfiguration {
 		return value;
 	}
 
-	// get locations item
+	// ----- get locations item
 	public GUIItemTriple readLocationsItem(String path, GUIItemTriple def) throws Throwable {
 		return contains(path) ? doReadGUIItemTriple(path, false) : def;
 	}
@@ -620,7 +643,7 @@ public class YMLConfiguration {
 		return value;
 	}*/
 
-	// get chance item
+	// ----- get chance item
 	public ItemChancePair readChanceItem(String path, ItemChancePair def) throws Throwable {
 		return contains(path) ? doReadChanceItem(path) : def;
 	}
@@ -642,10 +665,10 @@ public class YMLConfiguration {
 		// read
 		ItemStack item = readItemStack(path, null);
 		int chance = readMandatoryInteger(path + ".chance");
-		return new ItemChancePair(item, chance);
+		return ItemChancePair.of(item, chance);
 	}
 
-	// get item
+	// ----- get item
 	public ItemStack readItemStack(String path, ItemStack def) throws Throwable {
 		return contains(path) ? doReadItemStack(path) : def;
 	}
@@ -665,89 +688,47 @@ public class YMLConfiguration {
 			throwError("missing item config section at path " + path);
 		}
 		// read config in DataIO and use the adapter so it's consistent for both config and json
-		DataIO data = readObject(path, true); // true to convert snake_case to camelCase because we're using that for json
+		DataIO data = readObject(path, true);  // true to convert snake_case to camelCase because we're using that for json
 		return AdapterItemStack.INSTANCE.readCurrent(data);
 	}
 
-	// get cost
-	public Cost readCost(String path, Cost def) throws Throwable {
-		return contains(path) ? doReadCost(path) : def;
+	// ----- get standalone elements
+	private final FakeConfigSuperElement fakeSuperElementParent = new FakeConfigSuperElement(this, "config");
+
+	public ElementNotify readNotify(String path) {
+		return readElement(path, ElementNotify.class);
 	}
 
-	public Cost readMandatoryCost(String path) throws Throwable {
-		if (!contains(path)) {
-			throwMissing(path, "cost");
+	public <T extends Element> T readElement(String path, Class<T> elementClass) {
+		T element = null;
+		try {
+			element = Reflection.newInstance(elementClass, fakeSuperElementParent, "config_" + path.replace('.', '-'), Need.optional(), null).get();  // classic element constructor ; different ones will need the method below
+		} catch (Throwable exception) {
+			throwError("couldn't load initialize of type " + elementClass.getName() + " at path " + path, exception);
 		}
-		Cost cost = doReadCost(path);
-		// empty
-		if (cost.isEmpty()) {
-			throwError("cost at path " + path + " is empty");
-		}
-		return cost;
+
+		return readElement(path, element);
 	}
 
-	private Cost doReadCost(String path) throws Throwable {
-		if (!contains(path)) {
-			return null;
-		}
-		if (!contains(path)) {
-			throwMissing(path, "cost");
-		}
-		// read
-		Cost value = new Cost();
-		if (isConfigurationSection(path)) {
-			// single item
-			if (contains(path + ".item")) {
-				ItemStack item = readMandatoryItemStack(path + ".item");
-				String displayName = readString(path + ".item.display_name", null);
-				value.add(item, displayName);
-			}
-			// multiple items
-			else {
-				if (contains(path + ".items")) {
-					for (String itemId : readKeysForSection(path + ".items")) {
-						ItemStack item = readMandatoryItemStack(path + ".items." + itemId);
-						String displayName = readString(path + ".items." + itemId + ".display_name", null);
-						value.add(item, displayName);
-					}
-				}
-			}
-			// currencies
-			if (contains(path + ".currencies")) {
-				for (String currencyId : readKeysForSection(path + ".currencies")) {
-					Currency currency = Currency.safeValueOf(currencyId);
-					if (currency == null) throwError("invalid currency " + currencyId + " for cost config at path " + path);
-					double amount = readMandatoryDouble(path + ".currencies." + currencyId);
-					value.add(currency, amount);
-				}
-			}
-		}
-		// string, currency
-		else {
-			String[] raw = readString(path, null).split(" ");
-			Currency currency = null;
-			Double amount = null;
-			// specified currency
-			if (raw.length > 1) {
-				currency = Currency.safeValueOf(raw[0].trim());
-				if (currency == null) throwError("invalid currency " + raw[0].trim() + " for cost config at path " + path);
-				amount = NumberUtils.doubleOrNull(raw[1]);
-				if (amount == null) throwError("invalid amount " + raw[1].trim() + " for cost config at path " + path);
-			}
-			// no currency specified, use Vault
-			else {
-				currency = Currency.VAULT;
-				amount = NumberUtils.doubleOrNull(raw[0].trim());
-				if (amount == null) throwError("invalid amount " + raw[0].trim() + " for cost config at path " + path);
-			}
-			// load
-			value.add(currency, amount);
-		}
-		// return
-		return value;
+	public <T extends Element> T readElement(String path, BiFunction<FakeConfigSuperElement, String, T> initializer) {
+		T element = initializer.apply(fakeSuperElementParent, "config_" + path.replace('.', '-'));
+		return readElement(path, element);
 	}
 
-	// get value
+	private <T extends Element> T readElement(String path, T element) {
+		element.setParent(fakeSuperElementParent);
+		element.setForcedConfigurationPath(path);
+
+		try {
+			element.read();
+		} catch (Throwable exception) {
+			throwError("couldn't load element of type " + element.getTypeName() + " at path " + path, exception);
+		}
+
+		return element;
+	}
+
+	// ----- get value
 	public <T> T readValue(String path, T def, Serializer<T> serializer) {
 		return readValue(path, def, serializer, null);
 	}
@@ -780,7 +761,50 @@ public class YMLConfiguration {
 		return value;
 	}
 
-	// get enum
+	// ----- value : get value list
+	public <T> List<T> readValueList(String path, List<T> def, Serializer<T> serializer) {
+		return contains(path) ? doReadValueList(path, serializer) : def;
+	}
+
+	public <T> List<T> readMandatoryValueList(String path, Serializer<T> serializer) {
+		if (!contains(path)) {
+			throwMissing(path, serializer.getTypeName() + " list");
+		}
+		return doReadValueList(path, serializer);
+	}
+
+	private <T> List<T> doReadValueList(String path, Serializer<T> serializer) {
+		validatePath(path);
+		// get list
+		Object object = yml.getConfigValue(path);
+		List<T> value = new ArrayList<>();
+		if (object != null) {
+			if (object instanceof List) {
+				for (Object obj : (List) object) {
+					try {
+						T valueObj = serializer.deserialize(String.valueOf(obj));
+						if (valueObj != null) {
+							value.add(valueObj);
+							continue;
+						}
+					} catch (Throwable ignored) {}
+					throwError("element " + obj + " is invalid for " + serializer.getTypeName() + " at path " + path);
+				}
+			} else label:{
+				try {
+					T valueObject = serializer.deserialize(String.valueOf(object));
+					if (valueObject != null) {
+						value.add(valueObject);
+						break label;
+					}
+				} catch (Throwable ignored) {}
+				throwError("element " + object + " is invalid for " + serializer.getTypeName() + " at path " + path);
+			}
+		}
+		return value;
+	}
+
+	// ----- get enum
 	public <T extends Enum<T>> T readEnum(String path, T def, Class<T> enumClass) {
 		return readValue(path, def, Serializer.ofEnum(enumClass));
 	}
@@ -789,7 +813,7 @@ public class YMLConfiguration {
 		return readMandatoryValue(path, Serializer.ofEnum(enumClass));
 	}
 
-	// get location
+	// ----- get location
 	public Location readLocation(String path, Location def) {
 		return readValue(path, def, Serializer.LOCATION);
 	}
@@ -798,7 +822,7 @@ public class YMLConfiguration {
 		return readMandatoryValue(path, Serializer.LOCATION);
 	}
 
-	// set
+	// ----- set
 	public void copyFrom(YMLConfiguration src, String srcPath, String targetPath) {
 		write(targetPath, null);
 		if (src.contains(srcPath)) {
@@ -844,7 +868,7 @@ public class YMLConfiguration {
 		}
 	}
 
-	public void write(String path, Object value) {
+	public void write(String path, @Nullable Object value) {
 		if (path.startsWith(".")) {
 			path = path.substring(1);  // just ignore blank, so we don't have to always worry about that (in migrations, for instance)
 		}
@@ -885,14 +909,14 @@ public class YMLConfiguration {
 		}
 	}
 
-	// utils
+	// ----- utils
 	public void validatePath(String path) {
 		if (StringUtils.hasChar(path, ' ') || StringUtils.hasChar(path, '\t') || path.trim().length() != path.length()) {
 			throwError("path '" + path + "' contains whitespaces");
 		}
 	}
 
-	// logs
+	// ----- logs
 	public String buildMistakeErrorHeader() {
 		return "Configuration mistake in file " + logFilePath + " : ";
 	}

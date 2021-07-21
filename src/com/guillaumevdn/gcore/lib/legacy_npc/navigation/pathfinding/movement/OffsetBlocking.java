@@ -32,7 +32,7 @@ public final class OffsetBlocking {
 		this.backupZ = z;
 	}
 
-	// get
+	// ----- get
 	public int getX() {
 		return x;
 	}
@@ -53,7 +53,7 @@ public final class OffsetBlocking {
 		return backupZ;
 	}
 
-	// obj
+	// ----- obj
 	@Override
 	public int hashCode() {
 		return Objects.hash(x, z, backupX, backupZ);

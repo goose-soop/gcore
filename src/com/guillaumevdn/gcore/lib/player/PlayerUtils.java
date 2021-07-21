@@ -16,6 +16,7 @@ import org.bukkit.entity.Player;
 import com.guillaumevdn.gcore.TextGeneric;
 import com.guillaumevdn.gcore.lib.command.CommandCall;
 import com.guillaumevdn.gcore.lib.compatibility.Version;
+import com.guillaumevdn.gcore.lib.gui.struct.ClickCall;
 import com.guillaumevdn.gcore.lib.string.StringUtils;
 import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
 
@@ -107,6 +108,8 @@ public final class PlayerUtils {
 			}
 		} else if (target instanceof CommandCall) {
 			sendMessage(((CommandCall) target).getSender(), message, cc, onlyCC);
+		} else if (target instanceof ClickCall) {
+			sendMessage(((ClickCall) target).getClicker(), message, cc, onlyCC);
 		} else if (target instanceof UUID) {
 			sendMessage(Bukkit.getOfflinePlayer((UUID) target), message, cc, onlyCC);
 		} else if (target instanceof Replacer) {

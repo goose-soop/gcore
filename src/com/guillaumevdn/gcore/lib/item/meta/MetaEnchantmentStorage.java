@@ -10,6 +10,7 @@ import com.guillaumevdn.gcore.lib.element.struct.Need;
 import com.guillaumevdn.gcore.lib.element.type.container.ElementItem;
 import com.guillaumevdn.gcore.lib.element.type.map.ElementEnchantmentLevelMap;
 import com.guillaumevdn.gcore.lib.item.ItemCheck;
+import com.guillaumevdn.gcore.lib.item.ItemReference;
 import com.guillaumevdn.gcore.lib.object.ObjectUtils;
 import com.guillaumevdn.gcore.lib.serialization.data.DataIO;
 import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
@@ -19,18 +20,18 @@ import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
  */
 public final class MetaEnchantmentStorage {
 
-	public static boolean match(ItemMeta itemMeta, ItemMeta referenceMeta, ItemCheck check) {
-		EnchantmentStorageMeta meta = ObjectUtils.castOrNull(itemMeta, EnchantmentStorageMeta.class); // might be null if exact match is false
-		EnchantmentStorageMeta ref = ObjectUtils.castOrNull(referenceMeta, EnchantmentStorageMeta.class);
-		if (ref == null) return true;
+	public static boolean match(ItemMeta itemMeta, ItemReference reference, ItemCheck check) {
+		if (!reference.hasMeta(EnchantmentStorageMeta.class)) return true;
+		EnchantmentStorageMeta meta = ObjectUtils.castOrNull(itemMeta, EnchantmentStorageMeta.class);  // might be null if exact match is false
+
 		// enchantments
 		if (check.isExact()) {
-			if (meta.hasStoredEnchants() != ref.hasStoredEnchants()) return false;
-			if (!CollectionUtils.contentEquals(meta.getStoredEnchants(), ref.getStoredEnchants())) return false;
+			if ((meta != null && meta.hasStoredEnchants()) != reference.hasStoredEnchants()) return false;
+			if (reference.hasStoredEnchants() && !CollectionUtils.contentEquals(meta.getStoredEnchants(), reference.getStoredEnchants())) return false;
 		} else {
-			if (ref.hasStoredEnchants() && (meta == null || !meta.hasStoredEnchants())) return false;
-			for (Enchantment enchantment : ref.getStoredEnchants().keySet()) {
-				if (meta.getStoredEnchants().get(enchantment) != ref.getStoredEnchants().get(enchantment)) {
+			if (reference.hasStoredEnchants() && (meta == null || !meta.hasStoredEnchants())) return false;
+			for (Enchantment enchantment : reference.getStoredEnchants().keySet()) {
+				if (meta.getStoredEnchants().get(enchantment) != reference.getStoredEnchants().get(enchantment)) {
 					return false;
 				}
 			}
@@ -57,7 +58,7 @@ public final class MetaEnchantmentStorage {
 			if (storedEnchantments != null) {
 				for (String raw : storedEnchantments.getKeys()) {
 					Enchantment enchantment = ObjectUtils.enchantmentOrNull(raw);
-					Integer level = storedEnchantments.readInteger("enchantment");
+					Integer level = storedEnchantments.readInteger(raw);
 					if (enchantment != null && level != null) {
 						meta.addStoredEnchant(enchantment, level, true);
 					}

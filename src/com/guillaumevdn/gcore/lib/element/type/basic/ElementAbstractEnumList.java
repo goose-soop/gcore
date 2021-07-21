@@ -33,7 +33,7 @@ public abstract class ElementAbstractEnumList<E> extends ElementValueList<E> {
 		this.cacheEditorSelector = cacheEditorSelector;
 	}
 
-	// get
+	// ----- get
 	public abstract List<E> getValues();
 
 	@Override
@@ -75,12 +75,12 @@ public abstract class ElementAbstractEnumList<E> extends ElementValueList<E> {
 								setValue(newValue);
 							}
 							// reopen GUI (that refreshes it since it's an editor GUI)
-							call.getGUI().openFor(call.getClicker(), call.getPageIndex());
+							call.reopenGUI();
 							getSuperElement().onEditorChange(this);
 						},
 						// on cancel
 						() -> {
-							call.getGUI().openFor(call.getClicker(), call.getPageIndex());
+							call.reopenGUI();
 						});
 			}
 			// select with single icon
@@ -100,12 +100,12 @@ public abstract class ElementAbstractEnumList<E> extends ElementValueList<E> {
 								setValue(newValue);
 							}
 							// reopen GUI (that refreshes it since it's an editor GUI)
-							call.getGUI().openFor(call.getClicker(), call.getPageIndex());
+							call.reopenGUI();
 							getSuperElement().onEditorChange(this);
 						},
 						// on cancel
 						() -> {
-							call.getGUI().openFor(call.getClicker(), call.getPageIndex());
+							call.reopenGUI();
 						});
 			}
 		}

@@ -41,7 +41,7 @@ public class ReverseSplitLowerCaseMap<V> {
 		this.separator = separator;
 	}
 
-	// internal
+	// ----- internal
 	private Pair<Map<Integer, V>, Integer> findParent(String elementKey) {
 		elementKey = elementKey.toLowerCase();
 		int count = StringUtils.countChar(elementKey, separator);
@@ -109,7 +109,7 @@ public class ReverseSplitLowerCaseMap<V> {
 		}
 	}
 
-	// methods
+	// ----- methods
 	public boolean isEmpty() {
 		return size() == 0; // calculate size because there might be empty submaps
 	}
@@ -134,7 +134,7 @@ public class ReverseSplitLowerCaseMap<V> {
 		return findParent(key).process((map, part) -> map.containsKey(part));
 	}
 
-	// get
+	// ----- get
 	public V get(String key) {
 		return findParent(key).process((map, part) -> map.get(part));
 	}
@@ -160,7 +160,7 @@ public class ReverseSplitLowerCaseMap<V> {
 		}
 	}
 
-	// set
+	// ----- set
 	public void put(String key, V value) {
 		findParent(key).consume((map, part) -> map.put(part, value));
 	}
@@ -190,7 +190,7 @@ public class ReverseSplitLowerCaseMap<V> {
 		standalone.clear();
 	}
 
-	// object
+	// ----- object
 	private static final int prime = 31;
 
 	@Override

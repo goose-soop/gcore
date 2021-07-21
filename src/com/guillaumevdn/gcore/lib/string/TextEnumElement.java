@@ -12,7 +12,7 @@ public interface TextEnumElement extends Text {
 	String getId();
 	TextElement getText();
 
-	// override methods with text
+	// ----- override methods with text
 	@Override
 	default List<String> getCurrentLines() {
 		return getText().getCurrentLines();
@@ -28,13 +28,13 @@ public interface TextEnumElement extends Text {
 		return getText().getType();
 	}
 
-	// set
+	// ----- set
 	@Override
 	default void setLines(List<String> newLines) {
 		getText().setLines(newLines);
 	}
 
-	// parse
+	// ----- parse
 	@Override
 	default String parseLine(Replacer replacer) {
 		return getText().parseLine(replacer);

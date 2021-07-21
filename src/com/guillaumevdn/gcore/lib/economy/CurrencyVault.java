@@ -17,7 +17,7 @@ public class CurrencyVault extends Currency {
 		super("VAULT", "Vault");
 	}
 
-	// initialization
+	// ----- initialization
 	@Override
 	protected boolean initialize() throws Throwable {
 		Class<?> economyClass = Class.forName("net.milkbowl.vault.economy.Economy");
@@ -26,7 +26,7 @@ public class CurrencyVault extends Currency {
 		return economy != null;
 	}
 
-	// methods
+	// ----- methods
 	@Override
 	protected boolean doGive(OfflinePlayer player, double amount) throws Throwable {
 		ReflectionObject response = economy.invokeMethod("depositPlayer", player, amount);

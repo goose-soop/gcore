@@ -2,6 +2,7 @@ package com.guillaumevdn.gcore.lib.element.struct.parsing;
 
 import org.bukkit.entity.Player;
 
+import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.TextEditorGeneric;
 import com.guillaumevdn.gcore.lib.element.struct.IElement;
 import com.guillaumevdn.gcore.lib.object.ObjectUtils;
@@ -25,7 +26,7 @@ public class ParsingError extends Exception {
 		this.element = element;
 	}
 
-	// send error
+	// ----- send error
 	public void send(Player player) {
 		TextEditorGeneric.messageCantImportValue.replace("{error}", () -> getMessage()).send(player);
 	}
@@ -55,7 +56,11 @@ public class ParsingError extends Exception {
 		}
 	}
 
-	// build error
+	public void print() {
+		print(this, null);
+	}
+
+	// ----- build error
 	public static String buildErrorAtPath(String error, IElement element) {
 		return StringUtils.capitalize(error) + " " + atPath(element);
 	}
@@ -73,6 +78,9 @@ public class ParsingError extends Exception {
 	}
 
 	private static String atPathInFile(IElement element) {
+		if (element.getSuperElement().getConfiguration().getCreationStackTrace() != null) {
+			GCore.inst().getMainLogger().error("Found a mistake in a fake configuration file, created at :", element.getSuperElement().getConfiguration().getCreationStackTrace());
+		}
 		return "in file §4" + element.getSuperElement().getConfiguration().getLogFilePath() + "§r§c at path §4" + element.getConfigurationPath() + "§r§c";
 	}
 

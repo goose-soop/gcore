@@ -20,7 +20,7 @@ public class ScoreboardEntry {
 		this.suffix = suffix;
 	}
 
-	// get
+	// ----- get
 	public String getName() {
 		return name;
 	}
@@ -36,12 +36,12 @@ public class ScoreboardEntry {
 	public Team getTeam() {
 		return team;
 	}
-	
+
 	public int getScore() {
 		return score;
 	}
 
-	// set
+	// ----- set
 	public void setTeam(Team team) {
 		this.team = team;
 	}
@@ -59,12 +59,14 @@ public class ScoreboardEntry {
 
 	public void reset(org.bukkit.scoreboard.Scoreboard bukkit) {
 		if (team != null && team.hasEntry(name)) {
-			team.removeEntry(name);
+			try {
+				team.removeEntry(name);
+			} catch (IllegalStateException ignored) {}  // means he's not there, don't care, that was the point
 		}
 		bukkit.resetScores(name);
 	}
 
-	// obj
+	// ----- obj
 	@Override
 	public int hashCode() {
 		return Objects.hash(prefix, name, suffix);

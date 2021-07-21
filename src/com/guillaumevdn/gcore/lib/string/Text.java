@@ -15,7 +15,7 @@ import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
  */
 public interface Text {
 
-	// get
+	// ----- get
 	List<String> getCurrentLines();
 
 	default int size() {
@@ -37,10 +37,10 @@ public interface Text {
 
 	TextType getType();
 
-	// set
+	// ----- set
 	void setLines(List<String> newLines);
 
-	// parse
+	// ----- parse
 	default String parseLine() {
 		return parseLine(null);
 	}
@@ -53,7 +53,7 @@ public interface Text {
 
 	List<String> parseLines(Replacer replacer);
 
-	// send
+	// ----- send
 	default void send(Object target) {
 		parseLines().forEach(line -> PlayerUtils.sendMessage(target, line));
 	}
@@ -62,7 +62,7 @@ public interface Text {
 		parseLines().forEach(line -> PlayerUtils.sendMessage(target, line, cc, onlyCC));
 	}
 
-	// replace and parse/send directly
+	// ----- replace and parse/send directly
 	default ReplacingText replace(Player player) {
 		return new ReplacingText(this, Replacer.of(player));
 	}
@@ -108,6 +108,11 @@ public interface Text {
 			return this;
 		}
 
+		public ReplacingText replace(Replacer other) {
+			this.replacer.with(other);
+			return this;
+		}
+
 		public String parseLine() {
 			return text.parseLine(replacer);
 		}
@@ -126,10 +131,23 @@ public interface Text {
 
 	}
 
-	// type
+	// ----- type
 	public static enum TextType {
 		NORMAL,
 		RANDOM_LINE
+	}
+
+	// ----- fast creation
+	public static Text empty() {
+		return new TextElement();
+	}
+
+	public static Text of(String... lines) {
+		return new TextElement(lines);
+	}
+
+	public static Text of(List<String> lines) {
+		return new TextElement(lines);
 	}
 
 }

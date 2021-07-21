@@ -22,7 +22,7 @@ public abstract class TypableElementType<T extends TypableContainerElement> impl
 		this.icon = icon;
 	}
 
-	// get
+	// ----- get
 	public final String getId() {
 		return id;
 	}
@@ -31,7 +31,7 @@ public abstract class TypableElementType<T extends TypableContainerElement> impl
 		return icon;
 	}
 
-	// elements
+	// ----- elements
 	private transient List<String> lastFilled = new ArrayList<>();
 
 	public final void fillTypeSpecificElements(T value) {
@@ -54,7 +54,7 @@ public abstract class TypableElementType<T extends TypableContainerElement> impl
 		lastFilled.forEach(elementId -> value.remove(elementId));
 	}
 
-	// object
+	// ----- object
 	@Override
 	public final String toString() {
 		return id;

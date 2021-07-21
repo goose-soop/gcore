@@ -12,6 +12,7 @@ import com.guillaumevdn.gcore.lib.element.struct.Need;
 import com.guillaumevdn.gcore.lib.element.type.container.ElementItem;
 import com.guillaumevdn.gcore.lib.element.type.list.ElementFireworkEffectList;
 import com.guillaumevdn.gcore.lib.item.ItemCheck;
+import com.guillaumevdn.gcore.lib.item.ItemReference;
 import com.guillaumevdn.gcore.lib.object.ObjectUtils;
 import com.guillaumevdn.gcore.lib.serialization.data.DataIO;
 import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
@@ -21,17 +22,17 @@ import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
  */
 public final class MetaFirework {
 
-	public static boolean match(ItemMeta itemMeta, ItemMeta referenceMeta, ItemCheck check) {
+	public static boolean match(ItemMeta itemMeta, ItemReference reference, ItemCheck check) {
+		if (!reference.hasMeta(FireworkMeta.class)) return true;
 		FireworkMeta meta = ObjectUtils.castOrNull(itemMeta, FireworkMeta.class); // might be null if exact match is false
-		FireworkMeta ref = ObjectUtils.castOrNull(referenceMeta, FireworkMeta.class);
-		if (ref == null) return true;
-		// charged projectiles
+
+		// effects
 		if (check.isExact()) {
-			if (meta.hasEffects() != ref.hasEffects() || meta.getEffects().size() != ref.getEffects().size()) return false;
+			if (meta.hasEffects() != reference.hasEffects() || meta.getEffects().size() != reference.getEffects().size()) return false;
 		} else {
-			if (ref.hasEffects() && (meta == null || meta.hasEffects())) return false;
+			if (reference.hasEffects() && (meta == null || meta.hasEffects())) return false;
 		}
-		main: for (FireworkEffect refEffect : ref.getEffects()) {
+		main: for (FireworkEffect refEffect : reference.getEffects()) {
 			for (FireworkEffect effect : meta.getEffects()) {
 				if (effect.equals(refEffect)) {
 					continue main;
@@ -39,6 +40,7 @@ public final class MetaFirework {
 			}
 			return false;
 		}
+
 		// seems good
 		return true;
 	}

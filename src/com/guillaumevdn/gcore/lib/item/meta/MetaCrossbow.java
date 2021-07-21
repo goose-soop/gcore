@@ -3,6 +3,8 @@ package com.guillaumevdn.gcore.lib.item.meta;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.CrossbowMeta;
@@ -13,6 +15,7 @@ import com.guillaumevdn.gcore.lib.element.struct.Need;
 import com.guillaumevdn.gcore.lib.element.type.container.ElementItem;
 import com.guillaumevdn.gcore.lib.element.type.list.ElementItemList;
 import com.guillaumevdn.gcore.lib.item.ItemCheck;
+import com.guillaumevdn.gcore.lib.item.ItemReference;
 import com.guillaumevdn.gcore.lib.item.ItemUtils;
 import com.guillaumevdn.gcore.lib.object.ObjectUtils;
 import com.guillaumevdn.gcore.lib.serialization.adapter.type.AdapterItemStack;
@@ -24,20 +27,20 @@ import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
  */
 public final class MetaCrossbow {
 
-	public static boolean match(ItemMeta itemMeta, ItemMeta referenceMeta, ItemCheck check) {
+	public static boolean match(ItemMeta itemMeta, ItemReference reference, ItemCheck check) {
+		if (!reference.hasMeta(CrossbowMeta.class)) return true;
 		CrossbowMeta meta = ObjectUtils.castOrNull(itemMeta, CrossbowMeta.class);  // might be null if exact match is false
-		CrossbowMeta ref = ObjectUtils.castOrNull(referenceMeta, CrossbowMeta.class);
-		if (ref == null) return true;
+		
 		// charged projectiles
 		if (check.isExact()) {
 			if (meta.hasChargedProjectiles() != meta.hasChargedProjectiles()) return false;  // parce qu'on rappelle que .getChargedProjectiles est @NotNull mais qu'il est null quand même :CringeHarold: #956
-			if (!ref.hasChargedProjectiles()) return true;
-			if (meta.getChargedProjectiles().size() != ref.getChargedProjectiles().size()) return false;
+			if (!reference.hasChargedProjectiles()) return true;
+			if (meta.getChargedProjectiles().size() != reference.getChargedProjectiles().size()) return false;
 		} else {
-			if (ref.hasChargedProjectiles() && (meta == null || !meta.hasChargedProjectiles())) return false;
-			if (!ref.hasChargedProjectiles()) return true;
+			if (reference.hasChargedProjectiles() && (meta == null || !meta.hasChargedProjectiles())) return false;
+			if (!reference.hasChargedProjectiles()) return true;
 		}
-		main: for (ItemStack refProjectile : ref.getChargedProjectiles()) {
+		main: for (ItemStack refProjectile : reference.getChargedProjectiles()) {
 			for (ItemStack projectile : meta.getChargedProjectiles()) {
 				if (ItemUtils.match(refProjectile, projectile, check)) {
 					continue main;
@@ -45,6 +48,7 @@ public final class MetaCrossbow {
 			}
 			return false;
 		}
+		
 		// seems good
 		return true;
 	}
@@ -79,7 +83,7 @@ public final class MetaCrossbow {
 
 	public static void fillElements(ItemMeta sampleMeta, ElementItem item) {
 		if (ObjectUtils.instanceOf(sampleMeta, CrossbowMeta.class)) {
-			item.addItemList("charged_projectiles", Need.optional(), TextEditorGeneric.descriptionItemCrossbowChargedProjectiles);
+			item.addItemList("charged_projectiles", Need.optional(), item.getMode(), TextEditorGeneric.descriptionItemCrossbowChargedProjectiles);
 		}
 	}
 
@@ -99,13 +103,13 @@ public final class MetaCrossbow {
 		});
 	}
 
-	public static void importElements(ElementItem item, ItemMeta itemMeta, Player player) {
+	public static void importElements(ElementItem item, ItemMeta itemMeta, @Nullable Player clicker) {
 		CrossbowMeta meta = ObjectUtils.castOrNull(itemMeta, CrossbowMeta.class);
 		if (meta != null) {
 			ElementItemList list = item.getElementAs("charged_projectiles");
 			list.clear();
 			for (ItemStack projectile : meta.getChargedProjectiles()) {
-				list.createAndAddElement().importValue(projectile, player);
+				list.createAndAddElement().importValue(projectile, clicker);
 			}
 		}
 	}

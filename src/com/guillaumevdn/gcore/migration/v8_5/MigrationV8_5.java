@@ -41,7 +41,6 @@ public final class MigrationV8_5 extends MigrationNextMinor {
 			new ResourceExtractor(getPlugin(), getPlugin().getDataFile("guis"), "guis").extract(false, true);
 			migrateGUIToOwnFile(this, getPlugin().loadConfigurationFile("config.yml"), "confirm_gui", "guis/SYSTEM_confirm.yml", CollectionUtils.asMap("item_yes", "confirm", "item_no", "cancel"), "&dConfirm action", (src, target) -> {
 				List<String> lore = src.readStringList("confirm_gui.item_yes.lore", new ArrayList<>());
-				lore.add("{confirm}");
 				target.write("contents.confirm.lore", lore);
 			});
 		}

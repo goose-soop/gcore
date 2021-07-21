@@ -29,7 +29,7 @@ public class ElementDouble extends ElementValue<Double> {
 		this.max = max;
 	}
 
-	// get
+	// ----- get
 	public final double getMin() {
 		return min;
 	}
@@ -38,7 +38,7 @@ public class ElementDouble extends ElementValue<Double> {
 		return max;
 	}
 
-	// parse
+	// ----- parse
 	@Override
 	protected void validate(Double value) throws ParsingError {
 		if (value < min) {
@@ -48,7 +48,7 @@ public class ElementDouble extends ElementValue<Double> {
 		}
 	}
 
-	// editor
+	// ----- editor
 	@Override
 	public Mat editorIconType() {
 		return CommonMats.LIME_DYE;

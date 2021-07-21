@@ -22,7 +22,7 @@ public class PositionTypePlayerRelativeCylinderInside extends PositionType {
 		super(id, CommonMats.PLAYER_HEAD);
 	}
 
-	// elements
+	// ----- elements
 	@Override
 	public boolean mustCache(ElementPosition position) {
 		return false;
@@ -34,7 +34,7 @@ public class PositionTypePlayerRelativeCylinderInside extends PositionType {
 		position.addDouble("radius", Need.required(), 1, TextEditorGeneric.descriptionPositionTypeCylinderRadius);
 	}
 
-	// parse
+	// ----- parse
 	@Override
 	public Position doParse(ElementPosition position, Replacer replacer) throws ParsingError {
 		Location center = position.getElementAs("center", ElementRelativeLocation.class).parseNoCatchOrThrowParsingNull(replacer);

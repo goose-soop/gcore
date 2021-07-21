@@ -14,7 +14,7 @@ public abstract class TimeIn {
 		this.minute = minute;
 	}
 
-	// get
+	// ----- get
 	public final int getHour() {
 		return hour;
 	}

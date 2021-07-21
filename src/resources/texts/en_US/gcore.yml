@@ -9,6 +9,18 @@ messagePluginReloaded: |
 messagePluginManipulateError: |
   &7Action on plugin &7{plugin} &7couldn't be processed.
 
+messagePluginInternalState: |
+  &7&m            &r &7{plugin} &7&m            &r
+  &7Version : &a{version}
+  &7Lifecycle reference : &a{lifecycle_reference}
+  &7Registered data boards : &a{data_boards}
+  &7Registered loggers : &a{loggers}
+  &7Registered integrations : &a{integrations}
+  &7Registered bossbars : &a{bossbars}
+  &7Registered GUIs : &a{guis}
+  &7Registered tasks : &a{tasks}
+  &7Registered listeners : &a{listeners}
+
 messagePluginList: |
   &7There are &a{count} &7plugins, &a{active} &7are active, &7{inactive} &7are inactive : {plugins}
 
@@ -22,7 +34,6 @@ messageGcoreExportCouldnt: |
 
 commandDescriptionGcore: main command for GCore
 commandDescriptionGcorePlugins: list GCore's dependant plugins
-commandDescriptionGcoreReload: reload GCore
 commandDescriptionGcoreExport: export GCore-dependant plugins data
 commandDescriptionGcoreItemRead: read item to configuration
 

@@ -22,7 +22,6 @@ messageGcoreExportCouldnt: |
 
 commandDescriptionGcore: main command for GCore
 commandDescriptionGcorePlugins: list GCore's dependant plugins
-commandDescriptionGcoreReload: reload GCore
 commandDescriptionGcoreExport: export GCore-dependant plugins data
 commandDescriptionGcoreItemRead: read item to configuration
 

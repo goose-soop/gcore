@@ -20,16 +20,18 @@ import com.guillaumevdn.gcore.lib.string.Text;
 public class ElementFireworkEffectList extends ListElement<ElementFireworkEffect> implements ParseableListElement<FireworkEffect, ElementFireworkEffect> {
 
 	public ElementFireworkEffectList(Element parent, String id, Need need, Text editorDescription) {
-		super("firework effect", parent, id, need, editorDescription);
+		super("firework effect", true, parent, id, need, editorDescription);
 	}
 
-	// element
+	// ----- element
+
 	@Override
 	public ElementFireworkEffect createElement(String elementId) {
 		return new ElementFireworkEffect(this, elementId, Need.optional(), null);
 	}
 
-	// cache
+	// ----- valuesCache
+
 	private ParsedCache<List<FireworkEffect>> cache = new ParsedCache<>();
 
 	@Override
@@ -42,7 +44,8 @@ public class ElementFireworkEffectList extends ListElement<ElementFireworkEffect
 		cache.clear();
 	}
 
-	// editor
+	// ----- editor
+
 	@Override
 	public Mat editorIconType() {
 		return CommonMats.NETHER_STAR;

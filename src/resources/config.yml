@@ -15,6 +15,7 @@
 #  user: 'username'
 #  pass: 'pwd'
 #  args: '&useSSL=false'
+#  pre8019: true  # set this to true if you're using MySQL < 8.0.19
 
 # Data back-end (NONE, JSON or MYSQL ; default is JSON if not specified)
 data_backend:
@@ -37,10 +38,15 @@ log:
 # Commands
 # --------------------------------------------------
 
+# Generic aliases
+generic_commands_aliases:
+  reload: [reload,rl]
+  pluginstate: [pluginstate,plstate]
+  migrate: [migrate]
+
 # Aliases
 commands_aliases:
   plugins: [plugins,pl]
-  reload: [reload,rl]
   export: [export]
   itemread: [itemread,ir]
 
@@ -88,6 +94,7 @@ particles:
 
 currencies:
   VAULT:
+    name: 'money'
     #format_multiplier: 0.1
     format_decimal_precision: 2
     format_single: '{amount}$'
@@ -97,7 +104,7 @@ currencies:
       name: '{formatted_amount}'
       enchantments:
         DURABILITY: 1
-      hide_flags: true
+      flags: [HIDE_ENCHANTS]
 
 # --------------------------------------------------
 # Miscalleneous
@@ -129,11 +136,22 @@ console_log_level_colors:
 #custom_time_zone: 'Europe/Brussels'
 
 # Allow hooking into ProtocolLib to create packet-based GUIs
-# Unless you're experiencing unfixable issues with it, I strongly advise you to keep this enabled
+# Unless you're experiencing unfixable issues with it, I advise you to keep this enabled
 allow_protocol_guis: true
+
+# Use this to delay the processing of protocol GUI clicks if you're experiencing weird issues such as items from a previous menu staying in the newly opened one
+#delay_protocol_gui_clicks_ticks: 1
 
 # Don't log which editor texts are missing on load
 dont_log_missing_editor_texts: true
+
+# Don't log a list of elements that were successfully loaded
+dont_log_loaded_elements_names: false
+
+# Don't consider invalid values as errors and just ignore them. Should be used wisely : errors are meant to be fixed !
+# This is planned for specific uses (for instance, synchronizing elements between bungeecord servers where external data, such as worlds or NPCs, are different)
+# Applies mainly to most basic values (enums, worlds, ...)
+ignore_invalid_element_values: false
 
 # Debug logs for item and NBT creation/matching
 logspam_item_nbt: false
@@ -141,12 +159,18 @@ logspam_item_nbt: false
 # Set this to ASYNC if you see issues in timings due to tasks in CustomEventsListener
 custom_events_thread: SYNC
 
+# Use this to force the plugin to use a specific version of Spigot
+#force_server_version: MC_1_12_R1
+
+# Use this to disable loading of offline players' cache if it's causing delays on load
+#dont_cache_offline_players_on_load: true
+
 # --------------------------------------------------
 # GUI
 # --------------------------------------------------
 
 # How often should items with placeholders be updated in an opened GUI (in ticks)
-gui_items_refresh_ticks_placeholder: 600
+gui_items_refresh_ticks_placeholder: 20
 
 # How often should dynamic borders in GUIs be updated (in ticks)
 dynamic_border_refresh_ticks: 5

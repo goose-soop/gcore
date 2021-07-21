@@ -8,6 +8,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -15,8 +16,10 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.TextGeneric;
 import com.guillaumevdn.gcore.WorkerGCore;
+import com.guillaumevdn.gcore.integration.citizens.event.NPCBothClickEvent;
 import com.guillaumevdn.gcore.integration.citizens.position.PositionTypeCitizensNPCRelativeAreaInside;
 import com.guillaumevdn.gcore.integration.citizens.position.PositionTypeCitizensNPCRelativeAreaOutside;
 import com.guillaumevdn.gcore.integration.citizens.position.PositionTypeCitizensNPCRelativeCylinderInside;
@@ -25,7 +28,6 @@ import com.guillaumevdn.gcore.integration.citizens.position.PositionTypeCitizens
 import com.guillaumevdn.gcore.integration.citizens.position.PositionTypeCitizensNPCRelativeSphereInside;
 import com.guillaumevdn.gcore.integration.citizens.position.PositionTypeCitizensNPCRelativeSphereOutside;
 import com.guillaumevdn.gcore.integration.citizens.position.PositionTypeCitizensNPCRelativeWorld;
-import com.guillaumevdn.gcore.lib.bukkit.BukkitThread;
 import com.guillaumevdn.gcore.lib.chat.PlayerChatEvent;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.integration.Integration;
@@ -33,13 +35,15 @@ import com.guillaumevdn.gcore.lib.integration.IntegrationInstance;
 import com.guillaumevdn.gcore.lib.location.position.PositionType;
 import com.guillaumevdn.gcore.lib.location.position.PositionTypes;
 import com.guillaumevdn.gcore.lib.number.NumberUtils;
+import com.guillaumevdn.gcore.lib.plugin.PluginUtils;
 import com.guillaumevdn.gcore.lib.reflection.Reflection;
 import com.guillaumevdn.gcore.lib.string.StringUtils;
 import com.guillaumevdn.gcore.lib.string.Text;
 import com.guillaumevdn.gcore.lib.tuple.Pair;
 
 import net.citizensnpcs.api.CitizensAPI;
-import net.citizensnpcs.api.event.NPCClickEvent;
+import net.citizensnpcs.api.event.NPCLeftClickEvent;
+import net.citizensnpcs.api.event.NPCRightClickEvent;
 import net.citizensnpcs.api.npc.NPC;
 
 /**
@@ -52,7 +56,7 @@ public class IntegrationInstanceCitizens extends IntegrationInstance implements 
 		registerSerializer(NPC.class, value -> "" + value.getId(), string -> CitizensAPI.getNPCRegistry().getById(NumberUtils.integerOrNull(string)));
 	}
 
-	// activation
+	// ----- activation
 	private Map<String, Class<? extends PositionType>> types = CollectionUtils.asMap(
 			"CITIZENS_NPC_RELATIVE_AREA_INSIDE", PositionTypeCitizensNPCRelativeAreaInside.class,
 			"CITIZENS_NPC_RELATIVE_AREA_OUTSIDE", PositionTypeCitizensNPCRelativeAreaOutside.class,
@@ -83,7 +87,21 @@ public class IntegrationInstanceCitizens extends IntegrationInstance implements 
 		HandlerList.unregisterAll(this);
 	}
 
-	// await npc selection
+	// ----- utils
+	public static Location getNPCLocation(NPC npc) {
+		if (npc == null) {
+			return null;
+		}
+		if (npc.getEntity() == null) {
+			if (PluginUtils.isPluginEnabled("Citizens")) {
+				return null;  // #1886, citizens is sometimes disabled and "getStoredLocation" needs it to be enabled to work
+			}
+			return npc.getStoredLocation();
+		}
+		return npc.getEntity().getLocation();
+	}
+
+	// ----- await npc selection
 	private static Set<UUID> awaitingNPCsCancelChat = new HashSet<>();
 	private static Map<UUID, Pair<Consumer<NPC>, Runnable>> awaitingNPCs = new HashMap<>();
 
@@ -116,7 +134,7 @@ public class IntegrationInstanceCitizens extends IntegrationInstance implements 
 				awaitingNPCs.remove(player.getUniqueId());
 				if (awaitingNPC != null) {
 					if (awaitingNPC.getB() != null) {
-						BukkitThread.SYNC.operate(() -> awaitingNPC.getB().run());
+						GCore.inst().operateSync(() -> awaitingNPC.getB().run());
 					}
 				}
 			}
@@ -124,7 +142,17 @@ public class IntegrationInstanceCitizens extends IntegrationInstance implements 
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-	public void event(NPCClickEvent event) {
+	public void event(NPCRightClickEvent event) {
+		NPCBothClickEvent.callFrom(event);
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void event(NPCLeftClickEvent event) {
+		NPCBothClickEvent.callFrom(event);
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void event(NPCBothClickEvent event) {
 		Player player = event.getClicker();
 		Pair<Consumer<NPC>, Runnable> awaitingNPC = awaitingNPCs.remove(player.getUniqueId());
 		if (awaitingNPC != null) {

@@ -43,10 +43,11 @@ public final class ResourceExtractor {
 		this.resourcePath = resourcePath;
 	}
 
-	// methods
+	// ----- methods
 	public int extract(boolean override, boolean subpaths) throws Throwable {
 		WrapperInteger done = WrapperInteger.of(0);
 		Wrapper<Throwable> error = Wrapper.of(null);
+
 		// get jar file
 		File jarfile = null;
 		try {
@@ -56,8 +57,10 @@ public final class ResourceExtractor {
 		} catch (Throwable exception) {
 			throw new IOException(exception);
 		}
+
 		// create folder
 		targetFolder.mkdirs();
+
 		// read entries
 		JarFile jar = new JarFile(jarfile);
 		jar.stream().forEachOrdered(entry -> {
@@ -66,10 +69,12 @@ public final class ResourceExtractor {
 			}
 			try {
 				String path = entry.getName();
+
 				// not target
 				if (!path.startsWith(resourcePath)) {
 					return;
 				}
+
 				// directory
 				if (entry.isDirectory() && !path.contains(".")) {
 					if (subpaths) {
@@ -89,34 +94,51 @@ public final class ResourceExtractor {
 						if (index == -1) index = path.indexOf('/');
 						file = new File(targetFolder, path.substring(index, path.length()));
 					}
+
 					// delete file if override
 					if (file.exists() && override) {
 						file.delete();
 					}
+
 					// extract file
 					if (!file.exists()) {
-						if (file.getParentFile() != null && !file.getParentFile().exists()) file.getParentFile().mkdirs();
+						if (file.getParentFile() != null && !file.getParentFile().exists()) {
+							file.getParentFile().mkdirs();
+						}
 						file.createNewFile();
+
+						InputStream in = plugin.getClass().getClassLoader().getResourceAsStream(entry.getName());
+						FileOutputStream out = new FileOutputStream(file);
+
+						byte[] buffer = new byte[1024];
+						for (int n; (n = in.read(buffer)) != -1; out.write(buffer, 0, n));
+
+						in.close();
+						out.close();
+
+						/* // original code, which tends to be slower
 						InputStream is = jar.getInputStream(entry);
 						FileOutputStream fos = new FileOutputStream(file);
 						while (is.available() > 0) {
 							fos.write(is.read());
 						}
 						fos.close();
-						is.close();
+						is.close();*/
+
 						done.alter(1);
 					}
+
 				}
 			} catch (Throwable exception) {
 				error.set(exception);
 			}
 		});
 		jar.close();
-		// error
+
 		if (error.get() != null) {
 			throw error.get();
 		}
-		// done
+
 		return done.get();
 	}
 

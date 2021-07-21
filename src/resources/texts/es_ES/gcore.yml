@@ -22,5 +22,4 @@ messageGcoreExportCouldnt: |
 
 commandDescriptionGcore: comando principal para GCore
 commandDescriptionGcorePlugins: enumerar los plugins dependientes de GCore
-commandDescriptionGcoreReload: recargar GCore
 commandDescriptionGcoreExport: exportar los datos de los plugins dependientes de GCore

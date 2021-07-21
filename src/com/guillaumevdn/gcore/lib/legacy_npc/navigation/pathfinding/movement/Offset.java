@@ -26,7 +26,7 @@ public final class Offset {
 		this.blocking = blocking;
 	}
 
-	// get
+	// ----- get
 	public int getGap() {
 		return gap;
 	}
@@ -51,7 +51,7 @@ public final class Offset {
 		return (x == 0 && z != 0) || (x != 0 && z == 0);
 	}
 
-	// do
+	// ----- do
 	public double distanceToTargetIfApplied(Point applyTo, Point finalTarget) {
 		double newX = applyTo.getX() + x;
 		double newY = applyTo.getY() + y;
@@ -62,7 +62,7 @@ public final class Offset {
 		return Math.sqrt(NumberUtils.square(newX - tX) + NumberUtils.square(newY - tY) + NumberUtils.square(newZ - tZ));
 	}
 
-	// obj
+	// ----- obj
 	@Override
 	public int hashCode() {
 		return Objects.hash(gap, x, y, z, blocking);

@@ -11,7 +11,7 @@ public class OptionalIfPresentFail {
 		this.wasPresent = wasPresent;
 	}
 
-	// do
+	// ----- do
 	public void orDo(Runnable ifAbsent) {
 		if (!wasPresent) {
 			ifAbsent.run();

@@ -20,7 +20,7 @@ public enum Operation {
 		this.applierString = applierString;
 	}
 
-	// do
+	// ----- do
 	public double apply(double value, double param) {
 		return applierDouble.apply(value, param);
 	}

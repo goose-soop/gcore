@@ -2,8 +2,10 @@ package com.guillaumevdn.gcore.lib.object;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -20,7 +22,7 @@ import com.guillaumevdn.gcore.lib.function.ThrowableConsumer;
  */
 public final class ObjectUtils {
 
-	// enum
+	// ----- enum
 	public static <E extends Enum<E>> E safeValueOf(String name, Class<E> enumClass) {
 		if (name == null || name.isEmpty()) {
 			return null;
@@ -39,6 +41,17 @@ public final class ObjectUtils {
 
 	public static <E extends Enum<E>> List<E> safeValuesOf(Collection<String> names, Class<E> enumClass) {
 		List<E> result = new ArrayList<>();
+		names.forEach(name -> {
+			E t = safeValueOf(name, enumClass);
+			if (t != null) {
+				result.add(t);
+			}
+		});
+		return result;
+	}
+
+	public static <E extends Enum<E>> Set<E> safeValuesSetOf(Collection<String> names, Class<E> enumClass) {
+		Set<E> result = new HashSet<>();
 		names.forEach(name -> {
 			E t = safeValueOf(name, enumClass);
 			if (t != null) {
@@ -103,12 +116,17 @@ public final class ObjectUtils {
 		return null;
 	}
 
-	// cast
+	// ----- cast
 	public static <T> void ifCanBeCasted(Object object, Class<T> castClass, Consumer<T> consumer) {
 		T casted = castOrNull(object, castClass);
 		if (casted != null) {
 			consumer.accept(casted);
 		}
+	}
+
+	public static <T, R> Optional<R> ifCanBeCastedDo(Object object, Class<T> castClass, Function<T, R> consumer) {
+		T casted = castOrNull(object, castClass);
+		return Optional.of(casted == null ? null : consumer.apply(casted));
 	}
 
 	public static <T> T castOrNull(Object object, Class<T> castClass) {
@@ -141,13 +159,13 @@ public final class ObjectUtils {
 		return null;
 	}
 
-	// equals
+	// ----- equals
 	public static <T> boolean equals(Object object, Class<T> typeClass, Function<T, Boolean> equals) {
 		T other = ObjectUtils.castOrNull(object, typeClass);
 		return other != null && equals.apply(other);
 	}
 
-	// instanceof
+	// ----- instanceof
 	private static final Map<Class<?>, Class<?>> primitiveWrappers = CollectionUtils.asMap(
 			int.class, Integer.class,
 			double.class, Double.class,
@@ -208,7 +226,7 @@ public final class ObjectUtils {
 		return false;
 	}
 
-	// misc
+	// ----- misc
 	public static <T> Consumer<T> emptyConsumer() {
 		return t -> {};
 	}

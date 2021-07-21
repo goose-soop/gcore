@@ -9,14 +9,13 @@ import javax.annotation.Nonnull;
  */
 public abstract class ItemHolder {
 
-	private String id;
+	private final String id;
 
 	public ItemHolder(String id) {
 		this.id = id;
 	}
 
-	// get
-	public String getId() {
+	public final String getId() {
 		return id;
 	}
 
@@ -24,11 +23,13 @@ public abstract class ItemHolder {
 		return false;
 	}
 
-	// do
+	// ----- do
+
 	@Nonnull
 	public abstract ActiveItemHolder newActive(ActiveGUI gui);
 
-	// object
+	// ----- object
+
 	@Override
 	public int hashCode() {
 		return Objects.hashCode(id);

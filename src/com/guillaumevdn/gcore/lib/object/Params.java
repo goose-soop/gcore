@@ -5,13 +5,13 @@ package com.guillaumevdn.gcore.lib.object;
  */
 public final class Params {
 
-	// params
+	// ----- params
 	private Object[] params = null;
 
 	public Params() {
 	}
 
-	// get
+	// ----- get
 	public Object[] getParams() {
 		return params == null ? new Object[0] : params;
 	}
@@ -41,7 +41,7 @@ public final class Params {
 		return def;
 	}
 
-	// static
+	// ----- static
 	public static Params of(Object... params) {
 		Params result = new Params();
 		result.params = params;

@@ -16,7 +16,7 @@ public class YMLAdapter<T> {
 		this.adapter = serializer;
 	}
 
-	// write
+	// ----- write
 	public void write(YMLConfiguration writer, String path, T value) throws Throwable {
 		writer.write(path, null); // reset path
 		if (value == null) {
@@ -49,7 +49,7 @@ public class YMLAdapter<T> {
 		}
 	}
 
-	// read
+	// ----- read
 	public T read(YMLConfiguration reader, String path, boolean snakeCaseToCamelCase) throws Throwable {
 		if (!reader.contains(path)) {
 			return null;

@@ -17,7 +17,7 @@ public final class ReplacerData {
 	private Supplier<Location> location = null;
 	private StringReplacer custom = StringReplacer.empty();
 
-	// get
+	// ----- get
 	@Nullable
 	public Player getPlayer() {
 		return player == null ? null : player.get();
@@ -38,7 +38,7 @@ public final class ReplacerData {
 		return custom;
 	}
 
-	// set
+	// ----- set
 	public ReplacerData with(Player player) {
 		return withPlayer(() -> player);
 	}
@@ -82,13 +82,13 @@ public final class ReplacerData {
 		return this;
 	}
 
-	// str
+	// ----- str
 	@Override
 	public String toString() {
 		return "player " + getPlayer() + ", location " + getLocation() + ", custom " + custom.toString();
 	}
 
-	// clone
+	// ----- clone
 	@Override
 	public ReplacerData clone() {
 		ReplacerData clone = new ReplacerData();

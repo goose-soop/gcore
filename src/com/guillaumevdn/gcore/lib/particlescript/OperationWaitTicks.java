@@ -9,19 +9,19 @@ import org.bukkit.entity.Player;
  */
 public class OperationWaitTicks implements Operation {
 
-	// base
+	// ----- base
 	private String ticks;
 
 	public OperationWaitTicks(String ticks) {
 		this.ticks = ticks;
 	}
 
-	// get
+	// ----- get
 	public String getTicks() {
 		return ticks;
 	}
 
-	// methods
+	// ----- methods
 	@Override
 	public int perform(ParticleScriptExecution execution, Collection<Player> players, boolean isAsync) {
 		return (int) Math.ceil(execution.parseAndCalculate(ticks));

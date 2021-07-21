@@ -16,7 +16,7 @@ public final class PathOptimizer {
 	public static List<OptimizedPathPoint> optimize(Path path, Pathfinding finder) {
 		MovementFinder optimizer = MovementFinder.ofProperties(0, finder.getMovementFinder().getMinBottomVertical(), finder.getMovementFinder().canStickToWall(), false);
 		List<OptimizedPathPoint> points = new ArrayList<>();
-		path.getPoints().forEach(expl -> points.add(new OptimizedPathPoint(expl.getMovementToPoint(), expl.getPoint())));
+		path.iteratePoints((next, remover, breaker) -> points.add(new OptimizedPathPoint(next.getMovementToPoint(), next.getPoint())));
 		// connect points that could be connected (close, only use gap 0)
 		connect: for (;;) {
 			for (int i = 0; i < points.size(); ++i) {

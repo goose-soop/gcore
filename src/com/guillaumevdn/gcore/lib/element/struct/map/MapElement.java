@@ -42,7 +42,7 @@ public abstract class MapElement<K, V extends Element> extends AbstractMapElemen
 		super(keySerializer, overrideTypeName ? typeName : "map of " + StringUtils.getReadableName(keySerializer.getTypeClass()) + " and " + typeName, parent, id, need, editorDescription);
 	}
 
-	// get
+	// ----- get
 	@Override
 	public final int size() {
 		return super.size();
@@ -62,13 +62,13 @@ public abstract class MapElement<K, V extends Element> extends AbstractMapElemen
 		super.clear();
 	}
 
-	// add/remove
+	// ----- add/remove
 	@Override
 	public final V add(K key, V value) {
 		return super.add(key, value);
 	}
 
-	// loading and saving
+	// ----- loading and saving
 	@Override
 	protected final void clearBeforeRead() {
 		clear();
@@ -111,7 +111,7 @@ public abstract class MapElement<K, V extends Element> extends AbstractMapElemen
 
 	protected abstract V createElement(String elementId);
 
-	// editor
+	// ----- editor
 	@Override
 	public EditorGUI editorGUI(ClickCall fromCall) {
 		EditorGUI editor = new EditorGUI(this, fromCall) {
@@ -149,8 +149,8 @@ public abstract class MapElement<K, V extends Element> extends AbstractMapElemen
 						editorAskKeyAndCreateAndAddElement(call, (key, value) -> {
 							getSuperElement().onEditorChange(MapElement.this);
 							// reopen GUI (that refreshes it since it's an editor GUI)
-							call.getGUI().openFor(call.getClicker(), call.getPageIndex());
-						}, () -> call.getGUI().openFor(call.getClicker(), call.getPageIndex()));
+							call.reopenGUI();
+						}, () -> call.reopenGUI());
 					}
 				}));
 				// done

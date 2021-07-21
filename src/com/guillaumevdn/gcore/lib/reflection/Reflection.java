@@ -3,6 +3,7 @@ package com.guillaumevdn.gcore.lib.reflection;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -15,6 +16,7 @@ import org.bukkit.entity.Player;
 
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.compatibility.Version;
+import com.guillaumevdn.gcore.lib.concurrency.RWHashSet;
 import com.guillaumevdn.gcore.lib.function.ThrowableConsumer;
 import com.guillaumevdn.gcore.lib.logic.ComparisonType;
 import com.guillaumevdn.gcore.lib.object.ObjectUtils;
@@ -25,21 +27,13 @@ import com.guillaumevdn.gcore.lib.string.StringUtils;
  */
 public final class Reflection {
 
-	// class
-	public static String getNmsPackage() {
-		return "net.minecraft.server." + Version.CURRENT.getPackageName();
-	}
-
-	public static String getCraftbukkitPackage() {
-		return "org.bukkit.craftbukkit." + Version.CURRENT.getPackageName();
-	}
-
+	// ----- class
 	public static Class getNmsClass(String path) throws Throwable {
-		return Class.forName(getNmsPackage() + "." + path);
+		return Class.forName(Version.CURRENT.getNMSPackage() + "." + path);
 	}
 
 	public static Class getCraftbukkitClass(String path) throws Throwable {
-		return Class.forName(getCraftbukkitPackage() + "." + path);
+		return Class.forName(Version.CURRENT.getCraftbukkitPackage() + "." + path);
 	}
 
 	public static Class safeArrayClass(Class typeClass, int depth) {
@@ -47,6 +41,14 @@ public final class Reflection {
 			return getArrayClass(typeClass, depth);
 		} catch (Throwable exception) {
 			exception.printStackTrace();
+			return null;
+		}
+	}
+
+	public static Class classOrNull(String name) {
+		try {
+			return Class.forName(name);
+		} catch (Throwable exception) {
 			return null;
 		}
 	}
@@ -59,7 +61,16 @@ public final class Reflection {
 		return Class.forName(StringUtils.repeatString("[", depth) + "L" + typeClass.getName() + ";");
 	}
 
-	// version
+	public static <T> T[] createArray(Class<T> type, Collection<?> content) {
+		T[] array = (T[]) Array.newInstance(type, content.size());
+		int i = -1;
+		for (Object elem : content) {
+			array[++i] = (T) elem;
+		}
+		return array;
+	}
+
+	// ----- version
 	public static <T> T getForThisVersion(Object... objects) {
 		return getForThisVersion(CollectionUtils.asMap(objects));
 	}
@@ -79,7 +90,7 @@ public final class Reflection {
 		}
 	}
 
-	// enum
+	// ----- enum
 	public static ReflectionEnum getEnum(String path) throws Throwable {
 		return ReflectionEnum.of(Class.forName(path));
 	}
@@ -96,7 +107,7 @@ public final class Reflection {
 		return ReflectionFakeEnum.of(getNmsClass(path));
 	}
 
-	// method
+	// ----- method
 	public static <T> boolean isOverridenSafe(Class<? extends T> subclass, Class<T> superclass, String methodName, Class... methodParams) {
 		try {
 			return isOverriden(subclass, superclass, methodName, methodParams);
@@ -138,7 +149,7 @@ public final class Reflection {
 		return ReflectionMethod.of(clazz, name, params);
 	}
 
-	// constructor
+	// ----- constructor
 	public static ReflectionObject newNmsInstance(String path, Object... params) throws Throwable {
 		return newInstance(getNmsClass(path), params);
 	}
@@ -167,7 +178,7 @@ public final class Reflection {
 		return result;
 	}
 
-	// field
+	// ----- field
 	public static ReflectionField getNmsField(String path, String name) throws Throwable {
 		return new ReflectionField(getNmsClass(path), name);
 	}
@@ -176,7 +187,7 @@ public final class Reflection {
 		return new ReflectionField(Class.forName(path), name);
 	}
 
-	// block
+	// ----- block
 	public static ReflectionObject processBlockData(Block block, ThrowableConsumer<ReflectionObject> dataProcessor) throws Throwable {
 		return processBlockData(ReflectionObject.of(block), dataProcessor);
 	}
@@ -188,9 +199,9 @@ public final class Reflection {
 		return block;
 	}
 
-	// packet
+	// ----- packet
 	public static ReflectionObject getPlayerConnection(Player player) throws Throwable {
-		return ReflectionObject.of(player).invokeMethod("getHandle").getField("playerConnection");
+		return ReflectionObject.of(player).invokeMethod("getHandle").getField(Version.ATLEAST_1_17 ? "b" : "playerConnection");
 	}
 
 	public static void sendNmsPacket(Player player, String path, Object... params) throws Throwable {
@@ -206,12 +217,18 @@ public final class Reflection {
 	}
 
 	public static void sendNmsPacket(Collection<Player> players, Object packet) throws Throwable {
-		for (Player player : players) {
-			sendNmsPacket(player, packet);
+		if (players instanceof RWHashSet) {
+			((RWHashSet<Player>) players).forEachThrowable(player -> {
+				sendNmsPacket(player, packet);
+			});
+		} else {
+			for (Player player : players) {
+				sendNmsPacket(player, packet);
+			}
 		}
 	}
 
-	// error
+	// ----- error
 	public static void logAndRethrowError(Throwable exception, String log) throws Error {
 		final String id = StringUtils.generateRandomAlphanumericString(10);
 		System.out.println("---- Reflection error " + id + " ----\n" + log);

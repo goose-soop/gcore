@@ -16,12 +16,12 @@ public class BiKeyReference<K, K2> extends KeyReference<K> {
 		this.key2 = key2;
 	}
 
-	// get
+	// ----- get
 	public final K2 getKey2() {
 		return key2;
 	}
 
-	// object
+	// ----- object
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) return true;
@@ -39,7 +39,7 @@ public class BiKeyReference<K, K2> extends KeyReference<K> {
 		return "(" + super.toString() + "/" + key2.toString() + ")";
 	}
 
-	// static
+	// ----- static
 	public static <K, K2> BiKeyReference<K, K2> of(K key, K2 key2) {
 		return new BiKeyReference<>(key, key2);
 	}

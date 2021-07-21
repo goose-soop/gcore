@@ -5,11 +5,11 @@ import java.lang.reflect.Constructor;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.function.Consumer;
 
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -17,17 +17,26 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.guillaumevdn.gcore.ConfigGCore;
 import com.guillaumevdn.gcore.GCore;
+import com.guillaumevdn.gcore.TextGCore;
 import com.guillaumevdn.gcore.lib.bukkit.BukkitThread;
 import com.guillaumevdn.gcore.lib.chat.JsonMessage;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.collection.LowerCaseHashMap;
 import com.guillaumevdn.gcore.lib.command.Command;
+import com.guillaumevdn.gcore.lib.command.Subcommand;
+import com.guillaumevdn.gcore.lib.command.generic.GenericMigrate;
+import com.guillaumevdn.gcore.lib.command.generic.GenericPluginState;
+import com.guillaumevdn.gcore.lib.command.generic.GenericReload;
 import com.guillaumevdn.gcore.lib.compatibility.Version;
 import com.guillaumevdn.gcore.lib.compatibility.bossbar.Bossbar;
+import com.guillaumevdn.gcore.lib.concurrency.RWLowerCaseHashMap;
 import com.guillaumevdn.gcore.lib.configuration.YMLConfiguration;
 import com.guillaumevdn.gcore.lib.configuration.file.YMLError;
 import com.guillaumevdn.gcore.lib.data.Board;
@@ -54,22 +63,26 @@ import com.guillaumevdn.gcore.libs.com.google.gson.GsonBuilder;
 public abstract class GPlugin<C extends GPluginConfig, P extends PermissionContainer> extends JavaPlugin {
 
 	private final int spigotResourceId;
+	private final String mainCommandName;
+	private final String mainCommandHelpAlias;
+	private Command mainCommand = null;
 	private final List<Class<? extends Migration>> migrations;
 	private final Class<C> configurationClass;
 	private C configuration = null;
 	private final Class<P> permissionContainerClass;
 	private P permissionContainer = null;
-	private final LowerCaseHashMap<TextFile> textFiles = new LowerCaseHashMap<>();
-	private final LowerCaseHashMap<Board> data = new LowerCaseHashMap<>();
-	private final LowerCaseHashMap<Command> commands = new LowerCaseHashMap<>();
-	private final LowerCaseHashMap<Listener> listeners = new LowerCaseHashMap<>();
-	private final LowerCaseHashMap<Task> tasks = new LowerCaseHashMap<>();
-	private final LowerCaseHashMap<Logger> loggers = new LowerCaseHashMap<>();
-	private final LowerCaseHashMap<GUI> guis = new LowerCaseHashMap<>();
-	private final LowerCaseHashMap<Bossbar> bossbars = new LowerCaseHashMap<>();
-	private final LowerCaseHashMap<Integration> integrations = new LowerCaseHashMap<>();
-	private Logger mainLogger = new Logger(this, getName() + "-" + getDescription().getVersion(), true, true, 10000, false);  // define it temporarily for start
+	private final RWLowerCaseHashMap<TextFile<?>> textFiles = new RWLowerCaseHashMap<>();
+	private final RWLowerCaseHashMap<Board> data = new RWLowerCaseHashMap<>();
+	private final RWLowerCaseHashMap<Command> commands = new RWLowerCaseHashMap<>();
+	private final RWLowerCaseHashMap<Listener> listeners = new RWLowerCaseHashMap<>();
+	private final RWLowerCaseHashMap<Task> tasks = new RWLowerCaseHashMap<>();
+	private final RWLowerCaseHashMap<Logger> loggers = new RWLowerCaseHashMap<>();
+	private final RWLowerCaseHashMap<GUI> guis = new RWLowerCaseHashMap<>();
+	private final RWLowerCaseHashMap<Bossbar> bossbars = new RWLowerCaseHashMap<>();
+	private final RWLowerCaseHashMap<Integration> integrations = new RWLowerCaseHashMap<>();
+	private Logger mainLogger = new Logger(this, getName() + "-" + getDescription().getVersion(), true, true, false);  // define it temporarily for start
 	private boolean activated = false;
+	private Object lifecycleReference = new Object();  // changed on every reload ; allows to create WeakHashMap caches that reset on reload
 	private Gson gson = createGsonBuilder().create();
 	private Gson prettyGson = createGsonBuilder().setPrettyPrinting().create();
 
@@ -77,16 +90,34 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 		return FileUtils.createGsonBuilder();
 	}
 
-	public GPlugin(int spigotResourceId, Class<C> configurationClass, Class<P> permissionContainerClass, Class<? extends Migration>... migrations) {
+	public GPlugin(int spigotResourceId, String mainCommandName, String mainCommandHelpAlias, Class<C> configurationClass, Class<P> permissionContainerClass, Class<? extends Migration>... migrations) {
 		this.spigotResourceId = spigotResourceId;
+		this.mainCommandName = mainCommandName;
+		this.mainCommandHelpAlias = mainCommandHelpAlias;
 		this.migrations = CollectionUtils.asUnmodifiableList(migrations);
 		this.configurationClass = configurationClass;
 		this.permissionContainerClass = permissionContainerClass;
 	}
 
-	// get
-	public int getSpigotResourceId() {
+	// ----- get
+	public final int getSpigotResourceId() {
 		return spigotResourceId;
+	}
+
+	public final String getMainCommandName() {
+		return mainCommandName;
+	}
+
+	public final String getMainCommandHelpAlias() {
+		return mainCommandHelpAlias;
+	}
+
+	public final Command getMainCommand() {
+		return mainCommand;
+	}
+
+	protected Subcommand buildMainCommandBase() {
+		return null;
 	}
 
 	public final Class<C> getConfigurationClass() {
@@ -105,15 +136,19 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 		return permissionContainer;
 	}
 
+	public final List<Class<? extends Migration>> getMigrations() {
+		return migrations;
+	}
+
 	public final YMLConfiguration loadConfigurationFile(String path) {
 		return new YMLConfiguration(this, getDataFile(path));
 	}
 
-	public final LowerCaseHashMap<TextFile> getTexts() {
-		return textFiles;
+	public final List<GUI> getGUIs() {
+		return Collections.unmodifiableList(guis.copyValues());
 	}
 
-	public final LowerCaseHashMap<Board> getData() {
+	public final RWLowerCaseHashMap<Board> getData() {
 		return data;
 	}
 
@@ -121,32 +156,12 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 		return new File(getDataFolder() + "/" + path);
 	}
 
-	public final Map<String, Listener> getListeners() {
-		return Collections.unmodifiableMap(listeners);
-	}
-
-	public final Map<String, Task> getTasks() {
-		return Collections.unmodifiableMap(tasks);
-	}
-
-	public final Map<String, Logger> getLoggers() {
-		return Collections.unmodifiableMap(loggers);
-	}
-
-	public final Map<String, GUI> getGuis() {
-		return Collections.unmodifiableMap(guis);
-	}
-
-	public Map<String, Bossbar> getBossbars() {
-		return Collections.unmodifiableMap(bossbars);
-	}
-
-	public final Map<String, Integration> getIntegrations() {
-		return Collections.unmodifiableMap(integrations);
-	}
-
 	public final Integration getIntegration(String pluginName) {
 		return integrations.get(pluginName);
+	}
+
+	public final RWLowerCaseHashMap<Integration> getIntegrations() {
+		return integrations;
 	}
 
 	public final Logger getLogger(String id) {
@@ -157,8 +172,28 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 		return mainLogger;
 	}
 
+	public final RWLowerCaseHashMap<Logger> getLoggers() {
+		return loggers;
+	}
+
+	public final RWLowerCaseHashMap<Task> getTasks() {
+		return tasks;
+	}
+
+	public final RWLowerCaseHashMap<Listener> getListeners() {
+		return listeners;
+	}
+
+	public final RWLowerCaseHashMap<Bossbar> getBossbars() {
+		return bossbars;
+	}
+
 	public final boolean isActivated() {
 		return activated;
+	}
+
+	public final Object getLifecycleReference() {
+		return lifecycleReference;
 	}
 
 	public final Gson getGson() {
@@ -169,7 +204,7 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 		return prettyGson;
 	}
 
-	// enable
+	// ----- enable
 	private final boolean migrate() throws Throwable {
 		for (Class<? extends Migration> cls : migrations) {
 			if (!cls.newInstance().process()) {
@@ -185,7 +220,7 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 	protected void registerTexts() {
 	}
 
-	protected abstract File getDefaultTextsFolder();
+	public abstract File getDefaultTextsFolder();
 
 	protected void registerData() {
 	}
@@ -199,8 +234,12 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 	protected void registerAndEnableIntegrations() {
 	}
 
+	protected void onGPluginEnable(GPlugin plugin) {
+	}
+
 	@Override
 	public void onEnable() {
+		lifecycleReference = new Object();
 		activated = false;
 		try {
 			// GCore isn't enabled
@@ -213,6 +252,7 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 				failEnable("Couldn't check if GCore is enabled", exception);
 				return;
 			}
+
 			// mark all migrations as done if there's no plugin folder
 			try {
 				if (!getDataFolder().exists()) {
@@ -226,6 +266,7 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 				failEnable("couldn't check for previous migrations", exception);
 				return;
 			}
+
 			// pre-enable
 			try {
 				preEnable();
@@ -233,6 +274,7 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 				failEnable("couldn't check for previous migrations", exception);
 				return;
 			}
+
 			// migrate
 			try {
 				if (!migrate()) {
@@ -243,18 +285,22 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 				failEnable(null);
 				return;
 			}
+
 			// log version if GCore
 			if (GCore.inst().equals(this)) {
+				// log version
 				if (Version.CURRENT.equals(Version.UNSUPPORTED)) {
-					getMainLogger().warning("Couldn't find registered server version ; using UNSUPPORTED with found package name " + Version.CURRENT.getPackageName());
+					getMainLogger().warning("Couldn't find registered server version ; using UNSUPPORTED with found package " + Version.CURRENT.getNMSPackage());
 				} else if (Version.CURRENT.equals(Version.UNKNOWN)) {
 					getMainLogger().error("Couldn't find server version");
 				} else {
 					getMainLogger().info("Found server version " + Version.CURRENT);
 				}
 			}
+
 			// register types
 			registerTypes();
+
 			// register texts
 			try {
 				registerTexts();
@@ -262,6 +308,7 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 				failEnable("Couldn't register texts", exception);
 				return;
 			}
+
 			// save default configs
 			try {
 				int savedConfig = new ResourceExtractor(this, new File(getDataFolder() + "/"), "resources/").extract(false, true);
@@ -270,20 +317,20 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 				failEnable("Couldn't extract default config file ", exception);
 				return;
 			}
+
 			// initialize texts file if has texts
 			if (!textFiles.isEmpty()) {
 				// extract default text files
 				File defaultFolder = getDefaultTextsFolder();
 				try {
-					if (defaultFolder.exists()) {
-						defaultFolder.delete();
-					}
+					FileUtils.delete(defaultFolder);
 					defaultFolder.mkdirs();
-					new ResourceExtractor(this, defaultFolder, "resources/texts").extract(true, true);
+					new ResourceExtractor(this, defaultFolder, "resources/texts/").extract(false, true);
 				} catch (Throwable exception) {
 					failEnable("Couldn't extract default text files", exception);
 					return;
 				}
+
 				// save default text files and load
 				try {
 					// missing files
@@ -295,6 +342,7 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 					return;
 				}
 			}
+
 			// register and enable integrations before configuration if this is not GCore : things in integrations might be needed to load config
 			if (!GCore.inst().equals(this)) {
 				try {
@@ -304,6 +352,7 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 					return;
 				}
 			}
+
 			// load config
 			if (configurationClass != null) {
 				try {
@@ -322,10 +371,12 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 					return;
 				}
 			}
+
 			// read texts
 			if (!readTexts(ConfigGCore.langId)) {
 				return;
 			}
+
 			// register and enable integrations after configuration if this is GCore : position/time frame types need CommonMats to load
 			if (GCore.inst().equals(this)) {
 				try {
@@ -335,6 +386,7 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 					return;
 				}
 			}
+
 			// load permission container
 			if (permissionContainerClass != null) {
 				try {
@@ -348,8 +400,16 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 					return;
 				}
 			}
+
+			// initialize main command
+			mainCommand = registerCommand(new Command(this, mainCommandName, mainCommandName, buildMainCommandBase()));
+			mainCommand.setSubcommand(new GenericReload(this));
+			mainCommand.setSubcommand(new GenericMigrate(this));
+			mainCommand.setSubcommand(new GenericPluginState(this));
+
 			// register main logger
-			registerLogger(mainLogger = new Logger(this, getName() + "-" + getDescription().getVersion(), getConfiguration().logMainConsole(), getConfiguration().logMainFile(), 10000));
+			registerLogger(mainLogger = new Logger(this, getName() + "-" + getDescription().getVersion(), getConfiguration().logMainConsole(), getConfiguration().logMainFile()));
+
 			// register data
 			try {
 				registerData();
@@ -357,6 +417,7 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 				failEnable("Couldn't register data", exception);
 				return;
 			}
+
 			// enable
 			try {
 				enable();
@@ -366,9 +427,10 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 				}
 				return;
 			}
+
 			// notify update and notify update listeners
 			notifyUpdate(Bukkit.getConsoleSender());
-			registerListener(new Listener() {
+			registerListener("join_update", new Listener() {
 				@EventHandler(priority = EventPriority.LOWEST)
 				public void event(PlayerJoinEvent event) {
 					if (permissionContainer.getAdminPermission().has(event.getPlayer())) {
@@ -376,23 +438,71 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 					}
 				}
 			});
+
+			// bossbar listeners ; centralize them all here because when bossbars are started/stopped, the registration + HandlerList.unregisterAll(listener) things take an unholy amount of time to execute (about half of the time of the whole bossbar sending process) #1734
+			registerListener("bossbar", new Listener() {
+				@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+				public void event(PlayerQuitEvent event) {
+					bossbars.iterateAndModify((id, bossbar, remover, breaker) -> bossbar.handleDisconnect(event.getPlayer()));
+				}
+				@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+				public void event(PlayerTeleportEvent event) {
+					bossbars.iterateAndModify((id, bossbar, remover, breaker) -> bossbar.handleTeleport(event.getPlayer()));
+				}
+				@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+				public void event(PlayerRespawnEvent event) {
+					bossbars.iterateAndModify((id, bossbar, remover, breaker) -> bossbar.handleTeleport(event.getPlayer()));
+				}
+			});
+
 			// start logger tasks
-			loggers.values().forEach(Logger::startSaving);
+			loggers.forEach((__, logger) -> logger.startSaving());
+
 			// initialize data boards
-			data.values().forEach(board -> board.initialize(BukkitThread.ASYNC, () -> board.startSaving()));
+			data.forEach((__, board) -> board.initialize(BukkitThread.ASYNC, () -> board.startSaving()));
+
 			// register commands
-			commands.values().forEach(command -> getCommand(command.getName()).setExecutor(command));
+			commands.forEach((__, command) -> getCommand(command.getName()).setExecutor(command));
+
 			// register listeners
-			listeners.values().forEach(listener -> {
+			listeners.forEach((__, listener) -> {
 				Bukkit.getPluginManager().registerEvents(listener, this);
 			});
+
 			// start tasks
-			tasks.values().forEach(Task::start);
+			tasks.forEach((__, task) -> {
+				if (!task.isActive()) {
+					task.start();
+				}
+			});
+
 			// mark as activated
 			activated = true;
 			Bukkit.getConsoleSender().sendMessage("§a[" + getName() + "-" + getDescription().getVersion() + "] Successfully enabled");
+
+			// trigger other plugins
+			triggerEnableInOtherPlugins();
 		} catch (Throwable exception) {
 			failEnable("Couldn't enable", exception);
+		}
+	}
+
+	private void triggerEnableInOtherPlugins() {
+		for (GPlugin plugin : PluginUtils.getGPlugins()) {
+			if (plugin.isActivated() && !plugin.equals(this)) {
+				try {
+					plugin.onGPluginEnable(this);  // ez, to avoid having to register an integration just for this
+					Integration integ = plugin.getIntegration(getName());
+					if (integ != null) {
+						if (integ.isActivated()) {
+							integ.deactivate();
+						}
+						integ.activate();
+					}
+				} catch (Throwable exception) {
+					exception.printStackTrace();
+				}
+			}
 		}
 	}
 
@@ -402,68 +512,99 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 		if (log != null) {
 			try {
 				mainLogger.error(log, exception);
-				mainLogger.error("Disabling plugin");
+				mainLogger.error("Disabling plugin - you can re-try with /" + mainCommandName);
+				getCommand(mainCommandName).setExecutor(new CommandExecutor() {
+					@Override
+					public boolean onCommand(CommandSender sender, org.bukkit.command.Command command, String label, String[] args) {
+						if (retry()) {
+							TextGCore.messagePluginReloaded.replace("{plugin}", () -> getName()).send(sender);
+						} else {
+							sender.sendMessage("§cCould not enable " + getName() + ", please check the console output.");
+						}
+						return true;
+					}
+				});
 				mainLogger.saveFileIfPersistent();
+				onDisable();
 			} catch (Throwable ignored) {
 				ignored.printStackTrace();
 			}
 		}
-		setEnabled(false);
+		//setEnabled(false);
 	}
 
-	// disable
+	public final boolean retry() {
+		if (!activated) {
+			onEnable();
+		}
+		return activated;
+	}
+
+	// ----- disable
 	@Override
 	public void onDisable() {
-		onDisable0(BukkitThread.SYNC, null);
+		onDisable0(null);
 	}
 
-	private void onDisable0(BukkitThread dataSaving, Runnable callback) {
+	private void onDisable0(Runnable callback) {
 		activated = false;
+
 		// disable plugin
 		try {
 			disable();
 		} catch (Throwable exception) {
 			mainLogger.error("Couldn't disable plugin", exception);
 		}
+
 		try {
 			// unregister listeners
 			listeners.clear();
 			HandlerList.unregisterAll(this);
+
 			// unregister commands
-			CollectionUtils.clearForEach(commands, (id, command) -> getCommand(command.getName()).setExecutor(null));
+			commands.forEach((id, command) -> getCommand(command.getName()).setExecutor(null));
+			commands.clear();
+
 			// cancel tasks
-			CollectionUtils.clearForEach(tasks.values(), Task::stop);
-			Bukkit.getScheduler().cancelTasks(this); // make sure to cancel all tasks, future as well
+			tasks.forEach((__, task) -> task.stop());
+			tasks.clear();
+			Bukkit.getScheduler().cancelTasks(this);  // make sure to cancel all tasks, future as well
+
 			// close and unregister GUIs
-			CollectionUtils.asList(guis.values()).forEach(gui -> gui.deactivate(true));
+			guis.copyValues().forEach(gui -> gui.deactivate(true));
+
 			// unregister bossbars
-			CollectionUtils.asList(bossbars.values()).forEach(bar -> bar.stop());
+			bossbars.copyValues().forEach(Bossbar::stop);
+
 			// disable integrations
-			CollectionUtils.clearForEach(integrations, (id, integration) -> integration.deactivate());
+			integrations.forEach((id, integration) -> integration.deactivate());
+			integrations.clear();
+
 			// save and cancel loggers
-			CollectionUtils.clearForEachThrowableIgnore(loggers.values(), logger -> {
+			loggers.forEachThrowable((__, logger) -> {
 				logger.saveFileIfPersistent();
 				logger.stopSaving();
 			});
-		} catch (Throwable ignored) {}
+			loggers.clear();
+		} catch (Throwable ignored) {
+			ignored.printStackTrace();
+		}
+
 		// save data and stop saving
-		List<String> remainingToSave = data.entrySet().stream().filter(entry -> entry.getValue().mustSaveSomething()).map(entry -> entry.getKey()).collect(Collectors.toList());
-		CollectionUtils.clearForEach(data, (id, board) -> {
-			board.saveNeeded(dataSaving, () -> {
-				// callback if no more data boards to save
-				remainingToSave.remove(id);
-				if (callback != null && remainingToSave.isEmpty()) {
-					callback.run();
-				}
-			});
+		data.forEach((id, board) -> {
+			board.saveNeeded(BukkitThread.current(), null);
 			board.stopSaving();
 		});
+		data.clear();
+
 		// clear misc
 		textFiles.clear();
+
 		// unload config
 		configuration = null;
-		// callback instantly if no data boards
-		if (callback != null && remainingToSave.isEmpty()) {
+
+		// callback
+		if (callback != null) {
 			callback.run();
 		}
 	}
@@ -471,7 +612,7 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 	protected void disable() throws Throwable {
 	}
 
-	// reload
+	// ----- reload
 	private transient boolean reloading = false;
 
 	public boolean isReloading() {
@@ -484,9 +625,20 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 		}
 		try {
 			reloading = true;
-			onDisable0(BukkitThread.ASYNC, () -> {
+			onDisable0(() -> {
 				try {
 					onEnable();
+					if (equals(GCore.inst())) {
+						PluginUtils.getGPlugins().forEach(plugin -> {
+							try {
+								if (!plugin.equals(GCore.inst())) {
+									plugin.reload(null);
+								}
+							} catch (Throwable ignored) {}
+						});
+					} else {
+						triggerEnableInOtherPlugins();
+					}
 					reloading = false;
 					if (callback != null) {
 						callback.run();
@@ -504,7 +656,7 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 		}
 	}
 
-	// update notification
+	// ----- update notification
 	public final void notifyUpdate(CommandSender sender) {
 		// local is indev
 		Integer local = StringUtils.getUniqueVersionNumber(getDescription().getVersion());
@@ -513,7 +665,7 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 		}
 		// can show update notifications
 		else if (getConfiguration().updateNotification() && spigotResourceId > 0 && !equals(GCore.inst())) {
-			BukkitThread.ASYNC.operate(() -> {
+			operateAsync(() -> {
 				String response = PluginUtils.getOfficialVersion(this);
 				// unknown server response
 				if (response.isEmpty() || response.equals("unknown_server") || response.equals("Invalid resource") || response.contains("?resource=id")) {
@@ -547,7 +699,7 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 		}
 	}
 
-	// texts
+	// ----- texts
 	public final void registerTextFile(TextFile textFile) {
 		textFiles.put(textFile.getFilePath(), textFile);
 	}
@@ -558,7 +710,7 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 		Bukkit.getConsoleSender().sendMessage("§a[" + getName() + "-" + getDescription().getVersion() + "] Loading texts...");
 		try {
 			if (langFolder.isDirectory()) {
-				for (TextFile<?> textFile : textFiles.values()) {
+				textFiles.forEachThrowable((String __, TextFile<?> textFile) -> {
 					// read file
 					File langFile = new File(langFolder + "/" + textFile.getFilePath());
 					LowerCaseHashMap<List<String>> texts = readTextsFromFile(textFile.getValues().keySet(), langFile);
@@ -596,32 +748,7 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 							mainLogger.warning("Loaded " + StringUtils.pluralizeAmountDesc("missing text", missing.size()) + " from default lang " + defaultLang + " for " + textFile.getFilePath() + (textFile.getFilePath().contains("editor") && ConfigGCore.dontLogMissingEditorTexts ? "" : " : " + StringUtils.toTextString(", ", missingDisplay)));
 						}
 					}
-					// save missing texts
-					// - actually don't do it ; it would pollute incomplete text files with english text
-					/*if (!missing.isEmpty()) {
-						// read missing texts from file
-						File defaultFile = new File(defaultFolder + "/" + langId + "/" + textFile.getFilePath());
-						if (!defaultFile.exists()) {
-							defaultFile = new File(defaultFolder + "/en_US/" + textFile.getFilePath());
-						}
-						if (defaultFile.exists()) {
-							// load default texts and write missing texts to file
-							LowerCaseHashMap<List<String>> missingTexts = readTextsFromFile(missing.keySet(), defaultFile);
-							if (!missingTexts.isEmpty()) {
-								YMLConfiguration config = new YMLConfiguration(this, langFile);
-								config.getBackingYML().getBase().addComment(CollectionUtils.asList("", "-------------------- UPDATED LINES --------------------", ""));
-								missingTexts.forEach((missingTextId, defaultLines) -> {
-									Text text = missing.get(missingTextId);
-									text.setLines(defaultLines);
-									config.write(missingTextId, defaultLines.size() == 1 ? defaultLines.get(0) : defaultLines);
-								});
-								config.save();
-							}
-							// log
-							mainLogger.info("Saved " + StringUtils.pluralizeAmountDesc("missing text", missing.size()) + " in " + langFile + " : " + StringUtils.toTextString(", ", missingDisplay));
-						}
-					}*/
-				}
+				});
 			}
 			return true;
 		} catch (Throwable exception) {
@@ -646,13 +773,13 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 		return texts;
 	}
 
-	// commands
+	// ----- commands
 	public final Command registerCommand(Command command) {
 		commands.put(command.getName(), command);
 		return command;
 	}
 
-	// data
+	// ----- data
 	public final <T extends Board> T registerDataBoard(T board) {
 		// already registered
 		if (data.containsKey(board.getId())) {
@@ -665,11 +792,7 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 		return board;
 	}
 
-	// listeners
-	public final void registerListener(Listener listener) {
-		registerListener(listener.getClass().getName(), listener);
-	}
-
+	// ----- listeners
 	public final void registerListener(String id, Listener listener) {
 		// unregistered
 		if (listeners.containsKey(id)) {
@@ -683,10 +806,6 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 		}
 	}
 
-	public final Listener stopListener(Class<? extends Listener> clazz) {
-		return stopListener(clazz.getName());
-	}
-
 	public final Listener stopListener(String id) {
 		Listener listener = listeners.remove(id);
 		if (listener != null) {
@@ -695,7 +814,7 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 		return listener;
 	}
 
-	// tasks
+	// ----- tasks
 	public final Task registerTask(String id, boolean async, int ticksPeriod, ThrowableRunnable runner) {
 		// unregistered
 		if (tasks.containsKey(id)) {
@@ -720,7 +839,7 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 		return task;
 	}
 
-	// logger
+	// ----- logger
 	public final void registerLogger(final Logger logger) {
 		// already registered
 		if (loggers.containsKey(logger.getId())) {
@@ -730,7 +849,7 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 		loggers.put(logger.getId(), logger);
 	}
 
-	// GUI
+	// ----- GUI
 	public final void registerGUI(GUI gui) {
 		// already registered
 		GUI existing = guis.remove(gui.getId());
@@ -748,7 +867,7 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 		guis.remove(gui.getId());
 	}
 
-	// bossbar
+	// ----- bossbar
 	public final void registerBossbar(Bossbar bar) {
 		// already registered
 		Bossbar existing = bossbars.remove(bar.getId());
@@ -766,7 +885,7 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 		bossbars.remove(bar.getId());
 	}
 
-	// integration
+	// ----- integration
 	public final Integration registerAndEnableIntegration(Integration integration) {
 		// already registered
 		if (integrations.containsKey(integration.getPluginName())) {
@@ -788,6 +907,56 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 		integrations.remove(integration.getPluginName());
 		// deactivate
 		integration.deactivate();
+	}
+
+	// ----- utils
+
+	public final void operate(BukkitThread thread, ThrowableRunnable callable) {
+		thread.operate(this, callable);
+	}
+
+	public final void operate(BukkitThread thread, ThrowableRunnable callable, Consumer<Throwable> onError) {
+		thread.operate(this, callable, onError);
+	}
+
+	public final void operateLater(BukkitThread thread, ThrowableRunnable callable, long ticks) {
+		thread.operateLater(this, callable, ticks);
+	}
+
+	public final void operateLater(BukkitThread thread, ThrowableRunnable callable, Consumer<Throwable> onError, long ticks) {
+		thread.operateLater(this, callable, onError, ticks);
+	}
+
+	public final void operateSync(ThrowableRunnable callable) {
+		operate(BukkitThread.SYNC, callable);
+	}
+
+	public final void operateSync(ThrowableRunnable callable, Consumer<Throwable> onError) {
+		operate(BukkitThread.SYNC, callable, onError);
+	}
+
+	public final void operateSyncLater(ThrowableRunnable callable, long ticks) {
+		operateLater(BukkitThread.SYNC, callable, ticks);
+	}
+
+	public final void operateSyncLater(ThrowableRunnable callable, Consumer<Throwable> onError, long ticks) {
+		operateLater(BukkitThread.SYNC, callable, onError, ticks);
+	}
+
+	public final void operateAsync(ThrowableRunnable callable) {
+		operate(BukkitThread.ASYNC, callable);
+	}
+
+	public final void operateAsync(ThrowableRunnable callable, Consumer<Throwable> onError) {
+		operate(BukkitThread.ASYNC, callable, onError);
+	}
+
+	public final void operateAsyncLater(ThrowableRunnable callable, long ticks) {
+		operateLater(BukkitThread.ASYNC, callable, ticks);
+	}
+
+	public final void operateAsyncLater(ThrowableRunnable callable, Consumer<Throwable> onError, long ticks) {
+		operateLater(BukkitThread.ASYNC, callable, onError, ticks);
 	}
 
 }

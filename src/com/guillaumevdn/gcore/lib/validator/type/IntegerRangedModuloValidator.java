@@ -14,7 +14,7 @@ public class IntegerRangedModuloValidator extends IntegerValidator {
 		this.modulo = modulo;
 	}
 
-	// get
+	// ----- get
 	public int getMin() {
 		return min;
 	}
@@ -27,7 +27,7 @@ public class IntegerRangedModuloValidator extends IntegerValidator {
 		return modulo;
 	}
 
-	// methods
+	// ----- methods
 	@Override
 	public boolean isValid(Integer value) {
 		return value != null && value >= min && value <= max && value % modulo == 0;

@@ -27,7 +27,7 @@ public class SerializerLowerCaseLinkedHashMap<K, V> implements Cloneable {
 		this.keySerializer = keySerializer;
 	}
 
-	// methods
+	// ----- methods
 	/**
 	 * Clear the map
 	 */
@@ -85,6 +85,13 @@ public class SerializerLowerCaseLinkedHashMap<K, V> implements Cloneable {
 	 */
 	public List<V> values() {
 		return Collections.unmodifiableList(CollectionUtils.asList(map.values()));
+	}
+
+	/**
+	 * @return a stream of sorted values for this map
+	 */
+	public Stream<V> valuesStream() {
+		return map.values().stream();
 	}
 
 	/**
@@ -156,7 +163,7 @@ public class SerializerLowerCaseLinkedHashMap<K, V> implements Cloneable {
 		});
 	}
 
-	// object
+	// ----- object
 	@Override
 	public String toString() {
 		if (isEmpty()) {

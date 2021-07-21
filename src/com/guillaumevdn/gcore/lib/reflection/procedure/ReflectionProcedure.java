@@ -7,12 +7,12 @@ public class ReflectionProcedure<F, T> {
 
 	private F function = null;
 
-	// get
+	// ----- get
 	public F get() {
 		return function;
 	}
 
-	// set
+	// ----- set
 	public T set(F function) {
 		return setIf(true, function);
 	}

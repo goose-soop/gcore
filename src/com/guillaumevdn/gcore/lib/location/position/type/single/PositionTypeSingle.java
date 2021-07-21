@@ -23,14 +23,14 @@ public class PositionTypeSingle extends PositionType {
 		super(id, CommonMats.MINECART);
 	}
 
-	// elements
+	// ----- elements
 	@Override
 	protected void doFillTypeSpecificElements(ElementPosition position) {
 		position.addLocation("location", Need.required(), TextEditorGeneric.descriptionPositionTypeSingleLocation);
 		position.addPointTolerance("point_tolerance", Need.optional(PointTolerance.LENIENT), TextEditorGeneric.descriptionPositionTypePointTolerance);
 	}
 
-	// parse
+	// ----- parse
 	@Override
 	public Position doParse(ElementPosition position, Replacer replacer) throws ParsingError {
 		Location location = position.getElementAs("location", ElementLocation.class).parseNoCatchOrThrowParsingNull(replacer);

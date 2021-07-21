@@ -27,7 +27,7 @@ public class ArgumentPairEnumDouble<E extends Enum<E>> extends Argument<Pair<E, 
 		return enumClass;
 	}
 
-	// do
+	// ----- do
 	@Override
 	public Pair<E, Double> consume(CommandCall call) {
 		if (call.getArguments().size() < 2) {

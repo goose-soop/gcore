@@ -30,7 +30,7 @@ public class ElementConfigSection<T> extends Element {
 		super(typeName, parent, id, need.getType(), editorDescription);
 	}
 
-	// get
+	// ----- get
 	public SectionNode getValue() {
 		return value;
 	}
@@ -50,12 +50,12 @@ public class ElementConfigSection<T> extends Element {
 		return CommonMats.NETHER_STAR;
 	}
 
-	// set
+	// ----- set
 	public void setValue(SectionNode value) {
 		this.value = value;
 	}
 
-	// loading and saving
+	// ----- loading and saving
 	@Override
 	protected void clearBeforeRead() {
 		value = null;
@@ -89,7 +89,7 @@ public class ElementConfigSection<T> extends Element {
 		}
 	}
 
-	// editor
+	// ----- editor
 	@Override
 	public EditorGUI editorGUI(ClickCall fromCall) {
 		return null;

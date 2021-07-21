@@ -35,12 +35,12 @@ public abstract class ElementLinear<T extends LinearObjectType, L extends Linear
 		this.typeSerializer = serializer.getTypeSerializer();
 	}
 
-	// get
+	// ----- get
 	public Serializer<T> getTypeSerializer() {
 		return typeSerializer;
 	}
 
-	// editor
+	// ----- editor
 	@Override
 	public List<String> editorIconLore() {
 		List<String> lore = super.editorIconLore();
@@ -60,16 +60,16 @@ public abstract class ElementLinear<T extends LinearObjectType, L extends Linear
 					getSuperElement().onEditorChange(this);
 				} else {
 					try {
-						L parsed = doParseString(current.getA().name() + " " + value);
+						L parsed = current == null || current.getA() == null ? null : doParseString(current.getA().name() + " " + value);
 						setValue(parsed == null ? null : CollectionUtils.asList(getSerializer().serialize(parsed)));
-						call.getGUI().setRegularItem(buildEditorItem(call.getSlot()));
+						call.getGUI().setRegularItem(buildEditorItem(call.getPageIndex(), call.getSlot()));
 						getSuperElement().onEditorChange(this);
 					} catch (ParsingError error) {
 						error.send(call.getClicker());
 					}
 				}
-				call.getGUI().openFor(call.getClicker(), call.getPageIndex());
-			}, () -> call.getGUI().openFor(call.getClicker(), call.getPageIndex()));
+				call.reopenGUI();
+			}, () -> call.reopenGUI());
 		}
 		// shift + left-click : select type
 		else if (call.getType().equals(ClickType.SHIFT_LEFT)) {
@@ -80,18 +80,18 @@ public abstract class ElementLinear<T extends LinearObjectType, L extends Linear
 						Pair<T, List<String>> current = getCurrentPair();
 						try {
 							L parsed = doParseString(value.name() + (current.getB().isEmpty() ? "" : " " + StringUtils.toTextString(",", current.getB())));
-							setValue(parsed == null ? null : CollectionUtils.asList(getSerializer().serialize(parsed)));
+							setValue(CollectionUtils.asList(parsed == null ? value.name() : getSerializer().serialize(parsed)));
 						} catch (ParsingError error) {
 							setValue(CollectionUtils.asList(value.name()));
 						}
 						// open GUI and change
-						call.getGUI().setRegularItem(buildEditorItem(call.getSlot()));
-						call.getGUI().openFor(call.getClicker(), call.getPageIndex());
+						call.getGUI().setRegularItem(buildEditorItem(call.getPageIndex(), call.getSlot()));
+						call.reopenGUI();
 						getSuperElement().onEditorChange(this);
 					},
 					// on cancel
 					() -> {
-						call.getGUI().openFor(call.getClicker(), call.getPageIndex());
+						call.reopenGUI();
 					});
 		}
 		// other

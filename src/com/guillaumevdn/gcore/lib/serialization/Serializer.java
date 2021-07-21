@@ -84,7 +84,7 @@ public abstract class Serializer<T> {
 		this.registered = register;
 	}
 
-	// get
+	// ----- get
 	public final String getTypeName() {
 		return typeName;
 	}
@@ -101,7 +101,7 @@ public abstract class Serializer<T> {
 		return registered;
 	}
 
-	// serialization
+	// ----- serialization
 	public abstract String serialize(T value);
 	public abstract T deserialize(String string);
 
@@ -110,11 +110,11 @@ public abstract class Serializer<T> {
 	}
 
 	public List<T> deserialize(Collection<String> strings) {
-		return strings == null ? null : strings.stream().map(t -> deserialize(t)).collect(Collectors.toList());
+		return strings == null ? null : strings.stream().map(t -> t == null ? null : deserialize(t.trim())).collect(Collectors.toList());
 	}
 
 	// ----------------------------------------------------------------------------------------------------
-	// registration
+	// ----- registration
 	// ----------------------------------------------------------------------------------------------------
 
 	private static final Map<Class, Serializer> registration = new HashMap<>();
@@ -144,11 +144,11 @@ public abstract class Serializer<T> {
 		registration.remove(serializerClass);
 	}
 
-	// init
+	// ----- init
 	public static void init() {}
 
 	// ----------------------------------------------------------------------------------------------------
-	// creation
+	// ----- creation
 	// ----------------------------------------------------------------------------------------------------
 
 	public static <T> Serializer<T> of(Class<T> typeClass, Function<T, String> serializer, Function<String, T> deserializer) {
@@ -238,7 +238,7 @@ public abstract class Serializer<T> {
 	}
 
 	// ----------------------------------------------------------------------------------------------------
-	// types : java
+	// ----- types : java
 	// ----------------------------------------------------------------------------------------------------
 
 	public static final Serializer<String> STRING = of(String.class, value -> value, string -> string);
@@ -308,7 +308,7 @@ public abstract class Serializer<T> {
 	});
 
 	// ----------------------------------------------------------------------------------------------------
-	// types : mine
+	// ----- types : mine
 	// ----------------------------------------------------------------------------------------------------
 
 	public static final Serializer<TimeFrameType> TIME_FRAME_TYPE = ofTypable(TimeFrameType.class, () -> TimeFrameTypes.inst());
@@ -336,7 +336,7 @@ public abstract class Serializer<T> {
 			});
 
 	// ----------------------------------------------------------------------------------------------------
-	// types : bukkit
+	// ----- types : bukkit
 	// ----------------------------------------------------------------------------------------------------
 
 	public static final Serializer NAMESPACED_KEY = !Version.ATLEAST_1_12 ? null : of(org.bukkit.NamespacedKey.class, value -> value.getNamespace() + ":" + value.getKey(), string -> {
@@ -404,17 +404,17 @@ public abstract class Serializer<T> {
 			});
 
 	// ----------------------------------------------------------------------------------------------------
-	// types : linear
+	// ----- types : linear
 	// ----------------------------------------------------------------------------------------------------
 
 	public static final LinearSerializer<BlockStateType, BlockState> BLOCK_STATE = Serializer.ofLinear(Serializer.ofEnum(BlockStateType.class), BlockState.class, (type, params) -> new BlockState(type, params));
 
 	// ----------------------------------------------------------------------------------------------------
-	// types : variants
+	// ----- types : variants
 	// ----------------------------------------------------------------------------------------------------
 
 	public static final Serializer<Sound> SOUND = of(Sound.class, value -> value.getId(), string -> Sound.firstFromIdOrDataName(string).orNull());
 	public static final Serializer<Particle> PARTICLE = of(Particle.class, value -> value.getId(), string -> Particle.firstFromIdOrDataName(string).orNull());
-	public static final Serializer<Mat> MAT = of(Mat.class, value -> value.getId(), string -> Mat.firstFromIdOrDataName(string).orNull());
+	public static final Serializer<Mat> MAT = of(Mat.class, value -> value.getId(), string -> Mat.firstFromIdOrDataName(string).orElse(null));
 
 }

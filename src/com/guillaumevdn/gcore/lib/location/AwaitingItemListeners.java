@@ -10,9 +10,9 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 
+import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.TextGeneric;
 import com.guillaumevdn.gcore.WorkerGCore;
-import com.guillaumevdn.gcore.lib.bukkit.BukkitThread;
 import com.guillaumevdn.gcore.lib.chat.PlayerChatEvent;
 import com.guillaumevdn.gcore.lib.string.StringUtils;
 import com.guillaumevdn.gcore.lib.tuple.Pair;
@@ -36,7 +36,7 @@ public class AwaitingItemListeners implements Listener {
 				Pair<Consumer<ItemStack>, Runnable> awaitingItem = WorkerGCore.inst().consumeAwaitingItems(player);
 				if (awaitingItem != null) {
 					if (awaitingItem.getB() != null) {
-						BukkitThread.SYNC.operate(() -> awaitingItem.getB().run());
+						GCore.inst().operateSync(() -> awaitingItem.getB().run());
 					}
 				}
 			}

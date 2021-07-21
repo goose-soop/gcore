@@ -9,9 +9,11 @@ import java.util.Collection;
 import java.util.List;
 
 import com.guillaumevdn.gcore.lib.configuration.YMLConfiguration;
+import com.guillaumevdn.gcore.lib.configuration.file.Node.WriteType;
 import com.guillaumevdn.gcore.lib.configuration.file.node.ConfigNode;
 import com.guillaumevdn.gcore.lib.configuration.file.node.ListValueNode;
 import com.guillaumevdn.gcore.lib.configuration.file.node.SectionNode;
+import com.guillaumevdn.gcore.lib.configuration.file.node.SectionNode.SectionNodeType;
 import com.guillaumevdn.gcore.lib.configuration.file.node.SingleValueNode;
 import com.guillaumevdn.gcore.lib.configuration.file.node.SuperNode;
 import com.guillaumevdn.gcore.lib.configuration.reader.YMLReader;
@@ -31,7 +33,7 @@ public class YMLFile {
 		this.configuration = configuration;
 	}
 
-	// get
+	// ----- get
 	public SuperNode getBase() {
 		return base;
 	}
@@ -99,22 +101,26 @@ public class YMLFile {
 		return null;
 	}
 
-	// write
+	// ----- write
 	public void write(File file) throws Throwable {
 		File parent = file.getParentFile();
 		if (parent != null) {
 			parent.mkdirs();
 		}
 		try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8));) {
-			base.write(writer);
+			base.write(writer, WriteType.PREFIX_ID_VALUE);
 		}
 	}
 
 	public SectionNode mkdirs(String path) {
+		return mkdirs(path, SectionNodeType.REGULAR);
+	}
+
+	public SectionNode mkdirs(String path, SectionNodeType type) {
 		List<String> split = StringUtils.split(path, ".", -1);
 		SectionNode node = base;
 		String id = null;
-		while (split.size() != 0 && (id = split.remove(0)) != null) {
+		while (!split.isEmpty() && (id = split.remove(0)) != null) {
 			ConfigNode sub = node.getConfigNode(id);
 			if (ObjectUtils.instanceOf(sub, SectionNode.class)) {
 				node = (SectionNode) sub;
@@ -122,7 +128,17 @@ public class YMLFile {
 				if (sub != null) {
 					node.removeConfigNode(sub);
 				}
-				sub = new SectionNode(node, id, null);
+
+				SectionNodeType subType;
+				if (node.getType().equals(SectionNodeType.COMPACT)) {
+					subType = SectionNodeType.COMPACT;
+				} else if (split.isEmpty()) {
+					subType = type;
+				} else {
+					subType = SectionNodeType.REGULAR;  // do not automatically create compact nested maps for intermediate parents
+				}
+
+				sub = new SectionNode(node, id, subType, null);
 				node.setConfigNode(sub);
 				node = (SectionNode) sub;
 			}
@@ -164,18 +180,18 @@ public class YMLFile {
 		}
 	}
 
-	// do
+	// ----- do
 	public void print() {
 		try {
 			StringBuilder builder = new StringBuilder();
-			base.write(builder);
+			base.write(builder, WriteType.PREFIX_ID_VALUE);
 			System.out.println(builder.toString());
 		} catch (Throwable exeption) {
 			exeption.printStackTrace();
 		}
 	}
 
-	// read
+	// ----- read
 	public void read() throws Throwable {
 		try {
 			this.base = YMLReader.readFile(this);

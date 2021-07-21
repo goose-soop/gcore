@@ -18,7 +18,7 @@ public class OptimizedPathPoint {
 		this.point = point;
 	}
 
-	// get
+	// ----- get
 	@Nullable
 	public Movement getMovementToPoint() {
 		return movementToPoint;
@@ -28,7 +28,7 @@ public class OptimizedPathPoint {
 		return point;
 	}
 
-	// str
+	// ----- str
 	@Override
 	public String toString() {
 		return point.toString();

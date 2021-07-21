@@ -23,7 +23,7 @@ public class ArgumentInteger extends Argument<Integer> {
 		this.tabComplete = mode.complete().collect(Collectors.toList());
 	}
 
-	// do
+	// ----- do
 	@Override
 	public Integer consume(CommandCall call) {
 		if (call.getArguments().isEmpty()) {
@@ -44,9 +44,10 @@ public class ArgumentInteger extends Argument<Integer> {
 		return tabComplete;
 	}
 
-	// enum
+	// ----- enum
 	public static enum TabCompleteMode {
 
+		_1_2_3_4_5_6_7_8_9_10(CollectionUtils.asList("1", "2", "3", "4", "5", "6", "7", "8", "9", "10")),
 		_1_2_5_10(CollectionUtils.asList("1", "2", "5", "10"))
 		;
 

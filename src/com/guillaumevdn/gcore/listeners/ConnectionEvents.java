@@ -27,7 +27,7 @@ public class ConnectionEvents implements Listener {
 		if (Version.ATLEAST_1_9 && PluginUtils.isPluginEnabled("ProtocolLib") && NpcProtocols.inst() != null) {
 			BoardUsersNPCs.inst().fetchValue(player.getUniqueId(), null, null, false, true);
 		}
-		// fetch and cache statistics
+		// fetch and valuesCache statistics
 		Statistic.values().forEach(statistic -> BoardStatistics.inst().fetchValue(statistic, player.getUniqueId(), null, null, true, true));
 	}
 

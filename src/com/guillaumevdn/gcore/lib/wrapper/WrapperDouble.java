@@ -9,13 +9,13 @@ public class WrapperDouble extends Wrapper<Double> {
 		super(value);
 	}
 
-	// methods
+	// ----- methods
 	public double alter(double delta) {
 		set(get() + delta);
 		return get();
 	}
 
-	// static
+	// ----- static
 	public static WrapperDouble of(double value) {
 		return new WrapperDouble(value);
 	}

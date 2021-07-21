@@ -9,7 +9,6 @@ import java.util.UUID;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Pose;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -42,20 +41,28 @@ public final class NpcProtocols {
 	private final Map<Integer, Object> slots;
 
 	public NpcProtocols() throws Throwable {
-		slotEnum = Reflection.getNmsEnum("EnumItemSlot");
-		playerInfoActionEnum = Reflection.getNmsEnum("PacketPlayOutPlayerInfo$EnumPlayerInfoAction");
+		slotEnum = Reflection.getNmsEnum((Version.REMAPPED ? "world.entity." : "") + "EnumItemSlot");
+		playerInfoActionEnum = Reflection.getNmsEnum((Version.REMAPPED ? "network.protocol.game." : "") + "PacketPlayOutPlayerInfo$EnumPlayerInfoAction");
 		slots = CollectionUtils.asMap(
+				0, slotEnum.valueOf("MAINHAND").get(),
+				1, slotEnum.valueOf("OFFHAND").get(),
+				2, slotEnum.valueOf("FEET").get(),
+				3, slotEnum.valueOf("LEGS").get(),
+				4, slotEnum.valueOf("CHEST").get(),
+				5, slotEnum.valueOf("HEAD").get()
+				);
+		/*slots = CollectionUtils.asMap(
 				0, Version.ATLEAST_1_14 ? slotEnum.valueOf("OFFHAND").get() : slotEnum.valueOf("MAINHAND").get(),
 						1, Version.ATLEAST_1_14 ? slotEnum.valueOf("MAINHAND").get() : slotEnum.valueOf("OFFHAND").get(),
 								2, slotEnum.valueOf("FEET").get(),
 								3, slotEnum.valueOf("LEGS").get(),
 								4, slotEnum.valueOf("CHEST").get(),
 								5, slotEnum.valueOf("HEAD").get()
-				);
+				);*/
 		instance = this;
 	}
 
-	// data
+	// ----- data
 	public void sendMetadata(Player player, WrappedDataWatcher data, int entityId) {
 		PacketContainer packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.ENTITY_METADATA);
 		packet.getIntegers().write(0, entityId);
@@ -90,92 +97,38 @@ public final class NpcProtocols {
 		return data;
 	}
 
-	// https://wiki.vg/Entity_metadata#Player
+	// ----- https://wiki.vg/Entity_metadata#Player
 	public Map<Integer, Object> getDefaultHumanEntityMetadata() {
 		if (Version.CURRENT.equals(Version.MC_1_9_R2)) {
 			return CollectionUtils.asMap(
-					0, (byte) 0,
-					1, 0,
-					2, "",
-					3, false,
-					4, false,
-					5, (byte) 0,
-					6, 1f,
-					7, 0,
-					8, false,
-					9, 0,
-					10, 0.0f,
-					11, 0,
-					12, (byte) 127,
-					13, (byte) 0
+					12, (byte) 127
 					);
 		} else if (Version.ATLEAST_1_10 && !Version.ATLEAST_1_14) {
 			return CollectionUtils.asMap(
-					0, (byte) 0,
-					1, 0,
-					2, "",
-					3, false,
-					4, false,
-					5, false,
-					6, (byte) 0,
-					7, 1f,
-					8, 0,
-					9, false,
-					10, 0,
-					11, 0f,
-					12, 0,
-					13, (byte) 127,
-					14, (byte) 0
+					13, (byte) 127
 					);
 		} else if (Version.CURRENT.equals(Version.MC_1_14_R1)) {
 			return CollectionUtils.asMap(
-					0, (byte) 0,
-					1, 300,
-					2, "",
-					3, false,
-					4, false,
-					5, false,
-					6, Pose.STANDING.name(),
-					7, (byte) 0,
-					8, 1f,
-					9, 0,
-					10, false,
-					11, 0,
-					13, 0f,
-					14, 0, // score
-					15, (byte) 127, // displayed skin part
-					16, (byte) 0 // main hand (0 = left)
+					15, (byte) 127  // displayed skin part
 					);
 		} else if (Version.ATLEAST_1_15) {
 			return CollectionUtils.asMap(
-					0, 0,
-					1, 300,
-					2, "",
-					3, false,
-					4, false,
-					5, false,
-					6, Pose.STANDING.name(),
-					7, (byte) 0,
-					8, 1f,
-					9, 0,
-					10, false,
-					11, 0,
-					12, 0,
-					14, 0f,
-					15, 0,
-					16, (byte) 127,
-					17, (byte) 0 // main hand (0 = left)
+					16, (byte) 127  // displayed skin part
 					);
 		}
 		return null;
 	}
 
 	public Object createPlayerInfo(Object gameProfile, GameMode gameMode, int entityId, String name) throws Throwable {
-		ReflectionObject gm = Reflection.invokeNmsMethod("EnumGamemode", "getById", null, gameMode.getValue());
-		return Reflection.newNmsInstance("PacketPlayOutPlayerInfo$PlayerInfoData", null, gameProfile, entityId, gm.get(), createNMSText(name)).get();
+		ReflectionObject gm = Reflection.invokeNmsMethod((Version.REMAPPED ? "world.level." : "") + "EnumGamemode", "getById", null, gameMode.getValue());
+		if (Version.REMAPPED) {
+			return Reflection.newNmsInstance("network.protocol.game.PacketPlayOutPlayerInfo$PlayerInfoData", gameProfile, entityId, gm.get(), createNMSText(name)).get();
+		} else {
+			return Reflection.newNmsInstance("PacketPlayOutPlayerInfo$PlayerInfoData", null, gameProfile, entityId, gm.get(), createNMSText(name)).get();
+		}
 	}
 
-	// misc
+	// ----- misc
 	public void sendInventory(Player player, int entityId, ItemStack... items) throws Throwable {
 		if (items.length != 6) {
 			return;
@@ -185,7 +138,7 @@ public final class NpcProtocols {
 			for (int i = 0; i < items.length; ++i) {
 				list.add(Reflection.newInstance("com.mojang.datafixers.util.Pair", slots.get(i), Reflection.invokeCraftbukkitMethod("inventory.CraftItemStack", "asNMSCopy", null, items[i]).get()).get());
 			}
-			Reflection.sendNmsPacket(player, Reflection.newNmsInstance("PacketPlayOutEntityEquipment", entityId, list).get());
+			Reflection.sendNmsPacket(player, Reflection.newNmsInstance((Version.REMAPPED ? "network.protocol.game." : "") + "PacketPlayOutEntityEquipment", entityId, list).get());
 		} else {
 			for (int i = 0; i < items.length; ++i) {
 				PacketContainer packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.ENTITY_EQUIPMENT);
@@ -209,7 +162,7 @@ public final class NpcProtocols {
 		sendPacket(player, packet);
 	}
 
-	// position
+	// ----- position
 	public final void sendTarget(Player player, int entityId, double yaw, double pitch) {
 		// create look packet
 		byte yawAngle = (byte) (yaw * 256d / 360d);
@@ -300,12 +253,25 @@ public final class NpcProtocols {
 	}
 
 	public void remove(Player player, int entityId) {
-		PacketContainer packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.ENTITY_DESTROY);
-		packet.getIntegerArrays().write(0, new int[] { entityId });
-		sendPacket(player, packet);
+		if (Version.ATLEAST_1_17_1) {
+			try {
+				ReflectionObject packet = Reflection.newNmsInstance("network.protocol.game.PacketPlayOutEntityDestroy", new int[] { entityId });
+				Reflection.sendNmsPacket(player, packet.justGet());
+			} catch (Throwable exception) {
+				exception.printStackTrace();
+			}
+		} else {
+			PacketContainer packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.ENTITY_DESTROY);
+			if (Version.ATLEAST_1_17) {
+				packet.getIntegers().write(0, entityId);
+			} else {
+				packet.getIntegerArrays().write(0, new int[] { entityId });
+			}
+			sendPacket(player, packet);
+		}
 	}
 
-	public WrappedDataWatcher spawn(Player player, int entityId, String name, Location location, String skinData, String skinSignature) throws Throwable {
+	public void spawn(Player player, int entityId, String name, Location location, String skinData, String skinSignature) throws Throwable {
 		Class infoActionEnum = playerInfoActionEnum.getEnumClass();
 		if (Version.ATLEAST_1_15) {
 			// create game profile
@@ -323,6 +289,11 @@ public final class NpcProtocols {
 			spawnPacket.getBytes().write(0, (byte) (location.getYaw() * 256f / 360f));
 			spawnPacket.getBytes().write(1, (byte) (location.getPitch() * 256f / 360f));
 			spawnPacket.getSpecificModifier(UUID.class).write(0, gameProfile.getUUID());
+			// create metadata packet
+			WrappedDataWatcher metadata = createMetadata(getDefaultHumanEntityMetadata());
+			PacketContainer metadataPacket = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.ENTITY_METADATA);
+			metadataPacket.getIntegers().write(0, entityId);
+			metadataPacket.getWatchableCollectionModifier().write(0, metadata.getWatchableObjects());
 			// create info packet
 			PacketContainer infoPacket = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.PLAYER_INFO);
 			infoPacket.getSpecificModifier(infoActionEnum).write(0, playerInfoActionEnum.valueOf("ADD_PLAYER").get());
@@ -330,6 +301,7 @@ public final class NpcProtocols {
 			// send packets
 			sendPacket(player, infoPacket);
 			sendPacket(player, spawnPacket);
+			sendPacket(player, metadataPacket);
 			// more info
 			new BukkitRunnable() {
 				@Override
@@ -349,8 +321,6 @@ public final class NpcProtocols {
 			}.runTaskLater(GCore.inst(), 40L);
 			// update look
 			sendTarget(player, entityId, location.getYaw(), location.getPitch());
-			// success
-			return createMetadata(getDefaultHumanEntityMetadata());
 		}
 		else if (Version.ATLEAST_1_14) {
 			// create profile and metadata
@@ -394,8 +364,6 @@ public final class NpcProtocols {
 			}.runTaskLater(GCore.inst(), 20L);
 			// update look
 			sendTarget(player, entityId, location.getYaw(), location.getPitch());
-			// success
-			return metadata;
 		}
 		else {
 			// create game profile
@@ -443,12 +411,10 @@ public final class NpcProtocols {
 			}.runTaskLater(GCore.inst(), 20L);
 			// update look
 			sendTarget(player, entityId, location.getYaw(), location.getPitch());
-			// success
-			return metadata;
 		}
 	}
 
-	// text
+	// ----- text
 	public Object createNMSText(String string) {
 		if (string == null || string.length() == 0) {
 			return null;
@@ -456,7 +422,7 @@ public final class NpcProtocols {
 		return Compat.createChatComponent(string).get();
 	}
 
-	// send packet
+	// ----- send packet
 	public void sendPacket(Player player, PacketContainer packet) {
 		try {
 			ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet);

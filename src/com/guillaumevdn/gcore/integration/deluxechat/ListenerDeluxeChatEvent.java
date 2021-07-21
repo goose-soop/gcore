@@ -17,6 +17,7 @@ public final class ListenerDeluxeChatEvent {
 				PlayerChatEvent event = PlayerChatEvent.call(og.getPlayer(), og.getChatMessage(), og.getRecipients());
 				og.setChatMessage(event.getMessage());
 				og.setCancelled(event.isCancelled());
+				//System.out.println("DeluxeChatEvent, message '" + og.getChatMessage() + "'");
 				if (og.getRecipients().isEmpty()) {
 					og.setCancelled(true);
 				}

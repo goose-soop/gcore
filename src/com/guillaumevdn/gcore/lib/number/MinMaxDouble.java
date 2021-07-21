@@ -12,7 +12,7 @@ public class MinMaxDouble {
 		this.max = Math.max(a, b);
 	}
 
-	// get
+	// ----- get
 	public double getMin() {
 		return min;
 	}
@@ -21,7 +21,7 @@ public class MinMaxDouble {
 		return max;
 	}
 
-	// static
+	// ----- static
 	public static MinMaxDouble of(double a, double b) {
 		return new MinMaxDouble(a, b);
 	}

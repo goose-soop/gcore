@@ -28,7 +28,7 @@ public class PositionSingle implements Position {
 		this.tolerance = tolerance;
 	}
 
-	// get
+	// ----- get
 	public Location getLocation() {
 		return location;
 	}
@@ -37,7 +37,7 @@ public class PositionSingle implements Position {
 		return tolerance;
 	}
 
-	// methods
+	// ----- methods
 	@Override
 	public boolean match(Location loc) {
 		if (loc == null) {

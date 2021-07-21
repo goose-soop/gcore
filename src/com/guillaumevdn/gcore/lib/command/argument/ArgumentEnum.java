@@ -30,7 +30,7 @@ public class ArgumentEnum<E extends Enum<E>> extends PartialArgument<E> {
 		return enumClass;
 	}
 
-	// do
+	// ----- do
 	@Override
 	protected E exactMatch(CommandCall call, String arg) {
 		return ObjectUtils.safeValueOf(arg, enumClass);

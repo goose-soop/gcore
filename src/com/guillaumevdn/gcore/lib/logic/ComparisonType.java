@@ -53,7 +53,7 @@ public enum ComparisonType {
 			)
 	;
 
-	// base
+	// ----- base
 	private String symbol;
 	private TriFunction<Comparable, Comparable, Comparator, Boolean> comparableComparator;
 	private TriFunction<Double, Double, Double, Boolean> comparatorDouble;
@@ -68,12 +68,12 @@ public enum ComparisonType {
 		this.taker = taker;
 	}
 
-	// get
+	// ----- get
 	public String getSymbol() {
 		return symbol;
 	}
 
-	// do
+	// ----- do
 	public <T extends Comparable<T>> boolean compare(Comparable<T> a, Comparable<T> b) {
 		return compare(a, b, (a1, b1) -> a1.compareTo(b1));
 	}
@@ -98,7 +98,7 @@ public enum ComparisonType {
 		return taker != null;
 	}
 
-	// static
+	// ----- static
 	public static ComparisonType fromSymbolOrNull(String symbol) {
 		for (ComparisonType comparison : ComparisonType.values()) {
 			if (comparison.symbol.equalsIgnoreCase(symbol)) {

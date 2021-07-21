@@ -19,12 +19,12 @@ public class SerializableGsonAdapter<T> extends TypeAdapter<T> {
 		this.serializer = serializer;
 	}
 
-	// get
+	// ----- get
 	public Serializer<T> getSerializer() {
 		return serializer;
 	}
 
-	// json
+	// ----- json
 	@Override
 	public T read(JsonReader reader) throws IOException {
 		if (reader.peek().equals(JsonToken.NULL)) {

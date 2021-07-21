@@ -22,7 +22,7 @@ public final class Need {
 		this.def = def;
 	}
 
-	// get
+	// ----- get
 	public NeedType getType() {
 		return need;
 	}
@@ -53,7 +53,7 @@ public final class Need {
 		return null;
 	}
 
-	// static
+	// ----- static
 	private static final Need REQUIRED = new Need(NeedType.REQUIRED, null);
 	private static final Need OPTIONAL_EMPTY = new Need(NeedType.OPTIONAL, null);
 

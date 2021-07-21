@@ -19,7 +19,7 @@ public abstract class ElementEnumList<E extends Enum<E>> extends ElementAbstract
 		this.values = CollectionUtils.asList(enumClass.getEnumConstants());
 	}
 
-	// get
+	// ----- get
 	@Override
 	public List<E> getValues() {
 		return values;

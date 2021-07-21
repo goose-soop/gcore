@@ -5,7 +5,7 @@ package com.guillaumevdn.gcore.lib.element.struct.basic;
  */
 public enum SizeTolerance {
 
-	// values
+	// ----- values
 	DISALLOW_EMPTY_OR_LIST(false, false),
 	ALLOW_EMPTY(true, false),
 	ALLOW_LIST(false, true),
@@ -18,7 +18,7 @@ public enum SizeTolerance {
 		this.allowList = allowList;
 	}
 
-	// get
+	// ----- get
 	public boolean allowEmpty() {
 		return allowEmpty;
 	}

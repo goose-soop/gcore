@@ -17,7 +17,7 @@ import com.guillaumevdn.gcore.lib.string.StringUtils;
  */
 public final class NumberUtils {
 
-	// integer
+	// ----- integer
 	public static Integer integerOrNull(Object raw) {
 		try {
 			return Integer.valueOf(raw.toString().trim());
@@ -29,6 +29,10 @@ public final class NumberUtils {
 	public static int integerOrElse(Object raw, int def) {
 		Integer integer = integerOrNull(raw);
 		return integer != null ? integer : def;
+	}
+
+	public static Integer orZero(Integer obj) {
+		return obj != null ? obj : 0;
 	}
 
 	public static List<Integer> integersIn(String... raw) {
@@ -63,7 +67,7 @@ public final class NumberUtils {
 		return nb * nb;
 	}
 
-	// long
+	// ----- long
 	public static Long longOrNull(Object raw) {
 		try {
 			return Long.valueOf(raw.toString().trim());
@@ -72,7 +76,7 @@ public final class NumberUtils {
 		}
 	}
 
-	// double
+	// ----- double
 	public static Double doubleOrNull(Object raw) {
 		try {
 			return Double.valueOf(raw.toString().trim());
@@ -91,7 +95,7 @@ public final class NumberUtils {
 		return Double.parseDouble(format.format(value).replace(',', '.') /* happens sometimes for some reason, wrong locale maybe */);
 	}
 
-	// float
+	// ----- float
 	public static Float floatOrNull(Object raw) {
 		try {
 			return Float.valueOf(raw.toString().trim());
@@ -100,7 +104,7 @@ public final class NumberUtils {
 		}
 	}
 
-	// byte
+	// ----- byte
 	public static Byte byteOrNull(Object raw) {
 		try {
 			return Byte.valueOf(raw.toString().trim());
@@ -109,7 +113,7 @@ public final class NumberUtils {
 		}
 	}
 
-	// random
+	// ----- random
 	public static int random(int min, int max) {
 		return min == max ? min /* error thrown otherwise */ : ThreadLocalRandom.current().nextInt(min, max + 1);
 	}
@@ -130,7 +134,7 @@ public final class NumberUtils {
 		return ThreadLocalRandom.current().nextBoolean();
 	}
 
-	// range
+	// ----- range
 	public static boolean isInRange(Integer number, int min, int max) {
 		return number != null && number >= min && number <= max;
 	}
@@ -147,8 +151,8 @@ public final class NumberUtils {
 		return number < min ? min : (number > max ? max : number);
 	}
 
-	// calculation
-	// https://stackoverflow.com/questions/3422673/how-to-evaluate-a-math-expression-given-in-string-form, that guy is a real programmer, Pog
+	// ----- calculation
+	// ----- https://stackoverflow.com/questions/3422673/how-to-evaluate-a-math-expression-given-in-string-form, that guy is a real programmer, Pog
 	public static double calculateExpression(String expression) throws CalculationError {
 		final String str = expression.trim().toLowerCase();
 		return new Object() {

@@ -31,7 +31,7 @@ public final class Movement {
 		this.extraOffset = extraOffset;
 	}
 
-	// get
+	// ----- get
 	public Point getOrigin() {
 		return origin;
 	}
@@ -54,7 +54,7 @@ public final class Movement {
 		return extraOffset;
 	}
 
-	// obj
+	// ----- obj
 	@Override
 	public String toString() {
 		return type + ", " + offset + (extraOffset == null ? "" : ", extra " + extraOffset);

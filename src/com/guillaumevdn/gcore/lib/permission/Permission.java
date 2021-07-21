@@ -13,12 +13,12 @@ public final class Permission {
 		this.name = name;
 	}
 
-	// get
+	// ----- get
 	public String getName() {
 		return name;
 	}
 
-	// methods
+	// ----- methods
 	public boolean has(Object target) {
 		return PlayerUtils.hasPermission(target, name);
 	}

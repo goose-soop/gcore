@@ -22,7 +22,7 @@ public abstract class Argument<T> extends UsageRestriction implements Arg {
 		this.usage = usage;
 	}
 
-	// get
+	// ----- get
 	public final NeedType getNeed() {
 		return need;
 	}
@@ -45,7 +45,7 @@ public abstract class Argument<T> extends UsageRestriction implements Arg {
 		return get(call) != null;
 	}
 
-	// do
+	// ----- do
 	public abstract T consume(CommandCall call);
 	public abstract List<String> tabComplete(CommandCall call);
 

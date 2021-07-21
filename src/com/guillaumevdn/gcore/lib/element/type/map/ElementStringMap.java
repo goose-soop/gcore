@@ -27,7 +27,7 @@ public class ElementStringMap extends MapElement<String, ElementString> implemen
 		super(String.class, "string", parent, id, need, editorDescription);
 	}
 
-	// add
+	// ----- add
 	@Override
 	public ElementString createElement(String elementId) {
 		ElementString elem = new ElementString(this, elementId, Need.optional(), null);
@@ -35,7 +35,7 @@ public class ElementStringMap extends MapElement<String, ElementString> implemen
 		return elem;
 	}
 
-	// parsing
+	// ----- parsing
 	private ParsedCache<Map<String, String>> cache = new ParsedCache<>();
 
 	@Override
@@ -48,7 +48,7 @@ public class ElementStringMap extends MapElement<String, ElementString> implemen
 		cache.clear();
 	}
 
-	// editor
+	// ----- editor
 	@Override
 	public Mat editorIconType() {
 		return CommonMats.ENCHANTING_TABLE;
@@ -61,18 +61,18 @@ public class ElementStringMap extends MapElement<String, ElementString> implemen
 			final String id = raw.toLowerCase().trim();
 			if (!StringUtils.isAlphanumeric(id.replace("_", ""))) {
 				TextEditorGeneric.messageElementCreateInvalidId.replace("{value}", () -> id).send(call.getClicker());
-				call.getGUI().openFor(call.getClicker(), call.getPageIndex());
+				call.reopenGUI();
 			} else if (getElement(id).isPresent()) {
 				TextEditorGeneric.messageElementCreateAlreadyExists.replace("{value}", () -> id).send(call.getClicker());
-				call.getGUI().openFor(call.getClicker(), call.getPageIndex());
+				call.reopenGUI();
 			}
 			// create element
 			else {
 				add(id, createElement(id));
 				// reopen GUI (that refreshes it since it's an editor GUI)
-				call.getGUI().openFor(call.getClicker(), call.getPageIndex());
+				call.reopenGUI();
 			}
-		}, () -> call.getGUI().openFor(call.getClicker(), call.getPageIndex()));
+		}, () -> call.reopenGUI());
 	}
 
 }

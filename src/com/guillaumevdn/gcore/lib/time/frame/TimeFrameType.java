@@ -16,7 +16,7 @@ public abstract class TimeFrameType extends TypableElementType<ElementTimeFrame>
 		super(id, icon);
 	}
 
-	// get current
+	// ----- get current
 	public abstract Pair<ZonedDateTime, ZonedDateTime> getBounds(ElementTimeFrame frame, Replacer replacer, int offset);
 
 }

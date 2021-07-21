@@ -22,7 +22,7 @@ public class PositionTypeClosestMythicMobRelativeSingle extends PositionTypeClos
 		super(id);
 	}
 
-	// elements
+	// ----- elements
 	@Override
 	protected void doFillTypeSpecificElements(ElementPosition position) {
 		super.doFillTypeSpecificElements(position);
@@ -30,7 +30,7 @@ public class PositionTypeClosestMythicMobRelativeSingle extends PositionTypeClos
 		position.addPointTolerance("point_tolerance", Need.optional(PointTolerance.LENIENT), TextEditorGeneric.descriptionPositionTypePointTolerance);
 	}
 
-	// parse
+	// ----- parse
 	@Override
 	public Position doParseMob(ElementPosition position, Location mobLocation, Replacer replacer) throws ParsingError {
 		Location location = position.getElementAs("location", ElementRelativeLocation.class).parseNoCatchOrThrowParsingNull(replacer.cloneReplacer().with(mobLocation));

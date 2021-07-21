@@ -1,8 +1,8 @@
 package com.guillaumevdn.gcore.lib.reflection;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
+
+import com.guillaumevdn.gcore.lib.concurrency.RWHashMap;
 
 /**
  * @author GuillaumeVDN
@@ -15,12 +15,12 @@ public class ReflectionFakeEnum {
 		this.fakeEnumClass = fakeEnumClass;
 	}
 
-	// get
+	// ----- get
 	public Class<?> getFakeEnumClass() {
 		return fakeEnumClass;
 	}
 
-	// methods
+	// ----- methods
 	public ReflectionObject valueOf(String valueName) throws Throwable {
 		for (Field value : fakeEnumClass.getDeclaredFields()) {
 			if (valueName.equalsIgnoreCase(value.getName())) {
@@ -46,8 +46,8 @@ public class ReflectionFakeEnum {
 		return fakeEnumClass.getEnumConstants();
 	}
 
-	// cache
-	private static Map<Integer, ReflectionFakeEnum> cache = new HashMap<>();
+	// ----- valuesCache
+	private static RWHashMap<Integer, ReflectionFakeEnum> cache = new RWHashMap<>();
 
 	public static ReflectionFakeEnum of(Class<?> enumClass) throws Throwable {
 		// hash by class name

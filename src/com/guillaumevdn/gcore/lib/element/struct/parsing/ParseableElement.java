@@ -46,9 +46,9 @@ public interface ParseableElement<T> extends IElement {
 			}
 			return parsed;
 		} catch (Throwable error) {
-			/* - actually don't cache when errors because it might not be noticed then. prefer error spamming so that they actually fix it ; (there's already a logspam prevention in loggers as well)
-			if (cache != null) {
-				cache.set(Optional.empty());
+			/* - actually don't valuesCache when errors because it might not be noticed then. prefer error spamming so that they actually fix it ; (there's already a logspam prevention in loggers as well)
+			if (valuesCache != null) {
+				valuesCache.set(Optional.empty());
 			}*/
 			throw error instanceof ParsingError ? (ParsingError) error : new ParsingError(this, error);
 		}
@@ -56,7 +56,7 @@ public interface ParseableElement<T> extends IElement {
 
 	T doParse(@Nonnull Replacer replacer) throws ParsingError;
 
-	// allow some shotcuts, otherwise it's waaaaaayy too boring
+	// ----- allow some shotcuts, otherwise it's waaaaaayy too boring
 	default T directParseOrNull(@Nonnull Replacer replacer) {
 		return parse(replacer).orNull();
 	}

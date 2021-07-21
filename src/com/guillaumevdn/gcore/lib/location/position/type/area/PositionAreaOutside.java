@@ -24,7 +24,7 @@ public class PositionAreaOutside implements Position {
 		this.b = b;
 	}
 
-	// methods
+	// ----- methods
 	@Override
 	public boolean match(Location loc) {
 		if (loc == null) {

@@ -15,7 +15,7 @@ public final class NBTList extends NBTBase {
 		super(parent, name, depth, tag);
 	}
 
-	// get value
+	// ----- get value
 	public final int size() throws Throwable {
 		return getTag().invokeMethod("size").get();
 	}
@@ -34,7 +34,7 @@ public final class NBTList extends NBTBase {
 	private static final String getValueMethod = Reflection.getForThisVersion(Version.MC_1_7_R4, "g", Version.MC_1_9_R2, "h", Version.MC_1_12_R1, "i", Version.MC_1_13_R2, "get");
 
 	private final Object doGetObject(int index) throws Throwable {
-		return getTag().invokeMethod(getValueMethod, index).getField("data").get();
+		return getTag().invokeMethod(getValueMethod, index).getField(getValueType().getDataFieldName()).get();
 	}
 
 	public final Byte getByte(int index) throws Throwable {
@@ -97,7 +97,7 @@ public final class NBTList extends NBTBase {
 		return null;
 	}
 
-	// set value
+	// ----- set value
 	private static final String removeKeyMethod = Reflection.getForThisVersion(Version.MC_1_7_R4, "a", Version.MC_1_9_R2, "remove");
 
 	public final void remove(int index) throws Throwable {
@@ -113,8 +113,8 @@ public final class NBTList extends NBTBase {
 		getTag().invokeMethod(setIndexMethod, type.equals(NBTType.COMPOUND) || type.equals(NBTType.LIST) ? value : type.newNmsWrapper(value).get());
 	}
 
-	public final void setObject(int index, Object value) throws Throwable {
-		doSet(NBTType.OBJECT, index, value);
+	public final void set(int index, Object value) throws Throwable {
+		doSet(NBTType.ANY, index, value);
 	}
 
 	public final void setByte(int index, byte value) throws Throwable {
@@ -188,8 +188,8 @@ public final class NBTList extends NBTBase {
 		}
 	}
 
-	public final void addObject(Object value) throws Throwable {
-		doAdd(NBTType.OBJECT, value);
+	public final void add(Object value) throws Throwable {
+		doAdd(NBTType.ANY, value);
 	}
 
 	public final void addByte(byte value) throws Throwable {
@@ -252,7 +252,7 @@ public final class NBTList extends NBTBase {
 		}
 	}
 
-	// match
+	// ----- match
 	public boolean match(NBTList reference, boolean exactMatch) throws Throwable {
 		if (exactMatch && size() != reference.size()) return false;
 		else if (!exactMatch && size() < reference.size()) return false;

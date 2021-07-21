@@ -23,7 +23,7 @@ public class ExploringPathPoint {
 		this.point = point;
 	}
 
-	// get
+	// ----- get
 	@Nullable
 	public Movement getMovementToPoint() {
 		return movementToPoint;
@@ -37,12 +37,12 @@ public class ExploringPathPoint {
 		return offsetsToIgnore;
 	}
 
-	// set
+	// ----- set
 	public void ignoreOffset(Offset offset) {
 		offsetsToIgnore.add(offset);
 	}
 
-	// str
+	// ----- str
 	@Override
 	public String toString() {
 		return point.toString();

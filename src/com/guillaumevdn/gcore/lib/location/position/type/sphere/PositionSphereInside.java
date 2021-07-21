@@ -33,7 +33,7 @@ public class PositionSphereInside implements Position {
 		return radius;
 	}
 
-	// methods
+	// ----- methods
 	@Override
 	public boolean match(Location loc) {
 		if (loc == null) {

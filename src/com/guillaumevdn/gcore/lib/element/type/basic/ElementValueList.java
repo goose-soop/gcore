@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.bukkit.inventory.ItemStack;
 
+import com.guillaumevdn.gcore.ConfigGCore;
 import com.guillaumevdn.gcore.TextEditorGeneric;
 import com.guillaumevdn.gcore.WorkerGCore;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
@@ -40,7 +41,7 @@ public abstract class ElementValueList<T> extends BasicElement<List<T>> {
 		this.serializer = serializer;
 	}
 
-	// get
+	// ----- get
 	public final Serializer<T> getSerializer() {
 		return serializer;
 	}
@@ -58,7 +59,7 @@ public abstract class ElementValueList<T> extends BasicElement<List<T>> {
 		return result.isEmpty() ? null : result;
 	}
 
-	// parse
+	// ----- parse
 	@Override
 	protected List<T> doParseEmpty() {
 		return new ArrayList<>();
@@ -66,12 +67,16 @@ public abstract class ElementValueList<T> extends BasicElement<List<T>> {
 
 	@Override
 	protected List<T> doParseString(String raw) throws ParsingError {
-		return CollectionUtils.asList(doParseStringSingle(raw));
+		T single = doParseStringSingle(raw);
+		return single == null ? new ArrayList<>() : CollectionUtils.asList(single);
 	}
 
 	protected T doParseStringSingle(String raw) throws ParsingError {
 		T value = serializer.deserialize(raw);  // if any exception is thrown here, it'll be catched and displayed correctly
 		if (value == null) {
+			if (ConfigGCore.ignoreInvalidElementValues) {
+				return null;  // and here goes my consistency :PepeHands:
+			}
 			throw new ParsingError(this, "invalid value '" + raw + "'");
 		}
 		validate(value);
@@ -82,7 +87,10 @@ public abstract class ElementValueList<T> extends BasicElement<List<T>> {
 	protected List<T> doParseList(List<String> raw) throws ParsingError {
 		List<T> value = new ArrayList<>();
 		for (String r : raw) {
-			value.add(doParseStringSingle(r));  // if any exception is thrown here, it'll be catched and displayed correctly
+			T elem = doParseStringSingle(r);  // if any exception is thrown here, it'll be catched and displayed correctly
+			if (elem != null) {  // if ConfigGCore.ignoreInvalidElementValues
+				value.add(elem);
+			}
 		}
 		return value;
 	}
@@ -90,7 +98,7 @@ public abstract class ElementValueList<T> extends BasicElement<List<T>> {
 	protected void validate(T value) throws ParsingError {
 	}
 
-	// editor
+	// ----- editor
 	@Override
 	public EditorGUI editorGUI(ClickCall fromCall) {
 		return new EditorGUI(this, fromCall) {
@@ -219,8 +227,8 @@ public abstract class ElementValueList<T> extends BasicElement<List<T>> {
 					error.send(call.getClicker());
 				}
 			}
-			call.getGUI().openFor(call.getClicker(), call.getPageIndex());
-		}, () -> call.getGUI().openFor(call.getClicker(), call.getPageIndex()));
+			call.reopenGUI();
+		}, () -> call.reopenGUI());
 	}
 
 	public void onEditorOtherClickEdit(int lineIndex, ClickCall call) {

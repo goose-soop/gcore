@@ -29,14 +29,14 @@ public abstract class PositionTypeCitizensNPCRelative extends PositionType {
 		super(id, CommonMats.PLAYER_HEAD);
 	}
 
-	// elements
+	// ----- elements
 	@Override
 	protected void doFillTypeSpecificElements(ElementPosition position) {
 		position.add(new ElementCitizensNPC(position, "npc", Need.optional(), TextEditorGeneric.descriptionPositionTypeCitizensNPCRelative));
 		position.add(new ElementStringList(position, "npc_names", Need.optional(), TextEditorGeneric.descriptionPositionTypeCitizensNPCRelativeNames));
 	}
 
-	// parse
+	// ----- parse
 	@Override
 	public boolean mustCache(ElementPosition position) {
 		return !position.getElementAs("npc_names").readContains();

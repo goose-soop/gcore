@@ -13,7 +13,7 @@ import com.guillaumevdn.gcore.lib.object.ObjectUtils;
  */
 public final class Statistic {
 
-	// registration
+	// ----- registration
 	private static LowerCaseHashMap<Statistic> registered = new LowerCaseHashMap<>();
 
 	public static Collection<Statistic> values() {
@@ -42,12 +42,12 @@ public final class Statistic {
 		this.id = id;
 	}
 
-	// get
+	// ----- get
 	public String getId() {
 		return id;
 	}
 
-	// object
+	// ----- object
 	@Override
 	public String toString() {
 		return getId();

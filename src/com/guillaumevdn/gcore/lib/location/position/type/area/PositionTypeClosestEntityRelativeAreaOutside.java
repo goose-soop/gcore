@@ -23,7 +23,7 @@ public class PositionTypeClosestEntityRelativeAreaOutside extends PositionType {
 		super(id, CommonMats.ZOMBIE_HEAD);
 	}
 
-	// elements
+	// ----- elements
 	@Override
 	protected void doFillTypeSpecificElements(ElementPosition position) {
 		position.addEntityTypeList("entity_types", Need.optional(), TextEditorGeneric.descriptionPositionTypeClosestEntityTypes);
@@ -33,7 +33,7 @@ public class PositionTypeClosestEntityRelativeAreaOutside extends PositionType {
 		position.addRelativeLocation("bound2", Need.required(), TextEditorGeneric.descriptionPositionTypeRelativeBound2);
 	}
 
-	// parse
+	// ----- parse
 	@Override
 	public boolean mustCache(ElementPosition position) {
 		return false;

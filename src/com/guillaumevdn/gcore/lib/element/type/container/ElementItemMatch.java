@@ -2,8 +2,6 @@ package com.guillaumevdn.gcore.lib.element.type.container;
 
 import java.util.List;
 
-import org.bukkit.inventory.ItemStack;
-
 import com.guillaumevdn.gcore.TextEditorGeneric;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.compatibility.material.CommonMats;
@@ -16,6 +14,7 @@ import com.guillaumevdn.gcore.lib.element.type.basic.ElementInteger;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementItemCheck;
 import com.guillaumevdn.gcore.lib.element.type.list.ItemMatch;
 import com.guillaumevdn.gcore.lib.item.ItemCheck;
+import com.guillaumevdn.gcore.lib.item.ItemReference;
 import com.guillaumevdn.gcore.lib.item.ItemUtils;
 import com.guillaumevdn.gcore.lib.string.Text;
 import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
@@ -25,7 +24,7 @@ import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
  */
 public class ElementItemMatch extends ParseableContainerElement<ItemMatch> {
 
-	private ElementItem item = addItem("item", Need.required(), false, TextEditorGeneric.descriptionItemMatchItem);
+	private ElementItem item = addItem("item", Need.required(), ElementItemMode.MATCH, TextEditorGeneric.descriptionItemMatchItem);
 	private ElementInteger goal = addInteger("goal", Need.optional(1), 1, TextEditorGeneric.descriptionItemMatchGoal);
 	private ElementItemCheck check;
 
@@ -34,7 +33,7 @@ public class ElementItemMatch extends ParseableContainerElement<ItemMatch> {
 		check = !allowCustomCheck ? null : addItemCheck("check", Need.required(), TextEditorGeneric.descriptionItemMatchCheck);
 	}
 
-	// get
+	// ----- get
 	public ElementItem getItem() {
 		return item;
 	}
@@ -47,16 +46,16 @@ public class ElementItemMatch extends ParseableContainerElement<ItemMatch> {
 		return check;
 	}
 
-	// parse
+	// ----- parse
 	@Override
 	public ItemMatch doParse(Replacer replacer) throws ParsingError {
-		ItemStack item = this.item.parseNoCatchOrThrowParsingNull(replacer);
+		ItemReference reference = ItemReference.of(this.item, replacer);
 		int goal = this.goal.parseNoCatch(replacer).orElse(1);
 		ItemCheck check = this.check == null ? ItemCheck.ExactSame : this.check.parseNoCatch(replacer).orElse(ItemCheck.ExactSame);
-		return new ItemMatch(item, goal, check);
+		return new ItemMatch(getId(), reference, goal, check);
 	}
 
-	// editor
+	// ----- editor
 	@Override
 	public Mat editorIconType() {
 		return CommonMats.APPLE;

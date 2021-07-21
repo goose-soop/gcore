@@ -1,11 +1,11 @@
 package com.guillaumevdn.gcore.lib.gui.internal;
 
-import java.util.Map;
 import java.util.function.Consumer;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import com.guillaumevdn.gcore.lib.concurrency.RWHashMap;
 import com.guillaumevdn.gcore.lib.gui.struct.ClickCall;
 import com.guillaumevdn.gcore.lib.gui.struct.ClickCall.ClickType;
 import com.guillaumevdn.gcore.lib.gui.struct.GUI;
@@ -23,22 +23,22 @@ public abstract class Handler {
 		this.gui = gui;
 	}
 
-	// activation
+	// ----- activation
 	public abstract void activate();
 	public abstract void deactivate();
 
-	// get
+	// ----- get
 	public GUI getGUI() {
 		return gui;
 	}
 
 	public abstract int getPageCount();
-	public abstract Map<Player, Integer> getViewers();
+	public abstract RWHashMap<Player, Integer> getViewers();
 	public abstract int getViewerPage(Player player);
 	public abstract int firstEmpty(int pageIndex);
 	public abstract ItemStack getPageItem(int pageIndex, int slot);
 
-	// set
+	// ----- set
 	public void setPageItem(IntegerPair location, ItemStack item) {
 		setPageItem(location.getA(), location.getB(), item);
 	}
@@ -52,32 +52,40 @@ public abstract class Handler {
 	public abstract void clearPage(int pageIndex);
 	public abstract void clear();
 
-	// do
+	// ----- do
 	public abstract void createPage();
 	public abstract void openPage(Player player, int pageIndex);
 	public abstract void close(Player player);
 
-	// event
+	// ----- event
+	protected void beforeSwitchPage() {
+	}
+
 	public final void onClick(Player player, ClickType click, int slot, int pageIndex) throws Throwable {
 		// control item
 		if (slot == gui.getType().getPreviousPageItemSlot()) {
 			if (pageIndex > 0) {
-				gui.openFor(player, pageIndex - 1);
+				beforeSwitchPage();
+				gui.openFor(player, pageIndex - 1, gui.getFromCall(player));
 				return;
 			}
 		} else if (slot == gui.getType().getNextPageItemSlot()) {
 			if (pageIndex + 1 < getPageCount()) {
-				gui.openFor(player, pageIndex + 1);
+				beforeSwitchPage();
+				gui.openFor(player, pageIndex + 1, gui.getFromCall(player));
 				return;
 			}
 		} else if (slot == gui.getBackItemSlot()) {
 			gui.onBack(player);
 			return;
 		}
+
 		// find matching item
-		GUIItem item = gui.getPersistentItem(slot);
-		if (item == null) item = gui.getRegularItem(pageIndex, slot);
-		if (item == null) return;
+		GUIItem item = gui.getItemWithPerformer(pageIndex, slot, click);
+		if (item == null) {
+			return;
+		}
+
 		// click
 		Consumer<ClickCall> performer = item.getClickPerformer(click);
 		if (performer != null) {
@@ -87,6 +95,10 @@ public abstract class Handler {
 				throw new Error("couldn't perform click effects of item " + item.getId() + " in GUI " + getGUI().getId() + " at slot " + slot + " of page " + pageIndex, exception);
 			}
 		}
+	}
+
+	public void onClose(Player player) {
+		gui.onClose(player);
 	}
 
 }

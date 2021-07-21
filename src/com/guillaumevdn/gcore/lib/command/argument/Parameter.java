@@ -24,7 +24,7 @@ public final class Parameter extends UsageRestriction implements Arg {
 		this.tabComplete = Collections.unmodifiableList(Stream.of(aliases).map(param -> "-" + param).collect(Collectors.toList()));
 	}
 
-	// get
+	// ----- get
 	public List<String> getAliases() {
 		return aliases;
 	}

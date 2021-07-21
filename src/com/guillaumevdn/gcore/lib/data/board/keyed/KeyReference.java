@@ -13,12 +13,12 @@ public class KeyReference<K> {
 		this.key = key;
 	}
 
-	// get
+	// ----- get
 	public final K getKey() {
 		return key;
 	}
 
-	// object
+	// ----- object
 	@Override
 	public boolean equals(Object obj) {
 		return ObjectUtils.equals(obj, getClass(), other -> key.equals(other.getKey()));
@@ -34,7 +34,7 @@ public class KeyReference<K> {
 		return key.toString();
 	}
 
-	// static
+	// ----- static
 	public static <K> KeyReference<K> of(K key) {
 		return new KeyReference<>(key);
 	}

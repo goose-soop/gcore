@@ -17,7 +17,7 @@ public abstract class DataAdapter<T> {
 		this.version = version;
 	}
 
-	// get
+	// ----- get
 	public final Class<T> getType() {
 		return type;
 	}
@@ -34,7 +34,7 @@ public abstract class DataAdapter<T> {
 		return adapterYML;
 	}
 
-	// set
+	// ----- set
 	public abstract void write(T object, DataIO writer) throws Throwable;
 	public abstract T read(int version, DataIO reader) throws Throwable;
 

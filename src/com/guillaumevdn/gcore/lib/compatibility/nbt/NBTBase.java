@@ -19,7 +19,7 @@ public abstract class NBTBase {
 		this.tag = tag;
 	}
 
-	// get
+	// ----- get
 	public final NBTBase getParent() {
 		return parent;
 	}
@@ -44,7 +44,7 @@ public abstract class NBTBase {
 		return tag;
 	}
 
-	// set
+	// ----- set
 	public final void setTag(ReflectionObject tag) {
 		this.tag = tag;
 	}

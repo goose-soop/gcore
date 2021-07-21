@@ -26,7 +26,7 @@ public final class GcorePlugins extends Subcommand {
 		int inactive = 0;
 		List<String> plugins = new ArrayList<>();
 		for (GPlugin plugin : PluginUtils.getGPlugins()) {
-			if (plugin.isEnabled()) {
+			if (plugin.isEnabled() && plugin.isActivated()) {
 				plugins.add("§a" + plugin.getName());
 			} else {
 				++inactive;

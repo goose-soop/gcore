@@ -25,7 +25,7 @@ public class ElementLocation extends ElementValue<Location> {
 		super(Location.class, parent, id, need, editorDescription);
 	}
 
-	// editor
+	// ----- editor
 	@Override
 	public Mat editorIconType() {
 		return CommonMats.RAIL;
@@ -53,20 +53,20 @@ public class ElementLocation extends ElementValue<Location> {
 					} catch (Throwable ignored) {}
 					setValue(loc == null ? null : CollectionUtils.asList(value));
 				}
-				call.getGUI().setRegularItem(buildEditorItem(call.getSlot()));
-				call.getGUI().openFor(call.getClicker(), call.getPageIndex());
+				call.getGUI().setRegularItem(buildEditorItem(call.getPageIndex(), call.getSlot()));
+				call.reopenGUI();
 				getSuperElement().onEditorChange(this);
-			}, () -> call.getGUI().openFor(call.getClicker(), call.getPageIndex()));
+			}, () -> call.reopenGUI());
 		}
 		// shift + right-click : import
 		else if (call.getType().equals(ClickType.SHIFT_RIGHT)) {
 			call.getClicker().closeInventory();
 			WorkerGCore.inst().awaitLocation(call.getClicker(), TextEditorGeneric.messageElementBasicImportLocation, value -> {
 				setValue(CollectionUtils.asList(getSerializer().serialize(value)));
-				call.getGUI().setRegularItem(buildEditorItem(call.getSlot()));
-				call.getGUI().openFor(call.getClicker(), call.getPageIndex());
+				call.getGUI().setRegularItem(buildEditorItem(call.getPageIndex(), call.getSlot()));
+				call.reopenGUI();
 				getSuperElement().onEditorChange(this);
-			}, () -> call.getGUI().openFor(call.getClicker(), call.getPageIndex()));
+			}, () -> call.reopenGUI());
 		}
 		// other
 		else {

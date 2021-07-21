@@ -15,20 +15,28 @@ public final class Node<V extends Element> implements IElement {
 	private final ElementsContainer<? extends V> ref;
 	private final NodeType type;
 	private final String key;
+	private final String globalId;
 	private final V value;
 
-	public Node(ElementsContainer<? extends V> ref, String key) {
-		this(ref, key, null);
+	public Node(ElementsContainer<? extends V> ref, String key, String globalId) {
+		this.ref = ref;
+		this.type = NodeType.GLOBAL;
+		this.key = key;
+		this.globalId = globalId;
+		this.value = null;
 	}
 
 	public Node(ElementsContainer<? extends V> ref, String key, V element) {
+		if (element == null) {
+			throw new IllegalArgumentException("local elements can't be null");
+		}
 		this.ref = ref;
-		this.type = element == null ? NodeType.GLOBAL : NodeType.LOCAL;
+		this.type = NodeType.LOCAL;
 		this.key = key;
+		this.globalId = null;
 		this.value = element;
 	}
 
-	// get
 	public NodeType getType() {
 		return type;
 	}
@@ -36,12 +44,16 @@ public final class Node<V extends Element> implements IElement {
 	public String getKey() {
 		return key;
 	}
-
-	public V getValue() {
-		return value != null ? value : ref.getElement(key).orNull();
+	
+	public String getGlobalId() {
+		return globalId;
 	}
 
-	// abstract element
+	public V getValue() {
+		return value != null ? value : ref.getElement(globalId).orNull();
+	}
+
+	// ----- abstract element
 	@Override
 	public String getId() {
 		return getKey();
@@ -67,7 +79,7 @@ public final class Node<V extends Element> implements IElement {
 		return getValue().getConfigurationPath();
 	}
 
-	// object
+	// ----- object
 	@Override
 	public int hashCode() {
 		return Objects.hash(key);

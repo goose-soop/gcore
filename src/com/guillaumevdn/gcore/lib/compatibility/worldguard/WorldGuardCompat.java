@@ -1,5 +1,6 @@
 package com.guillaumevdn.gcore.lib.compatibility.worldguard;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
@@ -10,6 +11,7 @@ import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.compatibility.Version;
 import com.guillaumevdn.gcore.lib.location.LocationUtils;
 import com.guillaumevdn.gcore.lib.location.Point;
+import com.guillaumevdn.gcore.lib.plugin.PluginUtils;
 import com.guillaumevdn.gcore.lib.reflection.Reflection;
 import com.guillaumevdn.gcore.lib.reflection.ReflectionObject;
 import com.guillaumevdn.gcore.lib.reflection.procedure.ReflectionProcedureBiFunction;
@@ -21,7 +23,7 @@ import com.guillaumevdn.gcore.lib.tuple.Pair;
  */
 public final class WorldGuardCompat {
 
-	// get region
+	// ----- get region
 	private static final ReflectionProcedureBiFunction<World, String, Object> GET_REGION = new ReflectionProcedureBiFunction<World, String, Object>()
 			.setIf(Version.ATLEAST_1_13, (world, regionId) -> {
 				Object bukkitWorld = Reflection.newInstance("com.sk89q.worldedit.bukkit.BukkitWorld", world).justGet();
@@ -30,10 +32,13 @@ public final class WorldGuardCompat {
 			.orElse((world, regionId) -> ReflectionObject.ofPlugin("WorldGuard").invokeMethod("getRegionContainer").invokeMethod("get", world).invokeMethod("getRegion", regionId).orNull());
 
 	public static Object getRegion(World world, String regionId) {
+		if (!PluginUtils.isPluginEnabled("WorldGuard")) {
+			return null;
+		}
 		return GET_REGION.process(world, regionId);
 	}
 
-	// get regions
+	// ----- get regions
 	private static final ReflectionProcedureFunction<World, Collection<String>> GET_REGIONS = new ReflectionProcedureFunction<World, Collection<String>>()
 			.setIf(Version.ATLEAST_1_13, (world) -> {
 				Object bukkitWorld = Reflection.newInstance("com.sk89q.worldedit.bukkit.BukkitWorld", world).justGet();
@@ -46,10 +51,13 @@ public final class WorldGuardCompat {
 			});
 
 	public static Collection<String> getRegions(World world) {
+		if (!PluginUtils.isPluginEnabled("WorldGuard")) {
+			return new ArrayList<>();
+		}
 		return GET_REGIONS.process(world);
 	}
 
-	// get region bounds
+	// ----- get region bounds
 	private static final ReflectionProcedureBiFunction<World, String, Pair<Point, Point>> GET_REGION_BOUNDS = new ReflectionProcedureBiFunction<World, String, Pair<Point, Point>>()
 			.orElse((world, regionId) -> {
 				ReflectionObject region = ReflectionObject.ofOrNull(getRegion(world, regionId));
@@ -62,11 +70,17 @@ public final class WorldGuardCompat {
 			});
 
 	public static Pair<Point, Point> getRegionBounds(World world, String regionId) {
+		if (!PluginUtils.isPluginEnabled("WorldGuard")) {
+			return null;
+		}
 		return GET_REGION_BOUNDS.process(world, regionId);
 	}
 
-	// is in region
+	// ----- is in region
 	public static boolean isInRegion(World world, String regionId, Location location) {
+		if (!PluginUtils.isPluginEnabled("WorldGuard")) {
+			return false;
+		}
 		if (!world.equals(location.getWorld())) {
 			return false;
 		}

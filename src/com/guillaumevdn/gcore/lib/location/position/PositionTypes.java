@@ -38,7 +38,7 @@ public final class PositionTypes extends TypableElementTypes<PositionType> {
 		super(PositionType.class);
 	}
 
-	// types
+	// ----- types
 	public final PositionTypeNone 									NONE 										= register(new PositionTypeNone("NONE"));
 
 	public final PositionTypeWorlds		 							WORLDS 										= register(new PositionTypeWorlds("WORLDS"));
@@ -71,7 +71,7 @@ public final class PositionTypes extends TypableElementTypes<PositionType> {
 	public final PositionTypeClosestEntityRelativeCylinderInside 	CLOSEST_ENTITY_RELATIVE_CYLINDER_INSIDE 	= register(new PositionTypeClosestEntityRelativeCylinderInside("CLOSEST_ENTITY_RELATIVE_CYLINDER_INSIDE"));
 	public final PositionTypeClosestEntityRelativeCylinderOutside 	CLOSEST_ENTITY_RELATIVE_CYLINDER_OUTSIDE 	= register(new PositionTypeClosestEntityRelativeCylinderOutside("CLOSEST_ENTITY_RELATIVE_CYLINDER_OUTSIDE"));
 
-	// values
+	// ----- values
 	public static PositionTypes inst() {
 		return GCore.inst().getPositionTypes();
 	}

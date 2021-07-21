@@ -31,7 +31,7 @@ public final class Point {
 		this.z = z;
 	}
 
-	// get
+	// ----- get
 	public int getX() {
 		return x;
 	}
@@ -44,12 +44,12 @@ public final class Point {
 		return z;
 	}
 
-	// distance
+	// ----- distance
 	public double distance(Point other) {
 		return Math.sqrt(NumberUtils.square(x - other.x) + NumberUtils.square(y - other.y) + NumberUtils.square(z - other.z));
 	}
 
-	// manipulation
+	// ----- manipulation
 	public Location toLocation(World world) {
 		return new Location(world, x + 0.5d, y, z + 0.5d);
 	}
@@ -71,7 +71,7 @@ public final class Point {
 		return new Point(x + offx, y + offy, z + offz);
 	}
 
-	// object
+	// ----- object
 	@Override
 	public int hashCode() {
 		return Objects.hash(x, y, z);

@@ -20,17 +20,17 @@ public class ElementItemMatchList extends ListElement<ElementItemMatch> implemen
 	private boolean allowCustomCheck;
 
 	public ElementItemMatchList(Element parent, String id, Need need, boolean allowCustomCheck, Text editorDescription) {
-		super("item", parent, id, need, editorDescription);
+		super("item", true, parent, id, need, editorDescription);
 		this.allowCustomCheck = allowCustomCheck;
 	}
 
-	// element
+	// ----- element
 	@Override
 	protected ElementItemMatch createElement(String elementId) {
 		return new ElementItemMatch(this, elementId, Need.optional(), allowCustomCheck, null);
 	}
 
-	// parsing
+	// ----- parsing
 	private ParsedCache<List<ItemMatch>> cache = new ParsedCache<>();
 
 	@Override
@@ -43,7 +43,7 @@ public class ElementItemMatchList extends ListElement<ElementItemMatch> implemen
 		cache.clear();
 	}
 
-	// editor
+	// ----- editor
 	@Override
 	public Mat editorIconType() {
 		return CommonMats.NETHER_STAR;

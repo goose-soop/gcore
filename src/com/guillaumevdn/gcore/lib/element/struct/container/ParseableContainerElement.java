@@ -15,7 +15,7 @@ public abstract class ParseableContainerElement<T> extends ContainerElement impl
 		super(typeName, parent, id, need, editorDescription);
 	}
 
-	// parsing
+	// ----- parsing
 	private ParsedCache<T> cache = new ParsedCache<>();
 
 	@Override

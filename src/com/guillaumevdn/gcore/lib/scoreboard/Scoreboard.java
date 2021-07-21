@@ -17,7 +17,6 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Team;
 
 import com.guillaumevdn.gcore.lib.GPlugin;
-import com.guillaumevdn.gcore.lib.bukkit.BukkitThread;
 import com.guillaumevdn.gcore.lib.string.StringUtils;
 
 /**
@@ -46,7 +45,7 @@ public final class Scoreboard {
 		this.updateTicks = updateTicks;
 	}
 
-	// get
+	// ----- get
 	public String getId() {
 		return id;
 	}
@@ -59,12 +58,12 @@ public final class Scoreboard {
 		return player;
 	}
 
-	// start/stop
+	// ----- start/stop
 	public void start() {
 		if (active) return;
 		active = true;
 
-		BukkitThread.SYNC.operate(() -> {
+		getPlugin().operateSync(() -> {
 			// register
 			bukkit = Bukkit.getScoreboardManager().getNewScoreboard();
 			bukkit.registerNewObjective("scb", "obj").setDisplaySlot(DisplaySlot.SIDEBAR);
@@ -83,7 +82,7 @@ public final class Scoreboard {
 		// stop updating
 		plugin.stopTask("scoreboard_" + id);
 
-		BukkitThread.SYNC.operate(() -> {
+		getPlugin().operateSync(() -> {
 			// unset player
 			if (player.isOnline()) {
 				player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
@@ -98,7 +97,7 @@ public final class Scoreboard {
 		});
 	}
 
-	// update
+	// ----- update
 	public void update() {
 		if (!active || !player.isOnline()) {
 			return;
@@ -145,7 +144,10 @@ public final class Scoreboard {
 				team = teams.get(teamId);
 				if (team == null) {
 					String teamName = "" + teamId;
-					team = bukkit.registerNewTeam(teamName);
+					team = bukkit.getTeam(teamName);  // sometimes it apparently already exists (#1664 ; synchronization issue ?)
+					if (team == null) {
+						team = bukkit.registerNewTeam(teamName);
+					}
 					team.setPrefix(entry.getPrefix());
 					team.setSuffix(entry.getSuffix());
 					teams.put(teamId, team);
@@ -180,6 +182,14 @@ public final class Scoreboard {
 	}
 
 	private static ScoreboardEntry buildEntry(String text, Map<String, Integer> offsets) {
+
+		/**
+		 * DO NOT EVER TOUCH THIS CODE AGAIN
+		 * IT WORKS
+		 * I SWEAR TO GOD
+		 * DO NOT TOUCH IT
+		 */
+
 		// no need for teams
 		if (text.length() <= 16) {
 			int offset = offsets.compute(text, (__, o) -> o == null ? 0 : o + 1);
@@ -221,7 +231,7 @@ public final class Scoreboard {
 		// get name
 		name = colors + text.substring(start, end + 1) + StringUtils.repeatString("§r", offset);
 
-		// -- suffix
+		// ----- suffix
 		colorEnd = adaptColorCodeEnd(text, end);
 		colors = StringUtils.getLastColors(text.substring(0, colorEnd + 1));
 

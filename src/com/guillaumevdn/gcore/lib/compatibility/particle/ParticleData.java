@@ -22,7 +22,7 @@ public final class ParticleData extends SimpleVariantData<ParticleExtra> {
 		this.musicNote = extra != null && extra.contains(ParticleExtra.MUSIC_NOTE);
 	}
 
-	// get
+	// ----- get
 	public boolean isColorable() {
 		return colorable;
 	}
@@ -31,13 +31,13 @@ public final class ParticleData extends SimpleVariantData<ParticleExtra> {
 		return musicNote;
 	}
 
-	// object
+	// ----- object
 	@Override
 	public ParticleData clone() {
 		return new ParticleData(getVersion(), getVersionComparison(), getDataName(), getExtra().isEmpty() ? null : CollectionUtils.asList(getExtra()));
 	}
 
-	// extra
+	// ----- extra
 	public static enum ParticleExtra {
 		COLORABLE, MUSIC_NOTE;
 	}

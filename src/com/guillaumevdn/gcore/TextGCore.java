@@ -8,18 +8,18 @@ import com.guillaumevdn.gcore.lib.string.TextEnumElement;
  */
 public enum TextGCore implements TextEnumElement {
 
-	// plugin
+	// ----- plugin
 	messagePluginUnknown,
 	messagePluginReloaded,
 	messagePluginManipulateError,
+	messagePluginInternalState,
 	messagePluginList,
 	messageGcoreExportFile,
 	messageGcoreExportCouldnt,
 
-	// command
+	// ----- command
 	commandDescriptionGcore,
 	commandDescriptionGcorePlugins,
-	commandDescriptionGcoreReload,
 	commandDescriptionGcoreExport,
 	commandDescriptionGcoreItemRead,
 
@@ -33,7 +33,7 @@ public enum TextGCore implements TextEnumElement {
 	TextGCore() {
 	}
 
-	// get
+	// ----- get
 	@Override
 	public String getId() {
 		return name();

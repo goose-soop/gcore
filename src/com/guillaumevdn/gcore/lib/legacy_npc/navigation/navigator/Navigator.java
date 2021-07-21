@@ -9,6 +9,7 @@ import org.bukkit.scheduler.BukkitTask;
 
 import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.lib.legacy_npc.NPC;
+import com.guillaumevdn.gcore.lib.legacy_npc.NPCManager;
 import com.guillaumevdn.gcore.lib.legacy_npc.navigation.pathfinding.Pathfinding;
 import com.guillaumevdn.gcore.lib.legacy_npc.navigation.pathfinding.PathfindingResult;
 import com.guillaumevdn.gcore.lib.legacy_npc.navigation.pathfinding.Point;
@@ -50,7 +51,7 @@ public abstract class Navigator {
 		this.runnable = new NavigatorTask(this);
 	}
 
-	// get
+	// ----- get
 	public abstract List<NPC> getNpcs();
 
 	public World getWorld() {
@@ -69,7 +70,7 @@ public abstract class Navigator {
 		return task != null;
 	}
 
-	// control
+	// ----- control
 	void restart() {
 		if (task != null) {
 			task.cancel();
@@ -99,6 +100,7 @@ public abstract class Navigator {
 			// start
 			ticks = 0L;
 			task = runnable.runTaskTimerAsynchronously(GCore.inst(), 0L, 1L);
+			NPCManager.inst().addNavigator(this);
 		}
 	}
 
@@ -110,6 +112,7 @@ public abstract class Navigator {
 				finder.end(PathfindingResult.CANCEL);
 			}
 			onDone.accept(result);
+			NPCManager.inst().removeNavigator(this);
 		}
 	}
 

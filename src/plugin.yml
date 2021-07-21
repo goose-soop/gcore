@@ -4,7 +4,7 @@ description: Core library for GuillaumeVDN's plugins
 author: GuillaumeVDN
 website: www.guillaumevdn.com
 # techy
-version: 8.12.0
+version: 8.24.0
 api-version: 1.13
 main: com.guillaumevdn.gcore.GCore
 softdepend:

@@ -7,7 +7,7 @@ import com.guillaumevdn.gcore.lib.function.ThrowableBiFunction;
  */
 public class ReflectionProcedureBiFunction<A, B, R> extends ReflectionProcedure<ThrowableBiFunction<A, B, R>, ReflectionProcedureBiFunction<A, B, R>> {
 
-	// methods
+	// ----- methods
 	public R process(A a, B b) {
 		return process(a, b, null);
 	}

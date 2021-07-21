@@ -24,6 +24,7 @@ import com.guillaumevdn.gcore.lib.object.NeedType;
 import com.guillaumevdn.gcore.lib.object.ObjectUtils;
 import com.guillaumevdn.gcore.lib.string.StringUtils;
 import com.guillaumevdn.gcore.lib.string.Text;
+import com.guillaumevdn.gcore.lib.tuple.IntegerPair;
 
 /**
  * @author GuillaumeVDN
@@ -37,6 +38,8 @@ public abstract class Element implements IElement, Comparable<Element> {
 	private final NeedType need;
 	private final Text editorDescription;
 
+	private String forcedConfigurationPath = null;  // used in YMLConfiguration, to load elements quickly with no parent
+
 	public Element(String typeName, Element parent, String id, NeedType need, Text editorDescription) {
 		this.typeName = typeName;
 		this.id = id.toLowerCase();
@@ -45,7 +48,7 @@ public abstract class Element implements IElement, Comparable<Element> {
 		setParent(parent);
 	}
 
-	// get
+	// ----- get
 	public String getTypeName() {
 		return typeName;
 	}
@@ -71,11 +74,23 @@ public abstract class Element implements IElement, Comparable<Element> {
 		return need;
 	}
 
+	public final boolean isRequiredInContext() {
+		Element parent = this.parent;
+		if (parent == null || parent.readContains()) {
+			return getNeed().equals(NeedType.REQUIRED);
+		}
+		return false;
+	}
+
 	public Text getEditorDescription() {
 		return editorDescription;
 	}
 
 	public String getConfigurationPath() {
+		if (forcedConfigurationPath != null) {
+			return forcedConfigurationPath;
+		}
+
 		// this method is overriden for super elements, so parent can't be null here
 		String parentPath = parent.getConfigurationPath();
 		return parentPath == null || parentPath.isEmpty() ? id : parentPath + "." + id;
@@ -85,7 +100,7 @@ public abstract class Element implements IElement, Comparable<Element> {
 	public abstract boolean hasParseableLocations();
 	public abstract boolean isCurrentlyDefault();
 
-	// set
+	// ----- set
 	public final void setParent(Element parent) {
 		this.parent = parent;
 		// find super element
@@ -100,7 +115,11 @@ public abstract class Element implements IElement, Comparable<Element> {
 		}
 	}
 
-	// object
+	public final void setForcedConfigurationPath(String forcedConfigurationPath) {
+		this.forcedConfigurationPath = forcedConfigurationPath;
+	}
+
+	// ----- object
 	@Override
 	public final String toString() {
 		return id;
@@ -123,7 +142,7 @@ public abstract class Element implements IElement, Comparable<Element> {
 		return other != null && other.getId().equals(id);
 	}
 
-	// loading and saving
+	// ----- loading and saving
 	private boolean readContains = false;
 
 	public final boolean readContains() {
@@ -151,15 +170,15 @@ public abstract class Element implements IElement, Comparable<Element> {
 					ParseableElement parseable = ObjectUtils.castOrNull(this, ParseableElement.class);
 					Object def = parseable == null ? null : parseable.parseGeneric().orNull();
 					if (def == null) {
-						getSuperElement().addLoadError("missing " + getTypeName() + " at path " + path);
+						superElement.addLoadError("missing " + getTypeName() + " at path " + path);
 					}
 				}
 			}
 		} catch (Throwable exception) {
 			ConfigError configError = ObjectUtils.findCauseOrNull(exception, ConfigError.class);
-			if (configError != null) {// a config error that wasn't catch already ? :think:
+			if (configError != null) {  // a config error that wasn't catched already ? :think:
 				superElement.addLoadError(configError.getMessage());
-			} else {// regular error, re-throw it
+			} else {  // regular error, re-throw it
 				throw exception;
 			}
 		}
@@ -174,7 +193,7 @@ public abstract class Element implements IElement, Comparable<Element> {
 	protected abstract void doRead() throws Throwable;
 	protected abstract void doWrite() throws Throwable;
 
-	// editor
+	// ----- editor
 	public abstract Mat editorIconType();
 
 	public List<String> editorCurrentValue() {
@@ -260,8 +279,8 @@ public abstract class Element implements IElement, Comparable<Element> {
 		return biggest;
 	}
 
-	public final GUIItem buildEditorItem(int slot) {
-		return new GUIItem("element_" + getId(), slot, ItemUtils.addAllFlags(editorIcon()), call -> onEditorClick(call));
+	public final GUIItem buildEditorItem(int page, int slot) {
+		return new GUIItem("element_" + getId(), CollectionUtils.asList(IntegerPair.of(page, slot)), ItemUtils.addAllFlags(editorIcon()), call -> onEditorClick(call));
 	}
 
 	public EditorGUI editorGUI(ClickCall fromCall) {
@@ -273,7 +292,7 @@ public abstract class Element implements IElement, Comparable<Element> {
 		if (call.getType().equals(ClickType.LEFT)) {
 			EditorGUI editor = editorGUI(call);
 			if (editor != null) {
-				editor.openFor(call.getClicker());
+				editor.openFor(call.getClicker(), call);
 			}
 		}
 	}

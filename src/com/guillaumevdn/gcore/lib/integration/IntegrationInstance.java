@@ -21,7 +21,7 @@ public abstract class IntegrationInstance {
 		this.integration = integration;
 	}
 
-	// get
+	// ----- get
 	public Integration getIntegration() {
 		return integration;
 	}
@@ -34,7 +34,7 @@ public abstract class IntegrationInstance {
 		return events;
 	}
 
-	// set
+	// ----- set
 	public <T> void registerSerializer(Class<T> typeClass, Function<T, String> serializer, Function<String, T> deserializer) {
 		serializers.add(new IntegrationSerializer<>(typeClass, serializer, deserializer));
 	}
@@ -47,8 +47,12 @@ public abstract class IntegrationInstance {
 		events.add(new IntegrationEvent<>(this, eventClass, priority, ignoreCancelled, performer));
 	}
 
-	// activation
-	public abstract boolean activate();
-	public abstract void deactivate();
+	// ----- activation
+	public boolean activate() {
+		return true;
+	}
+
+	public void deactivate() {
+	}
 
 }

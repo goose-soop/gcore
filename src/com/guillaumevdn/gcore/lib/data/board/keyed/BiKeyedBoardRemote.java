@@ -1,8 +1,5 @@
 package com.guillaumevdn.gcore.lib.data.board.keyed;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -10,6 +7,7 @@ import java.util.stream.Collectors;
 import com.guillaumevdn.gcore.lib.GPlugin;
 import com.guillaumevdn.gcore.lib.bukkit.BukkitThread;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
+import com.guillaumevdn.gcore.lib.concurrency.RWHashMap;
 import com.guillaumevdn.gcore.lib.data.BoardType;
 
 /**
@@ -22,22 +20,17 @@ public abstract class BiKeyedBoardRemote<K, K2, V> extends BiKeyedBoard<K, K2, V
 	}
 
 	// ----------------------------------------------------------------------------------------------------
-	// get
+	// ----- get
 	// ----------------------------------------------------------------------------------------------------
 
 	public final V getCachedValue(K key, K2 key2) {
-		Map<K2, V> values = cache.get(key);
+		RWHashMap<K2, V> values = cache.get(key);
 		return values == null ? null : values.get(key2);
 	}
 
-	public final Map<K2, V> getCachedValues(K key) {
-		Map<K2, V> values = cache.get(key);
-		return values == null ? null : Collections.unmodifiableMap(values);
-	}
-
-	public void fetchValues(K key, Consumer<Map<K2, V>> ifFound, boolean createDef, boolean forceFetch, boolean mustCache) {
+	public void fetchValues(K key, Consumer<RWHashMap<K2, V>> ifFound, boolean createDef, boolean forceFetch, boolean mustCache) {
 		// cached
-		Map<K2, V> cachedValue = forceFetch ? cache.remove(key) : cache.get(key);
+		RWHashMap<K2, V> cachedValue = forceFetch ? cache.remove(key) : cache.get(key);
 		if (cachedValue != null && !forceFetch) {
 			if (ifFound != null) {
 				ifFound.accept(cachedValue);
@@ -48,7 +41,7 @@ public abstract class BiKeyedBoardRemote<K, K2, V> extends BiKeyedBoard<K, K2, V
 			KeyReference<K> ref = new KeyReference<>(key);
 			pullKeys(BukkitThread.ASYNC, CollectionUtils.asSet(ref), () -> {
 				// build final consumer
-				Consumer<Map<K2, V>> consumer = values -> {
+				Consumer<RWHashMap<K2, V>> consumer = values -> {
 					try {
 						if (ifFound != null) {
 							ifFound.accept(values);
@@ -57,14 +50,14 @@ public abstract class BiKeyedBoardRemote<K, K2, V> extends BiKeyedBoard<K, K2, V
 						throw exception;
 					} finally {
 						if (!mustCache) {
-							disposeCacheElements(BukkitThread.ASYNC, values.keySet().stream().map(k2 -> BiKeyReference.of(key, k2)).collect(Collectors.toSet()), null); // will be saved if needed
+							disposeCacheElements(BukkitThread.ASYNC, values.streamResultKeys(s -> s.map(k2 -> BiKeyReference.of(key, k2)).collect(Collectors.toSet())), null); // will be saved if needed
 						}
 					}
 				};
 				// absent
-				Map<K2, V> result = cache.get(key);
+				RWHashMap<K2, V> result = cache.get(key);
 				if (result == null && createDef) {
-					result = new HashMap<>();
+					result = new RWHashMap<>();
 					if (mustCache) {
 						cache.put(key, result);
 					}
@@ -108,7 +101,7 @@ public abstract class BiKeyedBoardRemote<K, K2, V> extends BiKeyedBoard<K, K2, V
 				if (result == null && def != null) {
 					result = def.get();
 					if (mustCache) {
-						cache.computeIfAbsent(key, __ -> new HashMap<>()).put(key2, result);
+						cache.computeIfAbsent(key, __ -> new RWHashMap<>()).put(key2, result);
 					}
 				}
 				// process
@@ -120,13 +113,13 @@ public abstract class BiKeyedBoardRemote<K, K2, V> extends BiKeyedBoard<K, K2, V
 	}
 
 	// ----------------------------------------------------------------------------------------------------
-	// set
+	// ----- set
 	// ----------------------------------------------------------------------------------------------------
 
 	public final void putValue(K key, K2 key2, V value, Runnable onPush, boolean mustCache) {
 		BiKeyReference<K, K2> ref = new BiKeyReference<>(key, key2);
-		// cache new value
-		cache.computeIfAbsent(key, k -> new HashMap<>()).put(key2, value);
+		// valuesCache new value
+		cache.computeIfAbsent(key, k -> new RWHashMap<>()).put(key2, value);
 		// push element
 		pushElements(BukkitThread.ASYNC, CollectionUtils.asSet(ref), () -> {
 			if (onPush != null) {

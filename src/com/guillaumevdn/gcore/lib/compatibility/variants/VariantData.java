@@ -28,7 +28,7 @@ public abstract class VariantData<E extends Enum<E>> implements Cloneable {
 		this.extra = Collections.unmodifiableList(extra == null ? new ArrayList<>() : extra);
 	}
 
-	// get
+	// ----- get
 	public final Version getVersion() {
 		return version;
 	}
@@ -45,7 +45,7 @@ public abstract class VariantData<E extends Enum<E>> implements Cloneable {
 		return extra;
 	}
 
-	// object
+	// ----- object
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) return true;

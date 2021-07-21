@@ -24,7 +24,7 @@ public class PositionTypeCitizensNPCRelativeWorld extends PositionTypeCitizensNP
 		super(id);
 	}
 
-	// parse
+	// ----- parse
 	@Override
 	protected Position doParse(ElementPosition position, NPC npc, Replacer replacer) {
 		World world = npc.getEntity().getWorld();

@@ -9,23 +9,18 @@ import java.io.LineNumberReader;
 import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.ConcurrentModificationException;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.bukkit.Bukkit;
 
 import com.guillaumevdn.gcore.ConfigGCore;
 import com.guillaumevdn.gcore.lib.GPlugin;
-import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
+import com.guillaumevdn.gcore.lib.concurrency.RWArrayList;
+import com.guillaumevdn.gcore.lib.concurrency.RWHashMap;
 import com.guillaumevdn.gcore.lib.exception.ConfigError;
 import com.guillaumevdn.gcore.lib.file.FileUtils;
 import com.guillaumevdn.gcore.lib.reflection.Reflection;
-import com.guillaumevdn.gcore.lib.string.StringUtils;
 
 /**
  * @author GuillaumeVDN
@@ -34,27 +29,28 @@ public class Logger {
 
 	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd'/'MM HH':'mm':'ss");
 	protected static final DateTimeFormatter LOCALDATETIME_FORMAT = DateTimeFormatter.ofPattern("uuuu'-'MM'-'dd'-'HH'-'mm'-'ss");
+	public static final int REGULAR_LINE_LIMIT = 100000;
 
 	private GPlugin plugin;
 	private String id;
 	private boolean logConsole, logFile, antiSpam;
 	private int fileLineLimit;
-	private List<String> linesToSave = Collections.synchronizedList(new ArrayList<>());
+	private RWArrayList<String> linesToSave = new RWArrayList<>();
 
-	public Logger(GPlugin plugin, String id, boolean logConsole, boolean logFile, int fileLineLimit) {
-		this(plugin, id, logConsole, logFile, fileLineLimit, true);
+	public Logger(GPlugin plugin, String id, boolean logConsole, boolean logFile) {
+		this(plugin, id, logConsole, logFile, true);
 	}
 
-	public Logger(GPlugin plugin, String id, boolean logConsole, boolean logFile, int fileLineLimit, boolean antiSpam) {
+	public Logger(GPlugin plugin, String id, boolean logConsole, boolean logFile, boolean antiSpam) {
 		this.plugin = plugin;
 		this.id = id;
 		this.logConsole = logConsole;
 		this.logFile = logFile;
 		this.antiSpam = antiSpam;
-		this.fileLineLimit = fileLineLimit;
+		this.fileLineLimit = REGULAR_LINE_LIMIT;
 	}
 
-	// get
+	// ----- get
 	public final GPlugin getPlugin() {
 		return plugin;
 	}
@@ -68,7 +64,7 @@ public class Logger {
 	}
 
 	public File getArchiveFile(ZonedDateTime date) {
-		return new File(plugin.getDataFolder() + "/logs_archives/" + id + "-" + date.format(LOCALDATETIME_FORMAT) + ".log");
+		return new File(plugin.getDataFolder() + "/logs/archived/" + id + "-" + date.format(LOCALDATETIME_FORMAT) + ".log");
 	}
 
 	public boolean isLogConsole() {
@@ -79,7 +75,7 @@ public class Logger {
 		return logFile;
 	}
 
-	// methods
+	// ----- methods
 	public void info(String line) {
 		info(line, false);
 	}
@@ -113,20 +109,20 @@ public class Logger {
 	}
 
 	public void debug(String line) {
-		log(LogLevel.DEBUG, line, true, true, null);
+		log(LogLevel.DEBUG, line, true, false, null);
 	}
 
-	private transient Map<String, Long> lastLogged = new ConcurrentHashMap<>();  // #925, concurrent mod exception
+	private transient RWHashMap<String, Long> lastLogged = new RWHashMap<>();  // #925, concurrent mod exception
 
 	public void log(LogLevel level, String line, boolean printIdInConsole, Throwable trace) {
-		log(level, line, printIdInConsole, true, trace);
+		log(level, line, printIdInConsole, false, trace);
 	}
 
 	public void log(LogLevel level, String line, boolean printIdInConsole, boolean ignoreAntiSpam, Throwable trace) {
 		try {
 			// already logged recently
 			if (antiSpam && !ignoreAntiSpam) {
-				if (System.currentTimeMillis() - lastLogged.computeIfAbsent(line, __ -> 0L) < 5000L) {
+				if (System.currentTimeMillis() - lastLogged.computeIfAbsent(line, __ -> 0L) < 1000L) {
 					return;
 				}
 				lastLogged.put(line, System.currentTimeMillis());
@@ -152,7 +148,7 @@ public class Logger {
 		}
 	}
 
-	// saving
+	// ----- saving
 	public final void startSaving() {
 		stopSaving();
 		if (logFile) {
@@ -172,37 +168,29 @@ public class Logger {
 				int newLineCount = 0;
 				if (file.exists()) {
 					try (LineNumberReader reader = new LineNumberReader(new FileReader(file))) {
-						while (reader.readLine() != null);
-						newLineCount = reader.getLineNumber();
+						while (reader.readLine() != null) {
+							++newLineCount;
+						}
 					}
 				}
 				newLineCount += linesToSave.size();
 				// write lines
 				FileUtils.ensureExistence(file);
 				BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
-				synchronized (linesToSave) {
-					CollectionUtils.clearForEachThrowable(linesToSave, line -> writer.write(line + "\n"));
-				}
+				linesToSave.forEach(line -> {
+					try {
+						writer.write(line + "\n");
+					} catch (IOException ignored) {
+						ignored.printStackTrace();
+					}
+				});
+				linesToSave.clear();
 				writer.close();
 				// maybe file has too many lines, so archive it
 				if (newLineCount > fileLineLimit) {
 					File archiveFile = getArchiveFile(ConfigGCore.timeNow());
 					FileUtils.delete(archiveFile);
 					file.renameTo(archiveFile);
-				}
-			} catch (Throwable exception) {
-				throw new IOException("couldn't save lines for logger " + getId() + ", plugin " + plugin.getName(), exception);
-			}
-			try {
-				// logger file is too big, move it
-				if (FileUtils.countLines(file) > 5000) {
-					File dest = null;
-					int count = 0;
-					do {
-						String countStr = String.valueOf(++count);
-						dest = new File(file.getParentFile(), file.getName() + "_archive_" + StringUtils.repeatString("0", 4 - countStr.length()) + countStr);
-					} while (dest.exists());
-					file.renameTo(dest);
 				}
 			} catch (Throwable exception) {
 				throw new IOException("couldn't save lines for logger " + getId() + ", plugin " + plugin.getName(), exception);

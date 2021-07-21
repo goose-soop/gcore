@@ -17,7 +17,7 @@ public class TimeInYear extends TimeIn {
 		this.dayOfMonth = dayOfMonth;
 	}
 
-	// get
+	// ----- get
 	public Month getMonth() {
 		return month;
 	}

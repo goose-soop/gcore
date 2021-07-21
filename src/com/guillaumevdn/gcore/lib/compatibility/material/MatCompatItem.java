@@ -13,15 +13,15 @@ import com.guillaumevdn.gcore.lib.reflection.procedure.ReflectionProcedureFuncti
  */
 public final class MatCompatItem {
 
-	// create stack
+	// ----- create stack
 	private static final ReflectionProcedureFunction<Mat, ItemStack> CREATE_STACK = new ReflectionProcedureFunction<Mat, ItemStack>()
 			.setIf(Version.ATLEAST_1_13, mat -> {
 				return new ItemStack(mat.getData().getDataInstance());
 			})
 			.orElse(mat -> {
 				ItemStack item = Reflection.newInstance("org.bukkit.inventory.ItemStack", Reflection
-						.params(mat.getData().getLegacyData() == 0, mat.getData().getDataInstance(), 1)
-						.orElse(mat.getData().getDataInstance(), 1, (short) 0, (byte) mat.getData().getLegacyData())
+						.params(!mat.getData().hasLegacyData(), mat.getData().getDataInstance(), 1)
+						.orElse(mat.getData().getDataInstance(), 1, (short) 0, (byte) mat.getData().getLegacyDataOrZero())
 						.get())
 						.get(ItemStack.class);
 				return item;
@@ -31,13 +31,13 @@ public final class MatCompatItem {
 		return CREATE_STACK.process(mat);
 	}
 
-	// match
+	// ----- match
 	private static final ReflectionProcedureBiFunction<ItemStack, Mat, Boolean> MATCH = new ReflectionProcedureBiFunction<ItemStack, Mat, Boolean>()
 			.setIf(Version.ATLEAST_1_13, (item, mat) -> item.getType().equals(mat.getData().getDataInstance()))
-			.orElse((item, mat) -> item.getType().equals(mat.getData().getDataInstance()) && (Version.ATLEAST_1_13 || Compat.getLegacyData(item) == mat.getData().getLegacyData()));
+			.orElse((item, mat) -> item.getType().equals(mat.getData().getDataInstance()) && (Version.ATLEAST_1_13 || mat.getData().acceptsLegacyData(Compat.getLegacyData(item))));
 
 	public static boolean match(ItemStack item, Mat mat) {
-		return mat.getData().getDataName().equalsIgnoreCase("NOCHECK") || MATCH.process(item, mat);
+		return mat.isNoCheck() || MATCH.process(item, mat);
 	}
 
 }

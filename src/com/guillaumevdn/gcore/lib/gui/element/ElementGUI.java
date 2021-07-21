@@ -11,15 +11,16 @@ import com.guillaumevdn.gcore.lib.GPlugin;
 import com.guillaumevdn.gcore.lib.compatibility.material.CommonMats;
 import com.guillaumevdn.gcore.lib.compatibility.material.Mat;
 import com.guillaumevdn.gcore.lib.configuration.YMLConfiguration;
+import com.guillaumevdn.gcore.lib.element.struct.Element;
 import com.guillaumevdn.gcore.lib.element.struct.Need;
 import com.guillaumevdn.gcore.lib.element.struct.SuperElement;
 import com.guillaumevdn.gcore.lib.element.struct.container.ContainerElement;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementString;
 import com.guillaumevdn.gcore.lib.gui.element.item.ElementGUIItem;
-import com.guillaumevdn.gcore.lib.gui.struct.ClickCall;
 import com.guillaumevdn.gcore.lib.gui.struct.ElementGUIType;
 import com.guillaumevdn.gcore.lib.gui.struct.GUIType;
 import com.guillaumevdn.gcore.lib.object.Optional;
+import com.guillaumevdn.gcore.lib.string.Text;
 import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
 
 /**
@@ -32,12 +33,50 @@ public class ElementGUI extends ContainerElement implements SuperElement {
 	private ElementGUIItemList defaultContents = null;
 
 	public ElementGUI(File file, String id, boolean defContents) {
-		super("GUI", null, id, Need.optional(), null);
+		this(file, id, defContents, null);
+	}
+
+	public ElementGUI(File file, String id, boolean defContents, Text editorDescription) {
+		this(null, file, id, defContents, editorDescription);
+	}
+
+	protected ElementGUI(Element parent, File file, String id, boolean defContents, Text editorDescription) {
+		super("GUI", parent, id, Need.optional(), editorDescription);
 		this.file = file;
 		if (defContents) defaultContents = add(new ElementGUIItemList(this, "contents", Need.optional(), TextEditorGeneric.descriptionGuiContents));
 	}
 
-	// super element
+	public ElementString getName() {
+		return name;
+	}
+
+	public ElementGUIType getSize() {
+		return type;
+	}
+
+	// ----- default implementation
+
+	public List<ElementGUIItem> getContents() {
+		return defaultContents.values();
+	}
+
+	public Optional<ElementGUIItem> getContent(String id) {
+		return defaultContents.getElement(id);
+	}
+
+	public ActiveElementGUI build(Replacer replacer) {
+		return new ActiveElementGUI(this, replacer);
+	}
+
+	// ----- editor
+
+	@Override
+	public Mat editorIconType() {
+		return CommonMats.CHEST;
+	}
+
+	// ----- super element
+
 	private File file;
 	private List<String> loadErrors = new ArrayList<>();
 	protected YMLConfiguration config = null;
@@ -49,34 +88,5 @@ public class ElementGUI extends ContainerElement implements SuperElement {
 	@Override public String getConfigurationPath() { return ""; }
 	@Override public void addLoadError(String error) { loadErrors.add(error); }
 	@Override public void reloadConfiguration() { this.config = new YMLConfiguration(getPlugin(), file); }
-
-	// default implementation
-	public List<ElementGUIItem> getContents() {
-		return defaultContents.values();
-	}
-
-	public Optional<ElementGUIItem> getContent(String id) {
-		return defaultContents.getElement(id);
-	}
-
-	// get
-	public ElementString getName() {
-		return name;
-	}
-
-	public ElementGUIType getSize() {
-		return type;
-	}
-
-	// build
-	public ActiveElementGUI build(Replacer replacer, ClickCall fromCall) {
-		return new ActiveElementGUI(this, replacer, fromCall);
-	}
-
-	// editor
-	@Override
-	public Mat editorIconType() {
-		return CommonMats.CHEST;
-	}
 
 }

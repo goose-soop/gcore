@@ -21,7 +21,7 @@ public class PositionTypePlayerRelativeAreaInside extends PositionType {
 		super(id, CommonMats.PLAYER_HEAD);
 	}
 
-	// elements
+	// ----- elements
 	@Override
 	public boolean mustCache(ElementPosition position) {
 		return false;
@@ -33,7 +33,7 @@ public class PositionTypePlayerRelativeAreaInside extends PositionType {
 		position.addRelativeLocation("bound2", Need.required(), TextEditorGeneric.descriptionPositionTypeRelativeBound2);
 	}
 
-	// parse
+	// ----- parse
 	@Override
 	public Position doParse(ElementPosition position, Replacer replacer) throws ParsingError {
 		Location a = position.getElementAs("bound1", ElementRelativeLocation.class).parseNoCatchOrThrowParsingNull(replacer);

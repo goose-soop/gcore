@@ -20,12 +20,12 @@ public class ArgumentFixed extends Argument<String> {
 		this.aliases = CollectionUtils.asUnmodifiableLowercaseList(aliases);
 	}
 
-	// get
+	// ----- get
 	public List<String> getAliases() {
 		return aliases;
 	}
 
-	// do
+	// ----- do
 	@Override
 	public String consume(CommandCall call) {
 		for (int i = 0; i < call.getArguments().size(); ++i) {

@@ -17,7 +17,7 @@ public class ElementUUIDList extends ElementValueList<UUID> {
 		super(UUID.class, parent, id, need, editorDescription);
 	}
 
-	// editor
+	// ----- editor
 	@Override
 	public Mat editorIconType() {
 		return CommonMats.COMMAND_BLOCK;

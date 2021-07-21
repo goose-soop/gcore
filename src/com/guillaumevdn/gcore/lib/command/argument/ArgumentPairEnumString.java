@@ -26,7 +26,7 @@ public class ArgumentPairEnumString<E extends Enum<E>> extends Argument<Pair<E, 
 		return enumClass;
 	}
 
-	// do
+	// ----- do
 	@Override
 	public Pair<E, String> consume(CommandCall call) {
 		if (call.getArguments().size() < 2) {
@@ -49,7 +49,7 @@ public class ArgumentPairEnumString<E extends Enum<E>> extends Argument<Pair<E, 
 	public List<String> tabComplete(CommandCall call) {
 		List<String> result = new ArrayList<>();
 		for (E e : enumClass.getEnumConstants()) {
-			result.add(e.name().toLowerCase() + " value");
+			result.add(e.name().toLowerCase() + " 1");
 		}
 		return result;
 	}

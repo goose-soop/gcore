@@ -21,12 +21,12 @@ public class ElementTimeInWeek extends ElementTimeIn<TimeInWeek> {
 		super("time in week", parent, id, need, editorDescription);
 	}
 
-	// get
+	// ----- get
 	public ElementDayOfWeek getDay() {
 		return day;
 	}
 
-	// parse
+	// ----- parse
 	@Override
 	public TimeInWeek doParse(Replacer replacer) throws ParsingError {
 		DayOfWeek day = this.day.parseNoCatchOrThrowParsingNull(replacer);

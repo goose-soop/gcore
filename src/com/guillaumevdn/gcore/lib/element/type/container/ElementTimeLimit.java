@@ -23,7 +23,7 @@ public class ElementTimeLimit extends ContainerElement {
 		super("time limit", parent, id, need, editorDescription);
 	}
 
-	// get
+	// ----- get
 	public ElementDuration getDuration() {
 		return duration;
 	}
@@ -32,7 +32,7 @@ public class ElementTimeLimit extends ContainerElement {
 		return reminder;
 	}
 
-	// editor
+	// ----- editor
 	@Override
 	public Mat editorIconType() {
 		return CommonMats.REPEATER;

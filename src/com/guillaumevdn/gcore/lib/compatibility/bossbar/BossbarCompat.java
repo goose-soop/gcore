@@ -20,7 +20,7 @@ import com.guillaumevdn.gcore.lib.reflection.procedure.ReflectionProcedureConsum
  */
 public final class BossbarCompat {
 
-	// get or create modern instance
+	// ----- get or create modern instance
 	private static ReflectionObject getModernInstance(Bossbar bossbar, Player player) throws Throwable {
 		ReflectionObject instance = bossbar.getInstance(null);
 		if (instance == null) {
@@ -59,7 +59,7 @@ public final class BossbarCompat {
 		}
 	}
 
-	// add player
+	// ----- add player
 	private static final ReflectionProcedureBiConsumer<Bossbar, Player> ADD_PLAYER = new ReflectionProcedureBiConsumer<Bossbar, Player>()
 			.set((bossbar, player) -> {
 				FakeDragon instance = new FakeDragon(bossbar, player);
@@ -74,7 +74,7 @@ public final class BossbarCompat {
 		ADD_PLAYER.process(bossbar, player);
 	}
 
-	// remove player
+	// ----- remove player
 	private static final ReflectionProcedureBiConsumer<Bossbar, Player> REMOVE_PLAYER = new ReflectionProcedureBiConsumer<Bossbar, Player>()
 			.set((bossbar, player) -> {
 				ReflectionObject instance = bossbar.getInstances().remove(player);
@@ -92,7 +92,7 @@ public final class BossbarCompat {
 		REMOVE_PLAYER.process(bossbar, player);
 	}
 
-	// set title
+	// ----- set title
 	private static final ReflectionProcedureConsumer<Bossbar> SET_TITLE = new ReflectionProcedureConsumer<Bossbar>()
 			.set((bossbar) -> {
 				refreshExistingLegacyInstance(bossbar);
@@ -107,7 +107,7 @@ public final class BossbarCompat {
 		SET_TITLE.process(bossbar);
 	}
 
-	// set progress
+	// ----- set progress
 	private static final ReflectionProcedureConsumer<Bossbar> SET_PROGRESS = new ReflectionProcedureConsumer<Bossbar>()
 			.set((bossbar) -> {
 				refreshExistingLegacyInstance(bossbar);
@@ -122,7 +122,7 @@ public final class BossbarCompat {
 		SET_PROGRESS.process(bossbar);
 	}
 
-	// set color
+	// ----- set color
 	private static final ReflectionProcedureConsumer<Bossbar> SET_COLOR = new ReflectionProcedureConsumer<Bossbar>()
 			.setIf(Version.ATLEAST_1_9, (bossbar) -> {
 				forExistingModernInstance(bossbar, instance -> {
@@ -135,7 +135,7 @@ public final class BossbarCompat {
 		SET_COLOR.process(bossbar);
 	}
 
-	// set style
+	// ----- set style
 	private static final ReflectionProcedureConsumer<Bossbar> SET_STYLE = new ReflectionProcedureConsumer<Bossbar>()
 			.setIf(Version.ATLEAST_1_9, (bossbar) -> {
 				forExistingModernInstance(bossbar, instance -> {
@@ -148,7 +148,7 @@ public final class BossbarCompat {
 		SET_STYLE.process(bossbar);
 	}
 
-	// set flags
+	// ----- set flags
 	private static final ReflectionProcedureConsumer<Bossbar> SET_FLAGS = new ReflectionProcedureConsumer<Bossbar>()
 			.setIf(Version.ATLEAST_1_9, (bossbar) -> {
 				forExistingModernInstance(bossbar, instance -> {
@@ -163,7 +163,7 @@ public final class BossbarCompat {
 		SET_FLAGS.process(bossbar);
 	}
 
-	// send temporary
+	// ----- send temporary
 	public static Bossbar sendTemp(GPlugin plugin, String title, BossbarColor color, BossbarStyle style, Collection<BossbarFlag> flags, Collection<Player> players, long millis, boolean noAutoProgress) {
 		int ticks = (int) (millis / 50L);
 		return ticks <= 0 ? null : sendTemp(plugin, title, color, style, flags, players, ticks, noAutoProgress);

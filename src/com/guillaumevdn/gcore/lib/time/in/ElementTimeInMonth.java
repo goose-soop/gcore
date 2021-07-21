@@ -19,12 +19,12 @@ public class ElementTimeInMonth extends ElementTimeIn<TimeInMonth> {
 		super("time in month", parent, id, need, editorDescription);
 	}
 
-	// get
+	// ----- get
 	public ElementInteger getDayOfMonth() {
 		return dayOfMonth;
 	}
 
-	// parse
+	// ----- parse
 	@Override
 	public TimeInMonth doParse(Replacer replacer) throws ParsingError {
 		Integer dayOfMonth = this.dayOfMonth.parseNoCatchOrThrowParsingNull(replacer);

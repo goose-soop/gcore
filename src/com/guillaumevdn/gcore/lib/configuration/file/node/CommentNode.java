@@ -17,21 +17,26 @@ public class CommentNode extends Node {
 		this.lines = lines;
 	}
 
-	// get
+	// ----- get
 	public List<String> getLines() {
 		return lines;
 	}
 
-	// write
+	// ----- write
 	@Override
-	public void write(Appendable writer) throws Throwable {
+	public void write(Appendable writer, WriteType type) throws Throwable {
 		String prefix = getPrefix();
 		for (String line : lines) {
 			writer.append(prefix + "#" + line + "\n");
 		}
 	}
 
-	// clone
+	@Override
+	public void writeInCompact(Appendable writer, boolean compactParent) throws Throwable {
+		throw new UnsupportedOperationException("can't write a compact comment");
+	}
+
+	// ----- clone
 	@Override
 	public CommentNode clone(SectionNode parent) {
 		return new CommentNode(parent, CollectionUtils.asList(lines));

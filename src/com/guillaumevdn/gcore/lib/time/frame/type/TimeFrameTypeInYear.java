@@ -1,7 +1,7 @@
 package com.guillaumevdn.gcore.lib.time.frame.type;
 
-import java.time.ZonedDateTime;
 import java.time.Month;
+import java.time.ZonedDateTime;
 
 import com.guillaumevdn.gcore.TextEditorGeneric;
 import com.guillaumevdn.gcore.lib.element.struct.Need;
@@ -17,7 +17,7 @@ public class TimeFrameTypeInYear extends TimeFrameTypeIn<TimeInYear> {
 		super(id, new TimeInYear(Month.JANUARY, 1, 0, 0), new TimeInYear(Month.DECEMBER, 31, 23, 59));
 	}
 
-	// elements
+	// ----- elements
 	@Override
 	protected void doFillTypeSpecificElements(ElementTimeFrame frame) {
 		super.doFillTypeSpecificElements(frame);
@@ -26,8 +26,8 @@ public class TimeFrameTypeInYear extends TimeFrameTypeIn<TimeInYear> {
 	}
 
 	@Override
-	protected ZonedDateTime minusOnePeriod(ZonedDateTime time) {
-		return time.minusYears(1);
+	protected ZonedDateTime deltaPeriod(ZonedDateTime time, int delta) {
+		return time.plusYears(delta);
 	}
 
 }

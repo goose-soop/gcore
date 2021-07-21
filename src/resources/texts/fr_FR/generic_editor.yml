@@ -280,6 +280,9 @@ descriptionGuiItemDynamicBorderLinearIconOn: |
 descriptionGuiItemDynamicBorderLinearIconOff: |
   &7L'icône pour les items inactifs.
 
+descriptionGuiItemDynamicBorderLinearRefreshTicks: |
+  &7La vitesse de rafraichissement (en ticks)
+
 # -------------------- Position --------------------
 
 descriptionPositionType: |
@@ -547,6 +550,9 @@ descriptionTimeFrameLimitedStart: |
 
 descriptionTimeFrameLimitedEnd: |
   &7Temps de fin
+
+descriptionTimeFrameRepeatPeriodDuration: |
+  &7La durée de la période
 
 # -------------------- Messages --------------------
 

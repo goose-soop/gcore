@@ -6,11 +6,13 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.function.BiFunction;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
 
+import com.guillaumevdn.gcore.lib.GPlugin;
 import com.guillaumevdn.gcore.lib.GPluginConfig;
 import com.guillaumevdn.gcore.lib.bukkit.BukkitThread;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
@@ -28,6 +30,7 @@ import com.guillaumevdn.gcore.lib.economy.Currency;
 import com.guillaumevdn.gcore.lib.exception.ConfigError;
 import com.guillaumevdn.gcore.lib.file.FileUtils;
 import com.guillaumevdn.gcore.lib.function.ThrowableSupplier;
+import com.guillaumevdn.gcore.lib.gui.ConfirmGUIElement;
 import com.guillaumevdn.gcore.lib.gui.element.ElementGUI;
 import com.guillaumevdn.gcore.lib.gui.element.item.type.GUIItemTypes;
 import com.guillaumevdn.gcore.lib.gui.struct.GUIType;
@@ -46,31 +49,43 @@ public class ConfigGCore extends GPluginConfig {
 
 	public static YMLConfiguration baseConfig;
 
-	// commands aliases
+	// ----- commands aliases
+	public static List<String> genericCommandsAliasesReload;
+	public static List<String> genericCommandsAliasesPluginState;
+	public static List<String> genericCommandsAliasesMigrate;
+
 	public static List<String> commandsAliasesPlugins;
-	public static List<String> commandsAliasesReload;
 	public static List<String> commandsAliasesItemRead;
 	public static List<String> commandsAliasesExport;
 
-	// variants
+	// ----- variants
 	public static Mats mats = null;
 	public static Sounds sounds;
 	public static Particles particles;
 
-	// types
+	// ----- types
 	public static LowerCaseHashMap<ParticleScript> particleScripts;
 
-	// misc
+	// ----- misc
 	public static String langId;
 	public static String unknownPlaceholderResult;
+
 	public static int numberFormattingDecimals;
 	public static String numberFormattingSeparateThousands;
 	public static boolean numberFormattingBigNumbers;
-	public static ZoneId customTimeZone;
-	public static boolean allowProtocolGUIs;
-	public static boolean dontLogMissingEditorTexts;
-	public static boolean logspamItemNbt;
+
 	public static BukkitThread customEventsThread;
+	public static ZoneId customTimeZone;
+
+	public static boolean allowProtocolGUIs;
+	public static int delayProtocolGUIClicksTicks;
+	public static boolean dontLogMissingEditorTexts;
+	public static boolean dontLogLoadedElementsNames;
+	public static boolean ignoreInvalidElementValues;
+	public static boolean logspamItemNbt;
+	public static boolean dontCacheOfflinePlayersOnLoad;
+
+	public static boolean mySQLPre8019;
 
 	public static ZoneId timeZone() {
 		return customTimeZone != null ? customTimeZone : ZoneId.systemDefault();
@@ -106,7 +121,7 @@ public class ConfigGCore extends GPluginConfig {
 		return DateTimeFormatter.ofPattern(TextGeneric.dateTimeFormat.parseLine()).format(timeZoneAware);
 	}
 
-	// gui
+	// ----- gui
 	public static int guiItemRefreshTicksPlaceholders = 30 * 20;
 	public static int dynamicBorderRefreshTicks = 5;
 
@@ -114,17 +129,22 @@ public class ConfigGCore extends GPluginConfig {
 	public static ItemStack previousPageItem;
 	public static ItemStack nextPageItem;
 
-	public static ElementGUI guiConfirm;
+	public static ConfirmGUIElement guiConfirm;
 
-	// load
+	// ----- load
 	@Override
 	protected YMLConfiguration doLoad() throws Throwable {
 		baseConfig = GCore.inst().loadConfigurationFile("config.yml");
+
 		// commands aliases
+		genericCommandsAliasesReload = CollectionUtils.asLowercaseList(baseConfig.readStringList("generic_commands_aliases.reload", CollectionUtils.asList("reload", "rl")));
+		genericCommandsAliasesPluginState = CollectionUtils.asLowercaseList(baseConfig.readStringList("generic_commands_aliases.pluginstate", CollectionUtils.asList("pluginstate", "plstate")));
+		genericCommandsAliasesMigrate = CollectionUtils.asLowercaseList(baseConfig.readStringList("generic_commands_aliases.migrate", CollectionUtils.asList("migrate")));
 		commandsAliasesPlugins = CollectionUtils.asLowercaseList(baseConfig.readMandatoryStringList("commands_aliases.plugins"));
-		commandsAliasesReload = CollectionUtils.asLowercaseList(baseConfig.readMandatoryStringList("commands_aliases.reload"));
+		commandsAliasesPlugins = CollectionUtils.asLowercaseList(baseConfig.readMandatoryStringList("commands_aliases.plugins"));
 		commandsAliasesItemRead = CollectionUtils.asLowercaseList(baseConfig.readStringList("commands_aliases.itemread", CollectionUtils.asList("itemread", "ir")));
 		commandsAliasesExport = CollectionUtils.asLowercaseList(baseConfig.readMandatoryStringList("commands_aliases.export"));
+
 		// materials
 		try {
 			GCore.inst().getMainLogger().info("Loading materials...");
@@ -145,6 +165,7 @@ public class ConfigGCore extends GPluginConfig {
 			if (causeConfig != null) throw new ConfigError(causeConfig.getMessage() + " (when loading common materials)");
 			else throw new Error("Couldn't load common materials", exception);
 		}
+
 		// sounds
 		try {
 			GCore.inst().getMainLogger().info("Loading sounds...");
@@ -157,6 +178,7 @@ public class ConfigGCore extends GPluginConfig {
 			if (causeConfig != null) throw causeConfig;
 			throw new Error("Couldn't load sounds", exception);
 		}
+
 		// particles
 		try {
 			GCore.inst().getMainLogger().info("Loading particles...");
@@ -169,13 +191,16 @@ public class ConfigGCore extends GPluginConfig {
 			if (causeConfig != null) throw causeConfig;
 			throw new Error("Couldn't load particles", exception);
 		}
+
 		// types
 		GCore.inst().timeFrameTypes = new TimeFrameTypes();
 		GCore.inst().positionTypes = new PositionTypes();
 		GCore.inst().guiItemTypes = new GUIItemTypes();
+
 		particleScripts = new LowerCaseHashMap<>();
 		loadParticleScripts(GCore.inst().getDataFile("particle_scripts/"));
 		Currency.values().forEach(Currency::enable);
+
 		// misc
 		langId = baseConfig.readMandatoryString("lang");
 		unknownPlaceholderResult = baseConfig.readMandatoryString("unknown_placeholder_result");
@@ -197,9 +222,15 @@ public class ConfigGCore extends GPluginConfig {
 			customTimeZone = ZoneId.of(zoneId);
 		}
 		allowProtocolGUIs = baseConfig.readBoolean("allow_protocol_guis", true);
+		delayProtocolGUIClicksTicks = baseConfig.readInteger("delay_protocol_gui_clicks_ticks", -1);
 		dontLogMissingEditorTexts = baseConfig.readBoolean("dont_log_missing_editor_texts", true);
+		dontLogLoadedElementsNames = baseConfig.readBoolean("dont_log_loaded_elements_names", false);
+		ignoreInvalidElementValues = baseConfig.readBoolean("ignore_invalid_element_values", false);
 		logspamItemNbt = baseConfig.readBoolean("logspam_item_nbt", false);
 		customEventsThread = baseConfig.readEnum("custom_events_thread", BukkitThread.SYNC, BukkitThread.class);
+		dontCacheOfflinePlayersOnLoad = baseConfig.readBoolean("dont_cache_offline_players_on_load", false);
+		mySQLPre8019 = baseConfig.readBoolean("mysql.pre8019", true);
+
 		// data
 		if (baseConfig.contains("mysql")) {
 			String host = baseConfig.readMandatoryString("mysql.host");
@@ -210,6 +241,7 @@ public class ConfigGCore extends GPluginConfig {
 			String url = "jdbc:mysql://" + host + "/" + name + "?allowMultiQueries=true" + customArgs;
 			GCore.inst().getMySQLConnector().setMysql(new MySQL(url, usr, pwd));
 		}
+
 		// gui
 		guiItemRefreshTicksPlaceholders = baseConfig.readMandatoryInteger("gui_items_refresh_ticks_placeholder");
 		dynamicBorderRefreshTicks = baseConfig.readInteger("dynamic_border_refresh_ticks", 5);
@@ -227,12 +259,14 @@ public class ConfigGCore extends GPluginConfig {
 				if (nextPage >= -1 && nextPage < type.getSize()) type.setNextPageItemSlot(nextPage);
 			}
 		}
-		guiConfirm = loadGUI("guis/SYSTEM_confirm.yml", "confirm", "cancel");
+		guiConfirm = loadGUI(GCore.inst(), "guis/SYSTEM_confirm.yml", (file, id) -> new ConfirmGUIElement(file, id));
+
 		// add missing default options to config
 		if (!baseConfig.contains("allow_protocol_guis")) {
 			baseConfig.write("allow_protocol_guis", true);
 			baseConfig.save();
 		}
+
 		// done, load loggers from base config
 		return baseConfig;
 	}
@@ -255,17 +289,14 @@ public class ConfigGCore extends GPluginConfig {
 		return variants;
 	}
 
-	protected final ElementGUI loadGUI(String filePath, String... requiredItems) throws Throwable {
-		File file = GCore.inst().getDataFile(filePath);
-		ElementGUI gui = new ElementGUI(file, FileUtils.getSimpleName(file), true);
+	public static final ElementGUI loadGUI(GPlugin plugin, String filePath) throws Throwable {
+		return loadGUI(plugin, filePath, (file, id) -> new ElementGUI(file, id, true));
+	}
+
+	public static final <E extends ElementGUI> E loadGUI(GPlugin plugin, String filePath, BiFunction<File, String, E> init) throws Throwable {
+		File file = plugin.getDataFile(filePath);
+		E gui = init.apply(file, FileUtils.getSimpleName(file));
 		gui.read();
-		if (requiredItems != null) {
-			for (String required : requiredItems) {
-				if (!gui.getContent(required).isPresent()) {
-					throw new ConfigError("missing content item '" + required + "' in " + filePath + "'");
-				}
-			}
-		}
 		return gui;
 	}
 

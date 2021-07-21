@@ -8,4 +8,8 @@ public interface ThrowableRunnable {
 
 	void run() throws Throwable;
 
+	public static ThrowableRunnable fromSafe(Runnable runnable) {
+		return () -> runnable.run();
+	}
+
 }

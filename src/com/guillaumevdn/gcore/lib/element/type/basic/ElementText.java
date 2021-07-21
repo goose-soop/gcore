@@ -32,7 +32,7 @@ public class ElementText extends BasicElement<Text> {
 		super("text", SizeTolerance.ALLOW_EMPTY_AND_LIST, parent, id, need.getType(), need.getDef() != null ? ((Text) need.getDef()).getCurrentLines() : null, editorDescription);
 	}
 
-	// parse
+	// ----- parse
 	@Override
 	protected Text doParseEmpty() {
 		return new TextElement();
@@ -48,13 +48,13 @@ public class ElementText extends BasicElement<Text> {
 		return new TextElement(raw);
 	}
 
-	// editor
+	// ----- editor
 	@Override
 	public Mat editorIconType() {
 		return CommonMats.BOOKSHELF;
 	}
 
-	// editor
+	// ----- editor
 	@Override
 	public EditorGUI editorGUI(ClickCall fromCall) {
 		return new EditorGUI(this, fromCall) {
@@ -172,8 +172,8 @@ public class ElementText extends BasicElement<Text> {
 			v.set(lineIndex, value);
 			setValue(v);
 			getSuperElement().onEditorChange(ElementText.this);
-			call.getGUI().openFor(call.getClicker(), call.getPageIndex());
-		}, () -> call.getGUI().openFor(call.getClicker(), call.getPageIndex()));
+			call.reopenGUI();
+		}, () -> call.reopenGUI());
 	}
 
 }

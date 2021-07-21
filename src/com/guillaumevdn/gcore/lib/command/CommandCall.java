@@ -37,7 +37,7 @@ public class CommandCall {
 		this.forTabComplete = forTabComplete;
 	}
 
-	// get
+	// ----- get
 	public Command getCommand() {
 		return command;
 	}
@@ -78,7 +78,7 @@ public class CommandCall {
 		return forTabComplete;
 	}
 
-	// set
+	// ----- set
 	public void setArgumentValue(int index, Object value) {
 		if (index < argumentValues.length) {
 			argumentValues[index] = value;

@@ -2,8 +2,8 @@ package com.guillaumevdn.gcore.lib.element.struct.container.typable;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+
+import com.guillaumevdn.gcore.lib.concurrency.RWLowerCaseHashMap;
 
 /**
  * @author GuillaumeVDN
@@ -11,25 +11,25 @@ import java.util.Map;
 public abstract class TypableElementTypes<T extends TypableElementType> {
 
 	private final Class<T> typeClass;
-	private final Map<String, T> types = new HashMap<>();
+	private final RWLowerCaseHashMap<T> types = new RWLowerCaseHashMap<>();
 
 	public TypableElementTypes(Class<T> typeClass) {
 		this.typeClass = typeClass;
 	}
 
-	// get
+	// ----- get
 	public final Class<T> getTypeClass() {
 		return typeClass;
 	}
 
 	public final Collection<T> values() {
-		return Collections.unmodifiableCollection(types.values());
+		return Collections.unmodifiableCollection(types.copyValues());
 	}
 
 	public abstract T defaultValue();
 
 	public final T safeValueOf(String id) {
-		return types.get(id.toUpperCase());
+		return types.get(id);
 	}
 
 	public final T valueOf(String id) throws IllegalArgumentException {
@@ -38,9 +38,9 @@ public abstract class TypableElementTypes<T extends TypableElementType> {
 		return value;
 	}
 
-	// set
+	// ----- set
 	public final <TT extends T> TT register(TT type) {
-		types.put(type.getId().toUpperCase(), type);
+		types.put(type.getId(), type);
 		return type;
 	}
 
@@ -52,7 +52,7 @@ public abstract class TypableElementTypes<T extends TypableElementType> {
 
 	public final void unregister(String id) {
 		if (id != null) {
-			types.remove(id.toUpperCase());
+			types.remove(id);
 		}
 	}
 

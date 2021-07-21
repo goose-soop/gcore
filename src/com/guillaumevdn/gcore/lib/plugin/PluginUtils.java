@@ -18,7 +18,7 @@ import com.guillaumevdn.gcore.lib.object.ObjectUtils;
  */
 public final class PluginUtils {
 
-	// plugins
+	// ----- plugins
 	public static boolean isPluginEnabled(String plugin) {
 		for (Plugin pl : Bukkit.getPluginManager().getPlugins()) {
 			if (pl.getName().equalsIgnoreCase(plugin)) {
@@ -37,7 +37,7 @@ public final class PluginUtils {
 		return null;
 	}
 
-	// gplugins
+	// ----- gplugins
 	public static List<GPlugin> getGPlugins() {
 		List<GPlugin> result = new ArrayList<>();
 		for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
@@ -58,7 +58,18 @@ public final class PluginUtils {
 		return null;
 	}
 
-	// update
+	public static boolean isGPluginActivated(String plugin) {
+		GPlugin pl = getGPlugin(plugin);
+		return pl != null && pl.isEnabled() && pl.isActivated();
+	}
+
+	public static void ifActiveGPlugin(String plugin, Runnable runnable) {
+		if (isGPluginActivated(plugin)) {
+			runnable.run();
+		}
+	}
+
+	// ----- update
 	public static String getOfficialVersion(GPlugin plugin) {
 		try {
 			// connect

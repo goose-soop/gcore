@@ -15,6 +15,7 @@ import com.guillaumevdn.gcore.lib.element.type.basic.ElementString;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementStringList;
 import com.guillaumevdn.gcore.lib.element.type.container.ElementItem;
 import com.guillaumevdn.gcore.lib.item.ItemCheck;
+import com.guillaumevdn.gcore.lib.item.ItemReference;
 import com.guillaumevdn.gcore.lib.object.ObjectUtils;
 import com.guillaumevdn.gcore.lib.serialization.data.DataIO;
 import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
@@ -24,24 +25,28 @@ import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
  */
 public final class MetaBook {
 
-	public static boolean match(ItemMeta itemMeta, ItemMeta referenceMeta, ItemCheck check) {
-		BookMeta meta = ObjectUtils.castOrNull(itemMeta, BookMeta.class); // might be null if exact match is false
-		BookMeta ref = ObjectUtils.castOrNull(referenceMeta, BookMeta.class);
-		if (ref == null) return true;
+	public static boolean match(ItemMeta itemMeta, ItemReference reference, ItemCheck check) {
+		if (!reference.hasMeta(BookMeta.class)) return true;
+		BookMeta meta = ObjectUtils.castOrNull(itemMeta, BookMeta.class);  // might be null if exact match is false
+
 		// author
-		if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getAuthor(), ref.getAuthor()))) return false;
-		else if (!check.isExact() && ref.hasAuthor() && (meta == null || !Objects.deepEquals(meta.getAuthor(), ref.getAuthor()))) return false;
+		if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getAuthor(), reference.getAuthor()))) return false;
+		else if (!check.isExact() && reference.hasAuthor() && (meta == null || !Objects.deepEquals(meta.getAuthor(), reference.getAuthor()))) return false;
+
 		// title
-		if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getTitle(), ref.getTitle()))) return false;
-		else if (!check.isExact() && ref.hasTitle() && (meta == null || !Objects.deepEquals(meta.getTitle(), ref.getTitle()))) return false;
+		if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getTitle(), reference.getTitle()))) return false;
+		else if (!check.isExact() && reference.hasTitle() && (meta == null || !Objects.deepEquals(meta.getTitle(), reference.getTitle()))) return false;
+
 		// author
 		if (Version.ATLEAST_1_9) {
-			if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getGeneration(), ref.getGeneration()))) return false;
-			else if (!check.isExact() && ref.hasGeneration() && (meta == null || !Objects.deepEquals(meta.getGeneration(), ref.getGeneration()))) return false;
+			if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getGeneration(), reference.getGeneration()))) return false;
+			else if (!check.isExact() && reference.hasGeneration() && (meta == null || !Objects.deepEquals(meta.getGeneration(), reference.getGeneration()))) return false;
 		}
+
 		// pages
-		if (check.isExact() && (meta == null || meta.hasPages() != ref.hasPages() || !CollectionUtils.contentEquals(meta.getPages(), ref.getPages()))) return false;
-		else if (!check.isExact() && ref.hasPages() && (meta == null || !meta.hasPages() || !CollectionUtils.contentEquals(meta.getPages(), ref.getPages()))) return false;
+		if (check.isExact() && (meta == null || meta.hasPages() != reference.hasPages() || !CollectionUtils.contentEquals(meta.getPages(), reference.getPages()))) return false;
+		else if (!check.isExact() && reference.hasPages() && (meta == null || !meta.hasPages() || !CollectionUtils.contentEquals(meta.getPages(), reference.getPages()))) return false;
+
 		// seems good
 		return true;
 	}

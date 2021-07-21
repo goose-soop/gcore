@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
+import com.guillaumevdn.gcore.lib.configuration.reader.YMLReader;
 import com.guillaumevdn.gcore.lib.number.NumberUtils;
 import com.guillaumevdn.gcore.lib.string.StringUtils;
 
@@ -24,7 +25,7 @@ public class ListValueNode extends ConfigNode {
 		this.trailingComment = trailingComment;
 	}
 
-	// get
+	// ----- get
 	public List<String> getValue() {
 		return value;
 	}
@@ -41,32 +42,54 @@ public class ListValueNode extends ConfigNode {
 		return trailingComment;
 	}
 
-	// set
+	// ----- set
 	public void setValue(List<String> value) {
 		if (value == null) throw new IllegalArgumentException("value can't be null");
 		this.value = CollectionUtils.asList(value);
 	}
 
-	// write
+	// ----- write
 	@Override
-	public void write(Appendable writer) throws Throwable {
+	public void write(Appendable writer, WriteType type) throws Throwable {
 		String prefix = getPrefix();
+
+		if (type.writePrefix()) writer.append(prefix);
+		if (type.writeId()) writer.append(YMLReader.wrapIdToWrite(getId()) + ": ");
+
 		if (value.isEmpty()) {
-			writer.append(prefix + getId() + ": []" + (trailingComment != null ? "  #" + trailingComment : "") + "\n");
+			writer.append("[]" + (trailingComment != null ? "  #" + trailingComment : "") + "\n");
 		} else if (shouldWriteCompact()) {
-			writer.append(prefix + getId() + ": [" + StringUtils.toTextString(",", StringUtils.retranslateColorCodesCopy(value.stream().map(line -> SingleValueNode.wrapValueToWrite(line)).collect(Collectors.toList()))) + "]" + (trailingComment != null ? "  #" + trailingComment : "") + "\n");
+			writer.append("[" + StringUtils.toTextString(", ", StringUtils.retranslateColorCodesCopy(value.stream().map(line -> YMLReader.wrapValueToWrite(line)).collect(Collectors.toList()))) + "]" + (trailingComment != null ? "  #" + trailingComment : "") + "\n");
 		} else if (ez) {
-			writer.append(prefix + getId() + ": |-" + (trailingComment != null ? "  #" + trailingComment : "") + "\n");
+			writer.append("|" + (trailingComment != null ? "  #" + trailingComment : "") + "\n");
 			String linePrefix = prefix + "  ";
 			for (String line : StringUtils.retranslateColorCodesCopy(value)) {
 				writer.append(linePrefix + line + "\n");
 			}
 		} else {
-			writer.append(prefix + getId() + ":" + (trailingComment != null ? "  #" + trailingComment : "") + "\n");
-			String linePrefix = prefix + "  - ";
-			for (String line : StringUtils.retranslateColorCodesCopy(value)) {
-				writer.append(linePrefix + SingleValueNode.wrapValueToWrite(line) + "\n");
+			if (type.writeId() || trailingComment != null) {
+				writer.append((trailingComment != null ? " #" + trailingComment : "") + "\n");
 			}
+			String linePrefix = prefix + "  - ";
+			int i = 0;
+			for (String line : StringUtils.retranslateColorCodesCopy(value)) {
+				if (type.writePrefix() || i > 0) {
+					writer.append(linePrefix);
+				} else {
+					writer.append("- ");
+				}
+				writer.append(YMLReader.wrapValueToWrite(line) + "\n");
+				++i;
+			}
+		}
+	}
+
+	@Override
+	public void writeInCompact(Appendable writer, boolean compactParent) throws Throwable {
+		if (value.isEmpty()) {
+			writer.append(YMLReader.wrapIdToWrite(getId()) + ": []");
+		} else {
+			writer.append(YMLReader.wrapIdToWrite(getId()) + ": [" + StringUtils.toTextString(", ", StringUtils.retranslateColorCodesCopy(value.stream().map(line -> YMLReader.wrapValueToWrite(line)).collect(Collectors.toList()))) + "]");
 		}
 	}
 
@@ -78,7 +101,7 @@ public class ListValueNode extends ConfigNode {
 		return false;
 	}
 
-	// clone
+	// ----- clone
 	@Override
 	public ListValueNode clone(SectionNode parent) {
 		return new ListValueNode(parent, getId(), CollectionUtils.asList(value), compact, ez, trailingComment);

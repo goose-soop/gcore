@@ -21,7 +21,7 @@ public final class AnimationUtils {
 
 	private static final double DEBUG_MULTIPLIER = 1d;
 
-	// - https://minecraft.gamepedia.com/Sprinting#Usage
+	// ----- - https://minecraft.gamepedia.com/Sprinting#Usage
 	private static final double TICK_WALKING = 0.21585 * DEBUG_MULTIPLIER;
 	private static final double TICK_SPRINTING = 0.2806 * DEBUG_MULTIPLIER;
 
@@ -201,6 +201,6 @@ public final class AnimationUtils {
 		ticks.add(target.toLocation(finder.getWorld()));
 	}
 
-	// FIXME : make sure we're animating slabs correctly
+	// ----- FIXME : make sure we're animating slabs correctly
 
 }

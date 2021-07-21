@@ -3,25 +3,27 @@ package com.guillaumevdn.gcore.lib.data.board.keyed;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.guillaumevdn.gcore.lib.GPlugin;
 import com.guillaumevdn.gcore.lib.bukkit.BukkitThread;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
+import com.guillaumevdn.gcore.lib.concurrency.RWHashMap;
+import com.guillaumevdn.gcore.lib.concurrency.RWHashSet;
 import com.guillaumevdn.gcore.lib.data.Board;
 import com.guillaumevdn.gcore.lib.data.BoardType;
 import com.guillaumevdn.gcore.lib.data.DataBackEnd;
 import com.guillaumevdn.gcore.lib.file.FileUtils;
+import com.guillaumevdn.gcore.lib.function.QuadriConsumer;
 import com.guillaumevdn.gcore.lib.function.ThrowableRunnable;
 import com.guillaumevdn.gcore.lib.string.StringUtils;
+import com.guillaumevdn.gcore.lib.wrapper.WrapperBoolean;
 
 /**
  * @author GuillaumeVDN
@@ -29,7 +31,7 @@ import com.guillaumevdn.gcore.lib.string.StringUtils;
 public abstract class KeyedBoard<K, V, R extends KeyReference<K>> extends Board {
 
 	private final Class<V> valueClass;
-	protected final Map<K, V> cache = new HashMap<>();
+	protected final RWHashMap<K, V> cache = new RWHashMap<>();
 
 	public KeyedBoard(GPlugin plugin, String id, BoardType type, Class<V> valueClass, int saveDelayTicks) {
 		super(plugin, id, type, saveDelayTicks);
@@ -37,45 +39,38 @@ public abstract class KeyedBoard<K, V, R extends KeyReference<K>> extends Board 
 	}
 
 	// ----------------------------------------------------------------------------------------------------
-	// get
+	// ----- get
 	// ----------------------------------------------------------------------------------------------------
 
-	public final Map<K, V> getCache() {
-		return Collections.unmodifiableMap(cache);
-	}
-
-	public final Set<K> getCacheKeys() {
-		return Collections.unmodifiableSet(cache.keySet());
-	}
-
-	public final Collection<V> getCacheValues() {
-		return Collections.unmodifiableCollection(cache.values());
-	}
-
-	protected V getCachedValue(K key) {
+	public final V getCachedValue(K key) {
 		return cache.get(key);
 	}
 
-	protected V getCachedValue(R key) {
+	public final V getCachedValue(R key) {
 		return cache.get(key.getKey());
 	}
 
-	protected Collection<V> getCachedValues(Set<R> refs) {
-		List<V> values = new ArrayList<>();
-		refs.forEach(ref -> {
-			V value = getCachedValue(ref);
-			if (value != null) {
-				values.add(value);
-			}
-		});
-		return Collections.unmodifiableCollection(values);
+	/*public final List<V> copyCacheValues() {
+		return valuesCache.copyValues();
+	}*/
+
+	public final <RES> RES streamResultValues(Function<Stream<V>, RES> operator) {
+		return cache.streamResultValues(operator);
+	}
+
+	public final void iterateAndModifyCache(QuadriConsumer<K, V, WrapperBoolean /* remover */, WrapperBoolean /* breaker */> consumer) {
+		cache.iterateAndModify(consumer);
+	}
+
+	public final void iterateCache(BiConsumer<K, V> consumer) {
+		cache.forEach(consumer);
 	}
 
 	// ----------------------------------------------------------------------------------------------------
-	// save
+	// ----- save
 	// ----------------------------------------------------------------------------------------------------
 
-	protected transient Set<R> toSave = new HashSet<>();
+	private transient RWHashSet<R> toSave = new RWHashSet<>();
 
 	@Override
 	public boolean mustSaveSomething() {
@@ -86,13 +81,17 @@ public abstract class KeyedBoard<K, V, R extends KeyReference<K>> extends Board 
 		toSave.add(element);
 	}
 
+	protected final void removeCachedToSaveIf(Predicate<R> filter) {
+		toSave.removeIf(filter);
+	}
+
 	@Override
 	public final void saveNeeded(BukkitThread thread, ThrowableRunnable callback) {
-		pushElements(thread, CollectionUtils.asSet(toSave), callback);
+		pushElements(thread, toSave.copy(), callback);
 	}
 
 	// ----------------------------------------------------------------------------------------------------
-	// data
+	// ----- data
 	// ----------------------------------------------------------------------------------------------------
 
 	public final void pullElements(BukkitThread thread, Set<R> references, ThrowableRunnable callback) {
@@ -101,7 +100,7 @@ public abstract class KeyedBoard<K, V, R extends KeyReference<K>> extends Board 
 		}
 		operate(thread, "pull board elements " + StringUtils.toTextString(", ", references), () -> {
 			toSave.removeAll(references);
-			onPulledElements(thread, references);
+			references.forEach(ref -> pulledElement(thread, ref, getCachedValue(ref)));
 			if (callback != null) {
 				callback.run();
 			}
@@ -115,7 +114,7 @@ public abstract class KeyedBoard<K, V, R extends KeyReference<K>> extends Board 
 		});
 	}
 
-	protected void onPulledElements(BukkitThread thread, Set<R> references) {
+	protected void pulledElement(BukkitThread thread, R reference, V value) {
 	}
 
 	public final void pushElements(BukkitThread thread, Set<R> references, ThrowableRunnable callback) {
@@ -140,7 +139,7 @@ public abstract class KeyedBoard<K, V, R extends KeyReference<K>> extends Board 
 		if (references.isEmpty()) {
 			return;
 		}
-		beforeDeleteElements(thread, references);
+		references.forEach(ref -> beforeDeleteElement(thread, ref, getCachedValue(ref)));
 		operate(thread, "delete board elements " + references, callback, () -> {
 			toSave.removeAll(references);
 			references.forEach(ref -> cache.remove(ref.getKey()));
@@ -153,7 +152,8 @@ public abstract class KeyedBoard<K, V, R extends KeyReference<K>> extends Board 
 	}
 
 	public abstract void removeElementsFromCache(Set<R> references);
-	protected void beforeDeleteElements(BukkitThread thread, Set<R> references) {
+
+	protected void beforeDeleteElement(BukkitThread thread, R reference, V value) {
 	}
 
 	public final void disposeCacheElements(BukkitThread thread, R reference, ThrowableRunnable callback) {
@@ -164,39 +164,46 @@ public abstract class KeyedBoard<K, V, R extends KeyReference<K>> extends Board 
 		if (references.isEmpty()) {
 			return;
 		}
-		beforeDisposeCacheElements(thread, references);  // this might set some more elements to save
-		// disposing means "saving if needed and then remove from cache" ; if elements don't need to be saved, remove directly from cache
+		references.forEach(ref -> beforeDisposeCacheElement(thread, ref, getCachedValue(ref)));  // this might set some more elements to save
+
+		// disposing means "saving if needed and then remove from valuesCache" ; if elements don't need to be saved, remove directly from valuesCache
 		Set<R> mustPush = references.stream().filter(ref -> toSave.contains(ref)).collect(Collectors.toSet());
 		Set<R> musntPush = references.stream().filter(ref -> !toSave.contains(ref)).collect(Collectors.toSet());
 		removeElementsFromCache(musntPush);
-		// push needed elements, then remove from cache
+		musntPush.forEach(ref -> disposedCacheElement(ref));;
+
+		// push needed elements, then remove from valuesCache
 		pushElements(thread, mustPush, () -> {
 			removeElementsFromCache(mustPush);
+			mustPush.forEach(ref -> disposedCacheElement(ref));
 			if (callback != null) {
 				callback.run();
 			}
 		});
 	}
 
-	protected void beforeDisposeCacheElements(BukkitThread thread, Set<R> references) {
+	protected void beforeDisposeCacheElement(BukkitThread thread, R reference, V value) {
+	}
+
+	protected void disposedCacheElement(R reference) {
 	}
 
 	// ----------------------------------------------------------------------------------------------------
-	// json
+	// ----- json
 	// ----------------------------------------------------------------------------------------------------
 
-	// wrapper and file
+	// ----- wrapper and file
 	public abstract File getRoot();
 	public abstract File getFile(K key);
 	public abstract K getKey(File file);
 
-	// init
+	// ----- init
 	@Override
 	protected final void remoteInitJson() throws Throwable {
 		getRoot().mkdirs();
 	}
 
-	// pull
+	// ----- pull
 	@Override
 	protected void remotePullAllJson() throws Throwable {
 		File root = getRoot();
@@ -233,11 +240,11 @@ public abstract class KeyedBoard<K, V, R extends KeyReference<K>> extends Board 
 		}
 	}
 
-	protected V valueFromJson(FileReader reader) {  // this can be overriden because for complex values such as maps gson seems to be completely drunk and literally puts keys/values as raw string in the map...
+	protected V valueFromJson(FileReader reader) {  // this can be overriden because for complex values such as maps gson seems to be drunk and puts keys/values as raw string in the map
 		return getPlugin().getPrettyGson().fromJson(reader, valueClass);
 	}
 
-	// push
+	// ----- push
 	protected final void remotePushElementsJson(Set<R> references) throws Throwable {
 		remotePushKeysJson(references.stream().map(ref -> new KeyReference<K>(ref.getKey())).collect(Collectors.toSet()));
 	}
@@ -252,21 +259,25 @@ public abstract class KeyedBoard<K, V, R extends KeyReference<K>> extends Board 
 			} else {
 				FileUtils.reset(file);
 				try (FileWriter writer = new FileWriter(file)) {
-					getPlugin().getPrettyGson().toJson(value, valueClass, writer);
+					valueToJson(value, writer);
 				}
 			}
 		}
 	}
 
-	// delete
+	protected void valueToJson(V value, FileWriter writer) {  // this can be overriden because for complex values such as maps gson seems to be drunk and puts keys/values as raw string in the map
+		getPlugin().getPrettyGson().toJson(value, valueClass, writer);
+	}
+
+	// ----- delete
 	protected final void remoteDeleteElementsJson(Set<R> references) throws Throwable {
-		// at this point, values have been removed from cache
+		// at this point, values have been removed from valuesCache
 		// this method will delete the file if no value, or update with remaining values
 		remotePushElementsJson(references);
 	}
 
 	// ----------------------------------------------------------------------------------------------------
-	// mysql
+	// ----- mysql
 	// ----------------------------------------------------------------------------------------------------
 
 	protected abstract void remotePullElementsMySQL(Set<R> references) throws Throwable;

@@ -1,9 +1,12 @@
 package com.guillaumevdn.gcore.integration.placeholderapi;
 
-import com.guillaumevdn.gcore.lib.bukkit.BukkitThread;
+import org.bukkit.entity.Player;
+
+import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.lib.integration.Integration;
 import com.guillaumevdn.gcore.lib.integration.IntegrationInstance;
 
+import me.clip.placeholderapi.PlaceholderAPI;
 import me.clip.placeholderapi.PlaceholderAPIPlugin;
 
 /**
@@ -17,10 +20,10 @@ public class IntegrationInstancePlaceholderAPI extends IntegrationInstance {
 
 	private PlaceholderExpansionGCore expansion;
 
-	// activation
+	// ----- activation
 	@Override
 	public boolean activate() {
-		BukkitThread.SYNC.operate(() -> {
+		GCore.inst().operateSync(() -> {
 			expansion = new PlaceholderExpansionGCore();
 			expansion.register();
 		});
@@ -29,7 +32,7 @@ public class IntegrationInstancePlaceholderAPI extends IntegrationInstance {
 
 	@Override
 	public void deactivate() {
-		BukkitThread.SYNC.operate(() -> {
+		GCore.inst().operateSync(() -> {
 			try {
 				try {
 					expansion.unregister();
@@ -39,6 +42,11 @@ public class IntegrationInstancePlaceholderAPI extends IntegrationInstance {
 			} catch (Throwable ignored) {}  // come on man
 			expansion = null;
 		});
+	}
+
+	// ----- utils
+	public String parse(Player player, String string) {
+		return PlaceholderAPI.setPlaceholders(player, string);
 	}
 
 }

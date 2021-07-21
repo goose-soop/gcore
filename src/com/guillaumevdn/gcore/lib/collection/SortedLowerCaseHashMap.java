@@ -62,7 +62,7 @@ public class SortedLowerCaseHashMap<V> implements Cloneable {
 		}
 	}
 
-	// methods
+	// ----- methods
 	public final Type getType() {
 		return type;
 	}
@@ -235,7 +235,7 @@ public class SortedLowerCaseHashMap<V> implements Cloneable {
 		return this;
 	}
 
-	// methods
+	// ----- methods
 	public String getKeyByValue(V value) {
 		for (String key : keySet()) {
 			if (get(key).equals(value)) {
@@ -284,12 +284,12 @@ public class SortedLowerCaseHashMap<V> implements Cloneable {
 		});
 	}
 
-	// type enum
+	// ----- type enum
 	public static enum Type {
 		KEY_SORTED, VALUE_SORTED;
 	}
 
-	// order enum
+	// ----- order enum
 	public static enum Order {
 
 		NATURAL(1),
@@ -303,7 +303,7 @@ public class SortedLowerCaseHashMap<V> implements Cloneable {
 
 	}
 
-	// static methods
+	// ----- static methods
 	public static <TV> SortedLowerCaseHashMap<TV> asMap(Type type, Order order, Object... objects) {
 		if (objects.length != 0 && objects.length % 2 != 0) throw new IllegalArgumentException("size isn't a multiple of 2");
 		SortedLowerCaseHashMap<TV> map = new SortedLowerCaseHashMap<>(type, order);

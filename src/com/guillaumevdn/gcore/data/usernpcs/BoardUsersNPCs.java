@@ -1,9 +1,8 @@
 package com.guillaumevdn.gcore.data.usernpcs;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -25,7 +24,6 @@ import com.guillaumevdn.gcore.lib.number.NumberUtils;
 import com.guillaumevdn.gcore.lib.object.ObjectUtils;
 import com.guillaumevdn.gcore.lib.player.PlayerUtils;
 import com.guillaumevdn.gcore.lib.plugin.PluginUtils;
-import com.guillaumevdn.gcore.lib.serialization.Serializer;
 import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
 
 /**
@@ -42,7 +40,7 @@ public class BoardUsersNPCs extends UniKeyedBoardRemote<UUID, UserNPCs> {
 	}
 
 	// ----------------------------------------------------------------------------------------------------
-	// data
+	// ----- data
 	// ----------------------------------------------------------------------------------------------------
 
 	@Override
@@ -74,49 +72,46 @@ public class BoardUsersNPCs extends UniKeyedBoardRemote<UUID, UserNPCs> {
 	}
 
 	@Override
-	protected void onPulledElements(BukkitThread thread, Set<KeyReference<UUID>> references) {
-		references.forEach(ref -> {
-			// no value ; create it
-			UserNPCs usr = getCachedValue(ref.getKey());
-			if (usr == null) {
-				putValue(ref.getKey(), usr = new UserNPCs(ref.getKey()), null, true);
+	protected void pulledElement(BukkitThread thread, KeyReference<UUID> reference, UserNPCs usr) {
+		// no value ; create it
+		if (usr == null) {
+			putValue(reference.getKey(), usr = new UserNPCs(reference.getKey()), null, true);
+		}
+		UserNPCs user = usr; // pepega
+
+		// not connected
+		Player player = Bukkit.getPlayer(reference.getKey());
+		if (player == null) {
+			return;
+		}
+
+		// create default data for each npc
+		NPCManager.ifPresent(manager -> {
+			Replacer replacer = Replacer.of(player);
+			for (ElementNPC npcConfig : manager.getNPCsConfig().values()) {
+				createAndSpawnDefault(player, user, npcConfig, replacer);
 			}
-			UserNPCs user = usr; // pepega
-			// not connected
-			Player player = Bukkit.getPlayer(ref.getKey());
-			if (player == null) {
-				return;
-			}
-			// create default data for each npc
-			NPCManager.ifPresent(manager -> {
-				Replacer replacer = Replacer.of(player);
-				for (ElementNPC npcConfig : manager.getNPCsConfig().values()) {
-					createAndSpawnDefault(player, user, npcConfig, replacer);
-				}
-			});
 		});
 	}
 
 	@Override
-	protected void beforeDisposeCacheElements(BukkitThread thread, Set<KeyReference<UUID>> references) {
-		references.forEach(ref -> {
-			// not connected
-			Player player = Bukkit.getPlayer(ref.getKey());
-			if (player == null) {
-				return;
+	protected void beforeDisposeCacheElement(BukkitThread thread, KeyReference<UUID> reference, UserNPCs user) {
+		if (user != null) {
+			Player player = Bukkit.getPlayer(user.getUniqueId());
+			if (player != null) {
+				// remove npcs
+				NPCManager.ifPresent(manager -> {
+					manager.removeNpcs(player);
+				});
 			}
-			// remove npcs
-			NPCManager.ifPresent(manager -> {
-				manager.removeNpcs(player);
-			});
-		});
+		}
 	}
 
 	// ----------------------------------------------------------------------------------------------------
-	// json
+	// ----- json
 	// ----------------------------------------------------------------------------------------------------
 
-	// file
+	// ----- file
 	@Override
 	public File getRoot() {
 		return GCore.inst().getDataFile("data_v8/users_npcs/");
@@ -138,21 +133,20 @@ public class BoardUsersNPCs extends UniKeyedBoardRemote<UUID, UserNPCs> {
 	}
 
 	// ----------------------------------------------------------------------------------------------------
-	// mysql
+	// ----- mysql
 	// ----------------------------------------------------------------------------------------------------
 
-	// init
+	// ----- init
 	private final String TABLE_NAME = getId();
 
 	@Override
 	protected void remoteInitMySQL() throws Throwable {
-		GCore.inst().getMySQLConnector().performUpdateQuery(getPlugin(), new Query(""
-				+ "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + "("
-				+ "`user_uuid` CHAR(36) NOT NULL,"
-				+ "`data` LONGTEXT NOT NULL,"
-				+ "PRIMARY KEY(`user_uuid`)"
-				+ ") ENGINE=InnoDB DEFAULT CHARSET=?;"
-				, "utf8")
+		GCore.inst().getMySQLConnector().performUpdateQuery(getPlugin(), getLogger(),
+				"CREATE TABLE IF NOT EXISTS " + TABLE_NAME + "("
+						+ "user_uuid CHAR(36) NOT NULL,"
+						+ "data LONGTEXT NOT NULL,"
+						+ "PRIMARY KEY(user_uuid)"
+						+ ") ENGINE=InnoDB DEFAULT CHARSET = 'utf8';"
 				);
 	}
 
@@ -163,9 +157,8 @@ public class BoardUsersNPCs extends UniKeyedBoardRemote<UUID, UserNPCs> {
 
 	@Override
 	protected void remotePullElementsMySQL(Set<KeyReference<UUID>> references) throws Throwable {
-		List<UUID> keys = new ArrayList<>();
-		references.forEach(ref -> keys.add(ref.getKey()));
-		GCore.inst().getMySQLConnector().performGetQuery(getPlugin(), Query.buildSelectKeysIn(TABLE_NAME, "user_uuid", keys, Serializer.UUID),
+		GCore.inst().getMySQLConnector().performGetQuery(getPlugin(), getLogger(),
+				Query.buildSelectKeysIn(TABLE_NAME, "user_uuid", references),
 				set -> {
 					while (set.next()) {
 						UUID uuid = UUID.fromString(set.getString("user_uuid")); // row can't contain an invalid UUID, since the query above was built from a valid UUID object
@@ -186,29 +179,18 @@ public class BoardUsersNPCs extends UniKeyedBoardRemote<UUID, UserNPCs> {
 
 	@Override
 	protected void remotePushElementsMySQL(Set<KeyReference<UUID>> refs) throws Throwable {
-		if (refs.isEmpty()) return; // let's avoid deleting the whole table just because there's no WHERE clause
-		for (List<KeyReference<UUID>> references : CollectionUtils.split(refs, 999)) {  // multiple VALUES are limited to 1000 elements ; https://stackoverflow.com/questions/452859/inserting-multiple-rows-in-a-single-sql-query#comment22032805_452934
-			Query query = new Query("INSERT INTO " + TABLE_NAME + "(`user_uuid`,`data`) VALUES ");
-			int i = -1;
-			for (KeyReference<UUID> reference : references) {
-				String comma = (++i + 1 < references.size() ? "," : "");
-				query.add("(?,?)" + comma, reference.getKey(), GCore.inst().getGson().toJson(getCachedValue(reference.getKey())));
-			}
-			query.add(" ON DUPLICATE KEY UPDATE `data`=VALUES(`data`);");
-			GCore.inst().getMySQLConnector().performUpdateQuery(getPlugin(), query);
+		if (refs.isEmpty()) return;
+		for (Collection<? extends KeyReference<UUID>> references : CollectionUtils.splitCollection(refs, 999)) {  // multiple VALUES are limited to 1000 elements ; https://stackoverflow.com/questions/452859/inserting-multiple-rows-in-a-single-sql-query#comment22032805_452934
+			Query query = Query.buildInsertOrUpdatePair(TABLE_NAME, "user_uuid", "data", references, k -> GCore.inst().getGson().toJson(getCachedValue(k.getKey())));
+			GCore.inst().getMySQLConnector().performUpdateQuery(getPlugin(), getLogger(), query);
 		}
 	}
 
 	@Override
 	protected void remoteDeleteElementsMySQL(Set<KeyReference<UUID>> references) throws Throwable {
-		if (references.isEmpty()) return; // let's avoid deleting the whole table just because there's no WHERE clause
-		Query query = new Query("DELETE FROM " + TABLE_NAME + " ");
-		int i = -1;
-		for (KeyReference<UUID> reference : references) {
-			query.add((++i == 0 ? "WHERE" : "OR") + " (`user_uuid`=?)", reference.getKey());
-		}
-		query.add(";");
-		GCore.inst().getMySQLConnector().performUpdateQuery(getPlugin(), query);
+		if (references.isEmpty()) return;  // let's avoid deleting the whole table just because there's no WHERE clause
+		Query query = Query.buildDeleteKeysIn(TABLE_NAME, "user_uuid", references);
+		GCore.inst().getMySQLConnector().performUpdateQuery(getPlugin(), getLogger(), query);
 	}
 
 }

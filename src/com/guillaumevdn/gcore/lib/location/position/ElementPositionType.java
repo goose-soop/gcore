@@ -1,7 +1,11 @@
 package com.guillaumevdn.gcore.lib.location.position;
 
+import java.util.Comparator;
+import java.util.List;
+
 import com.guillaumevdn.gcore.lib.compatibility.material.CommonMats;
 import com.guillaumevdn.gcore.lib.compatibility.material.Mat;
+import com.guillaumevdn.gcore.lib.concurrency.RWWeakHashMap;
 import com.guillaumevdn.gcore.lib.element.struct.Element;
 import com.guillaumevdn.gcore.lib.element.struct.container.typable.ElementTypableElementType;
 import com.guillaumevdn.gcore.lib.string.Text;
@@ -13,6 +17,12 @@ public final class ElementPositionType extends ElementTypableElementType<Positio
 
 	public ElementPositionType(Element parent, String id, Text editorDescription) {
 		super(PositionTypes.inst(), parent, id, editorDescription);
+	}
+
+	private static RWWeakHashMap<Object, List<PositionType>> cache = new RWWeakHashMap<>();
+	@Override
+	protected List<PositionType> cacheOrBuild() {
+		return cachedOrBuild(cache, () -> PositionTypes.inst().values().stream().sorted(Comparator.comparing(e -> e.getId())));
 	}
 
 	@Override

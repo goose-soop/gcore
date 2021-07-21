@@ -7,7 +7,7 @@ import com.guillaumevdn.gcore.lib.function.ThrowableOctoConsumer;
  */
 public class ReflectionProcedureOctoConsumer<A, B, C, D, E, F, G, H> extends ReflectionProcedure<ThrowableOctoConsumer<A, B, C, D, E, F, G, H>, ReflectionProcedureOctoConsumer<A, B, C, D, E, F, G, H>> {
 
-	// methods
+	// ----- methods
 	public void process(A a, B b, C c, D d, E e, F f, G g, H h) {
 		ThrowableOctoConsumer<A, B, C, D, E, F, G, H> function = get();
 		if (function != null) {

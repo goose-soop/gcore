@@ -22,14 +22,14 @@ public class PositionTypeSphereInside extends PositionType {
 		super(id, CommonMats.NETHER_STAR);
 	}
 
-	// elements
+	// ----- elements
 	@Override
 	protected void doFillTypeSpecificElements(ElementPosition position) {
 		position.addLocation("center", Need.required(), TextEditorGeneric.descriptionPositionTypeSphereCenter);
 		position.addDouble("radius", Need.required(), 1, TextEditorGeneric.descriptionPositionTypeSphereRadius);
 	}
 
-	// parse
+	// ----- parse
 	@Override
 	public Position doParse(ElementPosition position, Replacer replacer) throws ParsingError {
 		Location center = position.getElementAs("center", ElementLocation.class).parseNoCatchOrThrowParsingNull(replacer);

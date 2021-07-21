@@ -4,17 +4,16 @@ package com.guillaumevdn.gcore.lib.tuple;
  * @author GuillaumeVDN
  */
 public class IntegerPair extends Pair<Integer, Integer> {
-
 	
-	public IntegerPair() {
+	private IntegerPair() {
 		super();
 	}
 
-	public IntegerPair(Integer a, Integer b) {
+	private IntegerPair(Integer a, Integer b) {
 		super(a, b);
 	}
 
-	// static
+	// ----- static
 	public static IntegerPair of(Integer a, Integer b) {
 		return new IntegerPair(a, b);
 	}

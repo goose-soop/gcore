@@ -21,7 +21,7 @@ public interface Replacer {
 	@Nonnull
 	ReplacerData getReplacerData();
 
-	// parsing
+	// ----- parsing
 	default String parse(String string) {
 		if (StringUtils.hasPlaceholders(string)) {
 			ReplacerData data = getReplacerData();
@@ -85,7 +85,7 @@ public interface Replacer {
 		return copy;
 	}
 
-	// alterer
+	// ----- alterer
 	default Replacer cloneReplacer() {
 		ReplacerData data = getReplacerData().clone();
 		return new Replacer() {
@@ -152,7 +152,7 @@ public interface Replacer {
 		return this;
 	}
 
-	// to string
+	// ----- to string
 	default String describeReplacer() {
 		ReplacerData data = getReplacerData();
 		Location loc = data.getLocation();
@@ -162,7 +162,7 @@ public interface Replacer {
 				;
 	}
 
-	// creation
+	// ----- creation
 	static final Replacer GENERIC = empty();
 
 	static Replacer empty() {
@@ -170,7 +170,7 @@ public interface Replacer {
 	}
 
 	static Replacer of(Player player) {
-		return player == null ? empty() : new SimpleReplacer(new ReplacerData().with(player));  // do not cache players, since this method might be called to create a replacer with other things
+		return player == null ? empty() : new SimpleReplacer(new ReplacerData().with(player));  // do not valuesCache players, since this method might be called to create a replacer with other things
 	}
 
 	static Replacer ofPlayer(Supplier<Player> player) {

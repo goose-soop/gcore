@@ -8,7 +8,7 @@ import com.guillaumevdn.gcore.lib.string.TextEnumElement;
  */
 public enum TextEditorGeneric implements TextEnumElement {
 
-	// element
+	// ----- element
 	guiSelectTitle,
 	guiSearchName,
 
@@ -28,7 +28,7 @@ public enum TextEditorGeneric implements TextEnumElement {
 	elementElementCountPlural,
 	elementListElement,
 
-	// controls
+	// ----- controls
 	controlEdit,
 	controlClear,
 	controlToggle,
@@ -47,7 +47,7 @@ public enum TextEditorGeneric implements TextEnumElement {
 	controlAddElementWithDefault,
 	controlTextSetRandom,
 
-	// item
+	// ----- item
 	descriptionItemType,
 	descriptionItemDurability,
 	descriptionItemAmount,
@@ -96,7 +96,7 @@ public enum TextEditorGeneric implements TextEnumElement {
 	descriptionItemTropicalFishPatternColor,
 	descriptionItemTropicalFishPattern,
 
-	// item condition
+	// ----- item condition
 	descriptionItemMatchItem,
 	descriptionItemMatchGoal,
 	descriptionItemMatchCheck,
@@ -108,7 +108,7 @@ public enum TextEditorGeneric implements TextEnumElement {
 	descriptionItemsNeededTake,
 	descriptionItemsNeededErrorMessage,
 
-	// gui
+	// ----- gui
 	descriptionGuiName,
 	descriptionGuiType,
 	descriptionGuiContents,
@@ -123,8 +123,9 @@ public enum TextEditorGeneric implements TextEnumElement {
 	descriptionGuiItemDynamicBorderLinearOnCount,
 	descriptionGuiItemDynamicBorderLinearIconOn,
 	descriptionGuiItemDynamicBorderLinearIconOff,
+	descriptionGuiItemDynamicBorderLinearRefreshTicks,
 
-	// position
+	// ----- position
 	descriptionPositionType,
 
 	descriptionPositionTypeClosestEntityTypes,
@@ -152,24 +153,24 @@ public enum TextEditorGeneric implements TextEnumElement {
 	descriptionPositionTypeCylinderCenter,
 	descriptionPositionTypeCylinderRadius,
 
-	// relative location
+	// ----- relative location
 	descriptionRelativeLocationHorizontalAngle,
 	descriptionRelativeLocationVerticalOffset,
 	descriptionRelativeLocationDistance,
 
-	// world restriction
+	// ----- world restriction
 	descriptionWorldRestrictionWhitelist,
 	descriptionWorldRestrictionBlacklist,
 
-	// command restriction
+	// ----- command restriction
 	descriptionCommandRestrictionWhitelist,
 	descriptionCommandRestrictionBlacklist,
 
-	// dynmap marker
+	// ----- dynmap marker
 	descriptionDynmapMarkerLocation,
 	descriptionDynmapMarkerText,
 
-	// potion effect
+	// ----- potion effect
 	descriptionPotionEffectType,
 	descriptionPotionEffectDuration,
 	descriptionPotionEffectAmplifier,
@@ -177,32 +178,32 @@ public enum TextEditorGeneric implements TextEnumElement {
 	descriptionPotionEffectParticles,
 	descriptionPotionEffectIcon,
 
-	// firework effect
+	// ----- firework effect
 	descriptionFireworkEffectType,
 	descriptionFireworkEffectColors,
 	descriptionFireworkEffectFadeColors,
 	descriptionFireworkEffectFlicker,
 	descriptionFireworkEffectTrail,
 
-	// time
+	// ----- time
 	descriptionElementTimeMonth,
 	descriptionElementTimeDayOfMonth,
 	descriptionElementTimeDayOfWeek,
 	descriptionElementTimeHour,
 	descriptionElementTimeMinute,
 
-	// time limit
+	// ----- time limit
 	descriptionTimeLimitDuration,
 	descriptionTimeLimitReminder,
 
-	// duration
+	// ----- duration
 	descriptionDurationTime,
 	descriptionDurationUnit,
 
-	// comparison
+	// ----- comparison
 	descriptionComparisonType,
 
-	// notify
+	// ----- notify
 	descriptionNotifyMessage,
 	descriptionNotifyActionbar,
 	descriptionNotifyActionbarDuration,
@@ -220,7 +221,7 @@ public enum TextEditorGeneric implements TextEnumElement {
 	descriptionNotifySoundVolume,
 	descriptionNotifySoundPitch,
 
-	// time frame
+	// ----- time frame
 	descriptionTimeFrameType,
 
 	descriptionTimeFrameInDayStart,
@@ -238,7 +239,9 @@ public enum TextEditorGeneric implements TextEnumElement {
 	descriptionTimeFrameLimitedStart,
 	descriptionTimeFrameLimitedEnd,
 
-	// message
+	descriptionTimeFrameRepeatPeriodDuration,
+
+	// ----- message
 	messageElementBasicEdit,
 	messageElementBasicEditSuggestCurrent,
 	messageElementBasicEditSearch,
@@ -263,7 +266,7 @@ public enum TextEditorGeneric implements TextEnumElement {
 	TextEditorGeneric() {
 	}
 
-	// get
+	// ----- get
 	@Override
 	public String getId() {
 		return name();

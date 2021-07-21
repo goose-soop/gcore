@@ -9,6 +9,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.guillaumevdn.gcore.lib.compatibility.material.Mat;
+import com.guillaumevdn.gcore.lib.gui.struct.ClickCall;
 import com.guillaumevdn.gcore.lib.gui.struct.ClickCall.ClickType;
 import com.guillaumevdn.gcore.lib.gui.struct.GUI.Option;
 
@@ -31,34 +32,36 @@ public class VanillaEvents implements Listener {
 		if (pageIndex == -1) {
 			return;
 		}
+
 		// cancel event
 		event.setCancelled(true);
+
 		// not on inventory
 		if (event.getClickedInventory() == null) {
 			return;
 		}
+
 		// not a player
 		final Player player = event.getWhoClicked() != null && event.getWhoClicked() instanceof Player ? (Player) event.getWhoClicked() : null;
 		if (player == null) {
 			return;
 		}
+
 		// too recent
 		if (System.currentTimeMillis() - lastClick <= 20L) {
 			return;
 		}
 		lastClick = System.currentTimeMillis();
+
 		// process later
 		new BukkitRunnable() {
 			@Override
 			public void run() {
 				int slot = event.getRawSlot();
 				try {
-					// player inventory
 					if (player.getInventory().equals(event.getClickedInventory())) {
-						handler.getGUI().onPlayerInventoryClick(player, event.getRawSlot(), Mat.isVoid(event.getCurrentItem()) ? null : event.getCurrentItem(), ClickType.valueOf(event.getClick().name()), pageIndex);
-					}
-					// another inventory
-					else {
+						handler.getGUI().onPlayerInventoryClick(new ClickCall(player, ClickType.valueOf(event.getClick().name()), handler.getGUI(), pageIndex, slot), Mat.isVoid(event.getCurrentItem()) ? null : event.getCurrentItem());
+					} else {
 						handler.onClick(player, ClickType.valueOf(event.getClick().toString()), slot, pageIndex);
 					}
 				} catch (Throwable exception) {
@@ -82,7 +85,7 @@ public class VanillaEvents implements Listener {
 		}
 		// call on close
 		try {
-			handler.getGUI().onClose(player);
+			handler.onClose(player);
 		} catch (Throwable exception) {
 			throw new Error("couldn't perform close effects in GUI " + handler.getGUI().getId() + " for page " + pageIndex, exception);
 		}

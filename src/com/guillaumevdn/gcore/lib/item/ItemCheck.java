@@ -6,6 +6,7 @@ package com.guillaumevdn.gcore.lib.item;
 public enum ItemCheck {
 
 	ExactSame,
+	ExactSame_ExceptDurability,
 
 	SameBase,
 	SameBase_SameDurability,
@@ -34,9 +35,9 @@ public enum ItemCheck {
 		this.loreContains = name().contains("LoreContains");
 	}
 
-	// ez methods
+	// ----- ez methods
 	public boolean isExact() {
-		return equals(ExactSame);
+		return equals(ExactSame) || equals(ExactSame_ExceptDurability);  // durability don't use this method, so this is okay
 	}
 
 	public boolean mustHaveSameDurability() {

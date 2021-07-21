@@ -19,7 +19,7 @@ public class NBTCompound extends NBTBase {
 		super(parent, name, depth, tag);
 	}
 
-	// keys
+	// ----- keys
 	/*private static final String getValueTypeMethod = Reflection.getForThisVersion(Version.MC_1_8_R3, "b", Version.MC_1_9_R2, "d", Version.MC_1_15_R1, "e", Version.MC_1_16_R1, "d");
 
 	public final NBTType getValueType(String key) throws Throwable {
@@ -34,7 +34,7 @@ public class NBTCompound extends NBTBase {
 		return NBTType.getByWrappedClass(getTag().invokeMethod("get", key).get());
 	}
 
-	// keys
+	// ----- keys
 	public final Set<String> getKeys() throws Throwable {
 		return getTag().invokeMethod(Version.ATLEAST_1_13 ? "getKeys" : "c").get();
 	}
@@ -43,9 +43,13 @@ public class NBTCompound extends NBTBase {
 		return getTag().invokeMethod("hasKey", key).get();
 	}
 
-	// get value
-	public final Object getObject(String key) throws Throwable {
-		return NBTType.OBJECT.getValue(this, key);
+	// ----- get value
+	public final Object get(String key) throws Throwable {
+		return get(NBTType.ANY, key);
+	}
+
+	public final Object get(NBTType type, String key) throws Throwable {
+		return type.getValue(this, key);
 	}
 
 	public final Byte getByte(String key) throws Throwable {
@@ -99,12 +103,12 @@ public class NBTCompound extends NBTBase {
 		return new NBTCompound(this, key, getDepth() + 1, tag);
 	}
 
-	// set value
+	// ----- set value
 	public final void remove(String key) throws Throwable {
 		getTag().invokeMethod("remove", key);
 	}
 
-	public final void setObject(String key, Object value) throws Throwable {
+	public final void set(String key, Object value) throws Throwable {
 		NBTType type = value == null ? NBTType.UNKNOWN : NBTType.getByValueClass(value);
 		if (type.equals(NBTType.UNKNOWN)) {
 			remove(key);
@@ -167,7 +171,7 @@ public class NBTCompound extends NBTBase {
 		ConfigGCore.logspamItemNbt(this, () -> "Set compound " + key + " with keys " + compound.getKeys());
 	}
 
-	// match
+	// ----- match
 	public boolean match(NBTCompound reference, boolean exactMatch) throws Throwable {
 		List<String> thisKeys = CollectionUtils.asList(getKeys());
 		List<String> refKeys = CollectionUtils.asList(reference.getKeys());
@@ -207,8 +211,10 @@ public class NBTCompound extends NBTBase {
 			}
 			// value
 			else if (!type.equals(NBTType.UNKNOWN)) {
-				if (!Objects.deepEquals(getObject(key), reference.getObject(key))) {
-					ConfigGCore.logspamItemNbt(this, () -> "value match failed, this " + getObject(key) + ", ref " + reference.getObject(key));
+				Object obj = get(type, key);
+				Object ref = reference.get(type, key);
+				if (!Objects.deepEquals(obj, ref)) {
+					ConfigGCore.logspamItemNbt(this, () -> "value match failed, this " + obj + ", ref " + ref);
 					return false;
 				}
 			}
@@ -217,7 +223,7 @@ public class NBTCompound extends NBTBase {
 		return true;
 	}
 
-	// add
+	// ----- add
 	public boolean addNonClonedElementsFrom(NBTCompound reference) throws Throwable {
 		Set<String> thisKeys = getKeys();
 		List<String> refKeys = CollectionUtils.asList(reference.getKeys());
@@ -259,8 +265,8 @@ public class NBTCompound extends NBTBase {
 			// value
 			else if (!type.equals(NBTType.UNKNOWN)) {
 				if (!thisKeys.contains(key)) {  // don't replace existing values
-					ConfigGCore.logspamItemNbt(this, () -> "  Copying value " + key + " : " + reference.getObject(key));
-					setObject(key, reference.getObject(key));
+					ConfigGCore.logspamItemNbt(this, () -> "  Copying value " + key + " : " + reference.get(key));
+					set(key, reference.get(key));
 				}
 			}
 		}

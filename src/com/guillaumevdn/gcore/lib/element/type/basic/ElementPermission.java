@@ -16,7 +16,7 @@ public class ElementPermission extends ElementValue<Permission> {
 		super(Permission.class, parent, id, need, editorDescription);
 	}
 
-	// editor
+	// ----- editor
 	@Override
 	public Mat editorIconType() {
 		return CommonMats.IRON_DOOR;

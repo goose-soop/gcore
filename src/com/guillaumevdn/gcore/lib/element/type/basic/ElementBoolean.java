@@ -24,7 +24,7 @@ public class ElementBoolean extends ElementValue<Boolean> {
 		super(Boolean.class, parent, id, need, editorDescription);
 	}
 
-	// editor
+	// ----- editor
 	@Override
 	public Mat editorIconType() {
 		Optional<Boolean> parsed = parseGeneric();
@@ -58,15 +58,15 @@ public class ElementBoolean extends ElementValue<Boolean> {
 					setValue(null);
 				}
 				getSuperElement().onEditorChange(ElementBoolean.this);
-				call.getGUI().openFor(call.getClicker(), call.getPageIndex());
+				call.reopenGUI();
 				getSuperElement().onEditorChange(this);
-			}, () -> call.getGUI().openFor(call.getClicker(), call.getPageIndex()));
+			}, () -> call.reopenGUI());
 		}
 		// right-click : toggle
 		else if (call.getType().equals(ClickType.RIGHT)) {
 			Optional<Boolean> parsed = parseGeneric();
 			setValue(CollectionUtils.asList(String.valueOf(!parsed.orElse(true))));
-			call.getGUI().setRegularItem(buildEditorItem(call.getSlot()));
+			call.getGUI().setRegularItem(buildEditorItem(call.getPageIndex(), call.getSlot()));
 			getSuperElement().onEditorChange(ElementBoolean.this);
 		}
 		// other

@@ -15,7 +15,7 @@ import com.guillaumevdn.gcore.lib.number.NumberUtils;
  */
 public class OperationDisplay implements Operation {
 
-	// base
+	// ----- base
 	private Particle effect;
 	private String x, y, z, count;
 	private String red, green, blue;
@@ -33,7 +33,7 @@ public class OperationDisplay implements Operation {
 		this.noteColor = noteColor;
 	}
 
-	// get
+	// ----- get
 	public Particle getEffect() {
 		return effect;
 	}
@@ -70,7 +70,7 @@ public class OperationDisplay implements Operation {
 		return noteColor;
 	}
 
-	// methods
+	// ----- methods
 	@Override
 	public int perform(final ParticleScriptExecution execution, final Collection<Player> players, boolean isAsync) {
 		final Double x = execution.parseAndCalculate(this.x);
@@ -83,7 +83,7 @@ public class OperationDisplay implements Operation {
 		final int count = execution.parseAndCalculateInteger(this.count);
 		if (x != null && y != null && z != null) {
 			Color color = NumberUtils.isInRange(red, 0, 255) && NumberUtils.isInRange(red, 0, 255) && NumberUtils.isInRange(red, 0, 255) ? Color.fromRGB(red, green, blue) : null;
-			BukkitThread.regular(isAsync).operate(() -> {
+			BukkitThread.regular(isAsync).operate(execution.getPlugin(), () -> {
 				Location loc = new Location(execution.getBaseLocation().getWorld(), x, y, z);
 				effect.send(players != null ? players : loc.getWorld().getPlayers(), loc, color, noteColor, count, 0f);
 			});

@@ -24,7 +24,7 @@ public class ElementPatternTypeColorMap extends ElementAbstractEnumMap<PatternTy
 		super(PatternType.class, "banner pattern type + color", parent, id, need, editorDescription, CollectionUtils.asList(PatternType.values()));
 	}
 
-	// add
+	// ----- add
 	@Override
 	public ElementDyeColor createElement(String elementId) {
 		ElementDyeColor elem = new ElementDyeColor(this, elementId, Need.optional(), null);
@@ -32,7 +32,7 @@ public class ElementPatternTypeColorMap extends ElementAbstractEnumMap<PatternTy
 		return elem;
 	}
 
-	// parsing
+	// ----- parsing
 	private ParsedCache<Map<PatternType, DyeColor>> cache = new ParsedCache<>();
 
 	@Override
@@ -45,7 +45,7 @@ public class ElementPatternTypeColorMap extends ElementAbstractEnumMap<PatternTy
 		cache.clear();
 	}
 
-	// editor
+	// ----- editor
 	@Override
 	public Mat editorIconType() {
 		return CommonMats.BLUE_BANNER;

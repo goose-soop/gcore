@@ -21,7 +21,7 @@ public enum LogLevel {
 		this.consoleColor = consoleColor;
 	}
 
-	// get
+	// ----- get
 	public String getFilePrefix() {
 		return filePrefix;
 	}
@@ -30,7 +30,7 @@ public enum LogLevel {
 		return consoleColor;
 	}
 
-	// set
+	// ----- set
 	public void setConsoleColor(ChatColor color) {
 		if (color != null) {
 			this.consoleColor = "§" + color.getChar();

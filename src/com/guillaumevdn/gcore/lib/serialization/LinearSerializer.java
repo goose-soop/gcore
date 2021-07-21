@@ -24,12 +24,12 @@ public abstract class LinearSerializer<T extends LinearObjectType, L extends Lin
 		this.typeSerializer = typeSerializer;
 	}
 
-	// get
+	// ----- get
 	public final Serializer<T> getTypeSerializer() {
 		return typeSerializer;
 	}
 
-	// methods
+	// ----- methods
 	@Override
 	public String serialize(L value) {
 		if (value == null) {

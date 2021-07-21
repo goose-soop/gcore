@@ -1,12 +1,10 @@
 package com.guillaumevdn.gcore.lib.data.board.keyed;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 import com.guillaumevdn.gcore.lib.GPlugin;
+import com.guillaumevdn.gcore.lib.concurrency.RWHashMap;
 import com.guillaumevdn.gcore.lib.data.BoardType;
 import com.guillaumevdn.gcore.lib.function.TriFunction;
 
@@ -20,21 +18,16 @@ public abstract class BiKeyedBoardLocal<K, K2, V> extends BiKeyedBoard<K, K2, V>
 	}
 
 	// ----------------------------------------------------------------------------------------------------
-	// get
+	// ----- get
 	// ----------------------------------------------------------------------------------------------------
 
-	public final Map<K2, V> getValues(K key) {
-		Map<K2, V> values = cache.get(key);
-		return values == null ? null : Collections.unmodifiableMap(values);
-	}
-
 	public final V getValue(K key, K2 key2) {
-		Map<K2, V> values = cache.get(key);
+		RWHashMap<K2, V> values = cache.get(key);
 		return values == null ? null : values.get(key2);
 	}
 
 	public final V getValueOrCreate(K key, K2 key2, BiFunction<K, K2, V> mappingFunction) {
-		Map<K2, V> values = cache.computeIfAbsent(key, k -> new HashMap<>());
+		RWHashMap<K2, V> values = cache.computeIfAbsent(key, k -> new RWHashMap<>());
 		V value = values.get(key2);
 		if (value == null) {
 			putValue(key, key2, value = mappingFunction.apply(key, key2));
@@ -62,12 +55,12 @@ public abstract class BiKeyedBoardLocal<K, K2, V> extends BiKeyedBoard<K, K2, V>
 	}
 
 	// ----------------------------------------------------------------------------------------------------
-	// set
+	// ----- set
 	// ----------------------------------------------------------------------------------------------------
 
 	public final V putValue(K key, K2 key2, V value) {
 		if (value == null) throw new IllegalArgumentException("value can't be null");
-		V old = cache.computeIfAbsent(key, s -> new HashMap<>()).put(key2, value);
+		V old = cache.computeIfAbsent(key, s -> new RWHashMap<>()).put(key2, value);
 		addCachedToSave(new BiKeyReference<>(key, key2));
 		onValuePut(key, key2, value);
 		return old;

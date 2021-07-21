@@ -5,15 +5,15 @@ package com.guillaumevdn.gcore.lib.tuple;
  */
 public class StringPair extends Pair<String, String> {
 
-	public StringPair() {
+	private StringPair() {
 		super();
 	}
 
-	public StringPair(String a, String b) {
+	private StringPair(String a, String b) {
 		super(a, b);
 	}
 
-	// static
+	// ----- static
 	public static StringPair of(String a, String b) {
 		return new StringPair(a, b);
 	}

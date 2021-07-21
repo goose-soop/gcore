@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
@@ -20,32 +21,40 @@ public class Sound extends Variant<SoundData> {
 		super(id, data);
 	}
 
-	// object
+	// ----- object
 	@Override
 	public Sound clone() {
 		return new Sound(getId(), getData().clone());
 	}
 
-	// play
+	// ----- play
 	public void play(Object target) {
-		play(target, 1F, 1F);
+		play(target, null);
+	}
+
+	public void play(Object target, Location forceLocation) {
+		play(target, 1F, 1F, forceLocation);
 	}
 
 	public void play(Object target, float volume, float pitch) {
+		play(target, volume, pitch, null);
+	}
+
+	public void play(Object target, float volume, float pitch, Location forceLocation) {
 		if (target instanceof Collection<?>) {
 			for (Object sub : ((Collection<?>) target)) {
-				play(sub, volume, pitch);
+				play(sub, volume, pitch, forceLocation);
 			}
 		} else if (target instanceof OfflinePlayer) {
 			Player player = ((OfflinePlayer) target).getPlayer();
-			if (player != null) player.playSound(player.getLocation(), getData().getDataInstance(), volume, pitch);
+			if (player != null) player.playSound(forceLocation != null ? forceLocation : player.getLocation(), getData().getDataInstance(), volume, pitch);
 		} else if (target instanceof UUID) {
 			Player player = Bukkit.getPlayer((UUID) target);
-			if (player != null) player.playSound(player.getLocation(), getData().getDataInstance(), volume, pitch);
+			if (player != null) player.playSound(forceLocation != null ? forceLocation : player.getLocation(), getData().getDataInstance(), volume, pitch);
 		}
 	}
 
-	// static
+	// ----- static
 	public static Collection<Sound> values() {
 		return ConfigGCore.sounds.values();
 	}

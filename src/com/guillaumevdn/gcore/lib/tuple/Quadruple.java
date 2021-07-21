@@ -14,18 +14,18 @@ public class Quadruple<A, B, C, D> {
 	private C c;
 	private D d;
 
-	public Quadruple() {
+	private Quadruple() {
 		this(null, null, null, null);
 	}
 
-	public Quadruple(A a, B b, C c, D d) {
+	private Quadruple(A a, B b, C c, D d) {
 		this.a = a;
 		this.b = b;
 		this.c = c;
 		this.d = d;
 	}
 
-	// get
+	// ----- get
 	public A getA() {
 		return a;
 	}
@@ -42,7 +42,7 @@ public class Quadruple<A, B, C, D> {
 		return d;
 	}
 
-	// set
+	// ----- set
 	public void setA(A a) {
 		this.a = a;
 	}
@@ -59,7 +59,7 @@ public class Quadruple<A, B, C, D> {
 		this.d = d;
 	}
 
-	// object
+	// ----- object
 	@Override
 	public String toString() {
 		return "(" + String.valueOf(a) + "," + String.valueOf(b) + "," + String.valueOf(c) + "," + String.valueOf(d) + ")";
@@ -77,7 +77,7 @@ public class Quadruple<A, B, C, D> {
 		return other != null && Objects.deepEquals(a, other.a) && Objects.deepEquals(b, other.b) && Objects.deepEquals(c, other.c) && Objects.deepEquals(d, other.d);
 	}
 
-	// static
+	// ----- static
 	public static <A, B, C, D> Quadruple<A, B, C, D> of(A a, B b, C c, D d) {
 		return new Quadruple<>(a, b, c, d);
 	}

@@ -1,13 +1,10 @@
 package com.guillaumevdn.gcore.lib.gui.internal.protocol;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import com.guillaumevdn.gcore.lib.concurrency.RWHashMap;
+import com.guillaumevdn.gcore.lib.concurrency.RWHashSet;
 import com.guillaumevdn.gcore.lib.gui.struct.GUI;
 
 /**
@@ -17,9 +14,10 @@ public class Window {
 
 	private int id;
 	private int index;
+	private int stateId;
 	private GUI gui;
-	private Map<Integer, ItemStack> items = new HashMap<>();
-	private Set<Player> viewing = new HashSet<>();
+	private RWHashMap<Integer, ItemStack> items = new RWHashMap<>();
+	private RWHashSet<Player> viewing = new RWHashSet<>();
 
 	public Window(int id, int index, GUI gui) {
 		this.id = id;
@@ -27,7 +25,6 @@ public class Window {
 		this.gui = gui;
 	}
 
-	// get
 	public int getId() {
 		return id;
 	}
@@ -40,11 +37,11 @@ public class Window {
 		return gui;
 	}
 
-	public Map<Integer, ItemStack> getItems() {
+	public RWHashMap<Integer, ItemStack> getItems() {
 		return items;
 	}
 
-	public Set<Player> getViewers() {
+	public RWHashSet<Player> getViewers() {
 		return viewing;
 	}
 
@@ -55,6 +52,10 @@ public class Window {
 			}
 		}
 		return -1;
+	}
+
+	public int incrementStateId() {
+		return (stateId = stateId + 1 & 0x7FFF);
 	}
 
 }

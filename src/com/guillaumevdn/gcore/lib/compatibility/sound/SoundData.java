@@ -17,13 +17,13 @@ public class SoundData extends SimpleExistingVariantData<org.bukkit.Sound, Sound
 		super(version, versionComparison, dataName, dataInstance, extra);
 	}
 
-	// object
+	// ----- object
 	@Override
 	public SoundData clone() {
 		return new SoundData(getVersion(), getVersionComparison(), getDataName(), getDataInstance(), getExtra().isEmpty() ? null : CollectionUtils.asList(getExtra()));
 	}
 
-	// extra
+	// ----- extra
 	public static enum SoundExtra {
 	}
 

@@ -27,9 +27,9 @@ public class ElementCitizensNPCList extends ElementAbstractEnumList<NPC> {
 		return CollectionUtils.asList(CitizensAPI.getNPCRegistry().sorted());
 	}
 	
-	// TODO : import npc here too
+	// ----- TODO : import npc here too
 
-	// editor
+	// ----- editor
 	@Override
 	public Mat editorIconType() {
 		return CommonMats.PLAYER_HEAD;

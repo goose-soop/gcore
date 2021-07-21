@@ -5,24 +5,25 @@ import java.io.File;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
+import com.guillaumevdn.gcore.command.GcoreBlockMat;
+import com.guillaumevdn.gcore.command.GcoreBlockMaterial;
 import com.guillaumevdn.gcore.command.GcoreExport;
+import com.guillaumevdn.gcore.command.GcoreImpl;
 import com.guillaumevdn.gcore.command.GcoreItemRead;
 import com.guillaumevdn.gcore.command.GcoreNpcReset;
 import com.guillaumevdn.gcore.command.GcorePlugins;
-import com.guillaumevdn.gcore.command.GcoreReload;
 import com.guillaumevdn.gcore.data.BoardStatistics;
 import com.guillaumevdn.gcore.data.usernpcs.BoardUsersNPCs;
 import com.guillaumevdn.gcore.data.usernpcs.UserNPCs;
 import com.guillaumevdn.gcore.integration.citizens.IntegrationInstanceCitizens;
 import com.guillaumevdn.gcore.integration.deluxechat.IntegrationDeluxeChat;
+import com.guillaumevdn.gcore.integration.holographicdisplays.IntegrationInstanceHolographicDisplays;
 import com.guillaumevdn.gcore.integration.mythicmobs.IntegrationInstanceMythicMobs;
 import com.guillaumevdn.gcore.integration.placeholderapi.IntegrationInstancePlaceholderAPI;
 import com.guillaumevdn.gcore.lib.GPlugin;
 import com.guillaumevdn.gcore.lib.chat.AwaitingChatListeners;
 import com.guillaumevdn.gcore.lib.chat.VanillaChatListeners;
-import com.guillaumevdn.gcore.lib.command.Command;
 import com.guillaumevdn.gcore.lib.data.MySQLConnector;
-import com.guillaumevdn.gcore.lib.event.CustomEventsListeners;
 import com.guillaumevdn.gcore.lib.gui.element.item.type.GUIItemTypes;
 import com.guillaumevdn.gcore.lib.integration.Integration;
 import com.guillaumevdn.gcore.lib.integration.IntegrationListeners;
@@ -37,6 +38,7 @@ import com.guillaumevdn.gcore.libs.com.google.gson.GsonBuilder;
 import com.guillaumevdn.gcore.listeners.ConnectionEvents;
 import com.guillaumevdn.gcore.migration.v8_0.config.MigrationV8Config;
 import com.guillaumevdn.gcore.migration.v8_0.data.MigrationV8Data;
+import com.guillaumevdn.gcore.migration.v8_24.MigrationV8_24;
 import com.guillaumevdn.gcore.migration.v8_5.MigrationV8_5;
 import com.guillaumevdn.gcore.migration.v8_9.MigrationV8_9;
 
@@ -49,10 +51,11 @@ public final class GCore extends GPlugin<ConfigGCore, PermissionGCore> {
 	public static GCore inst() { return instance; }
 
 	public GCore() {
-		super(24180, ConfigGCore.class, PermissionGCore.class,
+		super(24180, "gcore", "gcore", ConfigGCore.class, PermissionGCore.class,
 				MigrationV8Config.class, MigrationV8Data.class,
 				MigrationV8_5.class,
-				MigrationV8_9.class
+				MigrationV8_9.class,
+				MigrationV8_24.class
 				);
 		instance = this;
 	}
@@ -72,7 +75,7 @@ public final class GCore extends GPlugin<ConfigGCore, PermissionGCore> {
 		return super.createGsonBuilder().registerTypeAdapter(UserNPCs.class, AdapterUserNPCs.INSTANCE.getGsonAdapter());
 	}
 
-	// base
+	// ----- base
 	TimeFrameTypes timeFrameTypes = null;
 	PositionTypes positionTypes = null;
 	GUIItemTypes guiItemTypes = null;
@@ -100,7 +103,7 @@ public final class GCore extends GPlugin<ConfigGCore, PermissionGCore> {
 		return worker;
 	}
 
-	// plugin
+	// ----- plugin
 	@Override
 	protected void registerTypes() {
 		Serializer.init();
@@ -115,13 +118,14 @@ public final class GCore extends GPlugin<ConfigGCore, PermissionGCore> {
 	}
 
 	@Override
-	protected File getDefaultTextsFolder() {
+	public File getDefaultTextsFolder() {
 		return getDataFile("/data_v8/default_texts/");
 	}
 
 	@Override
 	protected void registerAndEnableIntegrations() {
 		registerAndEnableIntegration(new Integration<>(this, "Citizens", IntegrationInstanceCitizens.class));
+		registerAndEnableIntegration(new Integration<>(this, "HolographicDisplays", IntegrationInstanceHolographicDisplays.class));
 		registerAndEnableIntegration(new Integration<>(this, "MythicMobs", IntegrationInstanceMythicMobs.class));
 		registerAndEnableIntegration(new Integration<>(this, "PlaceholderAPI", IntegrationInstancePlaceholderAPI.class));
 	}
@@ -159,8 +163,10 @@ public final class GCore extends GPlugin<ConfigGCore, PermissionGCore> {
 		// init worker
 		getMainLogger().info("Initializing worker and caches");
 		worker = new WorkerGCore();
-		for (OfflinePlayer player : Bukkit.getOfflinePlayers()) {
-			worker.registerOfflinePlayer(player.getName(), player.getUniqueId());
+		if (!ConfigGCore.dontCacheOfflinePlayersOnLoad) {
+			for (OfflinePlayer player : Bukkit.getOfflinePlayers()) {
+				worker.registerOfflinePlayer(player.getName(), player.getUniqueId());
+			}
 		}
 
 		// integrations
@@ -169,21 +175,21 @@ public final class GCore extends GPlugin<ConfigGCore, PermissionGCore> {
 
 		// listeners
 		getMainLogger().info("Initializing tasks and listeners");
-		registerListener(new ConnectionEvents());
-		registerListener(new VanillaChatListeners());
-		registerListener(new AwaitingChatListeners());
-		registerListener(new AwaitingLocationListeners());
-		registerListener(new AwaitingItemListeners());
-		registerListener(new CustomEventsListeners());
-		registerListener(new IntegrationListeners());
+		registerListener("connection", new ConnectionEvents());
+		registerListener("vanilla_chat", new VanillaChatListeners());
+		registerListener("awaiting_chat", new AwaitingChatListeners());
+		registerListener("awaiting_location", new AwaitingLocationListeners());
+		registerListener("awaiting_item", new AwaitingItemListeners());
+		registerListener("integration", new IntegrationListeners());
 
 		// gcore command
-		Command commandGcore = registerCommand(new Command(this, "gcore", "gcore", null));
-		commandGcore.setSubcommand(new GcoreReload());
-		commandGcore.setSubcommand(new GcorePlugins());
-		commandGcore.setSubcommand(new GcoreExport());
-		commandGcore.setSubcommand(new GcoreItemRead());
-		commandGcore.setSubcommand(new GcoreNpcReset());
+		getMainCommand().setSubcommand(new GcorePlugins());
+		getMainCommand().setSubcommand(new GcoreExport());
+		getMainCommand().setSubcommand(new GcoreNpcReset());
+		getMainCommand().setSubcommand(new GcoreItemRead());
+		getMainCommand().setSubcommand(new GcoreBlockMat());
+		getMainCommand().setSubcommand(new GcoreBlockMaterial());
+		getMainCommand().setSubcommand(new GcoreImpl());
 	}
 
 	@Override

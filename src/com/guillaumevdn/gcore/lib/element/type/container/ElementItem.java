@@ -3,6 +3,8 @@ package com.guillaumevdn.gcore.lib.element.type.container;
 import java.util.List;
 import java.util.Objects;
 
+import javax.annotation.Nullable;
+
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -31,6 +33,8 @@ import com.guillaumevdn.gcore.lib.element.type.map.ElementEnchantmentLevelMap;
 import com.guillaumevdn.gcore.lib.gui.ItemFlag;
 import com.guillaumevdn.gcore.lib.gui.struct.ClickCall;
 import com.guillaumevdn.gcore.lib.gui.struct.ClickCall.ClickType;
+import com.guillaumevdn.gcore.lib.item.ItemCheck;
+import com.guillaumevdn.gcore.lib.item.ItemReference;
 import com.guillaumevdn.gcore.lib.item.ItemUtils;
 import com.guillaumevdn.gcore.lib.item.meta.MetaBook;
 import com.guillaumevdn.gcore.lib.item.meta.MetaEnchantmentStorage;
@@ -50,41 +54,40 @@ import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
 /**
  * @author GuillaumeVDN
  */
-public class ElementItem extends ParseableContainerElement<ItemStack> {
+public final class ElementItem extends ParseableContainerElement<ItemStack> {
 
-	// item
-	private ElementMat type;
-	private ElementInteger durability;
-	private ElementInteger amount;
-	// meta
-	private ElementBoolean unbreakable;
-	private ElementInteger customModelData;
-	private ElementEnchantmentLevelMap enchantments;
-	private ElementItemFlagList flags;
-	private ElementString name;
-	private ElementStringList lore;
-	// nbt
-	private ElementConfigSection nbt;
+	private final ElementItemMode mode;
 
-	public ElementItem(Element parent, String id, Need need, Text editorDescription) {
-		this(parent, id, need, true, editorDescription);
-	}
+	private final ElementMat type;
+	private final ElementInteger durability;
+	private final ElementInteger amount;
 
-	public ElementItem(Element parent, String id, Need need, boolean allowAmount, Text editorDescription) {
+	private final ElementBoolean unbreakable;
+	private final ElementInteger customModelData;
+	private final ElementEnchantmentLevelMap enchantments;
+	private final ElementItemFlagList flags;
+	private final ElementString name;
+	private final ElementStringList lore;
+
+	private final ElementConfigSection nbt;
+
+	public ElementItem(Element parent, String id, Need need, ElementItemMode mode, Text editorDescription) {
 		super("item", parent, id, need, editorDescription);
-		// add settings
-		type = addMat("type", Need.required(), TextEditorGeneric.descriptionItemType);
+		this.mode = mode;
+
+		type = addMat("type", mode.requireType() ? Need.required() : Need.optional(), TextEditorGeneric.descriptionItemType);
 		durability = addInteger("durability", Need.optional(0), TextEditorGeneric.descriptionItemDurability);
-		amount = !allowAmount ? null : addInteger("amount", Need.optional(1), TextEditorGeneric.descriptionItemAmount);
-		// meta
+		amount = !mode.allowAmount() ? null : addInteger("amount", Need.optional(1), TextEditorGeneric.descriptionItemAmount);
+
 		unbreakable = addBoolean("unbreakable", Need.optional(false), SlotPlacement.START_ROW, TextEditorGeneric.descriptionItemUnbreakable);
 		customModelData = !Version.ATLEAST_1_14 ? null : addInteger("custom_model_data", Need.optional(), TextEditorGeneric.descriptionItemCustomModelData);
 		enchantments = addEnchantmentLevelMap("enchantments", Need.optional(), TextEditorGeneric.descriptionItemEnchantments);
 		flags = addItemFlagList("flags", Need.optional(), TextEditorGeneric.descriptionItemFlags);
 		name = addString("name", Need.optional(), TextEditorGeneric.descriptionItemName);
 		lore = addStringList("lore", Need.optional(), TextEditorGeneric.descriptionItemLore);
-		// nbt
+
 		nbt = addConfigSection("nbt tags", "nbt", Need.optional(), SlotPlacement.START_ROW, TextEditorGeneric.descriptionItemNbt);
+
 		// add watcher of type for specific metas
 		type.addWatcher((previous, next) -> {
 			updateSpecificMetaElements(this, previous, next);
@@ -134,7 +137,10 @@ public class ElementItem extends ParseableContainerElement<ItemStack> {
 		}
 	}
 
-	// get
+	public ElementItemMode getMode() {
+		return mode;
+	}
+
 	public ElementMat getType() {
 		return type;
 	}
@@ -175,10 +181,10 @@ public class ElementItem extends ParseableContainerElement<ItemStack> {
 		return nbt;
 	}
 
-	// read/import
+	// ----- read/import
 	@Override
 	protected void doRead() throws Throwable {
-		type.read(); // read type first so it'll trigger watcher
+		type.read();  // read type first so it'll trigger watcher that will add elements
 		for (Element element : values()) {
 			if (!element.equals(type)) {
 				element.read();
@@ -186,7 +192,7 @@ public class ElementItem extends ParseableContainerElement<ItemStack> {
 		}
 	}
 
-	public void importValue(ItemStack value, Player clicker) {
+	public void importValue(ItemStack value, @Nullable Player clicker) {
 		// item
 		Mat mat = Mat.fromItem(value).get();
 		int dura = Compat.getDurability(value);
@@ -231,12 +237,14 @@ public class ElementItem extends ParseableContainerElement<ItemStack> {
 			AdapterNBTCompound.INSTANCE.write(new NBTItem(value), nbtWriter);
 			nbt.setValue(nbtWriter.isEmpty() ? null : nbtWriter.toYML(null, "nbt", false));
 		} catch (Throwable exception) {
-			clicker.sendMessage("§cCouldn't save NBT tags of this item, see console for a detailed error.");
+			if (clicker != null) {
+				clicker.sendMessage("§cCouldn't save NBT tags of this item, see console for a detailed error.");
+			}
 			exception.printStackTrace();
 		}
 	}
 
-	// parsing
+	// ----- parsing/match
 	@Override
 	public ItemStack doParse(Replacer replacer) throws ParsingError {
 		// don't contain and optional, means it's null : don't throw parsing errors
@@ -279,7 +287,7 @@ public class ElementItem extends ParseableContainerElement<ItemStack> {
 			if (Version.ATLEAST_1_14) com.guillaumevdn.gcore.lib.item.meta.MetaCrossbow.writeElements(this, data, replacer);
 			if (Version.ATLEAST_1_15) com.guillaumevdn.gcore.lib.item.meta.MetaSuspiciousStew.writeElements(this, data, replacer);
 			if (nbt.getValue() != null) {
-				data.writeObject("nbt", nbt.getValue().toIO(false));
+				data.writeObject("nbt", nbt.getValue().toIO(false, replacer));
 			}
 			return AdapterItemStack.INSTANCE.readCurrent(data);
 		} catch (Throwable exception) {
@@ -287,7 +295,11 @@ public class ElementItem extends ParseableContainerElement<ItemStack> {
 		}
 	}
 
-	// editor
+	public boolean match(ItemStack item, ItemCheck check, Replacer replacer) throws ParsingError {
+		return ItemUtils.match(item, ItemReference.of(this, replacer), check);
+	}
+
+	// ----- editor
 	@Override
 	public Mat editorIconType() {
 		return CommonMats.APPLE;
@@ -313,10 +325,10 @@ public class ElementItem extends ParseableContainerElement<ItemStack> {
 			call.getClicker().closeInventory();
 			WorkerGCore.inst().awaitItem(call.getClicker(), TextEditorGeneric.messageElementContainerImportItem, value -> {
 				importValue(value, call.getClicker());
-				call.getGUI().setRegularItem(buildEditorItem(call.getSlot()));
-				call.getGUI().openFor(call.getClicker(), call.getPageIndex());
+				call.getGUI().setRegularItem(buildEditorItem(call.getPageIndex(), call.getSlot()));
+				call.reopenGUI();
 				getSuperElement().onEditorChange(this);
-			}, () -> call.getGUI().openFor(call.getClicker(), call.getPageIndex()));
+			}, () -> call.reopenGUI());
 		}
 		// other
 		else {

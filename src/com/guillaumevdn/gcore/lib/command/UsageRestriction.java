@@ -20,7 +20,7 @@ public abstract class UsageRestriction {
 		this.permission = permission;
 	}
 
-	// get
+	// ----- get
 	public final boolean isPlayerOnly() {
 		return playerOnly;
 	}
@@ -41,7 +41,7 @@ public abstract class UsageRestriction {
 		return !playerOnly || ObjectUtils.instanceOf(sender, Player.class);
 	}
 
-	// do
+	// ----- do
 	public final boolean validateUse(CommandSender sender) {
 		if (!isCorrectSender(sender)) {
 			TextGeneric.messageCommandNotPlayer.send(sender);

@@ -13,16 +13,16 @@ public final class ScoreboardBuilder {
 	private String title = null;
 	private List<String> entries = new ArrayList<>();
 
-	// get
+	// ----- get
 	public String getTitle() {
 		return title;
 	}
 
 	public Stream<String> entries() {
-		return entries.stream().limit(16);
+		return entries.stream().limit(15);
 	}
 
-	// set
+	// ----- set
 	public ScoreboardBuilder title(String title) {
 		this.title = title.length() > 32 ? title.substring(0, 32) : title;
 		return this;

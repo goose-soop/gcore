@@ -36,12 +36,12 @@ public abstract class ElementLinearList<T extends LinearObjectType, L extends Li
 		this.typeSerializer = serializer.getTypeSerializer();
 	}
 
-	// get
+	// ----- get
 	public Serializer<T> getTypeSerializer() {
 		return typeSerializer;
 	}
 
-	// editor
+	// ----- editor
 	@Override
 	protected String editorNewLine() {
 		T type = CollectionUtils.random(types.keySet());
@@ -73,11 +73,11 @@ public abstract class ElementLinearList<T extends LinearObjectType, L extends Li
 						}
 						// open GUI and change
 						getSuperElement().onEditorChange(this);
-						call.getGUI().openFor(call.getClicker(), call.getPageIndex());
+						call.reopenGUI();
 					},
 					// on cancel
 					() -> {
-						call.getGUI().openFor(call.getClicker(), call.getPageIndex());
+						call.reopenGUI();
 					});
 		}
 		// right-click : edit parameters
@@ -86,20 +86,20 @@ public abstract class ElementLinearList<T extends LinearObjectType, L extends Li
 				Pair<T, List<String>> current = getCurrentPair(lineIndex);
 				if (StringUtils.hasPlaceholders(value)) {
 					setNewValueLine(lineIndex, current.getA() == null ? null : current.getA().name() + " " + value);
-					call.getGUI().setRegularItem(buildEditorItem(call.getSlot()));
+					call.getGUI().setRegularItem(buildEditorItem(call.getPageIndex(), call.getSlot()));
 					getSuperElement().onEditorChange(this);
 				} else {
 					try {
 						L parsed = current.getA() == null ? null : doParseLine(current.getA().name() + " " + value);
 						setNewValueLine(lineIndex, parsed == null ? null : getSerializer().serialize(parsed));
-						call.getGUI().setRegularItem(buildEditorItem(call.getSlot()));
+						call.getGUI().setRegularItem(buildEditorItem(call.getPageIndex(), call.getSlot()));
 						getSuperElement().onEditorChange(this);
 					} catch (ParsingError error) {
 						error.send(call.getClicker());
 					}
 				}
-				call.getGUI().openFor(call.getClicker(), call.getPageIndex());
-			}, () -> call.getGUI().openFor(call.getClicker(), call.getPageIndex()));
+				call.reopenGUI();
+			}, () -> call.reopenGUI());
 		}
 	}
 

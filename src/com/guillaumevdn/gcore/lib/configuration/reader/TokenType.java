@@ -3,16 +3,18 @@ package com.guillaumevdn.gcore.lib.configuration.reader;
 import java.util.List;
 
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
-import com.guillaumevdn.gcore.lib.configuration.reader.token.ReaderComment;
-import com.guillaumevdn.gcore.lib.configuration.reader.token.ReaderLineBreak;
-import com.guillaumevdn.gcore.lib.configuration.reader.token.ReaderList;
-import com.guillaumevdn.gcore.lib.configuration.reader.token.ReaderListCompact;
-import com.guillaumevdn.gcore.lib.configuration.reader.token.ReaderListEz;
-import com.guillaumevdn.gcore.lib.configuration.reader.token.ReaderSection;
-import com.guillaumevdn.gcore.lib.configuration.reader.token.ReaderSectionEmpty;
-import com.guillaumevdn.gcore.lib.configuration.reader.token.ReaderValue;
-import com.guillaumevdn.gcore.lib.configuration.reader.token.ReaderValueDeveloped;
-import com.guillaumevdn.gcore.lib.configuration.reader.token.ReaderValueDevelopedWeak;
+import com.guillaumevdn.gcore.lib.configuration.reader.type.ReaderComment;
+import com.guillaumevdn.gcore.lib.configuration.reader.type.ReaderLineBreak;
+import com.guillaumevdn.gcore.lib.configuration.reader.type.ReaderList;
+import com.guillaumevdn.gcore.lib.configuration.reader.type.ReaderListCompact;
+import com.guillaumevdn.gcore.lib.configuration.reader.type.ReaderListEz;
+import com.guillaumevdn.gcore.lib.configuration.reader.type.ReaderSection;
+import com.guillaumevdn.gcore.lib.configuration.reader.type.ReaderSectionCompact;
+import com.guillaumevdn.gcore.lib.configuration.reader.type.ReaderSectionEmpty;
+import com.guillaumevdn.gcore.lib.configuration.reader.type.ReaderCompactNestedMap;
+import com.guillaumevdn.gcore.lib.configuration.reader.type.ReaderValue;
+import com.guillaumevdn.gcore.lib.configuration.reader.type.ReaderValueDeveloped;
+import com.guillaumevdn.gcore.lib.configuration.reader.type.ReaderValueDevelopedWeak;
 import com.guillaumevdn.gcore.lib.function.ThrowableFunction;
 
 /*
@@ -32,11 +34,27 @@ public enum TokenType {
 	VALUE(new ReaderValue()),
 
 	SECTION(new ReaderSection()),
+	SECTION_NESTED_MAP(new ReaderCompactNestedMap()),
 	SECTION_EMPTY(new ReaderSectionEmpty()),
+	SECTION_COMPACT(new ReaderSectionCompact()),
 	;
 
 	public static final List<TokenType> NOT_IDENTIFIABLE = CollectionUtils.asList(LINE_BREAK, COMMENT);
-	public static final List<TokenType> IDENTIFIABLE = CollectionUtils.asList(SECTION_EMPTY, LIST_COMPACT, LIST_EZ, LIST, VALUE_DEVELOPED, VALUE_DEVELOPED_WEAK, VALUE, SECTION);
+	public static final List<TokenType> IDENTIFIABLE = CollectionUtils.asList(
+			SECTION_EMPTY,
+			SECTION_COMPACT,
+			SECTION_NESTED_MAP,
+
+			LIST_COMPACT,
+			LIST_EZ,
+			LIST,
+
+			VALUE_DEVELOPED,
+			VALUE_DEVELOPED_WEAK,
+			VALUE,
+
+			SECTION
+			);
 
 	private ThrowableFunction<ReaderContext, Boolean> reader;  // return true to start checking the first token type again
 
@@ -44,7 +62,7 @@ public enum TokenType {
 		this.reader = reader;
 	}
 
-	// do
+	// ----- do
 	public boolean read(ReaderContext context) throws Throwable {
 		context.setTokenType(this);
 		return reader.apply(context);

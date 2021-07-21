@@ -21,7 +21,7 @@ public class PositionTypeClosestMythicMobRelativeCylinderOutside extends Positio
 		super(id);
 	}
 
-	// elements
+	// ----- elements
 	@Override
 	protected void doFillTypeSpecificElements(ElementPosition position) {
 		super.doFillTypeSpecificElements(position);
@@ -29,7 +29,7 @@ public class PositionTypeClosestMythicMobRelativeCylinderOutside extends Positio
 		position.addDouble("radius", Need.required(), 1, TextEditorGeneric.descriptionPositionTypeCylinderRadius);
 	}
 
-	// parse
+	// ----- parse
 	@Override
 	public Position doParseMob(ElementPosition position, Location mobLocation, Replacer replacer) throws ParsingError {
 		Location center = position.getElementAs("center", ElementRelativeLocation.class).parseNoCatchOrThrowParsingNull(replacer.cloneReplacer().with(mobLocation));

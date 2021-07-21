@@ -15,7 +15,7 @@ public class TimeInWeek extends TimeIn {
 		this.day = day;
 	}
 
-	// get
+	// ----- get
 	public DayOfWeek getDay() {
 		return day;
 	}

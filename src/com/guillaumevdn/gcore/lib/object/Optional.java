@@ -2,6 +2,7 @@ package com.guillaumevdn.gcore.lib.object;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -26,7 +27,7 @@ public final class Optional<T> {
 		this.value = value;
 	}
 
-	// filter
+	// ----- filter
 	/** @return this optional, with value set to null if it doesn't match the filter */
 	public Optional<T> filter(Predicate<T> filter) {
 		if (!isPresent() || !filter.test(value)) {
@@ -35,7 +36,7 @@ public final class Optional<T> {
 		return this;
 	}
 
-	// get/or else
+	// ----- get/or else
 	public boolean isPresent() {
 		return value != null;
 	}
@@ -61,7 +62,7 @@ public final class Optional<T> {
 	}
 
 	public T orEmptyMap() {
-		return orElse(() -> (T) new ArrayList<>());
+		return orElse(() -> (T) new HashMap<>());
 	}
 
 	public T orEmptyText() {
@@ -72,7 +73,7 @@ public final class Optional<T> {
 		return value != null && ((Collection<?>) value).contains(elem);
 	}
 
-	// do
+	// ----- do
 	public <R> Optional<R> ifPresentMapCastOrNull(Class<R> castClass) {
 		return isPresent() ? of(ObjectUtils.castOrNull(value, castClass)) : empty();
 	}
@@ -120,7 +121,7 @@ public final class Optional<T> {
 		return orThrow(() -> new ParsingError(atFault, "invalid value"));
 	}
 
-	// object
+	// ----- object
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -140,7 +141,7 @@ public final class Optional<T> {
 		return String.valueOf(value);
 	}
 
-	// static
+	// ----- static
 	public static <T> Optional<T> of(T value) {
 		return new Optional<>(value);
 	}

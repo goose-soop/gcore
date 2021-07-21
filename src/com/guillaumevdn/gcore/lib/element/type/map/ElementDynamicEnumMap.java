@@ -23,7 +23,7 @@ public abstract class ElementDynamicEnumMap<E, V extends Element> extends MapEle
 
 	public abstract Collection<E> getValues();
 
-	// editor
+	// ----- editor
 	@Override
 	protected void editorAskKeyAndCreateAndAddElement(ClickCall call, BiConsumer<E, V> onCreate, Runnable onCancel) {
 		EnumSelectorGUI.openSelector(call.getClicker(), false, getKeySerializer(), () -> getValues().stream().sorted((a, b) -> getKeySerializer().serialize(a).compareTo(getKeySerializer().serialize(b))).filter(key -> !keys().contains(key)).collect(Collectors.toList()), editorIconType(), key -> {

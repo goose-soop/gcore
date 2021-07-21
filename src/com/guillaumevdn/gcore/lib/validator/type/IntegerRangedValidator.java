@@ -13,7 +13,7 @@ public class IntegerRangedValidator extends IntegerValidator {
 		this.max = max;
 	}
 
-	// get
+	// ----- get
 	public int getMin() {
 		return min;
 	}
@@ -22,7 +22,7 @@ public class IntegerRangedValidator extends IntegerValidator {
 		return max;
 	}
 
-	// methods
+	// ----- methods
 	@Override
 	public boolean isValid(Integer value) {
 		return value != null && value >= min && value <= max;

@@ -6,7 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
-import com.guillaumevdn.gcore.GCore;
+import com.guillaumevdn.gcore.lib.GPlugin;
 import com.guillaumevdn.gcore.lib.function.ThrowableRunnable;
 
 /**
@@ -21,17 +21,17 @@ public enum BukkitThread {
 
 	private final boolean isSync = !name().contains("ASYNC");
 
-	public void operate(ThrowableRunnable callable) {
-		operate(callable, null);
+	public void operate(GPlugin plugin, ThrowableRunnable callable) {
+		operate(plugin, callable, null);
 	}
 
-	public void operate(ThrowableRunnable callable, Consumer<Throwable> onError) {
+	public void operate(GPlugin plugin, ThrowableRunnable callable, Consumer<Throwable> onError) {
 		try {
-			if (!GCore.inst().isEnabled()) {
+			if (!plugin.isActivated()) {
 				callable.run();
 			} else if (equals(BukkitThread.ASYNC)) {
 				if (Bukkit.isPrimaryThread()) {
-					buildRunnable(callable, onError).runTaskAsynchronously(GCore.inst());
+					buildRunnable(callable, onError).runTaskAsynchronously(plugin);
 				} else {
 					callable.run();
 				}
@@ -39,12 +39,12 @@ public enum BukkitThread {
 				if (Bukkit.isPrimaryThread()) {
 					callable.run();
 				} else {
-					buildRunnable(callable, onError).runTask(GCore.inst());
+					buildRunnable(callable, onError).runTask(plugin);
 				}
 			} else if (equals(BukkitThread.FORCE_ASYNC)) {
-				buildRunnable(callable, onError).runTaskAsynchronously(GCore.inst());
+				buildRunnable(callable, onError).runTaskAsynchronously(plugin);
 			} else if (equals(BukkitThread.FORCE_SYNC)) {
-				buildRunnable(callable, onError).runTask(GCore.inst());
+				buildRunnable(callable, onError).runTask(plugin);
 			}
 		} catch (Throwable error) {
 			if (onError != null) {
@@ -55,14 +55,20 @@ public enum BukkitThread {
 		}
 	}
 
-	public BukkitTask operateLater(ThrowableRunnable callable, Consumer<Throwable> onError, long ticks) {
+	public BukkitTask operateLater(GPlugin plugin, ThrowableRunnable callable, long ticks) {
+		return operateLater(plugin, callable, null, ticks);
+	}
+
+	public BukkitTask operateLater(GPlugin plugin, ThrowableRunnable callable, Consumer<Throwable> onError, long ticks) {
 		try {
-			if (!GCore.inst().isEnabled()) {
+			if (!plugin.isEnabled()) {
 				callable.run();
+			} else if (ticks <= 0L) {
+				operate(plugin, callable, onError);
 			} else if (isSync) {
-				return buildRunnable(callable, onError).runTaskLater(GCore.inst(), ticks);
+				return buildRunnable(callable, onError).runTaskLater(plugin, ticks);
 			} else {
-				return buildRunnable(callable, onError).runTaskLaterAsynchronously(GCore.inst(), ticks);
+				return buildRunnable(callable, onError).runTaskLaterAsynchronously(plugin, ticks);
 			}
 		} catch (Throwable error) {
 			if (onError != null) {
@@ -95,6 +101,10 @@ public enum BukkitThread {
 
 	public static BukkitThread regular(boolean async) {
 		return async ? ASYNC : SYNC;
+	}
+
+	public static BukkitThread current() {
+		return regular(!Bukkit.isPrimaryThread());
 	}
 
 }

@@ -12,18 +12,18 @@ public final class SuperNode extends SectionNode {
 		super(file);
 	}
 
-	// get
+	// ----- get
 	@Override
 	public int getDepthLevel() {
 		return -1;
 	}
 
-	// write
+	// ----- write
 	@Override
-	public void write(Appendable writer) throws Throwable {
+	public void write(Appendable writer, WriteType type) throws Throwable {
 		for (int i = 0; i < getNodes().size(); ++i) {
 			Node elem = getNodes().get(i);
-			elem.write(writer);
+			elem.write(writer, WriteType.PREFIX_ID_VALUE);
 			if (i + 1 < getNodes().size() && !(elem instanceof LineBreaksNode) && !(getNodes().get(i + 1) instanceof LineBreaksNode)) {
 				writer.append("\n");
 			}

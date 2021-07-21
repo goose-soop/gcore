@@ -16,6 +16,7 @@ import com.guillaumevdn.gcore.lib.element.type.basic.ElementTimeUnit;
 import com.guillaumevdn.gcore.lib.exception.ConfigError;
 import com.guillaumevdn.gcore.lib.object.NeedType;
 import com.guillaumevdn.gcore.lib.object.ObjectUtils;
+import com.guillaumevdn.gcore.lib.string.StringUtils;
 import com.guillaumevdn.gcore.lib.string.Text;
 import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
 import com.guillaumevdn.gcore.lib.time.TimeUnit;
@@ -33,7 +34,7 @@ public class ElementDuration extends ParseableContainerElement<Long> {
 
 		// we need to overwrite the doWrite methods here, because when editing from the editor, calling superElement.onChange() triggers the write method of this thing and it'll write as section
 
-		time = add(new ElementInteger(this, "time", Need.optional(defaultTime), 1, TextEditorGeneric.descriptionDurationTime) {
+		time = add(new ElementInteger(this, "time", Need.optional(defaultTime), 0, TextEditorGeneric.descriptionDurationTime) {
 			@Override
 			protected void doWrite() throws Throwable {
 				ElementDuration.this.doWrite();
@@ -47,7 +48,7 @@ public class ElementDuration extends ParseableContainerElement<Long> {
 		});
 	}
 
-	// get
+	// ----- get
 	public ElementInteger getTime() {
 		return time;
 	}
@@ -56,7 +57,7 @@ public class ElementDuration extends ParseableContainerElement<Long> {
 		return unit;
 	}
 
-	// set
+	// ----- set
 	public void setValue(long milliseconds) {
 		if (milliseconds < 1000L || milliseconds % 1000L != 0L) {
 			time.setValue(CollectionUtils.asList("" + milliseconds));
@@ -76,7 +77,7 @@ public class ElementDuration extends ParseableContainerElement<Long> {
 		}
 	}
 
-	// load
+	// ----- load
 	@Override
 	protected void doRead() throws Throwable {
 		YMLConfiguration config = getSuperElement().getConfiguration();
@@ -105,18 +106,19 @@ public class ElementDuration extends ParseableContainerElement<Long> {
 		String defaultTime = this.time.getDefaultValueLine(0);
 		String unit = this.unit.getValueLine(0);
 		String defaultUnit = this.unit.getDefaultValueLine(0);
-		if (time == null || unit == null || (!getNeed().equals(NeedType.REQUIRED) && (defaultTime == null || defaultTime.equalsIgnoreCase(time)) && (defaultUnit == null || defaultUnit.equalsIgnoreCase(unit)))) {
+
+		if ((time == null && unit == null) || (!getNeed().equals(NeedType.REQUIRED) && StringUtils.equalsIgnoreCaseNullable(time, defaultTime) && StringUtils.equalsIgnoreCaseNullable(unit, defaultUnit))) {
 			config.write(path, null);
 		} else {
-			config.write(path, (time != null ? time : defaultTime) + " " + (unit != null ? unit : defaultUnit));
+			config.write(path, (time != null ? time : (defaultTime != null ? defaultTime : 1)) + " " + (unit != null ? unit : (defaultUnit != null ? defaultUnit : TimeUnit.SECOND)));
 		}
 	}
 
-	// parse
+	// ----- parse
 	@Override
 	public Long doParse(Replacer replacer) throws ParsingError {
 		// don't contain and optional, means it's null : don't throw parsing errors
-		if (!readContains() && getNeed().equals(NeedType.OPTIONAL) && time.getDefaultValue() == null && unit.getDefaultValue() == null) {
+		if (!readContains() && !isRequiredInContext() && time.getDefaultValue() == null && unit.getDefaultValue() == null) {
 			return null;
 		}
 		int time = this.time.parseNoCatchOrThrowParsingNull(replacer);
@@ -124,7 +126,7 @@ public class ElementDuration extends ParseableContainerElement<Long> {
 		return unit.toMillis(time);
 	}
 
-	// editor
+	// ----- editor
 	@Override
 	public Mat editorIconType() {
 		return CommonMats.CLOCK;

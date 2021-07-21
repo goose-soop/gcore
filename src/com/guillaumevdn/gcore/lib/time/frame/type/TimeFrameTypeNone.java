@@ -18,7 +18,7 @@ public class TimeFrameTypeNone extends TimeFrameType {
 		super(id, CommonMats.BEDROCK);
 	}
 
-	// get
+	// ----- get
 	@Override
 	public Pair<ZonedDateTime, ZonedDateTime> getBounds(ElementTimeFrame frame, Replacer replacer, int offset) {
 		// 10 years ought to be enough

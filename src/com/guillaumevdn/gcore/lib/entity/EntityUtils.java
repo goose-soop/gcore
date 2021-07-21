@@ -9,15 +9,18 @@ import java.util.function.Function;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+
+import com.guillaumevdn.gcore.lib.compatibility.Version;
 
 /**
  * @author GuillaumeVDN
  */
 public final class EntityUtils {
 
-	// find
+	// ----- find
 	public static List<Entity> getEntitiesInSquare(Location center, double range, Function<Entity, Boolean> validator) {
 		List<Entity> entities = new ArrayList<>();
 		for (Entity entity : center.getWorld().getEntities()) {
@@ -29,7 +32,21 @@ public final class EntityUtils {
 		return entities;
 	}
 
-	// player
+	public static Entity getEntityByUUID(UUID uuid) {
+		if (Version.ATLEAST_1_11) {
+			return Bukkit.getEntity(uuid);
+		}
+		for (World world : Bukkit.getWorlds()) {
+			for (Entity entity : world.getEntities()) {
+				if (uuid.equals(entity.getUniqueId())) {
+					return entity;
+				}
+			}
+		}
+		return null;
+	}
+
+	// ----- player
 	public static void playUtilSound(Player player, Sound sound) {
 		if (sound != null) {
 			player.playSound(player.getEyeLocation(), sound, 0.5f, 1f);

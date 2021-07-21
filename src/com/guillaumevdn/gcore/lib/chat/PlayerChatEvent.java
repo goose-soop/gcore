@@ -32,7 +32,7 @@ public class PlayerChatEvent extends Event implements Cancellable {
 		this.recipients = recipients;
 	}
 
-	// get
+	// ----- get
 	public Player getPlayer() {
 		return sender;
 	}
@@ -71,7 +71,7 @@ public class PlayerChatEvent extends Event implements Cancellable {
 		return startsWith ? configString.equalsIgnoreCase(message) : message.toLowerCase().startsWith(configString.toLowerCase());
 	}
 
-	// set
+	// ----- set
 	public void setMessage(String message) {
 		this.message = message;
 	}
@@ -91,7 +91,7 @@ public class PlayerChatEvent extends Event implements Cancellable {
 		this.cancelled = cancelled;
 	}
 
-	// handlers
+	// ----- handlers
 	private static final HandlerList handlers = new HandlerList();
 
 	public HandlerList getHandlers() {
@@ -102,7 +102,7 @@ public class PlayerChatEvent extends Event implements Cancellable {
 		return handlers;
 	}
 
-	// static
+	// ----- static
 	public static PlayerChatEvent call(Player sender, String message, Set<? extends CommandSender> recipients) {
 		return call(sender, 0, message, recipients);
 	}

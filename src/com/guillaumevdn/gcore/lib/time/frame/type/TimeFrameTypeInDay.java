@@ -16,17 +16,17 @@ public class TimeFrameTypeInDay extends TimeFrameTypeIn<TimeInDay> {
 		super(id, new TimeInDay(0, 0), new TimeInDay(23, 59));
 	}
 
-	// elements
+	// ----- elements
 	@Override
 	protected void doFillTypeSpecificElements(ElementTimeFrame frame) {
 		super.doFillTypeSpecificElements(frame);
-		frame.addTimeInDay("start", Need.optional(), TextEditorGeneric.descriptionTimeFrameInWeekStart);
-		frame.addTimeInDay("end", Need.optional(), TextEditorGeneric.descriptionTimeFrameInWeekEnd);
+		frame.addTimeInDay("start", Need.optional(), TextEditorGeneric.descriptionTimeFrameInDayStart);
+		frame.addTimeInDay("end", Need.optional(), TextEditorGeneric.descriptionTimeFrameInDayEnd);
 	}
 
 	@Override
-	protected ZonedDateTime minusOnePeriod(ZonedDateTime time) {
-		return time.minusDays(1);
+	protected ZonedDateTime deltaPeriod(ZonedDateTime time, int delta) {
+		return time.plusDays(delta);
 	}
 
 }

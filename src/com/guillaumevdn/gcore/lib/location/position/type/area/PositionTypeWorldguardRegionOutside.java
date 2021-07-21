@@ -24,14 +24,14 @@ public class PositionTypeWorldguardRegionOutside extends PositionType {
 		super(id, CommonMats.IRON_DOOR);
 	}
 
-	// elements
+	// ----- elements
 	@Override
 	protected void doFillTypeSpecificElements(ElementPosition position) {
 		ElementWorld world = position.addWorld("world", Need.required(), TextEditorGeneric.descriptionPositionTypeWorldguardRegionWorld);
 		position.addWorldguardRegion(world, "region", Need.required(), TextEditorGeneric.descriptionPositionTypeWorldguardRegionRegion);
 	}
 
-	// parse
+	// ----- parse
 	@Override
 	public Position doParse(ElementPosition position, Replacer replacer) throws ParsingError {
 		WGRegion region = position.getElementAs("region", ElementWorldguardRegion.class).parseNoCatchOrThrowParsingNull(replacer);

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import com.guillaumevdn.gcore.TextEditorGeneric;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
@@ -41,7 +42,7 @@ public abstract class BasicElement<T> extends Element implements ParseableElemen
 		setValue(null);
 	}
 
-	// get
+	// ----- get
 	public SizeTolerance getSizeTolerance() {
 		return sizeTolerance;
 	}
@@ -60,6 +61,10 @@ public abstract class BasicElement<T> extends Element implements ParseableElemen
 
 	public final List<String> getValue() {
 		return value;
+	}
+
+	public final int getValueSize() {
+		return value == null ? 0 : value.size();
 	}
 
 	public final String getValueLine(int index) {
@@ -103,29 +108,33 @@ public abstract class BasicElement<T> extends Element implements ParseableElemen
 		return (value == null && defaultValue != null) || Objects.deepEquals(value, defaultValue);
 	}
 
-	// set
+	// ----- set
 	public final void setValue(List<String> newValue) {
 		// same value
 		if (newValue == null ? this.value == null : this.value != null && CollectionUtils.contentEquals(newValue, this.value)) {
 			return;
 		}
+
 		// attempt to parse previous and new value for watchers
 		T previous = null, next = null;
 		try { previous = this.value.size() == 1 ? doParseString(this.value.get(0)) : doParseList(this.value); } catch (Throwable ignored) {}
 		try { next = newValue.size() == 1 ? doParseString(newValue.get(0)) : doParseList(newValue); } catch (Throwable ignored) {}
+
 		// set value
 		if (newValue == null) {
 			this.value = null;
 			this.isParseable = false;
 		} else {
-			this.value = Collections.unmodifiableList(StringUtils.formatCopy(newValue)); // reformat since color parsing is made on read
+			this.value = Collections.unmodifiableList(newValue.stream().map(line -> StringUtils.format(line).trim()).collect(Collectors.toList()));  // reformat since color parsing is made on read
 			this.isParseable = StringUtils.hasPlaceholders(newValue);
 		}
-		// reset cache
+
+		// reset valuesCache
 		resetCache();
 		if (getParent() != null) {
 			getParent().resetCache();
 		}
+
 		// call watchers
 		for (BiConsumer<T, T> watcher : watchers) {
 			watcher.accept(previous, next);
@@ -136,7 +145,7 @@ public abstract class BasicElement<T> extends Element implements ParseableElemen
 		watchers.add(watcher);
 	}
 
-	// loading and saving
+	// ----- loading and saving
 	@Override
 	protected void clearBeforeRead() {
 		setValue(null);
@@ -179,7 +188,7 @@ public abstract class BasicElement<T> extends Element implements ParseableElemen
 		}
 	}
 
-	// parsing
+	// ----- parsing
 	private ParsedCache<T> cache = new ParsedCache<>();
 
 	@Override
@@ -225,7 +234,7 @@ public abstract class BasicElement<T> extends Element implements ParseableElemen
 		throw new ParsingError(this, "can't parse a string value for element of type " + getTypeName());
 	}
 
-	// editor
+	// ----- editor
 	@Override
 	public List<String> editorCurrentValue() {
 		return value != null ? value : defaultValue;
@@ -246,7 +255,7 @@ public abstract class BasicElement<T> extends Element implements ParseableElemen
 		if (call.getType().equals(ClickType.CONTROL_DROP)) {
 			setValue(null);
 			getSuperElement().onEditorChange(this);
-			call.getGUI().setRegularItem(buildEditorItem(call.getSlot()));
+			call.getGUI().setRegularItem(buildEditorItem(call.getPageIndex(), call.getSlot()));
 		}
 		// other
 		else {

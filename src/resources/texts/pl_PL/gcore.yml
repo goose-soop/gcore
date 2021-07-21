@@ -24,5 +24,4 @@ messageGcoreExportCouldnt: |
 
 commandDescriptionGcore: główna komenda GCore
 commandDescriptionGcorePlugins: lista pluginów zależych od GCore
-commandDescriptionGcoreReload: przeładuj GCore
 commandDescriptionGcoreExport: wyeksportuj dane pluginów zależych od GCore

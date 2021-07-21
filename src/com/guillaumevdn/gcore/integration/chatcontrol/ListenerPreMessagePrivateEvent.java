@@ -15,7 +15,7 @@ import com.guillaumevdn.gcore.lib.object.ObjectUtils;
  */
 public final class ListenerPreMessagePrivateEvent implements Listener {
 
-	// on doit faire ceux-là à la main vu que monsieur obfusque ses plugins jusqu'à l'os
+	// ----- on doit faire ceux-là à la main vu que monsieur obfusque ses plugins jusqu'à l'os
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void event(PrePrivateMessageEvent og) {

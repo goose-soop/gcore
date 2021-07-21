@@ -22,7 +22,7 @@ public class ElementClickTypeOverrideClickMap extends ElementAbstractDefaultEnum
 		super(ClickType.class, "override click", parent, id, need, editorDescription, CollectionUtils.asList(ClickType.values()));
 	}
 
-	// add
+	// ----- add
 	@Override
 	public ElementOverrideClick createElement(String elementId) {
 		return new ElementOverrideClick(this, elementId, Need.optional(new OverrideClick(OverrideClickType.NONE)), null);
@@ -33,7 +33,7 @@ public class ElementClickTypeOverrideClickMap extends ElementAbstractDefaultEnum
 		return new ElementOverrideClick(this, elementId, Need.optional(new OverrideClick(OverrideClickType.NONE)), null);
 	}
 
-	// parsing
+	// ----- parsing
 	private ParsedCache<Map<ClickType, OverrideClick>> cache = new ParsedCache<>();
 
 	@Override
@@ -46,7 +46,7 @@ public class ElementClickTypeOverrideClickMap extends ElementAbstractDefaultEnum
 		cache.clear();
 	}
 
-	// editor
+	// ----- editor
 	@Override
 	public Mat editorIconType() {
 		return CommonMats.COMMAND_BLOCK;

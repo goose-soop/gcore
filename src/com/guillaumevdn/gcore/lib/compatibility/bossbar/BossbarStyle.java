@@ -11,11 +11,11 @@ public enum BossbarStyle {
 	SEGMENTED_12,
 	SEGMENTED_20
 
-	// spigot names ?
-	// PROGRESS
-	// NOTCHED_6
-	// NOTCHED_10
-	// NOTCHED_12
-	// NOTCHED_20
+	// ----- spigot names ?
+	// ----- PROGRESS
+	// ----- NOTCHED_6
+	// ----- NOTCHED_10
+	// ----- NOTCHED_12
+	// ----- NOTCHED_20
 
 }

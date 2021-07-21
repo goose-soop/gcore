@@ -17,7 +17,7 @@ public class ElementColorList extends ElementValueList<Color> {
 		super(Color.class, parent, id, need, editorDescription);
 	}
 
-	// editor
+	// ----- editor
 	@Override
 	public Mat editorIconType() {
 		return CommonMats.PINK_WOOL;

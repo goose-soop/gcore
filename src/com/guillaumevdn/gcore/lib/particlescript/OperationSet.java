@@ -6,7 +6,7 @@ import org.bukkit.entity.Player;
 
 public class OperationSet implements Operation {
 
-	// base
+	// ----- base
 	private String variable, value;
 
 	public OperationSet(String variable, String value) {
@@ -14,7 +14,7 @@ public class OperationSet implements Operation {
 		this.value = value;
 	}
 
-	// get
+	// ----- get
 	public String getVariable() {
 		return variable;
 	}
@@ -23,7 +23,7 @@ public class OperationSet implements Operation {
 		return value;
 	}
 
-	// methods
+	// ----- methods
 	@Override
 	public int perform(ParticleScriptExecution execution, Collection<Player> players, boolean isAsync) {
 		execution.setVariable(variable, execution.parseAndCalculate(value));

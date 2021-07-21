@@ -21,14 +21,14 @@ public abstract class ConfigNode extends Node {
 		this.id = id; // NOT to lowercase : some keys are actually uppercase !
 	}
 
-	// get
+	// ----- get
 	public String getId() {
 		return id;
 	}
 
 	public abstract String getTrailingComment();
 
-	// object
+	// ----- object
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) return true;
@@ -47,7 +47,7 @@ public abstract class ConfigNode extends Node {
 	}
 
 
-	// clone
+	// ----- clone
 	@Override
 	public abstract ConfigNode clone(SectionNode parent);
 

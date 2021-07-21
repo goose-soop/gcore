@@ -39,7 +39,7 @@ public abstract class Variants<V extends Variant, DE extends Enum<DE>, D extends
 		this.lenient = lenient;
 	}
 
-	// get
+	// ----- get
 	public final String getTypeName() {
 		return typeName;
 	}
@@ -72,7 +72,7 @@ public abstract class Variants<V extends Variant, DE extends Enum<DE>, D extends
 		values.print(GCore.inst().getDataFile("loaded_" + getTypeName() + ".txt"));
 	}
 
-	// resolve values
+	// ----- resolve values
 	public final Optional<V> fromId(String id) {
 		return Optional.of(values.get(id));
 	}
@@ -97,7 +97,7 @@ public abstract class Variants<V extends Variant, DE extends Enum<DE>, D extends
 		return result;
 	}
 
-	// set
+	// ----- set
 	public final void register(V value) {
 		values.put(value.getId(), value);
 		onRegister(value);
@@ -107,7 +107,7 @@ public abstract class Variants<V extends Variant, DE extends Enum<DE>, D extends
 	protected void onRegister(V value) {
 	}
 
-	// load
+	// ----- load
 	public void reload(File file, String defaultResource) throws ConfigError {
 		values.clear();
 		// not custom, regenerate file
@@ -206,7 +206,7 @@ public abstract class Variants<V extends Variant, DE extends Enum<DE>, D extends
 		}
 	}
 
-	// load element config
+	// ----- load element config
 	public abstract D loadElementConfigAndCreateData(Version version, ComparisonType comparison, List<DE> extra, String rawData) throws Throwable;
 
 	protected abstract V createElement(String id, D data) throws Throwable;
@@ -227,7 +227,7 @@ public abstract class Variants<V extends Variant, DE extends Enum<DE>, D extends
 		return null;
 	}
 
-	// utils
+	// ----- utils
 	protected static int loadPositiveNumber(String string, String type) throws ConfigError {
 		string = string.trim();
 		int number = 0;
@@ -240,6 +240,14 @@ public abstract class Variants<V extends Variant, DE extends Enum<DE>, D extends
 			throw new ConfigError("'" + string + "' isn't a valid " + type);
 		}
 		return number;
+	}
+
+	protected static List<Integer> loadPositiveNumberList(String[] array, int startInclusive, int endExclusive, String type) throws ConfigError {
+		List<Integer> list = new ArrayList<>(endExclusive - startInclusive);
+		for (int i = startInclusive; i < endExclusive; ++i) {
+			list.add(loadPositiveNumber(array[i], null));
+		}
+		return list;
 	}
 
 }

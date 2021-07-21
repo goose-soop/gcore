@@ -2,12 +2,13 @@ package com.guillaumevdn.gcore.lib.element.type.container;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import javax.annotation.Nullable;
+
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -24,6 +25,7 @@ import com.guillaumevdn.gcore.lib.compatibility.bossbar.BossbarStyle;
 import com.guillaumevdn.gcore.lib.compatibility.material.CommonMats;
 import com.guillaumevdn.gcore.lib.compatibility.material.Mat;
 import com.guillaumevdn.gcore.lib.compatibility.sound.Sound;
+import com.guillaumevdn.gcore.lib.concurrency.RWHashMap;
 import com.guillaumevdn.gcore.lib.element.editor.SlotPlacement;
 import com.guillaumevdn.gcore.lib.element.struct.Element;
 import com.guillaumevdn.gcore.lib.element.struct.Need;
@@ -70,7 +72,7 @@ public class ElementNotify extends ContainerElement {
 		super("notify", parent, id, need, editorDescription);
 	}
 
-	// get
+	// ----- get
 	public ElementText getMessage() {
 		return message;
 	}
@@ -139,9 +141,9 @@ public class ElementNotify extends ContainerElement {
 		return !Stream.of(actionbar, bossbar, message, title, titleSubtitle, sound).anyMatch(elem -> elem.readContains());
 	}
 
-	// methods
-	private Map<Player, BukkitTask> lastActionbarTasks = new HashMap<>();
-	private Map<Player, Bossbar> lastBossbars = new HashMap<>();
+	// ----- methods
+	private RWHashMap<Player, BukkitTask> lastActionbarTasks = new RWHashMap<>();
+	private RWHashMap<Player, Bossbar> lastBossbars = new RWHashMap<>();
 
 	public void stopLastActionbar(Player player) {
 		BukkitTask task = lastActionbarTasks.remove(player);
@@ -158,16 +160,24 @@ public class ElementNotify extends ContainerElement {
 	}
 
 	public void sendAll(Player player, Replacer replacer) {
+		sendAll(player, replacer, null);
+	}
+
+	public void sendAll(Player player, Replacer replacer, @Nullable Location soundLocation) {
 		sendAll(CollectionUtils.asList(player), replacer);
 	}
 
 	public void sendAll(Collection<Player> players, Replacer replacer) {
+		sendAll(players, replacer, null);
+	}
+
+	public void sendAll(Collection<Player> players, Replacer replacer, @Nullable Location soundLocation) {
 		if (!readContains()) return;
 		sendMessage(players, replacer);
 		sendActionbar(players, replacer);
 		sendBossbar(players, replacer, false);
 		sendTitle(players, replacer);
-		playSound(players, replacer);
+		playSound(players, replacer, soundLocation);
 	}
 
 	public void sendMessage(Collection<Player> players, Replacer replacer) {
@@ -179,33 +189,37 @@ public class ElementNotify extends ContainerElement {
 	}
 
 	public void sendActionbar(Collection<Player> players, Replacer replacer, Integer forceDurationTicks) {
+		sendActionbar(players, replacer, forceDurationTicks, true);
+	}
+
+	public void sendActionbar(Collection<Player> players, Replacer replacer, Integer forceDurationTicks, boolean allowLoop) {
 		actionbar.parse(replacer).ifPresentDo(actionbar -> {
 			int durationTicks = forceDurationTicks != null ? forceDurationTicks : (int) (actionbarDuration.parse(replacer).orElse(1000L) / 50L);
 			players.forEach(player -> {
 				// send actionbar
 				Compat.sendActionbar(player, actionbar);
 				// start task if needed
-				stopLastActionbar(player);
-				if (durationTicks < 50) {
-					// actually nvm : lastActionbarTasks.put(player, BukkitThread.ASYNC.operateLater(() -> Compat.sendActionbar(player, ""), Throwable::printStackTrace, durationTicks));
-				} else if (durationTicks > 50) {
-					lastActionbarTasks.put(player, new BukkitRunnable() { // use a bukkit task here so it can be cancelled easily too
-						private int remainingTicks = durationTicks;
-						private int ticksBeforeUpdate = 60;
-						@Override
-						public void run() {
-							if (--remainingTicks <= 0) {
-								cancel();
-								lastActionbarTasks.remove(player);
-								Compat.sendActionbar(player, "");
-								return;
+				if (allowLoop) {
+					stopLastActionbar(player);
+					if (durationTicks > 50) {
+						lastActionbarTasks.put(player, new BukkitRunnable() {  // use a bukkit task here so it can be cancelled easily too
+							private int remainingTicks = durationTicks;
+							private int ticksBeforeUpdate = 50;
+							@Override
+							public void run() {
+								if (--remainingTicks <= 0) {
+									cancel();
+									lastActionbarTasks.remove(player);
+									Compat.sendActionbar(player, "");
+									return;
+								}
+								if (--ticksBeforeUpdate <= 0) {
+									Compat.sendActionbar(player, actionbar);
+									ticksBeforeUpdate = 50;
+								}
 							}
-							if (--ticksBeforeUpdate <= 0) {
-								Compat.sendActionbar(player, actionbar);
-								ticksBeforeUpdate = 60;
-							}
-						}
-					}.runTaskTimerAsynchronously(GCore.inst(), 1L, 1L));
+						}.runTaskTimerAsynchronously(GCore.inst(), 1L, 1L));
+					}
 				}
 			});
 		});
@@ -248,12 +262,16 @@ public class ElementNotify extends ContainerElement {
 	}
 
 	public void playSound(Collection<Player> players, Replacer replacer) {
+		playSound(players, replacer, null);
+	}
+
+	public void playSound(Collection<Player> players, Replacer replacer, @Nullable Location soundLocation) {
 		directParseAndIfPresentDo("sound", "sound_volume", "sound_pitch", replacer, (Sound sound, Double volume, Double pitch) -> {
-			sound.play(players, volume.floatValue(), pitch.floatValue());
+			sound.play(players, volume.floatValue(), pitch.floatValue(), soundLocation);
 		});
 	}
 
-	// editor
+	// ----- editor
 	@Override
 	public Mat editorIconType() {
 		return CommonMats.REPEATER;

@@ -2,20 +2,20 @@ package com.guillaumevdn.gcore.lib.legacy_npc;
 
 public enum NPCAnimation {
 
-	// values
+	// ----- values
 	TAKE_DAMAGE((byte) 1),
 	LEAVE_BED((byte) 2),
 	CRITICAL_EFFECT((byte) 4),
 	MAGIC_CRITICAL_EFFECT((byte) 5);
 
-	// base
+	// ----- base
 	private byte animationData;
 
 	private NPCAnimation(byte animationId) {
 		this.animationData = animationId;
 	}
 
-	// get
+	// ----- get
 	public byte getAnimationData() {
 		return animationData;
 	}

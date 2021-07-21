@@ -12,6 +12,7 @@ import com.guillaumevdn.gcore.lib.element.struct.Need;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementNamespacedKeyList;
 import com.guillaumevdn.gcore.lib.element.type.container.ElementItem;
 import com.guillaumevdn.gcore.lib.item.ItemCheck;
+import com.guillaumevdn.gcore.lib.item.ItemReference;
 import com.guillaumevdn.gcore.lib.object.ObjectUtils;
 import com.guillaumevdn.gcore.lib.serialization.Serializer;
 import com.guillaumevdn.gcore.lib.serialization.data.DataIO;
@@ -22,13 +23,14 @@ import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
  */
 public final class MetaKnowledgeBook {
 
-	public static boolean match(ItemMeta itemMeta, ItemMeta referenceMeta, ItemCheck check) {
+	public static boolean match(ItemMeta itemMeta, ItemReference reference, ItemCheck check) {
+		if (!reference.hasMeta(KnowledgeBookMeta.class)) return true;
 		KnowledgeBookMeta meta = ObjectUtils.castOrNull(itemMeta, KnowledgeBookMeta.class); // might be null if exact match is false
-		KnowledgeBookMeta ref = ObjectUtils.castOrNull(referenceMeta, KnowledgeBookMeta.class);
-		if (ref == null) return true;
-		// pages
-		if (check.isExact() && (meta == null || meta.hasRecipes() != ref.hasRecipes() || !CollectionUtils.contentEquals(meta.getRecipes(), ref.getRecipes()))) return false;
-		else if (!check.isExact() && ref.hasRecipes() && (meta == null || !meta.hasRecipes() || !CollectionUtils.contentEquals(meta.getRecipes(), ref.getRecipes()))) return false;
+
+		// recipes
+		if (check.isExact() && (meta == null || meta.hasRecipes() != reference.hasRecipes() || !CollectionUtils.contentEquals(meta.getRecipes(), reference.getRecipes()))) return false;
+		else if (!check.isExact() && reference.hasRecipes() && (meta == null || !meta.hasRecipes() || !CollectionUtils.contentEquals(meta.getRecipes(), reference.getRecipes()))) return false;
+
 		// seems good
 		return true;
 	}

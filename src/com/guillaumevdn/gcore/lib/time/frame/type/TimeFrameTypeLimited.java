@@ -22,7 +22,7 @@ public class TimeFrameTypeLimited extends TimeFrameType {
 		super(id, CommonMats.CLOCK);
 	}
 
-	// elements
+	// ----- elements
 	@Override
 	protected void doFillTypeSpecificElements(ElementTimeFrame frame) {
 		super.doFillTypeSpecificElements(frame);
@@ -30,10 +30,10 @@ public class TimeFrameTypeLimited extends TimeFrameType {
 		frame.addTimeInYear("end", Need.optional(), TextEditorGeneric.descriptionTimeFrameLimitedEnd);
 	}
 
-	// get
+	// ----- get
 	@Override
 	public Pair<ZonedDateTime, ZonedDateTime> getBounds(ElementTimeFrame frame, Replacer replacer, int offset) {
-		// offset isn't allowed
+		// offset isn't allowed here
 		if (offset != 0) {
 			return null;
 		}

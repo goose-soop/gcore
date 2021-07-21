@@ -7,12 +7,12 @@ public class ReflectionParams {
 
 	private Object[] params = null;
 
-	// get
+	// ----- get
 	public Object[] get() {
 		return params;
 	}
 
-	// set
+	// ----- set
 	public ReflectionParams setIf(boolean condition, Object... params) {
 		if (this.params == null && condition) {
 			this.params = params;

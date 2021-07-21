@@ -1,45 +1,63 @@
 package com.guillaumevdn.gcore.lib.gui.internal.protocol;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
 
 import com.comphenix.protocol.ProtocolLibrary;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
+import com.guillaumevdn.gcore.lib.concurrency.RWArrayList;
+import com.guillaumevdn.gcore.lib.concurrency.RWHashMap;
+import com.guillaumevdn.gcore.lib.concurrency.RWHashSet;
 import com.guillaumevdn.gcore.lib.gui.internal.Handler;
 import com.guillaumevdn.gcore.lib.gui.struct.GUI;
+import com.guillaumevdn.gcore.lib.wrapper.WrapperBoolean;
 
 /**
  * @author GuillaumeVDN
  */
 public class ProtocolHandler extends Handler {
 
-	public static final int WINDOW_ID = 72; // signed byte ; don't go above 128
-	List<Window> pages = new ArrayList<>();
+	public static final int WINDOW_ID = 72;  // signed byte ; don't go above 128
+	private RWArrayList<Window> pages = new RWArrayList<>();
 	private ProtocolEvents events = new ProtocolEvents(this);
 
 	public ProtocolHandler(GUI gui) {
 		super(gui);
 	}
 
-	// activation
+	// ----- activation
+
 	@Override
 	public void activate() {
 		ProtocolLibrary.getProtocolManager().addPacketListener(events);
+		Bukkit.getPluginManager().registerEvents(events, getGUI().getPlugin());
 	}
 
 	@Override
 	public void deactivate() {
 		ProtocolLibrary.getProtocolManager().removePacketListener(events);
+		HandlerList.unregisterAll(events);
 	}
 
-	// get
+	// ----- events
+
 	@Override
-	public Map<Player, Integer> getViewers() {
-		return CollectionUtils.asMap(map -> pages.forEach(page -> page.getViewers().forEach(player -> map.put(player, page.getIndex()))));
+	public void onClose(Player player) {
+		super.onClose(player);
+		removeViewer(player);
+	}
+
+	// -----
+
+	@Override
+	public RWHashMap<Player, Integer> getViewers() {
+		RWHashMap<Player, Integer> viewers = new RWHashMap<>();
+		pages.forEach(page -> {
+			page.getViewers().forEach(player -> viewers.put(player, page.getIndex()));
+		});
+		return viewers;
 	}
 
 	@Override
@@ -58,18 +76,17 @@ public class ProtocolHandler extends Handler {
 	}
 
 	Window getPage(Player player) {
-		for (Window page : pages) {
-			if (page.getViewers().contains(player)) {
-				return page;
-			}
-		}
-		return null;
+		return pages.streamResult(s -> s.filter(page -> page.getViewers().contains(player)).findFirst().orElse(null));
 	}
 
-	public void removeViewer(Player player) {
-		for (Window page : pages) {
-			page.getViewers().remove(player);
-		}
+	public boolean removeViewer(Player player) {
+		WrapperBoolean removed = WrapperBoolean.of(false);
+		pages.forEach(page -> {
+			if (page.getViewers().remove(player)) {
+				removed.set(true);
+			}
+		});
+		return removed.get();
 	}
 
 	@Override
@@ -83,13 +100,14 @@ public class ProtocolHandler extends Handler {
 		return page == null ? null : page.getItems().get(slot);
 	}
 
-	// set
+	// -----
+
 	@Override
 	public void setPageItem(int pageIndex, int slot, ItemStack item) {
 		Window page = getPage(pageIndex);
 		if (page != null) {
 			page.getItems().put(slot, item);
-			ProtocolPackets.SET_SLOT.process(page.getViewers(), page.getId(), slot, item);
+			ProtocolPackets.SET_SLOT.process(page.getViewers(), page.getId(), page.incrementStateId(), slot, item);
 		}
 	}
 
@@ -97,7 +115,7 @@ public class ProtocolHandler extends Handler {
 	public void clearPageItem(int pageIndex, int slot) {
 		Window page = getPage(pageIndex);
 		if (page != null && page.getItems().remove(slot) != null) {
-			ProtocolPackets.SET_SLOT.process(page.getViewers(), page.getId(), slot, null);
+			ProtocolPackets.SET_SLOT.process(page.getViewers(), page.getId(), page.incrementStateId(), slot, null);
 		}
 	}
 
@@ -112,13 +130,15 @@ public class ProtocolHandler extends Handler {
 
 	@Override
 	public void clear() {
-		CollectionUtils.clearForEach(pages, page -> {
+		pages.forEach(page -> {
 			page.getItems().clear();
 			ProtocolPackets.SET_WINDOW_ITEMS.process(page.getViewers(), page);
 		});
+		pages.clear();
 	}
 
-	// do
+	// ----- do
+
 	@Override
 	public void createPage() {
 		pages.add(new Window(WINDOW_ID, pages.size(), getGUI()));
@@ -126,18 +146,20 @@ public class ProtocolHandler extends Handler {
 
 	@Override
 	public void openPage(Player player, int pageIndex) {
-		List<Player> list = CollectionUtils.asList(player);
+		RWHashSet<Player> set = CollectionUtils.asRWSet(player);
 		Window page = getPage(pageIndex);
-		page.getViewers().add(player);
-		ProtocolPackets.OPEN_WINDOW.process(list, page);
-		ProtocolPackets.SET_WINDOW_ITEMS.process(list, page);
+		if (page != null) {
+			page.getViewers().add(player);
+			ProtocolPackets.OPEN_WINDOW.process(set, page);
+			ProtocolPackets.SET_WINDOW_ITEMS.process(set, page);
+		}
 	}
 
 	@Override
 	public void close(Player player) {
 		Window page = getPage(player);
 		if (page != null) {
-			ProtocolPackets.CLOSE_WINDOW.process(CollectionUtils.asList(player), page);
+			ProtocolPackets.CLOSE_WINDOW.process(CollectionUtils.asRWSet(player), page);
 		}
 		removeViewer(player);
 	}

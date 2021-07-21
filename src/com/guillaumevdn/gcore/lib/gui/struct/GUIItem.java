@@ -68,7 +68,7 @@ public class GUIItem {
 		this.overrideClicks = overrideClicks;
 	}
 
-	// get
+	// ----- get
 	public final String getId() {
 		return id;
 	}
@@ -86,7 +86,7 @@ public class GUIItem {
 	}
 
 	public final boolean isInLocation(int page, int slot) {
-		return locations.stream().anyMatch(location -> location.getA() == page && location.getB() == slot);
+		return locations.stream().anyMatch(location -> (page == -1 || location.getA() == page) && location.getB() == slot);
 	}
 
 	public final boolean isInSlot(int slot) {
@@ -94,7 +94,14 @@ public class GUIItem {
 	}
 
 	public final Consumer<ClickCall> getClickPerformer(ClickType type) {
-		Consumer<ClickCall> performer = overrideClicks == null ? null : overrideClicks.get(type);
+		Consumer<ClickCall> performer = null;
+
+		if (overrideClicks != null) {
+			performer = overrideClicks.get(type);
+			if (performer == null) {
+				performer = overrideClicks.get(ClickType.NONE);
+			}
+		}
 		if (performer == null) {
 			performer = clickPerformer;
 		}
@@ -108,7 +115,7 @@ public class GUIItem {
 		return performer;
 	}
 
-	// set
+	// ----- set
 	public final void setItem(ItemStack item) {
 		this.item = item;
 	}

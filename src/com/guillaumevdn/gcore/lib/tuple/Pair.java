@@ -14,16 +14,16 @@ public class Pair<A, B> {
 	private A a;
 	private B b;
 
-	public Pair() {
+	protected Pair() {
 		this(null, null);
 	}
 
-	public Pair(A a, B b) {
+	protected Pair(A a, B b) {
 		this.a = a;
 		this.b = b;
 	}
 
-	// get
+	// ----- get
 	public A getA() {
 		return a;
 	}
@@ -32,7 +32,7 @@ public class Pair<A, B> {
 		return b;
 	}
 
-	// set
+	// ----- set
 	public void setA(A a) {
 		this.a = a;
 	}
@@ -46,7 +46,7 @@ public class Pair<A, B> {
 		setB(b);
 	}
 
-	// do
+	// ----- do
 	public void consume(BiConsumer<A, B> consumer) {
 		consumer.accept(a, b);
 	}
@@ -55,7 +55,7 @@ public class Pair<A, B> {
 		return function.apply(a, b);
 	}
 
-	// object
+	// ----- object
 	@Override
 	public String toString() {
 		return "(" + String.valueOf(a) + "," + String.valueOf(b) + ")";
@@ -73,7 +73,7 @@ public class Pair<A, B> {
 		return other != null && Objects.deepEquals(a, other.a) && Objects.deepEquals(b, other.b);
 	}
 
-	// static
+	// ----- static
 	public static <A, B> Pair<A, B> of(A a, B b) {
 		return new Pair<>(a, b);
 	}

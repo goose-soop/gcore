@@ -3,6 +3,9 @@ package com.guillaumevdn.gcore.lib.gui.internal.protocol;
 import java.util.Map;
 
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -11,10 +14,14 @@ import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.ListeningWhitelist;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.events.PacketListener;
+import com.guillaumevdn.gcore.ConfigGCore;
 import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.lib.bukkit.BukkitThread;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.compatibility.Version;
+import com.guillaumevdn.gcore.lib.concurrency.RWHashSet;
+import com.guillaumevdn.gcore.lib.function.ThrowableRunnable;
+import com.guillaumevdn.gcore.lib.gui.struct.ClickCall;
 import com.guillaumevdn.gcore.lib.gui.struct.ClickCall.ClickType;
 import com.guillaumevdn.gcore.lib.gui.struct.GUI.Option;
 import com.guillaumevdn.gcore.lib.reflection.Reflection;
@@ -23,7 +30,7 @@ import com.guillaumevdn.gcore.lib.reflection.ReflectionObject;
 /**
  * @author GuillaumeVDN
  */
-public class ProtocolEvents implements PacketListener {
+public class ProtocolEvents implements PacketListener, Listener {
 
 	private ProtocolHandler handler;
 
@@ -31,7 +38,8 @@ public class ProtocolEvents implements PacketListener {
 		this.handler = handler;
 	}
 
-	// get
+	// ----- -----
+
 	@Override
 	public Plugin getPlugin() {
 		return handler.getGUI().getPlugin();
@@ -66,30 +74,45 @@ public class ProtocolEvents implements PacketListener {
 			"PICKUP_ALL", 6
 			);
 
-	// receive
+	// ----- receive
+
 	private transient long lastClick = 0L;
 
 	@Override
 	public void onPacketReceiving(PacketEvent event) {
 		// https://wiki.vg/index.php?title=Protocol#Click_Window
 		if (event.getPacketType().equals(PacketType.Play.Client.WINDOW_CLICK)) {
-			if (event.getPacket().getIntegers().getValues().get(0) == ProtocolHandler.WINDOW_ID) {
+
+			final int windowId = event.getPacket().getIntegers().getValues().get(0);
+			if (windowId == ProtocolHandler.WINDOW_ID) {
 				// not a valid page here
 				Window page = handler.getPage(event.getPlayer());
 				if (page == null) {
 					return;
 				}
 				event.setCancelled(true);
+
 				// read packet
-				short actionId = event.getPacket().getShorts().getValues().get(0);
-				int slot = event.getPacket().getIntegers().getValues().get(1);
-				int button = event.getPacket().getIntegers().getValues().get(2);
+				final int actionId;
+				final int slot;
+				final int button;
 				int mode;
+
+				if (Version.ATLEAST_1_17_1) {
+					actionId = event.getPacket().getIntegers().getValues().get(1);
+					slot = event.getPacket().getIntegers().getValues().get(2);
+					button = event.getPacket().getIntegers().getValues().get(3);
+				} else {
+					actionId = event.getPacket().getShorts().getValues().get(0);
+					slot = event.getPacket().getIntegers().getValues().get(1);
+					button = event.getPacket().getIntegers().getValues().get(2);
+				}
+
 				if (!Version.ATLEAST_1_9) {
 					mode = event.getPacket().getIntegers().getValues().get(3);
 				} else {
 					try {
-						Class clickTypeEnum = Reflection.getNmsClass("InventoryClickType");
+						Class clickTypeEnum = Reflection.getNmsClass((Version.REMAPPED ? "world.inventory." : "") + "InventoryClickType");
 						String modeEnum = ReflectionObject.of(event.getPacket().getEnumModifier(clickTypeEnum, clickTypeEnum).getValues().get(0)).invokeMethod("name").get();
 						Integer foundMode = MODES_19.get(modeEnum);
 						if (foundMode != null) {
@@ -105,29 +128,38 @@ public class ProtocolEvents implements PacketListener {
 				}
 				// cancel action
 				try {
+					RWHashSet<Player> set = CollectionUtils.asRWSet(event.getPlayer());
+
 					// send transaction packet to cancel click ; https://wiki.vg/Protocol#Window_Confirmation_.28clientbound.29
-					Reflection.sendNmsPacket(event.getPlayer(), "PacketPlayOutTransaction", page.getId(), actionId, false);
+					// removed in 1.17, we'll see what it does
+					if (Version.ATLEAST_1_17) {
+					} else {
+						Reflection.sendNmsPacket(event.getPlayer(), "PacketPlayOutTransaction", page.getId(), (short) actionId, false);
+					}
+
 					// if this is a shift click, resend the whole window because we can't know where the new item will be located
 					if (mode == 1) {
-						ProtocolPackets.SET_WINDOW_ITEMS.process(CollectionUtils.asList(event.getPlayer()), page);
+						ProtocolPackets.SET_WINDOW_ITEMS.process(set, page);
 					}
 					// else, only reset some slots
 					else {
 						// reset cursor
-						ProtocolPackets.SET_SLOT.process(CollectionUtils.asList(event.getPlayer()), -1, -1, null); // -1 and -1 for cursor ; see https://wiki.vg/Protocol#Set_Slot
+						ProtocolPackets.SET_SLOT.process(set, -1, page.incrementStateId(), -1, null); // -1 and -1 for cursor ; see https://wiki.vg/Protocol#Set_Slot
+
 						// reset slot in GUI
 						if (slot < page.getGUI().getType().getSize()) {
-							ProtocolPackets.SET_SLOT.process(CollectionUtils.asList(event.getPlayer()), page.getId(), slot, page.getItems().get(slot));
+							ProtocolPackets.SET_SLOT.process(set, page.getId(), page.incrementStateId(), slot, page.getItems().get(slot));
 						}
 						// reset slot in player inventory
 						else {
 							int playerInventorySlot = slot - page.getGUI().getType().getSize();
 							if (playerInventorySlot >= 27) {
-								ProtocolPackets.SET_SLOT.process(CollectionUtils.asList(event.getPlayer()), page.getId(), slot, event.getPlayer().getInventory().getContents()[playerInventorySlot - 27]);
+								ProtocolPackets.SET_SLOT.process(set, page.getId(), page.incrementStateId(), slot, event.getPlayer().getInventory().getContents()[playerInventorySlot - 27]);
 							} else {
-								ProtocolPackets.SET_SLOT.process(CollectionUtils.asList(event.getPlayer()), page.getId(), slot, event.getPlayer().getInventory().getContents()[playerInventorySlot + 9]);
+								ProtocolPackets.SET_SLOT.process(set, page.getId(), page.incrementStateId(), slot, event.getPlayer().getInventory().getContents()[playerInventorySlot + 9]);
 							}
 						}
+
 						// reset offhand slot if it's a offhand key click
 						if (mode == 2 && button == 40) {
 							ProtocolPackets.REFRESH_EQUIPMENT.process(event.getPlayer());
@@ -136,7 +168,7 @@ public class ProtocolEvents implements PacketListener {
 						else if (mode == 2) {
 							int buttonSlot = page.getGUI().getType().getSize() + 27 + button;
 							if (buttonSlot != slot) {
-								ProtocolPackets.SET_SLOT.process(CollectionUtils.asList(event.getPlayer()), page.getId(), buttonSlot, event.getPlayer().getInventory().getContents()[button]);
+								ProtocolPackets.SET_SLOT.process(set, page.getId(), page.incrementStateId(), buttonSlot, event.getPlayer().getInventory().getContents()[button]);
 							}
 						}
 					}
@@ -144,29 +176,41 @@ public class ProtocolEvents implements PacketListener {
 					GCore.inst().getMainLogger().error("Couldn't cancel action", exception);
 					event.getPlayer().updateInventory();
 				}
+
 				// ignore special slot
 				if (slot == -999) {
 					return;
 				}
+
 				// too recent
 				if (System.currentTimeMillis() - lastClick <= 20L) {
 					return;
 				}
 				lastClick = System.currentTimeMillis();
+
 				// process click
-				if (mode == 0) {
-					click(event.getPlayer(), button == 0 ? ClickType.LEFT : ClickType.RIGHT, page.getIndex(), slot);
-				} else if (mode == 1) {
-					click(event.getPlayer(), button == 0 ? ClickType.SHIFT_LEFT : ClickType.SHIFT_RIGHT, page.getIndex(), slot);
-				} else if (mode == 2) {
-					click(event.getPlayer(), button == 40 ? ClickType.KEY_OFFHAND : ClickType.valueOf("NUMBER_KEY_" + (button + 1)), page.getIndex(), slot);
-				} else if (mode == 3) {
-					click(event.getPlayer(), ClickType.MIDDLE, page.getIndex(), slot);
-				} else if (mode == 4) {
-					click(event.getPlayer(), button == 0 ? ClickType.DROP : ClickType.CONTROL_DROP, page.getIndex(), slot);
-				} else if (mode == 6) {
-					click(event.getPlayer(), ClickType.DOUBLE_CLICK, page.getIndex(), slot);
+				final int m = mode;  // turbo pepega
+				Runnable processor = () -> {
+					if (m == 0) {
+						click(event.getPlayer(), button == 0 ? ClickType.LEFT : ClickType.RIGHT, page.getIndex(), slot);
+					} else if (m == 1) {
+						click(event.getPlayer(), button == 0 ? ClickType.SHIFT_LEFT : ClickType.SHIFT_RIGHT, page.getIndex(), slot);
+					} else if (m == 2) {
+						click(event.getPlayer(), button == 40 ? ClickType.KEY_OFFHAND : ClickType.valueOf("NUMBER_KEY_" + (button + 1)), page.getIndex(), slot);
+					} else if (m == 3) {
+						click(event.getPlayer(), ClickType.MIDDLE, page.getIndex(), slot);
+					} else if (m == 4) {
+						click(event.getPlayer(), button == 0 ? ClickType.DROP : ClickType.CONTROL_DROP, page.getIndex(), slot);
+					} else if (m == 6) {
+						click(event.getPlayer(), ClickType.DOUBLE_CLICK, page.getIndex(), slot);
+					}
+				};
+				if (ConfigGCore.delayProtocolGUIClicksTicks > 0) {  // maybe delay it, #1206
+					BukkitThread.current().operateLater(handler.getGUI().getPlugin(), ThrowableRunnable.fromSafe(processor), null, ConfigGCore.delayProtocolGUIClicksTicks);
+				} else {
+					processor.run();
 				}
+
 			}
 		}
 		// https://wiki.vg/Protocol#Window_Confirmation_.28serverbound.29
@@ -193,7 +237,7 @@ public class ProtocolEvents implements PacketListener {
 			page.getViewers().remove(event.getPlayer());
 			// call on close
 			try {
-				handler.getGUI().onClose(event.getPlayer());
+				handler.onClose(event.getPlayer());
 			} catch (Throwable exception) {
 				throw new Error("couldn't perform close effects in GUI " + handler.getGUI().getId() + " for page " + page.getIndex(), exception);
 			}
@@ -212,22 +256,28 @@ public class ProtocolEvents implements PacketListener {
 	}
 
 	private void click(Player player, ClickType click, int pageIndex, int slot) {
-		BukkitThread.SYNC.operate(() -> {
+		BukkitThread.FORCE_SYNC.operate(handler.getGUI().getPlugin(), () -> {
 			// player inventory
 			if (slot >= handler.getGUI().getType().getSize()) {
 				int s = slot >= handler.getGUI().getType().getSize() + 27 ? slot - handler.getGUI().getType().getSize() - 27 : slot - handler.getGUI().getType().getSize() + 9;
-				handler.getGUI().onPlayerInventoryClick(player, s, handler.getPageItem(pageIndex, slot), click, pageIndex);
+				handler.getGUI().onPlayerInventoryClick(new ClickCall(player, click, handler.getGUI(), pageIndex, s), player.getInventory().getItem(s));
 			}
 			// another inventory
 			else {
 				handler.onClick(player, click, slot, pageIndex);
 			}
-		}, exception -> {
-			throw new Error("couldn't perform click effects in GUI " + handler.getGUI().getId() + " at slot " + slot + " of page " + pageIndex, exception);
+		}, error -> {
+			handler.getGUI().getPlugin().getMainLogger().error("couldn't perform click effects in GUI " + handler.getGUI().getId() + " at slot " + slot + " of page " + pageIndex, error);
 		});
 	}
 
-	// send
+	@EventHandler
+	public void onDisconnect(PlayerQuitEvent event) {
+		handler.removeViewer(event.getPlayer());
+	}
+
+	// ----- send
+
 	@Override
 	public void onPacketSending(PacketEvent event) {
 	}

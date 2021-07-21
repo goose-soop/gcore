@@ -22,7 +22,6 @@ messageGcoreExportCouldnt: |
 
 commandDescriptionGcore: commande principale de GCore
 commandDescriptionGcorePlugins: lister les plugins dépendants de GCore
-commandDescriptionGcoreReload: redémarrer GCore
 commandDescriptionGcoreExport: exporter les données des plugins dépendants de GCore
 commandDescriptionGcoreItemRead: lire un item vers la configuration
 

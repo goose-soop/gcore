@@ -17,7 +17,7 @@ public class YMLMigrationWriting extends YMLConfiguration {
 		}
 	}
 
-	// don't load, completely override
+	// ----- don't load, completely override
 	@Override
 	public void load() {
 	}

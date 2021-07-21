@@ -1,6 +1,8 @@
 package com.guillaumevdn.gcore.lib.chat;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 
 import org.bukkit.ChatColor;
@@ -9,6 +11,7 @@ import org.json.simple.JSONObject;
 
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.compatibility.Compat;
+import com.guillaumevdn.gcore.lib.string.StringUtils;
 
 /**
  * @author JustisR and GuillaumeVDN
@@ -40,24 +43,54 @@ public class JsonMessage {
 
 		private final JsonMessage message;
 		private final String string = ",{\"text\":\"\",\"extra\":[";
-		private final String[] strings;
+		private List<String> parts = new ArrayList<>();
 		private String hover = "", click = "";
 
 		private JsonStringBuilder(JsonMessage jsonMessage, String text) {
 			message = jsonMessage;
-			String[] colors = text.split(String.valueOf(ChatColor.COLOR_CHAR));
-			for (int i = 0; i < colors.length; i++) {
-				if (i == 0 && !text.startsWith(String.valueOf(ChatColor.COLOR_CHAR))) {
-					colors[i] = "{\"text\":\"" + colors[i] + "\"}";
-				} else if (colors[i].length() < 1) {
-					colors[i] = "{\"text\":\"\"}";
-				} else {
-					ChatColor color = ChatColor.getByChar(colors[i].substring(0, 1));
-					colors[i] = "{\"text\":\"" + colors[i].substring(1) + "\",\"color\":\"" + color.name().toLowerCase(Locale.US) + "\"}";
-				}
-				if (i + 1 != colors.length) colors[i] = colors[i] + ",";
+			// unformatted text
+			if (!text.contains("§")) {
+				parts.add("{\"text\":\"" + text + "\"}");
 			}
-			strings = colors;
+			// formatted
+			else {
+				String[] split = text.split(String.valueOf(ChatColor.COLOR_CHAR));
+				for (int i = 0; i < split.length; ++i) {
+					// empty text
+					if (split[i].isEmpty()) {
+						parts.add("{\"text\":\"\"}");
+					}
+					// with color
+					else {
+						String ch = split[i].substring(0, 1);
+						// hex color code
+						if (ch.equalsIgnoreCase("x")) {
+							// get code
+							String code = "";
+							int j = i + 1;
+							for (; j < split.length && j < i + 6; ++j) {
+								code += split[j];
+							}
+							String last = j < split.length ? split[j] : null;
+							if (last != null && !last.isEmpty()) {  // valid hex code
+								parts.add("{\"text\":\"" + last.substring(1) + "\",\"color\":\"#" + (code + last.charAt(0)).toUpperCase() + "\"}");
+								i = j;
+							} else {  // invalid code
+								parts.add("{\"text\":\"" + split[i] + "\"}");
+							}
+						}
+						// regular code
+						else {
+							ChatColor color = ChatColor.getByChar(ch);
+							if (color != null) {
+								parts.add("{\"text\":\"" + split[i].substring(1) + "\",\"color\":\"" + color.name().toLowerCase(Locale.US) + "\"}");
+							} else {  // unknown color code
+								parts.add("{\"text\":\"" + split[i] + "\"}");
+							}
+						}
+					}
+				}
+			}
 		}
 
 		public JsonStringBuilder setHover(String... lore) {
@@ -86,9 +119,7 @@ public class JsonMessage {
 
 		public JsonMessage build() {
 			StringBuilder builder = new StringBuilder(message.msg + string);
-			for (String string : strings) {
-				builder.append(string);
-			}
+			builder.append(StringUtils.toTextString(",", parts));
 			builder.append("]" + hover + click + "}");
 			message.msg = builder.toString();
 			return message;

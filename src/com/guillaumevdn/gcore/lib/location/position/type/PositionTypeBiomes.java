@@ -26,13 +26,13 @@ public class PositionTypeBiomes extends PositionType {
 		super(id, CommonMats.MINECART);
 	}
 
-	// elements
+	// ----- elements
 	@Override
 	protected void doFillTypeSpecificElements(ElementPosition position) {
 		position.addBiomeList("biomes", Need.required(), TextEditorGeneric.descriptionPositionTypeBiomes);
 	}
 
-	// parse
+	// ----- parse
 	@Override
 	public Position doParse(ElementPosition position, Replacer replacer) throws ParsingError {
 		List<Biome> biomes = position.directParseNoCatchOrThrowParsingNull("biomes", replacer);

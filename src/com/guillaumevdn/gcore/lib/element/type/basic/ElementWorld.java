@@ -25,7 +25,7 @@ public class ElementWorld extends ElementValue<World> {
 		super(World.class, parent, id, need, editorDescription);
 	}
 
-	// editor
+	// ----- editor
 	@Override
 	public Mat editorIconType() {
 		return CommonMats.FURNACE_MINECART;
@@ -52,16 +52,16 @@ public class ElementWorld extends ElementValue<World> {
 					} catch (Throwable ignored) {}
 					setValue(world == null ? null : CollectionUtils.asList(value));
 				}
-				call.getGUI().setRegularItem(buildEditorItem(call.getSlot()));
-				call.getGUI().openFor(call.getClicker(), call.getPageIndex());
+				call.getGUI().setRegularItem(buildEditorItem(call.getPageIndex(), call.getSlot()));
+				call.reopenGUI();
 				getSuperElement().onEditorChange(this);
-			}, () -> call.getGUI().openFor(call.getClicker(), call.getPageIndex()));
+			}, () -> call.reopenGUI());
 		}
 		// right-click : import
 		else if (call.getType().equals(ClickType.RIGHT)) {
 			setValue(CollectionUtils.asList(getSerializer().serialize(call.getClicker().getWorld())));
-			call.getGUI().setRegularItem(buildEditorItem(call.getSlot()));
-			call.getGUI().openFor(call.getClicker(), call.getPageIndex());
+			call.getGUI().setRegularItem(buildEditorItem(call.getPageIndex(), call.getSlot()));
+			call.reopenGUI();
 			getSuperElement().onEditorChange(this);
 		}
 		// other

@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.collection.SortedHashMap;
+import com.guillaumevdn.gcore.lib.integration.Integration;
 import com.guillaumevdn.gcore.lib.location.Point;
 import com.guillaumevdn.gcore.lib.number.NumberUtils;
 import com.guillaumevdn.gcore.lib.player.PlayerUtils;
@@ -34,7 +35,7 @@ public class PlaceholderContainer implements Comparable<PlaceholderContainer> {
 		this.replacer = replacer;
 	}
 
-	// get
+	// ----- get
 	public String getId() {
 		return id;
 	}
@@ -51,7 +52,7 @@ public class PlaceholderContainer implements Comparable<PlaceholderContainer> {
 		return description;
 	}
 
-	// methods
+	// ----- methods
 	public String parse(String string, Player player) {
 		try {
 			return needPlayer && player == null ? string : replacer.apply(string, player);
@@ -66,7 +67,7 @@ public class PlaceholderContainer implements Comparable<PlaceholderContainer> {
 		return Integer.compare(priority, other.priority);
 	}
 
-	// static methods
+	// ----- static methods
 	public static String parseAll(String line, Player player) {
 		if (line != null) {
 			for (PlaceholderContainer replacer : registered.values()) {
@@ -113,7 +114,7 @@ public class PlaceholderContainer implements Comparable<PlaceholderContainer> {
 		return desc;
 	}
 
-	// registration
+	// ----- registration
 	private static SortedHashMap<String, PlaceholderContainer> registered = SortedHashMap.valueSorted();
 
 	public static SortedHashMap<String, PlaceholderContainer> values() {
@@ -129,7 +130,7 @@ public class PlaceholderContainer implements Comparable<PlaceholderContainer> {
 		registered.remove(id);
 	}
 
-	// values
+	// ----- values
 	public static final PlaceholderContainerBrackets PLAYER_LOCATION = register(new PlaceholderContainerBrackets("player_location", 1, true, CollectionUtils.asList("§7Player location : §8{player_location}"), (placeholderContent, player) -> {
 		if (placeholderContent.equalsIgnoreCase("player_location")) {
 			return Serializer.POINT.serialize(new Point(player.getLocation()));
@@ -165,7 +166,11 @@ public class PlaceholderContainer implements Comparable<PlaceholderContainer> {
 	}));
 
 	public static final PlaceholderContainer PLACEHOLDER_API = register(new PlaceholderContainer("placeholderapi", 998, true, CollectionUtils.asList("§7Supports Placeholder API placeholders"), (string, player) -> {
-		return PlaceholderAPIUtils.parse(player, string);
+		Integration integration = GCore.inst().getIntegration("PlaceholderAPI");
+		if (integration.getInstance() != null) {
+			return ((com.guillaumevdn.gcore.integration.placeholderapi.IntegrationInstancePlaceholderAPI) integration.getInstance()).parse(player, string);
+		}
+		return string;
 	}));
 
 	public static final PlaceholderContainerBrackets RANDOM_INTEGER = register(new PlaceholderContainerBrackets("random_integer", 999, false, CollectionUtils.asList("§7Random number : §8{random_integer:MIN,MAX}"), (placeholderContent, player) -> {

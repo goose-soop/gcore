@@ -37,7 +37,7 @@ public enum OverrideClickType implements LinearObjectType {
 		this.handlerBuilder = handlerBuilder;
 	}
 
-	// get
+	// ----- get
 	@Override
 	public boolean requireParam() {
 		return requiredParam;

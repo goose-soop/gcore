@@ -23,7 +23,7 @@ public class ElementEnchantmentLevelMap extends ElementAbstractEnumMap<Enchantme
 		super(Enchantment.class, "enchantment level", parent, id, need, editorDescription, CollectionUtils.asList(Enchantment.values()));
 	}
 
-	// add
+	// ----- add
 	@Override
 	public ElementInteger createElement(String elementId) {
 		ElementInteger element = new ElementInteger(this, elementId, Need.optional(), 1, null);
@@ -31,7 +31,7 @@ public class ElementEnchantmentLevelMap extends ElementAbstractEnumMap<Enchantme
 		return element;
 	}
 
-	// parsing
+	// ----- parsing
 	private ParsedCache<Map<Enchantment, Integer>> cache = new ParsedCache<>();
 
 	@Override
@@ -44,7 +44,7 @@ public class ElementEnchantmentLevelMap extends ElementAbstractEnumMap<Enchantme
 		cache.clear();
 	}
 
-	// editor
+	// ----- editor
 	@Override
 	public Mat editorIconType() {
 		return CommonMats.ENCHANTING_TABLE;

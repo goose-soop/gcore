@@ -8,12 +8,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
 
 import com.guillaumevdn.gcore.lib.GPlugin;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
@@ -44,7 +38,7 @@ public final class Bossbar {
 		this.players = CollectionUtils.asSet(players);
 	}
 
-	// get
+	// ----- get
 	public GPlugin getPlugin() {
 		return plugin;
 	}
@@ -77,7 +71,7 @@ public final class Bossbar {
 		return Collections.unmodifiableSet(players);
 	}
 
-	// set
+	// ----- set
 	public void setTitle(String title) {
 		this.title = title;
 		BossbarCompat.setColor(this);
@@ -103,19 +97,22 @@ public final class Bossbar {
 		BossbarCompat.setFlags(this);
 	}
 
-	public void addPlayer(Player player) {
+	private void addPlayer(Player player) {
 		if (players.add(player) && instances != null) {
+			//System.out.println("[QCDEBUG] Adding player " + player.getName() + " to bossbar " + title);
 			BossbarCompat.addPlayer(this, player);
 		}
 	}
 
-	public void removePlayer(Player player) {
-		if (players.remove(player) && instances != null) {
+	private boolean removePlayer(Player player) {
+		boolean removed = players.remove(player);
+		if (removed && instances != null) {
 			BossbarCompat.removePlayer(this, player);
 		}
+		return removed;
 	}
 
-	// instance
+	// ----- instance
 	private Map<Player, ReflectionObject> instances = null;
 
 	Map<Player, ReflectionObject> getInstances() {
@@ -148,24 +145,6 @@ public final class Bossbar {
 		plugin.registerBossbar(this);
 		instances = new HashMap<>();
 		players.forEach(player -> BossbarCompat.addPlayer(this, player));
-		plugin.registerListener("bossbar_" + id, new Listener() {
-			@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-			public void event(PlayerQuitEvent event) {
-				removePlayer(event.getPlayer());
-			}
-			@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-			public void event(PlayerTeleportEvent event) {
-				handleTeleport(event.getPlayer());
-			}
-			@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-			public void event(PlayerRespawnEvent event) {
-				handleTeleport(event.getPlayer());
-			}
-			private void handleTeleport(Player player) {
-				removePlayer(player);
-				addPlayer(player);
-			}
-		});
 	}
 
 	public void stop() {
@@ -174,8 +153,18 @@ public final class Bossbar {
 			instances = null;
 		}
 		plugin.unregisterBossbar(this);
-		plugin.stopListener("bossbar_" + id);
 		plugin.stopTask("bossbar_temp_autoprogress_" + id);
+	}
+
+	// events are in GPlugin, inside a dedicated listener
+	public void handleDisconnect(Player player) {
+		removePlayer(player);
+	}
+
+	public void handleTeleport(Player player) {
+		if (removePlayer(player)) {
+			addPlayer(player);
+		}
 	}
 
 }

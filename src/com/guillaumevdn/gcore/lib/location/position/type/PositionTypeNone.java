@@ -25,7 +25,7 @@ public class PositionTypeNone extends PositionType {
 		super(id, CommonMats.BEDROCK);
 	}
 
-	// parse
+	// ----- parse
 	@Override
 	public Position doParse(ElementPosition position, Replacer replacer) throws ParsingError {
 		return new Position() {

@@ -18,7 +18,7 @@ public final class ReaderLine {
 		return line;
 	}
 
-	// obj
+	// ----- obj
 	@Override
 	public String toString() {
 		return number + " '" + line + "'";

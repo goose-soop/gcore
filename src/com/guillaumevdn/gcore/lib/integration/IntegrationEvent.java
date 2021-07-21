@@ -38,7 +38,7 @@ public class IntegrationEvent<T extends Event> {
 		this.performer = performer;
 	}
 
-	// get
+	// ----- get
 	public IntegrationInstance getIntegration() {
 		return integration;
 	}
@@ -59,7 +59,7 @@ public class IntegrationEvent<T extends Event> {
 		return cancellable;
 	}
 
-	// listener
+	// ----- listener
 	private Listener listener = null;
 	
 	public void registerListener() {

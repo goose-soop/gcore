@@ -22,7 +22,6 @@ import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.compatibility.material.CommonMats;
 import com.guillaumevdn.gcore.lib.compatibility.material.Mat;
 import com.guillaumevdn.gcore.lib.gui.struct.ClickCall;
-import com.guillaumevdn.gcore.lib.gui.struct.ClickCall.ClickType;
 import com.guillaumevdn.gcore.lib.gui.struct.GUI;
 import com.guillaumevdn.gcore.lib.gui.struct.GUIItem;
 import com.guillaumevdn.gcore.lib.gui.struct.GUIType;
@@ -47,7 +46,7 @@ public class EnumSelectorGUI<V> extends GUI {
 	private Set<UUID> awaitingSearchChat = new HashSet<>();
 
 	public EnumSelectorGUI(Serializer<V> serializer, List<V> values, Mat icon, LinkedHashMap<V, Mat> valuesIcons, Function<V, String> customGetValueName) {
-		super(GCore.inst(), "editor_select_" + serializer.getTypeClass().getSimpleName(), TextEditorGeneric.guiSelectTitle.parseLine(), GUIType.CHEST_6_ROW, new ClickCall(), Option.DONT_UNREGISTER_ON_CLOSE);
+		super(GCore.inst(), "editor_select_" + serializer.getTypeClass().getSimpleName(), TextEditorGeneric.guiSelectTitle.parseLine(), GUIType.CHEST_6_ROW, Option.DONT_UNREGISTER_ON_CLOSE);
 		this.serializer = serializer;
 		this.values = values;
 		this.icon = icon;
@@ -55,7 +54,7 @@ public class EnumSelectorGUI<V> extends GUI {
 		this.customGetValueName = customGetValueName;
 	}
 
-	// fill
+	// ----- fill
 	@Override
 	protected boolean doFill() {
 		for (V value : (valuesIcons != null ? valuesIcons.keySet() : values)) {
@@ -88,26 +87,26 @@ public class EnumSelectorGUI<V> extends GUI {
 					}
 					if (matching.isEmpty()) {
 						TextEditorGeneric.messageElementBasicEditSearchNoMatch.replace("{value}", () -> value).send(call.getClicker());
-						openFor(call.getClicker());
+						openFor(call.getClicker(), call.getGUI().getFromCall(call.getClicker()));
 					} else if (matching.size() != 1) {
 						TextEditorGeneric.messageElementBasicEditSearchTooManyMatches.replace("{value}", () -> value).send(call.getClicker());
-						openFor(call.getClicker());
+						openFor(call.getClicker(), call.getGUI().getFromCall(call.getClicker()));
 					} else {
 						TextEditorGeneric.messageElementBasicEditSearchMatch.replace("{value}", () -> matching.get(0)).send(call.getClicker());
 						success(call.getClicker(), matching.get(0));
 					}
 				}
-			}, () -> call.getGUI().openFor(call.getClicker(), call.getPageIndex()));
+			}, () -> call.reopenGUI());
 		}));
 		return true;
 	}
-
+	
 	@Override
-	public void onPlayerInventoryClick(Player clicker, int slot, ItemStack item, ClickType clickType, int clickPageIndex) {
+	public void onPlayerInventoryClick(ClickCall call, ItemStack item) {
 		if (serializer.getTypeClass().equals(Mat.class)) {
-			Mat mat = Mat.fromItem(item).orNull();
+			Mat mat = Mat.fromItem(item).orElse(null);
 			if (mat != null) {
-				success(clicker, (V) mat);
+				success(call.getClicker(), (V) mat);
 			}
 		}
 	}
@@ -145,7 +144,7 @@ public class EnumSelectorGUI<V> extends GUI {
 		}
 	}
 
-	// static
+	// ----- static
 	private static final Map<Class<?>, EnumSelectorGUI<?>> selectorCache = new HashMap<>();
 
 	public static <V> void openSelector(Player player, boolean cache, Serializer<V> serializer, Supplier<List<V>> values, Mat icon, Consumer<V> onSelect, Runnable onBack) {
@@ -165,7 +164,7 @@ public class EnumSelectorGUI<V> extends GUI {
 	}
 
 	public static <V> void openSelector(Player player, boolean cache, Serializer<V> serializer, Supplier<List<V>> values, Mat icon, Supplier<LinkedHashMap<V, Mat>> valuesIcons, Function<V, String> customGetValueName, Consumer<V> onSelect, Runnable onBack) {
-		cache = cache && serializer.isRegistered(); // don't cache unregistered serializers
+		cache = cache && serializer.isRegistered(); // don't valuesCache unregistered serializers
 		EnumSelectorGUI gui = !cache ? null : selectorCache.get(serializer.getTypeClass());
 		if (gui == null) {
 			gui = new EnumSelectorGUI<V>(serializer, values == null ? null : values.get(), icon, valuesIcons == null ? null : valuesIcons.get(), customGetValueName);
@@ -174,7 +173,7 @@ public class EnumSelectorGUI<V> extends GUI {
 			}
 		}
 		gui.awaiting.put(player.getUniqueId(), Pair.of(onSelect, onBack));
-		gui.openFor(player);
+		gui.openFor(player, null);
 	}
 
 }

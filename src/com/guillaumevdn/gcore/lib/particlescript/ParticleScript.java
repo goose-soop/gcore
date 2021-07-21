@@ -12,7 +12,7 @@ import com.guillaumevdn.gcore.lib.object.ObjectUtils;
  */
 public class ParticleScript {
 
-	// base
+	// ----- base
 	private final GPlugin plugin;
 	private final String id;
 	private final List<Operation> operations;
@@ -27,7 +27,7 @@ public class ParticleScript {
 		this.operations = operations;
 	}
 
-	// get
+	// ----- get
 	public final GPlugin getPlugin() {
 		return plugin;
 	}
@@ -40,7 +40,7 @@ public class ParticleScript {
 		return operations;
 	}
 
-	// object
+	// ----- object
 	@Override
 	public String toString() {
 		return getId();

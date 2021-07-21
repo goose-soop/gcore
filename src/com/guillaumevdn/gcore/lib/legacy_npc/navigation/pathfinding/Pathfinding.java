@@ -21,7 +21,7 @@ import com.guillaumevdn.gcore.lib.location.PointTolerance;
  */
 public final class Pathfinding {
 
-	// properties
+	// ----- properties
 	private final World world;
 	private final Point origin;
 	private final Point target;
@@ -29,17 +29,17 @@ public final class Pathfinding {
 	private final int entityHeight;
 	private final MovementFinder movementFinder;
 
-	// callbacks
+	// ----- callbacks
 	private final BiConsumer<PathfindingResult, List<OptimizedPathPoint>> onDone;  // B will either be the successful path, either the closest path
 
-	// active
+	// ----- active
 	private final PathfindingTask runnable;
 	private BukkitTask task = null;
-	private PositionCache<Mat> typeCache;  // cache block types since we'll more than likely check the same blocks multiple times
+	private PositionCache<Mat> typeCache;  // valuesCache block types since we'll more than likely check the same blocks multiple times
 	private PositionCache<Object> toIgnore;  Object __VALUE = new Object();
 	private Path path;
 
-	// construct
+	// ----- construct
 	/**
 	 * @param origin is the origin block BELOW the entity's feet
 	 * @param target is the target block BELOW the entity's feet
@@ -55,7 +55,7 @@ public final class Pathfinding {
 		this.runnable = new PathfindingTask(this);
 	}
 
-	// get
+	// ----- get
 	public World getWorld() {
 		return world;
 	}
@@ -88,7 +88,7 @@ public final class Pathfinding {
 		return task != null;
 	}
 
-	// block
+	// ----- block
 	public boolean mustIgnore(Point point) {
 		return toIgnore.contains(point.getX(), point.getY(), point.getZ());
 	}
@@ -129,7 +129,7 @@ public final class Pathfinding {
 		return true;
 	}
 
-	// control
+	// ----- control
 	public void start() {
 		if (task == null) {
 			// reset data
@@ -146,10 +146,10 @@ public final class Pathfinding {
 		if (task != null) {
 			task.cancel();
 			task = null;
-			onDone.accept(result, path.getPoints().isEmpty() || result.equals(PathfindingResult.CANCEL) ? null : PathOptimizer.optimize(path, this));
+			onDone.accept(result, path.isEmpty() || result.equals(PathfindingResult.CANCEL) ? null : PathOptimizer.optimize(path, this));
 		}
 	}
 
-	// FIXME : when animating, make sure we're animating slabs correctly
+	// ----- FIXME : when animating, make sure we're animating slabs correctly
 
 }

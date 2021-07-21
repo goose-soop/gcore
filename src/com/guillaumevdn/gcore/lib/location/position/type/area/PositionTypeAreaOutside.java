@@ -21,14 +21,14 @@ public class PositionTypeAreaOutside extends PositionType {
 		super(id, CommonMats.IRON_DOOR);
 	}
 
-	// elements
+	// ----- elements
 	@Override
 	protected void doFillTypeSpecificElements(ElementPosition position) {
 		position.addLocation("bound1", Need.required(), TextEditorGeneric.descriptionPositionTypeBound1);
 		position.addLocation("bound2", Need.required(), TextEditorGeneric.descriptionPositionTypeBound2);
 	}
 
-	// parse
+	// ----- parse
 	public Position doParse(ElementPosition position, Replacer replacer) throws ParsingError {
 		Location a = position.getElementAs("bound1", ElementLocation.class).parseNoCatchOrThrowParsingNull(replacer);
 		Location b = position.getElementAs("bound2", ElementLocation.class).parseNoCatchOrThrowParsingNull(replacer);

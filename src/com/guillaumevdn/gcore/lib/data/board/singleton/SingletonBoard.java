@@ -27,7 +27,7 @@ public abstract class SingletonBoard<W> extends Board {
 	}
 
 	// ----------------------------------------------------------------------------------------------------
-	// save
+	// ----- save
 	// ----------------------------------------------------------------------------------------------------
 
 	private transient boolean toSave = false;
@@ -47,7 +47,7 @@ public abstract class SingletonBoard<W> extends Board {
 	}
 
 	// ----------------------------------------------------------------------------------------------------
-	// data
+	// ----- data
 	// ----------------------------------------------------------------------------------------------------
 
 	public final void pushAll(BukkitThread thread, ThrowableRunnable callback) {
@@ -69,18 +69,18 @@ public abstract class SingletonBoard<W> extends Board {
 	}
 
 	// ----------------------------------------------------------------------------------------------------
-	// json
+	// ----- json
 	// ----------------------------------------------------------------------------------------------------
 
-	// file
+	// ----- file
 	public abstract File getFile();
 
-	// init
+	// ----- init
 	@Override
 	protected void remoteInitJson() throws Throwable {
 	}
 
-	// push
+	// ----- push
 	protected void remotePushAllJson() throws Throwable {
 		File file = getFile();
 		FileUtils.reset(file);
@@ -93,7 +93,7 @@ public abstract class SingletonBoard<W> extends Board {
 
 	protected abstract void wrapJsonData(W wrapper);
 
-	// pull
+	// ----- pull
 	@Override
 	protected void remotePullAllJson() throws Throwable {
 		File file = getFile();
@@ -110,7 +110,7 @@ public abstract class SingletonBoard<W> extends Board {
 	protected abstract void unwrapJsonData(W wrapper);
 
 	// ----------------------------------------------------------------------------------------------------
-	// mysql
+	// ----- mysql
 	// ----------------------------------------------------------------------------------------------------
 
 	protected abstract void remotePushAllMySQL() throws Throwable;

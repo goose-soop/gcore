@@ -11,12 +11,12 @@ public abstract class Validator<T> {
 		this.mustBeDescription = mustBeDescription;
 	}
 
-	// get
+	// ----- get
 	public String getMustBeDescription() {
 		return mustBeDescription;
 	}
 
-	// abstract methods
+	// ----- abstract methods
 	public abstract boolean isValid(T value);
 
 }

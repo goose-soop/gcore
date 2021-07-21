@@ -255,8 +255,7 @@ descriptionGuiItemType: |
   &7Type item
 
 descriptionGuiItemIcon: |
-  &7
-Het pictogram dat moet worden weergegeven (als het geselecteerde type er niet automatisch een genereert)
+  &7Het pictogram dat moet worden weergegeven (als het geselecteerde type er niet automatisch een genereert)
 
 descriptionGuiItemLocations: |
   &7De locaties voor dit item

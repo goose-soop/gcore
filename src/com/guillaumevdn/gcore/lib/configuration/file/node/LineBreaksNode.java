@@ -14,21 +14,26 @@ public class LineBreaksNode extends Node {
 		this.count = count;
 	}
 
-	// get
+	// ----- get
 	public int getCount() {
 		return count;
 	}
 
-	// write
+	// ----- write
 	@Override
-	public void write(Appendable writer) throws Throwable {
+	public void write(Appendable writer, WriteType type) throws Throwable {
 		writer.append("\n"); // ignore count actually
 		/*for (int i = 0; i < count; ++i) {
 			writer.append("\n");
 		}*/
 	}
 
-	// clone
+	@Override
+	public void writeInCompact(Appendable writer, boolean compactParent) throws Throwable {
+		throw new UnsupportedOperationException("can't write compact line breaks");
+	}
+
+	// ----- clone
 	@Override
 	public LineBreaksNode clone(SectionNode parent) {
 		return new LineBreaksNode(parent, count);

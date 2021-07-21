@@ -46,7 +46,7 @@ public class NPCManager implements Listener {
 		}
 	}
 
-	// base
+	// ----- base
 	private Map<Integer, ElementNPC> elementsNpcs = new HashMap<>();
 	private Map<Player, Map<Integer, NPC>> npcs = new HashMap<>();
 	private List<Navigator> navigators = new ArrayList<>();
@@ -57,7 +57,7 @@ public class NPCManager implements Listener {
 		instance = this;
 	}
 
-	// get
+	// ----- get
 	public Map<Integer, ElementNPC> getNPCsConfig() {
 		return elementsNpcs;
 	}
@@ -101,7 +101,7 @@ public class NPCManager implements Listener {
 		navigators.remove(navigator);
 	}
 
-	// methods
+	// ----- methods
 	public void addNpc(Player player, NPC npc) {
 		Map<Integer, NPC> playerNpcs = npcs.get(player);
 		if (playerNpcs == null) npcs.put(player, playerNpcs = new HashMap<Integer, NPC>());
@@ -189,7 +189,7 @@ public class NPCManager implements Listener {
 		return true;
 	}
 
-	// enable/disable/reload
+	// ----- enable/disable/reload
 	public void enable() throws Throwable {
 		reload();
 		// start update task
@@ -258,7 +258,7 @@ public class NPCManager implements Listener {
 		}
 	}
 
-	// events
+	// ----- events
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void event(PlayerQuitEvent event) {
 		Player player = event.getPlayer();

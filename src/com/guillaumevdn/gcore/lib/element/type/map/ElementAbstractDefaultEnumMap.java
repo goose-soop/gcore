@@ -34,7 +34,7 @@ public abstract class ElementAbstractDefaultEnumMap<E, V extends Element> extend
 		valuesBuilder.get(this.valuesIcons = new LinkedHashMap<>());
 	}
 
-	// editor
+	// ----- editor
 	@Override
 	protected void editorAskKeyAndCreateAndAddElement(ClickCall call, BiConsumer<E, V> onCreate, Runnable onCancel) {
 		if (values != null) {

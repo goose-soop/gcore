@@ -24,7 +24,7 @@ public abstract class GPluginConfig {
 	private final Map<String, DataBackEnd> dataBackEnds = new HashMap<>();
 	private boolean updateNotification = true;
 
-	// get
+	// ----- get
 	public final boolean logMainConsole() {
 		return logMainConsole;
 	}
@@ -49,7 +49,7 @@ public abstract class GPluginConfig {
 		return updateNotification;
 	}
 
-	// load
+	// ----- load
 	public final void load() throws Throwable {
 		try {
 			YMLConfiguration config = doLoad();

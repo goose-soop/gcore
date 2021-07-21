@@ -27,12 +27,12 @@ public class ReflectionField {
 		}
 	}
 
-	// get
+	// ----- get
 	public Field getField() {
 		return field;
 	}
 
-	// methods
+	// ----- methods
 	public ReflectionObject retrieve(Object object) throws Throwable {
 		if (!field.isAccessible()) field.setAccessible(true);
 		Object result = field.get(object);

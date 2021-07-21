@@ -16,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.data.usernpcs.UserNPC;
 import com.guillaumevdn.gcore.data.usernpcs.UserNPCs;
+import com.guillaumevdn.gcore.lib.concurrency.RWHashMap;
 import com.guillaumevdn.gcore.lib.configuration.YMLConfiguration;
 import com.guillaumevdn.gcore.lib.data.Query;
 import com.guillaumevdn.gcore.lib.legacy_npc.ElementNPC;
@@ -76,23 +77,22 @@ public final class MigrationV8Data extends Migration {
 			});
 			// create tables
 			attemptOperation("creating MySQL tables", BackupBehavior.NONE, () -> {
-				mysql.performUpdateQuery(getPlugin(), new Query("DROP TABLE IF EXISTS `gcore_users_npcs_v8`;"
-						+ "CREATE TABLE `gcore_users_npcs_v8`("
-						+ "`user_uuid` CHAR(36) NOT NULL,"
-						+ "`data` LONGTEXT NOT NULL,"
-						+ "PRIMARY KEY(`user_uuid`)"
-						+ ") ENGINE=InnoDB DEFAULT CHARSET=?;"
-						, "utf8"));
+				mysql.performUpdateQuery(getPlugin(), new Query("DROP TABLE IF EXISTS gcore_users_npcs_v8;"
+						+ "CREATE TABLE gcore_users_npcs_v8("
+						+ "user_uuid CHAR(36) NOT NULL,"
+						+ "data LONGTEXT NOT NULL,"
+						+ "PRIMARY KEY(user_uuid)"
+						+ ") ENGINE=InnoDB DEFAULT CHARSET = 'utf8';"));
 			});
 			// statistics
 			attemptOperation("copying MySQL statistics", BackupBehavior.NONE, () -> {
-				mysql.performUpdateQuery(getPlugin(), new Query("DROP TABLE IF EXISTS `gcore_statistics_v8`;"
-						+ "CREATE TABLE `gcore_statistics_v8` LIKE `gcore_statistics`;"
-						+ "INSERT INTO `gcore_statistics_v8` SELECT * FROM `gcore_statistics`;"));
+				mysql.performUpdateQuery(getPlugin(), new Query("DROP TABLE IF EXISTS gcore_statistics_v8;"
+						+ "CREATE TABLE gcore_statistics_v8 LIKE gcore_statistics;"
+						+ "INSERT INTO gcore_statistics_v8 SELECT * FROM gcore_statistics;"));
 			});
 			// statistics
 			attemptOperation("converting MySQL users NPCs board", BackupBehavior.NONE, () -> {
-				ResultSet set = mysql.performGetQuery(getPlugin(), new Query("SELECT * FROM `gcore_users`"));
+				ResultSet set = mysql.performGetQuery(getPlugin(), new Query("SELECT * FROM gcore_users"));
 				while (set.next()) {
 					UUID uuid = null;
 					try {
@@ -100,7 +100,7 @@ public final class MigrationV8Data extends Migration {
 						uuid = migrateUserInfo(set.getString("id"));
 						UserNPCs user = migrateUserData(uuid, set.getString("data"), null, npcsConfig);
 						// write
-						mysql.performUpdateQuery(getPlugin(), new Query("INSERT INTO `gcore_users_npcs_v8`(`user_uuid`,`data`) VALUES (?, ?);", uuid, gson.toJson(user)));
+						mysql.performUpdateQuery(getPlugin(), new Query("INSERT INTO gcore_users_npcs_v8(user_uuid,data) VALUES (" + Query.escapeValue(uuid.toString()) + ", " + Query.escapeValue(gson.toJson(user)) + ");"));
 						countMod();
 					} catch (Throwable exception) {
 						error("Couldn't convert saved user NPCs for " + uuid + ", skipping", exception);
@@ -162,7 +162,7 @@ public final class MigrationV8Data extends Migration {
 
 	private UserNPCs migrateUserData(UUID uuid, String fromString, FileReader fromFile, Map<Integer, ElementNPC> npcsConfig) throws Throwable {
 		V7User v7 = fromString != null ? usersGson.fromJson(fromString, V7User.class) : usersGson.fromJson(fromFile, V7User.class);
-		Map<Integer, UserNPC> npcs = new HashMap<>();
+		RWHashMap<Integer, UserNPC> npcs = new RWHashMap<>();
 
 		if (v7 != null /* happens somehow */ && v7.npcs != null) {
 			for (int npcId : v7.npcs.keySet()) {

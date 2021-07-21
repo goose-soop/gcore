@@ -19,8 +19,10 @@ import com.guillaumevdn.gcore.lib.plugin.PluginUtils;
  */
 public abstract class Currency {
 
-	private String id;
-	private String requiredPlugin;
+	private final String id;
+	private final String requiredPlugin;
+
+	private String name;
 	private boolean enabled = false;
 	private double formatMultiplier = 1d;
 	private int formatDecimalPrecision = 2;
@@ -31,48 +33,54 @@ public abstract class Currency {
 	public Currency(String id, String requiredPlugin) {
 		this.id = id.toUpperCase();
 		this.requiredPlugin = requiredPlugin;
+		this.name = id;
 	}
 
-	// get
-	public String getId() {
+	public final String getId() {
 		return id;
 	}
 
-	public String getRequiredPlugin() {
+	public final String getRequiredPlugin() {
 		return requiredPlugin;
 	}
 
-	public boolean isEnabled() {
+	public final String getName() {
+		return name;
+	}
+
+	public final boolean isEnabled() {
 		return enabled;
 	}
 
-	public double getFormatMultiplier() {
+	public final double getFormatMultiplier() {
 		return formatMultiplier;
 	}
 
-	public int getFormatDecimalPrecision() {
+	public final int getFormatDecimalPrecision() {
 		return formatDecimalPrecision;
 	}
 
-	public String getFormatSingle() {
+	public final String getFormatSingle() {
 		return formatSingle;
 	}
 
-	public String getFormatMultiple() {
+	public final String getFormatMultiple() {
 		return formatMultiple;
 	}
 
-	public ItemStack getIcon() {
+	public final ItemStack getIcon() {
 		return icon;
 	}
-	
-	// obj
+
+	// ----- obj
+
 	@Override
 	public String toString() {
 		return getId();
 	}
 
-	// enable
+	// ----- enable
+
 	public boolean enable() {
 		// shouldn't enable
 		if (requiredPlugin == null || !PluginUtils.isPluginEnabled(requiredPlugin)) {
@@ -89,6 +97,7 @@ public abstract class Currency {
 			formatDecimalPrecision = ConfigGCore.baseConfig.readMandatoryInteger(path + ".format_decimal_precision");
 			formatMultiplier = ConfigGCore.baseConfig.readDouble(path + ".format_multiplier", 1d);
 			icon = ConfigGCore.baseConfig.readMandatoryItemStack(path + ".icon");
+			name = ConfigGCore.baseConfig.readString(path + ".name", id);
 			// done
 			GCore.inst().getMainLogger().info("Enabled currency " + id);
 			return (enabled = true);
@@ -106,7 +115,8 @@ public abstract class Currency {
 
 	protected abstract boolean initialize() throws Throwable;
 
-	// methods
+	// ----- methods
+
 	public String format(double amount) {
 		if (formatMultiplier != 1d) {
 			amount = amount * formatMultiplier;
@@ -173,12 +183,14 @@ public abstract class Currency {
 		}
 	}
 
-	// abstract methods
+	// ----- abstract
+
 	protected abstract double doGet(OfflinePlayer player) throws Throwable;
 	protected abstract boolean doGive(OfflinePlayer player, double amount) throws Throwable;
 	protected abstract boolean doTake(OfflinePlayer player, double amount) throws Throwable;
 
-	// registration
+	// ----- registration
+
 	private static final Map<String, Currency> registered = new HashMap<>();
 
 	public static Collection<Currency> values() {
@@ -200,7 +212,8 @@ public abstract class Currency {
 		return currency;
 	}
 
-	// values
+	// ----- values
+
 	public static final Currency VAULT = register(new CurrencyVault());
 
 	// TODO : add more currencies

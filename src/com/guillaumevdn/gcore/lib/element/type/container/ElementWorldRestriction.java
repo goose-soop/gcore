@@ -5,6 +5,7 @@ import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 
+import com.guillaumevdn.gcore.ConfigGCore;
 import com.guillaumevdn.gcore.TextEditorGeneric;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.compatibility.material.CommonMats;
@@ -30,7 +31,7 @@ public class ElementWorldRestriction extends ParseableContainerElement<List<Worl
 		super("world restriction", parent, id, need, editorDescription);
 	}
 
-	// get
+	// ----- get
 	public ElementWorldList getWhitelist() {
 		return whitelist;
 	}
@@ -39,7 +40,7 @@ public class ElementWorldRestriction extends ParseableContainerElement<List<Worl
 		return blacklist;
 	}
 
-	// parse
+	// ----- parse
 	@Override
 	public List<World> doParse(Replacer replacer) throws ParsingError {
 		List<World> whitelist = this.whitelist.parseNoCatch(replacer).orNull();
@@ -56,17 +57,17 @@ public class ElementWorldRestriction extends ParseableContainerElement<List<Worl
 			return true;
 		}
 		List<World> whitelist = this.whitelist.parse(replacer).orNull();
-		if (whitelist != null && !whitelist.isEmpty()) {
+		if (whitelist != null && (ConfigGCore.ignoreInvalidElementValues ? this.whitelist.getValueSize() != 0 : !whitelist.isEmpty())) {
 			return whitelist.contains(world);
 		}
 		List<World> blacklist = this.blacklist.parse(replacer).orNull();
-		if (blacklist != null && !blacklist.isEmpty()) {
+		if (blacklist != null && (ConfigGCore.ignoreInvalidElementValues ? this.blacklist.getValueSize() != 0 : !blacklist.isEmpty())) {
 			return !blacklist.contains(world);
 		}
 		return true;
 	}
 
-	// editor
+	// ----- editor
 	@Override
 	public Mat editorIconType() {
 		if (!parseGeneric().isPresent()) return CommonMats.MINECART;

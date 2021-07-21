@@ -25,7 +25,7 @@ public class ElementPosition extends TypableContainerElement<PositionType> imple
 		return add(new ElementPositionType(this, "type", TextEditorGeneric.descriptionPositionType));
 	}
 
-	// parsing
+	// ----- parsing
 	private ParsedCache<Position> cache = new ParsedCache<>();
 
 	@Override

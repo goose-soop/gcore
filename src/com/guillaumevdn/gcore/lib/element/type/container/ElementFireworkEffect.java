@@ -36,7 +36,7 @@ public class ElementFireworkEffect extends ParseableContainerElement<FireworkEff
 		super("potion effect", parent, id, need, editorDescription);
 	}
 
-	// get
+	// ----- get
 	public ElementFireworkEffectType getType() {
 		return type;
 	}
@@ -57,7 +57,7 @@ public class ElementFireworkEffect extends ParseableContainerElement<FireworkEff
 		return trail;
 	}
 
-	// import
+	// ----- import
 	public void importValue(FireworkEffect value) {
 		type.setValue(CollectionUtils.asList(value.getType().name()));
 		colors.setValue(Serializer.COLOR.serialize(value.getColors()));
@@ -66,7 +66,7 @@ public class ElementFireworkEffect extends ParseableContainerElement<FireworkEff
 		trail.setValue(value.hasTrail() ? CollectionUtils.asList("true") : null);
 	}
 
-	// parse
+	// ----- parse
 	@Override
 	public FireworkEffect doParse(Replacer replacer) throws ParsingError {
 		FireworkEffect.Type type = this.type.parseNoCatchOrThrowParsingNull(replacer);
@@ -77,7 +77,7 @@ public class ElementFireworkEffect extends ParseableContainerElement<FireworkEff
 		return FireworkEffect.builder().with(type).withColor(colors).withFade(fadeColors).flicker(flicker != null && flicker).trail(trail != null && trail).build();
 	}
 
-	// editor
+	// ----- editor
 	@Override
 	public Mat editorIconType() {
 		return CommonMats.REPEATER;

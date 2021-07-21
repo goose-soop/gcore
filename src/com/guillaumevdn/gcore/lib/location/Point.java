@@ -36,9 +36,13 @@ public class Point {
 		this.z = z;
 	}
 
-	// get
+	// ----- get
 	public World getWorld() {
 		return Bukkit.getWorld(world);
+	}
+
+	public String getWorldName() {
+		return world;
 	}
 
 	public int getX() {
@@ -53,7 +57,28 @@ public class Point {
 		return z;
 	}
 
-	// methods
+	public Mat getType() {
+		return Mat.fromBlock(toBlock()).orAir();
+	}
+
+	// ----- set
+	public void setWorld(String world) {
+		this.world = world;
+	}
+
+	public void setX(int x) {
+		this.x = x;
+	}
+
+	public void setY(int y) {
+		this.y = y;
+	}
+
+	public void setZ(int z) {
+		this.z = z;
+	}
+
+	// ----- methods
 	public Location toLocation() {
 		World world = getWorld();
 		return world == null ? null : new Location(world, x, y, z);
@@ -89,7 +114,12 @@ public class Point {
 		return Math.sqrt(Math.pow(location.getX() - this.getX(), 2d) + Math.pow(location.getZ() - this.getZ(), 2d) + Math.pow(location.getZ() - this.getZ(), 2d));
 	}
 
-	// object
+	// ----- transform
+	public Point getRelative(int x, int y, int z) {
+		return new Point(world, this.x + x, this.y + y, this.z + z);
+	}
+
+	// ----- object
 	@Override
 	public String toString() {
 		return Serializer.POINT.serialize(this);

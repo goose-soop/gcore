@@ -14,8 +14,10 @@ import com.guillaumevdn.gcore.ConfigGCore;
 import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.lib.GPlugin;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
-import com.guillaumevdn.gcore.lib.collection.LowerCaseHashMap;
 import com.guillaumevdn.gcore.lib.compatibility.material.Mat;
+import com.guillaumevdn.gcore.lib.concurrency.RWHashMap;
+import com.guillaumevdn.gcore.lib.concurrency.RWLowerCaseHashMap;
+import com.guillaumevdn.gcore.lib.concurrency.RWWeakHashMap;
 import com.guillaumevdn.gcore.lib.gui.internal.Handler;
 import com.guillaumevdn.gcore.lib.gui.internal.protocol.ProtocolHandler;
 import com.guillaumevdn.gcore.lib.gui.internal.vanilla.VanillaHandler;
@@ -31,12 +33,16 @@ import com.guillaumevdn.gcore.lib.tuple.IntegerPair;
  */
 public class GUI {
 
-	// options
+	// ----- options
 	public static enum Option {
-		DONT_UNREGISTER_ON_CLOSE;
+		DONT_UNREGISTER_ON_CLOSE,
+		AUTO_BACK_ITEM
 	}
 
-	// base
+	private static final int MAX_LENGTH = 30;
+	private static final String APPEND_CUT = "...";
+
+	// ----- base
 	private GPlugin plugin;
 	private final String id;
 	private final String name;
@@ -44,32 +50,50 @@ public class GUI {
 	private int backItemSlot = -1;
 	private final Set<Option> options;
 	private final List<Integer> regularItemSlots;
-	private final LowerCaseHashMap<GUIItem> regularItems = new LowerCaseHashMap<>();
-	private final LowerCaseHashMap<GUIItem> persistentItems = new LowerCaseHashMap<>();
+	private final RWLowerCaseHashMap<GUIItem> regularItems = new RWLowerCaseHashMap<>();
+	private final RWLowerCaseHashMap<GUIItem> persistentItems = new RWLowerCaseHashMap<>();
 	private final Handler handler;
 	private long lastFilled = 0L;
 	private boolean active = false;
-	private ClickCall fromCall = null;
+	private RWWeakHashMap<Player, ClickCall> fromCall = new RWWeakHashMap<>();
 
-	public GUI(GPlugin plugin, String id, String name, GUIType type, ClickCall fromCall, Option... options) {
-		this(plugin, id, name, type, NumberUtils.range(0, type.getRegularItemSlotsEnd()), fromCall, options);
+	public GUI(GPlugin plugin, String id, String name, GUIType type, Option... options) {
+		this(plugin, id, name, type, NumberUtils.range(0, type.getRegularItemSlotsEnd()), options);
 	}
 
-	public GUI(GPlugin plugin, String id, String name, GUIType type, List<Integer> regularItemSlots, ClickCall fromCall, Option... options) {
+	public GUI(GPlugin plugin, String id, String name, GUIType type, List<Integer> regularItemSlots, Option... options) {
 		this.plugin = plugin;
 		this.id = id;
 		String n = StringUtils.unformat(name);
-		int cutAt = 30;
-		if (n.length() > cutAt) {
-			cutAt = cutAt + (name.length() - n.length());
-			if (n.charAt(cutAt) == '§') {
+		if (n.length() > MAX_LENGTH) {
+			/*
+			 * Faut compter les couleurs nécessaires pour arriver au cut pour que le nom qu'on a cut, unformatté, ait la même taille que le cut normal
+			 * Perso j'ai la flemme
+
+			 int cutAt = n.length() - (MAX_LENGTH - APPEND_CUT.length()) + (name.length() - n.length());
+
+			int cutAt = n.length() - (MAX_LENGTH - APPEND_CUT.length()) + (name.length() - n.length());
+			int cutAtNormal = n.length() - (MAX_LENGTH - APPEND_CUT.length());
+
+			System.out.println("name " + name);
+			System.out.println("n    " + n);
+			System.out.println("n    " + name.replace('§', '&'));
+			System.out.println("= diff " + (name.length() - n.length()));
+			System.out.println("- cutAt " + cutAt);
+			System.out.println("- cutAtNormal " + cutAtNormal);
+			System.out.println("- subst " + name.substring(cutAt, name.length()) + ", length " + (name.substring(cutAt, name.length()).length()));
+
+			if (cutAt > 0 && name.charAt(cutAt - 1) == '§') {
 				if (cutAt + 1 >= n.length()) {
 					--cutAt;
 				} else {
 					++cutAt;
 				}
 			}
-			this.name = name.length() > 30 ? "..." + name.substring(name.length() - 27, name.length()) : name;
+			this.name = StringUtils.getLastColors(name.substring(0, cutAt)) + APPEND_CUT + name.substring(cutAt, name.length());
+			 */
+
+			this.name = StringUtils.getLastColors(name.substring(0, MAX_LENGTH)) + APPEND_CUT + name.substring(MAX_LENGTH, name.length());
 		} else {
 			this.name = name;
 		}
@@ -82,12 +106,11 @@ public class GUI {
 		}
 		this.options = Collections.unmodifiableSet(opts);
 		this.regularItemSlots = regularItemSlots;
-		this.fromCall = fromCall;
-		if (fromCall != null && type.getBackItemSlot() != -1) regularItemSlots.remove((Integer) (this.backItemSlot = type.getBackItemSlot()));
+		if (this.options.contains(Option.AUTO_BACK_ITEM) && type.getBackItemSlot() != -1) regularItemSlots.remove((Integer) (this.backItemSlot = type.getBackItemSlot()));
 		this.handler = ConfigGCore.allowProtocolGUIs && PluginUtils.isPluginEnabled("ProtocolLib") ? new ProtocolHandler(this) : new VanillaHandler(this);
 	}
 
-	// get
+	// ----- get
 	public final GPlugin getPlugin() {
 		return plugin;
 	}
@@ -108,7 +131,7 @@ public class GUI {
 		return options;
 	}
 
-	public final Map<String, GUIItem> getRegularItems() {
+	public final RWHashMap<String, GUIItem> getRegularItems() {
 		return regularItems;
 	}
 
@@ -116,7 +139,7 @@ public class GUI {
 		return regularItems.get(id);
 	}
 
-	public final Map<String, GUIItem> getPersistentItems() {
+	public final RWHashMap<String, GUIItem> getPersistentItems() {
 		return persistentItems;
 	}
 
@@ -132,11 +155,11 @@ public class GUI {
 		return active;
 	}
 
-	public final ClickCall getFromCall() {
-		return fromCall;
+	public final ClickCall getFromCall(Player player) {
+		return fromCall.get(player);
 	}
 
-	public final Map<Player, Integer> getViewers() {
+	public final RWHashMap<Player, Integer> getViewers() {
 		return handler.getViewers();
 	}
 
@@ -144,28 +167,38 @@ public class GUI {
 		return handler.getViewerPage(player);
 	}
 
-	// set
+	// ----- set
+
 	protected void setPlugin(GPlugin plugin) {  // this can be useful, for the confirm GUI for instance
 		this.plugin = plugin;
 	}
 
-	// items
-	public GUIItem getRegularItem(int pageIndex, int slot) {
-		for (GUIItem item : regularItems.values()) {
-			if (item.isInLocation(pageIndex, slot)) {
-				return item;
-			}
+	public void setFromCall(Player player, ClickCall fromCall) {
+		if (fromCall == null) {
+			this.fromCall.remove(player);
+		} else {
+			this.fromCall.put(player, fromCall);
 		}
-		return null;
+	}
+
+	// ----- items
+
+	public GUIItem getItem(int page, int slot) {
+		return persistentItems.streamResultValues(str -> str.filter(it -> it.isInSlot(slot)).findFirst())
+				.orElseGet(() -> regularItems.streamResultValues(str -> str.filter(it -> it.isInLocation(page, slot)).findFirst().orElse(null)));
+	}
+
+	public GUIItem getItemWithPerformer(int page, int slot, ClickType type) {  // some items allow to override them, but they however can still be detected at their slot (for instance, dynamic borders)
+		return persistentItems.streamResultValues(str -> str.filter(it -> it.isInSlot(slot) && it.getClickPerformer(type) != null).findFirst())
+				.orElseGet(() -> regularItems.streamResultValues(str -> str.filter(it -> it.isInLocation(page, slot) && it.getClickPerformer(type) != null).findFirst().orElse(null)));
+	}
+
+	public GUIItem getRegularItem(int pageIndex, int slot) {
+		return regularItems.streamResultValues(str -> str.filter(it -> it.isInLocation(pageIndex, slot)).findFirst().orElse(null));
 	}
 
 	public GUIItem getPersistentItem(int slot) {
-		for (GUIItem item : persistentItems.values()) {
-			if (item.isInSlot(slot)) {
-				return item;
-			}
-		}
-		return null;
+		return persistentItems.streamResultValues(str -> str.filter(it -> it.isInSlot(slot)).findFirst().orElse(null));
 	}
 
 	public void setItem(GUIItem item, boolean persistent) {
@@ -181,21 +214,22 @@ public class GUI {
 		if (Mat.isVoid(item.getItem())) {
 			throw new IllegalArgumentException("can't set regular item " + item.getId() + " in GUI " + getId() + ", void item");
 		}
+
 		// invalid slot
 		for (IntegerPair preferredLocation : item.getLocations()) {
 			if (preferredLocation.getB() < -1 || preferredLocation.getB() >= type.getSize()) {
 				throw new IllegalArgumentException("can't set regular item " + item.getId() + " in GUI " + getId() + ", preferred slot " + preferredLocation.getB() + " is outside bounds (-1 to " + (type.getSize() - 1) + ")");
 			}
 		}
+
 		// remove if existing
 		GUIItem previous = removeRegularItem(item);
+
+		// get locations
 		List<IntegerPair> locations;
-		// get locations from previous if existing
-		if (previous != null && !previous.getLocations().isEmpty()) {
+		if (previous != null && !previous.getLocations().isEmpty()) {  // get from previous
 			locations = previous.getLocations();
-		}
-		// recalculate locations otherwise
-		else {
+		} else {  // recalculate them
 			locations = new ArrayList<>();
 			if (item.getPreferredLocations().isEmpty()) {
 				IntegerPair location = findOrCreateFreeForRegular(-1, -1);
@@ -215,8 +249,10 @@ public class GUI {
 				}
 			}
 		}
+
 		// register it
 		regularItems.put(item.getId(), item);
+
 		// set item
 		locations.forEach(location -> {
 			handler.setPageItem(location, item.getItem());
@@ -234,6 +270,7 @@ public class GUI {
 		if (Mat.isVoid(item.getItem())) {
 			throw new IllegalArgumentException("can't set persistent item " + item.getId() + " in GUI " + getId() + ", void item");
 		}
+
 		// invalid slot
 		if (item.getPreferredLocations().isEmpty()) {
 			throw new IllegalArgumentException("can't set persistent item " + item.getId() + " in GUI " + getId() + ", no slot found");
@@ -251,10 +288,13 @@ public class GUI {
 				throw new IllegalArgumentException("can't set persistent item " + item.getId() + " in GUI " + getId() + ", preferred slot " + preferredLocation.getB() + " already has persistent item " + existing.getId());
 			}
 		}
+
 		// remove if existing
 		removePersistentItem(item);
+
 		// register it
 		persistentItems.put(item.getId(), item);
+
 		// add it on all pages
 		List<GUIItem> existingRegularItems = new ArrayList<>();
 		List<IntegerPair> locations = new ArrayList<>();
@@ -275,6 +315,7 @@ public class GUI {
 				locations.add(IntegerPair.of(pageIndex, preferredLocation.getB()));
 			}
 		});
+
 		// re-add existing regular items
 		existingRegularItems.forEach(existingItem -> setRegularItem(existingItem));
 		item.setLocations(locations);
@@ -317,13 +358,21 @@ public class GUI {
 		}
 	}
 
+	public void removeItem(String itemId, boolean persistent) {
+		if (persistent) {
+			removePersistentItem(itemId);
+		} else {
+			removeRegularItem(itemId);
+		}
+	}
+
 	public void clear() {
 		handler.clear();
 		persistentItems.clear();
 		regularItems.clear();
 	}
 
-	// page
+	// ----- page
 	public final int getPageCount() {
 		return handler.getPageCount();
 	}
@@ -353,7 +402,7 @@ public class GUI {
 			handler.setPageItem(pageIndex, backItemSlot, ConfigGCore.backItem);
 		}
 		// add persistent items
-		persistentItems.values().forEach(persistentItem -> {
+		persistentItems.forEach((__, persistentItem) -> {
 			persistentItem.getPreferredLocations().forEach(preferredLocation -> {
 				if ((pageIndex == 0 ? true : preferredLocation.getB() != type.getPreviousPageItemSlot())) {
 					handler.setPageItem(pageIndex, preferredLocation.getB(), persistentItem.getItem());
@@ -386,29 +435,31 @@ public class GUI {
 			}
 			// has preferred slot
 			if (preferredSlot >= 0) {
-				return isSlotFreeForRegular(preferredPageIndex, preferredSlot) ? new IntegerPair(preferredPageIndex, preferredSlot) : null;
+				return isSlotFreeForRegular(preferredPageIndex, preferredSlot) ? IntegerPair.of(preferredPageIndex, preferredSlot) : null;
 			}
 			// no preferred slot
 			else {
 				int firstEmpty = handler.firstEmpty(preferredPageIndex);
-				return firstEmpty != -1 && regularItemSlots.contains(firstEmpty) ? new IntegerPair(preferredPageIndex, firstEmpty) : null;
+				return firstEmpty != -1 && regularItemSlots.contains(firstEmpty) ? IntegerPair.of(preferredPageIndex, firstEmpty) : null;
 			}
 		}
 		// no preferred page
-		// has preferred slot
-		if (preferredSlot >= 0 && preferredSlot < type.getSize()) {
-			for (int page = 0; page < handler.getPageCount(); ++page) {
-				if (isSlotFreeForRegular(page, preferredSlot)) {
-					return new IntegerPair(page, preferredSlot);
+		else {
+			// has preferred slot
+			if (preferredSlot >= 0 && preferredSlot < type.getSize()) {
+				for (int page = 0; page < handler.getPageCount(); ++page) {
+					if (isSlotFreeForRegular(page, preferredSlot)) {
+						return IntegerPair.of(page, preferredSlot);
+					}
 				}
 			}
-		}
-		// no preferred slot
-		else {
-			for (int page = 0; page < handler.getPageCount(); ++page) {
-				int firstEmpty = handler.firstEmpty(page);
-				if (firstEmpty != -1 && regularItemSlots.contains(firstEmpty)) {
-					return new IntegerPair(page, firstEmpty);
+			// no preferred slot
+			else {
+				for (int page = 0; page < handler.getPageCount(); ++page) {
+					int firstEmpty = handler.firstEmpty(page);
+					if (firstEmpty != -1 && regularItemSlots.contains(firstEmpty)) {
+						return IntegerPair.of(page, firstEmpty);
+					}
 				}
 			}
 		}
@@ -430,10 +481,10 @@ public class GUI {
 			return false;
 		}
 		// has page control item
-		if (type.getPreviousPageItemSlot() != -1 && pageIndex > 0 && slot == type.getPreviousPageItemSlot()) {
+		if (type.getPreviousPageItemSlot() != -1 && slot == type.getPreviousPageItemSlot() && pageIndex > 0) {
 			return false;
 		}
-		if (type.getNextPageItemSlot() != -1 && (pageIndex == 0 || pageIndex + 1 < handler.getPageCount()) && slot == type.getNextPageItemSlot()) {
+		if (type.getNextPageItemSlot() != -1 && slot == type.getNextPageItemSlot() && pageIndex + 1 < handler.getPageCount()) {
 			return false;
 		}
 		if (backItemSlot != -1 && slot == backItemSlot) {
@@ -452,27 +503,30 @@ public class GUI {
 		return true;
 	}
 
-	// open and fill
+	// ----- open and fill
 	/** @return true if the GUI must be opened after refilling it */
 	public boolean refill() {
 		Map<Player, Integer> viewers = getViewers();
+
 		// clear/fill
 		clear();
 		boolean open = doFill();
 		lastFilled = System.currentTimeMillis();
+
 		// open new pages for viewers ; old pages are cleared, but kept open, so the cursor doesn't recenter when we reopen new pages
 		if (open) {
 			if (handler.getPageCount() == 0) {
 				createPage();
 			}
 			viewers.forEach((player, pageIndex) -> {
-				openFor(player, pageIndex < handler.getPageCount() ? pageIndex : handler.getPageCount() - 1);
+				openFor(player, pageIndex < handler.getPageCount() ? pageIndex : handler.getPageCount() - 1, getFromCall(player));
 			});
 		}
 		// or maybe just close pages for viewers
 		else {
 			viewers.keySet().forEach(player -> handler.close(player));
 		}
+
 		// done
 		return open;
 	}
@@ -483,36 +537,29 @@ public class GUI {
 	}
 
 	/** @return true if the GUI was opened */
-	public final boolean refillAndOpenFor(Player player) {
+	public final boolean refillAndOpenFor(Player player, ClickCall fromCall) {
 		int currentPage = getViewerPage(player);
-		return refill() && openFor(player, currentPage == -1 ? 0 : currentPage);
+		return refill() && openFor(player, currentPage == -1 ? 0 : currentPage, fromCall);
 	}
 
 	/** @return true if the GUI was opened */
-	public final boolean openFor(Player player) {
-		return openFor(player, 0);
+	public final boolean openFor(Player player, ClickCall fromCall) {
+		return openFor(player, 0, fromCall);
 	}
 
 	/** @return true if the GUI was opened ; this method can be overriden for extra monitoring but must call super */
-	public boolean openFor(Player player, int pageIndex) {
-		return doOpenFor(player, pageIndex);
+	public boolean openFor(Player player, int pageIndex, ClickCall fromCall) {
+		return doOpenFor(player, pageIndex, fromCall);
 	}
 
 	/** @return true if the GUI was opened */
-	private final boolean doOpenFor(Player player, int pageIndex) {
-		// remove player from all other GUIs if ProtocolLib ; because the window close packet isn't sent when opening a window while another is already opened, and this creates messy issues (player is considered to be on multiple pages at the same time)
-		if (PluginUtils.isPluginEnabled("ProtocolLib")) {
-			PluginUtils.getGPlugins().forEach(plugin -> plugin.getGuis().values().forEach(gui -> {
-				ProtocolHandler handler = ObjectUtils.castOrNull(((GUI) gui).handler, ProtocolHandler.class);
-				if (handler != null) {
-					handler.removeViewer(player);
-				}
-			}));
-		}
+	private final boolean doOpenFor(Player player, int pageIndex, ClickCall fromCall) {
+
 		// create a page if has none
 		if (handler.getPageCount() == 0) {
 			createPage();
 		}
+
 		// not active ; fill it (it might have been unregistered on close, or it's a new GUI)
 		if (!isActive()) {
 			activate();
@@ -531,6 +578,7 @@ public class GUI {
 				}
 			}
 		}
+
 		// invalid page
 		/*if (pageIndex >= handler.getPageCount()) {
 			throw new IllegalArgumentException("can't open GUI " + getId() + ", page index " + pageIndex + " is outside bounds");
@@ -538,12 +586,25 @@ public class GUI {
 		if (pageIndex >= handler.getPageCount()) {
 			pageIndex = handler.getPageCount() - 1;
 		}
+
+		// remove player from all other GUIs if ProtocolLib ; because the window close packet isn't sent when opening a window while another is already opened, and this creates messy issues (player is considered to be on multiple pages at the same time)
+		if (PluginUtils.isPluginEnabled("ProtocolLib")) {
+			PluginUtils.getGPlugins().forEach(plugin -> plugin.getGUIs().forEach(gui -> {
+				ProtocolHandler handler = ObjectUtils.castOrNull(((GUI) gui).handler, ProtocolHandler.class);
+				if (handler != null && handler.removeViewer(player)) {
+					((GUI) gui).onClose(player);  // also trigger on close watchers
+				}
+			}));
+		}
+
 		// open page
 		handler.openPage(player, pageIndex);
+		setFromCall(player, fromCall);
+
 		return true;
 	}
 
-	// registration and listeners
+	// ----- registration and listeners
 	public GUI activate() {
 		// already active
 		if (active) {
@@ -570,7 +631,7 @@ public class GUI {
 		plugin.unregisterGUI(this);
 		handler.deactivate();
 		// close
-		getViewers().keySet().forEach(player -> handler.close(player));
+		getViewers().forEach((player, __) -> handler.close(player));
 		// clear
 		if (clear) {
 			clear();
@@ -582,15 +643,20 @@ public class GUI {
 	public void onDeactivate() {
 	}
 
-	public void onPlayerInventoryClick(Player clicker, int slot, ItemStack item, ClickType clickType, int clickPageIndex) {
+	public void onPlayerInventoryClick(ClickCall call, ItemStack item) {
 	}
 
 	public void onClose(Player clicker) {
 	}
 
 	public void onBack(Player clicker) {
+		ClickCall fromCall = getFromCall(clicker);
 		if (fromCall != null) {
-			fromCall.getGUI().openFor(clicker, fromCall.getPageIndex());
+			if (fromCall.getGUI() != null) {
+				fromCall.getGUI().openFor(clicker, fromCall.getPageIndex(), fromCall.getGUI().getFromCall(clicker));
+			} else {
+				clicker.closeInventory();
+			}
 		}
 	}
 

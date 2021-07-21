@@ -20,16 +20,16 @@ import com.guillaumevdn.gcore.lib.string.Text;
 public class ElementPotionEffectList extends ListElement<ElementPotionEffect> implements ParseableListElement<PotionEffect, ElementPotionEffect> {
 
 	public ElementPotionEffectList(Element parent, String id, Need need, Text editorDescription) {
-		super("item", parent, id, need, editorDescription);
+		super("item", true, parent, id, need, editorDescription);
 	}
 
-	// element
+	// ----- element
 	@Override
 	protected ElementPotionEffect createElement(String elementId) {
 		return new ElementPotionEffect(this, elementId, Need.optional(), null);
 	}
 
-	// cache
+	// ----- valuesCache
 	private ParsedCache<List<PotionEffect>> cache = new ParsedCache<>();
 
 	@Override
@@ -42,7 +42,7 @@ public class ElementPotionEffectList extends ListElement<ElementPotionEffect> im
 		cache.clear();
 	}
 
-	// editor
+	// ----- editor
 	@Override
 	public Mat editorIconType() {
 		return CommonMats.GOLDEN_APPLE;

@@ -9,7 +9,7 @@ public class WrapperBoolean extends Wrapper<Boolean> {
 		super(value);
 	}
 
-	// static
+	// ----- static
 	public static WrapperBoolean of(Boolean value) {
 		return new WrapperBoolean(value);
 	}

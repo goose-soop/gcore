@@ -7,13 +7,21 @@ import org.bukkit.inventory.ItemStack;
  */
 public class ItemChancePair extends Pair<ItemStack, Integer> {
 
-	
-	public ItemChancePair() {
+	private ItemChancePair() {
 		super();
 	}
 
-	public ItemChancePair(ItemStack a, Integer b) {
+	private ItemChancePair(ItemStack a, Integer b) {
 		super(a, b);
+	}
+
+	// ----- static
+	public static ItemChancePair of(ItemStack a, Integer b) {
+		return new ItemChancePair(a, b);
+	}
+
+	public static ItemChancePair empty() {
+		return new ItemChancePair();
 	}
 
 }

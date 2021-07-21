@@ -39,6 +39,7 @@ public final class MojangUtils {
 
 	@Nullable
 	public static GameProfile fetchProfile(UUID uuid) throws Throwable {
+		if (uuid == null) return null;  // I am haunted by this
 		String suuid = UUIDTypeAdapter.fromUUID(uuid);
 		ProfileAnswer answer = jsonRequest("https://sessionserver.mojang.com/session/minecraft/profile/" + suuid + "?unsigned=false", ProfileAnswer.class);
 		if (answer == null) return null;
@@ -75,7 +76,7 @@ public final class MojangUtils {
 				System.out.println("Raw json : " + json);
 				throw new Error("couldn't read answer, for " + url, exception);
 			}
-		} else if (connection.getResponseCode() == HttpURLConnection.HTTP_NO_CONTENT) {
+		} else if (connection.getResponseCode() == HttpURLConnection.HTTP_NO_CONTENT || connection.getResponseCode() == 429 /* too many requests */) {
 			return null;
 		} else {
 			throw new Error("Reponse code " + connection.getResponseCode() + ", " + connection.getResponseMessage() + ", for " + url);

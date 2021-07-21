@@ -8,7 +8,7 @@ import com.guillaumevdn.gcore.lib.string.TextEnumElement;
  */
 public enum TextGeneric implements TextEnumElement {
 
-	// miscellaneous
+	// ----- miscellaneous
 	messageNoPermission,
 	messageInvalidPlayer,
 	messageInvalidOfflinePlayer,
@@ -16,12 +16,15 @@ public enum TextGeneric implements TextEnumElement {
 	messageSilentCC,
 	textCancel,
 
-	// command
+	// ----- command
 	commandParameterUsageTarget,
 	commandParameterUsageReset,
 	commandParameterUsageOperation,
 	commandParameterUsageAmount,
 	commandParameterUsageSpecificEditor,
+	commandDescriptionGenericReload,
+	commandDescriptionGenericPluginState,
+	commandDescriptionGenericMigrate,
 	messageCommandNotPlayer,
 	messageCommandMissingArgument,
 	messageCommandMissingArgumentFound,
@@ -36,7 +39,7 @@ public enum TextGeneric implements TextEnumElement {
 	messageCommandHelpPageOutsideBounds,
 	messageCommandHelpHeader,
 
-	// numbers
+	// ----- numbers
 	numberMillion,
 	numberBillion,
 	numberTrillion,
@@ -45,23 +48,29 @@ public enum TextGeneric implements TextEnumElement {
 	durationFormatHMS,
 	durationFormatDHMS,
 
-	// cost
+	// ----- cost
 	messageMustHaveCurrency,
 	messageMustHaveMoreItem,
 	messageMustHaveItem,
 
-	// item
+	// ----- item
 	textDescribeItem,
 	textDescribeItemNameIfHas,
 	textDescribeItemLoreIfHas,
 	textDescribeItemEnchantmentsIfHas,
 	textDescribeItemEnchantmentsLine,
-	textDescribeItemSingleLine,
 
-	// gui
+	textDescribeItemSingleLine,
+	textDescribeItemSingleLineNameIfHas,
+	textDescribeItemSingleLineLoreIfHas,
+	textDescribeItemSingleLineEnchantmentsIfHas,
+	textDescribeItemSingleLineEnchantmentsLine,
+	textDescribeItemSingleLineSeparator,
+
+	// ----- gui
 	guiConfirmName,
 
-	// format
+	// ----- format
 	dateTimeFormat
 
 	;
@@ -71,7 +80,7 @@ public enum TextGeneric implements TextEnumElement {
 	TextGeneric() {
 	}
 
-	// get
+	// ----- get
 	@Override
 	public String getId() {
 		return name();

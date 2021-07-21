@@ -1,17 +1,20 @@
 package com.guillaumevdn.gcore.lib.gui.struct.active;
 
 import java.util.Collection;
-import java.util.function.BiConsumer;
+import java.util.Set;
+
+import org.bukkit.inventory.ItemStack;
 
 import com.guillaumevdn.gcore.ConfigGCore;
 import com.guillaumevdn.gcore.lib.element.struct.parsing.ParsingError;
+import com.guillaumevdn.gcore.lib.function.TriConsumer;
+import com.guillaumevdn.gcore.lib.gui.struct.ClickCall;
 import com.guillaumevdn.gcore.lib.gui.struct.GUIItem;
-import com.guillaumevdn.gcore.lib.string.StringUtils;
 
 /**
  * Represents an active ItemHolder, built for one GUI
  * It's built when the GUI is loaded or refreshed, and destroyed when the GUI is destroyed
- * -> each ItemHolder will produce exactly one ActiveItemHolders in each GUI lifecycle
+ * -> each ItemHolder will produce exactly one ActiveItemHolders in each GUI lifecycle (by default, if not forced manually)
  * -> the ActiveGUIItems are the one in charge of creating, removing and refreshing their icons (GUIItem)
  * @author GuillaumeVDN
  */
@@ -22,8 +25,10 @@ public abstract class ActiveItemHolder {
 	private final boolean persistent;
 
 	private Collection<? extends GUIItem> lastItems = null;
+	private Set<String> lastPlaceholders = null;
+
 	private int refreshDelayTicks = -1;
-	private int currentDelayTicks = 0;  // we can use int, it'd take like 3 years to have an overflow, spigot will crash well before that time :KEKW:
+	private int currentDelayTicks = 0;  // we can use int, it'd take like 3 years to have an overflow, spigot will pass out well before that time :KEKW:
 
 	public ActiveItemHolder(ActiveGUI instance, ItemHolder holder) {
 		this.instance = instance;
@@ -31,7 +36,6 @@ public abstract class ActiveItemHolder {
 		this.persistent = holder.parsePersistent(instance);
 	}
 
-	// get
 	public final ActiveGUI getInstance() {
 		return instance;
 	}
@@ -44,17 +48,21 @@ public abstract class ActiveItemHolder {
 		return lastItems;
 	}
 
+	public final Set<String> getLastPlaceholders() {
+		return lastPlaceholders;
+	}
+
 	public final long getLastRefreshDelayTicks() {
 		return refreshDelayTicks;
 	}
 
-	// set
 	protected void setRefreshDelayTicks(int refreshDelayTicks) {
 		this.refreshDelayTicks = refreshDelayTicks;
 	}
 
-	// methods
-	final void init() {
+	// -----
+
+	public final void init() {
 		onCreate();
 		doRefresh();
 	}
@@ -67,28 +75,31 @@ public abstract class ActiveItemHolder {
 
 	public void doRefresh() {
 		try {
-			buildItems((items, newRefreshDelay) -> {
-				// parse items if still contains placeholders (maybe vanilla/generic placeholders were put there, our build() method doesn't parse those, only the holder/type-specific one)
-				for (GUIItem item : items) {
-					boolean hasPlaceholders = StringUtils.hasPlaceholders(item.getItem());
-					if (hasPlaceholders) {
-						item.setItem(instance.getReplacer().parse(item.getItem()));
-						// force a refresh delay if there's no holder/type-specific one
-						if (newRefreshDelay <= 0) {
-							newRefreshDelay = ConfigGCore.guiItemRefreshTicksPlaceholders;
-						}
-					}
+			buildItems((items, placeholders, newRefreshDelay) -> {
+				if (newRefreshDelay == null) {
+					newRefreshDelay = -1;
 				}
-				// set new delay
-				this.refreshDelayTicks = newRefreshDelay;
+
 				// remove last items
 				if (lastItems != null) {
-					items.forEach(item -> instance.removeItem(item, persistent));
+					lastItems.forEach(item -> instance.removeItem(item, persistent));
 				}
+
+				lastItems = items;
+				lastPlaceholders = placeholders;
+
+				// force refresh delay if there are placeholders
+				if (placeholders != null && !placeholders.isEmpty() && (newRefreshDelay <= 0 || ConfigGCore.guiItemRefreshTicksPlaceholders < newRefreshDelay)) {
+					newRefreshDelay = ConfigGCore.guiItemRefreshTicksPlaceholders;
+				}
+
+				// set new delay
+				this.refreshDelayTicks = newRefreshDelay;
+
 				// then fill new items in GUI
 				items.forEach(item -> instance.setItem(item, persistent));
-				lastItems = items;
-				// done
+
+				// call watcher ; done
 				onRefreshed();
 			});
 		} catch (ParsingError error) {
@@ -97,12 +108,20 @@ public abstract class ActiveItemHolder {
 	}
 
 	/**
-	 * @return a list of items and forced refresh delay
+	 * @return a list of items, a list of placeholders they had (can be null if not important for this item type) and a forced refresh delay
 	 * @throws ParsingError if a parsing error occurs when parsing this holder's settings during the initial build phase
 	 */
-	protected abstract void buildItems(BiConsumer<Collection<? extends GUIItem>, Integer> callback) throws ParsingError;
+	protected abstract void buildItems(TriConsumer<Collection<? extends GUIItem>, Set<String>, Integer> callback) throws ParsingError;
 
-	// watchers
+	/**	
+	 * @return true if something was done (therefore we should not check any other active holder)
+	 */
+	public boolean onPlayerInventoryClick(ClickCall call, ItemStack item) {
+		return false;
+	}
+
+	// ----- watchers
+
 	public void onCreate() {
 	}
 

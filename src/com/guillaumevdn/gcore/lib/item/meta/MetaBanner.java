@@ -19,6 +19,7 @@ import com.guillaumevdn.gcore.lib.element.type.basic.ElementDyeColor;
 import com.guillaumevdn.gcore.lib.element.type.container.ElementItem;
 import com.guillaumevdn.gcore.lib.element.type.map.ElementPatternTypeColorMap;
 import com.guillaumevdn.gcore.lib.item.ItemCheck;
+import com.guillaumevdn.gcore.lib.item.ItemReference;
 import com.guillaumevdn.gcore.lib.object.ObjectUtils;
 import com.guillaumevdn.gcore.lib.serialization.data.DataIO;
 import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
@@ -28,21 +29,23 @@ import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
  */
 public final class MetaBanner {
 
-	public static boolean match(ItemMeta itemMeta, ItemMeta referenceMeta, ItemCheck check) {
-		BannerMeta meta = ObjectUtils.castOrNull(itemMeta, BannerMeta.class); // might be null if exact match is false
-		BannerMeta ref = ObjectUtils.castOrNull(referenceMeta, BannerMeta.class);
-		if (ref == null) return true;
+	public static boolean match(ItemMeta itemMeta, ItemReference reference, ItemCheck check) {
+		if (!reference.hasMeta(BannerMeta.class)) return true;
+		BannerMeta meta = ObjectUtils.castOrNull(itemMeta, BannerMeta.class);  // might be null if exact match is false
+
 		// base color (<1.13, now stored as material type)
 		if (!Version.ATLEAST_1_13) {
-			if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getBaseColor(), ref.getBaseColor()))) return false;
-			else if (!check.isExact() && ref.getBaseColor() != null && (meta == null || !Objects.deepEquals(meta.getBaseColor(), ref.getBaseColor()))) return false;
+			if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getBaseColor(), reference.getBaseColor()))) return false;
+			else if (!check.isExact() && reference.getBaseColor() != null && (meta == null || !Objects.deepEquals(meta.getBaseColor(), reference.getBaseColor()))) return false;
 		}
+
 		// patterns
 		if (check.isExact()) {
-			if (!CollectionUtils.contentEquals(meta.getPatterns(), ref.getPatterns())) return false;
+			if (!CollectionUtils.contentEquals(meta.getPatterns(), reference.getPatterns())) return false;
 		} else {
-			if (ref.hasEnchants() && (meta == null || !meta.hasEnchants())) return false;
-			main: for (Pattern refPattern : ref.getPatterns()) {
+			List<Pattern> refPatterns = reference.getPatterns();
+			if (refPatterns != null && !refPatterns.isEmpty() && (meta == null || meta.getPatterns() == null)) return false;
+			main: for (Pattern refPattern : refPatterns) {
 				for (Pattern pattern : meta.getPatterns()) {
 					if (pattern.equals(refPattern)) {
 						continue main;
@@ -51,6 +54,7 @@ public final class MetaBanner {
 				return false;
 			}
 		}
+
 		// seems good
 		return true;
 	}

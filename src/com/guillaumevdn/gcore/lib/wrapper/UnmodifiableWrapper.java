@@ -13,13 +13,13 @@ public final class UnmodifiableWrapper<T> extends Wrapper<T> {
 		super(wrapper.get());
 	}
 
-	// set
+	// ----- set
 	@Override
 	public T set(T value) {
 		throw new UnsupportedOperationException();
 	}
 
-	// static
+	// ----- static
 	public static <T> Wrapper<T> of(T value) {
 		return new UnmodifiableWrapper<T>(value);
 	}

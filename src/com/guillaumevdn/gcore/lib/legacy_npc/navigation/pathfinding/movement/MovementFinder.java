@@ -89,7 +89,7 @@ public final class MovementFinder {
 	private static OffsetBlocking b(int x, int z) { return new OffsetBlocking(x, z); }
 	private static OffsetBlocking b(int x, int z, int backupX, int backupZ) { return new OffsetBlocking(x, z, backupX, backupZ); }
 
-	// get
+	// ----- get
 	public List<Offset> getOffsets() {
 		return offsets;
 	}
@@ -110,13 +110,13 @@ public final class MovementFinder {
 		return canSwim;
 	}
 
-	// set
+	// ----- set
 	private void withOffset(int gap, int x, int y, int z, OffsetBlocking... blocking) {  // FIXME : in offsets, add 'MovementType' for particular movements
 		offsets.add(new Offset(gap, x, y, z, CollectionUtils.asUnmodifiableList(blocking)));
 	}
 
 	// ----------------------------------------------------------------------------------------------------
-	// 		FIND MOVEMENT
+	// ----- 		FIND MOVEMENT
 	// ----------------------------------------------------------------------------------------------------
 
 	/**
@@ -238,6 +238,6 @@ public final class MovementFinder {
 		return new Movement(origin, target, type, offset);
 	}
 
-	// FIXME : when navigating, when about to do a movement, make sure it's actually still possible ; otherwise, recalculate path
+	// ----- FIXME : when navigating, when about to do a movement, make sure it's actually still possible ; otherwise, recalculate path
 
 }

@@ -2,6 +2,8 @@ package com.guillaumevdn.gcore.lib.gui.struct;
 
 import org.bukkit.entity.Player;
 
+import com.guillaumevdn.gcore.lib.gui.element.ElementGUI;
+
 /**
  * @author GuillaumeVDN
  */
@@ -24,7 +26,6 @@ public class ClickCall {
 		this.slot = slot;
 	}
 
-	// get
 	public Player getClicker() {
 		return clicker;
 	}
@@ -45,13 +46,36 @@ public class ClickCall {
 		return slot;
 	}
 
-	// string
+	// ----- shortcuts
+
+	public void reopenGUI() {
+		gui.openFor(clicker, pageIndex, gui.getFromCall(clicker));
+	}
+
+	/**
+	 * Get the click call for the ancestor in this "call stack"
+	 * This avoids infinite loops in GUIs (for types <PLUGIN>_GUI) and finds the actual previous path
+	 */
+	public ClickCall getAncestorFor(ElementGUI targetGUI) {
+		ClickCall c = this;
+		while (c != null) {
+			if (c.getGUI().getId().startsWith("instance_" + targetGUI.getId() + "_")) {
+				return c.getGUI().getFromCall(clicker);
+			}
+			c = c.getGUI().getFromCall(clicker);
+		}
+		return this;
+	}
+
+	// ----- obj
+
 	@Override
 	public String toString() {
 		return "ClickCall{player=" + clicker.getName() + ",type=" + type + ",location=" + pageIndex + "/" + slot + ",gui=" + gui.getName() + "}";
 	}
 
-	// click type
+	// ----- click type
+
 	public static enum ClickType {
 
 		LEFT,
@@ -74,6 +98,7 @@ public class ClickCall {
 		NUMBER_KEY_8,
 		NUMBER_KEY_9,
 		KEY_OFFHAND,
+		CREATIVE,  // not really used but avoids errors in creative inventory when clicking stuff in bottom inv
 		NONE
 		;
 

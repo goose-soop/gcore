@@ -25,7 +25,7 @@ public class Task {
 		this.runner = runner;
 	}
 
-	// get
+	// ----- get
 	public String getId() {
 		return id;
 	}
@@ -46,7 +46,11 @@ public class Task {
 		return task;
 	}
 
-	// methods
+	public boolean isActive() {
+		return task != null;
+	}
+
+	// ----- methods
 	public void start() {
 		stop();
 		BukkitRunnable runnable = new BukkitRunnable() {
@@ -58,7 +62,7 @@ public class Task {
 				try {
 					runner.run();
 				} catch (Throwable exception) {
-					throw new Error("an error occured while executing task " + id + " for plugin " + plugin.getName(), exception);
+					new Error("an error occured while executing task " + id + " for " + plugin.getName() + " v" + plugin.getDescription().getVersion(), exception).printStackTrace();
 				}
 			}
 		};

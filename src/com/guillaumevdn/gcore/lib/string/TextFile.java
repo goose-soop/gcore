@@ -40,7 +40,7 @@ public final class TextFile<T extends TextEnumElement> {
 		this.values = Collections.unmodifiableMap(vals);
 	}
 
-	// get
+	// ----- get
 	public GPlugin getPlugin() {
 		return plugin;
 	}

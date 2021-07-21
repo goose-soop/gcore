@@ -7,7 +7,7 @@ import com.guillaumevdn.gcore.lib.function.ThrowableTriConsumer;
  */
 public class ReflectionProcedureTriConsumer<A, B, C> extends ReflectionProcedure<ThrowableTriConsumer<A, B, C>, ReflectionProcedureTriConsumer<A, B, C>> {
 
-	// methods
+	// ----- methods
 	public void process(A param1, B param2, C param3) {
 		ThrowableTriConsumer<A, B, C> function = get();
 		if (function != null) {

@@ -1,15 +1,17 @@
 package com.guillaumevdn.gcore.lib.tuple;
 
+import com.guillaumevdn.gcore.lib.number.NumberUtils;
+
 /**
  * @author GuillaumeVDN
  */
 public class DoublePair extends Pair<Double, Double> {
 
-	public DoublePair() {
+	private DoublePair() {
 		super();
 	}
 
-	public DoublePair(Double a, Double b) {
+	private DoublePair(Double a, Double b) {
 		super(a, b);
 	}
 
@@ -17,7 +19,11 @@ public class DoublePair extends Pair<Double, Double> {
 		return getA() >= getB();
 	}
 
-	// set
+	public double randomInRange() {
+		return NumberUtils.random(getA(), getB());
+	}
+
+	// ----- set
 	public double alterA(double delta) {
 		setA(getA() + delta);
 		return getA();
@@ -33,13 +39,13 @@ public class DoublePair extends Pair<Double, Double> {
 		return getB();
 	}
 
-	// clone
+	// ----- clone
 	@Override
 	public DoublePair clone() {
 		return DoublePair.of(getA(), getB());
 	}
 
-	// static
+	// ----- static
 	public static DoublePair of(Double a, Double b) {
 		return new DoublePair(a, b);
 	}

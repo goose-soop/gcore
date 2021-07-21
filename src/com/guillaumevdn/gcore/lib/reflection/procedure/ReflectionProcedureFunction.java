@@ -7,7 +7,7 @@ import com.guillaumevdn.gcore.lib.function.ThrowableFunction;
  */
 public class ReflectionProcedureFunction<T, R> extends ReflectionProcedure<ThrowableFunction<T, R>, ReflectionProcedureFunction<T, R>> {
 
-	// methods
+	// ----- methods
 	public R process(T param) {
 		return process(param, null);
 	}

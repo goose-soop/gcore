@@ -30,7 +30,7 @@ public class ArgumentPlayer extends Argument<Player> implements PlayerArgument {
 		return senderIfNone;
 	}
 
-	// override permission
+	// ----- override permission
 	@Override
 	public boolean hasPermission(CommandSender sender) {
 		return senderIfNone || getPermission() == null || getPermission().has(sender);
@@ -41,7 +41,7 @@ public class ArgumentPlayer extends Argument<Player> implements PlayerArgument {
 		return senderIfNone && getPermission() != null && !getPermission().has(sender);
 	}
 
-	// do
+	// ----- do
 	@Override
 	public Player consume(CommandCall call) {
 		if (call.getArguments().isEmpty()) {

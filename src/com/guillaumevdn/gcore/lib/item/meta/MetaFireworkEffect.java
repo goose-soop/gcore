@@ -13,6 +13,7 @@ import com.guillaumevdn.gcore.lib.element.struct.Need;
 import com.guillaumevdn.gcore.lib.element.type.container.ElementFireworkEffect;
 import com.guillaumevdn.gcore.lib.element.type.container.ElementItem;
 import com.guillaumevdn.gcore.lib.item.ItemCheck;
+import com.guillaumevdn.gcore.lib.item.ItemReference;
 import com.guillaumevdn.gcore.lib.object.ObjectUtils;
 import com.guillaumevdn.gcore.lib.serialization.data.DataIO;
 import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
@@ -22,13 +23,14 @@ import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
  */
 public final class MetaFireworkEffect {
 
-	public static boolean match(ItemMeta itemMeta, ItemMeta referenceMeta, ItemCheck check) {
-		FireworkEffectMeta meta = ObjectUtils.castOrNull(itemMeta, FireworkEffectMeta.class); // might be null if exact match is false
-		FireworkEffectMeta ref = ObjectUtils.castOrNull(referenceMeta, FireworkEffectMeta.class);
-		if (ref == null) return true;
+	public static boolean match(ItemMeta itemMeta, ItemReference reference, ItemCheck check) {
+		if (!reference.hasMeta(FireworkEffectMeta.class)) return true;
+		FireworkEffectMeta meta = ObjectUtils.castOrNull(itemMeta, FireworkEffectMeta.class);  // might be null if exact match is false
+
 		// effect
-		if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getEffect(), ref.getEffect()))) return false;
-		else if (!check.isExact() && ref.hasEffect() && (meta == null || !Objects.deepEquals(meta.getEffect(), ref.getEffect()))) return false;
+		if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getEffect(), reference.getEffect()))) return false;
+		else if (!check.isExact() && reference.hasEffect() && (meta == null || !Objects.deepEquals(meta.getEffect(), reference.getEffect()))) return false;
+
 		// seems good
 		return true;
 	}

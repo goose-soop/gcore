@@ -1,5 +1,6 @@
 package com.guillaumevdn.gcore.lib.element.type.basic;
 
+import com.guillaumevdn.gcore.ConfigGCore;
 import com.guillaumevdn.gcore.TextEditorGeneric;
 import com.guillaumevdn.gcore.WorkerGCore;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
@@ -38,7 +39,7 @@ public abstract class ElementValue<T> extends BasicElement<T> {
 		this.serializer = serializer;
 	}
 
-	// get
+	// ----- get
 	public final Serializer<T> getSerializer() {
 		return serializer;
 	}
@@ -53,11 +54,14 @@ public abstract class ElementValue<T> extends BasicElement<T> {
 		return null;
 	}
 
-	// parse
+	// ----- parse
 	@Override
 	protected T doParseString(String raw) throws ParsingError {
 		T value = serializer.deserialize(raw);  // if any exception is thrown here, it'll be catched and displayed correctly
 		if (value == null) {
+			if (ConfigGCore.ignoreInvalidElementValues) {
+				return null;  // and here goes my consistency :PepeHands:
+			}
 			throw new ParsingError(this, "invalid value '" + raw + "'");
 		}
 		validate(value);
@@ -67,7 +71,7 @@ public abstract class ElementValue<T> extends BasicElement<T> {
 	protected void validate(T value) throws ParsingError {
 	}
 
-	// editor
+	// ----- editor
 	@Override
 	public void onEditorClick(ClickCall call) {
 		// left-click : enter value
@@ -80,15 +84,15 @@ public abstract class ElementValue<T> extends BasicElement<T> {
 					try {
 						T parsed = doParseString(value);
 						setValue(parsed == null ? null : CollectionUtils.asList(value));
-						call.getGUI().setRegularItem(buildEditorItem(call.getSlot()));
-						call.getGUI().openFor(call.getClicker(), call.getPageIndex());
+						call.getGUI().setRegularItem(buildEditorItem(call.getPageIndex(), call.getSlot()));
+						call.reopenGUI();
 						getSuperElement().onEditorChange(this);
 					} catch (ParsingError error) {
 						error.send(call.getClicker());
 					}
 				}
-				call.getGUI().openFor(call.getClicker(), call.getPageIndex());
-			}, () -> call.getGUI().openFor(call.getClicker(), call.getPageIndex()));
+				call.reopenGUI();
+			}, () -> call.reopenGUI());
 		}
 		// other
 		else {

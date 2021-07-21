@@ -21,6 +21,9 @@ commandParameterUsageReset: reset
 commandParameterUsageOperation: operation
 commandParameterUsageAmount: amount
 commandParameterUsageSpecificEditor: editor
+commandDescriptionGenericReload: reload the plugin
+commandDescriptionGenericPluginState: information about the plugin internal state
+commandDescriptionGenericMigrate: re-run a migration
 messageCommandNotPlayer: |
   &7You can't execute this command from console.
 
@@ -88,7 +91,16 @@ textDescribeItemNameIfHas: '{name}'
 textDescribeItemLoreIfHas: '- {lore}'
 textDescribeItemEnchantmentsIfHas: '> {enchantments}'
 textDescribeItemEnchantmentsLine: '{enchant} {level}'
-textDescribeItemSingleLine: '{amount}x {type} {name}'
+
+textDescribeItemSingleLine: |  # lines will be separated by commas if not empty
+  {amount}x {type}
+  {name}
+  {enchantments}
+textDescribeItemSingleLineNameIfHas: '{name}'
+textDescribeItemSingleLineLoreIfHas: '{lore}'
+textDescribeItemSingleLineEnchantmentsIfHas: '{enchantments}'
+textDescribeItemSingleLineEnchantmentsLine: '{enchant} {level}'
+textDescribeItemSingleLineSeparator: ', '
 
 # -------------------- Format --------------------
 

@@ -1,5 +1,6 @@
 package com.guillaumevdn.gcore.lib.serialization.adapter.type;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -26,6 +27,7 @@ import com.guillaumevdn.gcore.lib.number.NumberUtils;
 import com.guillaumevdn.gcore.lib.reflection.Reflection;
 import com.guillaumevdn.gcore.lib.serialization.adapter.DataAdapter;
 import com.guillaumevdn.gcore.lib.serialization.data.DataIO;
+import com.guillaumevdn.gcore.lib.string.StringUtils;
 
 /**
  * @author GuillaumeVDN
@@ -113,7 +115,7 @@ public final class AdapterItemStack extends DataAdapter<ItemStack> {
 				}
 				try {
 					Material material = Reflection.invokeMethod("org.bukkit.material.Material", "getMaterial", null, numericType).get();
-					type = Mat.firstFromIdOrDataName(material.name()).orNull();
+					type = Mat.firstFromIdOrDataName(material.name()).orElse(null);
 				} catch (Throwable ignored) {}
 				if (type == null) {
 					throw new IllegalStateException("no material found with numeric type " + numericType);
@@ -130,10 +132,10 @@ public final class AdapterItemStack extends DataAdapter<ItemStack> {
 			ItemStack item = type.newStack();
 			// durability
 			// only set that if it's not already specified in the type, and it's not an <1.13 item with legacy data
-			// because in legacy versions, data and durability must be the same for the variant to appear correctly, otherwise it displays the blank version
+			// because in legacy versions, data and durability must be the same for the variant to appear correctly, otherwise it displays the weird blank item
 			Integer durability = reader.readInteger("durability");
 			if (durability == null) durability = 0;
-			if (durability != Compat.getDurability(item) && (Version.ATLEAST_1_13 || type.getData().getLegacyData() == 0)) {
+			if (durability != Compat.getDurability(item) && (Version.ATLEAST_1_13 || !type.getData().hasLegacyData())) {
 				item = Compat.setDurability(item, durability);
 			}
 			// amount
@@ -158,11 +160,13 @@ public final class AdapterItemStack extends DataAdapter<ItemStack> {
 				}
 			}
 			// enchantments
-			Map<Enchantment, Integer> enchantments = reader.readSameMap("enchantments", Enchantment.class, (raw, d) -> d.readInteger(raw));
+			Map<Enchantment, Integer> enchantments = reader.readNullableSimpleMap("enchantments", Enchantment.class, new HashMap<>(), (key, __, mapReader) -> mapReader.readInteger(key));
 			if (enchantments != null) {
 				if (meta == null) meta = item.getItemMeta();
 				for (Entry<Enchantment, Integer> enchantment : enchantments.entrySet()) {
-					meta.addEnchant(enchantment.getKey(), enchantment.getValue(), true);
+					if (enchantment.getValue() != 0) {  // allow negative enchants if needed, but not zero
+						meta.addEnchant(enchantment.getKey(), enchantment.getValue(), true);
+					}
 				}
 			}
 			// flags
@@ -175,13 +179,13 @@ public final class AdapterItemStack extends DataAdapter<ItemStack> {
 			String name = reader.readString("name");
 			if (name != null) {
 				if (meta == null) meta = item.getItemMeta();
-				meta.setDisplayName(name);
+				meta.setDisplayName(StringUtils.format(name));
 			}
 			// lore
 			List<String> lore = reader.readDirectList("lore");
 			if (lore != null) {
 				if (meta == null) meta = item.getItemMeta();
-				meta.setLore(lore);
+				meta.setLore(StringUtils.formatCopy(lore));
 			}
 			// specific meta
 			if (meta == null) meta = item.getItemMeta();

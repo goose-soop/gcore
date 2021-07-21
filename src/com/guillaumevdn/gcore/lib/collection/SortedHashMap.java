@@ -68,7 +68,7 @@ public class SortedHashMap<K, V> implements Cloneable {
 		}
 	}
 
-	// methods
+	// ----- methods
 	public final Type getType() {
 		return type;
 	}
@@ -226,7 +226,7 @@ public class SortedHashMap<K, V> implements Cloneable {
 		return this;
 	}
 
-	// methods
+	// ----- methods
 	public K getKeyByValue(V value) {
 		for (K key : keys()) {
 			if (get(key).equals(value)) {
@@ -275,12 +275,12 @@ public class SortedHashMap<K, V> implements Cloneable {
 		});
 	}
 
-	// type enum
+	// ----- type enum
 	public static enum Type {
 		KEY_SORTED, VALUE_SORTED;
 	}
 
-	// order enum
+	// ----- order enum
 	public static enum Order {
 
 		NATURAL(1),
@@ -294,7 +294,7 @@ public class SortedHashMap<K, V> implements Cloneable {
 
 	}
 
-	// static methods
+	// ----- static methods
 	public static <TK, TV> SortedHashMap<TK, TV> asMap(Type type, Order order, Object... objects) {
 		if (objects.length != 0 && objects.length % 2 != 0) throw new IllegalArgumentException("size isn't a multiple of 2");
 		SortedHashMap<TK, TV> map = new SortedHashMap<>(type, order);

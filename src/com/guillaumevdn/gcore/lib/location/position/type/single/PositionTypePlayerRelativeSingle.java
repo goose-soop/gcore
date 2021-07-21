@@ -23,7 +23,7 @@ public class PositionTypePlayerRelativeSingle extends PositionType {
 		super(id, CommonMats.PLAYER_HEAD);
 	}
 
-	// elements
+	// ----- elements
 	@Override
 	public boolean mustCache(ElementPosition position) {
 		return false;
@@ -35,7 +35,7 @@ public class PositionTypePlayerRelativeSingle extends PositionType {
 		position.addPointTolerance("point_tolerance", Need.optional(PointTolerance.LENIENT), TextEditorGeneric.descriptionPositionTypePointTolerance);
 	}
 
-	// parse
+	// ----- parse
 	@Override
 	public Position doParse(ElementPosition position, Replacer replacer) throws ParsingError {
 		Location location = position.getElementAs("location", ElementRelativeLocation.class).parseNoCatchOrThrowParsingNull(replacer);

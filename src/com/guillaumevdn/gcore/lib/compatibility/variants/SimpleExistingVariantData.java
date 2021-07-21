@@ -19,12 +19,12 @@ public abstract class SimpleExistingVariantData<T, E extends Enum<E>> extends Si
 		this.dataInstance = dataInstance;
 	}
 
-	// get
+	// ----- get
 	public final T getDataInstance() {
 		return dataInstance;
 	}
 
-	// object
+	// ----- object
 	@Override
 	public boolean equals(Object obj) {
 		if (!super.equals(obj)) return false;

@@ -32,7 +32,7 @@ public class ReaderContext {
 		this.indentLevel = indentLevel;
 	}
 
-	// get
+	// ----- get
 	public YMLFile getFile() {
 		return file;
 	}
@@ -65,6 +65,10 @@ public class ReaderContext {
 		return remaining != null && remaining.length() >= 2 && remaining.charAt(0) == begin && remaining.charAt(remaining.length() - 1) == end;
 	}
 
+	public boolean isRemainingWrappedWith(String begin, String end) {
+		return remaining != null && remaining.length() >= begin.length() + end.length() && remaining.startsWith(begin) && remaining.endsWith(end);
+	}
+
 	public String getTrailingComment() {
 		return trailingComment;
 	}
@@ -81,12 +85,12 @@ public class ReaderContext {
 		return indentLevel;
 	}
 
-	// set
+	// ----- set
 	public void setTokenType(TokenType tokenType) {
 		this.tokenType = tokenType;
 	}
 
-	// do
+	// ----- do
 	public ReaderLine peekLine() {
 		return lines.isEmpty() ? null : lines.get(0);
 	}
@@ -106,14 +110,36 @@ public class ReaderContext {
 		return null;
 	}
 
+	public ReaderLine peekComplexLineThatStartsWith(String startsWith) {  // a complex line is something that can be interpreted as something more than a scalar value (see cases below)
+		for (int i = 0; i < lines.size(); ++i) {
+			ReaderLine line = lines.get(i);
+			String l = line.getLine();
+			int c = YMLReader.indexOfComment(l);
+			if (c != -1) {
+				l = l.substring(0, c);
+			}
+			if (l.trim().isEmpty()) {
+				continue;  // skip comments
+			}
+			if (!l.startsWith(startsWith)) {
+				return null;
+			}
+			l = l.substring(startsWith.length()).trim();
+			if (YMLReader.indexOfColonSeparator(l) != -1 || l.startsWith("[") || l.startsWith("- ") || l.equals("{}") || l.equals(">") || l.equals("|") || l.equals("%")) {
+				return line;
+			}
+		}
+		return null;
+	}
+
 	public void consumeIdentifiable() {
 		identifiableLine = lines.remove(0);
 		// invalid indent
 		if (StringUtils.countLeadingChar(identifiableLine.getLine(), ' ') != currentIndent.length()) {
 			throwIndentError(identifiableLine, currentIndent.length(), false);
 		}
-		// not a valid config value
-		int index = identifiableLine.getLine().indexOf(':');
+		// detect id
+		int index = YMLReader.indexOfColonSeparator(identifiableLine.getLine());
 		if (index == -1) {
 			throwError("expected : at line " + identifiableLine.getNumber());
 		}

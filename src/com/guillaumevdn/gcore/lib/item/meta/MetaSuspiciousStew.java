@@ -13,6 +13,7 @@ import com.guillaumevdn.gcore.lib.element.struct.Need;
 import com.guillaumevdn.gcore.lib.element.type.container.ElementItem;
 import com.guillaumevdn.gcore.lib.element.type.list.ElementPotionEffectList;
 import com.guillaumevdn.gcore.lib.item.ItemCheck;
+import com.guillaumevdn.gcore.lib.item.ItemReference;
 import com.guillaumevdn.gcore.lib.object.ObjectUtils;
 import com.guillaumevdn.gcore.lib.serialization.adapter.type.AdapterPotionEffect;
 import com.guillaumevdn.gcore.lib.serialization.data.DataIO;
@@ -23,17 +24,17 @@ import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
  */
 public final class MetaSuspiciousStew {
 
-	public static boolean match(ItemMeta itemMeta, ItemMeta referenceMeta, ItemCheck check) {
+	public static boolean match(ItemMeta itemMeta, ItemReference reference, ItemCheck check) {
+		if (!reference.hasMeta(SuspiciousStewMeta.class)) return true;
 		SuspiciousStewMeta meta = ObjectUtils.castOrNull(itemMeta, SuspiciousStewMeta.class); // might be null if exact match is false
-		SuspiciousStewMeta ref = ObjectUtils.castOrNull(referenceMeta, SuspiciousStewMeta.class);
-		if (ref == null) return true;
+
 		// effects
 		if (check.isExact()) {
-			if (meta.hasCustomEffects() != ref.hasCustomEffects() || meta.getCustomEffects().size() != ref.getCustomEffects().size()) return false;
+			if (meta.hasCustomEffects() != reference.hasSuspiciousCustomEffects() || meta.getCustomEffects().size() != reference.getSuspiciousCustomEffects().size()) return false;
 		} else {
-			if (ref.hasCustomEffects() && (meta == null || meta.hasCustomEffects())) return false;
+			if (reference.hasSuspiciousCustomEffects() && (meta == null || meta.hasCustomEffects())) return false;
 		}
-		main: for (PotionEffect refEffect : ref.getCustomEffects()) {
+		main: for (PotionEffect refEffect : reference.getSuspiciousCustomEffects()) {
 			for (PotionEffect effect : meta.getCustomEffects()) {
 				if (effect.equals(refEffect)) {
 					continue main;
@@ -41,6 +42,7 @@ public final class MetaSuspiciousStew {
 			}
 			return false;
 		}
+		
 		// seems good
 		return true;
 	}

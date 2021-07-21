@@ -21,14 +21,15 @@ public final class FakeSuperElement extends Element implements SuperElement {
 
 	private GPlugin plugin;
 	private List<String> loadErrors = new ArrayList<>();
-	private FakeYMLConfiguration config = new FakeYMLConfiguration();
+	private FakeYMLConfiguration config;
 
 	public FakeSuperElement(GPlugin plugin, String id) {
-		super("FakeSuperElement", null, id, NeedType.OPTIONAL, null);
+		super("FakeConfigSuperElement", null, id, NeedType.OPTIONAL, null);
 		this.plugin = plugin;
+		config = new FakeYMLConfiguration(plugin);
 	}
 
-	// get
+	// ----- get
 	@Override
 	public GPlugin getPlugin() {
 		return plugin;
@@ -64,7 +65,7 @@ public final class FakeSuperElement extends Element implements SuperElement {
 		return true;
 	}
 
-	// load/save
+	// ----- load/save
 	public void reloadConfiguration() {
 	}
 
@@ -84,7 +85,7 @@ public final class FakeSuperElement extends Element implements SuperElement {
 	public void addLoadError(String error) {
 	}
 
-	// editor
+	// ----- editor
 	@Override
 	public Mat editorIconType() {
 		return CommonMats.APPLE;

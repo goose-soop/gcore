@@ -15,7 +15,7 @@ public class ElementTimeInDay extends ElementTimeIn<TimeInDay> {
 		super("time in day", parent, id, need, editorDescription);
 	}
 
-	// parse
+	// ----- parse
 	@Override
 	public TimeInDay doParse(Replacer replacer) throws ParsingError {
 		Integer hour = this.hour.parseNoCatchOrThrowParsingNull(replacer);

@@ -25,7 +25,7 @@ public abstract class TypableContainerElement<T extends TypableElementType> exte
 
 	protected abstract ElementTypableElementType<T> addType();
 
-	// get
+	// ----- get
 	public final TypableElementTypes<T> getTypes() {
 		return types;
 	}
@@ -44,7 +44,7 @@ public abstract class TypableContainerElement<T extends TypableElementType> exte
 
 	public final T getType() {
 		T type = this.type.parseGeneric().orNull();
-		if (type == null) { // fix type, a null type can't happen !
+		if (type == null) {  // fix type, a null type can't happen !
 			type = types.defaultValue();
 			this.type.setValue(CollectionUtils.asList(type.getId()));
 			type.fillTypeSpecificElements(this);
@@ -56,7 +56,7 @@ public abstract class TypableContainerElement<T extends TypableElementType> exte
 	public void onTypeChange(T oldType, T newType) {
 	}
 
-	// load
+	// ----- load
 	@Override
 	protected void doRead() throws Throwable {
 		// clear elements from previous type eventually
@@ -81,7 +81,7 @@ public abstract class TypableContainerElement<T extends TypableElementType> exte
 		}
 	}
 
-	// editor
+	// ----- editor
 	@Override
 	public Mat editorIconType() {
 		return getType().getIcon();

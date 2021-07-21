@@ -27,7 +27,7 @@ public class ElementLocationList extends ElementValueList<Location> {
 		super(Location.class, parent, id, need, editorDescription);
 	}
 
-	// editor
+	// ----- editor
 	@Override
 	public Mat editorIconType() {
 		return CommonMats.RAIL;
@@ -46,11 +46,21 @@ public class ElementLocationList extends ElementValueList<Location> {
 		// right-click : import location
 		if (call.getType().equals(ClickType.RIGHT)) {
 			WorkerGCore.inst().awaitLocation(call.getClicker(), TextEditorGeneric.messageElementBasicImportLocation, value -> {
-				setValue(CollectionUtils.asList(getSerializer().serialize(value)));
-				call.getGUI().setRegularItem(buildEditorItem(call.getSlot()));
-				call.getGUI().openFor(call.getClicker(), call.getPageIndex());
+				List<String> newValue = getValueCopy();
+				if (newValue == null) {
+					setValue(CollectionUtils.asList(getSerializer().serialize(value)));
+				} else {
+					if (lineIndex >= getValue().size()) {
+						newValue.add(getSerializer().serialize(value));
+					} else {
+						newValue.set(lineIndex, getSerializer().serialize(value));
+					}
+					setValue(newValue);
+				}
+				// reopen GUI (that refreshes it since it's an editor GUI)
+				call.reopenGUI();
 				getSuperElement().onEditorChange(this);
-			}, () -> call.getGUI().openFor(call.getClicker(), call.getPageIndex()));
+			}, () -> call.reopenGUI());
 		}
 	}
 

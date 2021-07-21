@@ -23,7 +23,7 @@ public class ElementTimeInYear extends ElementTimeIn<TimeInYear> {
 		super("time in year", parent, id, need, editorDescription);
 	}
 
-	// get
+	// ----- get
 	public ElementMonth getMonth() {
 		return month;
 	}
@@ -32,7 +32,7 @@ public class ElementTimeInYear extends ElementTimeIn<TimeInYear> {
 		return dayOfMonth;
 	}
 
-	// parse
+	// ----- parse
 	@Override
 	public TimeInYear doParse(Replacer replacer) throws ParsingError {
 		Month month = this.month.parseNoCatchOrThrowParsingNull(replacer);

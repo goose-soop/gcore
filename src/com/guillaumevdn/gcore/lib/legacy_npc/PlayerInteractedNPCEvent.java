@@ -18,7 +18,7 @@ public class PlayerInteractedNPCEvent extends PlayerEvent {
 		this.interaction = interaction;
 	}
 
-	// get
+	// ----- get
 	public NPC getNPC() {
 		return npc;
 	}
@@ -27,7 +27,7 @@ public class PlayerInteractedNPCEvent extends PlayerEvent {
 		return interaction;
 	}
 
-	// handlers
+	// ----- handlers
 	private static final HandlerList handlers = new HandlerList();
 
 	public HandlerList getHandlers() {

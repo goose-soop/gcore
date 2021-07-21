@@ -18,7 +18,7 @@ import com.guillaumevdn.gcore.lib.reflection.procedure.ReflectionProcedureTriCon
  */
 final class MatCompatBlock {
 
-	// set block
+	// ----- set block
 	private static final ReflectionProcedureBiConsumer<Block, Mat> SET_BLOCK = new ReflectionProcedureBiConsumer<Block, Mat>()
 			.setIf(Version.ATLEAST_1_13, (block, mat) -> {
 				Material material = mat.getData().getDataInstance();
@@ -42,7 +42,7 @@ final class MatCompatBlock {
 				}
 				// other
 				else {
-					ReflectionObject.of(block).invokeMethod("setTypeIdAndData", typeId, (byte) mat.getData().getLegacyData(), false);
+					ReflectionObject.of(block).invokeMethod("setTypeIdAndData", typeId, (byte) mat.getData().getLegacyDataOrZero(), false);
 				}
 			});
 
@@ -50,24 +50,24 @@ final class MatCompatBlock {
 		SET_BLOCK.process(block, mat);
 	}
 
-	// set block change
+	// ----- set block change
 	private static final ReflectionProcedureTriConsumer<Mat, Block, Player> SET_BLOCK_CHANGE = new ReflectionProcedureTriConsumer<Mat, Block, Player>()
 			.orElse((mat, block, player) -> {
-				player.sendBlockChange(block.getLocation(), mat.getData().getDataInstance(), (byte) mat.getData().getLegacyData()); // even in 1.13+, send data
+				player.sendBlockChange(block.getLocation(), mat.getData().getDataInstance(), (byte) mat.getData().getLegacyDataOrZero()); // even in 1.13+, send data
 			});
 
 	static void setBlockChange(Block block, Mat mat, Player player) {
 		SET_BLOCK_CHANGE.process(mat, block, player);
 	}
 
-	// match
+	// ----- match
 	private static final ReflectionProcedureBiFunction<Block, Mat, Boolean> MATCH = new ReflectionProcedureBiFunction<Block, Mat, Boolean>()
 			.orElse((block, mat) -> {
-				return block.getType().equals(mat.getData().getDataInstance()) && (Version.ATLEAST_1_13 || Compat.getLegacyData(block) == (byte) mat.getData().getLegacyData());
+				return block.getType().equals(mat.getData().getDataInstance()) && (Version.ATLEAST_1_13 || mat.getData().acceptsLegacyData(Compat.getLegacyData(block)));
 			});
 
 	static boolean match(Block block, Mat mat) {
-		return mat.getData().getDataName().equalsIgnoreCase("NOCHECK") || MATCH.process(block, mat);
+		return mat.isNoCheck() || MATCH.process(block, mat);
 	}
 
 }

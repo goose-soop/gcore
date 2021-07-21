@@ -26,7 +26,7 @@ public abstract class ElementTimeIn<T extends TimeIn> extends ParseableContainer
 		super(typeName, parent, id, need, editorDescription);
 	}
 
-	// get
+	// ----- get
 	public final ElementInteger getHour() {
 		return hour;
 	}
@@ -35,7 +35,7 @@ public abstract class ElementTimeIn<T extends TimeIn> extends ParseableContainer
 		return minute;
 	}
 
-	// editor
+	// ----- editor
 	@Override
 	public Mat editorIconType() {
 		return CommonMats.CLOCK;

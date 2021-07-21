@@ -19,7 +19,7 @@ public class ReflectionObject {
 		this.object = object;
 	}
 
-	// get
+	// ----- get
 	public Object justGet() {
 		return object;
 	}
@@ -40,14 +40,14 @@ public class ReflectionObject {
 		return orElse(null);
 	}
 
-	// set
+	// ----- set
 	/** @return this object, for chaining convenience because it's cool */
 	public ReflectionObject set(Object object) {
 		this.object = object;
 		return this;
 	}
 
-	// methods
+	// ----- methods
 	public ReflectionObject invokeMethod(String name, Object... params) throws Throwable {
 		if (object == null) {
 			throw new IllegalStateException("can't invoke method " + name + "(" + StringUtils.toTextString(", ", CollectionUtils.asList(params).stream().map(param -> param == null ? "null" : param.getClass().getSimpleName())) + ") on a null object");
@@ -83,13 +83,13 @@ public class ReflectionObject {
 		return this;
 	}
 
-	// object
+	// ----- object
 	@Override
 	public String toString() {
 		return "ReflectionObject{" + (object == null ? "null" : "class=" + object.getClass().getName() + ",value=" + String.valueOf(object)) + "}";
 	}
 
-	// static
+	// ----- static
 	public static ReflectionObject of(Object obj) {
 		ReflectionObject inst = ObjectUtils.castOrNull(obj, ReflectionObject.class);
 		return inst != null ? inst : new ReflectionObject(obj);

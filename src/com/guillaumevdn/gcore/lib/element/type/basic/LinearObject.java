@@ -30,13 +30,13 @@ public class LinearObject<T extends LinearObjectType> {
 		this.arguments = arguments == null ? new ArrayList<>() : arguments;
 	}
 
-	// object
+	// ----- object
 	@Override
 	public String toString() {
 		return type + " " + StringUtils.toTextString(" ", arguments);
 	}
 
-	// get
+	// ----- get
 	public T getType() {
 		return type;
 	}

@@ -1,6 +1,7 @@
 package com.guillaumevdn.gcore.lib.location.position.type.single;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.bukkit.DyeColor;
@@ -32,7 +33,7 @@ public class PositionTypeClosestEntityRelativeSingle extends PositionType {
 		super(id, CommonMats.ZOMBIE_HEAD);
 	}
 
-	// elements
+	// ----- elements
 	@Override
 	public boolean mustCache(ElementPosition position) {
 		return false;
@@ -57,19 +58,22 @@ public class PositionTypeClosestEntityRelativeSingle extends PositionType {
 			return null;
 		}
 		// find entities by types (or all entities if no type)
-		Class<? extends Entity>[] typesClasses = (Class<? extends Entity>[]) element.parseElementAsList("entity_types", EntityType.class, replacer).orEmptyList().stream().map(EntityType::getEntityClass).toArray();
+		List<Class<? extends Entity>> typesClassesList = element.parseElementAsList("entity_types", EntityType.class, replacer).orEmptyList().stream().map(EntityType::getEntityClass).collect(Collectors.toList());
+		Class[] typesClasses = typesClassesList.toArray(new Class[typesClassesList.size()]);
 		Stream<Entity> stream = (typesClasses.length == 0 ? parsingLocation.getWorld().getEntities() : parsingLocation.getWorld().getEntitiesByClasses(typesClasses)).stream();
 		// filter by name
-		element.parseElementAsList("entity_names", String.class, replacer).ifPresentDo(names -> {
-			stream.filter(entity -> entity.getCustomName() != null && names.stream().anyMatch(name -> name.equalsIgnoreCase(entity.getCustomName())));
-		});
+		List<String> names = element.parseElementAsList("entity_names", String.class, replacer).orNull();
+		if (names != null) {
+			stream = stream.filter(entity -> entity.getCustomName() != null && names.stream().anyMatch(name -> name.equalsIgnoreCase(entity.getCustomName())));
+		}
 		// filter by color
-		element.parseElementAsList("entity_colors", DyeColor.class, replacer).ifPresentDo(colors -> {
-			stream.filter(entity -> {
+		List<DyeColor> colors = element.parseElementAsList("entity_colors", DyeColor.class, replacer).orNull();
+		if (colors != null) {
+			stream = stream.filter(entity -> {
 				Colorable colorable = ObjectUtils.castOrNull(entity, Colorable.class);
 				return colorable != null && colors.contains(colorable.getColor());
 			});
-		});
+		}
 		// sort and find first
 		return stream.sorted((a, b) -> Double.compare(a.getLocation().distance(parsingLocation), b.getLocation().distance(parsingLocation)));
 	}
@@ -97,7 +101,7 @@ public class PositionTypeClosestEntityRelativeSingle extends PositionType {
 		return true;
 	}
 
-	// parse
+	// ----- parse
 	@Override
 	public Position doParse(ElementPosition position, Replacer replacer) throws ParsingError {
 		Entity entity = findMatching(position, replacer);

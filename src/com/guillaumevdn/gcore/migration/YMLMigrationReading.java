@@ -16,7 +16,7 @@ public class YMLMigrationReading extends YMLConfiguration {
 		super(plugin, file);
 	}
 
-	// read
+	// ----- read
 	private static final Replacer placeholdersReplacer = Replacer
 			.of("{objective}", () -> "{objective_name}")
 			.with("{objective_progress}", () -> "{objective_progression}")

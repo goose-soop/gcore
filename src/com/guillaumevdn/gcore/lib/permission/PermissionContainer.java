@@ -19,7 +19,7 @@ public abstract class PermissionContainer {
 		this.plugin = plugin;
 	}
 
-	// get
+	// ----- get
 	public final GPlugin getPlugin() {
 		return plugin;
 	}
@@ -33,7 +33,7 @@ public abstract class PermissionContainer {
 		return admin;
 	}
 
-	// set
+	// ----- set
 	public final Permission setAdmin(String name) {
 		if (admin != null) throw new IllegalStateException();
 		return admin = set(name);

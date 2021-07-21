@@ -34,7 +34,7 @@ public class InventoryState {
 		}
 	}
 
-	// get
+	// ----- get
 	public Inventory getInventory() {
 		return inventory;
 	}
@@ -43,7 +43,7 @@ public class InventoryState {
 		return items;
 	}
 
-	// compare
+	// ----- compare
 	public Pair<Map<Integer, ItemStack>, Map<Integer, ItemStack>> findChanges(InventoryState newState) {
 		return findChanges(items, newState.items);
 	}
@@ -73,7 +73,7 @@ public class InventoryState {
 					}
 					// same type of item
 					else {
-						int delta = currentItem.getAmount() - initialItem.getAmount();
+						int delta = currentItem.getAmount() - initialItem.getAmount();  // correct order ; will be positive if we have more, negative if we have less
 						if (delta > 0) {
 							currentItem.setAmount(delta);
 							added.put(slot, currentItem);
@@ -94,7 +94,7 @@ public class InventoryState {
 			}
 		}
 		// return
-		return new Pair<Map<Integer, ItemStack>, Map<Integer, ItemStack>>(removed, added);
+		return Pair.of(removed, added);
 	}
 
 }

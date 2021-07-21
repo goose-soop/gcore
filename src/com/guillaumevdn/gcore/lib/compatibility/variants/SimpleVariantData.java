@@ -15,7 +15,7 @@ public abstract class SimpleVariantData<E extends Enum<E>> extends VariantData<E
 		super(version, versionComparison, dataName, extra);
 	}
 
-	// get
+	// ----- get
 	@Override
 	public String toString() {
 		return "("

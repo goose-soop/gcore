@@ -32,7 +32,7 @@ public class ElementCitizensNPC extends ElementAbstractEnum<NPC> {
 		return CollectionUtils.asList(CitizensAPI.getNPCRegistry().sorted());
 	}
 
-	// editor
+	// ----- editor
 	@Override
 	public Mat editorIconType() {
 		return CommonMats.PLAYER_HEAD;
@@ -53,23 +53,23 @@ public class ElementCitizensNPC extends ElementAbstractEnum<NPC> {
 					// on select
 					value -> {
 						setValue(CollectionUtils.asList(getSerializer().serialize(value)));
-						call.getGUI().setRegularItem(buildEditorItem(call.getSlot()));
-						call.getGUI().openFor(call.getClicker(), call.getPageIndex());
+						call.getGUI().setRegularItem(buildEditorItem(call.getPageIndex(), call.getSlot()));
+						call.reopenGUI();
 						getSuperElement().onEditorChange(this);
 					},
 					// on cancel
 					() -> {
-						call.getGUI().openFor(call.getClicker(), call.getPageIndex());
+						call.reopenGUI();
 					});
 		}
 		// shift + right-click : import
 		else if (call.getType().equals(ClickType.SHIFT_RIGHT)) {
 			IntegrationInstanceCitizens.awaitNPC(call.getClicker(), TextEditorGeneric.messageElementBasicImportNPC, value -> {
 				setValue(CollectionUtils.asList(getSerializer().serialize(value)));
-				call.getGUI().setRegularItem(buildEditorItem(call.getSlot()));
-				call.getGUI().openFor(call.getClicker(), call.getPageIndex());
+				call.getGUI().setRegularItem(buildEditorItem(call.getPageIndex(), call.getSlot()));
+				call.reopenGUI();
 				getSuperElement().onEditorChange(this);
-			}, () -> call.getGUI().openFor(call.getClicker(), call.getPageIndex()));
+			}, () -> call.reopenGUI());
 		}
 		// other
 		else {

@@ -22,7 +22,7 @@ public class PositionTypeCitizensNPCRelativeAreaOutside extends PositionTypeCiti
 		super(id);
 	}
 
-	// elements
+	// ----- elements
 	@Override
 	protected void doFillTypeSpecificElements(ElementPosition position) {
 		super.doFillTypeSpecificElements(position);
@@ -30,7 +30,7 @@ public class PositionTypeCitizensNPCRelativeAreaOutside extends PositionTypeCiti
 		position.addRelativeLocation("bound2", Need.required(), TextEditorGeneric.descriptionPositionTypeRelativeBound2);
 	}
 
-	// parse
+	// ----- parse
 	@Override
 	protected Position doParse(ElementPosition position, NPC npc, Replacer replacer) throws ParsingError {
 		Location a = position.getElementAs("bound1", ElementRelativeLocation.class).parseNoCatchOrThrowParsingNull(replacer.cloneReplacer().with(npc.getEntity().getLocation()));

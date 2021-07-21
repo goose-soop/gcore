@@ -37,7 +37,7 @@ public class ElementPotionEffect extends ParseableContainerElement<PotionEffect>
 		super("time limit", parent, id, need, editorDescription);
 	}
 
-	// get
+	// ----- get
 	public ElementPotionEffectType getType() {
 		return type;
 	}
@@ -62,7 +62,7 @@ public class ElementPotionEffect extends ParseableContainerElement<PotionEffect>
 		return icon;
 	}
 
-	// import
+	// ----- import
 	public void importValue(PotionEffect effect) {
 		type.setValue(CollectionUtils.asList(effect.getType().getName()));
 		duration.setValue(((long) effect.getDuration()) * 50L);
@@ -76,7 +76,7 @@ public class ElementPotionEffect extends ParseableContainerElement<PotionEffect>
 		}
 	}
 
-	// parse
+	// ----- parse
 	@Override
 	public PotionEffect doParse(Replacer replacer) throws ParsingError {
 		PotionEffectType type = this.type.parseNoCatchOrThrowParsingNull(replacer);
@@ -94,7 +94,7 @@ public class ElementPotionEffect extends ParseableContainerElement<PotionEffect>
 		}
 	}
 
-	// editor
+	// ----- editor
 	@Override
 	public Mat editorIconType() {
 		return CommonMats.REPEATER;

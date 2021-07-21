@@ -15,6 +15,7 @@ import com.guillaumevdn.gcore.lib.command.CommandCall;
 import com.guillaumevdn.gcore.lib.object.NeedType;
 import com.guillaumevdn.gcore.lib.permission.Permission;
 import com.guillaumevdn.gcore.lib.player.PlayerUtils;
+import com.guillaumevdn.gcore.lib.string.StringUtils;
 import com.guillaumevdn.gcore.lib.string.Text;
 import com.guillaumevdn.gcore.lib.tuple.Pair;
 
@@ -34,7 +35,7 @@ public class ArgumentOfflinePlayer extends Argument<OfflinePlayer> implements Pl
 		return senderIfNone;
 	}
 
-	// override permission
+	// ----- override permission
 	@Override
 	public boolean hasPermission(CommandSender sender) {
 		return senderIfNone || getPermission() == null || getPermission().has(sender);
@@ -45,7 +46,7 @@ public class ArgumentOfflinePlayer extends Argument<OfflinePlayer> implements Pl
 		return senderIfNone && getPermission() != null && !getPermission().has(sender);
 	}
 
-	// do
+	// ----- do
 	@Override
 	public OfflinePlayer consume(CommandCall call) {
 		if (call.getArguments().isEmpty()) {
@@ -81,6 +82,7 @@ public class ArgumentOfflinePlayer extends Argument<OfflinePlayer> implements Pl
 		if (offline != null) {
 			OfflinePlayer player = Bukkit.getOfflinePlayer(offline.getA());
 			if (player != null && player.getLastPlayed() != 0L) {
+				WorkerGCore.inst().registerOfflinePlayer(player.getName(), player.getUniqueId());
 				return player;
 			}
 		}
@@ -93,7 +95,7 @@ public class ArgumentOfflinePlayer extends Argument<OfflinePlayer> implements Pl
 
 	@Override
 	public List<String> tabComplete(CommandCall call) {
-		return Stream.concat(PlayerUtils.getOnlineStream().map(pl -> pl.getName()), WorkerGCore.inst().getOfflinePlayersNames()).sorted(String::compareTo).collect(Collectors.toList());
+		return Stream.concat(PlayerUtils.getOnlineStream().map(pl -> pl.getName()), WorkerGCore.inst().getOfflinePlayersNames()).filter(n -> n != null).sorted(StringUtils.STRING_WITHNUMBERS_IGNORECASE).collect(Collectors.toList());
 	}
 
 }

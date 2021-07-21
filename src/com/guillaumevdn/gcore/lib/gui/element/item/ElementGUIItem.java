@@ -11,7 +11,6 @@ import com.guillaumevdn.gcore.lib.element.struct.Element;
 import com.guillaumevdn.gcore.lib.element.struct.Need;
 import com.guillaumevdn.gcore.lib.element.struct.container.typable.ElementTypableElementType;
 import com.guillaumevdn.gcore.lib.element.struct.container.typable.TypableContainerElement;
-import com.guillaumevdn.gcore.lib.element.struct.parsing.ParsingError;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementBoolean;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementSound;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementStringList;
@@ -22,9 +21,6 @@ import com.guillaumevdn.gcore.lib.gui.element.item.type.GUIItemType;
 import com.guillaumevdn.gcore.lib.gui.element.item.type.GUIItemTypes;
 import com.guillaumevdn.gcore.lib.gui.struct.ClickCall;
 import com.guillaumevdn.gcore.lib.gui.struct.ClickCall.ClickType;
-import com.guillaumevdn.gcore.lib.gui.struct.active.ActiveGUI;
-import com.guillaumevdn.gcore.lib.gui.struct.active.ActiveItemHolder;
-import com.guillaumevdn.gcore.lib.gui.struct.active.ItemHolder;
 import com.guillaumevdn.gcore.lib.string.Text;
 import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
 import com.guillaumevdn.gcore.lib.tuple.IntegerPair;
@@ -48,7 +44,7 @@ public class ElementGUIItem extends TypableContainerElement<GUIItemType> {
 		return add(new ElementGUIItemType(this, "type", TextEditorGeneric.descriptionGuiItemType));
 	}
 
-	// get
+	// ----- get
 	public ElementStringList getLocations() {
 		return locations;
 	}
@@ -65,14 +61,15 @@ public class ElementGUIItem extends TypableContainerElement<GUIItemType> {
 		return overrideClicks;
 	}
 
-	// do
+	// ----- do
 	private Map<ClickType, Consumer<ClickCall>> overrideClicksCache = null;
 
 	public Map<ClickType, Consumer<ClickCall>> parseOverrideClicks(Replacer replacer) {
-		// has cache
+		// has valuesCache
 		if (overrideClicksCache != null) {
 			return overrideClicksCache;
 		}
+
 		// add override clicks
 		Map<ClickType, Consumer<ClickCall>> result = new HashMap<>();
 		getOverrideClicks().parse(replacer).orEmptyMap().forEach((click, action) -> {  // don't ignore NONE type, even for the default element ; the dude choose to set it that way, maybe he wants to cancel the effects of the TYPE
@@ -81,6 +78,7 @@ public class ElementGUIItem extends TypableContainerElement<GUIItemType> {
 				result.put(click, handler);
 			}
 		});
+
 		// add default override click
 		ElementOverrideClick def = getOverrideClicks().getDefaultElement().orNull();
 		OverrideClick parsedDef = def == null ? null : def.parse(replacer).orNull();
@@ -90,15 +88,17 @@ public class ElementGUIItem extends TypableContainerElement<GUIItemType> {
 				result.computeIfAbsent(click, __ -> defHandler);
 			}
 		}
-		// cache if no parseable locations
+
+		// valuesCache if no parseable locations
 		if (!overrideClicks.hasParseableLocations()) {
 			overrideClicksCache = result;
 		}
+
 		// done
 		return result;
 	}
 
-	public List<IntegerPair> parseLocations(Replacer replacer) throws ParsingError {
+	public List<IntegerPair> parseLocations(Replacer replacer) {
 		List<IntegerPair> result = new ArrayList<>();
 		for (String location : locations.parse(replacer).orEmptyList()) {
 			try {
@@ -113,18 +113,9 @@ public class ElementGUIItem extends TypableContainerElement<GUIItemType> {
 		return result;
 	}
 
-	private transient ItemHolder holderCache = null;  // cache holder since it's only calling methods and equals check is with ID
-	public ItemHolder getHolder() {
-		return holderCache != null ? holderCache : (holderCache = new ItemHolder(getId()) {
-			@Override
-			public boolean parsePersistent(ActiveGUI instance) {
-				return ElementGUIItem.this.getPersistent().parse(instance.getReplacer()).orElse(false);
-			}
-			@Override
-			public ActiveItemHolder newActive(ActiveGUI gui) {
-				return ElementGUIItem.this.getType().newActive(gui, this, ElementGUIItem.this);
-			}
-		});
+	private transient ElementGUIItemHolder holderCache = null;  // valuesCache holder since it's only calling methods and equals check is with ID
+	public ElementGUIItemHolder getHolder() {
+		return holderCache != null ? holderCache : (holderCache = new ElementGUIItemHolder(this));
 	}
 
 }

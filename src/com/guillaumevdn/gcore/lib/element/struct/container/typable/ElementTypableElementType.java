@@ -4,7 +4,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import com.guillaumevdn.gcore.TextEditorGeneric;
-import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.compatibility.material.Mat;
 import com.guillaumevdn.gcore.lib.element.editor.EnumSelectorGUI;
 import com.guillaumevdn.gcore.lib.element.struct.Element;
@@ -22,11 +21,11 @@ public abstract class ElementTypableElementType<T extends TypableElementType> ex
 	private TypableElementTypes<T> types;
 
 	public ElementTypableElementType(TypableElementTypes<T> types, Element parent, String id, Text editorDescription) {
-		super(types.getTypeClass(), parent, id, Need.optional(types.defaultValue()), editorDescription, CollectionUtils.asList(types.values()));
+		super(types.getTypeClass(), parent, id, Need.optional(types.defaultValue()), editorDescription);
 		this.types = types;
 	}
 
-	// editor
+	// ----- editor
 	@Override
 	public List<String> editorIconLore() {
 		List<String> lore = super.nonControlEditorIconLore();
@@ -51,10 +50,11 @@ public abstract class ElementTypableElementType<T extends TypableElementType> ex
 						parent.changeType(value);
 					}
 				} catch (ClassCastException ignored) {}
+				
 				// reopen GUI (that refreshes it since it's an editor GUI)
-				call.getGUI().openFor(call.getClicker(), call.getPageIndex());
+				call.reopenGUI();
 				getSuperElement().onEditorChange(this);
-			}, () -> call.getGUI().openFor(call.getClicker(), call.getPageIndex()));
+			}, () -> call.reopenGUI());
 		}
 	}
 

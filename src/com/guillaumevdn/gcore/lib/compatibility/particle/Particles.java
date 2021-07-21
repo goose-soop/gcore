@@ -16,7 +16,7 @@ public final class Particles extends Variants<Particle, ParticleExtra, ParticleD
 		super("particle", Particle.class, ParticleData.class, ParticleExtra.class, regenerate, false);
 	}
 
-	// load
+	// ----- load
 	@Override
 	public ParticleData loadElementConfigAndCreateData(Version version, ComparisonType comparison, List<ParticleExtra> extra, String rawData) throws Throwable {
 		return new ParticleData(version, comparison, rawData, extra);

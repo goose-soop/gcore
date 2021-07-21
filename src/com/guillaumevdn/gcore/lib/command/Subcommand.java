@@ -13,6 +13,7 @@ import com.guillaumevdn.gcore.lib.command.argument.Argument;
 import com.guillaumevdn.gcore.lib.command.argument.ArgumentDouble;
 import com.guillaumevdn.gcore.lib.command.argument.ArgumentEnum;
 import com.guillaumevdn.gcore.lib.command.argument.ArgumentFixed;
+import com.guillaumevdn.gcore.lib.command.argument.ArgumentInfinite;
 import com.guillaumevdn.gcore.lib.command.argument.ArgumentInteger;
 import com.guillaumevdn.gcore.lib.command.argument.ArgumentInteger.TabCompleteMode;
 import com.guillaumevdn.gcore.lib.command.argument.ArgumentOfflinePlayer;
@@ -44,7 +45,7 @@ public abstract class Subcommand extends UsageRestriction {
 		this.description = description;
 	}
 
-	// get
+	// ----- get
 	public final Text getDescription() {
 		return description;
 	}
@@ -69,7 +70,7 @@ public abstract class Subcommand extends UsageRestriction {
 		return dependent;
 	}
 
-	// set
+	// ----- set
 	public final <A extends Argument> A addArgument(A argument) {
 		arguments.add(argument);
 		return argument;
@@ -81,6 +82,10 @@ public abstract class Subcommand extends UsageRestriction {
 
 	public final ArgumentString addArgumentString(NeedType need, boolean playerOnly, Permission permission, Text usage) {
 		return addArgument(new ArgumentString(need, playerOnly, permission, usage));
+	}
+
+	public final ArgumentInfinite addArgumentInfinite(NeedType need, boolean playerOnly, Permission permission, Text usage) {
+		return addArgument(new ArgumentInfinite(need, playerOnly, permission, usage));
 	}
 
 	public final ArgumentPlayer addArgumentPlayer(NeedType need, boolean playerOnly, Permission permission, Text usage, boolean senderIfNone) {
@@ -98,7 +103,7 @@ public abstract class Subcommand extends UsageRestriction {
 	public final ArgumentInteger addArgumentInteger(NeedType need, boolean playerOnly, Permission permission, Text usage, TabCompleteMode mode) {
 		return addArgument(new ArgumentInteger(need, playerOnly, permission, usage, mode));
 	}
-	
+
 	public final ArgumentDouble addArgumentDouble(NeedType need, boolean playerOnly, Permission permission, Text usage, TabCompleteMode mode) {
 		return addArgument(new ArgumentDouble(need, playerOnly, permission, usage, mode));
 	}
@@ -117,10 +122,10 @@ public abstract class Subcommand extends UsageRestriction {
 		this.dependent.add(Pair.of(dependent, CollectionUtils.asList(dependencies)));
 	}
 
-	// do
+	// ----- do
 	public abstract void perform(CommandCall call);
 
-	// help/text
+	// ----- help/text
 	public void logMissingArgument(Argument argument, CommandCall call) {
 		List<String> found = getArguments().stream()
 				.filter(arg -> arg.getUsage() != null && arg.get(call) != null)

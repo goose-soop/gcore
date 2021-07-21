@@ -44,15 +44,21 @@ public abstract class ElementsContainer<V extends SuperElement> {
 	private final Class<V> typeClass;
 	private final File baseFolder;
 	private final SortedLowerCaseHashMap<V> elements = SortedLowerCaseHashMap.keySorted();
+	private final List<String> skipFiles;
 
 	public ElementsContainer(GPlugin plugin, String typeName, Class<V> typeClass, File baseFolder) {
+		this(plugin, typeName, typeClass, baseFolder, new ArrayList<>());
+	}
+
+	public ElementsContainer(GPlugin plugin, String typeName, Class<V> typeClass, File baseFolder, List<String> skipFiles) {
 		this.plugin = plugin;
 		this.typeName = typeName;
 		this.typeClass = typeClass;
 		this.baseFolder = baseFolder;
+		this.skipFiles = skipFiles;
 	}
 
-	// get
+	// ----- get
 	public final GPlugin getPlugin() {
 		return plugin;
 	}
@@ -69,8 +75,12 @@ public abstract class ElementsContainer<V extends SuperElement> {
 		return baseFolder;
 	}
 
+	public final List<String> keys() {
+		return elements.keySet();  // already immutable
+	}
+
 	public final Collection<V> values() {
-		return elements.values(); // already immutable
+		return elements.values();  // already immutable
 	}
 
 	public final boolean isEmpty() {
@@ -85,12 +95,12 @@ public abstract class ElementsContainer<V extends SuperElement> {
 		return Optional.of(elements.get(key));
 	}
 
-	// set
+	// ----- set
 	public final void load() throws Throwable {
 		elements.clear();
 		doLoad(baseFolder);
 		if (!elements.isEmpty()) {
-			plugin.getMainLogger().info("Successfully loaded " + StringUtils.pluralizeAmountDesc(typeName, elements.size()) + " : " + StringUtils.toTextString(", ", elements.keySet()));
+			plugin.getMainLogger().info("Successfully loaded " + StringUtils.pluralizeAmountDesc(typeName, elements.size()) + (ConfigGCore.dontLogLoadedElementsNames ? "" : " : " + StringUtils.toTextString(", ", elements.keySet())));
 		}
 	}
 
@@ -103,17 +113,26 @@ public abstract class ElementsContainer<V extends SuperElement> {
 				doLoad(f);
 			}
 		} else {
-			// not a .yml file, skip it
-			if (!file.getName().toLowerCase().endsWith(".yml")) {
+			// should skip file
+			if (!file.getName().toLowerCase().endsWith(".yml") || file.getName().startsWith("SYSTEM_") || skipFiles.contains(FileUtils.getSimpleName(file))) {
 				return;
 			}
+
 			// can't load for another reason
 			String id = FileUtils.getSimpleName(file).toLowerCase();
 			ensureCanLoad(file, id);
-			// load element
+
+			// duplicate ID
 			V elem = createElement(file, id);
-			elem.read();
+			V existing = getElement(id).orNull();
+			if (existing != null) {
+				throw new ConfigError("Found duplicate " + typeName + " id '" + id + "', first in " + existing.getConfiguration().getLogFilePath() + ", second in " + elem.getConfiguration().getLogFilePath());
+			}
+
+			// load element
 			setElement(elem);
+			elem.read();
+
 			// notify loading errors
 			if (!elem.getLoadErrors().isEmpty()) {
 				getPlugin().getMainLogger().error("Errors were found when loading " + getTypeName() + " " + id + " :", true);
@@ -163,7 +182,7 @@ public abstract class ElementsContainer<V extends SuperElement> {
 		}
 	}
 
-	// editor
+	// ----- editor
 	public EditorGUI editorGUI(GPlugin plugin, String title, ClickCall fromCall) {
 		EditorGUI editor = new EditorGUI(plugin, title, fromCall) {
 			@Override
@@ -208,10 +227,10 @@ public abstract class ElementsContainer<V extends SuperElement> {
 							final File file = new File(baseFolder + "/" + id + ".yml");
 							if (!StringUtils.isAlphanumeric(id.replace("_", ""))) {
 								TextEditorGeneric.messageElementCreateInvalidId.replace("{value}", () -> id).send(call.getClicker());
-								call.getGUI().openFor(call.getClicker(), call.getPageIndex());
+								call.reopenGUI();
 							} else if (getElement(id).isPresent() || file.exists()) {
 								TextEditorGeneric.messageElementCreateAlreadyExists.replace("{value}", () -> id).send(call.getClicker());
-								call.getGUI().openFor(call.getClicker(), call.getPageIndex());
+								call.reopenGUI();
 							}
 							// create element
 							else {
@@ -223,10 +242,11 @@ public abstract class ElementsContainer<V extends SuperElement> {
 								} catch (Throwable exception) {
 									exception.printStackTrace();
 								}
+
 								// reopen GUI (that refreshes it since it's an editor GUI)
-								call.getGUI().openFor(call.getClicker(), call.getPageIndex());
+								call.reopenGUI();
 							}
-						}, () -> call.getGUI().openFor(call.getClicker(), call.getPageIndex()));
+						}, () -> call.reopenGUI());
 					}
 				}));
 				// done

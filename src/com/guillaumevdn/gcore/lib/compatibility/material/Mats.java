@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.inventory.ItemStack;
 
 import com.guillaumevdn.gcore.ConfigGCore;
@@ -29,12 +30,16 @@ public final class Mats extends Variants<Mat, MatExtra, MatData> {
 		super("material", Mat.class, MatData.class, MatExtra.class, regenerate, lenient);
 	}
 
-	// get
+	// ----- get
 	public Optional<Mat> fromItem(ItemStack item) {
 		return from(item.getType(), Compat.getLegacyData(item));
 	}
 
 	public Optional<Mat> fromBlock(Block block) {
+		return from(block.getType(), Compat.getLegacyData(block));
+	}
+
+	public Optional<Mat> fromBlock(BlockState block) {
 		return from(block.getType(), Compat.getLegacyData(block));
 	}
 
@@ -48,7 +53,7 @@ public final class Mats extends Variants<Mat, MatExtra, MatData> {
 			Optional<Mat> result = byIdAndDataQueryCache.get(queryId);
 			if (result == null) {
 				for (Mat mat : values()) {
-					if (mat.getData().getDataName().equalsIgnoreCase(typeName) && mat.getData().getLegacyData() == legacyData) {
+					if (mat.getData().getDataName().equalsIgnoreCase(typeName) && mat.getData().acceptsLegacyData(legacyData)) {
 						result = Optional.of(mat);
 						byIdAndDataQueryCache.put(queryId, result);
 						return result;
@@ -61,7 +66,7 @@ public final class Mats extends Variants<Mat, MatExtra, MatData> {
 		}
 		// >=1.13
 		else {
-			Optional<Mat> mat = fromIdOrDataName(typeName);  // this will cache an empty optional if none found
+			Optional<Mat> mat = fromIdOrDataName(typeName);  // this will valuesCache an empty optional if none found
 			if (mat.isPresent() || !isLenient()) {
 				return mat;
 			}
@@ -69,23 +74,29 @@ public final class Mats extends Variants<Mat, MatExtra, MatData> {
 		// create lenient
 		Mat lenient = ConfigGCore.mats.createIfLenient(type, legacyData);
 		Optional<Mat> result = lenient != null ? Optional.of(lenient) : Optional.empty();
-		// cache result if legacy
+		// valuesCache result if legacy
 		if (!Version.ATLEAST_1_13) {
 			byIdAndDataQueryCache.put(queryId, result);
 		}
 		return result;
 	}
 
-	// load
+	// ----- load
 	@Override
 	public MatData loadElementConfigAndCreateData(Version version, ComparisonType comparison, List<MatExtra> extra, String rawData) throws Throwable {
 		try {
 			String[] matSplit = rawData.split(":", -1);
 			String name = matSplit[0];
-			int legacyData = matSplit.length > 1 ? loadPositiveNumber(matSplit[1], "data") : 0;
+			int legacyData = -1;
+			List<Integer> legacyDatas = null;
+			if (matSplit.length == 2) {
+				legacyData = loadPositiveNumber(matSplit[1], "data");
+			} else if (matSplit.length > 2) {
+				legacyDatas = loadPositiveNumberList(matSplit, 1, matSplit.length, "data");
+			}
 			Material material = ObjectUtils.safeValueOf(name, Material.class);
 			if (material == null && Version.ATLEAST_1_13) material = ObjectUtils.safeValueOf("LEGACY_" + name, Material.class);
-			return new MatData(version, comparison, name, material, legacyData, extra);
+			return new MatData(version, comparison, name, material, legacyData, legacyDatas, extra);
 		} catch (Throwable exception) {
 			throw new ConfigError("invalid " + getTypeName() + " config " + rawData, exception);
 		}
@@ -98,12 +109,14 @@ public final class Mats extends Variants<Mat, MatExtra, MatData> {
 
 	Mat createIfLenient(Material material, int legacyData) {
 		if (!isLenient()) return null;
+
 		// lenient already exists
 		String id = material.name() + (legacyData == 0 ? "" : "_DATA" + legacyData);
 		Optional<Mat> existing = fromId(id);
 		if (existing.isPresent()) {
 			return existing.orNull();
 		}
+
 		// create lenient
 		if (legacyData != 0 && Version.ATLEAST_1_13) {
 			legacyData = 0;
@@ -112,7 +125,7 @@ public final class Mats extends Variants<Mat, MatExtra, MatData> {
 			GCore.inst().getMainLogger().warning("Creating lenient mat " + material.name() + ":" + legacyData);
 		}
 		try {
-			return registerIfHasCurrentVersion(id, CollectionUtils.asList(new MatData(Version.CURRENT, ComparisonType.EQUALS, material.name(), material, 0, null)));
+			return registerIfHasCurrentVersion(id, CollectionUtils.asList(new MatData(Version.CURRENT, ComparisonType.EQUALS, material.name(), material, 0, null, null)));
 		} catch (Throwable exception) {
 			GCore.inst().getMainLogger().error("Couldn't create custom mat " + id, exception);
 			return null;

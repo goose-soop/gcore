@@ -7,7 +7,7 @@ import com.guillaumevdn.gcore.lib.function.ThrowableConsumer;
  */
 public class ReflectionProcedureConsumer<T> extends ReflectionProcedure<ThrowableConsumer<T>, ReflectionProcedureConsumer<T>> {
 
-	// methods
+	// ----- methods
 	public void process(T param) {
 		ThrowableConsumer<T> function = get();
 		if (function != null) {

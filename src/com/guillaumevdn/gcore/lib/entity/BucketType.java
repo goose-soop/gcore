@@ -12,7 +12,7 @@ public enum BucketType {
 	LAVA, WATER, MILK;
 
 	public static BucketType fromBlock(Block block) {
-		Mat mat = Mat.fromBlock(block).orNull();
+		Mat mat = Mat.fromBlock(block).orElse(null);
 		if (mat != null) {
 			if (mat.getData().getDataName().toUpperCase().contains("LAVA")) return LAVA;
 			if (mat.getData().getDataName().toUpperCase().contains("WATER")) return WATER;

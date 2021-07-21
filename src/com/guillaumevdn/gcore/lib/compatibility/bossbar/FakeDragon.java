@@ -27,7 +27,7 @@ public final class FakeDragon {
 		this.player = player;
 	}
 
-	// get
+	// ----- get
 	public Bossbar getBossbar() {
 		return bossbar;
 	}
@@ -41,7 +41,7 @@ public final class FakeDragon {
 		return new Location(loc.getWorld(), loc.getX(), -10d, loc.getZ(), loc.getPitch(), loc.getYaw());
 	}
 
-	// packets
+	// ----- packets
 	public void sendSpawn() throws Throwable {
 		Location loc = getLocation();
 		ReflectionObject world = ReflectionObject.of(getPlayer().getWorld()).invokeMethod("getHandle");
@@ -51,7 +51,7 @@ public final class FakeDragon {
 		dragon.invokeMethod("setCustomName", getBossbar().getTitle());
 		dragon.invokeMethod("setHealth", (float) (getBossbar().getProgress() * 200f));
 		id = (int) dragon.invokeMethod("getId").get();
-		Reflection.sendNmsPacket(getPlayer(), "PacketPlayOutSpawnEntityLiving", dragon.get());
+		Reflection.sendNmsPacket(getPlayer(), "PacketPlayOutSpawnEntityLiving", dragon.justGet());
 		sendMetadata(getWatcher());
 	}
 
@@ -84,15 +84,15 @@ public final class FakeDragon {
 	}
 
 	private Object getWatcher() throws Throwable {
-		ReflectionObject watcher = Reflection.newNmsInstance("DataWatcher", dragon);
+		ReflectionObject watcher = Reflection.newNmsInstance("DataWatcher", dragon.justGet());
 		ReflectionMethod method = Reflection.getMethod(watcher.get().getClass(), "a", CollectionUtils.asList(int.class, Object.class));
-		method.invoke(watcher, Version.ATLEAST_1_8 ? 5 : 0, (byte) 0x20);
-		method.invoke(watcher, 6, new Float(getBossbar().getProgress()));
-		method.invoke(watcher, 7, new Integer(0));
-		method.invoke(watcher, 8, new Byte((byte) 1));
-		method.invoke(watcher, 10, getBossbar().getTitle());
-		method.invoke(watcher, 11, new Byte((byte) 1));
-		return watcher;
+		method.invoke(watcher.justGet(), Version.ATLEAST_1_8 ? 5 : 0, (byte) 0x20);
+		method.invoke(watcher.justGet(), 6, new Float(getBossbar().getProgress()));
+		method.invoke(watcher.justGet(), 7, new Integer(0));
+		method.invoke(watcher.justGet(), 8, new Byte((byte) 1));
+		method.invoke(watcher.justGet(), 10, getBossbar().getTitle());
+		method.invoke(watcher.justGet(), 11, new Byte((byte) 1));
+		return watcher.justGet();
 	}
 
 }

@@ -23,7 +23,7 @@ public class PositionTypeCitizensNPCRelativeSphereOutside extends PositionTypeCi
 		super(id);
 	}
 
-	// elements
+	// ----- elements
 	@Override
 	protected void doFillTypeSpecificElements(ElementPosition position) {
 		super.doFillTypeSpecificElements(position);
@@ -31,7 +31,7 @@ public class PositionTypeCitizensNPCRelativeSphereOutside extends PositionTypeCi
 		position.addDouble("radius", Need.required(), 1, TextEditorGeneric.descriptionPositionTypeSphereRadius);
 	}
 
-	// parse
+	// ----- parse
 	@Override
 	protected Position doParse(ElementPosition position, NPC npc, Replacer replacer) throws ParsingError {
 		Location center = position.getElementAs("center", ElementRelativeLocation.class).parseNoCatchOrThrowParsingNull(replacer.cloneReplacer().with(npc.getEntity().getLocation()));

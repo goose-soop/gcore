@@ -7,7 +7,7 @@ import com.guillaumevdn.gcore.lib.function.ThrowableSeptaConsumer;
  */
 public class ReflectionProcedureSeptaConsumer<A, B, C, D, E, F, G> extends ReflectionProcedure<ThrowableSeptaConsumer<A, B, C, D, E, F, G>, ReflectionProcedureSeptaConsumer<A, B, C, D, E, F, G>> {
 
-	// methods
+	// ----- methods
 	public void process(A a, B b, C c, D d, E e, F f, G g) {
 		ThrowableSeptaConsumer<A, B, C, D, E, F, G> function = get();
 		if (function != null) {

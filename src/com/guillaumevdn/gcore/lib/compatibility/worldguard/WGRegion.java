@@ -19,7 +19,7 @@ public class WGRegion {
 		this.regionId = regionId;
 	}
 
-	// get
+	// ----- get
 	public World getWorld() {
 		return world;
 	}
@@ -28,7 +28,7 @@ public class WGRegion {
 		return regionId;
 	}
 
-	// object
+	// ----- object
 	@Override
 	public int hashCode() {
 		return Objects.hash(world.getName(), regionId);

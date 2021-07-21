@@ -12,17 +12,17 @@ import com.guillaumevdn.gcore.lib.number.NumberUtils;
 import com.guillaumevdn.gcore.lib.reflection.Reflection;
 import com.guillaumevdn.gcore.lib.reflection.ReflectionEnum;
 import com.guillaumevdn.gcore.lib.reflection.ReflectionObject;
-import com.guillaumevdn.gcore.lib.reflection.procedure.ReflectionProcedureOctoConsumer;
+import com.guillaumevdn.gcore.lib.reflection.procedure.ReflectionProcedureUndeciConsumer;
 
 /**
  * @author GuillaumeVDN
  */
 public final class ParticleCompat {
 
-	// send particle
+	// ----- send particle
 	private static final int[] emptyData = new int[0];
-	private static final ReflectionProcedureOctoConsumer<Collection<Player>, Location, Particle, Color, Float, Integer, Integer, Float> SEND_PARTICLE = new ReflectionProcedureOctoConsumer<Collection<Player>, Location, Particle, Color, Float, Integer, Integer, Float>()
-			.setIf(Version.ATLEAST_1_13, (players, location, particle, color, redstoneColorScale, noteColor, count, speed) -> {
+	private static final ReflectionProcedureUndeciConsumer<Collection<Player>, Location, Particle, Color, Float, Integer, Integer, Float, Float, Float, Float> SEND_PARTICLE = new ReflectionProcedureUndeciConsumer<Collection<Player>, Location, Particle, Color, Float, Integer, Integer, Float, Float, Float, Float>()
+			.setIf(Version.ATLEAST_1_13, (players, location, particle, color, redstoneColorScale, noteColor, count, speed, offx, offy, offz) -> {
 				ReflectionEnum particleEnum = Reflection.getEnum("org.bukkit.Particle");
 				ReflectionObject particleBukkit = particleEnum.safeValueOf(particle.getData().getDataName());
 				if (particleBukkit == null) {
@@ -32,30 +32,30 @@ public final class ParticleCompat {
 					if (particle.getData().isMusicNote()) {
 						float note = NumberUtils.isInRange(noteColor, 0, 24) ? (float) noteColor : NumberUtils.random(0f, 24f);
 						players.forEach(player -> {
-							player.spawnParticle(particleBukkit.get(), location.getX(), location.getY(), location.getZ(), count, 0f, 0f, 0f, note);
+							player.spawnParticle(particleBukkit.get(), location.getX(), location.getY(), location.getZ(), count, offx, offy, offz, note);
 						});
 					}
 					// redstone
 					else if (particle.getData().getDataName().equals("REDSTONE")) {
-						org.bukkit.Particle.DustOptions data = new org.bukkit.Particle.DustOptions(color, redstoneColorScale);
+						org.bukkit.Particle.DustOptions data = new org.bukkit.Particle.DustOptions(color != null ? color : Color.fromRGB(NumberUtils.random(0, 255), NumberUtils.random(0, 255), NumberUtils.random(0, 255)), redstoneColorScale);
 						players.forEach(player -> {
-							player.spawnParticle(particleBukkit.get(), location.getX(), location.getY(), location.getZ(), 0, (0f), (0f), (0f), 0f, data);
+							player.spawnParticle(particleBukkit.get(), location.getX(), location.getY(), location.getZ(), 0, offx, offy, offz, 0f, data);
 						});
 					}
-					// not a note
+					// not colorable
 					else {
 						boolean useColor = color != null && particle.getData().isColorable();
 						players.forEach(player -> {
 							player.spawnParticle(particleBukkit.get(), location.getX(), location.getY(), location.getZ(),
 									useColor ? 0 : count,
-											(!useColor ? 0f : color.getRed()), (!useColor ? 0f : color.getGreen()), (!useColor ? 0f : color.getBlue()),
+											(!useColor ? offx : color.getRed()), (!useColor ? offy : color.getGreen()), (!useColor ? offz : color.getBlue()),
 											useColor ? 1f : speed);
 						});
 
 					}
 				}
 			})
-			.orIf(Version.ATLEAST_1_8, (players, location, particle, color, redstoneColorScale, noteColor, count, speed) -> {
+			.orIf(Version.ATLEAST_1_8, (players, location, particle, color, redstoneColorScale, noteColor, count, speed, offx, offy, offz) -> {
 				ReflectionEnum particleEnum = Reflection.getNmsEnum("EnumParticle");
 				ReflectionObject particleNms = particleEnum.safeValueOf(particle.getData().getDataName());
 				if (particleNms == null) {
@@ -68,7 +68,7 @@ public final class ParticleCompat {
 								particleNms.get(),
 								true,
 								(float) location.getX(), (float) location.getY(), (float) location.getZ(),
-								0f, 0f, 0f,
+								offx, offy, offz,
 								note, count, emptyData
 								);
 					}
@@ -79,20 +79,20 @@ public final class ParticleCompat {
 								particleNms.get(),
 								true,
 								(float) location.getX(), (float) location.getY(), (float) location.getZ(),
-								(!useColor ? 0f : color.getRed()), (!useColor ? 0f : color.getGreen()), (!useColor ? 0f : color.getBlue()),
+								(!useColor ? offx : color.getRed()), (!useColor ? offy : color.getGreen()), (!useColor ? offz : color.getBlue()),
 								useColor ? 1f : speed, useColor ? 0 : count, emptyData
 								);
 					}
 				}
 			})
-			.orElse((players, location, particle, color, redstoneColorScale, noteColor, count, speed) -> {
+			.orElse((players, location, particle, color, redstoneColorScale, noteColor, count, speed, offx, offy, offz) -> {
 				// note
 				if (particle.getData().isMusicNote()) {
 					float note = NumberUtils.isInRange(noteColor, 0, 24) ? (float) noteColor : NumberUtils.random(0f, 24f);
 					Reflection.sendNmsPacket(players, "PacketPlayOutWorldParticles",
 							particle.getData().getDataName(),
 							(float) location.getX(), (float) location.getY(), (float) location.getZ(),
-							0f, 0f, 0f,
+							offx, offy, offz,
 							note, count
 							);
 				}
@@ -102,18 +102,18 @@ public final class ParticleCompat {
 					Reflection.sendNmsPacket(players, "PacketPlayOutWorldParticles",
 							particle.getData().getDataName(),
 							(float) location.getX(), (float) location.getY(), (float) location.getZ(),
-							(!useColor ? 0f : color.getRed()), (!useColor ? 0f : color.getGreen()), (!useColor ? 0f : color.getBlue()),
+							(!useColor ? offx : color.getRed()), (!useColor ? offy : color.getGreen()), (!useColor ? offz : color.getBlue()),
 							speed, count
 							);
 				}
 			});
 
-	public static void sendParticle(Collection<Player> players, Location location, Particle particle, Color color, Integer noteColor, int count, float speed) {
-		sendParticle(players, location, particle, color, 1f, noteColor, count, speed);
+	public static void sendParticle(Collection<Player> players, Location location, Particle particle, Color color, Integer noteColor, int count, float speed, float offx, float offy, float offz) {
+		sendParticle(players, location, particle, color, 1f, noteColor, count, speed, offx, offy, offz);
 	}
 
-	public static void sendParticle(Collection<Player> players, Location location, Particle particle, Color color, Float redstoneColorScale, Integer noteColor, int count, float speed) {
-		SEND_PARTICLE.process(players, location, particle, color, redstoneColorScale, noteColor, count, speed);
+	public static void sendParticle(Collection<Player> players, Location location, Particle particle, Color color, Float redstoneColorScale, Integer noteColor, int count, float speed, float offx, float offy, float offz) {
+		SEND_PARTICLE.process(players, location, particle, color, redstoneColorScale, noteColor, count, speed, offx, offy, offz);
 	}
 
 }

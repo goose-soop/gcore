@@ -29,12 +29,12 @@ public final class StringReplacer {
 	private StringReplacer() {
 	}
 
-	// get
+	// ----- get
 	public Set<String> getExactMatchKeys() {
 		return Collections.unmodifiableSet(exactMatch.keySet());
 	}
 
-	// set
+	// ----- set
 	public StringReplacer with(String placeholder, Supplier<Object> replacer) {
 		exactMatch.put(placeholder, replacer);
 		return this;
@@ -81,7 +81,7 @@ public final class StringReplacer {
 		return clone;
 	}
 
-	// do
+	// ----- do
 	public String apply(String og) {
 		if (og == null) {
 			return og;
@@ -104,7 +104,7 @@ public final class StringReplacer {
 				match = customMatcher.applyCheckOverflow(placeholder);
 			}
 			// replace in string
-			String replacement = match == null ? placeholder : StringUtils.replacementToString(match, formatNumbers);
+			String replacement = match == null ? placeholder : StringUtils.replacementToString(match, formatNumbers).replace("$", "\\$");
 			matcher.appendReplacement(result, replacement);
 		}
 		// done
@@ -155,7 +155,7 @@ public final class StringReplacer {
 				}
 				if (collectionMatch != null) {
 					// if collection match is empty or single, skip it and eventually process is later ; this avoids suffix being put on the next line even though the replacing value is only one line
-					if (collectionMatch.isEmpty() || collectionMatch.iterator().next().equals("")) {
+					if (collectionMatch.isEmpty() || (collectionMatch.size() == 1 && collectionMatch.iterator().next().equals(""))) {
 						match = "";
 						collectionMatch = null;
 					} else if (collectionMatch.size() == 1) {
@@ -176,9 +176,9 @@ public final class StringReplacer {
 							} else {
 								str = colors + str;
 							}
-							if (!str.trim().isEmpty()) {
-								collectionReplacement.add(str);
-							}
+							//if (!str.trim().isEmpty()) {  // fuck it
+							collectionReplacement.add(str);
+							//}
 						}
 						// delete current line and insert result ; result will contain prefix and suffix so no need to re-add it
 						result.remove(i);
@@ -207,7 +207,7 @@ public final class StringReplacer {
 		return result;
 	}
 
-	// object
+	// ----- object
 	@Override
 	public String toString() {
 		return "(" + StringUtils.toTextString(", ", exactMatch.keySet())
@@ -215,7 +215,7 @@ public final class StringReplacer {
 		+ ")";
 	}
 
-	// maker
+	// ----- maker
 	public static StringReplacer empty() {
 		return new StringReplacer();
 	}

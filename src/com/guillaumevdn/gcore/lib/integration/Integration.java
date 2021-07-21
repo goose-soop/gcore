@@ -23,7 +23,7 @@ public class Integration<T extends IntegrationInstance> {
 		this.instanceClass = instanceClass;
 	}
 
-	// get
+	// ----- get
 	public GPlugin getGPlugin() {
 		return gplugin;
 	}
@@ -48,7 +48,7 @@ public class Integration<T extends IntegrationInstance> {
 		return instance != null;
 	}
 
-	// activation
+	// ----- activation
 	public boolean activate() throws Throwable {
 		deactivate();
 		Plugin plugin = getPlugin();

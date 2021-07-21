@@ -2,6 +2,7 @@ package com.guillaumevdn.gcore.lib.time.frame;
 
 import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.lib.element.struct.container.typable.TypableElementTypes;
+import com.guillaumevdn.gcore.lib.time.frame.type.TimeFrameRepeatPeriod;
 import com.guillaumevdn.gcore.lib.time.frame.type.TimeFrameTypeInDay;
 import com.guillaumevdn.gcore.lib.time.frame.type.TimeFrameTypeInMonth;
 import com.guillaumevdn.gcore.lib.time.frame.type.TimeFrameTypeInWeek;
@@ -18,15 +19,16 @@ public final class TimeFrameTypes extends TypableElementTypes<TimeFrameType> {
 		super(TimeFrameType.class);
 	}
 
-	// types
-	public final TimeFrameTypeInDay		DAILY 		= register(new TimeFrameTypeInDay("DAILY"));
-	public final TimeFrameTypeInWeek 	WEEKLY 		= register(new TimeFrameTypeInWeek("WEEKLY"));
-	public final TimeFrameTypeInMonth	MONTHLY 	= register(new TimeFrameTypeInMonth("MONTHLY"));
-	public final TimeFrameTypeInYear 	YEARLY 		= register(new TimeFrameTypeInYear("YEARLY"));
-	public final TimeFrameTypeLimited 	LIMITED		= register(new TimeFrameTypeLimited("LIMITED"));
-	public final TimeFrameTypeNone 		NONE 		= register(new TimeFrameTypeNone("NONE"));
+	// ----- types
+	public final TimeFrameTypeInDay			DAILY 			= register(new TimeFrameTypeInDay("DAILY"));
+	public final TimeFrameTypeInWeek 		WEEKLY 			= register(new TimeFrameTypeInWeek("WEEKLY"));
+	public final TimeFrameTypeInMonth		MONTHLY 		= register(new TimeFrameTypeInMonth("MONTHLY"));
+	public final TimeFrameTypeInYear 		YEARLY 			= register(new TimeFrameTypeInYear("YEARLY"));
+	public final TimeFrameRepeatPeriod		REPEAT_PERIOD	= register(new TimeFrameRepeatPeriod("REPEAT_PERIOD"));
+	public final TimeFrameTypeLimited	 	LIMITED			= register(new TimeFrameTypeLimited("LIMITED"));
+	public final TimeFrameTypeNone 			NONE 			= register(new TimeFrameTypeNone("NONE"));
 
-	// values
+	// ----- values
 	public static TimeFrameTypes inst() {
 		return GCore.inst().getTimeFrameTypes();
 	}

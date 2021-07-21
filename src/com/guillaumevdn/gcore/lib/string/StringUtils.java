@@ -8,15 +8,20 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+
+import javax.annotation.Nonnull;
 
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
@@ -28,14 +33,14 @@ import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.compatibility.Version;
 import com.guillaumevdn.gcore.lib.number.NumberUtils;
 import com.guillaumevdn.gcore.lib.reflection.ReflectionObject;
-import com.guillaumevdn.gcore.lib.tuple.IntegerPair;
+import com.guillaumevdn.gcore.lib.tuple.LongIntegerPair;
 
 /**
  * @author GuillaumeVDN
  */
 public final class StringUtils {
 
-	// color formatting
+	// ----- color formatting
 	public static final List<Character> FORMAT_CODES = CollectionUtils.asUnmodifiableList('1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'a', 'b', 'c', 'd', 'e', 'f', 'k', 'l', 'm', 'n', 'o', 'r');
 	public static final List<Character> FORMAT_CODES_HEX = CollectionUtils.asUnmodifiableList('1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z');
 
@@ -212,7 +217,7 @@ public final class StringUtils {
 		return lastColor != null ? lastColor : "";
 	}
 
-	// numbers
+	// ----- numbers
 	private static final BigDecimal MILLION = new BigDecimal("1000000");
 	private static final BigDecimal BILLION = new BigDecimal("1000000000");
 	private static final BigDecimal TRILLION = new BigDecimal("1000000000000");
@@ -258,10 +263,38 @@ public final class StringUtils {
 		}
 	}
 
-	// time
+	public static String makeProgressBar(double percentage, int barLength, String barChar, String barColor, String barEmpty) {
+		int ok = (int) Math.floor(percentage / 100d * barLength);
+		String bar = barColor;
+		for (int i = 0; i < ok; ++i) bar += barChar;
+		bar += barEmpty;
+		for (int i = 0; i < (barLength - ok); ++i) bar += barChar;
+		return bar;
+	}
+
+	// https://stackoverflow.com/questions/11089399/count-with-a-b-c-d-instead-of-0-1-2-3-with-javascript
+	private static final char[] ALPHABETIC = "abcdefghijklmnopqrstuvwxyz".toCharArray();
+	public static String alphabeticCountFor(int i) {
+		int mod = i % 26;
+		int pow = i / 26 | 0;
+		char out;
+		if (mod != 0) {
+			out = ALPHABETIC[mod - 1];
+		} else {
+			--pow;
+			out = 'z';
+		}
+		return pow != 0 ? alphabeticCountFor(pow) + out : "" + out;
+	}
+
+	// ----- time
 	public static String formatDurationTicks(long ticks) {
+		return formatDurationTicks(ticks, true);
+	}
+
+	public static String formatDurationTicks(long ticks, boolean allowSecs) {
 		int seconds = (int) (ticks / 20L);
-		float secondsDecimals = (float) (((double) (ticks % 20L)) / 20d);
+		float secondsDecimals = !allowSecs ? 0f : (float) (((double) (ticks % 20L)) / 20d);
 		return formatDurationSeconds(seconds, secondsDecimals);
 	}
 
@@ -284,22 +317,22 @@ public final class StringUtils {
 			return ConfigGCore.unknownPlaceholderResult;
 		} else if (seconds < 60) {
 			return TextGeneric.durationFormatS
-					.replace("{seconds}", () -> twoDigitString(seconds % 60) + (secondsDecimals > 0f ? toTextStringDecimals(secondsDecimals, 2) : ""))
+					.replace("{seconds}", () -> (seconds % 60) + (secondsDecimals > 0f ? toTextStringDecimals(secondsDecimals, 2) : ""))
 					.parseLine();
 		} else if (seconds < 3600) {
 			return TextGeneric.durationFormatMS
-					.replace("{minutes}", () -> twoDigitString((seconds % 3600) / 60))
+					.replace("{minutes}", () -> ((seconds % 3600) / 60))
 					.replace("{seconds}", () -> twoDigitString(seconds % 60) + (secondsDecimals > 0f ? toTextStringDecimals(secondsDecimals, 2) : ""))
 					.parseLine();
 		} else if (seconds < 86400) {
 			return TextGeneric.durationFormatHMS
-					.replace("{hours}", () -> twoDigitString(seconds / 3600))
+					.replace("{hours}", () -> (seconds / 3600))
 					.replace("{minutes}", () -> twoDigitString((seconds % 3600) / 60))
 					.replace("{seconds}", () -> twoDigitString(seconds % 60) + (secondsDecimals > 0f ? toTextStringDecimals(secondsDecimals, 2) : ""))
 					.parseLine();
 		} else {
 			return TextGeneric.durationFormatDHMS
-					.replace("{days}", () -> twoDigitString(seconds / 86400))
+					.replace("{days}", () -> (seconds / 86400))
 					.replace("{hours}", () -> twoDigitString((seconds % 86400) / 3600))
 					.replace("{minutes}", () -> twoDigitString((seconds % 3600) / 60))
 					.replace("{seconds}", () -> twoDigitString(seconds % 60) + (secondsDecimals > 0f ? toTextStringDecimals(secondsDecimals, 2) : ""))
@@ -317,7 +350,7 @@ public final class StringUtils {
 		}
 	}
 
-	// object
+	// ----- object
 	public static String replacementToString(Object object, boolean formatNumbers) {
 		if (object == null) {
 			return null;
@@ -334,7 +367,7 @@ public final class StringUtils {
 		return object.toString();
 	}
 
-	// alphanumeric
+	// ----- alphanumeric
 	private static final char[] alphanumericCharacters = "abcdefghijklmnopqrstuvwxyz0123456789".toCharArray();
 
 	public static String generateRandomAlphanumericString(int length) {
@@ -375,7 +408,7 @@ public final class StringUtils {
 		return (ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'z');
 	}
 
-	// version
+	// ----- version
 	public static Integer getUniqueVersionNumber(String version) {
 		return getUniqueVersionNumber(version, 3);
 	}
@@ -397,7 +430,7 @@ public final class StringUtils {
 		return NumberUtils.integerOrNull(result);
 	}
 
-	// text
+	// ----- text
 	public static String getReadableName(Class clazz) {
 		return separateAtCaps(clazz.getSimpleName());
 	}
@@ -488,7 +521,7 @@ public final class StringUtils {
 		return builder.toString();
 	}
 
-	private static void toTextStringObject(Object object, StringBuilder builder) {
+	public static void toTextStringObject(Object object, StringBuilder builder) {
 		if (object != null && object.getClass().getName().contains("TextComponent")) {
 			try {
 				builder.append(ReflectionObject.of(object).getField("text").justGet());
@@ -567,7 +600,7 @@ public final class StringUtils {
 		return builder.toString();
 	}
 
-	// collection
+	// ----- collection
 	public static List<Integer> findPlaceholderLines(List<String> list) {
 		List<Integer> result = new ArrayList<>();
 		for (int i = 0; i < list.size(); ++i) {
@@ -602,6 +635,64 @@ public final class StringUtils {
 	public static boolean hasPlaceholders(ItemStack item) {
 		ItemMeta meta = item == null ? null : item.getItemMeta();
 		return meta != null && (hasPlaceholders(meta.getDisplayName()) || hasPlaceholders(meta.getLore()));
+	}
+
+	@Nonnull
+	public static Set<String> getPlaceholders(String string) {
+		Set<String> placeholders = new HashSet<>();
+		if (string != null) {
+			doGetPlaceholders(string, '{', '}', placeholders);
+			doGetPlaceholders(string, '%', '%', placeholders);
+		}
+		return placeholders;
+	}
+
+	@Nonnull
+	public static Set<String> getPlaceholders(List<String> list) {
+		Set<String> placeholders = new HashSet<>();
+		if (list != null) {
+			list.forEach(line -> {
+				doGetPlaceholders(line, '{', '}', placeholders);
+				doGetPlaceholders(line, '%', '%', placeholders);
+			});
+		}
+		return placeholders;
+	}
+
+	private static Set<String> doGetPlaceholders(String string, char begin, char end, Set<String> placeholders) {
+		LinkedList<Integer> lastStarts = new LinkedList<>();
+		for (int i = 0; i < string.length(); ++i) {
+			char c = string.charAt(i);
+			if (c == begin) {
+				if (i + 1 < string.length() && isAlphanumeric(string.charAt(i + 1))) {
+					lastStarts.add(i);
+				}
+			} else if (c == end) {
+				if (!lastStarts.isEmpty()) {
+					placeholders.add(string.substring(lastStarts.removeLast(), i + 1));
+				}
+			}
+		}
+		return placeholders;
+	}
+
+	@Nonnull
+	public static Set<String> getPlaceholders(ItemStack item) {
+		Set<String> placeholders = new HashSet<>();
+		ItemMeta meta = item == null ? null : item.getItemMeta();
+		if (meta != null) {
+			if (meta.hasDisplayName()) {
+				doGetPlaceholders(meta.getDisplayName(), '{', '}', placeholders);
+				doGetPlaceholders(meta.getDisplayName(), '%', '%', placeholders);
+			}
+			if (meta.hasLore()) {
+				meta.getLore().forEach(line -> {
+					doGetPlaceholders(line, '{', '}', placeholders);
+					doGetPlaceholders(line, '%', '%', placeholders);
+				});
+			}
+		}
+		return placeholders;
 	}
 
 	public static List<String> split(String string, String separator, int limit) {
@@ -661,17 +752,18 @@ public final class StringUtils {
 
 	public static List<String> splitLongText(String string, int startSplittingLength, UnaryOperator<String> operateSplitted) {
 		List<String> result = new ArrayList<>();
-		// split with spaces after
+		// split with spaces before
 		while (string.length() > startSplittingLength) {
 			String unformat = unformat(string);
 			int index = unformat.indexOf(' ', startSplittingLength);
+			if (index != -1) index = string.lastIndexOf(' ', index);
 			if (index != -1) {
-				string = splitLongTextPart(string, result, string.lastIndexOf(' ', index), true, operateSplitted);
+				string = splitLongTextPart(string, result, index, true, operateSplitted);
 			} else {
 				break;
 			}
 		}
-		// split with spaces before
+		// split with spaces after
 		while (string.length() > startSplittingLength) {
 			int index = string.lastIndexOf(' ', startSplittingLength);
 			if (index != -1) {
@@ -727,7 +819,7 @@ public final class StringUtils {
 		return result;
 	}
 
-	// string
+	// ----- string
 	public static String nonEmptyOrNull(String string) {
 		if (string == null || string.isEmpty()) return null;
 		string = string.trim();
@@ -812,21 +904,37 @@ public final class StringUtils {
 	/**
 	 * @return null if no number was found, or a pair containing the number and length of substring
 	 */
-	public static IntegerPair findNumberFrom(char[] val, int index) {
+	public static LongIntegerPair findNumberFrom(char[] val, int index) {
 		StringBuilder builder = new StringBuilder();
+		int len = 0;  // because we skip leading zeros
 		--index;
 		while (++index < val.length) {
 			char ch = val[index];
 			if (Character.isDigit(ch)) {
+				++len;
+				if (ch == '0' && builder.length() == 0) {
+					continue;
+				}
 				builder.append(ch);
 			} else {
 				break;
 			}
 		}
-		return builder.length() == 0 ? null : new IntegerPair(Integer.parseInt(builder.toString()), builder.length());
+		if (builder.length() == 0) {  // maybe no number at all, or only zeros
+			return len != 0 ? LongIntegerPair.of(0L, len) : null;
+		}
+		try {
+			return LongIntegerPair.of(Long.parseLong(builder.toString()), len);
+		} catch (NumberFormatException ignored) {
+			return null;  // just compare chars if too big
+		}
 	}
 
-	// compare
+	// ----- compare
+	public static boolean equalsIgnoreCaseNullable(String a, String b) {
+		return a == null || b == null ? a == b : a.equalsIgnoreCase(b);
+	}
+
 	public static final Comparator<String> STRING_WITHNUMBERS = (a, b) -> compareAlphabeticallyWithNumbers(a, b);
 	public static final Comparator<String> STRING_WITHNUMBERS_IGNORECASE = (a, b) -> compareAlphabeticallyWithNumbersIgnoreCase(a, b);
 	public static final Comparator<Object> OBJECTSTRING_WITHNUMBERS = (a, b) -> STRING_WITHNUMBERS.compare(String.valueOf(a), String.valueOf(b));
@@ -841,30 +949,45 @@ public final class StringUtils {
 	}
 
 	private static int compareAlphabeticallyWithNumbers(String a, String b, boolean ignoreCase) {
+		if (a == null) return b == null ? 0 : 1;
+		if (b == null) return a == null ? 0 : -1;
+
 		char[] val1 = a.toCharArray();
 		char[] val2 = b.toCharArray();
 		int maxLength = Math.max(val1.length, val2.length);
 		int index1 = -1, index2 = -1;
+
 		while (++index1 < maxLength && ++index2 < maxLength) {
 			// too short
 			if (index1 >= val1.length) return -1;
 			if (index2 >= val2.length) return 1;
+
 			// same characters
 			char c1 = ignoreCase ? Character.toLowerCase(val1[index1]) : val1[index1];
 			char c2 = ignoreCase ? Character.toLowerCase(val2[index2]) : val2[index2];
+
 			// compare numbers
-			if (Character.isDigit(c1)) {
-				if (!Character.isDigit(c2)) return c1 - c2; // second isn't a number, compare chars
-				IntegerPair nb1 = findNumberFrom(val1, index1), nb2 = findNumberFrom(val2, index2);
-				if (nb1.getA() != nb2.getA()) return nb1.getA() - nb2.getA(); // not the same numbers, compare them
-				index1 += nb1.getB() - 1; // - 1 because the loop already does ++index
-				index2 += nb2.getB() - 1; // - 1 because the loop already does ++index
+			LongIntegerPair nb1 = findNumberFrom(val1, index1), nb2 = findNumberFrom(val2, index2);
+			if (nb1 != null) {
+				if (nb2 == null) return c1 - c2;  // second isn't a number, compare chars
+				if (nb1.getA() != nb2.getA()) {  // not the same numbers, compare them
+					long diff = nb1.getA() - nb2.getA();
+					if (diff >= Integer.MAX_VALUE)  {  // if diff is too big to be converted to int, compare characters directly
+						String aa = a.substring(index1, index1 + nb1.getB());
+						String bb = b.substring(index2, index2 + nb2.getB());
+						return ignoreCase ? aa.compareToIgnoreCase(bb) : aa.compareTo(bb);
+					}
+					return (int) diff;
+				}
+				index1 += nb1.getB() - 1;  // - 1 because the loop already increments index
+				index2 += nb2.getB() - 1;  // - 1 because the loop already increments index
 			}
 			// compare characters
 			else if (c1 != c2) {
 				return c1 - c2;
 			}
 		}
+
 		return 0;
 	}
 

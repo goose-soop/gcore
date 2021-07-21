@@ -20,7 +20,7 @@ public class ArgumentLegacyNPC extends Argument<ElementNPC> {
 		super(need, playerOnly, permission, usage);
 	}
 
-	// do
+	// ----- do
 	@Override
 	public ElementNPC consume(CommandCall call) {
 		if (call.getArguments().isEmpty()) {

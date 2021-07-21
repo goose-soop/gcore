@@ -33,6 +33,7 @@ import com.guillaumevdn.gcore.lib.element.type.basic.ElementColorList;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementComparisonType;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementConfigSection;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementCurrency;
+import com.guillaumevdn.gcore.lib.element.type.basic.ElementCurrencyList;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementDamageCauseList;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementDayOfWeek;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementDouble;
@@ -87,6 +88,7 @@ import com.guillaumevdn.gcore.lib.element.type.container.ElementCommandRestricti
 import com.guillaumevdn.gcore.lib.element.type.container.ElementDynmapMarker;
 import com.guillaumevdn.gcore.lib.element.type.container.ElementFireworkEffect;
 import com.guillaumevdn.gcore.lib.element.type.container.ElementItem;
+import com.guillaumevdn.gcore.lib.element.type.container.ElementItemMode;
 import com.guillaumevdn.gcore.lib.element.type.container.ElementItemsNeeded;
 import com.guillaumevdn.gcore.lib.element.type.container.ElementNotify;
 import com.guillaumevdn.gcore.lib.element.type.container.ElementPotionEffect;
@@ -98,6 +100,7 @@ import com.guillaumevdn.gcore.lib.element.type.list.ElementItemList;
 import com.guillaumevdn.gcore.lib.element.type.list.ElementItemMatchList;
 import com.guillaumevdn.gcore.lib.element.type.list.ElementPositionList;
 import com.guillaumevdn.gcore.lib.element.type.list.ElementPotionEffectList;
+import com.guillaumevdn.gcore.lib.element.type.map.ElementCurrencyDoubleMap;
 import com.guillaumevdn.gcore.lib.element.type.map.ElementEnchantmentLevelMap;
 import com.guillaumevdn.gcore.lib.element.type.map.ElementStringMap;
 import com.guillaumevdn.gcore.lib.function.QuadriConsumer;
@@ -105,7 +108,9 @@ import com.guillaumevdn.gcore.lib.function.QuintConsumer;
 import com.guillaumevdn.gcore.lib.function.TriConsumer;
 import com.guillaumevdn.gcore.lib.function.TriFunction;
 import com.guillaumevdn.gcore.lib.gui.struct.ClickCall;
+import com.guillaumevdn.gcore.lib.gui.struct.GUIType;
 import com.guillaumevdn.gcore.lib.location.position.ElementPosition;
+import com.guillaumevdn.gcore.lib.object.ObjectUtils;
 import com.guillaumevdn.gcore.lib.object.Optional;
 import com.guillaumevdn.gcore.lib.object.OptionalIfPresentFail;
 import com.guillaumevdn.gcore.lib.string.Text;
@@ -130,7 +135,7 @@ public abstract class ContainerElement extends AbstractMapElement<String, Elemen
 		super(String.class, typeName, parent, id, need, editorDescription);
 	}
 
-	// get
+	// ----- get
 	public final LowerCaseArrayList getStartRowSlots() {
 		return startRowSlots;
 	}
@@ -186,8 +191,8 @@ public abstract class ContainerElement extends AbstractMapElement<String, Elemen
 		return element != null ? element.parse(replacer) : Optional.empty();
 	}
 
-	// allow some shotcuts, otherwise it's waaaaaayy too boring
-	// - direct parse one element
+	// ----- allow some shotcuts, otherwise it's waaaaaayy too boring
+	// ----- - direct parse one element
 	public final <T> T directParseOrNull(String id, Replacer replacer) {
 		Optional<T> parsed = parseElementAs(id, replacer);
 		return parsed.orNull();
@@ -211,7 +216,7 @@ public abstract class ContainerElement extends AbstractMapElement<String, Elemen
 		return parsed.orElse(def);
 	}
 
-	// - direct parse elements and map
+	// ----- - direct parse elements and map
 	public final <A, R> Optional<R> directParseAndIfPresentMap(String id, Replacer replacer, Function<A, R> mapper) {
 		Optional<A> A = parseElementAs(id, replacer);
 		return A.ifPresentMap(mapper);
@@ -236,7 +241,7 @@ public abstract class ContainerElement extends AbstractMapElement<String, Elemen
 		});
 	}
 
-	// - direct parse elements and do
+	// ----- - direct parse elements and do
 	public final <A> OptionalIfPresentFail directParseAndIfPresentDo(String id, Replacer replacer, Consumer<A> consumer) {
 		Optional<A> A = parseElementAs(id, replacer);
 		return A.ifPresentDo(consumer);
@@ -300,7 +305,7 @@ public abstract class ContainerElement extends AbstractMapElement<String, Elemen
 		});
 	}
 
-	// add/remove
+	// ----- add/remove
 	@Override
 	protected final Element add(String key, Element value) {
 		return super.add(key, value);
@@ -322,20 +327,31 @@ public abstract class ContainerElement extends AbstractMapElement<String, Elemen
 		super.clear();
 	}
 
-	// loading and saving
+	// ----- loading and saving
 	@Override
 	public void resetCache() {
 		getElements().forEach(elem -> elem.getB().resetCache());
 	}
 
 	@Override
-	protected final void clearBeforeRead() { // obviously don't
+	protected final void clearBeforeRead() {  // obviously don't
 	}
+
+	//private static final Set<String> IGNORE_OPTIONS = CollectionUtils.asSet();
 
 	@Override
 	protected void doRead() throws Throwable {
+		// read elements
+		List<String> keys = getSuperElement().getConfiguration().readKeysForSectionCopyIfEmpty(getConfigurationPath());  // this creates a new list
 		for (Element element : values()) {
 			element.read();
+			keys.remove(element.getId());
+		}
+
+		// look for unknown options and log them
+		//keys.removeAll(IGNORE_OPTIONS);
+		for (String key : keys) {
+			getSuperElement().addLoadError("found unknown option '" + key + "' at path '" + (getConfigurationPath().isEmpty() ? key : getConfigurationPath() + "." + key) + "'");
 		}
 	}
 
@@ -345,21 +361,36 @@ public abstract class ContainerElement extends AbstractMapElement<String, Elemen
 		for (Element element : values()) {
 			element.write();
 		}
+		// if nothing was written (all default values) AND the DIRECT parent is a map element (which is not a container element), then write an empty value
+		if (!getSuperElement().getConfiguration().contains(getConfigurationPath())) {
+			AbstractMapElement parent = ObjectUtils.castOrNull(getParent(), AbstractMapElement.class);
+			if (parent != null && !(parent instanceof ContainerElement)) {
+				getSuperElement().getConfiguration().getBackingYML().mkdirs(getConfigurationPath());
+			}
+		}
 	}
 
-	// editor
+	// ----- editor
 	@Override
 	public EditorGUI editorGUI(ClickCall fromCall) {
 		EditorGUI editor = new EditorGUI(this, fromCall) {
 			@Override
 			protected boolean doFill() {
+				int page = 0;
 				int slot = -1;
 				for (Element element : values()) {
 					++slot;
 					if (startRowSlots.contains(element.getId())) while (slot % 9 != 0) ++slot;
 					else if (skipSlots.contains(element.getId()) && slot % 9 != 0) ++slot;
-					if (slot >= getType().getSize()) break;
-					setRegularItem(element.buildEditorItem(slot));
+
+					if (slot > GUIType.CHEST_6_ROW.getRegularItemSlotsEnd()) {
+						slot = 0;
+						++page;
+					} else if (slot >= getType().getSize()) {
+						break;
+					}
+
+					setRegularItem(element.buildEditorItem(page, slot));
 				}
 				return super.doFill();
 			}
@@ -367,7 +398,7 @@ public abstract class ContainerElement extends AbstractMapElement<String, Elemen
 		return editor;
 	}
 
-	// ez methods to add a specific element
+	// ----- ez methods to add a specific element
 	private final void slot(String id, SlotPlacement slot) {
 		if (slot != null) {
 			if (slot.equals(SlotPlacement.START_ROW)) {
@@ -412,6 +443,10 @@ public abstract class ContainerElement extends AbstractMapElement<String, Elemen
 	public final ElementConfigSection addConfigSection(String typeName, String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementConfigSection(typeName, this, id, need, editorDescription)); }
 	public final ElementCurrency addCurrency(String id, Need need, Text editorDescription) { return add(new ElementCurrency(this, id, need, editorDescription)); }
 	public final ElementCurrency addCurrency(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementCurrency(this, id, need, editorDescription)); }
+	public final ElementCurrencyList addCurrencyList(String id, Need need, Text editorDescription) { return add(new ElementCurrencyList(this, id, need, editorDescription)); }
+	public final ElementCurrencyList addCurrencyList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementCurrencyList(this, id, need, editorDescription)); }
+	public final ElementCurrencyDoubleMap addCurrencyDoubleMap(String id, Need need, Text editorDescription) { return add(new ElementCurrencyDoubleMap(this, id, need, editorDescription)); }
+	public final ElementCurrencyDoubleMap addCurrencyDoubleMap(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementCurrencyDoubleMap(this, id, need, editorDescription)); }
 	public final ElementDayOfWeek addDayOfWeek(String id, Need need, Text editorDescription) { return add(new ElementDayOfWeek(this, id, need, editorDescription)); }
 	public final ElementDayOfWeek addDayOfWeek(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementDayOfWeek(this, id, need, editorDescription)); }
 	public final ElementDamageCauseList addDamageCauseList(String id, Need need, Text editorDescription) { return add(new ElementDamageCauseList(this, id, need, editorDescription)); }
@@ -482,18 +517,16 @@ public abstract class ContainerElement extends AbstractMapElement<String, Elemen
 	public final ElementIntegerList addIntegerList(String id, Need need, int min, int max, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementIntegerList(this, id, need, min, max, editorDescription)); }
 	public final ElementInventoryTypeList addInventoryTypeList(String id, Need need, Text editorDescription) { return add(new ElementInventoryTypeList(this, id, need, editorDescription)); }
 	public final ElementInventoryTypeList addInventoryTypeList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementInventoryTypeList(this, id, need, editorDescription)); }
-	public final ElementItem addItem(String id, Need need, Text editorDescription) { return add(new ElementItem(this, id, need, editorDescription)); }
-	public final ElementItem addItem(String id, Need need, boolean allowAmount, Text editorDescription) { return add(new ElementItem(this, id, need, allowAmount, editorDescription)); }
-	public final ElementItem addItem(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementItem(this, id, need, editorDescription)); }
-	public final ElementItem addItem(String id, Need need, boolean allowAmount, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementItem(this, id, need, allowAmount, editorDescription)); }
+	public final ElementItem addItem(String id, Need need, ElementItemMode mode, Text editorDescription) { return add(new ElementItem(this, id, need, mode, editorDescription)); }
+	public final ElementItem addItem(String id, Need need, ElementItemMode mode, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementItem(this, id, need, mode, editorDescription)); }
 	public final ElementItemCheck addItemCheck(String id, Need need, Text editorDescription) { return add(new ElementItemCheck(this, id, need, editorDescription)); }
 	public final ElementItemCheck addItemCheck(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementItemCheck(this, id, need, editorDescription)); }
 	public final ElementItemMatchList addItemMatchList(String id, Need need, boolean allowCustomCheck, Text editorDescription) { return add(new ElementItemMatchList(this, id, need, allowCustomCheck, editorDescription)); }
 	public final ElementItemMatchList addItemMatchList(String id, Need need, boolean allowCustomCheck, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementItemMatchList(this, id, need, allowCustomCheck, editorDescription)); }
 	public final ElementItemFlagList addItemFlagList(String id, Need need, Text editorDescription) { return add(new ElementItemFlagList(this, id, need, editorDescription)); }
 	public final ElementItemFlagList addItemFlagList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementItemFlagList(this, id, need, editorDescription)); }
-	public final ElementItemList addItemList(String id, Need need, Text editorDescription) { return add(new ElementItemList(this, id, need, editorDescription)); }
-	public final ElementItemList addItemList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementItemList(this, id, need, editorDescription)); }
+	public final ElementItemList addItemList(String id, Need need, ElementItemMode mode, Text editorDescription) { return add(new ElementItemList(this, id, need, mode, editorDescription)); }
+	public final ElementItemList addItemList(String id, Need need, ElementItemMode mode, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementItemList(this, id, need, mode, editorDescription)); }
 	public final ElementItemsNeeded addItemsNeeded(String id, Need need, Text editorDescription) { return add(new ElementItemsNeeded(this, id, need, editorDescription)); }
 	public final ElementItemsNeeded addItemsNeeded(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementItemsNeeded(this, id, need, editorDescription)); }
 	public final ElementLocation addLocation(String id, Need need, Text editorDescription) { return add(new ElementLocation(this, id, need, editorDescription)); }

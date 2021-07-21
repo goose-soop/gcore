@@ -19,7 +19,7 @@ public class IntegrationSerializer<T> {
 		this.deserializer = deserializer;
 	}
 
-	// get
+	// ----- get
 	public Class<T> getTypeClass() {
 		return typeClass;
 	}
@@ -32,7 +32,7 @@ public class IntegrationSerializer<T> {
 		return deserializer;
 	}
 
-	// do
+	// ----- do
 	public void register() {
 		Serializer.of(typeClass, serializer, deserializer);
 	}
@@ -41,7 +41,7 @@ public class IntegrationSerializer<T> {
 		Serializer.unregister(typeClass);
 	}
 
-	// obj
+	// ----- obj
 	@Override
 	public String toString() {
 		return typeClass.getName();

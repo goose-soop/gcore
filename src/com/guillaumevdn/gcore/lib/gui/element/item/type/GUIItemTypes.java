@@ -2,7 +2,9 @@ package com.guillaumevdn.gcore.lib.gui.element.item.type;
 
 import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.lib.element.struct.container.typable.TypableElementTypes;
-import com.guillaumevdn.gcore.lib.gui.element.item.type.border.TypeDynamicBorderLinear;
+import com.guillaumevdn.gcore.lib.gui.element.item.type.types.TypeBack;
+import com.guillaumevdn.gcore.lib.gui.element.item.type.types.TypeDynamicBorderLinear;
+import com.guillaumevdn.gcore.lib.gui.element.item.type.types.TypeNone;
 
 /**
  * @author GuillaumeVDN
@@ -13,11 +15,12 @@ public final class GUIItemTypes extends TypableElementTypes<GUIItemType> {
 		super(GUIItemType.class);
 	}
 
-	// types
+	// ----- types
 	public final TypeNone 					NONE 					= register(new TypeNone("NONE"));
+	public final TypeBack 					BACK					= register(new TypeBack("BACK"));
 	public final TypeDynamicBorderLinear 	DYNAMIC_BORDER_LINEAR	= register(new TypeDynamicBorderLinear("DYNAMIC_BORDER_LINEAR"));
 
-	// values
+	// ----- values
 	public static GUIItemTypes inst() {
 		return GCore.inst().getGUIItemTypes();
 	}

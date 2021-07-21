@@ -30,7 +30,7 @@ public class ElementCommandRestriction extends ContainerElement {
 		super("command restriction", parent, id, need, editorDescription);
 	}
 
-	// get
+	// ----- get
 	public ElementStringList getWhitelist() {
 		return whitelist;
 	}
@@ -71,7 +71,7 @@ public class ElementCommandRestriction extends ContainerElement {
 		return string.toLowerCase();
 	}
 
-	// editor
+	// ----- editor
 	@Override
 	public Mat editorIconType() {
 		return CommonMats.COMMAND_BLOCK;

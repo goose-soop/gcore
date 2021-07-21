@@ -22,7 +22,6 @@ messageGcoreExportCouldnt: |
 
 commandDescriptionGcore: GCore的主指令
 commandDescriptionGcorePlugins: 列出以GCore为前置的插件
-commandDescriptionGcoreReload: 重载GCore
 commandDescriptionGcoreExport: 导出以GCore为前置的插件数据
 commandDescriptionGcoreItemRead: 将物品写入配置中
 

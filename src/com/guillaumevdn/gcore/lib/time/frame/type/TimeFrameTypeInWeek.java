@@ -17,7 +17,7 @@ public class TimeFrameTypeInWeek extends TimeFrameTypeIn<TimeInWeek> {
 		super(id, new TimeInWeek(DayOfWeek.MONDAY, 0, 0), new TimeInWeek(DayOfWeek.SUNDAY, 23, 59));
 	}
 
-	// elements
+	// ----- elements
 	@Override
 	protected void doFillTypeSpecificElements(ElementTimeFrame frame) {
 		super.doFillTypeSpecificElements(frame);
@@ -26,8 +26,8 @@ public class TimeFrameTypeInWeek extends TimeFrameTypeIn<TimeInWeek> {
 	}
 
 	@Override
-	protected ZonedDateTime minusOnePeriod(ZonedDateTime time) {
-		return time.minusWeeks(1);
+	protected ZonedDateTime deltaPeriod(ZonedDateTime time, int delta) {
+		return time.plusWeeks(delta);
 	}
 
 }

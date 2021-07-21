@@ -26,7 +26,7 @@ public class PositionCylinderOutside implements Position {
 		this.radius = radius;
 	}
 
-	// methods
+	// ----- methods
 	@Override
 	public boolean match(Location loc) {
 		if (loc == null) {

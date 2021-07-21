@@ -17,7 +17,7 @@ public class ElementNamespacedKeyList extends ElementValueList<NamespacedKey> {
 		super(NamespacedKey.class, parent, id, need, editorDescription);
 	}
 
-	// editor
+	// ----- editor
 	@Override
 	public Mat editorIconType() {
 		return CommonMats.PAPER;

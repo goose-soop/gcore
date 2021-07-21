@@ -15,6 +15,7 @@ import com.guillaumevdn.gcore.lib.element.type.basic.ElementDyeColor;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementTropicalFishPattern;
 import com.guillaumevdn.gcore.lib.element.type.container.ElementItem;
 import com.guillaumevdn.gcore.lib.item.ItemCheck;
+import com.guillaumevdn.gcore.lib.item.ItemReference;
 import com.guillaumevdn.gcore.lib.object.ObjectUtils;
 import com.guillaumevdn.gcore.lib.serialization.data.DataIO;
 import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
@@ -24,26 +25,30 @@ import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
  */
 public final class MetaTropicalFishBucket {
 
-	public static boolean match(ItemMeta itemMeta, ItemMeta referenceMeta, ItemCheck check) {
-		TropicalFishBucketMeta meta = ObjectUtils.castOrNull(itemMeta, TropicalFishBucketMeta.class); // might be null if exact match is false
-		TropicalFishBucketMeta ref = ObjectUtils.castOrNull(referenceMeta, TropicalFishBucketMeta.class);
-		if (ref == null) return true;
+	public static boolean match(ItemMeta itemMeta, ItemReference reference, ItemCheck check) {
+		if (!reference.hasMeta(TropicalFishBucketMeta.class)) return true;
+		TropicalFishBucketMeta meta = ObjectUtils.castOrNull(itemMeta, TropicalFishBucketMeta.class);  // might be null if exact match is false
+		
 		// variant
-		if (check.isExact() && meta.hasVariant() != ref.hasVariant()) {
+		if (check.isExact() && meta.hasVariant() != reference.hasVariant()) {
 			return false;
 		}
-		if (!ref.hasVariant()) {
+		if (!reference.hasVariant()) {
 			return true;
 		}
+		
 		// body color
-		if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getBodyColor(), ref.getBodyColor()))) return false;
-		else if (!check.isExact() && ref.getBodyColor() != null && (meta == null || !ref.getBodyColor().equals(meta.getBodyColor()))) return false;
+		if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getBodyColor(), reference.getBodyColor()))) return false;
+		else if (!check.isExact() && reference.getBodyColor() != null && (meta == null || !reference.getBodyColor().equals(meta.getBodyColor()))) return false;
+		
 		// pattern color
-		if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getPatternColor(), ref.getPatternColor()))) return false;
-		else if (!check.isExact() && ref.getPatternColor() != null && (meta == null || !ref.getPatternColor().equals(meta.getPatternColor()))) return false;
+		if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getPatternColor(), reference.getPatternColor()))) return false;
+		else if (!check.isExact() && reference.getPatternColor() != null && (meta == null || !reference.getPatternColor().equals(meta.getPatternColor()))) return false;
+		
 		// pattern
-		if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getPattern(), ref.getPattern()))) return false;
-		else if (!check.isExact() && ref.getPattern() != null && (meta == null || !ref.getPattern().equals(meta.getPattern()))) return false;
+		if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getPattern(), reference.getPattern()))) return false;
+		else if (!check.isExact() && reference.getPattern() != null && (meta == null || !reference.getPattern().equals(meta.getPattern()))) return false;
+		
 		// seems good
 		return true;
 	}

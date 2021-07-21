@@ -13,7 +13,7 @@ public class DoubleRangedValidator extends DoubleValidator {
 		this.max = max;
 	}
 
-	// get
+	// ----- get
 	public double getMin() {
 		return min;
 	}
@@ -22,7 +22,7 @@ public class DoubleRangedValidator extends DoubleValidator {
 		return max;
 	}
 
-	// methods
+	// ----- methods
 	@Override
 	public boolean isValid(Double value) {
 		return value != null && value >= min && value <= max;

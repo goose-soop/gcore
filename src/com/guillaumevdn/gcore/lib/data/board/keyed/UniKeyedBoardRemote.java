@@ -18,7 +18,7 @@ public abstract class UniKeyedBoardRemote<K, V> extends UniKeyedBoard<K, V> {
 	}
 
 	// ----------------------------------------------------------------------------------------------------
-	// get
+	// ----- get
 	// ----------------------------------------------------------------------------------------------------
 
 	public void fetchValue(K key, Consumer<V> ifFound, Supplier<V> def, boolean forceFetch, boolean mustCache) {
@@ -68,11 +68,11 @@ public abstract class UniKeyedBoardRemote<K, V> extends UniKeyedBoard<K, V> {
 	}
 
 	// ----------------------------------------------------------------------------------------------------
-	// set
+	// ----- set
 	// ----------------------------------------------------------------------------------------------------
 
 	public final void putValue(K key, V value, Runnable onPush, boolean mustCache) {
-		// cache new value
+		// valuesCache new value
 		if (mustCache) {
 			cache.put(key, value);
 		}

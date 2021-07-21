@@ -18,16 +18,16 @@ import com.guillaumevdn.gcore.lib.number.MinMaxDouble;
  */
 public interface Position {
 
-	// get
+	// ----- get
 	World getWorld();
 
-	// match
+	// ----- match
 	default boolean match(Player player) {
 		return match(player.getLocation());
 	}
 	boolean match(Location loc);
 
-	// random
+	// ----- random
 	boolean canFindRandom();
 	Location findRandom();
 	int findSafeRandomMaxY();
@@ -46,7 +46,7 @@ public interface Position {
 		return findRandom();
 	}
 
-	// random solid and free above
+	// ----- random solid and free above
 	MinMaxDouble getRandomSolidAndFreeAboveYBounds();
 
 	default boolean canFindRandomSolidAndFreeAbove() {
@@ -58,11 +58,11 @@ public interface Position {
 		Location loc = findRandom().clone();
 		loc.setY(y.getMin());
 		IntPredicate isYFree = offy -> {
-			Mat m = loc.getBlockY() + offy >= 256 ? null : Mat.fromBlock(loc.getBlock().getRelative(0, offy, 0)).orNull();
+			Mat m = loc.getBlockY() + offy >= 256 ? null : Mat.fromBlock(loc.getBlock().getRelative(0, offy, 0)).orElse(null);
 			return m != null && m.getData().isTraversable() && match(loc);
 		};
 		for (; loc.getY() <= y.getMax(); loc.add(0d, 1d, 0d)) {
-			Mat mat = Mat.fromBlock(loc.getBlock()).orNull();
+			Mat mat = Mat.fromBlock(loc.getBlock()).orElse(null);
 			if (mat != null && !mat.getData().isTraversable() && IntStream.range(1, height + 1).allMatch(isYFree)) {
 				return loc;
 			}
@@ -70,16 +70,16 @@ public interface Position {
 		return null;
 	}
 
-	// closest
+	// ----- closest
 	default Location findClosestTo(Player player) {
 		return findClosestTo(player.getLocation());
 	}
 	Location findClosestTo(Location loc);
 
-	// gps
+	// ----- gps
 	Location findGPSFor(Player player);
 
-	// fill
+	// ----- fill
 	boolean canFill();
 	default void fill(Mat blockType, List<BlockState> blockStates) {
 		throw new UnsupportedOperationException();

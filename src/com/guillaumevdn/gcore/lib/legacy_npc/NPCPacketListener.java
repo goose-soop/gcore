@@ -19,14 +19,13 @@ import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.events.PacketListener;
 import com.comphenix.protocol.injector.GamePhase;
 import com.guillaumevdn.gcore.GCore;
-import com.guillaumevdn.gcore.lib.bukkit.BukkitThread;
 
 public class NPCPacketListener implements PacketListener {
 
-	// base
+	// ----- base
 	private long lastInteract = 0L;
 
-	// overriden
+	// ----- overriden
 	@Override
 	public Plugin getPlugin() {
 		return GCore.inst();
@@ -88,7 +87,7 @@ public class NPCPacketListener implements PacketListener {
 			lastInteract = System.currentTimeMillis();
 			// trigger event (resync because spigot wants to >:|)
 			NPCInteraction interactionF = interaction; // :fbfDebilus:
-			BukkitThread.SYNC.operate(() -> Bukkit.getPluginManager().callEvent(new PlayerInteractedNPCEvent(player, npc, interactionF)));
+			GCore.inst().operateSync(() -> Bukkit.getPluginManager().callEvent(new PlayerInteractedNPCEvent(player, npc, interactionF)));
 		}
 	}
 

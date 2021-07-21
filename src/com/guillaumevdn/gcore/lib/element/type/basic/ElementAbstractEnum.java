@@ -32,10 +32,10 @@ public abstract class ElementAbstractEnum<E> extends ElementValue<E> {
 		this.cacheEditorSelector = cacheEditorSelector;
 	}
 
-	// get
+	// ----- get
 	public abstract List<E> getValues();
 
-	// editor
+	// ----- editor
 	@Override
 	public List<String> editorIconLore() {
 		List<String> lore = super.editorIconLore();
@@ -59,13 +59,13 @@ public abstract class ElementAbstractEnum<E> extends ElementValue<E> {
 						// on select
 						value -> {
 							setValue(CollectionUtils.asList(getSerializer().serialize(value)));
-							call.getGUI().setRegularItem(buildEditorItem(call.getSlot()));
-							call.getGUI().openFor(call.getClicker(), call.getPageIndex());
+							call.getGUI().setRegularItem(buildEditorItem(call.getPageIndex(), call.getSlot()));
+							call.reopenGUI();
 							getSuperElement().onEditorChange(this);
 						},
 						// on cancel
 						() -> {
-							call.getGUI().openFor(call.getClicker(), call.getPageIndex());
+							call.reopenGUI();
 						});
 			}
 			// select with single icon
@@ -74,13 +74,13 @@ public abstract class ElementAbstractEnum<E> extends ElementValue<E> {
 						// on select
 						value -> {
 							setValue(CollectionUtils.asList(getSerializer().serialize(value)));
-							call.getGUI().setRegularItem(buildEditorItem(call.getSlot()));
-							call.getGUI().openFor(call.getClicker(), call.getPageIndex());
+							call.getGUI().setRegularItem(buildEditorItem(call.getPageIndex(), call.getSlot()));
+							call.reopenGUI();
 							getSuperElement().onEditorChange(this);
 						},
 						// on cancel
 						() -> {
-							call.getGUI().openFor(call.getClicker(), call.getPageIndex());
+							call.reopenGUI();
 						});
 			}
 		}

@@ -20,7 +20,7 @@ public abstract class Node {
 		this.file = parent == null ? null : parent.getFile();
 	}
 
-	// get
+	// ----- get
 	public YMLFile getFile() {
 		return file;
 	}
@@ -37,10 +37,27 @@ public abstract class Node {
 		return StringUtils.repeatString("  ", getDepthLevel());
 	}
 
-	// write
-	public abstract void write(Appendable writer) throws Throwable;
+	// ----- write
+	public abstract void write(Appendable writer, WriteType type) throws Throwable;
+	public abstract void writeInCompact(Appendable writer, boolean isCompactParent) throws Throwable;
 
-	// clone
+	public static enum WriteType {
+
+		PREFIX_ID_VALUE,
+		ID_VALUE,
+		VALUE;
+
+		public boolean writePrefix() {
+			return ordinal() == 0;
+		}
+
+		public boolean writeId() {
+			return ordinal() != 2;
+		}
+
+	}
+
+	// ----- clone
 	public abstract Node clone(SectionNode parent);
 
 }

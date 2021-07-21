@@ -16,7 +16,7 @@ public class TimeFrameTypeInMonth extends TimeFrameTypeIn<TimeInMonth> {
 		super(id, new TimeInMonth(1, 0, 0), new TimeInMonth(31, 23, 59));
 	}
 
-	// elements
+	// ----- elements
 	@Override
 	protected void doFillTypeSpecificElements(ElementTimeFrame frame) {
 		super.doFillTypeSpecificElements(frame);
@@ -25,8 +25,8 @@ public class TimeFrameTypeInMonth extends TimeFrameTypeIn<TimeInMonth> {
 	}
 
 	@Override
-	protected ZonedDateTime minusOnePeriod(ZonedDateTime time) {
-		return time.minusMonths(1);
+	protected ZonedDateTime deltaPeriod(ZonedDateTime time, int delta) {
+		return time.plusMonths(delta);
 	}
 
 }

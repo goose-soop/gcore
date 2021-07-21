@@ -1,50 +1,46 @@
 package com.guillaumevdn.gcore.lib.legacy_npc.navigation.pathfinding.path;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.NoSuchElementException;
-
+import com.guillaumevdn.gcore.lib.concurrency.RWArrayList;
+import com.guillaumevdn.gcore.lib.function.TriConsumer;
 import com.guillaumevdn.gcore.lib.legacy_npc.navigation.pathfinding.Point;
+import com.guillaumevdn.gcore.lib.wrapper.WrapperBoolean;
 
 /**
  * @author GuillaumeVDN
  */
-public class Path {
+public final class Path {
 
-	private LinkedList<ExploringPathPoint> points;
+	private RWArrayList<ExploringPathPoint> points;
 
 	public Path(Point initialPoint) {
-		this(new LinkedList<>());
+		this(new RWArrayList<>());
 		add(new ExploringPathPoint(null, initialPoint));
 	}
 
-	public Path(LinkedList<ExploringPathPoint> points) {
+	public Path(RWArrayList<ExploringPathPoint> points) {
 		this.points = points;
 	}
 
-	// get
-	public List<ExploringPathPoint> getPoints() {
-		return Collections.unmodifiableList(points);
+	// ----- get
+	public boolean isEmpty() {
+		return points.isEmpty();
 	}
 
 	public ExploringPathPoint getLast() {
-		try {
-			return points.getLast();
-		} catch (NoSuchElementException ignored) {
-			return null;
-		}
+		return points.isEmpty() ? null : points.get(points.size() - 1);
 	}
 
-	// set
+	public void iteratePoints(TriConsumer<ExploringPathPoint, WrapperBoolean, WrapperBoolean> consumer) {
+		points.iterate(consumer);
+	}
+
+	// ----- set
 	public void add(ExploringPathPoint point) {
 		points.add(point);
 	}
 
 	public void removeLast() {
-		try {
-			points.removeLast();
-		} catch (NoSuchElementException ignored) {}
+		points.remove(points.size() - 1);
 	}
 
 }

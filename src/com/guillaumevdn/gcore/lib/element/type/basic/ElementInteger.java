@@ -29,7 +29,7 @@ public class ElementInteger extends ElementValue<Integer> {
 		this.max = max;
 	}
 
-	// get
+	// ----- get
 	public final int getMin() {
 		return min;
 	}
@@ -38,7 +38,7 @@ public class ElementInteger extends ElementValue<Integer> {
 		return max;
 	}
 
-	// parse
+	// ----- parse
 	@Override
 	protected void validate(Integer value) throws ParsingError {
 		if (value < min) {
@@ -48,7 +48,7 @@ public class ElementInteger extends ElementValue<Integer> {
 		}
 	}
 
-	// editor
+	// ----- editor
 	@Override
 	public Mat editorIconType() {
 		return CommonMats.LIME_DYE;

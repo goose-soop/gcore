@@ -22,15 +22,15 @@ public final class TextElement implements Text {
 		this(new ArrayList<>());
 	}
 
-	public TextElement(String line) {
-		this(CollectionUtils.asList(line));
+	public TextElement(String... lines) {
+		this(CollectionUtils.asList(lines));
 	}
 
 	public TextElement(List<String> lines) {
 		setLines(lines);
 	}
 
-	// get
+	// ----- get
 	@Override
 	public List<String> getCurrentLines() {
 		return lines;
@@ -46,7 +46,7 @@ public final class TextElement implements Text {
 		return type;
 	}
 
-	// set
+	// ----- set
 	@Override
 	public void setLines(List<String> newLines) {
 		lines = StringUtils.formatCopy(newLines);
@@ -57,7 +57,7 @@ public final class TextElement implements Text {
 		lines = Collections.unmodifiableList(lines);
 	}
 
-	// parse
+	// ----- parse
 	@Override
 	public String parseLine(Replacer replacer) {
 		if (lines.isEmpty()) {
@@ -81,7 +81,7 @@ public final class TextElement implements Text {
 		}
 	}
 
-	// object
+	// ----- object
 	@Override
 	public String toString() {
 		return StringUtils.toTextString("@@@", lines);

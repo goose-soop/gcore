@@ -8,6 +8,7 @@ import com.guillaumevdn.gcore.lib.configuration.file.YMLFile;
 import com.guillaumevdn.gcore.lib.configuration.file.node.SectionNode;
 import com.guillaumevdn.gcore.lib.configuration.file.node.SuperNode;
 import com.guillaumevdn.gcore.lib.file.FileUtils;
+import com.guillaumevdn.gcore.lib.number.NumberUtils;
 import com.guillaumevdn.gcore.lib.string.StringUtils;
 
 public class YMLReader {
@@ -62,19 +63,26 @@ public class YMLReader {
 			if (context.getLines().isEmpty()) {
 				return;
 			}
+
 			// read non-identifiable tokens
 			context.resetIdentifiable();
-			if (readTokens(context, TokenType.NOT_IDENTIFIABLE)) {
+			if (readNonIdentifiableTokens(context)) {
 				continue;
 			}
+
 			// read identifiable tokens
 			context.consumeIdentifiable();
 			if (readTokens(context, TokenType.IDENTIFIABLE)) {
 				continue;
 			}
+
 			// warn in console that this is an incorrect value (such as 'key: ')
 			GCore.inst().getMainLogger().warning("Found standalone key at path " + parent.getPath() + " in file " + file.getConfiguration().getLogFilePath());
 		}
+	}
+
+	public static boolean readNonIdentifiableTokens(ReaderContext context) throws Throwable {
+		return readTokens(context, TokenType.NOT_IDENTIFIABLE);
 	}
 
 	private static boolean readTokens(ReaderContext context, List<TokenType> tokens) throws Throwable {
@@ -86,6 +94,7 @@ public class YMLReader {
 		return false;
 	}
 
+	// ----- utils
 	public static String unwrapValue(String string, boolean nullIfEmpty) {
 		// empty
 		string = string.trim();
@@ -95,7 +104,7 @@ public class YMLReader {
 		// unwrap
 		char wrapping = string.charAt(0);
 		if (wrapping == '\'' || wrapping == '"') {
-			int commentIndex = YMLReader.indexOfComment(string);
+			int commentIndex = indexOfComment(string);
 			if (commentIndex != -1) {
 				string = string.substring(0, commentIndex).trim();
 			}
@@ -112,6 +121,67 @@ public class YMLReader {
 		return string;
 	}
 
+	public static String wrapValueToWrite(String value) {
+		// empty
+		if (value == null || value.isEmpty()) {
+			return "''";
+		}
+		// primitive
+		Double dbl = NumberUtils.doubleOrNull(value);
+		if (dbl != null) {
+			return StringUtils.getDoubleFormat(3).format(dbl);
+		}
+		if (NumberUtils.doubleOrNull(value) != null || NumberUtils.integerOrNull(value) != null || NumberUtils.longOrNull(value) != null || value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false")) {
+			return value;
+		}
+		// contains :
+		if (value.contains(":")) {
+			return "'" + value.replace("'", "''") + "'";
+		}
+		// starting or ending with a non-alphanumeric character
+		if (!StringUtils.isAlphanumeric(value.charAt(0)) || (value.length() != 1 && !StringUtils.isAlphanumeric(value.charAt(value.length() - 1)))) {
+			return "'" + value.replace("'", "''") + "'";
+		}
+		// don't wrap
+		return value;
+	}
+
+	public static String wrapIdToWrite(String id) {
+		return StringUtils.isAlphanumeric(id.replace("_", "")) ? id : "'" + id + "'";
+	}
+
+	public static int indexOfColonSeparator(String line) {
+		if (line.isEmpty()) {
+			return -1;
+		}
+		Character wrapping = null;
+		int wrappingCount = 0;
+		char[] chars = line.toCharArray();
+		for (int i = 0; i < chars.length; ++i) {
+			char ch = chars[i];
+			if (ch == '\'' || ch == '"') {
+				if (wrapping == null || wrapping == ch) {
+					wrapping = ch;
+					++wrappingCount;
+				} else {
+					// a wrapping was already defined and we found the other type in string, ignore it
+				}
+			} else if (ch == '#') {
+				if (wrappingCount % 2 == 0) {
+					return -1;  // found comment after wrapping ; if we're here, then we didn't find a colon before comment, so invalid
+				}
+			} else if (ch == ':') {
+				if (i + 1 >= chars.length || chars[i + 1] == ' ') {  // no longer tolerate 'key:value', we require a space (except at the end of lines, such as section keys)
+					if (wrappingCount % 2 == 0) {
+						return i;
+					}
+				}
+			}
+		}
+		// didn't find end of wrapping, or no colon, invalid
+		return -1;
+	}
+
 	public static int indexOfComment(String string) {
 		Character wrapping = null;
 		int wrappingCount = 0;
@@ -123,7 +193,7 @@ public class YMLReader {
 					wrapping = ch;
 					++wrappingCount;
 				} else {
-					// a wrapping was already defined and we found the other in string, ignore it
+					// a wrapping was already defined and we found the other type in string, ignore it
 				}
 			} else if (ch == '#') {
 				if (wrappingCount % 2 == 0) {
@@ -132,6 +202,22 @@ public class YMLReader {
 			}
 		}
 		return -1;
+	}
+
+	public static String requireValidIndentLevelPotentiallyLenient(ReaderContext context, ReaderLine peek) {  // for lists whose "-" don't have extra spaces and are at the same level as their keys
+		String indent = context.getCurrentIndent();  // don't add context.getIndentLevel() here, the list might be formatted without extra leading indent level
+		if (!peek.getLine().startsWith(indent)) {
+			context.throwIndentError(peek, indent.length(), true);
+		}
+		String s = peek.getLine().substring(indent.length());
+		while (s.startsWith(context.getIndentLevel())) {
+			indent += context.getIndentLevel();
+			s = s.substring(context.getIndentLevel().length());
+		}
+		if (!s.isEmpty() && s.charAt(0) == ' ') {
+			context.throwIndentError(peek, indent.length(), false);
+		}
+		return indent;
 	}
 
 }

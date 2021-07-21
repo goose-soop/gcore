@@ -29,7 +29,7 @@ public class ElementFloat extends ElementValue<Float> {
 		this.max = max;
 	}
 
-	// get
+	// ----- get
 	public final float getMin() {
 		return min;
 	}
@@ -38,7 +38,7 @@ public class ElementFloat extends ElementValue<Float> {
 		return max;
 	}
 
-	// parse
+	// ----- parse
 	@Override
 	protected void validate(Float value) throws ParsingError {
 		if (value < min) {
@@ -48,7 +48,7 @@ public class ElementFloat extends ElementValue<Float> {
 		}
 	}
 
-	// editor
+	// ----- editor
 	@Override
 	public Mat editorIconType() {
 		return CommonMats.LIME_DYE;

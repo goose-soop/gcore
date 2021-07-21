@@ -22,14 +22,14 @@ public class PositionTypeCylinderInside extends PositionType {
 		super(id, CommonMats.HOPPER);
 	}
 
-	// elements
+	// ----- elements
 	@Override
 	protected void doFillTypeSpecificElements(ElementPosition position) {
 		position.addLocation("center", Need.required(), TextEditorGeneric.descriptionPositionTypeCylinderCenter);
 		position.addDouble("radius", Need.required(), 1, TextEditorGeneric.descriptionPositionTypeCylinderRadius);
 	}
 
-	// parse
+	// ----- parse
 	@Override
 	public Position doParse(ElementPosition position, Replacer replacer) throws ParsingError {
 		Location center = position.getElementAs("center", ElementLocation.class).parseNoCatchOrThrowParsingNull(replacer);

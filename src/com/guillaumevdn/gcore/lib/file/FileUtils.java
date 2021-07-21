@@ -233,7 +233,7 @@ public final class FileUtils {
 		return name;
 	}
 
-	// https://stackoverflow.com/questions/453018/number-of-lines-in-a-file-in-java
+	// ----- https://stackoverflow.com/questions/453018/number-of-lines-in-a-file-in-java
 	public static int countLines(File file) {
 		try (InputStream is = new BufferedInputStream(new FileInputStream(file))) {
 			byte[] c = new byte[1024];

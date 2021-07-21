@@ -19,16 +19,16 @@ import com.guillaumevdn.gcore.lib.string.Text;
 public class ElementPositionList extends ListElement<ElementPosition> implements ParseableListElement<Position, ElementPosition> {
 
 	public ElementPositionList(Element parent, String id, Need need, Text editorDescription) {
-		super("position", parent, id, need, editorDescription);
+		super("position", true, parent, id, need, editorDescription);
 	}
 
-	// element
+	// ----- element
 	@Override
 	protected ElementPosition createElement(String elementId) {
 		return new ElementPosition(this, elementId, Need.optional(), null);
 	}
 
-	// parsing
+	// ----- parsing
 	private ParsedCache<List<Position>> cache = new ParsedCache<>();
 
 	@Override
@@ -41,7 +41,7 @@ public class ElementPositionList extends ListElement<ElementPosition> implements
 		cache.clear();
 	}
 
-	// editor
+	// ----- editor
 	@Override
 	public Mat editorIconType() {
 		return CommonMats.MINECART;

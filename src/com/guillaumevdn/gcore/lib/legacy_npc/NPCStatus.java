@@ -6,7 +6,7 @@ package com.guillaumevdn.gcore.lib.legacy_npc;
 
 public enum NPCStatus {
 
-	// status
+	// ----- status
 	ON_FIRE((byte) 1),
 	CROUCHED((byte) 2),
 	SPRINTING((byte) 8),
@@ -14,19 +14,19 @@ public enum NPCStatus {
 	GLOWING((byte) 64),
 	ELYTRA((byte) 128);
 
-	// base
+	// ----- base
 	private byte b;
 
 	private NPCStatus(byte b) {
 		this.b = b;
 	}
 
-	// methods
+	// ----- methods
 	public byte getByte() {
 		return b;
 	}
 
-	// static methods
+	// ----- static methods
 	public static byte getMasked(final NPCStatus... status) {
 		byte b = 0;
 		for (NPCStatus s : status) {

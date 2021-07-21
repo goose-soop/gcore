@@ -9,13 +9,13 @@ public class WrapperInteger extends Wrapper<Integer> {
 		super(value);
 	}
 
-	// methods
+	// ----- methods
 	public int alter(int delta) {
 		set(get() + delta);
 		return get();
 	}
 
-	// static
+	// ----- static
 	public static WrapperInteger of(Integer value) {
 		return new WrapperInteger(value);
 	}

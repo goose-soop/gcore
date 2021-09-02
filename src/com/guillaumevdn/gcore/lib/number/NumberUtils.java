@@ -85,14 +85,21 @@ public final class NumberUtils {
 		}
 	}
 
-	private static Map<Integer, DecimalFormat> roundFormatCache = new HashMap<>();
+	private static Map<Integer, DecimalFormat> roundFormatCache = new HashMap<>(1);
 
 	public static double round(double value, int places) {
 		if (places <= 0) {
-			return Math.round(value);
+			return (double) ((int) value);
+		}
+		return Double.parseDouble(roundString(value, places));
+	}
+
+	public static String roundString(double value, int places) {
+		if (places <= 0) {
+			return "" + (int) value;
 		}
 		DecimalFormat format = roundFormatCache.computeIfAbsent(places, __ -> new DecimalFormat("#." + StringUtils.repeatString("#", places)));
-		return Double.parseDouble(format.format(value).replace(',', '.') /* happens sometimes for some reason, wrong locale maybe */);
+		return format.format(value).replace(',', '.');  // happens sometimes for some reason, wrong locale maybe
 	}
 
 	// ----- float
@@ -223,6 +230,7 @@ public final class NumberUtils {
 					else if (func.equals("cos")) x = Math.cos(Math.toRadians(x));
 					else if (func.equals("tan")) x = Math.tan(Math.toRadians(x));
 					else if (func.equals("ln")) x = Math.log(x);
+					else if (func.equals("log")) x = Math.log10(x);
 					else if (func.equals("ceil")) x = Math.ceil(x);
 					else if (func.equals("floor")) x = Math.floor(x);
 					else if (func.equals("round")) x = Math.round(x);

@@ -36,7 +36,7 @@ public class ElementGUIItem extends TypableContainerElement<GUIItemType> {
 	private ElementClickTypeOverrideClickMap overrideClicks = add(new ElementClickTypeOverrideClickMap(this, "override_clicks", Need.optional(), TextEditorGeneric.descriptionGuiItemOverrideClicks));
 
 	public ElementGUIItem(Element parent, String id, Need need, Text editorDescription) {
-		super(GUIItemTypes.inst(), "GUI item", parent, id, need, editorDescription);
+		super(GUIItemTypes.inst(), parent, id, need, editorDescription);
 	}
 
 	@Override

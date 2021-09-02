@@ -19,7 +19,7 @@ import com.guillaumevdn.gcore.lib.string.Text;
 public class ElementClickTypeOverrideClickMap extends ElementAbstractDefaultEnumMap<ClickType, ElementOverrideClick> implements ParseableMapElement<ClickType, OverrideClick, ElementOverrideClick> {
 
 	public ElementClickTypeOverrideClickMap(Element parent, String id, Need need, Text editorDescription) {
-		super(ClickType.class, "override click", parent, id, need, editorDescription, CollectionUtils.asList(ClickType.values()));
+		super(ClickType.class, parent, id, need, editorDescription, CollectionUtils.asList(ClickType.values()));
 	}
 
 	// ----- add

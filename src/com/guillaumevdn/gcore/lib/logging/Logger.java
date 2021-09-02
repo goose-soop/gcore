@@ -35,7 +35,7 @@ public class Logger {
 	private String id;
 	private boolean logConsole, logFile, antiSpam;
 	private int fileLineLimit;
-	private RWArrayList<String> linesToSave = new RWArrayList<>();
+	private RWArrayList<String> linesToSave = new RWArrayList<>(5);
 
 	public Logger(GPlugin plugin, String id, boolean logConsole, boolean logFile) {
 		this(plugin, id, logConsole, logFile, true);
@@ -112,7 +112,7 @@ public class Logger {
 		log(LogLevel.DEBUG, line, true, false, null);
 	}
 
-	private transient RWHashMap<String, Long> lastLogged = new RWHashMap<>();  // #925, concurrent mod exception
+	private transient RWHashMap<String, Long> lastLogged = new RWHashMap<>(10, 1f);  // #925, concurrent mod exception
 
 	public void log(LogLevel level, String line, boolean printIdInConsole, Throwable trace) {
 		log(level, line, printIdInConsole, false, trace);

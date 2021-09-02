@@ -46,6 +46,9 @@ public class ListValueNode extends ConfigNode {
 	public void setValue(List<String> value) {
 		if (value == null) throw new IllegalArgumentException("value can't be null");
 		this.value = CollectionUtils.asList(value);
+		if (value.stream().anyMatch(line -> line.contains("\n"))) {
+			ez = false;
+		}
 	}
 
 	// ----- write
@@ -59,7 +62,7 @@ public class ListValueNode extends ConfigNode {
 		if (value.isEmpty()) {
 			writer.append("[]" + (trailingComment != null ? "  #" + trailingComment : "") + "\n");
 		} else if (shouldWriteCompact()) {
-			writer.append("[" + StringUtils.toTextString(", ", StringUtils.retranslateColorCodesCopy(value.stream().map(line -> YMLReader.wrapValueToWrite(line)).collect(Collectors.toList()))) + "]" + (trailingComment != null ? "  #" + trailingComment : "") + "\n");
+			writer.append("[" + StringUtils.toTextString(", ", StringUtils.retranslateColorCodesCopy(value.stream().map(line -> YMLReader.wrapValueToWrite(line.replace('\n', ' '))).collect(Collectors.toList()))) + "]" + (trailingComment != null ? "  #" + trailingComment : "") + "\n");
 		} else if (ez) {
 			writer.append("|" + (trailingComment != null ? "  #" + trailingComment : "") + "\n");
 			String linePrefix = prefix + "  ";
@@ -78,7 +81,17 @@ public class ListValueNode extends ConfigNode {
 				} else {
 					writer.append("- ");
 				}
-				writer.append(YMLReader.wrapValueToWrite(line) + "\n");
+				if (line.contains("\n")) {
+					String[] split = line.split("\\n");
+					for (int j = 0; j < split.length; ++j) {
+						writer.append((split[j].contains("&") ? split[j] : "&r" + split[j]) + "\n");
+						if (j + 1 < split.length) {
+							writer.append(prefix + "    ");
+						}
+					}
+				} else {
+					writer.append(YMLReader.wrapValueToWrite(line) + "\n");
+				}
 				++i;
 			}
 		}
@@ -89,7 +102,7 @@ public class ListValueNode extends ConfigNode {
 		if (value.isEmpty()) {
 			writer.append(YMLReader.wrapIdToWrite(getId()) + ": []");
 		} else {
-			writer.append(YMLReader.wrapIdToWrite(getId()) + ": [" + StringUtils.toTextString(", ", StringUtils.retranslateColorCodesCopy(value.stream().map(line -> YMLReader.wrapValueToWrite(line)).collect(Collectors.toList()))) + "]");
+			writer.append(YMLReader.wrapIdToWrite(getId()) + ": [" + StringUtils.toTextString(", ", StringUtils.retranslateColorCodesCopy(value.stream().map(line -> YMLReader.wrapValueToWrite(line.replace('\n', ' '))).collect(Collectors.toList()))) + "]");
 		}
 	}
 

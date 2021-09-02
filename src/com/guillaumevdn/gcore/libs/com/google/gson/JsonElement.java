@@ -9,20 +9,19 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF UNKNOWN KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
 
 package com.guillaumevdn.gcore.libs.com.google.gson;
 
+import com.guillaumevdn.gcore.libs.com.google.gson.internal.Streams;
+import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-
-import com.guillaumevdn.gcore.libs.com.google.gson.internal.Streams;
-import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonWriter;
 
 /**
  * A class representing an element of Json. It could either be a {@link JsonObject}, a

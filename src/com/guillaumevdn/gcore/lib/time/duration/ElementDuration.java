@@ -30,7 +30,7 @@ public class ElementDuration extends ParseableContainerElement<Long> {
 	protected ElementTimeUnit unit;
 
 	public ElementDuration(Element parent, String id, Need need, Integer defaultTime, TimeUnit defaultUnit, Text editorDescription) {
-		super("duration", parent, id, need, editorDescription);
+		super(parent, id, need, editorDescription);
 
 		// we need to overwrite the doWrite methods here, because when editing from the editor, calling superElement.onChange() triggers the write method of this thing and it'll write as section
 
@@ -102,9 +102,9 @@ public class ElementDuration extends ParseableContainerElement<Long> {
 	protected void doWrite() throws Throwable {
 		YMLConfiguration config = getSuperElement().getConfiguration();
 		String path = getConfigurationPath();
-		String time = this.time.getValueLine(0);
+		String time = this.time.getRawValueLine(0);
 		String defaultTime = this.time.getDefaultValueLine(0);
-		String unit = this.unit.getValueLine(0);
+		String unit = this.unit.getRawValueLine(0);
 		String defaultUnit = this.unit.getDefaultValueLine(0);
 
 		if ((time == null && unit == null) || (!getNeed().equals(NeedType.REQUIRED) && StringUtils.equalsIgnoreCaseNullable(time, defaultTime) && StringUtils.equalsIgnoreCaseNullable(unit, defaultUnit))) {

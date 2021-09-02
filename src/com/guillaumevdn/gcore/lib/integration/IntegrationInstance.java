@@ -14,14 +14,13 @@ import org.bukkit.event.EventPriority;
 public abstract class IntegrationInstance {
 
 	private Integration integration;
-	private List<IntegrationSerializer> serializers = new ArrayList<>();
-	private List<IntegrationEvent> events = new ArrayList<>();
+	private List<IntegrationSerializer> serializers = new ArrayList<>(0);
+	private List<IntegrationEvent> events = new ArrayList<>(0);
 
 	public IntegrationInstance(Integration integration) {
 		this.integration = integration;
 	}
 
-	// ----- get
 	public Integration getIntegration() {
 		return integration;
 	}
@@ -34,7 +33,6 @@ public abstract class IntegrationInstance {
 		return events;
 	}
 
-	// ----- set
 	public <T> void registerSerializer(Class<T> typeClass, Function<T, String> serializer, Function<String, T> deserializer) {
 		serializers.add(new IntegrationSerializer<>(typeClass, serializer, deserializer));
 	}

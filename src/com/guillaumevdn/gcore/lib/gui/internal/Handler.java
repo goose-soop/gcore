@@ -9,6 +9,7 @@ import com.guillaumevdn.gcore.lib.concurrency.RWHashMap;
 import com.guillaumevdn.gcore.lib.gui.struct.ClickCall;
 import com.guillaumevdn.gcore.lib.gui.struct.ClickCall.ClickType;
 import com.guillaumevdn.gcore.lib.gui.struct.GUI;
+import com.guillaumevdn.gcore.lib.gui.struct.GUI.Option;
 import com.guillaumevdn.gcore.lib.gui.struct.GUIItem;
 import com.guillaumevdn.gcore.lib.tuple.IntegerPair;
 
@@ -35,6 +36,10 @@ public abstract class Handler {
 	public abstract int getPageCount();
 	public abstract RWHashMap<Player, Integer> getViewers();
 	public abstract int getViewerPage(Player player);
+	public final boolean isViewer(Player player) {
+		return getViewerPage(player) >= 0;
+	}
+
 	public abstract int firstEmpty(int pageIndex);
 	public abstract ItemStack getPageItem(int pageIndex, int slot);
 
@@ -92,13 +97,23 @@ public abstract class Handler {
 			try {
 				performer.accept(new ClickCall(player, click, gui, pageIndex, slot));
 			} catch (Throwable exception) {
-				throw new Error("couldn't perform click effects of item " + item.getId() + " in GUI " + getGUI().getId() + " at slot " + slot + " of page " + pageIndex, exception);
+				getGUI().getPlugin().getMainLogger().error("Couldn't perform click effects of item " + item.getId() + " in GUI " + getGUI().getId() + " at slot " + slot + " of page " + pageIndex, exception);
 			}
 		}
 	}
 
 	public void onClose(Player player) {
+		// trigger watchers
 		gui.onClose(player);
+
+		// unregister on close
+		if (!gui.getOptions().contains(Option.DONT_UNREGISTER_ON_CLOSE)) {
+			gui.getPlugin().operateSyncLater(() -> {
+				if (getViewers().isEmpty()) {
+					gui.deactivate(true);
+				}
+			}, 5);
+		}
 	}
 
 }

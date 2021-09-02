@@ -27,7 +27,7 @@ public enum BukkitThread {
 
 	public void operate(GPlugin plugin, ThrowableRunnable callable, Consumer<Throwable> onError) {
 		try {
-			if (!plugin.isActivated()) {
+			if (!plugin.isEnabled() /* use enabled and not activated here, otherwise tasks on plugin startup will not run correctly */) {
 				callable.run();
 			} else if (equals(BukkitThread.ASYNC)) {
 				if (Bukkit.isPrimaryThread()) {
@@ -61,7 +61,7 @@ public enum BukkitThread {
 
 	public BukkitTask operateLater(GPlugin plugin, ThrowableRunnable callable, Consumer<Throwable> onError, long ticks) {
 		try {
-			if (!plugin.isEnabled()) {
+			if (!plugin.isEnabled() /* use enabled and not activated here, otherwise tasks on plugin startup will not run correctly */) {
 				callable.run();
 			} else if (ticks <= 0L) {
 				operate(plugin, callable, onError);

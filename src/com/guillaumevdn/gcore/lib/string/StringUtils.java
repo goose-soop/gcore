@@ -533,8 +533,8 @@ public final class StringUtils {
 		}
 	}
 
-	private static Map<Integer, DecimalFormat> doubleFormats = new HashMap<>();
-	private static Map<Integer, DecimalFormat> doubleDecimalsFormats = new HashMap<>();
+	private static Map<Integer, DecimalFormat> doubleFormats = new HashMap<>(1);
+	private static Map<Integer, DecimalFormat> doubleDecimalsFormats = new HashMap<>(1);
 
 	public static DecimalFormat getDoubleFormat(int places) {
 		DecimalFormat format = doubleFormats.get(places);

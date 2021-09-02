@@ -23,7 +23,7 @@ public class ElementItemList extends ListElement<ElementItem> implements Parseab
 	private final ElementItemMode mode;
 
 	public ElementItemList(Element parent, String id, Need need, ElementItemMode mode, Text editorDescription) {
-		super("item", true, parent, id, need, editorDescription);
+		super(true, parent, id, need, editorDescription);
 		this.mode = mode;
 	}
 

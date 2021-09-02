@@ -23,8 +23,7 @@ public class ElementDouble extends ElementValue<Double> {
 	}
 
 	public ElementDouble(Element parent, String id, Need need, double min, double max, Text editorDescription) {
-		super("double" + (min == -Double.MAX_VALUE && max == Double.MAX_VALUE ? "" : (min == -Double.MAX_VALUE ? " (max. " + max + ")" : (max == Double.MAX_VALUE ? " (min. " + min + ")" : " (" + min + " - " + max + ")"))),
-				Double.class, parent, id, need, editorDescription);
+		super(Double.class, parent, id, need, editorDescription);
 		this.min = min;
 		this.max = max;
 	}

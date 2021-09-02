@@ -102,8 +102,8 @@ public class IntegrationInstanceCitizens extends IntegrationInstance implements 
 	}
 
 	// ----- await npc selection
-	private static Set<UUID> awaitingNPCsCancelChat = new HashSet<>();
-	private static Map<UUID, Pair<Consumer<NPC>, Runnable>> awaitingNPCs = new HashMap<>();
+	private static Set<UUID> awaitingNPCsCancelChat = new HashSet<>(1);
+	private static Map<UUID, Pair<Consumer<NPC>, Runnable>> awaitingNPCs = new HashMap<>(1);
 
 	public static void awaitNPC(Player player, Text message, Consumer<NPC> onSelect, Runnable onCancel) {
 		// cancel current

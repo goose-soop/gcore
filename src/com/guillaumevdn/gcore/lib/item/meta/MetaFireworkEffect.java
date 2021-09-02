@@ -85,9 +85,12 @@ public final class MetaFireworkEffect {
 	}
 
 	public static void writeElements(ElementItem item, DataIO writer, Replacer replacer) {
-		item.parseElementAs("effect", FireworkEffect.class, replacer).ifPresentDo(effect -> {
-			writer.writeObject("effect", w -> writeEffect(effect, w));
-		});
+		ElementFireworkEffect effect = item.getElementAs("effect");
+		if (effect != null /* null on non-firework metas */ && effect.readContains()) {
+			effect.parse(replacer).ifPresentDo(eff -> {
+				writer.writeObject("effect", w -> writeEffect(eff, w));
+			});
+		}
 	}
 
 	public static void importElements(ElementItem item, ItemMeta itemMeta) {

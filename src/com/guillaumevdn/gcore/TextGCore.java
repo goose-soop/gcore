@@ -22,6 +22,8 @@ public enum TextGCore implements TextEnumElement {
 	commandDescriptionGcorePlugins,
 	commandDescriptionGcoreExport,
 	commandDescriptionGcoreItemRead,
+	commandDescriptionGcoreItemReadChat,
+	commandDescriptionGcoreItemReadClick,
 
 	messageItemReadNull,
 	messageItemReadExported,

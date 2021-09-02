@@ -83,13 +83,16 @@ public abstract class Currency {
 
 	public boolean enable() {
 		// shouldn't enable
-		if (requiredPlugin == null || !PluginUtils.isPluginEnabled(requiredPlugin)) {
+		if (requiredPlugin != null && !PluginUtils.isPluginEnabled(requiredPlugin)) {
 			return (enabled = false);
 		}
 		// enable
 		try {
 			// initialize inner
-			initialize();
+			if (!initialize()) {
+				return (enabled = false);
+			}
+
 			// config
 			String path = "currencies." + getId();
 			formatSingle = ConfigGCore.baseConfig.readMandatoryString(path + ".format_single");
@@ -98,6 +101,7 @@ public abstract class Currency {
 			formatMultiplier = ConfigGCore.baseConfig.readDouble(path + ".format_multiplier", 1d);
 			icon = ConfigGCore.baseConfig.readMandatoryItemStack(path + ".icon");
 			name = ConfigGCore.baseConfig.readString(path + ".name", id);
+
 			// done
 			GCore.inst().getMainLogger().info("Enabled currency " + id);
 			return (enabled = true);
@@ -121,7 +125,7 @@ public abstract class Currency {
 		if (formatMultiplier != 1d) {
 			amount = amount * formatMultiplier;
 		}
-		return (amount > 1d ? formatSingle : formatMultiple).replace("{amount}", String.valueOf(NumberUtils.round(amount, formatDecimalPrecision)));
+		return (amount > 1d ? formatMultiple : formatSingle).replace("{amount}", NumberUtils.roundString(amount, formatDecimalPrecision));
 	}
 
 	public double get(OfflinePlayer player) {
@@ -191,7 +195,7 @@ public abstract class Currency {
 
 	// ----- registration
 
-	private static final Map<String, Currency> registered = new HashMap<>();
+	private static final Map<String, Currency> registered = new HashMap<>(1);
 
 	public static Collection<Currency> values() {
 		return Collections.unmodifiableCollection(registered.values());
@@ -214,8 +218,9 @@ public abstract class Currency {
 
 	// ----- values
 
-	public static final Currency VAULT = register(new CurrencyVault());
-
-	// TODO : add more currencies
+	public static final Currency VAULT = register(new CurrencyVault("VAULT"));
+	public static final Currency PLAYER_POINTS = register(new CurrencyPlayerPoints("PLAYER_POINTS"));
+	public static final Currency TOKEN_ENCHANT = register(new CurrencyTokenEnchant("TOKEN_ENCHANT"));
+	public static final Currency XP_LEVEL = register(new CurrencyXPLevel("XP_LEVEL"));
 
 }

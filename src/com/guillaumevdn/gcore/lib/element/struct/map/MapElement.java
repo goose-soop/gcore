@@ -18,7 +18,6 @@ import com.guillaumevdn.gcore.lib.gui.struct.GUIItem;
 import com.guillaumevdn.gcore.lib.item.ItemUtils;
 import com.guillaumevdn.gcore.lib.object.Optional;
 import com.guillaumevdn.gcore.lib.serialization.Serializer;
-import com.guillaumevdn.gcore.lib.string.StringUtils;
 import com.guillaumevdn.gcore.lib.string.Text;
 
 /**
@@ -26,20 +25,12 @@ import com.guillaumevdn.gcore.lib.string.Text;
  */
 public abstract class MapElement<K, V extends Element> extends AbstractMapElement<K, V> {
 
-	public MapElement(Class<K> keyClass, String valueTypeName, Element parent, String id, Need need, Text editorDescription) {
-		this(keyClass, valueTypeName, false, parent, id, need, editorDescription);
+	public MapElement(Class<K> keyClass, Element parent, String id, Need need, Text editorDescription) {
+		super(keyClass, parent, id, need, editorDescription);
 	}
 
-	protected MapElement(Class<K> keyClass, String typeName, boolean overrideTypeName, Element parent, String id, Need need, Text editorDescription) {
-		super(keyClass, overrideTypeName ? typeName : "map of " + StringUtils.getReadableName(keyClass) + " and " + typeName, parent, id, need, editorDescription);
-	}
-
-	public MapElement(Serializer<K> keySerializer, String valueTypeName, Element parent, String id, Need need, Text editorDescription) {
-		this(keySerializer, valueTypeName, false, parent, id, need, editorDescription);
-	}
-
-	protected MapElement(Serializer<K> keySerializer, String typeName, boolean overrideTypeName, Element parent, String id, Need need, Text editorDescription) {
-		super(keySerializer, overrideTypeName ? typeName : "map of " + StringUtils.getReadableName(keySerializer.getTypeClass()) + " and " + typeName, parent, id, need, editorDescription);
+	public MapElement(Serializer<K> keySerializer, Element parent, String id, Need need, Text editorDescription) {
+		super(keySerializer, parent, id, need, editorDescription);
 	}
 
 	// ----- get
@@ -77,14 +68,17 @@ public abstract class MapElement<K, V extends Element> extends AbstractMapElemen
 	@Override
 	protected void doRead() throws Throwable {
 		String path = getConfigurationPath();
-		for (String elementId : getSuperElement().getConfiguration().readKeysForSection(path)) {
+		List<String> keys = getSuperElement().getConfiguration().readKeysForSection(path);
+
+		reinitializeElements(keys.size(), 1f);
+		for (String elementId : keys) {
 			// invalid key
 			K key = null;
 			try {
 				key = getKeySerializer().deserialize(elementId);
 			} catch (Throwable ignored) {
 				/*ignored.printStackTrace();
-				System.out.println("element id " + elementId + ", type serializer " + getKeySerializer());*/
+				Bukkit.getLogger().info("element id " + elementId + ", type serializer " + getKeySerializer());*/
 			}
 			if (key == null) {
 				getSuperElement().addLoadError("key " + elementId + " at path " + path + " isn't a valid " + getKeySerializer().getTypeName());

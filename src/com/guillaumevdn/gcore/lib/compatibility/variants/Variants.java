@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.guillaumevdn.gcore.GCore;
+import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.collection.ReverseSplitLowerCaseMap;
 import com.guillaumevdn.gcore.lib.compatibility.Version;
 import com.guillaumevdn.gcore.lib.configuration.YMLConfiguration;
@@ -148,14 +149,16 @@ public abstract class Variants<V extends Variant, DE extends Enum<DE>, D extends
 		string = string.replace("\t", " ").trim().toUpperCase();
 		while (string.contains("  ")) string = string.replace("  ", " ");
 		// get extras
-		List<DE> elementExtra = new ArrayList<>();
+		List<DE> elementExtra = null;
 		if (extraClass != null) {
 			for (DE extra : extraClass.getEnumConstants()) {
 				String extraParam = "--" + extra.name().toUpperCase();
 				int index = string.toUpperCase().indexOf(extraParam);
 				if (index != -1) {
 					string = string.substring(0, index) + string.substring(index + extraParam.length());
-					elementExtra.add(extra);
+					if (elementExtra == null) {
+						elementExtra = CollectionUtils.asList(extra);
+					}
 				}
 			}
 		}
@@ -217,6 +220,9 @@ public abstract class Variants<V extends Variant, DE extends Enum<DE>, D extends
 			if (first != null) {
 				SimpleExistingVariantData existing = ObjectUtils.castOrNull(first, SimpleExistingVariantData.class);
 				if (existing != null && existing.getDataInstance() == null) {
+					if (existing.getDataName().equals("NONE")) {
+						return null;  // we do not want to register this material on this version, it's a choice here
+					}
 					throw new ConfigError("variant " + typeName + " " + id + " has invalid " + first.getVersionComparison().getSymbol() + first.getVersion() + " data '" + first.getDataName() + "' (don't exist even though we're running this version)");
 				}
 				V value = createElement(id.toUpperCase(), first);

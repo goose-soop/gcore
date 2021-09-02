@@ -19,7 +19,7 @@ import com.guillaumevdn.gcore.lib.string.Text;
 public class ElementCurrencyDoubleMap extends ElementAbstractEnumMap<Currency, ElementDouble> implements ParseableMapElement<Currency, Double, ElementDouble> {
 
 	public ElementCurrencyDoubleMap(Element parent, String id, Need need, Text editorDescription) {
-		super(Currency.class, "currency amount", parent, id, need, editorDescription, CollectionUtils.asList(Currency.values()));
+		super(Currency.class, parent, id, need, editorDescription, CollectionUtils.asList(Currency.values()));
 	}
 
 	// ----- add

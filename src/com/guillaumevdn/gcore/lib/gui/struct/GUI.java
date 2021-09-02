@@ -6,8 +6,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 
 import com.guillaumevdn.gcore.ConfigGCore;
@@ -18,6 +20,7 @@ import com.guillaumevdn.gcore.lib.compatibility.material.Mat;
 import com.guillaumevdn.gcore.lib.concurrency.RWHashMap;
 import com.guillaumevdn.gcore.lib.concurrency.RWLowerCaseHashMap;
 import com.guillaumevdn.gcore.lib.concurrency.RWWeakHashMap;
+import com.guillaumevdn.gcore.lib.gui.element.item.type.types.border.BorderGUIItem;
 import com.guillaumevdn.gcore.lib.gui.internal.Handler;
 import com.guillaumevdn.gcore.lib.gui.internal.protocol.ProtocolHandler;
 import com.guillaumevdn.gcore.lib.gui.internal.vanilla.VanillaHandler;
@@ -39,7 +42,7 @@ public class GUI {
 		AUTO_BACK_ITEM
 	}
 
-	private static final int MAX_LENGTH = 30;
+	private static final int MAX_LENGTH = 25;
 	private static final String APPEND_CUT = "...";
 
 	// ----- base
@@ -50,12 +53,12 @@ public class GUI {
 	private int backItemSlot = -1;
 	private final Set<Option> options;
 	private final List<Integer> regularItemSlots;
-	private final RWLowerCaseHashMap<GUIItem> regularItems = new RWLowerCaseHashMap<>();
-	private final RWLowerCaseHashMap<GUIItem> persistentItems = new RWLowerCaseHashMap<>();
+	private final RWLowerCaseHashMap<GUIItem> regularItems = new RWLowerCaseHashMap<>(5, 1f);
+	private final RWLowerCaseHashMap<GUIItem> persistentItems = new RWLowerCaseHashMap<>(1, 1f);  // expecting more regulars than persistents
 	private final Handler handler;
 	private long lastFilled = 0L;
 	private boolean active = false;
-	private RWWeakHashMap<Player, ClickCall> fromCall = new RWWeakHashMap<>();
+	private RWWeakHashMap<Player, ClickCall> fromCall = new RWWeakHashMap<>(1, 1f);  // usually expecting one player per GUI
 
 	public GUI(GPlugin plugin, String id, String name, GUIType type, Option... options) {
 		this(plugin, id, name, type, NumberUtils.range(0, type.getRegularItemSlotsEnd()), options);
@@ -70,18 +73,18 @@ public class GUI {
 			 * Faut compter les couleurs nécessaires pour arriver au cut pour que le nom qu'on a cut, unformatté, ait la même taille que le cut normal
 			 * Perso j'ai la flemme
 
-			 int cutAt = n.length() - (MAX_LENGTH - APPEND_CUT.length()) + (name.length() - n.length());
+			int cutAt = n.length() - (MAX_LENGTH - APPEND_CUT.length()) + (name.length() - n.length());
 
 			int cutAt = n.length() - (MAX_LENGTH - APPEND_CUT.length()) + (name.length() - n.length());
 			int cutAtNormal = n.length() - (MAX_LENGTH - APPEND_CUT.length());
 
-			System.out.println("name " + name);
-			System.out.println("n    " + n);
-			System.out.println("n    " + name.replace('§', '&'));
-			System.out.println("= diff " + (name.length() - n.length()));
-			System.out.println("- cutAt " + cutAt);
-			System.out.println("- cutAtNormal " + cutAtNormal);
-			System.out.println("- subst " + name.substring(cutAt, name.length()) + ", length " + (name.substring(cutAt, name.length()).length()));
+			Bukkit.getLogger().info("name " + name);
+			Bukkit.getLogger().info("n    " + n);
+			Bukkit.getLogger().info("n    " + name.replace('§', '&'));
+			Bukkit.getLogger().info("= diff " + (name.length() - n.length()));
+			Bukkit.getLogger().info("- cutAt " + cutAt);
+			Bukkit.getLogger().info("- cutAtNormal " + cutAtNormal);
+			Bukkit.getLogger().info("- subst " + name.substring(cutAt, name.length()) + ", length " + (name.substring(cutAt, name.length()).length()));
 
 			if (cutAt > 0 && name.charAt(cutAt - 1) == '§') {
 				if (cutAt + 1 >= n.length()) {
@@ -93,7 +96,9 @@ public class GUI {
 			this.name = StringUtils.getLastColors(name.substring(0, cutAt)) + APPEND_CUT + name.substring(cutAt, name.length());
 			 */
 
-			this.name = StringUtils.getLastColors(name.substring(0, MAX_LENGTH)) + APPEND_CUT + name.substring(MAX_LENGTH, name.length());
+			int extra = n.length() - MAX_LENGTH;
+
+			this.name = StringUtils.getLastColors(name.substring(0, extra)) + APPEND_CUT + name.substring(extra, name.length());
 		} else {
 			this.name = name;
 		}
@@ -271,11 +276,11 @@ public class GUI {
 			throw new IllegalArgumentException("can't set persistent item " + item.getId() + " in GUI " + getId() + ", void item");
 		}
 
-		// invalid slot
+		// invalid locations
 		if (item.getPreferredLocations().isEmpty()) {
-			throw new IllegalArgumentException("can't set persistent item " + item.getId() + " in GUI " + getId() + ", no slot found");
+			throw new IllegalArgumentException("can't set persistent item " + item.getId() + " in GUI " + getId() + ", no location configured");
 		}
-		for (IntegerPair preferredLocation : item.getLocations()) {
+		for (IntegerPair preferredLocation : item.getPreferredLocations()) {
 			if (preferredLocation.getA() > 0) {
 				throw new IllegalArgumentException("can't set persistent item " + item.getId() + " in GUI " + getId() + ", no preferred page can be specified");
 			} else if (preferredLocation.getB() < 0 /* no -1 for persistent items */ || preferredLocation.getB() >= type.getSize()) {
@@ -284,7 +289,7 @@ public class GUI {
 				throw new IllegalArgumentException("can't set persistent item " + item.getId() + " in GUI " + getId() + ", preferred slot " + preferredLocation.getB() + " is the back item slot");
 			}
 			GUIItem existing = getPersistentItem(preferredLocation.getB());
-			if (existing != null) {
+			if (existing != null && !existing.getId().equals(item.getId()) && (existing instanceof BorderGUIItem ? item instanceof BorderGUIItem : true)) {
 				throw new IllegalArgumentException("can't set persistent item " + item.getId() + " in GUI " + getId() + ", preferred slot " + preferredLocation.getB() + " already has persistent item " + existing.getId());
 			}
 		}
@@ -294,6 +299,12 @@ public class GUI {
 
 		// register it
 		persistentItems.put(item.getId(), item);
+
+		// ensure there's at least one page
+		// when we call refill() manually, we sometimes end up adding a persistent dynamic border at first, and it's added nowhere because there are no pages
+		if (getPageCount() == 0) {
+			createPage();
+		}
 
 		// add it on all pages
 		List<GUIItem> existingRegularItems = new ArrayList<>();
@@ -592,7 +603,7 @@ public class GUI {
 			PluginUtils.getGPlugins().forEach(plugin -> plugin.getGUIs().forEach(gui -> {
 				ProtocolHandler handler = ObjectUtils.castOrNull(((GUI) gui).handler, ProtocolHandler.class);
 				if (handler != null && handler.removeViewer(player)) {
-					((GUI) gui).onClose(player);  // also trigger on close watchers
+					handler.onClose(player);
 				}
 			}));
 		}
@@ -654,10 +665,25 @@ public class GUI {
 		if (fromCall != null) {
 			if (fromCall.getGUI() != null) {
 				fromCall.getGUI().openFor(clicker, fromCall.getPageIndex(), fromCall.getGUI().getFromCall(clicker));
-			} else {
-				clicker.closeInventory();
+				return;
 			}
 		}
+		clicker.closeInventory();
+	}
+
+	// ----- static
+	public static GUI getOpenGUI(Player player) {
+		return PluginUtils.getGPlugins().stream().flatMap(pl -> (Stream<GUI>) pl.getGUIs().stream()).filter(gui -> gui.handler.isViewer(player)).findFirst().orElse(null);
+	}
+
+	public static boolean hasOpenGUI(Player player) {
+		if (!player.getOpenInventory().getTopInventory().getType().equals(InventoryType.CRAFTING)) {  // default opened view is the player's crafting inventory
+			return true;
+		}
+		if (getOpenGUI(player) != null) {
+			return true;
+		}
+		return false;
 	}
 
 }

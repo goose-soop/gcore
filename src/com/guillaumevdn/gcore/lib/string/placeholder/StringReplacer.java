@@ -21,7 +21,7 @@ public final class StringReplacer {
 
 	private static final Pattern PATTERN = Pattern.compile("\\{(.*?)\\}");
 
-	private LowerCaseHashMap<Supplier<Object>> exactMatch = new LowerCaseHashMap<>();
+	private LowerCaseHashMap<Supplier<Object>> exactMatch = new LowerCaseHashMap<>(5, 1f);
 	private CustomMatcher customMatcher = null;
 	private String customMatcherDesc = null;
 	private boolean formatNumbers = true;

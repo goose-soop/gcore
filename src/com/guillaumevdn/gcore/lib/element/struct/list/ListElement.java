@@ -30,8 +30,8 @@ public abstract class ListElement<T extends Element> extends MapElement<String, 
 
 	private final boolean allowCompactNestedWrite;
 
-	public ListElement(String elementTypeName, boolean allowCompactNestedWrite, Element parent, String id, Need need, Text editorDescription) {
-		super(String.class, "list of " + elementTypeName, true, parent, id, need, editorDescription);
+	public ListElement(boolean allowCompactNestedWrite, Element parent, String id, Need need, Text editorDescription) {
+		super(String.class, parent, id, need, editorDescription);
 		this.allowCompactNestedWrite = allowCompactNestedWrite;
 	}
 

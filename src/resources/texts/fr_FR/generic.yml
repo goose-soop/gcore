@@ -77,6 +77,9 @@ messageMustHaveMoreItem: |
 messageMustHaveItem: |
   &7Vous avez besoin de &c{item} &7pour ceci.
 
+messageMustHaveItemNoDetail: |
+  &7Vous n'avez pas les items requis pour ceci.
+
 # -------------------- Item --------------------
 
 # Placeholders for this : {amount}, {type}, {durability}, {custom_model_data}, {enchantments}, {name}, {lore}

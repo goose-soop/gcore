@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import com.guillaumevdn.gcore.ConfigGCore;
 import com.guillaumevdn.gcore.lib.compatibility.variants.Variant;
 import com.guillaumevdn.gcore.lib.object.Optional;
+import com.guillaumevdn.gcore.lib.player.PlayerUtils;
 
 /**
  * @author GuillaumeVDN
@@ -46,7 +47,7 @@ public class Sound extends Variant<SoundData> {
 				play(sub, volume, pitch, forceLocation);
 			}
 		} else if (target instanceof OfflinePlayer) {
-			Player player = ((OfflinePlayer) target).getPlayer();
+			Player player = PlayerUtils.getOnline((OfflinePlayer) target);
 			if (player != null) player.playSound(forceLocation != null ? forceLocation : player.getLocation(), getData().getDataInstance(), volume, pitch);
 		} else if (target instanceof UUID) {
 			Player player = Bukkit.getPlayer((UUID) target);

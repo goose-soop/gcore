@@ -62,7 +62,7 @@ public class BoardStatistics extends BiKeyedBoardRemote<Statistic, UUID, Double>
 
 	@Override
 	protected RWHashMap<UUID, Double> valueFromJson(FileReader reader) {
-		RWHashMap<UUID, Double> fixed = new RWHashMap<>();
+		RWHashMap<UUID, Double> fixed = new RWHashMap<>(10, 1f);
 		Map map = getPlugin().getPrettyGson().fromJson(reader, Map.class);
 		if (map != null) {  // there's a null issue somewhere around here #1339
 			map.forEach((key, value) -> {
@@ -168,7 +168,7 @@ public class BoardStatistics extends BiKeyedBoardRemote<Statistic, UUID, Double>
 							continue;
 						}
 						double value = set.getDouble("value");
-						cache.computeIfAbsent(stat, __ -> new RWHashMap<>()).put(uuid, value);
+						cache.computeIfAbsent(stat, __ -> new RWHashMap<>(10, 1f)).put(uuid, value);
 					}
 				});
 	}

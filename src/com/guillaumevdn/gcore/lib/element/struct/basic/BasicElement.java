@@ -6,7 +6,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
+
+import javax.annotation.Nonnull;
 
 import com.guillaumevdn.gcore.TextEditorGeneric;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
@@ -20,6 +21,7 @@ import com.guillaumevdn.gcore.lib.gui.struct.ClickCall;
 import com.guillaumevdn.gcore.lib.gui.struct.ClickCall.ClickType;
 import com.guillaumevdn.gcore.lib.object.NeedType;
 import com.guillaumevdn.gcore.lib.object.ObjectUtils;
+import com.guillaumevdn.gcore.lib.object.Optional;
 import com.guillaumevdn.gcore.lib.string.StringUtils;
 import com.guillaumevdn.gcore.lib.string.Text;
 import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
@@ -31,15 +33,51 @@ public abstract class BasicElement<T> extends Element implements ParseableElemen
 
 	private final SizeTolerance sizeTolerance;
 	private final List<String> defaultValue;
-	private List<String> value = null;
-	private boolean isParseable = false;
-	private final List<BiConsumer<T, T>> watchers = new ArrayList<>();
+	private List<BiConsumer<T, T>> watchers = null;  // lazy ; almost no elements need watchers
 
-	public BasicElement(String typeName, SizeTolerance sizeTolerance, Element parent, String id, NeedType need, List<String> def, Text editorDescription) {
-		super(typeName, parent, id, need, editorDescription);
+	private boolean hasParseableLocations = false;
+	private List<String> rawValue = null;  // IF NO PLACEHOLDERS : this is lazy ; it'll be loaded on-demand (-> when using the editor, or in some particular cases) ; while the parse result (cache) will always be present
+
+	public BasicElement(SizeTolerance sizeTolerance, Element parent, String id, NeedType need, List<String> def, Text editorDescription) {
+		super(parent, id, need, editorDescription);
 		this.sizeTolerance = sizeTolerance;
 		this.defaultValue = def == null ? null : Collections.unmodifiableList(def);
+		this.hasParseableLocations = defaultValue != null && StringUtils.hasPlaceholders(defaultValue);
 		setValue(null);
+	}
+
+	// ----- cache and raw value management
+
+	private ParsedCache<T> parsedCache = new ParsedCache<T>() {
+		@Override
+		protected void beforeSet(Optional<T> value) {
+			if (value != null && value.isPresent()) {  // we successfully parsed it ; so we no longer need the raw value
+				rawValue = null;
+			} else {  // we're setting a null value, maybe we failed to parse it ; re-load it from cached value
+				loadRawValue();
+			}
+		}
+	};
+
+	@Override
+	public ParsedCache<T> getCache() {
+		return hasParseableLocations() ? null : parsedCache;
+	}
+
+	@Override
+	public void resetCache() {
+		parsedCache.clear();
+	}
+
+	protected abstract List<String> loadRawValueFrom(@Nonnull T value);
+
+	private void loadRawValue() {
+		if (rawValue == null) {
+			T value = !parsedCache.isPresent() ? null : parsedCache.get().orNull();
+			if (value != null) {
+				rawValue = Collections.unmodifiableList(loadRawValueFrom(value));
+			}
+		}
 	}
 
 	// ----- get
@@ -59,40 +97,47 @@ public abstract class BasicElement<T> extends Element implements ParseableElemen
 		return defaultValue == null ? null : CollectionUtils.asList(defaultValue);
 	}
 
-	public final List<String> getValue() {
-		return value;
+	public final List<String> getRawValue() {
+		loadRawValue();
+		return rawValue;
 	}
 
-	public final int getValueSize() {
-		return value == null ? 0 : value.size();
+	public final int getRawValueSize() {
+		loadRawValue();
+		return rawValue == null ? 0 : rawValue.size();
 	}
 
-	public final String getValueLine(int index) {
-		return value == null || index >= value.size() ? null : value.get(index);
+	public final String getRawValueLine(int index) {
+		loadRawValue();
+		return rawValue == null || index >= rawValue.size() ? null : rawValue.get(index);
 	}
 
-	public final List<String> getValueCopy() {  // this is actually used in one case, so not useless :erycJebaited:
-		return value == null ? null : CollectionUtils.asList(value);
+	public final List<String> getRawValueCopy() {
+		loadRawValue();
+		return rawValue == null ? null : CollectionUtils.asList(rawValue);
 	}
 
-	public final List<String> getValueCopyOrNewList() {
-		return value == null ? new ArrayList<>() : CollectionUtils.asList(value);
+	public final List<String> getRawValueCopyOrNewList() {
+		loadRawValue();
+		return rawValue == null ? new ArrayList<>(0) : CollectionUtils.asList(rawValue);
 	}
 
-	public final List<String> getValueOrDefault() {
-		return getValueOrDefaultOr(null);
+	public final List<String> getRawValueOrDefault() {
+		return getRawValueOrDefaultOr(null);
 	}
 
-	public final List<String> getValueOrDefaultOr(List<String> def) {
-		return value != null ? value : (defaultValue != null ? defaultValue : def);
+	public final List<String> getRawValueOrDefaultOr(List<String> def) {
+		loadRawValue();
+		return rawValue != null ? rawValue : (defaultValue != null ? defaultValue : def);
 	}
 
-	public final String getValueLineOrDefault(int index) {
-		return value != null && index < value.size() ? value.get(index) : (defaultValue != null && index < defaultValue.size() ? defaultValue.get(index) : null);
+	public final String getRawValueLineOrDefault(int index) {
+		loadRawValue();
+		return rawValue != null && index < rawValue.size() ? rawValue.get(index) : (defaultValue != null && index < defaultValue.size() ? defaultValue.get(index) : null);
 	}
 
-	public final void ifValueOrDefaultIsPresent(Consumer<List<String>> ifPresent) {
-		List<String> value = getValueOrDefault();
+	public final void ifRawValueOrDefaultIsPresent(Consumer<List<String>> ifPresent) {
+		List<String> value = getRawValueOrDefault();
 		if (value != null) {
 			ifPresent.accept(value);
 		}
@@ -100,34 +145,27 @@ public abstract class BasicElement<T> extends Element implements ParseableElemen
 
 	@Override
 	public final boolean hasParseableLocations() {
-		return isParseable;
+		return hasParseableLocations;
 	}
 
 	@Override
 	public final boolean isCurrentlyDefault() {
-		return (value == null && defaultValue != null) || Objects.deepEquals(value, defaultValue);
+		loadRawValue();
+		return (rawValue == null && defaultValue != null) || Objects.deepEquals(rawValue, defaultValue);
 	}
 
 	// ----- set
 	public final void setValue(List<String> newValue) {
 		// same value
-		if (newValue == null ? this.value == null : this.value != null && CollectionUtils.contentEquals(newValue, this.value)) {
+		loadRawValue();
+		if (newValue == null ? this.rawValue == null : this.rawValue != null && CollectionUtils.contentEquals(newValue, this.rawValue)) {
 			return;
 		}
 
 		// attempt to parse previous and new value for watchers
 		T previous = null, next = null;
-		try { previous = this.value.size() == 1 ? doParseString(this.value.get(0)) : doParseList(this.value); } catch (Throwable ignored) {}
+		try { previous = this.rawValue.size() == 1 ? doParseString(this.rawValue.get(0)) : doParseList(this.rawValue); } catch (Throwable ignored) {}
 		try { next = newValue.size() == 1 ? doParseString(newValue.get(0)) : doParseList(newValue); } catch (Throwable ignored) {}
-
-		// set value
-		if (newValue == null) {
-			this.value = null;
-			this.isParseable = false;
-		} else {
-			this.value = Collections.unmodifiableList(newValue.stream().map(line -> StringUtils.format(line).trim()).collect(Collectors.toList()));  // reformat since color parsing is made on read
-			this.isParseable = StringUtils.hasPlaceholders(newValue);
-		}
 
 		// reset valuesCache
 		resetCache();
@@ -135,14 +173,33 @@ public abstract class BasicElement<T> extends Element implements ParseableElemen
 			getParent().resetCache();
 		}
 
+		// set value
+		if (newValue == null) {
+			this.rawValue = null;
+			this.hasParseableLocations = defaultValue != null && StringUtils.hasPlaceholders(defaultValue);
+		} else {
+			List<String> v = new ArrayList<>(newValue.size());
+			for (String l : newValue) {
+				v.add(StringUtils.format(l).trim());  // reformat since color parsing is made on read
+			}
+			this.rawValue = Collections.unmodifiableList(v);
+			this.hasParseableLocations = StringUtils.hasPlaceholders(v);
+		}
+
 		// call watchers
-		for (BiConsumer<T, T> watcher : watchers) {
-			watcher.accept(previous, next);
+		if (watchers != null) {
+			for (BiConsumer<T, T> watcher : watchers) {
+				watcher.accept(previous, next);
+			}
 		}
 	}
 
 	public final void addWatcher(BiConsumer<T, T> watcher) {
-		watchers.add(watcher);
+		if (watchers == null) {
+			watchers = CollectionUtils.asList(watcher);
+		} else {
+			watchers.add(watcher);
+		}
 	}
 
 	// ----- loading and saving
@@ -181,34 +238,24 @@ public abstract class BasicElement<T> extends Element implements ParseableElemen
 	protected void doWrite() throws Throwable {
 		YMLConfiguration config = getSuperElement().getConfiguration();
 		String path = getConfigurationPath();
-		if (value == null || (defaultValue != null && CollectionUtils.contentEquals(value, defaultValue))) {
+
+		loadRawValue();
+		if (rawValue == null || (defaultValue != null && CollectionUtils.contentEquals(rawValue, defaultValue))) {
 			config.write(path, null);
 		} else {
-			config.write(path, value.size() == 1 ? value.get(0) : value);
+			config.write(path, rawValue.size() == 1 ? rawValue.get(0) : rawValue);
 		}
 	}
 
 	// ----- parsing
-	private ParsedCache<T> cache = new ParsedCache<>();
-
-	@Override
-	public ParsedCache<T> getCache() {
-		return hasParseableLocations() ? null : cache;
-	}
-
-	@Override
-	public void resetCache() {
-		cache.clear();
-	}
-
 	@Override
 	public final T doParse(Replacer replacer) throws ParsingError {
-		// no value
-		List<String> raw = value != null ? value : defaultValue;
+		loadRawValue();
+		List<String> raw = rawValue != null ? rawValue : defaultValue;
 		if (raw == null) {
 			return null;
 		}
-		// parse
+
 		List<String> parsed = replacer.parse(raw);
 		T result;
 		if (parsed.size() > 1) {
@@ -218,7 +265,7 @@ public abstract class BasicElement<T> extends Element implements ParseableElemen
 		} else {
 			result = doParseEmpty();
 		}
-		// return
+
 		return result;
 	}
 
@@ -237,7 +284,8 @@ public abstract class BasicElement<T> extends Element implements ParseableElemen
 	// ----- editor
 	@Override
 	public List<String> editorCurrentValue() {
-		return value != null ? value : defaultValue;
+		loadRawValue();
+		return rawValue != null ? rawValue : defaultValue;
 	}
 
 	@Override

@@ -44,13 +44,17 @@ public final class Node<V extends Element> implements IElement {
 	public String getKey() {
 		return key;
 	}
-	
+
 	public String getGlobalId() {
 		return globalId;
 	}
 
 	public V getValue() {
 		return value != null ? value : ref.getElement(globalId).orNull();
+	}
+
+	public boolean keyOrGlobalIdEquals(String id) {
+		return id.equalsIgnoreCase(key) || id.equalsIgnoreCase(globalId /* maybe null */);
 	}
 
 	// ----- abstract element

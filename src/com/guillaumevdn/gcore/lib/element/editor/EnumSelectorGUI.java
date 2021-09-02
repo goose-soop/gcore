@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import com.guillaumevdn.gcore.ConfigGCore;
 import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.TextEditorGeneric;
 import com.guillaumevdn.gcore.WorkerGCore;
@@ -42,8 +43,8 @@ public class EnumSelectorGUI<V> extends GUI {
 	private Function<V, String> customGetValueName;
 	private Mat icon;
 
-	private Map<UUID, Pair<Consumer<V>, Runnable>> awaiting = new HashMap<>();
-	private Set<UUID> awaitingSearchChat = new HashSet<>();
+	private Map<UUID, Pair<Consumer<V>, Runnable>> awaiting = new HashMap<>(1);
+	private Set<UUID> awaitingSearchChat = new HashSet<>(1);
 
 	public EnumSelectorGUI(Serializer<V> serializer, List<V> values, Mat icon, LinkedHashMap<V, Mat> valuesIcons, Function<V, String> customGetValueName) {
 		super(GCore.inst(), "editor_select_" + serializer.getTypeClass().getSimpleName(), TextEditorGeneric.guiSelectTitle.parseLine(), GUIType.CHEST_6_ROW, Option.DONT_UNREGISTER_ON_CLOSE);
@@ -98,9 +99,12 @@ public class EnumSelectorGUI<V> extends GUI {
 				}
 			}, () -> call.reopenGUI());
 		}));
+		setPersistentItem(new GUIItem("back", getType().getBackItemSlot(), ConfigGCore.backItem, call -> {
+			onBack(call.getClicker());
+		}));
 		return true;
 	}
-	
+
 	@Override
 	public void onPlayerInventoryClick(ClickCall call, ItemStack item) {
 		if (serializer.getTypeClass().equals(Mat.class)) {
@@ -145,7 +149,7 @@ public class EnumSelectorGUI<V> extends GUI {
 	}
 
 	// ----- static
-	private static final Map<Class<?>, EnumSelectorGUI<?>> selectorCache = new HashMap<>();
+	private static final Map<Class<?>, EnumSelectorGUI<?>> selectorCache = new HashMap<>(1);
 
 	public static <V> void openSelector(Player player, boolean cache, Serializer<V> serializer, Supplier<List<V>> values, Mat icon, Consumer<V> onSelect, Runnable onBack) {
 		openSelector(player, cache, serializer, values, icon, null, null, onSelect, onBack);

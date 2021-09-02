@@ -13,7 +13,7 @@ public final class Path {
 	private RWArrayList<ExploringPathPoint> points;
 
 	public Path(Point initialPoint) {
-		this(new RWArrayList<>());
+		this(new RWArrayList<>(5));
 		add(new ExploringPathPoint(null, initialPoint));
 	}
 

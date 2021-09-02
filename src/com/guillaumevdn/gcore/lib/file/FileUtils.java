@@ -12,6 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
@@ -103,6 +104,10 @@ public final class FileUtils {
 			Files.delete(file.toPath());
 			return true;
 		} catch (Throwable exception) {
+			if (exception instanceof NoSuchFileException) {
+				// ??? happens sometimes, alright
+				return true;
+			}
 			GCore.inst().getMainLogger().error("Couldn't delete file " + file + ", attempting to delete on exit", exception);
 			file.deleteOnExit();
 			return false;

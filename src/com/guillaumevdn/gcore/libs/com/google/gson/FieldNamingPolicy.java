@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF UNKNOWN KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
@@ -21,8 +21,8 @@ import java.util.Locale;
 
 /**
  * An enumeration that defines a few standard naming conventions for JSON field names.
- * This enumeration should be used in conjunction with {@link com.google.gson.GsonBuilder}
- * to configure a {@link com.google.gson.Gson} instance to properly translate Java field
+ * This enumeration should be used in conjunction with {@link com.guillaumevdn.gcore.libs.com.google.gson.GsonBuilder}
+ * to configure a {@link com.guillaumevdn.gcore.libs.com.google.gson.Gson} instance to properly translate Java field
  * names into the desired JSON field names.
  *
  * @author Inderjeet Singh

@@ -24,6 +24,8 @@ public class PlayerDataSaver {
 	private Map<UUID, ItemStack[]> lastArmor = new HashMap();
 	private Map<UUID, Scoreboard> lastScoreboard = new HashMap();
 	private Map<UUID, PotionEffect[]> lastPotionEffects = new HashMap();
+	private Map<UUID, Float> lastFlySpeeds = new HashMap();
+	private Map<UUID, Float> lastWalkSpeeds = new HashMap();
 	private Map<UUID, Boolean> allowFly = new HashMap();
 	private Map<UUID, GameMode> gamemodes = new HashMap();
 
@@ -36,16 +38,13 @@ public class PlayerDataSaver {
 		allowFly.put(player.getUniqueId(), Boolean.valueOf(player.getAllowFlight()));
 		gamemodes.put(player.getUniqueId(), player.getGameMode());
 
-		player.getInventory().clear();
-		player.getInventory().setHelmet(null);
-		player.getInventory().setChestplate(null);
-		player.getInventory().setLeggings(null);
-		player.getInventory().setBoots(null);
-		player.updateInventory();
-
+		PlayerUtils.clear(player);
 		resetEffects(player);
 
-		player.setAllowFlight(player.getGameMode().equals(GameMode.CREATIVE));
+		lastFlySpeeds.put(player.getUniqueId(), player.getFlySpeed());
+		lastWalkSpeeds.put(player.getUniqueId(), player.getWalkSpeed());
+
+		player.setAllowFlight(false);
 		player.setFlying(false);
 
 		player.setGameMode(GameMode.SURVIVAL);
@@ -91,6 +90,14 @@ public class PlayerDataSaver {
 
 		if (gamemodes.containsKey(player.getUniqueId())) {
 			player.setGameMode(gamemodes.remove(player.getUniqueId()));
+		}
+
+		if (lastFlySpeeds.containsKey(player.getUniqueId())) {
+			player.setFlySpeed(lastFlySpeeds.remove(player.getUniqueId()));
+		}
+
+		if (lastWalkSpeeds.containsKey(player.getUniqueId())) {
+			player.setFlySpeed(lastWalkSpeeds.remove(player.getUniqueId()));
 		}
 	}
 

@@ -21,7 +21,7 @@ public class ElementParticleScript extends ElementFakeEnum<ParticleScript> {
 		super(ParticleScript.class, parent, id, need, editorDescription);
 	}
 
-	private static RWWeakHashMap<Object, List<ParticleScript>> cache = new RWWeakHashMap<>();
+	private static RWWeakHashMap<Object, List<ParticleScript>> cache = new RWWeakHashMap<>(1, 1f);
 	@Override
 	protected List<ParticleScript> cacheOrBuild() {
 		return cachedOrBuild(cache, () -> ConfigGCore.particleScripts.values().stream().sorted(Comparator.comparing(e -> e.getId())));

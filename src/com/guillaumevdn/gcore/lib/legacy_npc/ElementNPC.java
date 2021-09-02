@@ -40,7 +40,7 @@ public final class ElementNPC extends ContainerElement implements SuperElement {
 	private ElementItem helmet = addItem("helmet", Need.optional(), ElementItemMode.BUILDABLE, Text.of("§7An helmet item"));
 
 	public ElementNPC(String id) {
-		super("GCore NPC", null, id, Need.optional(), null);
+		super(null, id, Need.optional(), null);
 	}
 
 	// ----- super element

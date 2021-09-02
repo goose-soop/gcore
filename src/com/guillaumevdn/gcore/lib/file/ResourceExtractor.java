@@ -24,6 +24,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.jar.JarFile;
 
 import org.bukkit.plugin.java.JavaPlugin;
@@ -36,11 +37,17 @@ public final class ResourceExtractor {
 	private JavaPlugin plugin;
 	private File targetFolder;
 	private final String resourcePath;
+	private List<String> ignoreStartingBy;
 
 	public ResourceExtractor(JavaPlugin plugin, File targetFolder, String resourcePath) {
+		this(plugin, targetFolder, resourcePath, null);
+	}
+
+	public ResourceExtractor(JavaPlugin plugin, File targetFolder, String resourcePath, List<String> ignoreStartingBy) {
 		this.plugin = plugin;
 		this.targetFolder = targetFolder;
 		this.resourcePath = resourcePath;
+		this.ignoreStartingBy = ignoreStartingBy;
 	}
 
 	// ----- methods
@@ -70,8 +77,11 @@ public final class ResourceExtractor {
 			try {
 				String path = entry.getName();
 
-				// not target
+				// not target, or must ignore
 				if (!path.startsWith(resourcePath)) {
+					return;
+				}
+				if (ignoreStartingBy != null && ignoreStartingBy.stream().anyMatch(ignore -> path.startsWith(resourcePath + ignore))) {
 					return;
 				}
 

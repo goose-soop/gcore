@@ -19,6 +19,9 @@ import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.events.PacketListener;
 import com.comphenix.protocol.injector.GamePhase;
 import com.guillaumevdn.gcore.GCore;
+import com.guillaumevdn.gcore.lib.compatibility.Version;
+import com.guillaumevdn.gcore.lib.object.ObjectUtils;
+import com.guillaumevdn.gcore.lib.reflection.ReflectionObject;
 
 public class NPCPacketListener implements PacketListener {
 
@@ -55,36 +58,40 @@ public class NPCPacketListener implements PacketListener {
 			if (entityId < NpcProtocols.ENTITY_ID_BASE) {
 				return;
 			}
+
 			// not a known npc
 			int npcId = entityId - NpcProtocols.ENTITY_ID_BASE;
 			NPC npc = NPCManager.inst() == null ? null : NPCManager.inst().getNpc(player, npcId);
 			if (npc == null) {
 				return;
 			}
+
 			// get action
 			NPCInteraction interaction = null;
 			try {
-				Field field = packet.getEntityUseActions().getField(0);
-				field.setAccessible(true);
-				Object value = field.get(packet.getEntityUseActions().getTarget());
-				String act = value.toString();
-				if (act != null) {
-					for (NPCInteraction npcAction : NPCInteraction.values()) {
-						if (act.equalsIgnoreCase(npcAction.name())) {
-							interaction = npcAction;
-							break;
-						}
-					}
+				String act;
+				if (Version.ATLEAST_1_17) {
+					act = ReflectionObject.of(packet.getHandle()).getField("b").invokeMethod("a").invokeMethod("toString").get();
+				} else {
+					Field field = packet.getEntityUseActions().getField(0);
+					field.setAccessible(true);
+					Object value = field.get(packet.getEntityUseActions().getTarget());
+					act = value.toString();
 				}
-			} catch (Throwable ignored) {}
+				interaction = ObjectUtils.safeValueOf(act, NPCInteraction.class);  // safeValueOf, we're only interested in INTERACT and ATTACK but there are others
+			} catch (Throwable exception) {
+				GCore.inst().getMainLogger().error("An error occured while handling GCore NPC interaction packet", exception);
+			}
 			if (interaction == null) {
 				return;
 			}
+
 			// last interact (already interacted)
 			if (System.currentTimeMillis() - lastInteract < 50L) {
 				return;
 			}
 			lastInteract = System.currentTimeMillis();
+
 			// trigger event (resync because spigot wants to >:|)
 			NPCInteraction interactionF = interaction; // :fbfDebilus:
 			GCore.inst().operateSync(() -> Bukkit.getPluginManager().callEvent(new PlayerInteractedNPCEvent(player, npc, interactionF)));

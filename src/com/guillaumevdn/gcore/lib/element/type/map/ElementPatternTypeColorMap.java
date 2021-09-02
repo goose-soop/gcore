@@ -21,7 +21,7 @@ import com.guillaumevdn.gcore.lib.string.Text;
 public class ElementPatternTypeColorMap extends ElementAbstractEnumMap<PatternType, ElementDyeColor> implements ParseableMapElement<PatternType, DyeColor, ElementDyeColor> {
 
 	public ElementPatternTypeColorMap(Element parent, String id, Need need, Text editorDescription) {
-		super(PatternType.class, "banner pattern type + color", parent, id, need, editorDescription, CollectionUtils.asList(PatternType.values()));
+		super(PatternType.class, parent, id, need, editorDescription, CollectionUtils.asList(PatternType.values()));
 	}
 
 	// ----- add

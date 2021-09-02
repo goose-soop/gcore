@@ -16,8 +16,8 @@ public class Window {
 	private int index;
 	private int stateId;
 	private GUI gui;
-	private RWHashMap<Integer, ItemStack> items = new RWHashMap<>();
-	private RWHashSet<Player> viewing = new RWHashSet<>();
+	private RWHashMap<Integer, ItemStack> items = new RWHashMap<>(10, 1f);
+	private RWHashSet<Player> viewing = new RWHashSet<>(1);
 
 	public Window(int id, int index, GUI gui) {
 		this.id = id;

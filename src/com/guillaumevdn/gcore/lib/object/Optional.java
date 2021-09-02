@@ -58,11 +58,11 @@ public final class Optional<T> {
 	}
 
 	public T orEmptyList() {
-		return orElse(() -> (T) new ArrayList<>());
+		return orElse(() -> (T) new ArrayList<>(0));
 	}
 
 	public T orEmptyMap() {
-		return orElse(() -> (T) new HashMap<>());
+		return orElse(() -> (T) new HashMap<>(0, 1f));
 	}
 
 	public T orEmptyText() {

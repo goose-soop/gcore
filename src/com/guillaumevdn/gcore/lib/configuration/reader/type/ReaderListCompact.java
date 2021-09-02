@@ -28,7 +28,7 @@ public class ReaderListCompact implements ThrowableFunction<ReaderContext, Boole
 	}
 
 	public static List<String> readContentFromString(String content) {
-		List<String> list = new ArrayList<>();
+		List<String> list = new ArrayList<>(1);  // I'd rather take a little more time when loading than having many collections with a 10% fill ratio
 		content = content.replace("\"\"", "@@@").replace("''", "@@&");
 		// read content
 		if (!content.isEmpty()) {

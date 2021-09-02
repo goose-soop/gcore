@@ -20,7 +20,7 @@ public class ElementSound extends ElementFakeEnum<Sound> {
 		super(Sound.class, parent, id, need, editorDescription);
 	}
 
-	private static RWWeakHashMap<Object, List<Sound>> cache = new RWWeakHashMap<>();
+	private static RWWeakHashMap<Object, List<Sound>> cache = new RWWeakHashMap<>(1, 1f);
 	@Override
 	protected List<Sound> cacheOrBuild() {
 		return cachedOrBuild(cache, () -> Sound.values().stream().sorted(Comparator.comparing(e -> e.getId())));

@@ -33,7 +33,7 @@ public final class AdapterUserNPCs extends DataAdapter<UserNPCs> {
 	public UserNPCs read(int version, DataIO reader) throws Throwable {
 		if (version == 1) {
 			UUID uuid = reader.readSerialized("uuid", UUID.class);
-			RWHashMap<Integer, UserNPC> npcs = reader.readObjectMapOrThrow("npcs", Integer.class, new RWHashMap<>(), (__, npcId, npcReader) -> {
+			RWHashMap<Integer, UserNPC> npcs = reader.readObjectMapOrThrow("npcs", Integer.class, new RWHashMap<>(10, 1f), (__, npcId, npcReader) -> {
 				Boolean shown = npcReader.readBoolean("shown");
 				String name = npcReader.readString("name");
 				String skinData = npcReader.readString("skinData");

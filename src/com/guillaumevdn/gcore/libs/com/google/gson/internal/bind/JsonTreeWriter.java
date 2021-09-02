@@ -9,17 +9,12 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF UNKNOWN KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
 
 package com.guillaumevdn.gcore.libs.com.google.gson.internal.bind;
-
-import java.io.IOException;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.List;
 
 import com.guillaumevdn.gcore.libs.com.google.gson.JsonArray;
 import com.guillaumevdn.gcore.libs.com.google.gson.JsonElement;
@@ -27,6 +22,10 @@ import com.guillaumevdn.gcore.libs.com.google.gson.JsonNull;
 import com.guillaumevdn.gcore.libs.com.google.gson.JsonObject;
 import com.guillaumevdn.gcore.libs.com.google.gson.JsonPrimitive;
 import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This writer creates a JsonElement.
@@ -53,7 +52,7 @@ public final class JsonTreeWriter extends JsonWriter {
   private String pendingName;
 
   /** the JSON element constructed by this writer. */
-  private JsonElement product = JsonNull.INSTANCE;
+  private JsonElement product = JsonNull.INSTANCE; // 
 
   public JsonTreeWriter() {
     super(UNWRITABLE_WRITER);

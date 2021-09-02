@@ -3,6 +3,7 @@ package com.guillaumevdn.gcore.lib.element.type.basic;
 import java.util.Collections;
 import java.util.List;
 
+import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.concurrency.RWHashMap;
 import com.guillaumevdn.gcore.lib.concurrency.RWWeakHashMap;
@@ -15,13 +16,13 @@ import com.guillaumevdn.gcore.lib.string.Text;
  */
 public abstract class ElementEnum<E extends Enum<E>> extends ElementAbstractEnum<E> {
 
-	private static RWWeakHashMap<Object, RWHashMap<Class<?>, List<?>>> valueCache = new RWWeakHashMap<>();
+	private static RWWeakHashMap<Object, RWHashMap<Class<?>, List<?>>> valueCache = new RWWeakHashMap<>(1, 1f);
 	private List<E> values;
 
 	public ElementEnum(Class<E> enumClass, Element parent, String id, Need need, Text editorDescription) {
 		super(enumClass, true, parent, id, need, editorDescription);
 
-		RWHashMap<Class<?>, List<?>> cache = valueCache.computeIfAbsent(getSuperElement().getPlugin().getLifecycleReference(), __ -> new RWHashMap<>());
+		RWHashMap<Class<?>, List<?>> cache = valueCache.computeIfAbsent(GCore.inst().getLifecycleReference(), __ -> new RWHashMap<>(10, 1f));  // use GCore lifecycle reference ; those are enums, not dynamic enums
 		values = (List<E>) cache.get(enumClass);
 		if (values == null) {
 			values = CollectionUtils.asList(enumClass.getEnumConstants());

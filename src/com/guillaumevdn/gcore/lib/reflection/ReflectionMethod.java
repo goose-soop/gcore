@@ -98,7 +98,7 @@ public class ReflectionMethod {
 	}
 
 	// ----- valuesCache
-	private static RWHashMap<Integer, ReflectionMethod> cache = new RWHashMap<>();
+	private static RWHashMap<Integer, ReflectionMethod> cache = new RWHashMap<>(10, 1f);
 
 	public static ReflectionMethod of(Class<?> original, String name, List<Class<?>> params) throws Throwable {
 		// hash by class name

@@ -20,7 +20,7 @@ public class ElementItemMatchList extends ListElement<ElementItemMatch> implemen
 	private boolean allowCustomCheck;
 
 	public ElementItemMatchList(Element parent, String id, Need need, boolean allowCustomCheck, Text editorDescription) {
-		super("item", true, parent, id, need, editorDescription);
+		super(true, parent, id, need, editorDescription);
 		this.allowCustomCheck = allowCustomCheck;
 	}
 

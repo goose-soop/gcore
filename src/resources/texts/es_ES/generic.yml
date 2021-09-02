@@ -90,11 +90,6 @@ textDescribeItemEnchantmentsIfHas: '> {enchantments}'
 textDescribeItemEnchantmentsLine: '{enchant} {level}'
 textDescribeItemSingleLine: '{amount}x {type} {name}'
 
-# -------------------- GUI --------------------
-
-guiConfirmName: |
-  &dConfirmar acción
-
 # -------------------- Format --------------------
 
 # For date format characters, see https://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html

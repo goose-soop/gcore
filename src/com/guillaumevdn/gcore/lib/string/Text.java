@@ -94,7 +94,7 @@ public interface Text {
 		}
 
 		public ReplacingText replace(Player player) {
-			this.replacer.with(replacer);
+			this.replacer.with(player);
 			return this;
 		}
 

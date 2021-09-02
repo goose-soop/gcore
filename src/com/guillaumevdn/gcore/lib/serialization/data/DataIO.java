@@ -37,7 +37,7 @@ import com.guillaumevdn.gcore.lib.tuple.Pair;
  */
 public final class DataIO {
 
-	private LinkedHashMap<String, Object> objects = new LinkedHashMap<>(); // not a lowercase one because we're encoding stuff in camelcase
+	private LinkedHashMap<String, Object> objects = new LinkedHashMap<>();  // not a lowercase one because we're encoding stuff in camelcase
 
 	// ----- get
 	public Set<String> getKeys() {
@@ -72,6 +72,7 @@ public final class DataIO {
 	public void write(String key, ItemStack value) throws Throwable {
 		if (value != null) {
 			writeObjectOrThrow(key, data -> {
+				data.write("version", AdapterItemStack.INSTANCE.getVersion());
 				AdapterItemStack.INSTANCE.write(value, data);
 			});
 		}
@@ -340,7 +341,7 @@ public final class DataIO {
 
 	@Nullable
 	public <K, V, M extends Map<K, V>> M readNullableObjectMapOrThrow(String key, Class<K> keyClass, M map, ThrowableTriFunction<String, K, DataIO, V> valueDeserializer) throws Throwable {
-		return readObjectOrThrow(key, mapReader -> {
+		readObjectOrThrow(key, mapReader -> {
 			Serializer<K> keySerializer = Serializer.find(keyClass);
 			for (String elementKey : mapReader.getKeys()) {
 				K elementK = keySerializer.deserialize(elementKey);
@@ -353,6 +354,7 @@ public final class DataIO {
 			}
 			return map;
 		});
+		return map;
 	}
 
 	@Nonnull
@@ -378,7 +380,7 @@ public final class DataIO {
 
 	@Nullable
 	public <K, V, M extends Map<K, V>> M readNullableSimpleMapOrThrow(String key, Class<K> keyClass, M map, ThrowableTriFunction<String, K, DataIO, V> valueDeserializer) throws Throwable {
-		return readObjectOrThrow(key, mapReader -> {
+		readObjectOrThrow(key, mapReader -> {
 			Serializer<K> keySerializer = Serializer.find(keyClass);
 			for (String elementKey : mapReader.getKeys()) {
 				K elementK = keySerializer.deserialize(elementKey);
@@ -391,6 +393,7 @@ public final class DataIO {
 			}
 			return map;
 		});
+		return map;
 	}
 
 	@Nullable
@@ -430,12 +433,12 @@ public final class DataIO {
 	}
 
 	@Nonnull
-	public <T, L extends List<T>> L readSerializedList(String key, Class<T> clazz, L resultList) {
+	public <T, L extends Collection<T>> L readSerializedList(String key, Class<T> clazz, L resultList) {
 		return readSerializedList(key, resultList, Serializer.find(clazz)::deserialize);
 	}
 
 	@Nonnull
-	public <T, L extends List<T>> L readSerializedList(String key, L resultList, Function<String, T> deserialized) {
+	public <T, L extends Collection<T>> L readSerializedList(String key, L resultList, Function<String, T> deserialized) {
 		Object rawValue = objects.get(key);
 		List<String> list = null;
 		if (rawValue != null) {

@@ -45,7 +45,7 @@ public class NBTCompound extends NBTBase {
 
 	// ----- get value
 	public final Object get(String key) throws Throwable {
-		return get(NBTType.ANY, key);
+		return get(getValueType(key), key);
 	}
 
 	public final Object get(NBTType type, String key) throws Throwable {
@@ -193,9 +193,17 @@ public class NBTCompound extends NBTBase {
 			}
 		}
 		for (String key : refKeys) {
-			// list
 			NBTType type = getValueType(key);
 			ConfigGCore.logspamItemNbt(this, () -> "Checking key " + key + ", type " + type);
+
+			// type don't match in other
+			NBTType typeOther = reference.getValueType(key);
+			if (type == null || !type.equals(typeOther)) {
+				ConfigGCore.logspamItemNbt(this, () -> "reference is not of same type (" + typeOther + ")");
+				return false;
+			}
+
+			// list
 			if (type.equals(NBTType.LIST)) {
 				if (!getList(key).match(reference.getList(key), exactMatch)) {
 					ConfigGCore.logspamItemNbt(this, () -> "list match failed");
@@ -212,7 +220,7 @@ public class NBTCompound extends NBTBase {
 			// value
 			else if (!type.equals(NBTType.UNKNOWN)) {
 				Object obj = get(type, key);
-				Object ref = reference.get(type, key);
+				Object ref = reference.get(typeOther, key);
 				if (!Objects.deepEquals(obj, ref)) {
 					ConfigGCore.logspamItemNbt(this, () -> "value match failed, this " + obj + ", ref " + ref);
 					return false;
@@ -231,9 +239,9 @@ public class NBTCompound extends NBTBase {
 			refKeys.removeAll(NBTItem.IGNORE_TAGS);
 		}
 		ConfigGCore.logspamItemNbt(this, () -> "Copying " + getName() + " from " + reference.getName());
-		ConfigGCore.logspamItemNbt(this, () -> " Ref keys " + reference.getKeys());
-		ConfigGCore.logspamItemNbt(this, () -> " This keys " + thisKeys);
-		ConfigGCore.logspamItemNbt(this, () -> " Copy keys " + refKeys);
+		ConfigGCore.logspamItemNbt(this, () -> "- Ref keys " + reference.getKeys());
+		ConfigGCore.logspamItemNbt(this, () -> "- This keys " + thisKeys);
+		ConfigGCore.logspamItemNbt(this, () -> "- Copy keys " + refKeys);
 		for (String key : refKeys) {
 			// list
 			NBTType type = reference.getValueType(key);

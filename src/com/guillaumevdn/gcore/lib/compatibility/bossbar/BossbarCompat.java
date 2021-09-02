@@ -126,7 +126,7 @@ public final class BossbarCompat {
 	private static final ReflectionProcedureConsumer<Bossbar> SET_COLOR = new ReflectionProcedureConsumer<Bossbar>()
 			.setIf(Version.ATLEAST_1_9, (bossbar) -> {
 				forExistingModernInstance(bossbar, instance -> {
-					Object style = Reflection.getEnum("org.bukkit.boss.BarColor").valueOf(bossbar.getColor().name());
+					Object style = Reflection.getEnum("org.bukkit.boss.BarColor").valueOf(bossbar.getColor().name()).justGet();
 					instance.invokeMethod("setColor", style);
 				});
 			});
@@ -139,7 +139,7 @@ public final class BossbarCompat {
 	private static final ReflectionProcedureConsumer<Bossbar> SET_STYLE = new ReflectionProcedureConsumer<Bossbar>()
 			.setIf(Version.ATLEAST_1_9, (bossbar) -> {
 				forExistingModernInstance(bossbar, instance -> {
-					Object style = Reflection.getEnum("org.bukkit.boss.BarStyle").valueOf(bossbar.getStyle().name());
+					Object style = Reflection.getEnum("org.bukkit.boss.BarStyle").valueOf(bossbar.getStyle().name()).justGet();
 					instance.invokeMethod("setStyle", style);
 				});
 			});
@@ -153,7 +153,7 @@ public final class BossbarCompat {
 			.setIf(Version.ATLEAST_1_9, (bossbar) -> {
 				forExistingModernInstance(bossbar, instance -> {
 					for (BossbarFlag bossbarFlag : BossbarFlag.values()) {
-						Object flag = Reflection.getEnum("org.bukkit.boss.BarFlag").valueOf(bossbarFlag.name());
+						Object flag = Reflection.getEnum("org.bukkit.boss.BarFlag").valueOf(bossbarFlag.name()).justGet();
 						instance.invokeMethod(bossbar.getFlags().contains(bossbarFlag) ? "addFlag" : "removeFlag", flag);
 					}
 				});
@@ -164,14 +164,14 @@ public final class BossbarCompat {
 	}
 
 	// ----- send temporary
-	public static Bossbar sendTemp(GPlugin plugin, String title, BossbarColor color, BossbarStyle style, Collection<BossbarFlag> flags, Collection<Player> players, long millis, boolean noAutoProgress) {
+	public static Bossbar sendTemp(GPlugin plugin, String title, BossbarColor color, BossbarStyle style, Collection<BossbarFlag> flags, Collection<Player> players, long millis, Double noAutoProgressForceProgress) {
 		int ticks = (int) (millis / 50L);
-		return ticks <= 0 ? null : sendTemp(plugin, title, color, style, flags, players, ticks, noAutoProgress);
+		return ticks <= 0 ? null : sendTemp(plugin, title, color, style, flags, players, ticks, noAutoProgressForceProgress);
 	}
 
-	public static Bossbar sendTemp(GPlugin plugin, String title, BossbarColor color, BossbarStyle style, Collection<BossbarFlag> flags, Collection<Player> players, int ticks, boolean noAutoProgress) {
+	public static Bossbar sendTemp(GPlugin plugin, String title, BossbarColor color, BossbarStyle style, Collection<BossbarFlag> flags, Collection<Player> players, int ticks, Double noAutoProgressForceProgress) {
 		Bossbar bossbar = new Bossbar(plugin, "temp_" + UUID.randomUUID(), title, color, style, flags, 1f, players);
-		bossbar.startTempAutoProgress(ticks, noAutoProgress);
+		bossbar.startTemp(ticks, noAutoProgressForceProgress);
 		return bossbar;
 	}
 

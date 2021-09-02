@@ -29,7 +29,7 @@ public class ElementItemMatch extends ParseableContainerElement<ItemMatch> {
 	private ElementItemCheck check;
 
 	public ElementItemMatch(Element parent, String id, Need need, boolean allowCustomCheck, Text editorDescription) {
-		super("item condition", parent, id, need, editorDescription);
+		super(parent, id, need, editorDescription);
 		check = !allowCustomCheck ? null : addItemCheck("check", Need.required(), TextEditorGeneric.descriptionItemMatchCheck);
 	}
 

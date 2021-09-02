@@ -10,6 +10,8 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 import javax.net.ssl.HttpsURLConnection;
 
+import org.bukkit.Bukkit;
+
 import com.guillaumevdn.gcore.GCore;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
@@ -61,8 +63,11 @@ public final class MojangUtils {
 
 	@Nullable
 	private static <T> T jsonRequest(String url, Class<T> answerType) throws Throwable {
-		HttpsURLConnection connection = (HttpsURLConnection) new URL(url).openConnection();
-		if (connection.getResponseCode() == HttpsURLConnection.HTTP_OK) {
+		HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+		final int responseCode = connection.getResponseCode();
+		final String responseMessage = connection.getResponseMessage();
+
+		if (responseCode == HttpsURLConnection.HTTP_OK) {
 			// read json
 			String json = "";
 			BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
@@ -73,13 +78,13 @@ public final class MojangUtils {
 			try {
 				return GCore.inst().getGson().fromJson(json, answerType);
 			} catch (Throwable exception) {
-				System.out.println("Raw json : " + json);
+				Bukkit.getLogger().info("Raw json : " + json);
 				throw new Error("couldn't read answer, for " + url, exception);
 			}
-		} else if (connection.getResponseCode() == HttpURLConnection.HTTP_NO_CONTENT || connection.getResponseCode() == 429 /* too many requests */) {
+		} else if (responseCode == HttpURLConnection.HTTP_NO_CONTENT || responseCode == 429 /* too many requests */) {
 			return null;
 		} else {
-			throw new Error("Reponse code " + connection.getResponseCode() + ", " + connection.getResponseMessage() + ", for " + url);
+			throw new Error("Reponse code " + responseCode + ", " + responseMessage + ", for " + url);
 		}
 	}
 

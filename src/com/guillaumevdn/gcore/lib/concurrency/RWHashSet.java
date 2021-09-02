@@ -30,6 +30,12 @@ public class RWHashSet<T> extends HashSet<T> {
 
 	private static final long serialVersionUID = -5108501966613387973L;
 
+	// -------------------- construct --------------------
+
+	public RWHashSet(int initialCapacity) {
+		super(initialCapacity);
+	}
+
 	// -------------------- lock --------------------
 
 	private final RWLock lock = new RWLock();
@@ -242,7 +248,7 @@ public class RWHashSet<T> extends HashSet<T> {
 	@Override
 	public final RWHashSet<T> clone() {
 		return lock.read(() -> {
-			RWHashSet<T> clone = new RWHashSet<>();
+			RWHashSet<T> clone = new RWHashSet<>(super.size());
 			clone.addAll(this);
 			return clone;
 		});

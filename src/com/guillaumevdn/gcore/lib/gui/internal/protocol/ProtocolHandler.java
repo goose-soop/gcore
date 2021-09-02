@@ -20,7 +20,7 @@ import com.guillaumevdn.gcore.lib.wrapper.WrapperBoolean;
 public class ProtocolHandler extends Handler {
 
 	public static final int WINDOW_ID = 72;  // signed byte ; don't go above 128
-	private RWArrayList<Window> pages = new RWArrayList<>();
+	private RWArrayList<Window> pages = new RWArrayList<>(5);
 	private ProtocolEvents events = new ProtocolEvents(this);
 
 	public ProtocolHandler(GUI gui) {
@@ -53,7 +53,7 @@ public class ProtocolHandler extends Handler {
 
 	@Override
 	public RWHashMap<Player, Integer> getViewers() {
-		RWHashMap<Player, Integer> viewers = new RWHashMap<>();
+		RWHashMap<Player, Integer> viewers = new RWHashMap<>(10, 1f);
 		pages.forEach(page -> {
 			page.getViewers().forEach(player -> viewers.put(player, page.getIndex()));
 		});

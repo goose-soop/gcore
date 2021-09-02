@@ -11,7 +11,7 @@ import com.guillaumevdn.gcore.lib.concurrency.RWLowerCaseHashMap;
 public abstract class TypableElementTypes<T extends TypableElementType> {
 
 	private final Class<T> typeClass;
-	private final RWLowerCaseHashMap<T> types = new RWLowerCaseHashMap<>();
+	private final RWLowerCaseHashMap<T> types = new RWLowerCaseHashMap<>(5, 1f);
 
 	public TypableElementTypes(Class<T> typeClass) {
 		this.typeClass = typeClass;

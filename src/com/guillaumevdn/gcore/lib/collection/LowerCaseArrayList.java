@@ -14,6 +14,10 @@ public class LowerCaseArrayList extends ArrayList<String> {
 
 	private static final long serialVersionUID = 8645174203269985787L;
 
+	public LowerCaseArrayList(int initialCapacity) {
+		super(initialCapacity);
+	}
+
 	@Override
 	public boolean containsAll(Collection<?> elements) {
 		return super.containsAll(lower(elements));

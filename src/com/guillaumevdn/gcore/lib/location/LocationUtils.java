@@ -250,12 +250,14 @@ public final class LocationUtils {
 	// ----- vector
 
 	// https://stackoverflow.com/questions/31225062/rotating-a-vector-by-angle-and-axis-in-java
-	/**
-	 * @param axis est un vecteur normal au plan dans lequel on veut faire tourner le vecteur
-	 * @param angle est un angle en radians
-	 */
-	private static final Vector rotationAxis = new Vector(0d, 1d, 0d);
+
+	private static final Vector upRotationAxis = new Vector(0d, 1d, 0d);
+
 	public static Vector rotateVector(Vector vec, double angleInRadians) {
+		return rotateVector(vec, angleInRadians, upRotationAxis);
+	}
+
+	public static Vector rotateVector(Vector vec, double angleInRadians, Vector rotationAxis) {
 		double x = vec.getX();
 		double y = vec.getY();
 		double z = vec.getZ();

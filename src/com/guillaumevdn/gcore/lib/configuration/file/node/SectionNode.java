@@ -23,7 +23,7 @@ import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
  */
 public class SectionNode extends ConfigNode {
 
-	private List<Node> nodes = new ArrayList<>();
+	private List<Node> nodes = new ArrayList<>(1);
 	private String trailingComment;
 	private SectionNodeType type;
 

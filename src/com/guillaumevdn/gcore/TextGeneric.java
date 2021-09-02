@@ -52,6 +52,7 @@ public enum TextGeneric implements TextEnumElement {
 	messageMustHaveCurrency,
 	messageMustHaveMoreItem,
 	messageMustHaveItem,
+	messageMustHaveItemNoDetail,
 
 	// ----- item
 	textDescribeItem,
@@ -66,9 +67,6 @@ public enum TextGeneric implements TextEnumElement {
 	textDescribeItemSingleLineEnchantmentsIfHas,
 	textDescribeItemSingleLineEnchantmentsLine,
 	textDescribeItemSingleLineSeparator,
-
-	// ----- gui
-	guiConfirmName,
 
 	// ----- format
 	dateTimeFormat

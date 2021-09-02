@@ -34,7 +34,7 @@ public class ElementPotionEffect extends ParseableContainerElement<PotionEffect>
 	private ElementBoolean icon = !Version.ATLEAST_1_13 ? null : addBoolean("icon", Need.optional(true), TextEditorGeneric.descriptionPotionEffectIcon);
 
 	public ElementPotionEffect(Element parent, String id, Need need, Text editorDescription) {
-		super("time limit", parent, id, need, editorDescription);
+		super(parent, id, need, editorDescription);
 	}
 
 	// ----- get

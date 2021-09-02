@@ -19,7 +19,7 @@ import com.guillaumevdn.gcore.lib.string.Text;
 public class ElementPositionList extends ListElement<ElementPosition> implements ParseableListElement<Position, ElementPosition> {
 
 	public ElementPositionList(Element parent, String id, Need need, Text editorDescription) {
-		super("position", true, parent, id, need, editorDescription);
+		super(true, parent, id, need, editorDescription);
 	}
 
 	// ----- element

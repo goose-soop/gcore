@@ -20,8 +20,8 @@ public class MultipleBasedParticleScriptExecution<K> {
 	private ParticleScript script;
 	private final Supplier<Map<K, Location>> locationSupplier;
 	private final boolean autoLoop;
-	private Map<K, Location> locations = new HashMap<>();
-	private RWHashMap<K, ParticleScriptExecution> executions = new RWHashMap<>();
+	private Map<K, Location> locations = new HashMap<>(1);
+	private RWHashMap<K, ParticleScriptExecution> executions = new RWHashMap<>(0, 1f);
 
 	public MultipleBasedParticleScriptExecution(GPlugin plugin, ParticleScript script, Supplier<Map<K, Location>> locationSupplier, boolean autoLoop) {
 		this.plugin = plugin;

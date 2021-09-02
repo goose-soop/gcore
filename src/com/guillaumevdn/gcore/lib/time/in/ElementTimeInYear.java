@@ -20,7 +20,7 @@ public class ElementTimeInYear extends ElementTimeIn<TimeInYear> {
 	private ElementInteger dayOfMonth = addInteger("day_of_month", Need.optional(0), 1, 31, TextEditorGeneric.descriptionElementTimeDayOfMonth);
 
 	public ElementTimeInYear(Element parent, String id, Need need, Text editorDescription) {
-		super("time in year", parent, id, need, editorDescription);
+		super(parent, id, need, editorDescription);
 	}
 
 	// ----- get

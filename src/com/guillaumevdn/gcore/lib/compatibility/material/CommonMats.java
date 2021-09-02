@@ -11,6 +11,7 @@ import com.guillaumevdn.gcore.lib.logic.ComparisonType;
 public final class CommonMats {
 
 	public static final Mat AIR = Mat.firstFromIdOrDataName("AIR").get();
+	public static final Mat ANVIL = Mat.firstFromIdOrDataName("ANVIL").get();
 	public static final Mat APPLE = Mat.firstFromIdOrDataName("APPLE").get();
 	public static final Mat ARROW = Mat.firstFromIdOrDataName("ARROW").get();
 	public static final Mat BEDROCK = Mat.firstFromIdOrDataName("BEDROCK").get();
@@ -24,6 +25,7 @@ public final class CommonMats {
 	public static final Mat CHEST = Mat.firstFromIdOrDataName("CHEST").get();
 	public static final Mat CHEST_MINECART = Mat.firstFromIdOrDataName("CHEST_MINECART").get();
 	public static final Mat CLOCK = Mat.firstFromIdOrDataName("CLOCK").get();
+	public static final Mat COBBLESTONE = Mat.firstFromIdOrDataName("COBBLESTONE").get();
 	public static final Mat COMMAND_BLOCK = Mat.firstFromIdOrDataName("COMMAND_BLOCK").get();
 	public static final Mat COMPARATOR = Mat.firstFromIdOrDataName("COMPARATOR").get();
 	public static final Mat COMPASS = Mat.firstFromIdOrDataName("COMPASS").get();

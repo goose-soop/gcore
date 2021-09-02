@@ -47,6 +47,7 @@ import com.guillaumevdn.gcore.lib.element.type.basic.ElementEntityTypeList;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementFireworkEffectType;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementFloat;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementFloatList;
+import com.guillaumevdn.gcore.lib.element.type.basic.ElementGameMode;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementHorseColorList;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementHorseStyleList;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementInteger;
@@ -128,11 +129,11 @@ import com.guillaumevdn.gcore.lib.time.in.ElementTimeInYear;
  */
 public abstract class ContainerElement extends AbstractMapElement<String, Element> {
 
-	private final LowerCaseArrayList startRowSlots = new LowerCaseArrayList();  // since elements are stored in a linked map, just save which elements trigger a new line
-	private final LowerCaseArrayList skipSlots = new LowerCaseArrayList();  // since elements are stored in a linked map, just save which elements trigger a slot skip
+	private final LowerCaseArrayList startRowSlots = new LowerCaseArrayList(0);  // since elements are stored in a linked map, just save which elements trigger a new line
+	private final LowerCaseArrayList skipSlots = new LowerCaseArrayList(0);  // since elements are stored in a linked map, just save which elements trigger a slot skip
 
-	public ContainerElement(String typeName, Element parent, String id, Need need, Text editorDescription) {
-		super(String.class, typeName, parent, id, need, editorDescription);
+	public ContainerElement(Element parent, String id, Need need, Text editorDescription) {
+		super(String.class, parent, id, need, editorDescription);
 	}
 
 	// ----- get
@@ -439,8 +440,8 @@ public abstract class ContainerElement extends AbstractMapElement<String, Elemen
 	public final ElementCommandRestriction addCommandRestriction(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementCommandRestriction(this, id, need, editorDescription)); }
 	public final ElementComparisonType addComparisonType(String id, Need need, Text editorDescription) { return add(new ElementComparisonType(this, id, need, editorDescription)); }
 	public final ElementComparisonType addComparisonType(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementComparisonType(this, id, need, editorDescription)); }
-	public final ElementConfigSection addConfigSection(String typeName, String id, Need need, Text editorDescription) { return add(new ElementConfigSection(typeName, this, id, need, editorDescription)); }
-	public final ElementConfigSection addConfigSection(String typeName, String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementConfigSection(typeName, this, id, need, editorDescription)); }
+	public final ElementConfigSection addConfigSection(String id, Need need, Text editorDescription) { return add(new ElementConfigSection(this, id, need, editorDescription)); }
+	public final ElementConfigSection addConfigSection(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementConfigSection(this, id, need, editorDescription)); }
 	public final ElementCurrency addCurrency(String id, Need need, Text editorDescription) { return add(new ElementCurrency(this, id, need, editorDescription)); }
 	public final ElementCurrency addCurrency(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementCurrency(this, id, need, editorDescription)); }
 	public final ElementCurrencyList addCurrencyList(String id, Need need, Text editorDescription) { return add(new ElementCurrencyList(this, id, need, editorDescription)); }
@@ -499,6 +500,8 @@ public abstract class ContainerElement extends AbstractMapElement<String, Elemen
 	public final ElementFloatList addFloatList(String id, Need need, float min, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementFloatList(this, id, need, min, editorDescription)); }
 	public final ElementFloatList addFloatList(String id, Need need, float min, float max, Text editorDescription) { return add(new ElementFloatList(this, id, need, min, max, editorDescription)); }
 	public final ElementFloatList addFloatList(String id, Need need, float min, float max, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementFloatList(this, id, need, min, max, editorDescription)); }
+	public final ElementGameMode addGameMode(String id, Need need, Text editorDescription) { return add(new ElementGameMode(this, id, need, editorDescription)); }
+	public final ElementGameMode addGameMode(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementGameMode(this, id, need, editorDescription)); }
 	public final ElementHorseColorList addHorseColorList(String id, Need need, Text editorDescription) { return add(new ElementHorseColorList(this, id, need, editorDescription)); }
 	public final ElementHorseColorList addHorseColorList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementHorseColorList(this, id, need, editorDescription)); }
 	public final ElementHorseStyleList addHorseStyleList(String id, Need need, Text editorDescription) { return add(new ElementHorseStyleList(this, id, need, editorDescription)); }

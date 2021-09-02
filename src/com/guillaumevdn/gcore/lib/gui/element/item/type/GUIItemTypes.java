@@ -3,8 +3,8 @@ package com.guillaumevdn.gcore.lib.gui.element.item.type;
 import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.lib.element.struct.container.typable.TypableElementTypes;
 import com.guillaumevdn.gcore.lib.gui.element.item.type.types.TypeBack;
-import com.guillaumevdn.gcore.lib.gui.element.item.type.types.TypeDynamicBorderLinear;
 import com.guillaumevdn.gcore.lib.gui.element.item.type.types.TypeNone;
+import com.guillaumevdn.gcore.lib.gui.element.item.type.types.border.TypeDynamicBorderLinear;
 
 /**
  * @author GuillaumeVDN

@@ -162,7 +162,7 @@ public final class MigrationV8Data extends Migration {
 
 	private UserNPCs migrateUserData(UUID uuid, String fromString, FileReader fromFile, Map<Integer, ElementNPC> npcsConfig) throws Throwable {
 		V7User v7 = fromString != null ? usersGson.fromJson(fromString, V7User.class) : usersGson.fromJson(fromFile, V7User.class);
-		RWHashMap<Integer, UserNPC> npcs = new RWHashMap<>();
+		RWHashMap<Integer, UserNPC> npcs = new RWHashMap<>(10, 1f);
 
 		if (v7 != null /* happens somehow */ && v7.npcs != null) {
 			for (int npcId : v7.npcs.keySet()) {

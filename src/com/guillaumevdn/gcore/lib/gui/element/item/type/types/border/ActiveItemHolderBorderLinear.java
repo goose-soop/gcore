@@ -1,4 +1,4 @@
-package com.guillaumevdn.gcore.lib.gui.element.item.type.types;
+package com.guillaumevdn.gcore.lib.gui.element.item.type.types.border;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -59,7 +59,8 @@ public final class ActiveItemHolderBorderLinear extends ActiveItemHolder {
 
 			// parse settings
 			try {
-				locations = element.parseLocations(getInstance().getReplacer());
+				locations = element.parseLocations(getInstance().getReplacer());  // new list
+
 				if (locations.isEmpty()) {  // no point in going any further
 					itemIconOn = null;
 					return;
@@ -75,7 +76,7 @@ public final class ActiveItemHolderBorderLinear extends ActiveItemHolder {
 			}
 
 			// find actual locations by setting 'off' items everywhere
-			GUIItem placeholder = new GUIItem(getHolder().getId(), itemIconOff, clickSound, overrideClicks, null);
+			BorderGUIItem placeholder = new BorderGUIItem(getHolder().getId(), itemIconOff, clickSound, overrideClicks, null);
 			placeholder.setPreferredLocations(locations);
 			getInstance().setItem(placeholder, persistent);
 			locations = placeholder.getLocations();
@@ -86,7 +87,7 @@ public final class ActiveItemHolderBorderLinear extends ActiveItemHolder {
 			previousOn = new ArrayList<>();
 		}
 		// already initialized
-		else if (itemIconOn != null /* if parsing error */) {
+		else if (itemIconOn != null /* null if parsing error */) {
 			if (locations.isEmpty()) {
 				return;  // happens very rarily, no idea why
 			}

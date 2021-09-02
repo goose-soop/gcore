@@ -72,7 +72,7 @@ public final class ElementItem extends ParseableContainerElement<ItemStack> {
 	private final ElementConfigSection nbt;
 
 	public ElementItem(Element parent, String id, Need need, ElementItemMode mode, Text editorDescription) {
-		super("item", parent, id, need, editorDescription);
+		super(parent, id, need, editorDescription);
 		this.mode = mode;
 
 		type = addMat("type", mode.requireType() ? Need.required() : Need.optional(), TextEditorGeneric.descriptionItemType);
@@ -86,7 +86,7 @@ public final class ElementItem extends ParseableContainerElement<ItemStack> {
 		name = addString("name", Need.optional(), TextEditorGeneric.descriptionItemName);
 		lore = addStringList("lore", Need.optional(), TextEditorGeneric.descriptionItemLore);
 
-		nbt = addConfigSection("nbt tags", "nbt", Need.optional(), SlotPlacement.START_ROW, TextEditorGeneric.descriptionItemNbt);
+		nbt = addConfigSection("nbt", Need.optional(), SlotPlacement.START_ROW, TextEditorGeneric.descriptionItemNbt);
 
 		// add watcher of type for specific metas
 		type.addWatcher((previous, next) -> {
@@ -184,11 +184,21 @@ public final class ElementItem extends ParseableContainerElement<ItemStack> {
 	// ----- read/import
 	@Override
 	protected void doRead() throws Throwable {
+		List<String> keys = getSuperElement().getConfiguration().readKeysForSectionCopyIfEmpty(getConfigurationPath());  // this creates a new list
 		type.read();  // read type first so it'll trigger watcher that will add elements
+
+		// read elements
 		for (Element element : values()) {
 			if (!element.equals(type)) {
 				element.read();
 			}
+			keys.remove(element.getId());
+		}
+
+		// look for unknown options and log them
+		//keys.removeAll(IGNORE_OPTIONS);
+		for (String key : keys) {
+			getSuperElement().addLoadError("found unknown option '" + key + "' at path '" + (getConfigurationPath().isEmpty() ? key : getConfigurationPath() + "." + key) + "'");
 		}
 	}
 

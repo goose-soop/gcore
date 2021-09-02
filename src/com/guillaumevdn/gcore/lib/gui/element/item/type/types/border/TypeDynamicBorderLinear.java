@@ -1,4 +1,4 @@
-package com.guillaumevdn.gcore.lib.gui.element.item.type.types;
+package com.guillaumevdn.gcore.lib.gui.element.item.type.types.border;
 
 import com.guillaumevdn.gcore.ConfigGCore;
 import com.guillaumevdn.gcore.TextEditorGeneric;

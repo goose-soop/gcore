@@ -13,8 +13,8 @@ public class CurrencyVault extends Currency {
 
 	private ReflectionObject economy;
 
-	public CurrencyVault() {
-		super("VAULT", "Vault");
+	public CurrencyVault(String id) {
+		super(id, "Vault");
 	}
 
 	// ----- initialization
@@ -23,7 +23,7 @@ public class CurrencyVault extends Currency {
 		Class<?> economyClass = Class.forName("net.milkbowl.vault.economy.Economy");
 		RegisteredServiceProvider reg = Bukkit.getServicesManager().getRegistration(economyClass);
 		economy = reg == null ? null : ReflectionObject.of(reg).invokeMethod("getProvider");
-		return economy != null;
+		return economy != null && economy.justGet() != null;
 	}
 
 	// ----- methods

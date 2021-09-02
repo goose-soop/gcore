@@ -14,7 +14,7 @@ import com.guillaumevdn.gcore.lib.string.Text;
 public class ElementGUIItemList extends ListElement<ElementGUIItem> {
 
 	public ElementGUIItemList(Element parent, String id, Need need, Text editorDescription) {
-		super("GUI item", true, parent, id, need, editorDescription);
+		super(true, parent, id, need, editorDescription);
 	}
 
 	// ----- element

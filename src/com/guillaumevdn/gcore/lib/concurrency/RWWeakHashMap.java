@@ -28,6 +28,12 @@ import com.guillaumevdn.gcore.lib.wrapper.WrapperBoolean;
  */
 public class RWWeakHashMap<K, V> extends WeakHashMap<K, V> {
 
+	// -------------------- construct --------------------
+
+	public RWWeakHashMap(int initialCapacity, float loadFactor) {
+		super(initialCapacity, loadFactor);
+	}
+
 	// -------------------- utils --------------------
 
 	protected K keyModifier(Object key) {  // key modifiers for subclasses
@@ -118,7 +124,7 @@ public class RWWeakHashMap<K, V> extends WeakHashMap<K, V> {
 
 	public final WeakHashMap<K, V> copy() {
 		return lock(() -> {
-			WeakHashMap<K, V> copy = new WeakHashMap<>();
+			WeakHashMap<K, V> copy = new WeakHashMap<>(super.size());
 			Iterator<Entry<K, V>> it = super.entrySet().iterator();
 			while (it.hasNext()) {
 				Entry<K, V> next = it.next();
@@ -263,7 +269,7 @@ public class RWWeakHashMap<K, V> extends WeakHashMap<K, V> {
 	@Override
 	public final RWWeakHashMap<K, V> clone() {
 		return lock(() -> {
-			RWWeakHashMap<K, V> clone = new RWWeakHashMap<>();
+			RWWeakHashMap<K, V> clone = new RWWeakHashMap<>(super.size(), 1f);
 			clone.putAll(this);
 			return clone;
 		});

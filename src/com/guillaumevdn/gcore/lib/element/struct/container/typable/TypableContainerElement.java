@@ -17,8 +17,8 @@ public abstract class TypableContainerElement<T extends TypableElementType> exte
 	private final TypableElementTypes<T> types;
 	private final ElementTypableElementType<T> type;
 
-	public TypableContainerElement(TypableElementTypes<T> types, String valueTypeName, Element parent, String id, Need need, Text editorDescription) {
-		super(valueTypeName, parent, id, need, editorDescription);
+	public TypableContainerElement(TypableElementTypes<T> types, Element parent, String id, Need need, Text editorDescription) {
+		super(parent, id, need, editorDescription);
 		this.types = types;
 		this.type = addType();
 	}
@@ -89,7 +89,7 @@ public abstract class TypableContainerElement<T extends TypableElementType> exte
 
 	@Override
 	public List<String> editorCurrentValue() {
-		return CollectionUtils.asList(getTypeElement().getValueOrDefault());
+		return CollectionUtils.asList(getTypeElement().getRawValueOrDefault());
 	}
 
 }

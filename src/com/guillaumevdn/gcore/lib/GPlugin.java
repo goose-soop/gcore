@@ -56,6 +56,7 @@ import com.guillaumevdn.gcore.lib.string.Text;
 import com.guillaumevdn.gcore.lib.string.TextFile;
 import com.guillaumevdn.gcore.libs.com.google.gson.Gson;
 import com.guillaumevdn.gcore.libs.com.google.gson.GsonBuilder;
+import com.guillaumevdn.gcore.libs.org.bstats.Metrics;
 
 /**
  * @author GuillaumeVDN
@@ -65,21 +66,26 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 	private final int spigotResourceId;
 	private final String mainCommandName;
 	private final String mainCommandHelpAlias;
-	private Command mainCommand = null;
-	private final List<Class<? extends Migration>> migrations;
 	private final Class<C> configurationClass;
-	private C configuration = null;
 	private final Class<P> permissionContainerClass;
+	private final String dataContainerFolderName;
+	private final List<Class<? extends Migration>> migrations;
+
+	private Command mainCommand = null;
+	private C configuration = null;
 	private P permissionContainer = null;
-	private final RWLowerCaseHashMap<TextFile<?>> textFiles = new RWLowerCaseHashMap<>();
-	private final RWLowerCaseHashMap<Board> data = new RWLowerCaseHashMap<>();
-	private final RWLowerCaseHashMap<Command> commands = new RWLowerCaseHashMap<>();
-	private final RWLowerCaseHashMap<Listener> listeners = new RWLowerCaseHashMap<>();
-	private final RWLowerCaseHashMap<Task> tasks = new RWLowerCaseHashMap<>();
-	private final RWLowerCaseHashMap<Logger> loggers = new RWLowerCaseHashMap<>();
-	private final RWLowerCaseHashMap<GUI> guis = new RWLowerCaseHashMap<>();
-	private final RWLowerCaseHashMap<Bossbar> bossbars = new RWLowerCaseHashMap<>();
-	private final RWLowerCaseHashMap<Integration> integrations = new RWLowerCaseHashMap<>();
+
+	private final RWLowerCaseHashMap<TextFile<?>> textFiles = new RWLowerCaseHashMap<>(5, 1f);
+	private final RWLowerCaseHashMap<Board> data = new RWLowerCaseHashMap<>(5, 1f);
+	private final RWLowerCaseHashMap<Command> commands = new RWLowerCaseHashMap<>(5, 1f);
+	private final RWLowerCaseHashMap<Listener> listeners = new RWLowerCaseHashMap<>(5, 1f);
+	private final RWLowerCaseHashMap<Task> tasks = new RWLowerCaseHashMap<>(5, 1f);
+	private final RWLowerCaseHashMap<Logger> loggers = new RWLowerCaseHashMap<>(5, 1f);
+	private final RWLowerCaseHashMap<GUI> guis = new RWLowerCaseHashMap<>(5, 1f);
+	private final RWLowerCaseHashMap<Bossbar> bossbars = new RWLowerCaseHashMap<>(5, 1f);
+	private final RWLowerCaseHashMap<Integration> integrations = new RWLowerCaseHashMap<>(5, 1f);
+	private Metrics metrics = null;
+
 	private Logger mainLogger = new Logger(this, getName() + "-" + getDescription().getVersion(), true, true, false);  // define it temporarily for start
 	private boolean activated = false;
 	private Object lifecycleReference = new Object();  // changed on every reload ; allows to create WeakHashMap caches that reset on reload
@@ -90,13 +96,14 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 		return FileUtils.createGsonBuilder();
 	}
 
-	public GPlugin(int spigotResourceId, String mainCommandName, String mainCommandHelpAlias, Class<C> configurationClass, Class<P> permissionContainerClass, Class<? extends Migration>... migrations) {
+	public GPlugin(int spigotResourceId, String mainCommandName, String mainCommandHelpAlias, Class<C> configurationClass, Class<P> permissionContainerClass, String dataContainerFolderName, Class<? extends Migration>... migrations) {
 		this.spigotResourceId = spigotResourceId;
 		this.mainCommandName = mainCommandName;
 		this.mainCommandHelpAlias = mainCommandHelpAlias;
 		this.migrations = CollectionUtils.asUnmodifiableList(migrations);
 		this.configurationClass = configurationClass;
 		this.permissionContainerClass = permissionContainerClass;
+		this.dataContainerFolderName = dataContainerFolderName;
 	}
 
 	// ----- get
@@ -112,6 +119,22 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 		return mainCommandHelpAlias;
 	}
 
+	public final Class<C> getConfigurationClass() {
+		return configurationClass;
+	}
+
+	public final Class<P> getPermissionContainerClass() {
+		return permissionContainerClass;
+	}
+
+	public final String getDataContainerFolderName() {
+		return dataContainerFolderName;
+	}
+
+	public final List<Class<? extends Migration>> getMigrations() {
+		return migrations;
+	}
+
 	public final Command getMainCommand() {
 		return mainCommand;
 	}
@@ -120,24 +143,12 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 		return null;
 	}
 
-	public final Class<C> getConfigurationClass() {
-		return configurationClass;
-	}
-
 	public final C getConfiguration() {
 		return configuration;
 	}
 
-	public final Class<P> getPermissionContainerClass() {
-		return permissionContainerClass;
-	}
-
 	public final P getPermissionContainer() {
 		return permissionContainer;
-	}
-
-	public final List<Class<? extends Migration>> getMigrations() {
-		return migrations;
 	}
 
 	public final YMLConfiguration loadConfigurationFile(String path) {
@@ -220,8 +231,6 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 	protected void registerTexts() {
 	}
 
-	public abstract File getDefaultTextsFolder();
-
 	protected void registerData() {
 	}
 
@@ -301,6 +310,11 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 			// register types
 			registerTypes();
 
+			// trigger other plugins
+			// do this before config load, so that integrations from other plugins are registered (integrations are usually type registration and such, so it must be done here, so it loads before)
+			// integrations from THIS plugin though might still need a loading delay if said plugins are enabled after config load
+			triggerEnableInOtherPlugins();
+
 			// register texts
 			try {
 				registerTexts();
@@ -311,7 +325,7 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 
 			// save default configs
 			try {
-				int savedConfig = new ResourceExtractor(this, new File(getDataFolder() + "/"), "resources/").extract(false, true);
+				int savedConfig = new ResourceExtractor(this, new File(getDataFolder() + "/"), "resources/", extractDefaultConfigIgnoreStartingPaths()).extract(false, true);
 				if (savedConfig > 0) mainLogger.info("Saved " + StringUtils.pluralize(savedConfig + " default configuration file", savedConfig));
 			} catch (Throwable exception) {
 				failEnable("Couldn't extract default config file ", exception);
@@ -443,7 +457,12 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 			registerListener("bossbar", new Listener() {
 				@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 				public void event(PlayerQuitEvent event) {
-					bossbars.iterateAndModify((id, bossbar, remover, breaker) -> bossbar.handleDisconnect(event.getPlayer()));
+					bossbars.iterateAndModify((id, bossbar, remover, breaker) -> {
+						bossbar.handleDisconnect(event.getPlayer());
+						if (bossbar.getPlayers().isEmpty()) {
+							remover.set(true);
+						}
+					});
 				}
 				@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 				public void event(PlayerTeleportEvent event) {
@@ -476,15 +495,26 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 				}
 			});
 
+			// enable metrics (do not re-do this on plugin reload)
+			try {
+				if (metrics == null) {
+					metrics = new Metrics(this);
+				}
+			} catch (Throwable exception) {
+				getMainLogger().error("Could not initialize metrics", exception);
+			}
+
 			// mark as activated
 			activated = true;
 			Bukkit.getConsoleSender().sendMessage("§a[" + getName() + "-" + getDescription().getVersion() + "] Successfully enabled");
 
-			// trigger other plugins
-			triggerEnableInOtherPlugins();
 		} catch (Throwable exception) {
 			failEnable("Couldn't enable", exception);
 		}
+	}
+
+	protected List<String> extractDefaultConfigIgnoreStartingPaths() {
+		return null;
 	}
 
 	private void triggerEnableInOtherPlugins() {
@@ -620,6 +650,10 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 	}
 
 	public final boolean reload(ThrowableRunnable callback) {
+		return reload(callback, false);
+	}
+
+	private final boolean reload(ThrowableRunnable callback, boolean fromGCore) {
 		if (reloading) {
 			return true;
 		}
@@ -632,7 +666,7 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 						PluginUtils.getGPlugins().forEach(plugin -> {
 							try {
 								if (!plugin.equals(GCore.inst())) {
-									plugin.reload(null);
+									plugin.reload(null, true);
 								}
 							} catch (Throwable ignored) {}
 						});
@@ -649,11 +683,15 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 					return;
 				}
 			});
+			reloaded(fromGCore);
 			return true;
 		} catch (Throwable exception) {
 			failEnable("Couldn't reload plugin", exception);
 			return false;
 		}
+	}
+
+	protected void reloaded(boolean dueToGCore) {
 	}
 
 	// ----- update notification
@@ -666,6 +704,10 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 		// can show update notifications
 		else if (getConfiguration().updateNotification() && spigotResourceId > 0 && !equals(GCore.inst())) {
 			operateAsync(() -> {
+				if (Bukkit.isPrimaryThread()) {
+					return;  // apparently can't be async, maybe the plugin is stopping or something
+				}
+
 				String response = PluginUtils.getOfficialVersion(this);
 				// unknown server response
 				if (response.isEmpty() || response.equals("unknown_server") || response.equals("Invalid resource") || response.contains("?resource=id")) {
@@ -700,6 +742,10 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 	}
 
 	// ----- texts
+	public final File getDefaultTextsFolder() {
+		return getDataFile("/" + dataContainerFolderName + "/default_texts/");
+	}
+
 	public final void registerTextFile(TextFile textFile) {
 		textFiles.put(textFile.getFilePath(), textFile);
 	}
@@ -715,7 +761,7 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 					File langFile = new File(langFolder + "/" + textFile.getFilePath());
 					LowerCaseHashMap<List<String>> texts = readTextsFromFile(textFile.getValues().keySet(), langFile);
 					// mark texts as loaded and get missing texts to add to file
-					LowerCaseHashMap<Text> missing = new LowerCaseHashMap<>();
+					LowerCaseHashMap<Text> missing = new LowerCaseHashMap<>(10, 0.75f);
 					Set<String> missingDisplay = new HashSet<>();
 					for (String textId : textFile.getValues().keySet()) {
 						Text text = textFile.getValues().get(textId);
@@ -760,7 +806,7 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 	}
 
 	private LowerCaseHashMap<List<String>> readTextsFromFile(Set<String> keys, File file) throws Throwable {
-		LowerCaseHashMap<List<String>> texts = new LowerCaseHashMap<>();
+		LowerCaseHashMap<List<String>> texts = new LowerCaseHashMap<>(10, 0.75f);
 		if (file.exists()) {
 			YMLConfiguration config = new YMLConfiguration(this, file);
 			for (String key : keys) {

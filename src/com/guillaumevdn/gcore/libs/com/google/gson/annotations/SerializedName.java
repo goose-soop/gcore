@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF UNKNOWN KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
@@ -26,10 +26,10 @@ import java.lang.annotation.Target;
  * An annotation that indicates this member should be serialized to JSON with
  * the provided name value as its field name.
  *
- * <p>This annotation will override any {@link com.google.gson.FieldNamingPolicy}, including
- * the default field naming policy, that may have been set on the {@link com.google.gson.Gson}
+ * <p>This annotation will override any {@link com.guillaumevdn.gcore.libs.com.google.gson.FieldNamingPolicy}, including
+ * the default field naming policy, that may have been set on the {@link com.guillaumevdn.gcore.libs.com.google.gson.Gson}
  * instance. A different naming policy can set using the {@code GsonBuilder} class. See
- * {@link com.google.gson.GsonBuilder#setFieldNamingPolicy(com.google.gson.FieldNamingPolicy)}
+ * {@link com.guillaumevdn.gcore.libs.com.google.gson.GsonBuilder#setFieldNamingPolicy(com.google.gson.FieldNamingPolicy)}
  * for more information.</p>
  *
  * <p>Here is an example of how this annotation is meant to be used:</p>
@@ -53,6 +53,7 @@ import java.lang.annotation.Target;
  * MyClass target = new MyClass("v1", "v2", "v3");
  * Gson gson = new Gson();
  * String json = gson.toJson(target);
+ * Bukkit.getLogger().info(json);
  *
  * ===== OUTPUT =====
  * {"name":"v1","name1":"v2","c":"v3"}
@@ -71,7 +72,7 @@ import java.lang.annotation.Target;
  * </pre>
  * Note that MyClass.b is now deserialized from either name1, name2 or name3.
  *
- * @see com.google.gson.FieldNamingPolicy
+ * @see com.guillaumevdn.gcore.libs.com.google.gson.FieldNamingPolicy
  *
  * @author Inderjeet Singh
  * @author Joel Leitch

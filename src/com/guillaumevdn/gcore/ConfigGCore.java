@@ -56,6 +56,8 @@ public class ConfigGCore extends GPluginConfig {
 
 	public static List<String> commandsAliasesPlugins;
 	public static List<String> commandsAliasesItemRead;
+	public static List<String> commandsAliasesItemReadChat;
+	public static List<String> commandsAliasesItemReadClick;
 	public static List<String> commandsAliasesExport;
 
 	// ----- variants
@@ -143,6 +145,8 @@ public class ConfigGCore extends GPluginConfig {
 		commandsAliasesPlugins = CollectionUtils.asLowercaseList(baseConfig.readMandatoryStringList("commands_aliases.plugins"));
 		commandsAliasesPlugins = CollectionUtils.asLowercaseList(baseConfig.readMandatoryStringList("commands_aliases.plugins"));
 		commandsAliasesItemRead = CollectionUtils.asLowercaseList(baseConfig.readStringList("commands_aliases.itemread", CollectionUtils.asList("itemread", "ir")));
+		commandsAliasesItemReadChat = CollectionUtils.asLowercaseList(baseConfig.readStringList("commands_aliases.itemreadchat", CollectionUtils.asList("itemreadchat", "irc")));
+		commandsAliasesItemReadClick = CollectionUtils.asLowercaseList(baseConfig.readStringList("commands_aliases.itemreadclick", CollectionUtils.asList("itemreadclick", "irclick")));
 		commandsAliasesExport = CollectionUtils.asLowercaseList(baseConfig.readMandatoryStringList("commands_aliases.export"));
 
 		// materials
@@ -197,7 +201,7 @@ public class ConfigGCore extends GPluginConfig {
 		GCore.inst().positionTypes = new PositionTypes();
 		GCore.inst().guiItemTypes = new GUIItemTypes();
 
-		particleScripts = new LowerCaseHashMap<>();
+		particleScripts = new LowerCaseHashMap<>(5, 1f);
 		loadParticleScripts(GCore.inst().getDataFile("particle_scripts/"));
 		Currency.values().forEach(Currency::enable);
 

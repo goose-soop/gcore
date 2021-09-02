@@ -42,7 +42,7 @@ public class ElementWorld extends ElementValue<World> {
 	public void onEditorClick(ClickCall call) {
 		// left-click : enter value
 		if (call.getType().equals(ClickType.LEFT)) {
-			WorkerGCore.inst().awaitChatWithSuggestedValue(call.getClicker(), TextEditorGeneric.messageElementBasicEditSuggestCurrent, getValueLineOrDefault(0), value -> {
+			WorkerGCore.inst().awaitChatWithSuggestedValue(call.getClicker(), TextEditorGeneric.messageElementBasicEditSuggestCurrent, getRawValueLineOrDefault(0), value -> {
 				if (StringUtils.hasPlaceholders(value)) {
 					setValue(CollectionUtils.asList(value));
 				} else {

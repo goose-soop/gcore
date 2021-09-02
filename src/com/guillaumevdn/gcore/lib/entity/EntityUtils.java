@@ -7,13 +7,20 @@ import java.util.UUID;
 import java.util.function.Function;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.FireworkEffect;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.meta.FireworkMeta;
 
+import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.compatibility.Version;
+import com.guillaumevdn.gcore.lib.number.NumberUtils;
 
 /**
  * @author GuillaumeVDN
@@ -70,6 +77,21 @@ public final class EntityUtils {
 			}
 		}
 		return result;
+	}
+
+	// ----- misc
+	public static void spawnRandomFirework(Location location) {
+		Firework firework = (Firework) location.getWorld().spawnEntity(location, EntityType.FIREWORK);
+		FireworkMeta meta = firework.getFireworkMeta();
+		meta.addEffect(FireworkEffect.builder()
+				.with(CollectionUtils.randomArray(FireworkEffect.Type.values()))
+				.withColor(Color.fromRGB(NumberUtils.random(0, 255), NumberUtils.random(0, 255), NumberUtils.random(0, 255)))
+				.withFade(Color.fromRGB(NumberUtils.random(0, 255), NumberUtils.random(0, 255), NumberUtils.random(0, 255)))
+				.trail(NumberUtils.random())
+				.flicker(NumberUtils.random())
+				.build());
+		firework.setFireworkMeta(meta);
+
 	}
 
 }

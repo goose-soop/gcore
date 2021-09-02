@@ -18,11 +18,11 @@ public final class PositionCache<V> {
 	private int initialCapacityZ, initialCapacityY;
 
 	public PositionCache() {
-		this(500, 1, 1);
+		this(250, 1, 1);
 	}
 
 	public PositionCache(int initialCapacityX, int initialCapacityZ, int initialCapacityY) {
-		map = new RWHashMap<>(initialCapacityX);
+		map = new RWHashMap<>(initialCapacityX, 0.75f);
 	}
 
 	// ----- get
@@ -93,7 +93,7 @@ public final class PositionCache<V> {
 
 	// ----- util
 	private RWHashMap<Integer, V> getY(int x, int z) {
-		return map.computeIfAbsent(x, __ -> new RWHashMap<>(initialCapacityZ)).computeIfAbsent(z, __ -> new RWHashMap<>(initialCapacityY));
+		return map.computeIfAbsent(x, __ -> new RWHashMap<>(initialCapacityZ, 0.75f)).computeIfAbsent(z, __ -> new RWHashMap<>(initialCapacityY, 0.75f));
 	}
 
 }

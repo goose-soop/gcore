@@ -34,8 +34,8 @@ import com.guillaumevdn.gcore.lib.tuple.Pair;
 public class ReverseSplitLowerCaseMap<V> {
 
 	private final char separator;
-	private final Map<Integer, Object> base = new HashMap<>(); // we directly use the part hashcode as a key
-	private final Map<Integer, V> standalone = new HashMap<>(); // for keys with no separator
+	private final Map<Integer, Object> base = new HashMap<>(1, 1f);  // we directly use the part hashcode as a key
+	private final Map<Integer, V> standalone = new HashMap<>(1, 1f);  // for keys with no separator
 
 	public ReverseSplitLowerCaseMap(char separator) {
 		this.separator = separator;
@@ -45,20 +45,23 @@ public class ReverseSplitLowerCaseMap<V> {
 	private Pair<Map<Integer, V>, Integer> findParent(String elementKey) {
 		elementKey = elementKey.toLowerCase();
 		int count = StringUtils.countChar(elementKey, separator);
+
 		// standalone
 		if (count == 0) {
 			return Pair.of(standalone, elementKey.hashCode());
 		}
+
 		// find closest parent
 		int end = elementKey.length();
 		Map<Integer, Object> parent = base;
 		while (--count >= 0) {
 			int begin = elementKey.lastIndexOf(separator, end - 1);
 			int keyPart = elementKey.substring(begin + 1, end).hashCode();
+
 			// parent don't exist yet, create it
 			Object existingForKey = parent.get(keyPart);
 			if (existingForKey == null) {
-				parent.put(keyPart, existingForKey = new HashMap<>());
+				parent.put(keyPart, existingForKey = new HashMap<>(1));
 				parent = (Map<Integer, Object>) existingForKey;
 			}
 			// parent already exists
@@ -67,14 +70,16 @@ public class ReverseSplitLowerCaseMap<V> {
 			}
 			// key exists but it's not a parent ; move it
 			else {
-				Map<Integer, Object> sub = new HashMap<>();
+				Map<Integer, Object> sub = new HashMap<>(1);
 				sub.put(0, existingForKey);
 				parent.put(keyPart, sub);
 				parent = sub;
 			}
+
 			// next
 			end = begin;
 		}
+
 		// maybe it's element 0
 		int remaining = elementKey.substring(0, end).hashCode();
 		Object value = parent.get(remaining);

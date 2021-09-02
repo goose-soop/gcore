@@ -9,18 +9,12 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF UNKNOWN KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
 
 package com.guillaumevdn.gcore.libs.com.google.gson.internal.bind;
-
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 import com.guillaumevdn.gcore.libs.com.google.gson.Gson;
 import com.guillaumevdn.gcore.libs.com.google.gson.JsonElement;
@@ -37,6 +31,11 @@ import com.guillaumevdn.gcore.libs.com.google.gson.reflect.TypeToken;
 import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonReader;
 import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonToken;
 import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonWriter;
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Adapts maps to either JSON objects or JSON arrays.
@@ -50,6 +49,7 @@ import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonWriter;
  *   Map<Point, String> original = new LinkedHashMap<Point, String>();
  *   original.put(new Point(5, 6), "a");
  *   original.put(new Point(8, 8), "b");
+ *   Bukkit.getLogger().info(gson.toJson(original, type));
  * }</pre>
  * The above code prints this JSON object:<pre>   {@code
  *   {
@@ -61,8 +61,8 @@ import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonWriter;
  * just the {@link Object#toString() toString()} of the map key. Attempting to
  * convert the above JSON to an object fails with a parse exception:
  * <pre>com.google.gson.JsonParseException: Expecting object found: "(5,6)"
- *   at com.google.gson.JsonObjectDeserializationVisitor.visitFieldUsingCustomHandler
- *   at com.google.gson.ObjectNavigator.navigateClassFields
+ *   at com.guillaumevdn.gcore.libs.com.google.gson.JsonObjectDeserializationVisitor.visitFieldUsingCustomHandler
+ *   at com.guillaumevdn.gcore.libs.com.google.gson.ObjectNavigator.navigateClassFields
  *   ...</pre>
  *
  * <h3>Maps as JSON arrays</h3>

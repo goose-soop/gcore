@@ -43,7 +43,7 @@ public class ElementLocation extends ElementValue<Location> {
 		// left-click : enter value
 		if (call.getType().equals(ClickType.LEFT)) {
 			call.getClicker().closeInventory();
-			WorkerGCore.inst().awaitChatWithSuggestedValue(call.getClicker(), TextEditorGeneric.messageElementBasicEditSuggestCurrent, getValueLineOrDefault(0), value -> {
+			WorkerGCore.inst().awaitChatWithSuggestedValue(call.getClicker(), TextEditorGeneric.messageElementBasicEditSuggestCurrent, getRawValueLineOrDefault(0), value -> {
 				if (StringUtils.hasPlaceholders(value)) {
 					setValue(CollectionUtils.asList(value));
 				} else {

@@ -8,6 +8,7 @@ import com.guillaumevdn.gcore.lib.concurrency.RWHashMap;
 import com.guillaumevdn.gcore.lib.data.board.keyed.KeyReference;
 import com.guillaumevdn.gcore.lib.function.QuadriConsumer;
 import com.guillaumevdn.gcore.lib.function.ThrowableQuadriConsumer;
+import com.guillaumevdn.gcore.lib.legacy_npc.NPCManager;
 import com.guillaumevdn.gcore.lib.serialization.data.DataIO;
 import com.guillaumevdn.gcore.lib.wrapper.WrapperBoolean;
 
@@ -23,7 +24,7 @@ public final class UserNPCs {
 	public UserNPCs(UUID uuid) {
 		this.uuid = uuid;
 		this.ref = new KeyReference<>(uuid);
-		this.npcs = new RWHashMap<>();
+		this.npcs = new RWHashMap<>(NPCManager.inst().getNPCsConfig().size(), 1f);
 	}
 
 	public UserNPCs(UUID uuid, RWHashMap<Integer, UserNPC> npcs) {

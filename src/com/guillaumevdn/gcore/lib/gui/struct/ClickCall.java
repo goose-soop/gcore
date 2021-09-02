@@ -49,6 +49,10 @@ public class ClickCall {
 	// ----- shortcuts
 
 	public void reopenGUI() {
+		if (!gui.isActive()) {
+			gui.activate();
+			gui.refill();
+		}
 		gui.openFor(clicker, pageIndex, gui.getFromCall(clicker));
 	}
 
@@ -58,7 +62,7 @@ public class ClickCall {
 	 */
 	public ClickCall getAncestorFor(ElementGUI targetGUI) {
 		ClickCall c = this;
-		while (c != null) {
+		for (int tries = 0; c != null && tries < 25 /* more than enough, but necessary #1897 #1932 */; ++tries) {
 			if (c.getGUI().getId().startsWith("instance_" + targetGUI.getId() + "_")) {
 				return c.getGUI().getFromCall(clicker);
 			}
@@ -87,6 +91,8 @@ public class ClickCall {
 		DOUBLE_CLICK,
 		DROP,
 		CONTROL_DROP,
+		SWAP_OFFHAND,
+
 		// doesn't work for vanilla handling
 		NUMBER_KEY_1,
 		NUMBER_KEY_2,

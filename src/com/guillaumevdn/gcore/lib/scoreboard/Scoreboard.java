@@ -33,7 +33,7 @@ public final class Scoreboard {
 	private Supplier<Boolean> taskPreProcessor;
 
 	private Set<ScoreboardEntry> currentEntries = new HashSet<>();
-	private Map<Integer, Team> teams = new HashMap<>();
+	private Map<Integer, Team> teams = new HashMap<>(1);
 	private org.bukkit.scoreboard.Scoreboard bukkit;
 	private Objective objective;
 
@@ -56,6 +56,10 @@ public final class Scoreboard {
 
 	public Player getPlayer() {
 		return player;
+	}
+
+	public org.bukkit.scoreboard.Scoreboard getBukkit() {
+		return bukkit;
 	}
 
 	// ----- start/stop
@@ -102,82 +106,82 @@ public final class Scoreboard {
 		if (!active || !player.isOnline()) {
 			return;
 		}
-
-		// preprocessor
 		if (taskPreProcessor != null && !taskPreProcessor.get()) {
 			return;
 		}
 
-		// maybe the scoreboard was unregistered for some reason : restart it
-		try {
-			objective.getDisplayName();  // this throws an IllegalStateException if the component is unregistered
-		} catch (Throwable ignored) {
-			stop();
-			start();
-		}
-
-		// build
-		ScoreboardBuilder builder = new ScoreboardBuilder();
-		updater.accept(builder);
-
-		// update title
-		if (!objective.getDisplayName().equals(builder.getTitle())) {
-			objective.setDisplayName(builder.getTitle());
-		}
-
-		// build new entries
-		Map<String, Integer> offsets = new HashMap<>();
-		List<ScoreboardEntry> builtEntries = builder.entries().map(entry -> buildEntry(entry, offsets)).collect(Collectors.toList());
-		Set<ScoreboardEntry> newEntries = new HashSet<>();
-
-		//System.out.println("---------------------------------------------");
-
-		// process entries
-		int score = builtEntries.size();
-		for (ScoreboardEntry entry : builtEntries) {
-			--score;
-
-			// ensure team existence
-			Team team = null;
-			if (entry.getPrefix() != null) {
-				int teamId = (entry.getPrefix() + entry.getSuffix()).hashCode();
-				team = teams.get(teamId);
-				if (team == null) {
-					String teamName = "" + teamId;
-					team = bukkit.getTeam(teamName);  // sometimes it apparently already exists (#1664 ; synchronization issue ?)
-					if (team == null) {
-						team = bukkit.registerNewTeam(teamName);
-					}
-					team.setPrefix(entry.getPrefix());
-					team.setSuffix(entry.getSuffix());
-					teams.put(teamId, team);
-					//System.out.println("--created team, " + teamId);
-				} else {
-					//System.out.println("--team exists, " + teamId);
-				}
+		getPlugin().operateSync(() -> {
+			// maybe the scoreboard was unregistered for some reason : restart it
+			try {
+				objective.getDisplayName();  // this throws an IllegalStateException if the component is unregistered
+			} catch (Throwable ignored) {
+				stop();
+				start();
 			}
 
-			// set score and team
-			//System.out.println("--set score to " + score + " for " + entry);
-			entry.setScore(score);
-			entry.setTeam(team);
-			newEntries.add(entry);
-			//entries.put(entry.hashCode(), entry);
-		}
+			// build
+			ScoreboardBuilder builder = new ScoreboardBuilder();
+			updater.accept(builder);
 
-		// reset scores of entries that are still present on the bukkit scoreboard but should be removed
-		currentEntries.stream().filter(entry -> !newEntries.contains(entry)).forEach(entry -> {
-			//System.out.println(">>>>> reset entry " + entry);
-			entry.reset(bukkit);
-		});
+			// update title
+			if (!objective.getDisplayName().equals(builder.getTitle())) {
+				objective.setDisplayName(builder.getTitle());
+			}
 
-		//System.out.println("-- scores remaining : " + ReflectionObject.of(bukkit).getField("board").getField("playerScores").invokeMethod("keySet"));
+			// build new entries
+			Map<String, Integer> offsets = new HashMap<>();
+			List<ScoreboardEntry> builtEntries = builder.entries().map(entry -> buildEntry(entry, offsets)).collect(Collectors.toList());
+			Set<ScoreboardEntry> newEntries = new HashSet<>();
 
-		// set new scores
-		currentEntries = newEntries;  // we do be collecting garbage
-		newEntries.forEach(entry -> {
-			//System.out.println(">>>>> set entry " + entry + " to score " + entry.getScore());
-			entry.apply(objective);
+			//Bukkit.getLogger().info("---------------------------------------------");
+
+			// process entries
+			int score = builtEntries.size();
+			for (ScoreboardEntry entry : builtEntries) {
+				--score;
+
+				// ensure team existence
+				Team team = null;
+				if (entry.getPrefix() != null) {
+					int teamId = (entry.getPrefix() + entry.getSuffix()).hashCode();
+					team = teams.get(teamId);
+					if (team == null) {
+						String teamName = "" + teamId;
+						team = bukkit.getTeam(teamName);  // sometimes it apparently already exists (#1664 ; synchronization issue ?)
+						if (team == null) {
+							team = bukkit.registerNewTeam(teamName);
+						}
+						team.setPrefix(entry.getPrefix());
+						team.setSuffix(entry.getSuffix());
+						teams.put(teamId, team);
+						//Bukkit.getLogger().info("--created team, " + teamId);
+					} else {
+						//Bukkit.getLogger().info("--team exists, " + teamId);
+					}
+				}
+
+				// set score and team
+				//Bukkit.getLogger().info("--set score to " + score + " for " + entry);
+				entry.setScore(score);
+				entry.setTeam(team);
+				newEntries.add(entry);
+				//entries.put(entry.hashCode(), entry);
+			}
+
+			// reset scores of entries that are still present on the bukkit scoreboard but should be removed
+			currentEntries.stream().filter(entry -> !newEntries.contains(entry)).forEach(entry -> {
+				//Bukkit.getLogger().info(">>>>> reset entry " + entry);
+				entry.reset(bukkit);
+			});
+
+			//Bukkit.getLogger().info("-- scores remaining : " + ReflectionObject.of(bukkit).getField("board").getField("playerScores").invokeMethod("keySet"));
+
+			// set new scores
+			currentEntries = newEntries;  // we do be collecting garbage
+			newEntries.forEach(entry -> {
+				//Bukkit.getLogger().info(">>>>> set entry " + entry + " to score " + entry.getScore());
+				entry.apply(objective);
+			});
 		});
 	}
 

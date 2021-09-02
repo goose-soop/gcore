@@ -53,7 +53,7 @@ public abstract class ElementLinear<T extends LinearObjectType, L extends Linear
 	public void onEditorClick(ClickCall call) {
 		// right-click : edit parameters
 		if (call.getType().equals(ClickType.RIGHT)) {
-			WorkerGCore.inst().awaitChatWithSuggestedValue(call.getClicker(), TextEditorGeneric.messageElementBasicEditSuggestCurrent, getValueLineOrDefault(0), value -> {
+			WorkerGCore.inst().awaitChatWithSuggestedValue(call.getClicker(), TextEditorGeneric.messageElementBasicEditSuggestCurrent, getRawValueLineOrDefault(0), value -> {
 				Pair<T, List<String>> current = getCurrentPair();
 				if (StringUtils.hasPlaceholders(value)) {
 					setValue(current.getA() == null ? null : CollectionUtils.asList(current.getA().name() + " " + value));
@@ -101,10 +101,10 @@ public abstract class ElementLinear<T extends LinearObjectType, L extends Linear
 	}
 
 	private Pair<T, List<String>> getCurrentPair() {
-		if (getValue() == null) {
+		if (getRawValue() == null) {
 			return Pair.of(null, new ArrayList<>());
 		}
-		List<String> split = StringUtils.split(getValueLine(0), " ", 1);
+		List<String> split = StringUtils.split(getRawValueLine(0), " ", 1);
 		T type = getTypeSerializer().deserialize(split.get(0));
 		split.remove(0);
 		return Pair.of(type, split.isEmpty() || type == null ? new ArrayList<>() : split);

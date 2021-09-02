@@ -22,7 +22,7 @@ public final class FakeConfigSuperElement extends Element implements SuperElemen
 	private String parentPath;
 
 	public FakeConfigSuperElement(YMLConfiguration config, String parentPath) {
-		super("FakeConfigSuperElement", null, parentPath.replace('.', '_'), NeedType.OPTIONAL, null);
+		super(null, parentPath.replace('.', '_'), NeedType.OPTIONAL, null);
 		this.config = config;
 		this.parentPath = parentPath;
 	}

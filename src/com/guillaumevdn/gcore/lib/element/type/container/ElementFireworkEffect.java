@@ -33,7 +33,7 @@ public class ElementFireworkEffect extends ParseableContainerElement<FireworkEff
 	private ElementBoolean trail = addBoolean("trail", Need.optional(false), TextEditorGeneric.descriptionFireworkEffectTrail);
 
 	public ElementFireworkEffect(Element parent, String id, Need need, Text editorDescription) {
-		super("potion effect", parent, id, need, editorDescription);
+		super(parent, id, need, editorDescription);
 	}
 
 	// ----- get

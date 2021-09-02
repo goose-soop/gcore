@@ -14,10 +14,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.WeakHashMap;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
@@ -38,15 +36,22 @@ import com.guillaumevdn.gcore.lib.wrapper.WrapperBoolean;
 public final class CollectionUtils {
 
 	// ----- create collection
-	public static <T> List<T> asList(Consumer<List<T>> filler) {
-		List<T> list = new ArrayList<>();
-		filler.accept(list);
-		return list;
+
+	public static <T> List<T> asList(Collection<T> collection) {
+		List<T> result = new ArrayList<>(collection.size());
+		for (T t : collection) {
+			result.add(t);
+		}
+		return result;
 	}
 
 	@SafeVarargs
 	public static <T> List<T> asList(T... elements) {
-		return Stream.of(elements).collect(Collectors.toList());
+		List<T> result = new ArrayList<>(elements.length);
+		for (T t : elements) {
+			result.add(t);
+		}
+		return result;
 	}
 
 	public static <T> List<T> asList(Iterable<T> iterable) {
@@ -58,7 +63,7 @@ public final class CollectionUtils {
 	}
 
 	public static List<Integer> asList(int[] elements) {
-		List<Integer> list = new ArrayList<>();
+		List<Integer> list = new ArrayList<>(elements.length);
 		for (int elem : elements) {
 			list.add(elem);
 		}
@@ -66,43 +71,39 @@ public final class CollectionUtils {
 	}
 
 	public static <T> List<T> createList(Class<T> type, Collection<?> content) {
-		List<T> list = new ArrayList<>();
+		List<T> list = new ArrayList<>(content.size());
 		for (Object elem : content) {
 			list.add((T) elem);
 		}
 		return list;
 	}
 
-	public static List<String> asLowercaseList(String... elements) {
-		LowerCaseArrayList list = new LowerCaseArrayList();
+	public static LowerCaseArrayList asLowercaseList(String... elements) {
+		LowerCaseArrayList list = new LowerCaseArrayList(elements.length);
 		Stream.of(elements).forEach(element -> list.add(element));
 		return list;
 	}
 
 	public static LowerCaseArrayList asLowercaseList(Collection<String> elements) {
-		LowerCaseArrayList list = new LowerCaseArrayList();
+		LowerCaseArrayList list = new LowerCaseArrayList(elements.size());
 		elements.forEach(element -> list.add(element));
 		return list;
 	}
 
 	public static LowerCaseHashSet asLowercaseSet(String... elements) {
-		LowerCaseHashSet list = new LowerCaseHashSet();
+		LowerCaseHashSet list = new LowerCaseHashSet(elements.length);
 		for (String element : elements) list.add(element);
 		return list;
 	}
 
 	public static LowerCaseHashSet asLowercaseSet(Collection<String> elements) {
-		LowerCaseHashSet list = new LowerCaseHashSet();
+		LowerCaseHashSet list = new LowerCaseHashSet(elements.size());
 		elements.forEach(element -> list.add(element));
 		return list;
 	}
 
-	public static <T> List<T> asList(Collection<T> collection) {
-		return collection.stream().collect(Collectors.toList());
-	}
-
 	public static <T> List<T> asListMultiple(Class<T> typeClass, Object... objects) {
-		List<T> list = new ArrayList<>();
+		List<T> list = new ArrayList<>(objects.length);
 		addMultiple(objects, typeClass, list);
 		return list;
 	}
@@ -125,10 +126,6 @@ public final class CollectionUtils {
 				collection.add(casted);
 			}
 		}
-	}
-
-	public static <T> List<T> asUnmodifiableList(Consumer<List<T>> filler) {
-		return Collections.unmodifiableList(asList(filler));
 	}
 
 	@SafeVarargs
@@ -158,7 +155,7 @@ public final class CollectionUtils {
 	}
 
 	public static <T extends Comparable<T>> List<T> asSortedList(Collection<T> collection, Comparator<T> comparator) {
-		List<T> list = new ArrayList<>();
+		List<T> list = new ArrayList<>(collection.size());
 		if (collection != null) {
 			list.addAll(collection);
 			if (comparator == null) {
@@ -170,24 +167,26 @@ public final class CollectionUtils {
 		return list;
 	}
 
-	public static <T> Set<T> asSet(Consumer<Set<T>> filler) {
-		Set<T> list = new HashSet<>();
-		filler.accept(list);
-		return list;
-	}
-
 	@SafeVarargs
-	public static <T> Set<T> asSet(T... objects) {
-		return Stream.of(objects).collect(Collectors.toSet());
+	public static <T> Set<T> asSet(T... elements) {
+		Set<T> result = new HashSet<>(elements.length);
+		for (T t : elements) {
+			result.add(t);
+		}
+		return result;
 	}
 
 	public static <T> Set<T> asSet(Collection<T> collection) {
-		return collection.stream().collect(Collectors.toSet());
+		Set<T> result = new HashSet<>(collection.size());
+		for (T t : collection) {
+			result.add(t);
+		}
+		return result;
 	}
 
 	@SafeVarargs
 	public static <T> RWHashSet<T> asRWSet(T... objects) {
-		RWHashSet<T> list = new RWHashSet<>();
+		RWHashSet<T> list = new RWHashSet<>(objects.length);
 		if (objects != null) {
 			for (T obj : objects) {
 				list.add(obj);
@@ -205,7 +204,7 @@ public final class CollectionUtils {
 	}
 
 	public static <T> Set<T> asSetMultiple(Class<T> typeClass, Object... objects) {
-		Set<T> list = new HashSet<>();
+		Set<T> list = new HashSet<>(objects.length);
 		addMultiple(objects, typeClass, list);
 		return list;
 	}
@@ -220,7 +219,7 @@ public final class CollectionUtils {
 	}
 
 	public static <K, V> Map<K, V> asMap(Object... objects) {
-		return doAsMap(new HashMap<K, V>(), objects);
+		return doAsMap(new HashMap<K, V>(objects.length / 2), objects);
 	}
 
 	public static <K, V> Map<K, V> asMap(Map<K, V> map) {
@@ -232,21 +231,21 @@ public final class CollectionUtils {
 	}
 
 	public static <K, V> Map<K, V> asMapUniqueValue(Collection<K> keys, V value) {
-		Map<K, V> map = new HashMap<>();
+		Map<K, V> map = new HashMap<>(keys.size());
 		keys.forEach(key -> map.put(key, value));
 		return map;
 	}
 
 	public static <V> LowerCaseHashMap<V> asLowerCaseMap(Object... objects) {
-		return doAsMap(new LowerCaseHashMap<V>(), objects);
+		return doAsMap(new LowerCaseHashMap<V>(objects.length, 1f), objects);
 	}
 
 	public static <K, V> LinkedHashMap<K, V> asLinkedMap(Object... objects) {
-		return doAsMap(new LinkedHashMap<K, V>(), objects);
+		return doAsMap(new LinkedHashMap<K, V>(objects.length, 1f), objects);
 	}
 
 	public static <K, V> WeakHashMap<K, V> asWeakMap(Object... objects) {
-		return doAsMap(new WeakHashMap<K, V>(), objects);
+		return doAsMap(new WeakHashMap<K, V>(objects.length, 1f), objects);
 	}
 
 	public static <K, V> Map<K, V> asUnmodifiableMap(Object... objects) {
@@ -266,6 +265,10 @@ public final class CollectionUtils {
 	// ----- random
 	public static <T> T random(List<? extends T> list) {
 		return randomOptional(list).orNull();
+	}
+
+	public static <T> T randomArray(T[] array) {
+		return array.length == 0 ? null : array[NumberUtils.random(0, array.length - 1)];
 	}
 
 	public static <T> T random(Collection<? extends T> set) {
@@ -451,7 +454,7 @@ public final class CollectionUtils {
 	}
 
 	public static <T> List<T> findNew(Collection<T> previous, Collection<T> next) {
-		List<T> diff = new ArrayList<>();
+		List<T> diff = new ArrayList<>(next.size());
 		for (T elem : next) {
 			if (!previous.contains(elem)) {
 				diff.add(elem);

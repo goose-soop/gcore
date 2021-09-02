@@ -9,6 +9,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -31,11 +32,8 @@ public class RWHashMap<K, V> extends HashMap<K, V> {
 
 	// -------------------- constructor --------------------
 
-	public RWHashMap() {
-	}
-
-	public RWHashMap(int initialCapacity) {
-		super(initialCapacity);
+	public RWHashMap(int initialCapacity, float loadFactor) {
+		super(initialCapacity, loadFactor);
 	}
 
 	// -------------------- key modifier for subclasses --------------------
@@ -122,7 +120,7 @@ public class RWHashMap<K, V> extends HashMap<K, V> {
 
 	public final HashMap<K, V> copy() {
 		return lock.read(() -> {
-			HashMap<K, V> copy = new HashMap<>();
+			HashMap<K, V> copy = new HashMap<>(super.size());
 			Iterator<Entry<K, V>> it = super.entrySet().iterator();
 			while (it.hasNext()) {
 				Entry<K, V> next = it.next();
@@ -159,6 +157,18 @@ public class RWHashMap<K, V> extends HashMap<K, V> {
 	public final <R> R streamResultValues(Function<Stream<V>, R> operator) {
 		return lock.read(() -> {
 			return operator.apply(super.values().stream());
+		});
+	}
+
+	public final void streamValues(Consumer<Stream<V>> operator) {
+		lock.read(() -> {
+			operator.accept(super.values().stream());
+		});
+	}
+
+	public final V randomValue() {
+		return lock.read(() -> {
+			return CollectionUtils.random(super.values());
 		});
 	}
 
@@ -291,7 +301,7 @@ public class RWHashMap<K, V> extends HashMap<K, V> {
 	@Override
 	public final RWHashMap<K, V> clone() {
 		return lock.read(() -> {
-			RWHashMap<K, V> clone = new RWHashMap<>();
+			RWHashMap<K, V> clone = new RWHashMap<>(super.size(), 1f);
 			clone.putAll(this);
 			return clone;
 		});

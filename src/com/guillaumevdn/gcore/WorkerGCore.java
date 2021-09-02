@@ -57,7 +57,7 @@ public class WorkerGCore {
 	}
 
 	// ----- offline players
-	private LowerCaseHashMap<Pair<UUID, String>> offlinePlayersUUIDs = new LowerCaseHashMap<>();
+	private LowerCaseHashMap<Pair<UUID, String>> offlinePlayersUUIDs = new LowerCaseHashMap<>(10, 0.75f);
 
 	public void registerOfflinePlayer(String name, UUID uuid) {
 		if (name != null) {
@@ -78,11 +78,11 @@ public class WorkerGCore {
 	}
 
 	// ----- await inputs
-	private Map<UUID, Pair<Consumer<String>, Runnable>> awaitingChats = new HashMap<>();
-	private Set<UUID> awaitingLocationsCancelChat = new HashSet<>();
-	private Map<UUID, Pair<Consumer<Location>, Runnable>> awaitingLocations = new HashMap<>();
-	private Set<UUID> awaitingItemsCancelChat = new HashSet<>();
-	private Map<UUID, Pair<Consumer<ItemStack>, Runnable>> awaitingItems = new HashMap<>();
+	private Map<UUID, Pair<Consumer<String>, Runnable>> awaitingChats = new HashMap<>(1);
+	private Set<UUID> awaitingLocationsCancelChat = new HashSet<>(1);
+	private Map<UUID, Pair<Consumer<Location>, Runnable>> awaitingLocations = new HashMap<>(1);
+	private Set<UUID> awaitingItemsCancelChat = new HashSet<>(1);
+	private Map<UUID, Pair<Consumer<ItemStack>, Runnable>> awaitingItems = new HashMap<>(1);
 
 	public boolean hasAwaitingChat(Player player) {
 		return player != null && awaitingChats.containsKey(player.getUniqueId());
@@ -173,7 +173,7 @@ public class WorkerGCore {
 	}
 
 	// ----- game profile / skull items
-	private RWHashMap<UUID, GameProfile> profileCache = new RWHashMap<>();
+	private RWHashMap<UUID, GameProfile> profileCache = new RWHashMap<>(10, 1f);
 	private final GameProfile DEFAULT_PROFILE = fromTexture(UUID.randomUUID(), "Steve", "ewogICJ0aW1lc3RhbXAiIDogMTYwODAzMTQ1MTk2MSwKICAicHJvZmlsZUlkIiA6ICJlYzU2MTUzOGYzZmQ0NjFkYWZmNTA4NmIyMjE1NGJjZSIsCiAgInByb2ZpbGVOYW1lIiA6ICJBbGV4IiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzFhNGFmNzE4NDU1ZDRhYWI1MjhlN2E2MWY4NmZhMjVlNmEzNjlkMTc2OGRjYjEzZjdkZjMxOWE3MTNlYjgxMGIiCiAgICB9CiAgfQp9", "J4QNnTc0p9NbhK5zkD5pd+N2lKtH/0y884MOFQyxVGcUYDuSaa5XkkoLBTe/iaOICjarfwd1gLgNNg8XqAW3imb7bsOlN1D+3A3POkjlrdTKgLqFU9ouGwhdhh6rbMa6Sz6Ir6b8bgbeniEKYQxzOjyLbZwaDfJgXycPuQ7dnXiycVrgMYAcSHv3FH/K2Fm4RfjeIWJctWWsgpZdxmX9E0o83LEKlqEH6bT1aMTVnWJDRcak9A/OR6iSwz6ABrsWzARtlwi10mVwZUEQovByOo+UHxGfQErWm6kXbn7U/faDI3Gfq3ovvP/KyhGjB64gYQN0OWFt99N8FM+jWnPuRxVZlH0jx0Sxe2PGPvNy/lwD4gDbJfKScMSsapYZqbTenZ4QakqPVfGYI23JdQMC3IcTjuz4hHlKNjF+AgGZEqz/gDyKUT+95eOJH+8Kr0+KCzmKaL2zKY1/or7zcCsaeAyY/M+trfr6nARfFVBInHVYLHkOPkRSj3xvjNKW1sP4szJvxhQ/V968ipydRTlnQ67H8J8Laz5TDxxB2uQlRkGi6bvk1T7LSNNY/GSTovJVatR9adxTjbndby+DmrfFb666XjZ6kJshwEsudnQs2BU/jG9zi3tvCKoma/d6LbcSr2hfSYCl+ErWCFDSuVB4zJZa5rOLGW2Ea5s1ePFeHiM=");
 
 	private void fetchProfile(final UUID ownerUUID, String ownerName, String skinData, String skinSignature, Consumer<GameProfile> callback) {
@@ -183,11 +183,11 @@ public class WorkerGCore {
 		}
 		// no data
 		else if (ownerUUID != null || ownerName != null) {
-			//System.out.println("-- must fetch profile for uuid " + ownerUUID + " / " + ownerName);
+			//Bukkit.getLogger().info("-- must fetch profile for uuid " + ownerUUID + " / " + ownerName);
 			UUID actualUUID = ownerUUID;
 			// if offline mode, force fetching of UUID
 			if (!Bukkit.getOnlineMode() && ownerName != null) {
-				//System.out.println("offline mode, must fetch UUID by name");
+				//Bukkit.getLogger().info("offline mode, must fetch UUID by name");
 				actualUUID = null;
 			}
 			// maybe fix UUID if player connected once
@@ -206,10 +206,10 @@ public class WorkerGCore {
 			// find by UUID or fetch name
 			Consumer<UUID> fetcher = uuid -> {
 				GCore.inst().operateAsync(() -> {
-					//System.out.println("fetching profile by uuid " + uuid);
+					//Bukkit.getLogger().info("fetching profile by uuid " + uuid);
 					GameProfile profile = uuid == null ? null : MojangUtils.fetchProfile(uuid);  // nullable
 					if (profile == null) {
-						//System.out.println("no profile found, default profile");
+						//Bukkit.getLogger().info("no profile found, default profile");
 						profile = DEFAULT_PROFILE;
 					}
 					profileCache.put(uuid, profile);
@@ -226,7 +226,7 @@ public class WorkerGCore {
 				fetcher.accept(actualUUID);
 			} else {
 				GCore.inst().operateAsync(() -> {
-					//System.out.println("ownerName " + ownerName + " found, fetch uuid");
+					//Bukkit.getLogger().info("ownerName " + ownerName + " found, fetch uuid");
 					UUID fetch = MojangUtils.fetchUUID(ownerName);
 					fetcher.accept(fetch != null ? fetch : ownerUUID);
 				}, error -> {

@@ -20,7 +20,7 @@ import com.guillaumevdn.gcore.lib.string.Text;
 public class ElementFireworkEffectList extends ListElement<ElementFireworkEffect> implements ParseableListElement<FireworkEffect, ElementFireworkEffect> {
 
 	public ElementFireworkEffectList(Element parent, String id, Need need, Text editorDescription) {
-		super("firework effect", true, parent, id, need, editorDescription);
+		super(true, parent, id, need, editorDescription);
 	}
 
 	// ----- element

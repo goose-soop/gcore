@@ -61,7 +61,7 @@ public final class WorldGuardCompat {
 	private static final ReflectionProcedureBiFunction<World, String, Pair<Point, Point>> GET_REGION_BOUNDS = new ReflectionProcedureBiFunction<World, String, Pair<Point, Point>>()
 			.orElse((world, regionId) -> {
 				ReflectionObject region = ReflectionObject.ofOrNull(getRegion(world, regionId));
-				if (region == null) return null;
+				if (region.justGet() == null) return null;
 				ReflectionObject regionMin = region.invokeMethod("getMinimumPoint");
 				ReflectionObject regionMax = region.invokeMethod("getMaximumPoint");
 				Point min = new Point(world.getName(), regionMin.invokeMethod("getX").get(), regionMin.invokeMethod("getY").get(), regionMin.invokeMethod("getZ").get());

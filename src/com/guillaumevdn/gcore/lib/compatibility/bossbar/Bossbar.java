@@ -74,7 +74,7 @@ public final class Bossbar {
 	// ----- set
 	public void setTitle(String title) {
 		this.title = title;
-		BossbarCompat.setColor(this);
+		BossbarCompat.setTitle(this);
 	}
 
 	public void setProgress(double progress) {
@@ -99,7 +99,6 @@ public final class Bossbar {
 
 	private void addPlayer(Player player) {
 		if (players.add(player) && instances != null) {
-			//System.out.println("[QCDEBUG] Adding player " + player.getName() + " to bossbar " + title);
 			BossbarCompat.addPlayer(this, player);
 		}
 	}
@@ -113,7 +112,12 @@ public final class Bossbar {
 	}
 
 	// ----- instance
+	private boolean active = false;
 	private Map<Player, ReflectionObject> instances = null;
+
+	public boolean isActive() {
+		return active;
+	}
 
 	Map<Player, ReflectionObject> getInstances() {
 		return instances;
@@ -123,37 +127,43 @@ public final class Bossbar {
 		return instances == null ? null : instances.get(player);
 	}
 
-	public void startTempAutoProgress(int ticks, boolean noAutoProgress) {
+	public void startTemp(int ticks, Double noAutoProgressForceProgress) {
 		start();
-		if (noAutoProgress) {
-			setProgress(1d);
+		changeTemp(ticks, noAutoProgressForceProgress);
+	}
+
+	public void changeTemp(int ticks, Double noAutoProgressForceProgress) {
+		if (noAutoProgressForceProgress != null) {
+			setProgress(noAutoProgressForceProgress);
 		}
 		WrapperInteger remainingTicks = WrapperInteger.of(ticks);
-		plugin.registerTask("bossbar_temp_autoprogress_" + id, true, 1, () -> {
+		plugin.registerTask("bossbar_temp_" + id, true, 1, () -> {
 			if (remainingTicks.alter(-1) <= 0) {
 				stop();
-			} else if (!noAutoProgress) {
+			} else if (noAutoProgressForceProgress == null) {
 				setProgress(remainingTicks.get().doubleValue() / ((double) ticks));
 			}
 		});
 	}
 
 	public void start() {
+		active = true;
 		if (instances != null) {
 			stop();
 		}
 		plugin.registerBossbar(this);
-		instances = new HashMap<>();
+		instances = new HashMap<>(1);
 		players.forEach(player -> BossbarCompat.addPlayer(this, player));
 	}
 
 	public void stop() {
+		active = false;
 		if (instances != null) {
 			players.forEach(player -> BossbarCompat.removePlayer(this, player));
 			instances = null;
 		}
 		plugin.unregisterBossbar(this);
-		plugin.stopTask("bossbar_temp_autoprogress_" + id);
+		plugin.stopTask("bossbar_temp_" + id);
 	}
 
 	// events are in GPlugin, inside a dedicated listener

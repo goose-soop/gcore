@@ -239,4 +239,8 @@ public final class ObjectUtils {
 		return supplier;
 	}
 
+	public static <R> R produce(Supplier<R> result) {  // useful in super() calls for instance
+		return result.get();
+	}
+
 }

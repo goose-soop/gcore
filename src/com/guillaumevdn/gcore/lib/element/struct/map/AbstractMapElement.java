@@ -20,16 +20,20 @@ import com.guillaumevdn.gcore.lib.tuple.Pair;
 public abstract class AbstractMapElement<K, V extends IElement> extends Element {
 
 	private final Serializer<K> keySerializer;
-	private final SerializerLowerCaseLinkedHashMap<K, V> elements;
+	private SerializerLowerCaseLinkedHashMap<K, V> elements;
 
-	public AbstractMapElement(Class<K> keyClass, String typeName, Element parent, String id, Need need, Text editorDescription) {
-		this(Serializer.find(keyClass), typeName, parent, id, need, editorDescription);
+	public AbstractMapElement(Class<K> keyClass, Element parent, String id, Need need, Text editorDescription) {
+		this(Serializer.find(keyClass), parent, id, need, editorDescription);
 	}
 
-	public AbstractMapElement(Serializer<K> keySerializer, String typeName, Element parent, String id, Need need, Text editorDescription) {
-		super(typeName, parent, id, need.getType(), editorDescription);
+	public AbstractMapElement(Serializer<K> keySerializer, Element parent, String id, Need need, Text editorDescription) {
+		super(parent, id, need.getType(), editorDescription);
 		this.keySerializer = keySerializer;
-		this.elements = new SerializerLowerCaseLinkedHashMap<>(keySerializer);
+		reinitializeElements(0, 1f);
+	}
+
+	protected void reinitializeElements(int initialCapacity, float loadFactor) {
+		this.elements = new SerializerLowerCaseLinkedHashMap<>(keySerializer, initialCapacity, loadFactor);
 	}
 
 	// ----- get

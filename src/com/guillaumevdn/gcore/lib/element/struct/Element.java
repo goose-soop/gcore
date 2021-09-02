@@ -1,7 +1,9 @@
 package com.guillaumevdn.gcore.lib.element.struct;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import org.bukkit.enchantments.Enchantment;
@@ -14,7 +16,6 @@ import com.guillaumevdn.gcore.lib.configuration.YMLConfiguration;
 import com.guillaumevdn.gcore.lib.element.editor.EditorGUI;
 import com.guillaumevdn.gcore.lib.element.struct.list.referenceable.Node;
 import com.guillaumevdn.gcore.lib.element.struct.map.AbstractMapElement;
-import com.guillaumevdn.gcore.lib.element.struct.parsing.ParseableElement;
 import com.guillaumevdn.gcore.lib.exception.ConfigError;
 import com.guillaumevdn.gcore.lib.gui.struct.ClickCall;
 import com.guillaumevdn.gcore.lib.gui.struct.ClickCall.ClickType;
@@ -31,17 +32,15 @@ import com.guillaumevdn.gcore.lib.tuple.IntegerPair;
  */
 public abstract class Element implements IElement, Comparable<Element> {
 
-	private final String typeName;
 	private Element parent;
-	private SuperElement superElement;
 	private final String id;
 	private final NeedType need;
 	private final Text editorDescription;
 
 	private String forcedConfigurationPath = null;  // used in YMLConfiguration, to load elements quickly with no parent
+	private Map<String, String> extra = null;  // to have additionnal data
 
-	public Element(String typeName, Element parent, String id, NeedType need, Text editorDescription) {
-		this.typeName = typeName;
+	public Element(Element parent, String id, NeedType need, Text editorDescription) {
 		this.id = id.toLowerCase();
 		this.need = need;
 		this.editorDescription = editorDescription;
@@ -50,7 +49,7 @@ public abstract class Element implements IElement, Comparable<Element> {
 
 	// ----- get
 	public String getTypeName() {
-		return typeName;
+		return getClass().getSimpleName().replace("Element", "");
 	}
 
 	public final Element getParent() {
@@ -59,11 +58,23 @@ public abstract class Element implements IElement, Comparable<Element> {
 
 	@Override
 	public final SuperElement getSuperElement() {
-		return superElement;
+		// super element must be the highest parent in chain
+		// (since some super elements are sometimes overriden to make more specific elements)
+
+		Element parent = this;
+		while (parent.getParent() != null) {
+			parent = parent.getParent();
+		}
+		SuperElement sup = ObjectUtils.castOrNull(parent, SuperElement.class);
+		if (sup != null) {
+			return sup;
+		}
+
+		throw new IllegalArgumentException("no super element found in chain");
 	}
 
 	public final <T extends SuperElement> T getSuperElementAsOrNull(Class<T> elementClass) {
-		return ObjectUtils.castOrNull(superElement, elementClass);
+		return ObjectUtils.castOrNull(getSuperElement(), elementClass);
 	}
 
 	public final String getId() {
@@ -96,6 +107,10 @@ public abstract class Element implements IElement, Comparable<Element> {
 		return parentPath == null || parentPath.isEmpty() ? id : parentPath + "." + id;
 	}
 
+	public final String getExtra(String key) {
+		return extra != null ? extra.get(key) : null;
+	}
+
 	@Override
 	public abstract boolean hasParseableLocations();
 	public abstract boolean isCurrentlyDefault();
@@ -103,20 +118,18 @@ public abstract class Element implements IElement, Comparable<Element> {
 	// ----- set
 	public final void setParent(Element parent) {
 		this.parent = parent;
-		// find super element
-		Element elem = this;
-		while (elem != null) {
-			superElement = ObjectUtils.castOrNull(elem, SuperElement.class);
-			if (superElement != null) break;
-			elem = elem.getParent();
-		}
-		if (superElement == null) {
-			throw new IllegalArgumentException("no super element found in chain");
-		}
+		getSuperElement();  // throws an error if none found
 	}
 
 	public final void setForcedConfigurationPath(String forcedConfigurationPath) {
 		this.forcedConfigurationPath = forcedConfigurationPath;
+	}
+
+	public final void setExtra(String key, String value) {
+		if (extra == null) {
+			extra = new HashMap<>(2, 1f);
+		}
+		extra.put(key, value);
 	}
 
 	// ----- object
@@ -153,6 +166,7 @@ public abstract class Element implements IElement, Comparable<Element> {
 	}
 
 	/** @throws Throwable if any error, other than a ConfigError or one with a ConfigError parent, occurred */
+	@SuppressWarnings("unlikely-arg-type")
 	public final void read() throws Throwable {
 		readContains = false;
 		clearBeforeRead();
@@ -167,19 +181,25 @@ public abstract class Element implements IElement, Comparable<Element> {
 			// not in config
 			else {
 				if (getNeed().equals(NeedType.REQUIRED)) {
-					ParseableElement parseable = ObjectUtils.castOrNull(this, ParseableElement.class);
-					Object def = parseable == null ? null : parseable.parseGeneric().orNull();
-					if (def == null) {
-						superElement.addLoadError("missing " + getTypeName() + " at path " + path);
-					}
+					getSuperElement().addLoadError("missing " + getTypeName() + " at path " + path);
 				}
 			}
 		} catch (Throwable exception) {
 			ConfigError configError = ObjectUtils.findCauseOrNull(exception, ConfigError.class);
 			if (configError != null) {  // a config error that wasn't catched already ? :think:
-				superElement.addLoadError(configError.getMessage());
+				getSuperElement().addLoadError(configError.getMessage());
 			} else {  // regular error, re-throw it
 				throw exception;
+			}
+		}
+
+		// is super element ? notify errors
+		SuperElement sup = getSuperElement();
+		if (equals(sup)) {
+			// notify loading errors
+			if (!sup.getLoadErrors().isEmpty()) {
+				sup.getPlugin().getMainLogger().error("Errors were found when loading " + getTypeName() + " " + id + " :", true);
+				sup.getLoadErrors().forEach(error -> sup.getPlugin().getMainLogger().error("- " + error, true));
 			}
 		}
 	}

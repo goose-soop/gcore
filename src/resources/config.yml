@@ -49,6 +49,8 @@ commands_aliases:
   plugins: [plugins,pl]
   export: [export]
   itemread: [itemread,ir]
+  itemreadchat: [itemreadchat,irc]
+  itemreadclick: [itemreadclick,irclick]
 
 # --------------------------------------------------
 # Variants
@@ -95,7 +97,7 @@ particles:
 currencies:
   VAULT:
     name: 'money'
-    #format_multiplier: 0.1
+    format_multiplier: 1.0
     format_decimal_precision: 2
     format_single: '{amount}$'
     format_multiple: '{amount}$'
@@ -104,7 +106,43 @@ currencies:
       name: '{formatted_amount}'
       enchantments:
         DURABILITY: 1
-      flags: [HIDE_ENCHANTS]
+      flags: [HIDE_ENCHANTS, HIDE_ATTRIBUTES]
+  PLAYER_POINTS:
+    name: 'PlayerPoints points'
+    format_multiplier: 1.0
+    format_decimal_precision: 0
+    format_single: '{amount} point'
+    format_multiple: '{amount} points'
+    icon:
+      type: PAPER
+      name: '{formatted_amount}'
+      enchantments:
+        DURABILITY: 1
+      flags: [HIDE_ENCHANTS, HIDE_ATTRIBUTES]
+  TOKEN_ENCHANT:
+    name: 'TokenEnchant tokens'
+    format_multiplier: 1.0
+    format_decimal_precision: 0
+    format_single: '{amount} token'
+    format_multiple: '{amount} tokens'
+    icon:
+      type: PAPER
+      name: '{formatted_amount}'
+      enchantments:
+        DURABILITY: 1
+      flags: [HIDE_ENCHANTS, HIDE_ATTRIBUTES]
+  XP_LEVEL:
+    name: 'XP levels'
+    format_multiplier: 1.0
+    format_decimal_precision: 0
+    format_single: '{amount} level'
+    format_multiple: '{amount} levels'
+    icon:
+      type: PAPER
+      name: '{formatted_amount}'
+      enchantments:
+        DURABILITY: 1
+      flags: [HIDE_ENCHANTS, HIDE_ATTRIBUTES]
 
 # --------------------------------------------------
 # Miscalleneous

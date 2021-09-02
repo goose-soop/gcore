@@ -32,7 +32,6 @@ import com.guillaumevdn.gcore.lib.serialization.Serializer;
 import com.guillaumevdn.gcore.lib.serialization.adapter.type.AdapterNBTCompound;
 import com.guillaumevdn.gcore.lib.serialization.data.DataIO;
 import com.guillaumevdn.gcore.migration.YMLMigrationReading;
-import com.guillaumevdn.gcore.migration.YMLMigrationWriting;
 
 /**
  * @author GuillaumeVDN
@@ -211,7 +210,7 @@ public final class MigrationV8Config extends Migration {
 		}
 	}
 
-	public static void migrateItem(Migration migration, YMLMigrationReading src, String o, YMLMigrationWriting target, String n, boolean allowAmount) {
+	public static void migrateItem(Migration migration, YMLMigrationReading src, String o, YMLConfiguration target, String n, boolean allowAmount) {
 		if (!src.contains(o)) {
 			return;
 		}

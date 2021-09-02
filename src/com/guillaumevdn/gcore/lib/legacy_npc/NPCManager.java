@@ -104,7 +104,7 @@ public class NPCManager implements Listener {
 	// ----- methods
 	public void addNpc(Player player, NPC npc) {
 		Map<Integer, NPC> playerNpcs = npcs.get(player);
-		if (playerNpcs == null) npcs.put(player, playerNpcs = new HashMap<Integer, NPC>());
+		if (playerNpcs == null) npcs.put(player, playerNpcs = new HashMap<>(elementsNpcs.size()));
 		playerNpcs.put(npc.getId(), npc);
 		npc.spawn();
 	}
@@ -237,11 +237,7 @@ public class NPCManager implements Listener {
 
 	public void reload() throws Throwable {
 		// despawn existing NPCs
-		for (Player player : npcs.keySet()) {
-			for (NPC npc : npcs.get(player).values()) {
-				npc.despawn();
-			}
-		}
+		npcs.forEach((player, npcs) -> npcs.forEach((__, npc) -> npc.despawn()));
 		// load npcs
 		elementsNpcs.clear();
 		YMLConfiguration config = GCore.inst().loadConfigurationFile("npcs.yml");
@@ -251,11 +247,7 @@ public class NPCManager implements Listener {
 			elementsNpcs.put(id, npc);
 		}
 		// respawn existing NPCs
-		for (Player player : npcs.keySet()) {
-			for (NPC npc : npcs.get(player).values()) {
-				npc.spawn();
-			}
-		}
+		npcs.forEach((player, npcs) -> npcs.forEach((__, npc) -> npc.spawn()));
 	}
 
 	// ----- events

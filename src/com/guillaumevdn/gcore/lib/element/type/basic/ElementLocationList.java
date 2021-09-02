@@ -46,11 +46,11 @@ public class ElementLocationList extends ElementValueList<Location> {
 		// right-click : import location
 		if (call.getType().equals(ClickType.RIGHT)) {
 			WorkerGCore.inst().awaitLocation(call.getClicker(), TextEditorGeneric.messageElementBasicImportLocation, value -> {
-				List<String> newValue = getValueCopy();
+				List<String> newValue = getRawValueCopy();
 				if (newValue == null) {
 					setValue(CollectionUtils.asList(getSerializer().serialize(value)));
 				} else {
-					if (lineIndex >= getValue().size()) {
+					if (lineIndex >= getRawValue().size()) {
 						newValue.add(getSerializer().serialize(value));
 					} else {
 						newValue.set(lineIndex, getSerializer().serialize(value));

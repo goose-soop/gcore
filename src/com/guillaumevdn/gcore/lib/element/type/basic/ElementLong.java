@@ -23,8 +23,7 @@ public class ElementLong extends ElementValue<Long> {
 	}
 
 	public ElementLong(Element parent, String id, Need need, long min, long max, Text editorDescription) {
-		super("long" + (min == Long.MIN_VALUE && max == Long.MAX_VALUE ? "" : (min == Long.MIN_VALUE ? " (max. " + max + ")" : (max == Long.MAX_VALUE ? " (min. " + min + ")" : " (" + min + " - " + max + ")"))),
-				Long.class, parent, id, need, editorDescription);
+		super(Long.class, parent, id, need, editorDescription);
 		this.min = min;
 		this.max = max;
 	}

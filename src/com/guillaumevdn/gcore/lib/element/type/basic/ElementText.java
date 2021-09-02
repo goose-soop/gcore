@@ -29,7 +29,12 @@ import com.guillaumevdn.gcore.lib.wrapper.WrapperInteger;
 public class ElementText extends BasicElement<Text> {
 
 	public ElementText(Element parent, String id, Need need, Text editorDescription) {
-		super("text", SizeTolerance.ALLOW_EMPTY_AND_LIST, parent, id, need.getType(), need.getDef() != null ? ((Text) need.getDef()).getCurrentLines() : null, editorDescription);
+		super(SizeTolerance.ALLOW_EMPTY_AND_LIST, parent, id, need.getType(), need.getDef() != null ? ((Text) need.getDef()).getCurrentLines() : null, editorDescription);
+	}
+
+	@Override
+	protected List<String> loadRawValueFrom(Text value) {
+		return value.getCurrentLines();
 	}
 
 	// ----- parse
@@ -68,8 +73,8 @@ public class ElementText extends BasicElement<Text> {
 				setPersistentItem(new GUIItem("current", 47, editorIcon()));
 
 				// set lines items
-				if (getValue() != null) {
-					for (int i = 0; i < getValue().size(); ++i) {
+				if (getRawValue() != null) {
+					for (int i = 0; i < getRawValue().size(); ++i) {
 						final int lineIndex = i;
 						setRegularItem(new GUIItem("line_" + lineIndex, lineIndex, editorLineIcon(lineIndex), call -> {
 							// left-click : edit
@@ -80,7 +85,7 @@ public class ElementText extends BasicElement<Text> {
 							}
 							// shift + right-click : insert
 							else if (call.getType().equals(ClickType.SHIFT_RIGHT)) {
-								List<String> newValue = getValueCopyOrNewList();
+								List<String> newValue = getRawValueCopyOrNewList();
 								newValue.add(lineIndex, "new line");
 								setValue(newValue);
 								call.getGUI().refill();
@@ -95,9 +100,9 @@ public class ElementText extends BasicElement<Text> {
 									TextEditorGeneric.messageElementBasicListSwap.send(call.getClicker());
 								} else if (swapping.get() != lineIndex) {
 									TextEditorGeneric.messageElementBasicListSwapped.send(call.getClicker());
-									List<String> newValue = getValueCopyOrNewList();
-									newValue.set(swapping.get(), getValueLine(lineIndex));
-									newValue.set(lineIndex, getValueLine(swapping.get()));
+									List<String> newValue = getRawValueCopyOrNewList();
+									newValue.set(swapping.get(), getRawValueLine(lineIndex));
+									newValue.set(lineIndex, getRawValueLine(swapping.get()));
 									setValue(newValue);
 									call.getGUI().refill();
 									getSuperElement().onEditorChange(ElementText.this);
@@ -108,7 +113,7 @@ public class ElementText extends BasicElement<Text> {
 							}
 							// control + drop : delete
 							else if (call.getType().equals(ClickType.CONTROL_DROP)) {
-								List<String> newValue = getValueCopyOrNewList();
+								List<String> newValue = getRawValueCopyOrNewList();
 								newValue.remove(lineIndex);
 								setValue(newValue);
 								call.getGUI().refill();
@@ -122,10 +127,10 @@ public class ElementText extends BasicElement<Text> {
 
 				// new line item
 				setPersistentItem(new GUIItem("newline", 50, ItemUtils.createItem(CommonMats.BLAZE_ROD, TextEditorGeneric.controlAddElementName.parseLine(), null), call -> {
-					if (getValue() == null) {
+					if (getRawValue() == null) {
 						setValue(CollectionUtils.asList("new line"));
 					} else {
-						setValue(CollectionUtils.asListMultiple(String.class, getValue(), "new line"));
+						setValue(CollectionUtils.asListMultiple(String.class, getRawValue(), "new line"));
 					}
 					call.getGUI().refill();
 					getSuperElement().onEditorChange(ElementText.this);
@@ -133,12 +138,12 @@ public class ElementText extends BasicElement<Text> {
 
 				// random item
 				setPersistentItem(new GUIItem("random", 51, ItemUtils.createItem(CommonMats.COMMAND_BLOCK, TextEditorGeneric.controlTextSetRandom.parseLine(), null), call -> {
-					if (getValue() == null) {
+					if (getRawValue() == null) {
 						setValue(CollectionUtils.asList("@random"));
-					} else if ("@random".equalsIgnoreCase(getValueLine(0))) {
+					} else if ("@random".equalsIgnoreCase(getRawValueLine(0))) {
 						return;
 					} else {
-						setValue(CollectionUtils.asListMultiple(String.class, "@random", getValue()));
+						setValue(CollectionUtils.asListMultiple(String.class, "@random", getRawValue()));
 					}
 					call.getGUI().refill();
 					getSuperElement().onEditorChange(ElementText.this);
@@ -154,7 +159,7 @@ public class ElementText extends BasicElement<Text> {
 		List<String> lore = new ArrayList<>();
 		// current value
 		lore.add("§r");
-		lore.addAll(TextEditorGeneric.elementCurrentValueSingle.replace("{value}", () -> getValue().get(lineIndex)).parseLines());
+		lore.addAll(TextEditorGeneric.elementCurrentValueSingle.replace("{value}", () -> getRawValue().get(lineIndex)).parseLines());
 		// control
 		lore.add("§r");
 		lore.addAll(TextEditorGeneric.controlEdit.parseLines());
@@ -167,8 +172,8 @@ public class ElementText extends BasicElement<Text> {
 
 	public void onEditorClickEdit(int lineIndex, ClickCall call) {
 		call.getClicker().closeInventory();
-		WorkerGCore.inst().awaitChatWithSuggestedValue(call.getClicker(), TextEditorGeneric.messageElementBasicListLineEdit, getValueLine(lineIndex), value -> {
-			List<String> v = getValueCopyOrNewList();
+		WorkerGCore.inst().awaitChatWithSuggestedValue(call.getClicker(), TextEditorGeneric.messageElementBasicListLineEdit, getRawValueLine(lineIndex), value -> {
+			List<String> v = getRawValueCopyOrNewList();
 			v.set(lineIndex, value);
 			setValue(v);
 			getSuperElement().onEditorChange(ElementText.this);

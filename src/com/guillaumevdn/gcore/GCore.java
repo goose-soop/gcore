@@ -1,15 +1,16 @@
 package com.guillaumevdn.gcore;
 
-import java.io.File;
-
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
 import com.guillaumevdn.gcore.command.GcoreBlockMat;
 import com.guillaumevdn.gcore.command.GcoreBlockMaterial;
+import com.guillaumevdn.gcore.command.GcoreBoardElementPrint;
 import com.guillaumevdn.gcore.command.GcoreExport;
 import com.guillaumevdn.gcore.command.GcoreImpl;
 import com.guillaumevdn.gcore.command.GcoreItemRead;
+import com.guillaumevdn.gcore.command.GcoreItemReadChat;
+import com.guillaumevdn.gcore.command.GcoreItemReadClick;
 import com.guillaumevdn.gcore.command.GcoreNpcReset;
 import com.guillaumevdn.gcore.command.GcorePlugins;
 import com.guillaumevdn.gcore.data.BoardStatistics;
@@ -17,7 +18,6 @@ import com.guillaumevdn.gcore.data.usernpcs.BoardUsersNPCs;
 import com.guillaumevdn.gcore.data.usernpcs.UserNPCs;
 import com.guillaumevdn.gcore.integration.citizens.IntegrationInstanceCitizens;
 import com.guillaumevdn.gcore.integration.deluxechat.IntegrationDeluxeChat;
-import com.guillaumevdn.gcore.integration.holographicdisplays.IntegrationInstanceHolographicDisplays;
 import com.guillaumevdn.gcore.integration.mythicmobs.IntegrationInstanceMythicMobs;
 import com.guillaumevdn.gcore.integration.placeholderapi.IntegrationInstancePlaceholderAPI;
 import com.guillaumevdn.gcore.lib.GPlugin;
@@ -36,9 +36,11 @@ import com.guillaumevdn.gcore.lib.string.TextFile;
 import com.guillaumevdn.gcore.lib.time.frame.TimeFrameTypes;
 import com.guillaumevdn.gcore.libs.com.google.gson.GsonBuilder;
 import com.guillaumevdn.gcore.listeners.ConnectionEvents;
+import com.guillaumevdn.gcore.listeners.InventoryEvents;
 import com.guillaumevdn.gcore.migration.v8_0.config.MigrationV8Config;
 import com.guillaumevdn.gcore.migration.v8_0.data.MigrationV8Data;
 import com.guillaumevdn.gcore.migration.v8_24.MigrationV8_24;
+import com.guillaumevdn.gcore.migration.v8_25.MigrationV8_25;
 import com.guillaumevdn.gcore.migration.v8_5.MigrationV8_5;
 import com.guillaumevdn.gcore.migration.v8_9.MigrationV8_9;
 
@@ -51,11 +53,12 @@ public final class GCore extends GPlugin<ConfigGCore, PermissionGCore> {
 	public static GCore inst() { return instance; }
 
 	public GCore() {
-		super(24180, "gcore", "gcore", ConfigGCore.class, PermissionGCore.class,
+		super(24180, "gcore", "gcore", ConfigGCore.class, PermissionGCore.class, "data_v8",
 				MigrationV8Config.class, MigrationV8Data.class,
 				MigrationV8_5.class,
 				MigrationV8_9.class,
-				MigrationV8_24.class
+				MigrationV8_24.class,
+				MigrationV8_25.class
 				);
 		instance = this;
 	}
@@ -118,14 +121,8 @@ public final class GCore extends GPlugin<ConfigGCore, PermissionGCore> {
 	}
 
 	@Override
-	public File getDefaultTextsFolder() {
-		return getDataFile("/data_v8/default_texts/");
-	}
-
-	@Override
 	protected void registerAndEnableIntegrations() {
 		registerAndEnableIntegration(new Integration<>(this, "Citizens", IntegrationInstanceCitizens.class));
-		registerAndEnableIntegration(new Integration<>(this, "HolographicDisplays", IntegrationInstanceHolographicDisplays.class));
 		registerAndEnableIntegration(new Integration<>(this, "MythicMobs", IntegrationInstanceMythicMobs.class));
 		registerAndEnableIntegration(new Integration<>(this, "PlaceholderAPI", IntegrationInstancePlaceholderAPI.class));
 	}
@@ -176,6 +173,7 @@ public final class GCore extends GPlugin<ConfigGCore, PermissionGCore> {
 		// listeners
 		getMainLogger().info("Initializing tasks and listeners");
 		registerListener("connection", new ConnectionEvents());
+		registerListener("inventory", new InventoryEvents());
 		registerListener("vanilla_chat", new VanillaChatListeners());
 		registerListener("awaiting_chat", new AwaitingChatListeners());
 		registerListener("awaiting_location", new AwaitingLocationListeners());
@@ -187,9 +185,12 @@ public final class GCore extends GPlugin<ConfigGCore, PermissionGCore> {
 		getMainCommand().setSubcommand(new GcoreExport());
 		getMainCommand().setSubcommand(new GcoreNpcReset());
 		getMainCommand().setSubcommand(new GcoreItemRead());
+		getMainCommand().setSubcommand(new GcoreItemReadChat());
+		getMainCommand().setSubcommand(new GcoreItemReadClick());
 		getMainCommand().setSubcommand(new GcoreBlockMat());
 		getMainCommand().setSubcommand(new GcoreBlockMaterial());
 		getMainCommand().setSubcommand(new GcoreImpl());
+		getMainCommand().setSubcommand(new GcoreBoardElementPrint());
 	}
 
 	@Override

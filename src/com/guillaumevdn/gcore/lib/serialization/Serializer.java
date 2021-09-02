@@ -17,6 +17,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
@@ -314,11 +315,14 @@ public abstract class Serializer<T> {
 	public static final Serializer<TimeFrameType> TIME_FRAME_TYPE = ofTypable(TimeFrameType.class, () -> TimeFrameTypes.inst());
 	public static final Serializer<PositionType> POSITION_TYPE = ofTypable(PositionType.class, () -> PositionTypes.inst());
 	public static final Serializer<GUIItemType> GUI_ITEM_TYPE = ofTypable(GUIItemType.class, () -> GUIItemTypes.inst());
-	public static final Serializer<Currency> CURRENCY = of(Currency.class, value -> value.getId(), string -> Currency.safeValueOf(string));
+	public static final Serializer<Currency> CURRENCY = of(Currency.class, value -> value.getId(), string -> {
+		Currency curr = Currency.safeValueOf(string);
+		return curr != null && curr.isEnabled() ? curr : null;
+	});
 	public static final Serializer<ParticleScript> PARTICLE_SCRIPT = of(ParticleScript.class, value -> value.getId(), string -> ConfigGCore.particleScripts.get(string));
 	public static final Serializer<ItemFlag> ITEM_FLAG = ofEnum(ItemFlag.class);
 	public static final LinearSerializer<OverrideClickType, OverrideClick> OVERRIDE_CLICK = Serializer.ofLinear(Serializer.ofEnum(OverrideClickType.class), OverrideClick.class, (type, params) -> new OverrideClick(type, params));
-	public static final Serializer<Permission> PERMISSION = of(Permission.class, value -> value.getName(), string -> new Permission(string));
+	public static final Serializer<Permission> PERMISSION = of(Permission.class, value -> value.getName(), string -> new Permission(string, null));
 	public static final Serializer<Point> POINT = of(Point.class,
 			value -> value.getWorld().getName() + "," + value.getX() + "," + value.getY() + "," + value.getZ(),
 			string -> {
@@ -352,6 +356,7 @@ public abstract class Serializer<T> {
 	public static final Serializer<EntityType> ENTITY_TYPE = ofEnum(EntityType.class);
 	public static final Serializer<PotionEffectType> POTION_EFFECT_TYPE = of(PotionEffectType.class, value -> value.getName(), string -> ObjectUtils.potionEffectTypeOrNull(string));
 	public static final Serializer<Enchantment> ENCHANTMENT = of(Enchantment.class, value -> value.getName(), string -> ObjectUtils.enchantmentOrNull(string));
+	public static final Serializer<ChatColor> CHAT_COLOR = ofEnum(ChatColor.class);
 	public static final Serializer<Color> COLOR = of(Color.class, value -> {
 		try {
 			for (Field field : Color.class.getFields()) {

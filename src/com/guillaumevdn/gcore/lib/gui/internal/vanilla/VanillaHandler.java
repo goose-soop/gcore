@@ -43,7 +43,7 @@ public class VanillaHandler extends Handler {
 
 	@Override
 	public RWHashMap<Player, Integer> getViewers() {
-		RWHashMap<Player, Integer> viewers = new RWHashMap<>();
+		RWHashMap<Player, Integer> viewers = new RWHashMap<>(10, 1f);
 		for (int i = 0; i < pages.size(); ++i) {  // ConcurrentModificationException ?
 			for (HumanEntity pl : pages.get(i).getViewers()) {
 				Player player = ObjectUtils.castOrNull(pl, Player.class);
@@ -120,13 +120,17 @@ public class VanillaHandler extends Handler {
 
 	@Override
 	public void openPage(Player player, int pageIndex) {
-		player.openInventory(getPage(pageIndex));
+		getGUI().getPlugin().operateSync(() -> {
+			player.openInventory(getPage(pageIndex));
+		});
 	}
 
 	@Override
 	public void close(Player player) {
-		if (player.getOpenInventory() != null && pages.contains(player.getOpenInventory().getTopInventory())) {
-			getGUI().getPlugin().operateSync(() -> player.closeInventory());
+		if (pages.contains(player.getOpenInventory().getTopInventory())) {
+			getGUI().getPlugin().operateSync(() -> {
+				player.closeInventory();
+			});
 		}
 	}
 

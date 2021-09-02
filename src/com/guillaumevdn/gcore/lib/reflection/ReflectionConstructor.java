@@ -64,7 +64,7 @@ public class ReflectionConstructor {
 	}
 
 	// ----- valuesCache
-	private static RWHashMap<Integer, ReflectionConstructor> cache = new RWHashMap<>();
+	private static RWHashMap<Integer, ReflectionConstructor> cache = new RWHashMap<>(10, 1f);
 
 	public static ReflectionConstructor of(Class<?> clazz, Class<?>... params) throws Throwable {
 		// hash by class name

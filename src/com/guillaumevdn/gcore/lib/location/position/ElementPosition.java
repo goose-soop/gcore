@@ -17,7 +17,7 @@ import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
 public class ElementPosition extends TypableContainerElement<PositionType> implements ParseableElement<Position> {
 
 	public ElementPosition(Element parent, String id, Need need, Text editorDescription) {
-		super(PositionTypes.inst(), "position", parent, id, need, editorDescription);
+		super(PositionTypes.inst(), parent, id, need, editorDescription);
 	}
 
 	@Override

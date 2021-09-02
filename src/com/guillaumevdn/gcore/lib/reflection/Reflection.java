@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
@@ -231,7 +232,7 @@ public final class Reflection {
 	// ----- error
 	public static void logAndRethrowError(Throwable exception, String log) throws Error {
 		final String id = StringUtils.generateRandomAlphanumericString(10);
-		System.out.println("---- Reflection error " + id + " ----\n" + log);
+		Bukkit.getLogger().info("---- Reflection error " + id + " ----\n" + log);
 		exception.printStackTrace(System.out);
 		System.out.flush();
 		throw new Error(id, exception);

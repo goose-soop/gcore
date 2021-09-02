@@ -18,11 +18,15 @@ public class ParsedCache<T> {
 	}
 
 	public void set(Optional<T> value) {
+		beforeSet(value);
 		this.value = value;
 	}
 
 	public void clear() {
-		this.value = null;
+		set(null);
+	}
+
+	protected void beforeSet(Optional<T> value) {
 	}
 
 }

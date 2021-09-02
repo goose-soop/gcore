@@ -341,9 +341,11 @@ public class Command implements CommandExecutor, TabCompleter {
 					suggest.addAll(subcommand.getParameters().stream().filter(param -> !param.has(call)).flatMap(param -> param.getTabComplete().stream()).collect(Collectors.toList()));
 				}
 				// and suggest arguments that start with the current typed thing
+				final Subcommand subcommandF = subcommand;
 				suggest.addAll(subcommand.getArguments().stream()
 						.filter(arg -> arg.canUse(sender))
-						.filter(arg -> arg.get(call) == null || (arg == lastParsedArgumentF && !currentLower.isEmpty()) /* show tab completion for the entire current argument ; only if we're still typing it though */)
+						.filter(arg -> arg.get(call) == null || (arg == lastParsedArgumentF && !currentLower.isEmpty())) // show tab completion for the entire current argument, only if we're still typing it 
+						.filter(arg -> subcommandF.getIncompatible().stream().allMatch(incompatible -> !incompatible.contains(arg) || incompatible.stream().allMatch(inc -> !inc.has(call))))  // don't suggest arguments that are incompatible with already typed arguments
 						.map(arg -> arg.tabComplete(call))
 						.filter(tabComplete -> tabComplete != null)
 						.flatMap(tabComplete -> tabComplete.stream())

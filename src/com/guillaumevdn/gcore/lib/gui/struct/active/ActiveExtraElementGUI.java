@@ -15,7 +15,7 @@ import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
  */
 public class ActiveExtraElementGUI extends ActiveElementGUI {
 
-	private final RWLowerCaseHashMap<ItemHolder> more = new RWLowerCaseHashMap<>();
+	private final RWLowerCaseHashMap<ItemHolder> more = new RWLowerCaseHashMap<>(5, 1f);
 
 	public ActiveExtraElementGUI(ElementGUI element, Replacer replacer, Option... options) {
 		super(element, replacer, options);

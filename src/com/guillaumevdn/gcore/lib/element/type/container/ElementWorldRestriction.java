@@ -28,7 +28,7 @@ public class ElementWorldRestriction extends ParseableContainerElement<List<Worl
 	private ElementWorldList blacklist = addWorldList("blacklist", Need.optional(), TextEditorGeneric.descriptionWorldRestrictionBlacklist);
 
 	public ElementWorldRestriction(Element parent, String id, Need need, Text editorDescription) {
-		super("world restriction", parent, id, need, editorDescription);
+		super(parent, id, need, editorDescription);
 	}
 
 	// ----- get
@@ -57,11 +57,11 @@ public class ElementWorldRestriction extends ParseableContainerElement<List<Worl
 			return true;
 		}
 		List<World> whitelist = this.whitelist.parse(replacer).orNull();
-		if (whitelist != null && (ConfigGCore.ignoreInvalidElementValues ? this.whitelist.getValueSize() != 0 : !whitelist.isEmpty())) {
+		if (whitelist != null && (ConfigGCore.ignoreInvalidElementValues ? this.whitelist.getRawValueSize() != 0 : !whitelist.isEmpty())) {
 			return whitelist.contains(world);
 		}
 		List<World> blacklist = this.blacklist.parse(replacer).orNull();
-		if (blacklist != null && (ConfigGCore.ignoreInvalidElementValues ? this.blacklist.getValueSize() != 0 : !blacklist.isEmpty())) {
+		if (blacklist != null && (ConfigGCore.ignoreInvalidElementValues ? this.blacklist.getRawValueSize() != 0 : !blacklist.isEmpty())) {
 			return !blacklist.contains(world);
 		}
 		return true;

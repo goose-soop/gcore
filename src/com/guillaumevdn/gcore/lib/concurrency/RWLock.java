@@ -14,14 +14,16 @@ public final class RWLock {
 
 	// ----- lock manipulation
 
+	public ReentrantReadWriteLock getBackingLock() {
+		return lock;
+	}
+
 	public void lockRead() {
 		lock.readLock().lock();
 	}
 
 	public void unlockRead() {
-		while (lock.getReadHoldCount() > 0) {  // unlock all locks on this thread ; should be called only once
-			lock.readLock().unlock();
-		}
+		lock.readLock().unlock();  // unlock only once ; there might be multiple operations during the same "parent read lock", and always unlocking all held in this method would make it so parent operations could end up being made while not locked at all
 	}
 
 	public void lockWrite() {
@@ -29,9 +31,7 @@ public final class RWLock {
 	}
 
 	public void unlockWrite() {
-		while (lock.getWriteHoldCount() > 0) {  // unlock all locks on this thread ; should be called only once
-			lock.writeLock().unlock();
-		}
+		lock.writeLock().unlock();  // unlock only once ; there might be multiple operations during the same "parent write lock", and always unlocking all held in this method would make it so parent operations could end up being made while not locked at all
 	}
 
 	// ----- shortcuts to read/write
@@ -50,12 +50,7 @@ public final class RWLock {
 	public void readThrowable(ThrowableRunnable operation) throws Throwable {
 		try {
 			lockRead();
-			try {
-				operation.run();
-			} catch (Throwable error) {
-				unlockRead();
-				throw error;
-			}
+			operation.run();
 			unlockRead();
 		} catch (Throwable error) {
 			unlockRead();

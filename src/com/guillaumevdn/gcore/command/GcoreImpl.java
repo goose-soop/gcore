@@ -15,7 +15,7 @@ import com.guillaumevdn.gcore.lib.string.TextElement;
 public final class GcoreImpl extends Subcommand {
 
 	public GcoreImpl() {
-		super(true, PermissionGCore.inst().gcoreAdmin, new TextElement("server implementation"), CollectionUtils.asList("impl"));
+		super(false, PermissionGCore.inst().gcoreAdmin, new TextElement("server implementation"), CollectionUtils.asList("impl"));
 	}
 
 	@Override

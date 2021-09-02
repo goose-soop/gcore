@@ -55,9 +55,20 @@ public abstract class ActiveItemHolder {
 	public final long getLastRefreshDelayTicks() {
 		return refreshDelayTicks;
 	}
+	
+	public int getCurrentDelayTicks() {
+		return currentDelayTicks;
+	}
 
-	protected void setRefreshDelayTicks(int refreshDelayTicks) {
+	public final void setRefreshDelayTicks(int refreshDelayTicks) {
+		setRefreshDelayTicks(refreshDelayTicks, false);
+	}
+
+	public final void setRefreshDelayTicks(int refreshDelayTicks, boolean refreshNext) {
 		this.refreshDelayTicks = refreshDelayTicks;
+		if (refreshNext) {
+			this.currentDelayTicks = -1;
+		}
 	}
 
 	// -----

@@ -12,12 +12,12 @@ import com.guillaumevdn.gcore.lib.string.Text;
  */
 public abstract class ElementEnumMap<E extends Enum<E>, V extends Element> extends ElementAbstractEnumMap<E, V> {
 	
-	public ElementEnumMap(Class<E> enumClass, String valueTypeName, Element parent, String id, Need need, Text editorDescription) {
-		super(enumClass, valueTypeName, parent, id, need, editorDescription, CollectionUtils.asList(enumClass.getEnumConstants()));
+	public ElementEnumMap(Class<E> enumClass, Element parent, String id, Need need, Text editorDescription) {
+		super(enumClass, parent, id, need, editorDescription, CollectionUtils.asList(enumClass.getEnumConstants()));
 	}
 
-	public ElementEnumMap(Class<E> enumClass, String valueTypeName, Element parent, String id, Need need, Text editorDescription, MapSupplier<E, Mat> valuesBuilder) {
-		super(enumClass, valueTypeName, parent, id, need, editorDescription, valuesBuilder);
+	public ElementEnumMap(Class<E> enumClass, Element parent, String id, Need need, Text editorDescription, MapSupplier<E, Mat> valuesBuilder) {
+		super(enumClass, parent, id, need, editorDescription, valuesBuilder);
 	}
 
 }

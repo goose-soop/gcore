@@ -17,14 +17,15 @@ import com.guillaumevdn.gcore.lib.tuple.Pair;
 public class SerializerLowerCaseLinkedHashMap<K, V> implements Cloneable {
 
 	private final Serializer<K> keySerializer;
-	private final LowerCaseLinkedHashMap<V> map = new LowerCaseLinkedHashMap<>();
+	private final LowerCaseLinkedHashMap<V> map;
 
-	public SerializerLowerCaseLinkedHashMap(Class<K> keyClass) {
-		this(Serializer.find(keyClass));
+	public SerializerLowerCaseLinkedHashMap(Class<K> keyClass, int initialCapacity, float loadFactor) {
+		this(Serializer.find(keyClass), initialCapacity, loadFactor);
 	}
 
-	public SerializerLowerCaseLinkedHashMap(Serializer<K> keySerializer) {
+	public SerializerLowerCaseLinkedHashMap(Serializer<K> keySerializer, int initialCapacity, float loadFactor) {
 		this.keySerializer = keySerializer;
+		this.map = new LowerCaseLinkedHashMap<>(initialCapacity, loadFactor);
 	}
 
 	// ----- methods
@@ -199,7 +200,7 @@ public class SerializerLowerCaseLinkedHashMap<K, V> implements Cloneable {
 
 	@Override
 	public SerializerLowerCaseLinkedHashMap<K, V> clone() {
-		SerializerLowerCaseLinkedHashMap<K, V> clone = new SerializerLowerCaseLinkedHashMap<K, V>(keySerializer.getTypeClass());
+		SerializerLowerCaseLinkedHashMap<K, V> clone = new SerializerLowerCaseLinkedHashMap<K, V>(keySerializer.getTypeClass(), size(), 1f);
 		forEach((key, value) -> clone.put(key, value));
 		return this;
 	}

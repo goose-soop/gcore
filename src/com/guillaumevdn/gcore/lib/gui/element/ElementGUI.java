@@ -41,7 +41,7 @@ public class ElementGUI extends ContainerElement implements SuperElement {
 	}
 
 	protected ElementGUI(Element parent, File file, String id, boolean defContents, Text editorDescription) {
-		super("GUI", parent, id, Need.optional(), editorDescription);
+		super(parent, id, Need.optional(), editorDescription);
 		this.file = file;
 		if (defContents) defaultContents = add(new ElementGUIItemList(this, "contents", Need.optional(), TextEditorGeneric.descriptionGuiContents));
 	}

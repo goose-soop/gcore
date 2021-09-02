@@ -34,6 +34,12 @@ public class RWArrayList<T> extends ArrayList<T> {
 
 	private static final long serialVersionUID = -5108501966613387973L;
 
+	// -------------------- construct --------------------
+
+	public RWArrayList(int initialCapacity) {
+		super(initialCapacity);
+	}
+
 	// -------------------- element modifier for subclasses --------------------
 
 	protected T elementModifier(Object element) {
@@ -251,7 +257,7 @@ public class RWArrayList<T> extends ArrayList<T> {
 	@Override
 	public final RWArrayList<T> clone() {
 		return lock.read(() -> {
-			RWArrayList<T> clone = new RWArrayList<>();
+			RWArrayList<T> clone = new RWArrayList<>(super.size());
 			clone.addAll(this);
 			return clone;
 		});

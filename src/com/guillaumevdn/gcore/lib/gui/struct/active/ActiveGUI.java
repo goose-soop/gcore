@@ -26,8 +26,8 @@ import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
 public abstract class ActiveGUI extends GUI {
 
 	private final Replacer replacer;
-	private final RWLowerCaseHashMap<ActiveItemHolder> activeHolders = new RWLowerCaseHashMap<>();  // otherwise sometimes concurrent modification exception #1143
-	private final RWLowerCaseHashMap<Object> lifecycleData = new RWLowerCaseHashMap<>();  // this allows to store temporary values, such as interactions with player inventory slots
+	private final RWLowerCaseHashMap<ActiveItemHolder> activeHolders = new RWLowerCaseHashMap<>(5, 1f);  // otherwise sometimes concurrent modification exception #1143
+	private final RWLowerCaseHashMap<Object> lifecycleData = new RWLowerCaseHashMap<>(1, 1f);  // this allows to store temporary values, such as interactions with player inventory slots
 
 	public ActiveGUI(GPlugin plugin, String id, String name, GUIType type, Replacer replacer, Option... options) {
 		super(plugin, id, name, type, NumberUtils.range(0, type.getSize() -1), options);
@@ -39,7 +39,7 @@ public abstract class ActiveGUI extends GUI {
 	public final RWLowerCaseHashMap<ActiveItemHolder> getActiveHolders() {
 		return activeHolders;
 	}
-	
+
 	public final RWLowerCaseHashMap<Object> getLifecycleData() {
 		return lifecycleData;
 	}

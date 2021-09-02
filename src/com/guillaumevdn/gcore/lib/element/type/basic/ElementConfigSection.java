@@ -26,8 +26,8 @@ public class ElementConfigSection<T> extends Element {
 
 	private SectionNode value = null;
 
-	public ElementConfigSection(String typeName, Element parent, String id, Need need, Text editorDescription) {
-		super(typeName, parent, id, need.getType(), editorDescription);
+	public ElementConfigSection(Element parent, String id, Need need, Text editorDescription) {
+		super(parent, id, need.getType(), editorDescription);
 	}
 
 	// ----- get

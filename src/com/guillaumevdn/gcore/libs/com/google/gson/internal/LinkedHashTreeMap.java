@@ -10,7 +10,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF UNKNOWN KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
@@ -74,7 +74,7 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
         ? comparator
         : (Comparator) NATURAL_ORDER;
     this.header = new Node<K, V>();
-    this.table = new Node[16];
+    this.table = new Node[16]; // 
     this.threshold = (table.length / 2) + (table.length / 4); // 3/4 capacity
   }
 
@@ -564,6 +564,7 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
    * twice as many trees, each of (approximately) half the previous size.
    */
   static <K, V> Node<K, V>[] doubleCapacity(Node<K, V>[] oldTable) {
+    // 
     int oldCapacity = oldTable.length;
      // Arrays and generics don't get along.
     Node<K, V>[] newTable = new Node[oldCapacity * 2];
@@ -663,8 +664,8 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
    * building trees whose size isn't a power of 2 minus 1.
    *
    * <p>Unlike rebuilding a tree from scratch, this approach requires no value
-   * comparisons. Using this class to create a tree of size <i>suppl</i> is
-   * {@code O(suppl)}.
+   * comparisons. Using this class to create a tree of size <i>S</i> is
+   * {@code O(S)}.
    */
   final static class AvlBuilder<K, V> {
     /** This stack is a singly linked list, linked by the 'parent' field. */

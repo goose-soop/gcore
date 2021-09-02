@@ -20,7 +20,7 @@ public class ElementTimeLimit extends ContainerElement {
 	protected ElementNotify reminder = addNotify("reminder", Need.optional(), TextEditorGeneric.descriptionTimeLimitReminder);
 
 	public ElementTimeLimit(Element parent, String id, Need need, Text editorDescription) {
-		super("time limit", parent, id, need, editorDescription);
+		super(parent, id, need, editorDescription);
 	}
 
 	// ----- get

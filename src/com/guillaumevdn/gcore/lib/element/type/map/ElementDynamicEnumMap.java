@@ -17,8 +17,8 @@ import com.guillaumevdn.gcore.lib.string.Text;
  */
 public abstract class ElementDynamicEnumMap<E, V extends Element> extends MapElement<E, V> {
 
-	public ElementDynamicEnumMap(Serializer<E> typeSerializer, String valueTypeName, Element parent, String id, Need need, Text editorDescription) {
-		super(typeSerializer, valueTypeName, parent, id, need, editorDescription);
+	public ElementDynamicEnumMap(Serializer<E> typeSerializer, Element parent, String id, Need need, Text editorDescription) {
+		super(typeSerializer, parent, id, need, editorDescription);
 	}
 
 	public abstract Collection<E> getValues();

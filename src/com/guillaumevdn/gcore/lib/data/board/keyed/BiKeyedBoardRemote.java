@@ -50,14 +50,14 @@ public abstract class BiKeyedBoardRemote<K, K2, V> extends BiKeyedBoard<K, K2, V
 						throw exception;
 					} finally {
 						if (!mustCache) {
-							disposeCacheElements(BukkitThread.ASYNC, values.streamResultKeys(s -> s.map(k2 -> BiKeyReference.of(key, k2)).collect(Collectors.toSet())), null); // will be saved if needed
+							disposeCacheElements(BukkitThread.ASYNC, values.streamResultKeys(s -> s.map(k2 -> BiKeyReference.of(key, k2)).collect(Collectors.toSet())), null);  // will be saved if needed
 						}
 					}
 				};
 				// absent
 				RWHashMap<K2, V> result = cache.get(key);
 				if (result == null && createDef) {
-					result = new RWHashMap<>();
+					result = new RWHashMap<>(10, 1f);
 					if (mustCache) {
 						cache.put(key, result);
 					}
@@ -101,7 +101,7 @@ public abstract class BiKeyedBoardRemote<K, K2, V> extends BiKeyedBoard<K, K2, V
 				if (result == null && def != null) {
 					result = def.get();
 					if (mustCache) {
-						cache.computeIfAbsent(key, __ -> new RWHashMap<>()).put(key2, result);
+						cache.computeIfAbsent(key, __ -> new RWHashMap<>(10, 1f)).put(key2, result);
 					}
 				}
 				// process
@@ -119,7 +119,7 @@ public abstract class BiKeyedBoardRemote<K, K2, V> extends BiKeyedBoard<K, K2, V
 	public final void putValue(K key, K2 key2, V value, Runnable onPush, boolean mustCache) {
 		BiKeyReference<K, K2> ref = new BiKeyReference<>(key, key2);
 		// valuesCache new value
-		cache.computeIfAbsent(key, k -> new RWHashMap<>()).put(key2, value);
+		cache.computeIfAbsent(key, k -> new RWHashMap<>(10, 1f)).put(key2, value);
 		// push element
 		pushElements(BukkitThread.ASYNC, CollectionUtils.asSet(ref), () -> {
 			if (onPush != null) {

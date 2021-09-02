@@ -69,7 +69,7 @@ public class ElementNotify extends ContainerElement {
 	private ElementDouble soundPitch = addDouble("sound_pitch", Need.optional(1d), TextEditorGeneric.descriptionNotifySoundPitch);
 
 	public ElementNotify(Element parent, String id, Need need, Text editorDescription) {
-		super("notify", parent, id, need, editorDescription);
+		super(parent, id, need, editorDescription);
 	}
 
 	// ----- get
@@ -142,8 +142,8 @@ public class ElementNotify extends ContainerElement {
 	}
 
 	// ----- methods
-	private RWHashMap<Player, BukkitTask> lastActionbarTasks = new RWHashMap<>();
-	private RWHashMap<Player, Bossbar> lastBossbars = new RWHashMap<>();
+	private RWHashMap<Player, BukkitTask> lastActionbarTasks = new RWHashMap<>(5, 1f);
+	private RWHashMap<Player, Bossbar> lastBossbars = new RWHashMap<>(5, 1f);
 
 	public void stopLastActionbar(Player player) {
 		BukkitTask task = lastActionbarTasks.remove(player);
@@ -175,7 +175,7 @@ public class ElementNotify extends ContainerElement {
 		if (!readContains()) return;
 		sendMessage(players, replacer);
 		sendActionbar(players, replacer);
-		sendBossbar(players, replacer, false);
+		sendBossbar(players, replacer);
 		sendTitle(players, replacer);
 		playSound(players, replacer, soundLocation);
 	}
@@ -225,21 +225,42 @@ public class ElementNotify extends ContainerElement {
 		});
 	}
 
-	public void sendBossbar(Collection<Player> players, Replacer replacer, boolean noAutoProgress) {
-		sendBossbar(players, replacer, null, noAutoProgress);
+	public void sendBossbar(Collection<Player> players, Replacer replacer) {
+		sendBossbar(players, replacer, null, null, null);
 	}
 
-	public void sendBossbar(Collection<Player> players, Replacer replacer, Long forceDurationMillis, boolean noAutoProgress) {
+	public void sendBossbar(Collection<Player> players, Replacer replacer, Double noAutoProgressForceProgress) {
+		sendBossbar(players, replacer, null, noAutoProgressForceProgress, null);
+	}
+
+	public void sendBossbar(Collection<Player> players, Replacer replacer, Long forceDurationMillis, Double forceProgress, BossbarColor forceColor) {
 		directParseAndIfPresentDo("bossbar", "bossbar_color", "bossbar_style", "bossbar_flags", replacer, (String bossbar, BossbarColor color, BossbarStyle style, List<BossbarFlag> flags) -> {
 			players.forEach(player -> {
-				stopLastBossbar(player);
-				Bossbar instance;
-				Long bossbarDuration = forceDurationMillis != null ? forceDurationMillis : this.bossbarDuration.parse(replacer).orNull();
-				if (bossbarDuration != null) {
-					instance = BossbarCompat.sendTemp(getSuperElement().getPlugin(), bossbar, color, style, flags, CollectionUtils.asList(player), bossbarDuration, noAutoProgress);
-				} else {
-					instance = new Bossbar(getSuperElement().getPlugin(), "notify_" + UUID.randomUUID(), bossbar, color, style, flags, 1f, CollectionUtils.asList(player));
-					instance.start();
+				Long bossbarDurationMillis = forceDurationMillis != null ? forceDurationMillis : this.bossbarDuration.parse(replacer).orNull();
+
+
+				// already active, simply update parameters to avoid the ugly unregister/register animation
+				Bossbar instance = lastBossbars.remove(player);
+				if (instance != null && instance.isActive()) {
+					instance.setTitle(bossbar);
+					instance.setColor(forceColor != null ? forceColor : color);
+					instance.setStyle(style);
+					instance.setFlags(flags);
+					if (bossbarDurationMillis != null) {
+						int ticks = (int) (bossbarDurationMillis / 50L);
+						instance.changeTemp(ticks, forceProgress);
+					} else {
+						instance.setProgress(forceProgress != null ? forceProgress : 1f);
+					}
+				}
+				// not active, create new
+				else {
+					if (bossbarDurationMillis != null) {
+						instance = BossbarCompat.sendTemp(getSuperElement().getPlugin(), bossbar, forceColor != null ? forceColor : color, style, flags, CollectionUtils.asList(player), bossbarDurationMillis, forceProgress);
+					} else {
+						instance = new Bossbar(getSuperElement().getPlugin(), "notify_" + UUID.randomUUID(), bossbar, forceColor != null ? forceColor : color, style, flags, forceProgress != null ? forceProgress : 1f, CollectionUtils.asList(player));
+						instance.start();
+					}
 				}
 				lastBossbars.put(player, instance);
 			});

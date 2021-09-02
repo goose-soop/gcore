@@ -37,8 +37,8 @@ public abstract class ReferenceableListElement<T extends Element> extends Abstra
 	private final ElementsContainer<? extends T> ref;
 	private final boolean allowCompactNestedWrite;
 
-	protected ReferenceableListElement(ElementsContainer<? extends T> ref, boolean allowCompactNestedWrite, String typeName, Element parent, String id, Need need, Text editorDescription) {
-		super(String.class, "list of " + typeName, parent, id, need, editorDescription);
+	protected ReferenceableListElement(ElementsContainer<? extends T> ref, boolean allowCompactNestedWrite, Element parent, String id, Need need, Text editorDescription) {
+		super(String.class, parent, id, need, editorDescription);
 		this.ref = ref;
 		this.allowCompactNestedWrite = allowCompactNestedWrite;
 	}
@@ -54,7 +54,7 @@ public abstract class ReferenceableListElement<T extends Element> extends Abstra
 
 	@Override
 	public final Optional<Node<T>> getElement(String key) {
-		return findElement(node -> node.getKey().equalsIgnoreCase(key) || node.getGlobalId().equalsIgnoreCase(key));
+		return findElement(node -> node.keyOrGlobalIdEquals(key));
 	}
 
 	public final Optional<T> getActualValue(String key) {
@@ -89,7 +89,10 @@ public abstract class ReferenceableListElement<T extends Element> extends Abstra
 	@Override
 	protected void doRead() throws Throwable {
 		String path = getConfigurationPath();
-		for (String elementId : getSuperElement().getConfiguration().readKeysForSection(path)) {
+		List<String> keys = getSuperElement().getConfiguration().readKeysForSection(path);
+
+		reinitializeElements(keys.size(), 1f);
+		for (String elementId : keys) {
 			// global element
 			String globalElementId = null;
 			if (!getSuperElement().getConfiguration().isConfigurationSection(path + "." + elementId)) {
@@ -169,23 +172,6 @@ public abstract class ReferenceableListElement<T extends Element> extends Abstra
 					}));
 				}
 				// create items
-				setPersistentItem(new GUIItem("new_global_element", 49, ItemUtils.createItem(CommonMats.BLAZE_ROD, TextEditorGeneric.controlAddGlobalElementName.parseLine(), null), call -> {
-					// left-click : create
-					if (call.getType().equals(ClickType.LEFT)) {
-						LinkedHashMap<String, Mat> remaining = new LinkedHashMap<>();
-						getRef().getIcons().entrySet().stream().sorted((a, b) -> a.getValue().compareTo(b.getValue())).forEach(entry -> {
-							if (!keys().contains(entry.getKey())) {
-								remaining.put(entry.getKey(), entry.getValue());
-							}
-						});
-						EnumSelectorGUI.openSelector(call.getClicker(), false, getKeySerializer(), () -> remaining, key -> {
-							add(key, key);
-							getSuperElement().onEditorChange(ReferenceableListElement.this);
-							// reopen GUI (that refreshes it since it's an editor GUI)
-							call.reopenGUI();
-						}, () -> call.reopenGUI());
-					}
-				}));
 				setPersistentItem(new GUIItem("new_element", 50, ItemUtils.createItem(CommonMats.BLAZE_ROD, TextEditorGeneric.controlAddElementName.parseLine(), TextEditorGeneric.controlAddElementWithQuick.parseLines()), call -> {
 					// left-click : quickly create with a generated id
 					if (call.getType().equals(ClickType.LEFT)) {
@@ -204,6 +190,23 @@ public abstract class ReferenceableListElement<T extends Element> extends Abstra
 					// right-click : manually enter id
 					else if (call.getType().equals(ClickType.RIGHT)) {
 						editorAskKeyAndCreateAndAddLocalElement(call, (elementId, element) -> {
+							getSuperElement().onEditorChange(ReferenceableListElement.this);
+							// reopen GUI (that refreshes it since it's an editor GUI)
+							call.reopenGUI();
+						}, () -> call.reopenGUI());
+					}
+				}));
+				setPersistentItem(new GUIItem("new_global_element", 51, ItemUtils.createItem(CommonMats.BLAZE_ROD, TextEditorGeneric.controlAddGlobalElementName.parseLine(), null), call -> {
+					// left-click : create
+					if (call.getType().equals(ClickType.LEFT)) {
+						LinkedHashMap<String, Mat> remaining = new LinkedHashMap<>();
+						getRef().getIcons().entrySet().stream().sorted((a, b) -> a.getValue().compareTo(b.getValue())).forEach(entry -> {
+							if (!keys().contains(entry.getKey())) {
+								remaining.put(entry.getKey(), entry.getValue());
+							}
+						});
+						EnumSelectorGUI.openSelector(call.getClicker(), false, getKeySerializer(), () -> remaining, key -> {
+							add(key, key);
 							getSuperElement().onEditorChange(ReferenceableListElement.this);
 							// reopen GUI (that refreshes it since it's an editor GUI)
 							call.reopenGUI();

@@ -48,8 +48,8 @@ public abstract class ElementAbstractEnumList<E> extends ElementValueList<E> {
 		// right-click : select
 		if (call.getType().equals(ClickType.RIGHT)) {
 			List<E> v = getValues();
-			if (getValue() != null) {
-				v = v.stream().filter(value -> !CollectionUtils.containsIgnoreCase(getValue(), getSerializer().serialize(value))).collect(Collectors.toList());
+			if (getRawValue() != null) {
+				v = v.stream().filter(value -> !CollectionUtils.containsIgnoreCase(getRawValue(), getSerializer().serialize(value))).collect(Collectors.toList());
 			}
 			List<E> values = v; // pepega
 			// select with element icons
@@ -63,11 +63,11 @@ public abstract class ElementAbstractEnumList<E> extends ElementValueList<E> {
 						},
 						// on select
 						value -> {
-							List<String> newValue = getValueCopy();
+							List<String> newValue = getRawValueCopy();
 							if (newValue == null) {
 								setValue(CollectionUtils.asList(getSerializer().serialize(value)));
 							} else {
-								if (lineIndex >= getValue().size()) {
+								if (lineIndex >= getRawValue().size()) {
 									newValue.add(getSerializer().serialize(value));
 								} else {
 									newValue.set(lineIndex, getSerializer().serialize(value));
@@ -88,11 +88,11 @@ public abstract class ElementAbstractEnumList<E> extends ElementValueList<E> {
 				EnumSelectorGUI.openSelector(call.getClicker(), cacheEditorSelector, getSerializer(), () -> values, editorIconType(),
 						// on select
 						value -> {
-							List<String> newValue = getValueCopy();
+							List<String> newValue = getRawValueCopy();
 							if (newValue == null) {
 								setValue(CollectionUtils.asList(getSerializer().serialize(value)));
 							} else {
-								if (lineIndex >= getValue().size()) {
+								if (lineIndex >= getRawValue().size()) {
 									newValue.add(getSerializer().serialize(value));
 								} else {
 									newValue.set(lineIndex, getSerializer().serialize(value));
@@ -114,8 +114,8 @@ public abstract class ElementAbstractEnumList<E> extends ElementValueList<E> {
 	@Override
 	protected String editorNewLine() {
 		List<E> values = getValues();
-		if (getValue() != null) {
-			values = values.stream().filter(value -> !CollectionUtils.containsIgnoreCase(getValue(), getSerializer().serialize(value))).collect(Collectors.toList());
+		if (getRawValue() != null) {
+			values = values.stream().filter(value -> !CollectionUtils.containsIgnoreCase(getRawValue(), getSerializer().serialize(value))).collect(Collectors.toList());
 		}
 		return getSerializer().serialize(CollectionUtils.random(!values.isEmpty() ? values : getValues()));
 	}

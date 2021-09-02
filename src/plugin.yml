@@ -4,7 +4,7 @@ description: Core library for GuillaumeVDN's plugins
 author: GuillaumeVDN
 website: www.guillaumevdn.com
 # techy
-version: 8.24.0
+version: 8.27.3
 api-version: 1.13
 main: com.guillaumevdn.gcore.GCore
 softdepend:
@@ -14,6 +14,8 @@ softdepend:
   - DeluxeChat
   - MythicMobs
   - PlaceholderAPI
+  - PlayerPoints
+  - TokenEnchant
 loadbefore:
   - GCoreLegacy
   - QuestCreator

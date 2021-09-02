@@ -23,8 +23,7 @@ public class ElementInteger extends ElementValue<Integer> {
 	}
 
 	public ElementInteger(Element parent, String id, Need need, int min, int max, Text editorDescription) {
-		super("integer" + (min == Integer.MIN_VALUE && max == Integer.MAX_VALUE ? "" : (min == Integer.MIN_VALUE ? " (max. " + max + ")" : (max == Integer.MAX_VALUE ? " (min. " + min + ")" : " (" + min + " - " + max + ")"))),
-				Integer.class, parent, id, need, editorDescription);
+		super(Integer.class, parent, id, need, editorDescription);
 		this.min = min;
 		this.max = max;
 	}

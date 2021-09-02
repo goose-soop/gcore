@@ -20,14 +20,16 @@ public class SortedLowerCaseHashMap<V> implements Cloneable {
 
 	private final Type type;
 	private final Order order;
-	private final LowerCaseHashMap<V> map = new LowerCaseHashMap<>();
+	private final LowerCaseHashMap<V> map;
 	private final Comparator<String> keyComparator;
 
-	public SortedLowerCaseHashMap(final Type type, final Order order) {
+	public SortedLowerCaseHashMap(Type type, Order order, int initialCapacity, float loadFactor) {
 		if (type == null) throw new IllegalArgumentException("type can't be null");
 		if (order == null) throw new IllegalArgumentException("order can't be null");
 		this.type = type;
 		this.order = order;
+		this.map = new LowerCaseHashMap<>(initialCapacity, loadFactor);
+
 		// key sorted
 		if (type.equals(Type.KEY_SORTED)) {
 			keyComparator = new Comparator<String>() {
@@ -101,7 +103,7 @@ public class SortedLowerCaseHashMap<V> implements Cloneable {
 	public V get(String key) {
 		return map.get(key);
 	}
-	
+
 	/**
 	 * @param key the key
 	 * @return the value associated with this key, or the provided value
@@ -230,7 +232,7 @@ public class SortedLowerCaseHashMap<V> implements Cloneable {
 
 	@Override
 	public SortedLowerCaseHashMap<V> clone() {
-		SortedLowerCaseHashMap<V> clone = new SortedLowerCaseHashMap<V>(getType(), getOrder());
+		SortedLowerCaseHashMap<V> clone = new SortedLowerCaseHashMap<V>(getType(), getOrder(), size(), 1f);
 		forEach((key, value) -> clone.put(key, value));
 		return this;
 	}
@@ -304,29 +306,29 @@ public class SortedLowerCaseHashMap<V> implements Cloneable {
 	}
 
 	// ----- static methods
-	public static <TV> SortedLowerCaseHashMap<TV> asMap(Type type, Order order, Object... objects) {
+	public static <TV> SortedLowerCaseHashMap<TV> asMap(Type type, Order order, int initialCapacity, float loadFactor, Object... objects) {
 		if (objects.length != 0 && objects.length % 2 != 0) throw new IllegalArgumentException("size isn't a multiple of 2");
-		SortedLowerCaseHashMap<TV> map = new SortedLowerCaseHashMap<>(type, order);
+		SortedLowerCaseHashMap<TV> map = new SortedLowerCaseHashMap<>(type, order, initialCapacity, loadFactor);
 		for (int i = 0; i < objects.length; i += 2) {
 			map.put((String) objects[i], (TV) objects[i + 1]);
 		}
 		return map;
 	}
 
-	public static <TV> SortedLowerCaseHashMap<TV> keySorted() {
-		return new SortedLowerCaseHashMap<>(Type.KEY_SORTED, Order.NATURAL);
+	public static <TV> SortedLowerCaseHashMap<TV> keySorted(int initialCapacity, float loadFactor) {
+		return new SortedLowerCaseHashMap<>(Type.KEY_SORTED, Order.NATURAL, initialCapacity, loadFactor);
 	}
 
-	public static <TV> SortedLowerCaseHashMap<TV> keySortedReverse() {
-		return new SortedLowerCaseHashMap<>(Type.KEY_SORTED, Order.REVERSE);
+	public static <TV> SortedLowerCaseHashMap<TV> keySortedReverse(int initialCapacity, float loadFactor) {
+		return new SortedLowerCaseHashMap<>(Type.KEY_SORTED, Order.REVERSE, initialCapacity, loadFactor);
 	}
 
-	public static <TV> SortedLowerCaseHashMap<TV> valueSorted() {
-		return new SortedLowerCaseHashMap<>(Type.VALUE_SORTED, Order.NATURAL);
+	public static <TV> SortedLowerCaseHashMap<TV> valueSorted(int initialCapacity, float loadFactor) {
+		return new SortedLowerCaseHashMap<>(Type.VALUE_SORTED, Order.NATURAL, initialCapacity, loadFactor);
 	}
 
-	public static <TV> SortedLowerCaseHashMap<TV> valueSortedReverse() {
-		return new SortedLowerCaseHashMap<>(Type.VALUE_SORTED, Order.REVERSE);
+	public static <TV> SortedLowerCaseHashMap<TV> valueSortedReverse(int initialCapacity, float loadFactor) {
+		return new SortedLowerCaseHashMap<>(Type.VALUE_SORTED, Order.REVERSE, initialCapacity, loadFactor);
 	}
 
 }

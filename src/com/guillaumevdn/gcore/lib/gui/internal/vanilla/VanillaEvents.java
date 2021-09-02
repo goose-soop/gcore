@@ -54,21 +54,18 @@ public class VanillaEvents implements Listener {
 		lastClick = System.currentTimeMillis();
 
 		// process later
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				int slot = event.getRawSlot();
-				try {
-					if (player.getInventory().equals(event.getClickedInventory())) {
-						handler.getGUI().onPlayerInventoryClick(new ClickCall(player, ClickType.valueOf(event.getClick().name()), handler.getGUI(), pageIndex, slot), Mat.isVoid(event.getCurrentItem()) ? null : event.getCurrentItem());
-					} else {
-						handler.onClick(player, ClickType.valueOf(event.getClick().toString()), slot, pageIndex);
-					}
-				} catch (Throwable exception) {
-					throw new Error("couldn't perform click effects in GUI " + handler.getGUI().getId() + " at slot " + slot + " of page " + pageIndex, exception);
+		handler.getGUI().getPlugin().operateSyncLater(() -> {
+			int slot = event.getRawSlot();
+			try {
+				if (player.getInventory().equals(event.getClickedInventory())) {
+					handler.getGUI().onPlayerInventoryClick(new ClickCall(player, ClickType.valueOf(event.getClick().name()), handler.getGUI(), pageIndex, slot), Mat.isVoid(event.getCurrentItem()) ? null : event.getCurrentItem());
+				} else {
+					handler.onClick(player, ClickType.valueOf(event.getClick().toString()), slot, pageIndex);
 				}
+			} catch (Throwable exception) {
+				handler.getGUI().getPlugin().getMainLogger().error("Couldn't perform click effects in GUI " + handler.getGUI().getId() + " at slot " + slot + " of page " + pageIndex, exception);
 			}
-		}.runTaskLater(handler.getGUI().getPlugin(), 1L);
+		}, 1);
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)

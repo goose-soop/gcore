@@ -21,7 +21,7 @@ public final class ElementGUIItemType extends ElementTypableElementType<GUIItemT
 		super(GUIItemTypes.inst(), parent, id, editorDescription);
 	}
 
-	public static RWWeakHashMap<Object, List<GUIItemType>> valuesCache = new RWWeakHashMap<>();
+	public static RWWeakHashMap<Object, List<GUIItemType>> valuesCache = new RWWeakHashMap<>(5, 1f);
 	@Override
 	protected List<GUIItemType> cacheOrBuild() {
 		return cachedOrBuild(valuesCache, () -> GUIItemTypes.inst().values().stream().sorted(Comparator.comparing(e -> e.getId())));

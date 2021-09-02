@@ -27,7 +27,7 @@ public abstract class BiKeyedBoardLocal<K, K2, V> extends BiKeyedBoard<K, K2, V>
 	}
 
 	public final V getValueOrCreate(K key, K2 key2, BiFunction<K, K2, V> mappingFunction) {
-		RWHashMap<K2, V> values = cache.computeIfAbsent(key, k -> new RWHashMap<>());
+		RWHashMap<K2, V> values = cache.computeIfAbsent(key, k -> new RWHashMap<>(10, 1f));
 		V value = values.get(key2);
 		if (value == null) {
 			putValue(key, key2, value = mappingFunction.apply(key, key2));
@@ -60,7 +60,7 @@ public abstract class BiKeyedBoardLocal<K, K2, V> extends BiKeyedBoard<K, K2, V>
 
 	public final V putValue(K key, K2 key2, V value) {
 		if (value == null) throw new IllegalArgumentException("value can't be null");
-		V old = cache.computeIfAbsent(key, s -> new RWHashMap<>()).put(key2, value);
+		V old = cache.computeIfAbsent(key, s -> new RWHashMap<>(10, 1f)).put(key2, value);
 		addCachedToSave(new BiKeyReference<>(key, key2));
 		onValuePut(key, key2, value);
 		return old;

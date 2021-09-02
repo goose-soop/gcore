@@ -24,7 +24,7 @@ import com.guillaumevdn.gcore.lib.string.Text;
 public class ElementStringMap extends MapElement<String, ElementString> implements ParseableMapElement<String, String, ElementString> {
 
 	public ElementStringMap(Element parent, String id, Need need, Text editorDescription) {
-		super(String.class, "string", parent, id, need, editorDescription);
+		super(String.class, parent, id, need, editorDescription);
 	}
 
 	// ----- add

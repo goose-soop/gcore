@@ -22,14 +22,14 @@ public abstract class ElementAbstractDefaultEnumMap<E, V extends Element> extend
 	private final List<E> values;
 	private final LinkedHashMap<E, Mat> valuesIcons;
 
-	public ElementAbstractDefaultEnumMap(Class<E> typeClass, String valueTypeName, Element parent, String id, Need need, Text editorDescription, List<E> values) {
-		super(typeClass, valueTypeName, parent, id, need, editorDescription);
+	public ElementAbstractDefaultEnumMap(Class<E> typeClass, Element parent, String id, Need need, Text editorDescription, List<E> values) {
+		super(typeClass, parent, id, need, editorDescription);
 		this.values = values;
 		this.valuesIcons = null;
 	}
 
-	public ElementAbstractDefaultEnumMap(Class<E> typeClass, String valueTypeName, Element parent, String id, Need need, Text editorDescription, MapSupplier<E, Mat> valuesBuilder) {
-		super(typeClass, valueTypeName, parent, id, need, editorDescription);
+	public ElementAbstractDefaultEnumMap(Class<E> typeClass, Element parent, String id, Need need, Text editorDescription, MapSupplier<E, Mat> valuesBuilder) {
+		super(typeClass, parent, id, need, editorDescription);
 		this.values = null;
 		valuesBuilder.get(this.valuesIcons = new LinkedHashMap<>());
 	}

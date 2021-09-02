@@ -47,7 +47,7 @@ public class ReflectionFakeEnum {
 	}
 
 	// ----- valuesCache
-	private static RWHashMap<Integer, ReflectionFakeEnum> cache = new RWHashMap<>();
+	private static RWHashMap<Integer, ReflectionFakeEnum> cache = new RWHashMap<>(10, 1f);
 
 	public static ReflectionFakeEnum of(Class<?> enumClass) throws Throwable {
 		// hash by class name

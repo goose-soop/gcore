@@ -58,11 +58,11 @@ public class ScoreboardEntry {
 	}
 
 	public void reset(org.bukkit.scoreboard.Scoreboard bukkit) {
-		if (team != null && team.hasEntry(name)) {
-			try {
+		try {
+			if (team != null && team.hasEntry(name)) {
 				team.removeEntry(name);
-			} catch (IllegalStateException ignored) {}  // means he's not there, don't care, that was the point
-		}
+			}
+		} catch (IllegalStateException ignored) {}  // means he's not there, don't care, that was the point
 		bukkit.resetScores(name);
 	}
 

@@ -24,7 +24,7 @@ public final class FakeSuperElement extends Element implements SuperElement {
 	private FakeYMLConfiguration config;
 
 	public FakeSuperElement(GPlugin plugin, String id) {
-		super("FakeConfigSuperElement", null, id, NeedType.OPTIONAL, null);
+		super(null, id, NeedType.OPTIONAL, null);
 		this.plugin = plugin;
 		config = new FakeYMLConfiguration(plugin);
 	}

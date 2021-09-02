@@ -34,10 +34,10 @@ public final class Compat {
 	// ----- create chat component
 	private static final ReflectionProcedureFunction<String, ReflectionObject> CREATE_CHAT_COMPONENT = new ReflectionProcedureFunction<String, ReflectionObject>()
 			.setIf(Version.IS_1_7, string -> {
-				return Reflection.invokeNmsMethod("ChatSerializer", "a", null, "{\"text\": \"" + string + "\"}");
+				return Reflection.invokeNmsMethod("ChatSerializer", "a", null, "{\"text\": \"" + string.replace("\"", "\\\"") + "\"}");
 			})
 			.orElse(string -> {
-				return Reflection.invokeNmsMethod((Version.REMAPPED ? "network.chat." : "") + "IChatBaseComponent$ChatSerializer", "a", null, "{\"text\": \"" + string + "\"}");
+				return Reflection.invokeNmsMethod((Version.REMAPPED ? "network.chat." : "") + "IChatBaseComponent$ChatSerializer", "a", null, "{\"text\": \"" + string.replace("\"", "\\\"") + "\"}");
 			})
 			;
 

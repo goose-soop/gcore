@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
 
 import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.lib.GPlugin;
@@ -20,6 +21,7 @@ import com.guillaumevdn.gcore.lib.configuration.file.node.SectionNode;
 import com.guillaumevdn.gcore.lib.element.struct.Element;
 import com.guillaumevdn.gcore.lib.element.struct.Need;
 import com.guillaumevdn.gcore.lib.element.type.container.ElementNotify;
+import com.guillaumevdn.gcore.lib.element.type.list.ElementPotionEffectList;
 import com.guillaumevdn.gcore.lib.exception.ConfigError;
 import com.guillaumevdn.gcore.lib.number.NumberUtils;
 import com.guillaumevdn.gcore.lib.reflection.Reflection;
@@ -28,6 +30,8 @@ import com.guillaumevdn.gcore.lib.serialization.adapter.type.AdapterItemStack;
 import com.guillaumevdn.gcore.lib.serialization.data.DataIO;
 import com.guillaumevdn.gcore.lib.string.StringUtils;
 import com.guillaumevdn.gcore.lib.string.Text;
+import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
+import com.guillaumevdn.gcore.lib.time.duration.ElementDuration;
 import com.guillaumevdn.gcore.lib.tuple.ItemChancePair;
 import com.guillaumevdn.gcore.lib.validator.type.CollectionIntegerValidator;
 import com.guillaumevdn.gcore.lib.validator.type.DoubleValidator;
@@ -362,15 +366,18 @@ public class YMLConfiguration {
 		validatePath(path);
 		// get list
 		Object object = yml.getConfigValue(path);
-		List<String> value = new ArrayList<String>();
+		List<String> value;
 		if (object != null) {
 			if (object instanceof List) {
+				value = new ArrayList<>(((List) object).size());
 				for (Object obj : (List) object) {
 					value.add(String.valueOf(obj));
 				}
 			} else {
-				value.add(String.valueOf(object));
+				value = CollectionUtils.asList(String.valueOf(object));
 			}
+		} else {
+			value = new ArrayList<>(0);
 		}
 		// format
 		StringUtils.format(value);
@@ -695,6 +702,15 @@ public class YMLConfiguration {
 	// ----- get standalone elements
 	private final FakeConfigSuperElement fakeSuperElementParent = new FakeConfigSuperElement(this, "config");
 
+	public long readDurationMillis(String path) {
+		ElementDuration duration = readElement(path, (FakeConfigSuperElement parent, String id) -> new ElementDuration(parent, id, Need.optional(), null, null, null));
+		return duration.directParseOrElse(Replacer.GENERIC, 0L);
+	}
+
+	public List<PotionEffect> readPotionEffectList(String path) {
+		return readElement(path, (FakeConfigSuperElement parent, String id) -> new ElementPotionEffectList(parent, id, Need.optional(), null)).parse(Replacer.GENERIC).orEmptyList();
+	}
+
 	public ElementNotify readNotify(String path) {
 		return readElement(path, ElementNotify.class);
 	}
@@ -702,22 +718,22 @@ public class YMLConfiguration {
 	public <T extends Element> T readElement(String path, Class<T> elementClass) {
 		T element = null;
 		try {
-			element = Reflection.newInstance(elementClass, fakeSuperElementParent, "config_" + path.replace('.', '-'), Need.optional(), null).get();  // classic element constructor ; different ones will need the method below
+			element = Reflection.newInstance(elementClass, fakeSuperElementParent, "config-" + path, Need.optional(), null).get();  // classic element constructor ; different ones will need the method below
 		} catch (Throwable exception) {
 			throwError("couldn't load initialize of type " + elementClass.getName() + " at path " + path, exception);
 		}
-
 		return readElement(path, element);
 	}
 
 	public <T extends Element> T readElement(String path, BiFunction<FakeConfigSuperElement, String, T> initializer) {
-		T element = initializer.apply(fakeSuperElementParent, "config_" + path.replace('.', '-'));
+		T element = initializer.apply(fakeSuperElementParent, "config-" + path);
 		return readElement(path, element);
 	}
 
 	private <T extends Element> T readElement(String path, T element) {
 		element.setParent(fakeSuperElementParent);
 		element.setForcedConfigurationPath(path);
+		element.setExtra("config_file", getLogFilePath());
 
 		try {
 			element.read();

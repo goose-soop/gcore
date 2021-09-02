@@ -7,7 +7,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.ListenerPriority;
@@ -16,6 +15,7 @@ import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.events.PacketListener;
 import com.guillaumevdn.gcore.ConfigGCore;
 import com.guillaumevdn.gcore.GCore;
+import com.guillaumevdn.gcore.command.GcoreItemReadClick;
 import com.guillaumevdn.gcore.lib.bukkit.BukkitThread;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.compatibility.Version;
@@ -23,7 +23,6 @@ import com.guillaumevdn.gcore.lib.concurrency.RWHashSet;
 import com.guillaumevdn.gcore.lib.function.ThrowableRunnable;
 import com.guillaumevdn.gcore.lib.gui.struct.ClickCall;
 import com.guillaumevdn.gcore.lib.gui.struct.ClickCall.ClickType;
-import com.guillaumevdn.gcore.lib.gui.struct.GUI.Option;
 import com.guillaumevdn.gcore.lib.reflection.Reflection;
 import com.guillaumevdn.gcore.lib.reflection.ReflectionObject;
 
@@ -98,7 +97,7 @@ public class ProtocolEvents implements PacketListener, Listener {
 				final int button;
 				int mode;
 
-				if (Version.ATLEAST_1_17_1) {
+				if (Version.ATLEAST_1_17) {
 					actionId = event.getPacket().getIntegers().getValues().get(1);
 					slot = event.getPacket().getIntegers().getValues().get(2);
 					button = event.getPacket().getIntegers().getValues().get(3);
@@ -241,17 +240,6 @@ public class ProtocolEvents implements PacketListener, Listener {
 			} catch (Throwable exception) {
 				throw new Error("couldn't perform close effects in GUI " + handler.getGUI().getId() + " for page " + page.getIndex(), exception);
 			}
-			// unregister on close
-			if (!handler.getGUI().getOptions().contains(Option.DONT_UNREGISTER_ON_CLOSE)) {
-				new BukkitRunnable() {
-					@Override
-					public void run() {
-						if (handler.getViewers().isEmpty()) {
-							handler.getGUI().deactivate(true);
-						}
-					}
-				}.runTaskLater(handler.getGUI().getPlugin(), 5L);
-			}
 		}
 	}
 
@@ -261,10 +249,18 @@ public class ProtocolEvents implements PacketListener, Listener {
 			if (slot >= handler.getGUI().getType().getSize()) {
 				int s = slot >= handler.getGUI().getType().getSize() + 27 ? slot - handler.getGUI().getType().getSize() - 27 : slot - handler.getGUI().getType().getSize() + 9;
 				handler.getGUI().onPlayerInventoryClick(new ClickCall(player, click, handler.getGUI(), pageIndex, s), player.getInventory().getItem(s));
+
+				if (GcoreItemReadClick.TOGGLED.contains(player)) {
+					GcoreItemReadClick.logItem(player, player.getInventory().getItem(s));
+				}
 			}
 			// another inventory
 			else {
 				handler.onClick(player, click, slot, pageIndex);
+
+				if (GcoreItemReadClick.TOGGLED.contains(player)) {
+					GcoreItemReadClick.logItem(player, handler.getPageItem(pageIndex, slot));
+				}
 			}
 		}, error -> {
 			handler.getGUI().getPlugin().getMainLogger().error("couldn't perform click effects in GUI " + handler.getGUI().getId() + " at slot " + slot + " of page " + pageIndex, error);

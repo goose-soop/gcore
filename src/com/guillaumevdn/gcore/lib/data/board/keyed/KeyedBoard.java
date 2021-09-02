@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -31,7 +32,7 @@ import com.guillaumevdn.gcore.lib.wrapper.WrapperBoolean;
 public abstract class KeyedBoard<K, V, R extends KeyReference<K>> extends Board {
 
 	private final Class<V> valueClass;
-	protected final RWHashMap<K, V> cache = new RWHashMap<>();
+	protected final RWHashMap<K, V> cache = new RWHashMap<>(10, 1f);
 
 	public KeyedBoard(GPlugin plugin, String id, BoardType type, Class<V> valueClass, int saveDelayTicks) {
 		super(plugin, id, type, saveDelayTicks);
@@ -42,6 +43,10 @@ public abstract class KeyedBoard<K, V, R extends KeyReference<K>> extends Board 
 	// ----- get
 	// ----------------------------------------------------------------------------------------------------
 
+	public final Class<V> getValueClass() {
+		return valueClass;
+	}
+
 	public final V getCachedValue(K key) {
 		return cache.get(key);
 	}
@@ -50,9 +55,9 @@ public abstract class KeyedBoard<K, V, R extends KeyReference<K>> extends Board 
 		return cache.get(key.getKey());
 	}
 
-	/*public final List<V> copyCacheValues() {
-		return valuesCache.copyValues();
-	}*/
+	public final List<V> copyCacheValues() {
+		return cache.copyValues();
+	}
 
 	public final <RES> RES streamResultValues(Function<Stream<V>, RES> operator) {
 		return cache.streamResultValues(operator);
@@ -70,7 +75,7 @@ public abstract class KeyedBoard<K, V, R extends KeyReference<K>> extends Board 
 	// ----- save
 	// ----------------------------------------------------------------------------------------------------
 
-	private transient RWHashSet<R> toSave = new RWHashSet<>();
+	private transient RWHashSet<R> toSave = new RWHashSet<>(5);
 
 	@Override
 	public boolean mustSaveSomething() {

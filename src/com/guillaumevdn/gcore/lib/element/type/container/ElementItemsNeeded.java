@@ -40,7 +40,7 @@ public class ElementItemsNeeded extends ContainerElement {
 	private ElementText errorMessage = addText("error_message", Need.optional(), TextEditorGeneric.descriptionItemsNeededErrorMessage);
 
 	public ElementItemsNeeded(Element parent, String id, Need need, Text editorDescription) {
-		super("items needed", parent, id, need, editorDescription);
+		super(parent, id, need, editorDescription);
 	}
 
 	// ----- get
@@ -69,7 +69,7 @@ public class ElementItemsNeeded extends ContainerElement {
 	}
 
 	// ----- ref
-	private RWWeakHashMap<Object, RWWeakHashMap<Player, RWHashMap<ItemMatch, Integer>>> matchingItems = new RWWeakHashMap<>();  // kind of dirty, but this avoid re-checking for matches/locations when taking items later OR when willing to check which items match
+	private RWWeakHashMap<Object, RWWeakHashMap<Player, RWHashMap<ItemMatch, Integer>>> matchingItems = new RWWeakHashMap<>(1, 1f);  // kind of dirty, but this avoid re-checking for matches/locations when taking items later OR when willing to check which items match
 
 	@Nullable
 	public RWWeakHashMap<Player, RWHashMap<ItemMatch, Integer>> lastMatches(Object ref) {
@@ -161,7 +161,7 @@ public class ElementItemsNeeded extends ContainerElement {
 	}
 
 	private void setMatch(Object ref, Player player, ItemMatch item, int count) {
-		matchingItems.computeIfAbsent(ref, __ -> new RWWeakHashMap<>()).computeIfAbsent(player, __ -> new RWHashMap<>()).put(item, count > item.getGoal() ? item.getGoal() : count);
+		matchingItems.computeIfAbsent(ref, __ -> new RWWeakHashMap<>(5, 1f)).computeIfAbsent(player, __ -> new RWHashMap<>(10, 1f)).put(item, count > item.getGoal() ? item.getGoal() : count);
 	}
 
 	public void takeIfNeeded(Object ref, Replacer replacer, List<Player> players) {

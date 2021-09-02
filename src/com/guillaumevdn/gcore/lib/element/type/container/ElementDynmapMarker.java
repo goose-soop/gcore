@@ -21,7 +21,7 @@ public class ElementDynmapMarker extends ContainerElement {
 	private ElementText text = addText("text", Need.required(), TextEditorGeneric.descriptionDynmapMarkerText);
 
 	public ElementDynmapMarker(Element parent, String id, Need need, Text editorDescription) {
-		super("dynmap marker", parent, id, need, editorDescription);
+		super(parent, id, need, editorDescription);
 	}
 
 	// ----- get

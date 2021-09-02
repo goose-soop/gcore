@@ -20,7 +20,7 @@ import com.guillaumevdn.gcore.lib.string.Text;
 public class ElementPotionEffectList extends ListElement<ElementPotionEffect> implements ParseableListElement<PotionEffect, ElementPotionEffect> {
 
 	public ElementPotionEffectList(Element parent, String id, Need need, Text editorDescription) {
-		super("item", true, parent, id, need, editorDescription);
+		super(true, parent, id, need, editorDescription);
 	}
 
 	// ----- element

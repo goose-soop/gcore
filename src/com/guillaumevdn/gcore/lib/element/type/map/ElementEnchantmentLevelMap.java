@@ -20,7 +20,7 @@ import com.guillaumevdn.gcore.lib.string.Text;
 public class ElementEnchantmentLevelMap extends ElementAbstractEnumMap<Enchantment, ElementInteger> implements ParseableMapElement<Enchantment, Integer, ElementInteger> {
 
 	public ElementEnchantmentLevelMap(Element parent, String id, Need need, Text editorDescription) {
-		super(Enchantment.class, "enchantment level", parent, id, need, editorDescription, CollectionUtils.asList(Enchantment.values()));
+		super(Enchantment.class, parent, id, need, editorDescription, CollectionUtils.asList(Enchantment.values()));
 	}
 
 	// ----- add

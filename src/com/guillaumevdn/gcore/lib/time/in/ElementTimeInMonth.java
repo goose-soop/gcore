@@ -16,7 +16,7 @@ public class ElementTimeInMonth extends ElementTimeIn<TimeInMonth> {
 	private ElementInteger dayOfMonth = addInteger("day_of_month", Need.optional(), 1, 31, TextEditorGeneric.descriptionElementTimeDayOfMonth);
 
 	public ElementTimeInMonth(Element parent, String id, Need need, Text editorDescription) {
-		super("time in month", parent, id, need, editorDescription);
+		super(parent, id, need, editorDescription);
 	}
 
 	// ----- get

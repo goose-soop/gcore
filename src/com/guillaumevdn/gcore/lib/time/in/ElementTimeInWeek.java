@@ -18,7 +18,7 @@ public class ElementTimeInWeek extends ElementTimeIn<TimeInWeek> {
 	private ElementDayOfWeek day = addDayOfWeek("day_of_week", Need.optional(DayOfWeek.MONDAY), TextEditorGeneric.descriptionElementTimeDayOfWeek);
 
 	public ElementTimeInWeek(Element parent, String id, Need need, Text editorDescription) {
-		super("time in week", parent, id, need, editorDescription);
+		super(parent, id, need, editorDescription);
 	}
 
 	// ----- get

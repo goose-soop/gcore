@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -69,7 +70,7 @@ public final class PlayerUtils {
 			return sender.isOp() || sender.hasPermission(permission);
 		} else if (target instanceof OfflinePlayer) {
 			OfflinePlayer player = (OfflinePlayer) target;
-			Player playerOnline = player.getPlayer();
+			Player playerOnline = PlayerUtils.getOnline(player);
 			return playerOnline == null ? player.isOp() : hasPermission0(playerOnline, permission);
 		} else if (target instanceof UUID) {
 			return hasPermission(Bukkit.getOfflinePlayer((UUID) target), permission);
@@ -100,7 +101,7 @@ public final class PlayerUtils {
 			}
 		} else if (target instanceof OfflinePlayer) {
 			OfflinePlayer offline = (OfflinePlayer) target;
-			Player online = offline.getPlayer();
+			Player online = PlayerUtils.getOnline(offline);
 			if (online != null) {
 				sendMessage(online, message, cc, onlyCC);
 			} else {
@@ -117,6 +118,29 @@ public final class PlayerUtils {
 		} else {
 			throw new IllegalArgumentException("invalid target type " + target.getClass());
 		}
+	}
+
+	public static void ifOnline(OfflinePlayer player, Consumer<Player> consumer) {
+		Player online = getOnline(player);
+		if (online != null) {
+			consumer.accept(online);
+		}
+	}
+
+	public static Player getOnline(OfflinePlayer player) {
+		if (player.isOnline()) {  // if player is an old instance of a Player who disconnected, isOnline will be false but getPlayer() will return this, aka the old instance
+			return player.getPlayer();
+		}
+		return null;
+	}
+
+	public static void clear(Player player) {
+		player.getInventory().clear();
+		player.getInventory().setHelmet(null);
+		player.getInventory().setChestplate(null);
+		player.getInventory().setLeggings(null);
+		player.getInventory().setBoots(null);
+		player.updateInventory();
 	}
 
 }

@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF UNKNOWN KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
@@ -20,8 +20,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import com.guillaumevdn.gcore.libs.com.google.gson.JsonIOException;
-
-import io.netty.channel.Channel.Unsafe;
 
 /**
  * An implementation of {@link ReflectionAccessor} based on {@link Unsafe}.
@@ -81,7 +79,7 @@ final class UnsafeReflectionAccessor extends ReflectionAccessor {
   private static Field getOverrideField() {
     try {
       return AccessibleObject.class.getDeclaredField("override");
-    } catch (NoSuchFieldException e) {
+    } catch (Exception e) {
       return null;
     }
   }

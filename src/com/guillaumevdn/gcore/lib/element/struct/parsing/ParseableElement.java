@@ -19,7 +19,7 @@ public interface ParseableElement<T> extends IElement {
 	String getTypeName();
 	String getConfigurationPath();
 	SuperElement getSuperElement();
-	ParsedCache<T> getCache();  // if not null, will allow the thing to be cached whatever the replacer is (it means there's no placeholders)
+	ParsedCache<T> getCache();  // if not null, will allow the thing to be cached whatever the replacer is (it means there are no placeholders : the parsed value will be the same for every replacer)
 
 	default Optional<T> parseGeneric() {
 		return parse(Replacer.GENERIC);

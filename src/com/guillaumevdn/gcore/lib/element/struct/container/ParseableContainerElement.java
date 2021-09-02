@@ -11,8 +11,8 @@ import com.guillaumevdn.gcore.lib.string.Text;
  */
 public abstract class ParseableContainerElement<T> extends ContainerElement implements ParseableElement<T> {
 
-	public ParseableContainerElement(String typeName, Element parent, String id, Need need, Text editorDescription) {
-		super(typeName, parent, id, need, editorDescription);
+	public ParseableContainerElement(Element parent, String id, Need need, Text editorDescription) {
+		super(parent, id, need, editorDescription);
 	}
 
 	// ----- parsing

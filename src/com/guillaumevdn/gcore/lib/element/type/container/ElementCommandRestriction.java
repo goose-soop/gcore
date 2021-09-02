@@ -27,7 +27,7 @@ public class ElementCommandRestriction extends ContainerElement {
 	private ElementStringList blacklist = addStringList("blacklist", Need.optional(), TextEditorGeneric.descriptionCommandRestrictionBlacklist);
 
 	public ElementCommandRestriction(Element parent, String id, Need need, Text editorDescription) {
-		super("command restriction", parent, id, need, editorDescription);
+		super(parent, id, need, editorDescription);
 	}
 
 	// ----- get

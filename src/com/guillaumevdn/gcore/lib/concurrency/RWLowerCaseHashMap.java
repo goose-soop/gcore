@@ -11,6 +11,10 @@ public class RWLowerCaseHashMap<V> extends RWHashMap<String, V> {
 
 	private static final long serialVersionUID = -7860239421985019956L;
 
+	public RWLowerCaseHashMap(int initialCapacity, float loadFactor) {
+		super(initialCapacity, loadFactor);
+	}
+
 	@Override
 	protected String keyModifier(Object key) {
 		if (key == null) {

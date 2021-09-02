@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF UNKNOWN KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
@@ -28,19 +28,20 @@ import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonToken;
 import com.guillaumevdn.gcore.libs.com.google.gson.stream.MalformedJsonException;
 
 /**
- * A streaming replacer that allows reading of multiple {@link JsonElement}s from the specified reader
- * asynchronously.
- * 
+ * A streaming parser that allows reading of multiple {@link JsonElement}s from the specified reader
+ * asynchronously. The JSON data is parsed in lenient mode, see also
+ * {@link JsonReader#setLenient(boolean)}.
+ *
  * <p>This class is conditionally thread-safe (see Item 70, Effective Java second edition). To
  * properly use this class across multiple threads, you will need to add some external
  * synchronization. For example:
  * 
  * <pre>
- * JsonStreamParser replacer = new JsonStreamParser("['first'] {'second':10} 'third'");
+ * JsonStreamParser parser = new JsonStreamParser("['first'] {'second':10} 'third'");
  * JsonElement element;
- * synchronized (replacer) {  // synchronize on an object shared by threads
- *   if (replacer.hasNext()) {
- *     element = replacer.next();
+ * synchronized (parser) {  // synchronize on an object shared by threads
+ *   if (parser.hasNext()) {
+ *     element = parser.next();
  *   }
  * }
  * </pre>
@@ -50,7 +51,7 @@ import com.guillaumevdn.gcore.libs.com.google.gson.stream.MalformedJsonException
  * @since 1.4
  */
 public final class JsonStreamParser implements Iterator<JsonElement> {
-  private final JsonReader replacer;
+  private final JsonReader parser;
   private final Object lock;
 
   /**
@@ -66,16 +67,18 @@ public final class JsonStreamParser implements Iterator<JsonElement> {
    * @since 1.4
    */
   public JsonStreamParser(Reader reader) {
-    replacer = new JsonReader(reader);
-    replacer.setLenient(true);
+    parser = new JsonReader(reader);
+    parser.setLenient(true);
     lock = new Object();
   }
   
   /**
-   * Returns the next available {@link JsonElement} on the reader. Null if none available.
-   * 
-   * @return the next available {@link JsonElement} on the reader. Null if none available.
-   * @throws JsonParseException if the incoming stream is malformed JSON.
+   * Returns the next available {@link JsonElement} on the reader. Throws a
+   * {@link NoSuchElementException} if no element is available.
+   *
+   * @return the next available {@code JsonElement} on the reader.
+   * @throws JsonSyntaxException if the incoming stream is malformed JSON.
+   * @throws NoSuchElementException if no {@code JsonElement} is available.
    * @since 1.4
    */
   public JsonElement next() throws JsonParseException {
@@ -84,7 +87,7 @@ public final class JsonStreamParser implements Iterator<JsonElement> {
     }
     
     try {
-      return Streams.parse(replacer);
+      return Streams.parse(parser);
     } catch (StackOverflowError e) {
       throw new JsonParseException("Failed parsing JSON source to Json", e);
     } catch (OutOfMemoryError e) {
@@ -97,12 +100,13 @@ public final class JsonStreamParser implements Iterator<JsonElement> {
   /**
    * Returns true if a {@link JsonElement} is available on the input for consumption
    * @return true if a {@link JsonElement} is available on the input, false otherwise
+   * @throws JsonSyntaxException if the incoming stream is malformed JSON.
    * @since 1.4
    */
   public boolean hasNext() {
     synchronized (lock) {
       try {
-        return replacer.peek() != JsonToken.END_DOCUMENT;
+        return parser.peek() != JsonToken.END_DOCUMENT;
       } catch (MalformedJsonException e) {
         throw new JsonSyntaxException(e);
       } catch (IOException e) {

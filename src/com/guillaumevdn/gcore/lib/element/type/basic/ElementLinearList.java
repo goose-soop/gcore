@@ -82,7 +82,7 @@ public abstract class ElementLinearList<T extends LinearObjectType, L extends Li
 		}
 		// right-click : edit parameters
 		else if (call.getType().equals(ClickType.RIGHT)) {
-			WorkerGCore.inst().awaitChatWithSuggestedValue(call.getClicker(), TextEditorGeneric.messageElementBasicEditSuggestCurrent, getValueLineOrDefault(0), value -> {
+			WorkerGCore.inst().awaitChatWithSuggestedValue(call.getClicker(), TextEditorGeneric.messageElementBasicEditSuggestCurrent, getRawValueLineOrDefault(0), value -> {
 				Pair<T, List<String>> current = getCurrentPair(lineIndex);
 				if (StringUtils.hasPlaceholders(value)) {
 					setNewValueLine(lineIndex, current.getA() == null ? null : current.getA().name() + " " + value);
@@ -110,8 +110,8 @@ public abstract class ElementLinearList<T extends LinearObjectType, L extends Li
 
 	private void setNewValueLine(int lineIndex, String newLineSerialized) {
 		List<String> newListValue = null;
-		if (getValue() != null) {
-			newListValue = CollectionUtils.asList(getValue());
+		if (getRawValue() != null) {
+			newListValue = CollectionUtils.asList(getRawValue());
 			if (newLineSerialized == null) {
 				newListValue.remove(lineIndex);
 			} else {
@@ -126,7 +126,7 @@ public abstract class ElementLinearList<T extends LinearObjectType, L extends Li
 	}
 
 	private Pair<T, List<String>> getCurrentPair(int lineIndex) {
-		List<String> split = StringUtils.split(getValueLine(lineIndex), " ", 1);
+		List<String> split = StringUtils.split(getRawValueLine(lineIndex), " ", 1);
 		T type = getTypeSerializer().deserialize(split.get(0));
 		split.remove(0);
 		return Pair.of(type, split.isEmpty() || type == null ? new ArrayList<>() : split);

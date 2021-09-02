@@ -22,7 +22,7 @@ import com.guillaumevdn.gcore.lib.string.StringUtils;
  */
 public enum BlockStateType implements LinearObjectType {
 
-	AGE(CommonMats.WHITE_WOOL, "Ageable",  // FIXME : <1.13, we'll need to use Crops and their data, it would be interesting
+	AGE(CommonMats.WHITE_WOOL, "Ageable",  // TODO : <1.13, we'll need to use Crops and their data, it would be interesting
 			(state, data) -> data.invokeMethod("getAge").get(int.class) == state.getValidIntArgument(0),
 			(state, data) -> data.invokeMethod("setAge", state.getValidIntArgument(0))
 			),

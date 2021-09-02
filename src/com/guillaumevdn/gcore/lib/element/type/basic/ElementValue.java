@@ -1,5 +1,9 @@
 package com.guillaumevdn.gcore.lib.element.type.basic;
 
+import java.util.List;
+
+import javax.annotation.Nonnull;
+
 import com.guillaumevdn.gcore.ConfigGCore;
 import com.guillaumevdn.gcore.TextEditorGeneric;
 import com.guillaumevdn.gcore.WorkerGCore;
@@ -23,20 +27,17 @@ public abstract class ElementValue<T> extends BasicElement<T> {
 	private final Serializer<T> serializer;
 
 	public ElementValue(Class<T> typeClass, Element parent, String id, Need need, Text editorDescription) {
-		this(StringUtils.getReadableName(typeClass), typeClass, parent, id, need, editorDescription);
+		this(Serializer.find(typeClass), parent, id, need, editorDescription);
 	}
 
 	public ElementValue(Serializer<T> serializer, Element parent, String id, Need need, Text editorDescription) {
-		this(serializer.getTypeName(), serializer, parent, id, need, editorDescription);
-	}
-
-	public ElementValue(String valueTypeName, Class<T> typeClass, Element parent, String id, Need need, Text editorDescription) {
-		this(valueTypeName, Serializer.find(typeClass), parent, id, need, editorDescription);
-	}
-
-	public ElementValue(String valueTypeName, Serializer<T> serializer, Element parent, String id, Need need, Text editorDescription) {
-		super(valueTypeName, SizeTolerance.DISALLOW_EMPTY_OR_LIST, parent, id, need.getType(), need.serializeDef(serializer), editorDescription);
+		super(SizeTolerance.DISALLOW_EMPTY_OR_LIST, parent, id, need.getType(), need.serializeDef(serializer), editorDescription);
 		this.serializer = serializer;
+	}
+
+	@Override
+	protected List<String> loadRawValueFrom(@Nonnull T value) {
+		return CollectionUtils.asList(serializer.serialize(value));
 	}
 
 	// ----- get
@@ -76,7 +77,7 @@ public abstract class ElementValue<T> extends BasicElement<T> {
 	public void onEditorClick(ClickCall call) {
 		// left-click : enter value
 		if (call.getType().equals(ClickType.LEFT)) {
-			WorkerGCore.inst().awaitChatWithSuggestedValue(call.getClicker(), TextEditorGeneric.messageElementBasicEditSuggestCurrent, getValueLineOrDefault(0), value -> {
+			WorkerGCore.inst().awaitChatWithSuggestedValue(call.getClicker(), TextEditorGeneric.messageElementBasicEditSuggestCurrent, getRawValueLineOrDefault(0), value -> {
 				if (StringUtils.hasPlaceholders(value)) {
 					setValue(CollectionUtils.asList(value));
 					getSuperElement().onEditorChange(this);

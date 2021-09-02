@@ -25,13 +25,20 @@ public interface Replacer {
 	default String parse(String string) {
 		if (StringUtils.hasPlaceholders(string)) {
 			ReplacerData data = getReplacerData();
-			// parse custom replacer first, there might be placeholders needed in placeholder containers
-			if (data.getCustom() != null) {
-				string = data.getCustom().apply(string);
-			}
-			// then parse placeholder containers with player
+
+			// since we don't know in which order placeholders will go (containers that contain placeholders parsed by custom, or the opposite), we parse both twice (as long as there are placeholders)
+
 			if (data.getPlayer() != null) {
 				string = PlaceholderContainer.parseAll(string, data.getPlayer());
+			}
+			if (data.getCustom() != null && StringUtils.hasPlaceholders(string)) {
+				string = data.getCustom().apply(string);
+			}
+			if (data.getPlayer() != null) {
+				string = PlaceholderContainer.parseAll(string, data.getPlayer());
+			}
+			if (data.getCustom() != null && StringUtils.hasPlaceholders(string)) {
+				string = data.getCustom().apply(string);
 			}
 		}
 		return string;
@@ -42,20 +49,22 @@ public interface Replacer {
 	}
 
 	default List<String> parse(List<String> raw, boolean clone) {
-		// - this method don't use the parse(String) method because otherwise multi-line placeholders are translated to one line
+		// this method don't use the parse(String) method because otherwise multi-line placeholders are translated to one line
+
 		if (raw == null) {
 			return null;
 		}
 		ReplacerData data = getReplacerData();
-		// parse custom replacer first, there might be placeholders needed in placeholder containers
+
+		// since we don't know in which order placeholders will go (containers that contain placeholders parsed by custom, or the opposite), we parse both twice (as long as there are placeholders)
+
 		List<String> parsed;
 		if (data.getCustom() != null) {
 			parsed = data.getCustom().apply(raw, clone);
 		} else {
 			parsed = clone ? CollectionUtils.asList(raw) : raw;
 		}
-		// then parse placeholder containers with player
-		if (data.getPlayer() != null) {
+		if (data.getPlayer() != null && StringUtils.hasPlaceholders(parsed)) {
 			for (int i = 0; i < parsed.size(); ++i) {
 				String r = parsed.get(i);
 				if (StringUtils.hasPlaceholders(r)) {
@@ -63,6 +72,18 @@ public interface Replacer {
 				}
 			}
 		}
+		if (data.getCustom() != null && StringUtils.hasPlaceholders(parsed)) {
+			parsed = data.getCustom().apply(parsed, false);
+		}
+		if (data.getPlayer() != null && StringUtils.hasPlaceholders(parsed)) {
+			for (int i = 0; i < parsed.size(); ++i) {
+				String r = parsed.get(i);
+				if (StringUtils.hasPlaceholders(r)) {
+					parsed.set(i, PlaceholderContainer.parseAll(r, data.getPlayer()));
+				}
+			}
+		}
+
 		return parsed;
 	}
 

@@ -14,6 +14,10 @@ public class LowerCaseLinkedHashMap<V> extends LinkedHashMap<String, V> {
 
 	private static final long serialVersionUID = 8645174203269985787L;
 
+	public LowerCaseLinkedHashMap(int initialCapacity, float loadFactor) {
+		super(initialCapacity, loadFactor);
+	}
+
 	@Override
 	public boolean containsKey(Object key) {
 		return super.containsKey(lower(key));

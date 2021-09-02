@@ -26,12 +26,8 @@ public abstract class DefaultMapElement<K, V extends Element> extends MapElement
 
 	private V defaultElement = null;
 
-	public DefaultMapElement(Class<K> keyClass, String valueTypeName, Element parent, String id, Need need, Text editorDescription) {
-		super(keyClass, valueTypeName, parent, id, need, editorDescription);
-	}
-
-	protected DefaultMapElement(Class<K> keyClass, String typeName, boolean overrideTypeName, Element parent, String id, Need need, Text editorDescription) {
-		super(keyClass, typeName, overrideTypeName, parent, id, need, editorDescription);
+	public DefaultMapElement(Class<K> keyClass, Element parent, String id, Need need, Text editorDescription) {
+		super(keyClass, parent, id, need, editorDescription);
 	}
 
 	// ----- get

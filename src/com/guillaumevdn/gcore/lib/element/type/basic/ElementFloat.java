@@ -23,8 +23,7 @@ public class ElementFloat extends ElementValue<Float> {
 	}
 
 	public ElementFloat(Element parent, String id, Need need, float min, float max, Text editorDescription) {
-		super("float" + (min == -Float.MAX_VALUE && max == Float.MAX_VALUE ? "" : (min == -Float.MAX_VALUE ? " (max. " + max + ")" : (max == Float.MAX_VALUE ? " (min. " + min + ")" : " (" + min + " - " + max + ")"))),
-				Float.class, parent, id, need, editorDescription);
+		super(Float.class, parent, id, need, editorDescription);
 		this.min = min;
 		this.max = max;
 	}

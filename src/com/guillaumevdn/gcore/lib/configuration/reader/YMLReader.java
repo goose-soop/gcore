@@ -110,7 +110,7 @@ public class YMLReader {
 			}
 			if (string.charAt(string.length() - 1) == wrapping) {
 				String wrappingStr = String.valueOf(wrapping);
-				string = string.substring(1, string.length() - 1).replace(wrappingStr + wrappingStr, wrappingStr); // if value is wrapped, don't trim
+				string = string.substring(1, string.length() - 1).replace(wrappingStr + wrappingStr, wrappingStr);  // if value is wrapped, don't trim
 			}
 		}
 		// equals to null ? consider it as a mistake ; if they really want the 'null' string, they can wrap it with &r

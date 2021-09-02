@@ -2,6 +2,8 @@ package com.guillaumevdn.gcore.lib.configuration.file.node;
 
 import java.util.List;
 
+import org.bukkit.Bukkit;
+
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.configuration.reader.YMLReader;
 import com.guillaumevdn.gcore.lib.string.StringUtils;
@@ -74,11 +76,11 @@ public class SingleValueNode extends ConfigNode {
 	public void print() {
 		String prefix = getPrefix();
 		if (valueWithLineBreaks.size() == 1) {
-			System.out.println(getDepthLevel() + " " + prefix + getId() + ": " + YMLReader.wrapValueToWrite(StringUtils.retranslateColorCodes(valueWithLineBreaks.get(0))) + (trailingComment != null ? " #" + trailingComment : ""));
+			Bukkit.getLogger().info(getDepthLevel() + " " + prefix + getId() + ": " + YMLReader.wrapValueToWrite(StringUtils.retranslateColorCodes(valueWithLineBreaks.get(0))) + (trailingComment != null ? " #" + trailingComment : ""));
 		} else {
-			System.out.println(getDepthLevel() + " " + prefix + getId() + ": >" + (trailingComment != null ? " #" + trailingComment : ""));
+			Bukkit.getLogger().info(getDepthLevel() + " " + prefix + getId() + ": >" + (trailingComment != null ? " #" + trailingComment : ""));
 			for (String line : StringUtils.retranslateColorCodes(valueWithLineBreaks)) {
-				System.out.println(getDepthLevel() + " " + prefix + "  " + line);
+				Bukkit.getLogger().info(getDepthLevel() + " " + prefix + "  " + line);
 			}
 		}
 	}

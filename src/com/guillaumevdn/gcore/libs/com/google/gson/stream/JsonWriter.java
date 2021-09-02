@@ -9,12 +9,18 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF UNKNOWN KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
 
 package com.guillaumevdn.gcore.libs.com.google.gson.stream;
+
+import java.io.Closeable;
+import java.io.Flushable;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.Arrays;
 
 import static com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonScope.DANGLING_NAME;
 import static com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonScope.EMPTY_ARRAY;
@@ -23,12 +29,6 @@ import static com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonScope.EMPTY
 import static com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonScope.NONEMPTY_ARRAY;
 import static com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonScope.NONEMPTY_DOCUMENT;
 import static com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonScope.NONEMPTY_OBJECT;
-
-import java.io.Closeable;
-import java.io.Flushable;
-import java.io.IOException;
-import java.io.Writer;
-import java.util.Arrays;
 
 /**
  * Writes a JSON (<a href="http://www.ietf.org/rfc/rfc7159.txt">RFC 7159</a>)

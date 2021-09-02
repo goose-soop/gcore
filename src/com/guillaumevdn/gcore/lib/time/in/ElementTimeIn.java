@@ -22,8 +22,8 @@ public abstract class ElementTimeIn<T extends TimeIn> extends ParseableContainer
 	protected final ElementInteger hour = addInteger("hour", Need.optional(0), 0, 23, TextEditorGeneric.descriptionElementTimeHour);
 	protected final ElementInteger minute = addInteger("minute", Need.optional(0), 0, 59, TextEditorGeneric.descriptionElementTimeMinute);
 
-	public ElementTimeIn(String typeName, Element parent, String id, Need need, Text editorDescription) {
-		super(typeName, parent, id, need, editorDescription);
+	public ElementTimeIn(Element parent, String id, Need need, Text editorDescription) {
+		super(parent, id, need, editorDescription);
 	}
 
 	// ----- get
@@ -43,7 +43,7 @@ public abstract class ElementTimeIn<T extends TimeIn> extends ParseableContainer
 
 	@Override
 	public List<String> editorCurrentValue() {
-		Stream<String> stream = values().stream().flatMap(elem -> ((BasicElement) elem).getValueOrDefault().stream());
+		Stream<String> stream = values().stream().flatMap(elem -> ((BasicElement) elem).getRawValueOrDefault() == null ? Stream.empty() : ((BasicElement) elem).getRawValueOrDefault().stream());
 		List<String> all = stream.filter(value -> value != null).collect(Collectors.toList());
 		return all.isEmpty() ? null : all;
 	}

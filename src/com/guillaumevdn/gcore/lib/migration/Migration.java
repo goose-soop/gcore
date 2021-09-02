@@ -32,13 +32,24 @@ public abstract class Migration {
 	private int modCount = 0;
 
 	public Migration(GPlugin plugin, String backupName, String migrationName, String successFilePath) {
+		this(plugin,
+				backupName != null,
+				migrationName,
+				plugin.getDataFolder(),
+				new File(plugin.getDataFolder().getParentFile() + "/" + plugin.getName() + "_backup_on_" + backupName),
+				new File(plugin.getDataFolder() + "/" + successFilePath),
+				new File(plugin.getDataFolder() + "/hardlock")
+				);
+	}
+
+	public Migration(GPlugin plugin, boolean mustBackup, String migrationName, File pluginFolder, File backupFolder, File successFile, File hardlockFile) {
 		this.plugin = plugin;
-		this.mustBackup = backupName != null;
+		this.mustBackup = mustBackup;
 		this.migrationName = migrationName;
-		this.pluginFolder = plugin.getDataFolder();
-		this.backupFolder = new File(pluginFolder.getParentFile() + "/" + plugin.getName() + "_backup_on_" + backupName);
-		this.successFile = plugin.getDataFile(successFilePath);
-		this.hardlockFile = new File(pluginFolder + "/hardlock");
+		this.pluginFolder = pluginFolder;
+		this.backupFolder = backupFolder;
+		this.successFile = successFile;
+		this.hardlockFile = hardlockFile;
 		this.logger = new Logger(plugin, plugin.getName() + "-migration", true, false, false);
 	}
 
@@ -57,6 +68,10 @@ public abstract class Migration {
 
 	public final File getPluginFolder() {
 		return pluginFolder;
+	}
+
+	public final File getPluginFile(String path) {
+		return new File(pluginFolder + "/" + path);
 	}
 
 	public final File getBackupFolder() {

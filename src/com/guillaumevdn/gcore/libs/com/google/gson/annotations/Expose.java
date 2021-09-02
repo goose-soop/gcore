@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF UNKNOWN KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
@@ -26,9 +26,9 @@ import java.lang.annotation.Target;
  * An annotation that indicates this member should be exposed for JSON
  * serialization or deserialization.
  *
- * <p>This annotation has no effect unless you build {@link com.google.gson.Gson}
- * with a {@link com.google.gson.GsonBuilder} and invoke
- * {@link com.google.gson.GsonBuilder#excludeFieldsWithoutExposeAnnotation()}
+ * <p>This annotation has no effect unless you build {@link com.guillaumevdn.gcore.libs.com.google.gson.Gson}
+ * with a {@link com.guillaumevdn.gcore.libs.com.google.gson.GsonBuilder} and invoke
+ * {@link com.guillaumevdn.gcore.libs.com.google.gson.GsonBuilder#excludeFieldsWithoutExposeAnnotation()}
  * method.</p>
  *
  * <p>Here is an example of how this annotation is meant to be used:

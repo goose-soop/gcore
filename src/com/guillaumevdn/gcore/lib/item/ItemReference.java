@@ -122,10 +122,10 @@ public interface ItemReference {
 	}
 
 	static ItemReference of(ElementItem element, Replacer replacer) {
-		if (!element.getType().readContains()) {  // if type was written in config, MUST be valid configuration
+		if (!element.getType().readContains()) {
 			return new ItemReferenceElementNoType(element, replacer);
 		}
-		return of(element.parse(replacer).orNull());
+		return of(element.parse(replacer).orNull());  // if type was written in config, MUST be valid configuration
 	}
 
 }

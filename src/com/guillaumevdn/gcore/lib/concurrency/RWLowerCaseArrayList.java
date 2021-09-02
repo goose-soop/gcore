@@ -11,6 +11,10 @@ public class RWLowerCaseArrayList extends RWArrayList<String> {
 
 	private static final long serialVersionUID = 2584863854373010795L;
 
+	public RWLowerCaseArrayList(int initialCapacity) {
+		super(initialCapacity);
+	}
+
 	@Override
 	protected String elementModifier(Object element) {
 		if (element == null) {

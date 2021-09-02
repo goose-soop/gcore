@@ -21,7 +21,7 @@ public abstract class GPluginConfig {
 	private boolean logMainFile = true;
 	private List<String> logDataConsole = null;
 	private List<String> logDataFile = null;
-	private final Map<String, DataBackEnd> dataBackEnds = new HashMap<>();
+	private final Map<String, DataBackEnd> dataBackEnds = new HashMap<>(3);
 	private boolean updateNotification = true;
 
 	// ----- get

@@ -56,7 +56,7 @@ public class ElementIntegerList extends ElementValueList<Integer> {
 
 	@Override
 	protected String editorNewLine() {
-		return StringUtils.toTextString(Math.pow(10d, (double) (getValueOrDefault() == null ? 0 : getValueOrDefault().size())), 0);
+		return StringUtils.toTextString(Math.pow(10d, (double) (getRawValueOrDefault() == null ? 0 : getRawValueOrDefault().size())), 0);
 	}
 
 }

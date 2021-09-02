@@ -15,6 +15,10 @@ public class LowerCaseHashMap<V> extends HashMap<String, V> {
 
 	private static final long serialVersionUID = 8645174203269985787L;
 
+	public LowerCaseHashMap(int initialCapacity, float loadFactor) {
+		super(initialCapacity, loadFactor);
+	}
+
 	@Override
 	public boolean containsKey(Object key) {
 		return super.containsKey(lower(key));

@@ -36,6 +36,8 @@ commandDescriptionGcore: main command for GCore
 commandDescriptionGcorePlugins: list GCore's dependant plugins
 commandDescriptionGcoreExport: export GCore-dependant plugins data
 commandDescriptionGcoreItemRead: read item to configuration
+commandDescriptionGcoreItemReadChat: read item to chat
+commandDescriptionGcoreItemReadClick: read items from inventory clicks
 
 messageItemReadNull: |
   &cThis item can't be exported to configuration. Please hold an item in your hand.

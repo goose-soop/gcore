@@ -12,7 +12,7 @@ import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
 public class ElementTimeInDay extends ElementTimeIn<TimeInDay> {
 
 	public ElementTimeInDay(Element parent, String id, Need need, Text editorDescription) {
-		super("time in day", parent, id, need, editorDescription);
+		super(parent, id, need, editorDescription);
 	}
 
 	// ----- parse

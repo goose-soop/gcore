@@ -27,7 +27,7 @@ public class ElementRelativeLocation extends ParseableContainerElement<Location>
 	private ElementDouble verticalOffset = addDouble("vertical_offset", Need.optional(0d), TextEditorGeneric.descriptionRelativeLocationVerticalOffset);
 
 	public ElementRelativeLocation(Element parent, String id, Need need, Text editorDescription) {
-		super("relative location", parent, id, need, editorDescription);
+		super(parent, id, need, editorDescription);
 	}
 
 	@Override

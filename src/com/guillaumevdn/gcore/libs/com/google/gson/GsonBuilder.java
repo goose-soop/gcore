@@ -9,20 +9,12 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF UNKNOWN KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
 
 package com.guillaumevdn.gcore.libs.com.google.gson;
-
-import static com.guillaumevdn.gcore.libs.com.google.gson.Gson.DEFAULT_COMPLEX_MAP_KEYS;
-import static com.guillaumevdn.gcore.libs.com.google.gson.Gson.DEFAULT_ESCAPE_HTML;
-import static com.guillaumevdn.gcore.libs.com.google.gson.Gson.DEFAULT_JSON_NON_EXECUTABLE;
-import static com.guillaumevdn.gcore.libs.com.google.gson.Gson.DEFAULT_LENIENT;
-import static com.guillaumevdn.gcore.libs.com.google.gson.Gson.DEFAULT_PRETTY_PRINT;
-import static com.guillaumevdn.gcore.libs.com.google.gson.Gson.DEFAULT_SERIALIZE_NULLS;
-import static com.guillaumevdn.gcore.libs.com.google.gson.Gson.DEFAULT_SPECIALIZE_FLOAT_VALUES;
 
 import java.lang.reflect.Type;
 import java.sql.Timestamp;
@@ -40,6 +32,14 @@ import com.guillaumevdn.gcore.libs.com.google.gson.internal.bind.TreeTypeAdapter
 import com.guillaumevdn.gcore.libs.com.google.gson.internal.bind.TypeAdapters;
 import com.guillaumevdn.gcore.libs.com.google.gson.reflect.TypeToken;
 import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonReader;
+
+import static com.guillaumevdn.gcore.libs.com.google.gson.Gson.DEFAULT_COMPLEX_MAP_KEYS;
+import static com.guillaumevdn.gcore.libs.com.google.gson.Gson.DEFAULT_ESCAPE_HTML;
+import static com.guillaumevdn.gcore.libs.com.google.gson.Gson.DEFAULT_JSON_NON_EXECUTABLE;
+import static com.guillaumevdn.gcore.libs.com.google.gson.Gson.DEFAULT_LENIENT;
+import static com.guillaumevdn.gcore.libs.com.google.gson.Gson.DEFAULT_PRETTY_PRINT;
+import static com.guillaumevdn.gcore.libs.com.google.gson.Gson.DEFAULT_SERIALIZE_NULLS;
+import static com.guillaumevdn.gcore.libs.com.google.gson.Gson.DEFAULT_SPECIALIZE_FLOAT_VALUES;
 
 /**
  * <p>Use this builder to construct a {@link Gson} instance when you need to set configuration
@@ -173,7 +173,7 @@ public final class GsonBuilder {
 
   /**
    * Configures Gson to exclude all fields from consideration for serialization or deserialization
-   * that do not have the {@link com.google.gson.annotations.Expose} annotation.
+   * that do not have the {@link com.guillaumevdn.gcore.libs.com.google.gson.annotations.Expose} annotation.
    *
    * @return a reference to this {@code GsonBuilder} object to fulfill the "Builder" pattern
    */
@@ -217,6 +217,7 @@ public final class GsonBuilder {
    *   Map<Point, String> original = new LinkedHashMap<Point, String>();
    *   original.put(new Point(5, 6), "a");
    *   original.put(new Point(8, 8), "b");
+   *   Bukkit.getLogger().info(gson.toJson(original, type));
    * }</pre>
    * The above code prints this JSON object:<pre>  {@code
    *   {
@@ -243,6 +244,7 @@ public final class GsonBuilder {
    *   Map<Point, String> original = new LinkedHashMap<Point, String>();
    *   original.put(new Point(5, 6), "a");
    *   original.put(new Point(8, 8), "b");
+   *   Bukkit.getLogger().info(gson.toJson(original, type));
    * }
    *
    * The JSON output would look as follows:
@@ -387,7 +389,7 @@ public final class GsonBuilder {
 
   /**
    * By default, Gson is strict and only accepts JSON as specified by
-   * <a href="http://www.ietf.org/rfc/rfc4627.txt">RFC 4627</a>. This option makes the replacer
+   * <a href="http://www.ietf.org/rfc/rfc4627.txt">RFC 4627</a>. This option makes the parser
    * liberal in what it accepts.
    *
    * @return a reference to this {@code GsonBuilder} object to fulfill the "Builder" pattern
@@ -427,6 +429,7 @@ public final class GsonBuilder {
    * @since 1.2
    */
   public GsonBuilder setDateFormat(String pattern) {
+    // 
     this.datePattern = pattern;
     return this;
   }

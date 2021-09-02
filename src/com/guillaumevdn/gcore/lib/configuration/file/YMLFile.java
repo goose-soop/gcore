@@ -8,6 +8,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.List;
 
+import org.bukkit.Bukkit;
+
 import com.guillaumevdn.gcore.lib.configuration.YMLConfiguration;
 import com.guillaumevdn.gcore.lib.configuration.file.Node.WriteType;
 import com.guillaumevdn.gcore.lib.configuration.file.node.ConfigNode;
@@ -185,7 +187,7 @@ public class YMLFile {
 		try {
 			StringBuilder builder = new StringBuilder();
 			base.write(builder, WriteType.PREFIX_ID_VALUE);
-			System.out.println(builder.toString());
+			Bukkit.getLogger().info(builder.toString());
 		} catch (Throwable exeption) {
 			exeption.printStackTrace();
 		}

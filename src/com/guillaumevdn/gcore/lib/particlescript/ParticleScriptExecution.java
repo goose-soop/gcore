@@ -20,7 +20,7 @@ public class ParticleScriptExecution {
 	private final boolean autoLoop;
 	private int operationIndex;
 	private int ticksToWait;
-	private ConcurrentHashMap<String, Double> variables = new ConcurrentHashMap<>();  // lowercase keys
+	private ConcurrentHashMap<String, Double> variables = new ConcurrentHashMap<>(5);  // lowercase keys
 	private final Location fixedBaseLocation;
 
 	/**

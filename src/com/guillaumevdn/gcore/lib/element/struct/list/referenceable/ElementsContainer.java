@@ -17,6 +17,8 @@ import com.guillaumevdn.gcore.WorkerGCore;
 import com.guillaumevdn.gcore.lib.GPlugin;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.collection.SortedLowerCaseHashMap;
+import com.guillaumevdn.gcore.lib.collection.SortedLowerCaseHashMap.Order;
+import com.guillaumevdn.gcore.lib.collection.SortedLowerCaseHashMap.Type;
 import com.guillaumevdn.gcore.lib.compatibility.material.CommonMats;
 import com.guillaumevdn.gcore.lib.compatibility.material.Mat;
 import com.guillaumevdn.gcore.lib.configuration.YMLConfiguration;
@@ -43,7 +45,7 @@ public abstract class ElementsContainer<V extends SuperElement> {
 	private final String typeName;
 	private final Class<V> typeClass;
 	private final File baseFolder;
-	private final SortedLowerCaseHashMap<V> elements = SortedLowerCaseHashMap.keySorted();
+	private SortedLowerCaseHashMap<V> elements = SortedLowerCaseHashMap.keySorted(10, 1f);
 	private final List<String> skipFiles;
 
 	public ElementsContainer(GPlugin plugin, String typeName, Class<V> typeClass, File baseFolder) {
@@ -97,15 +99,34 @@ public abstract class ElementsContainer<V extends SuperElement> {
 
 	// ----- set
 	public final void load() throws Throwable {
-		elements.clear();
+		elements = new SortedLowerCaseHashMap<>(Type.KEY_SORTED, Order.NATURAL, countCandidates(baseFolder), 1f);
 		doLoad(baseFolder);
 		if (!elements.isEmpty()) {
 			plugin.getMainLogger().info("Successfully loaded " + StringUtils.pluralizeAmountDesc(typeName, elements.size()) + (ConfigGCore.dontLogLoadedElementsNames ? "" : " : " + StringUtils.toTextString(", ", elements.keySet())));
 		}
 	}
 
+	private boolean shouldSkipFile(File file) {
+		return !file.getName().toLowerCase().endsWith(".yml") || file.getName().startsWith("SYSTEM_") || skipFiles.contains(FileUtils.getSimpleName(file));
+	}
+
+	private int countCandidates(File file) {
+		if (!file.exists()) {  // might happen if the folder wasn't created yet
+			return 0;
+		}
+		if (file.isDirectory()) {
+			int count = 0;
+			for (File f : file.listFiles()) {
+				count += countCandidates(f);
+			}
+			return count;
+		} else {
+			return shouldSkipFile(file) ? 0 : 1;
+		}
+	}
+
 	private void doLoad(File file) throws Throwable {
-		if (!file.exists()) { // might happen if the folder wasn't created yet
+		if (!file.exists()) {  // might happen if the folder wasn't created yet
 			return;
 		}
 		if (file.isDirectory()) {
@@ -113,8 +134,7 @@ public abstract class ElementsContainer<V extends SuperElement> {
 				doLoad(f);
 			}
 		} else {
-			// should skip file
-			if (!file.getName().toLowerCase().endsWith(".yml") || file.getName().startsWith("SYSTEM_") || skipFiles.contains(FileUtils.getSimpleName(file))) {
+			if (shouldSkipFile(file)) {
 				return;
 			}
 
@@ -134,10 +154,11 @@ public abstract class ElementsContainer<V extends SuperElement> {
 			elem.read();
 
 			// notify loading errors
+			/* now done in all elements
 			if (!elem.getLoadErrors().isEmpty()) {
 				getPlugin().getMainLogger().error("Errors were found when loading " + getTypeName() + " " + id + " :", true);
 				elem.getLoadErrors().forEach(error -> getPlugin().getMainLogger().error("- " + error, true));
-			}
+			}*/
 		}
 	}
 

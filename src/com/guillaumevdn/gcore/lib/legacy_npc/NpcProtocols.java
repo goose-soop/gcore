@@ -99,17 +99,21 @@ public final class NpcProtocols {
 
 	// ----- https://wiki.vg/Entity_metadata#Player
 	public Map<Integer, Object> getDefaultHumanEntityMetadata() {
-		if (Version.CURRENT.equals(Version.MC_1_9_R2)) {
+		if (Version.MC_1_9_R2.equals(Version.CURRENT)) {
 			return CollectionUtils.asMap(
-					12, (byte) 127
+					12, (byte) 127  // displayed skin part
 					);
 		} else if (Version.ATLEAST_1_10 && !Version.ATLEAST_1_14) {
 			return CollectionUtils.asMap(
-					13, (byte) 127
+					13, (byte) 127  // displayed skin part
 					);
-		} else if (Version.CURRENT.equals(Version.MC_1_14_R1)) {
+		} else if (Version.MC_1_14_R1.equals(Version.CURRENT)) {
 			return CollectionUtils.asMap(
 					15, (byte) 127  // displayed skin part
+					);
+		} else if (Version.ATLEAST_1_17) {
+			return CollectionUtils.asMap(
+					17, (byte) 127  // displayed skin part
 					);
 		} else if (Version.ATLEAST_1_15) {
 			return CollectionUtils.asMap(

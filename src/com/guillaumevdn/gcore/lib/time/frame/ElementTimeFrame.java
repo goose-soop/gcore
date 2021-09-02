@@ -17,7 +17,7 @@ import com.guillaumevdn.gcore.lib.tuple.Pair;
 public class ElementTimeFrame extends TypableContainerElement<TimeFrameType> {
 
 	public ElementTimeFrame(Element parent, String id, Need need, Text editorDescription) {
-		super(TimeFrameTypes.inst(), "time frame", parent, id, need, editorDescription);
+		super(TimeFrameTypes.inst(), parent, id, need, editorDescription);
 	}
 
 	@Override

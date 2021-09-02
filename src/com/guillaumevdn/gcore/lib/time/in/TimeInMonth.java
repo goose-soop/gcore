@@ -14,14 +14,22 @@ public class TimeInMonth extends TimeIn {
 		this.dayOfMonth = dayOfMonth;
 	}
 
-	// ----- get
 	public int getDayOfMonth() {
 		return dayOfMonth;
 	}
 
 	@Override
 	public ZonedDateTime getCurrent() {
-		return ZonedDateTime.now().withDayOfMonth(dayOfMonth).withHour(hour).withMinute(minute).withSecond(0).withNano(0);
+		ZonedDateTime time = ZonedDateTime.now();
+		int dayOfMonth = this.dayOfMonth;
+		if (dayOfMonth < 1) {
+			dayOfMonth = 1;
+		}
+		int maxDate = time.toLocalDate().lengthOfMonth();
+		if (dayOfMonth > maxDate) {
+			dayOfMonth = maxDate;
+		}
+		return time.withDayOfMonth(dayOfMonth).withHour(hour).withMinute(minute).withSecond(0).withNano(0);
 	}
 
 }

@@ -17,7 +17,7 @@ import com.guillaumevdn.gcore.lib.function.ThrowableRunnable;
 public abstract class BiKeyedBoard<K, K2, V> extends KeyedBoard<K, RWHashMap<K2, V>, BiKeyReference<K, K2>> {
 
 	public BiKeyedBoard(GPlugin plugin, String id, BoardType type, int saveDelayTicks) {
-		super(plugin, id, type, (Class<RWHashMap<K2, V>>) new RWHashMap<>().getClass(), saveDelayTicks);
+		super(plugin, id, type, (Class<RWHashMap<K2, V>>) new RWHashMap<>(10, 1f).getClass(), saveDelayTicks);
 	}
 
 	// ----------------------------------------------------------------------------------------------------

@@ -602,8 +602,13 @@ public class GUI {
 		if (PluginUtils.isPluginEnabled("ProtocolLib")) {
 			PluginUtils.getGPlugins().forEach(plugin -> plugin.getGUIs().forEach(gui -> {
 				ProtocolHandler handler = ObjectUtils.castOrNull(((GUI) gui).handler, ProtocolHandler.class);
-				if (handler != null && handler.removeViewer(player)) {
-					handler.onClose(player);
+				if (handler != null) {
+					handler.removeViewer(player);
+					if (gui.equals(this)) {  // same GUI ? ignore it, we're reopening a page so he'll be added to the new viewers list
+					} else {
+						// otherwise, call remove on other handler
+						handler.onClose(player);
+					}
 				}
 			}));
 		}
@@ -637,12 +642,15 @@ public class GUI {
 		if (!active) {
 			return this;
 		}
+
 		// set inactive
 		active = false;
 		plugin.unregisterGUI(this);
 		handler.deactivate();
+
 		// close
 		getViewers().forEach((player, __) -> handler.close(player));
+
 		// clear
 		if (clear) {
 			clear();
@@ -669,6 +677,24 @@ public class GUI {
 			}
 		}
 		clicker.closeInventory();
+	}
+
+	// ----- obj
+
+	@Override
+	public String toString() {
+		return getId();
+	}
+
+	@Override
+	public int hashCode() {
+		return getId().hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		return ObjectUtils.ifCanBeCastedDo(obj, getClass(), other -> other.getId().equals(getId())).orElse(false);
 	}
 
 	// ----- static

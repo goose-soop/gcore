@@ -46,7 +46,8 @@ public class RWWeakHashMap<K, V> extends WeakHashMap<K, V> {
 				operation.run();
 			}
 		} catch (Throwable error) {
-			throw new RuntimeException("ERROR WHILE LOCKED, thread " + Thread.currentThread().toString(), error);
+			throw error;
+			// throw new RuntimeException("ERROR WHILE LOCKED, thread " + Thread.currentThread().toString(), error);
 		}
 	}
 
@@ -56,7 +57,8 @@ public class RWWeakHashMap<K, V> extends WeakHashMap<K, V> {
 				return operation.get();
 			}
 		} catch (Throwable error) {
-			throw new RuntimeException("ERROR WHILE LOCKED, thread " + Thread.currentThread().toString(), error);
+			throw error;
+			// throw new RuntimeException("ERROR WHILE LOCKED, thread " + Thread.currentThread().toString(), error);
 		}
 	}
 

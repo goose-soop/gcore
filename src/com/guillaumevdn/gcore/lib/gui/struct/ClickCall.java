@@ -92,6 +92,7 @@ public class ClickCall {
 		DROP,
 		CONTROL_DROP,
 		SWAP_OFFHAND,
+		UNKNOWN,  // exists in spigot, and has happened before, but I'm not sure what it means ; maybe a custom client or something
 
 		// doesn't work for vanilla handling
 		NUMBER_KEY_1,
@@ -105,7 +106,8 @@ public class ClickCall {
 		NUMBER_KEY_9,
 		KEY_OFFHAND,
 		CREATIVE,  // not really used but avoids errors in creative inventory when clicking stuff in bottom inv
-		NONE
+
+		NONE,
 		;
 
 		public boolean isNumberKey() {

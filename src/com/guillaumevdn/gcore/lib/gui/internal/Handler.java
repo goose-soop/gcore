@@ -103,17 +103,19 @@ public abstract class Handler {
 	}
 
 	public void onClose(Player player) {
-		// trigger watchers
-		gui.onClose(player);
+		gui.getPlugin().operateSyncLater(() -> {
+			// trigger watchers (with a slight delay, to make sure we're not just "closing" because of switching page)
+			if (!isViewer(player)) {
+				gui.onClose(player);
+			}
 
-		// unregister on close
-		if (!gui.getOptions().contains(Option.DONT_UNREGISTER_ON_CLOSE)) {
-			gui.getPlugin().operateSyncLater(() -> {
+			// unregister on close
+			if (!gui.getOptions().contains(Option.DONT_UNREGISTER_ON_CLOSE)) {
 				if (getViewers().isEmpty()) {
 					gui.deactivate(true);
 				}
-			}, 5);
-		}
+			}
+		}, 5);
 	}
 
 }

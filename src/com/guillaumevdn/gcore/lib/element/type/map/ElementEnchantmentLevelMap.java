@@ -26,7 +26,7 @@ public class ElementEnchantmentLevelMap extends ElementAbstractEnumMap<Enchantme
 	// ----- add
 	@Override
 	public ElementInteger createElement(String elementId) {
-		ElementInteger element = new ElementInteger(this, elementId, Need.optional(), 1, null);
+		ElementInteger element = new ElementInteger(this, elementId, Need.optional(), null);  // no min. value allows usage of math placeholders, <1 will mean no enchant
 		element.setValue(CollectionUtils.asList("1"));  // don't use the default value otherwise it won't be saved
 		return element;
 	}

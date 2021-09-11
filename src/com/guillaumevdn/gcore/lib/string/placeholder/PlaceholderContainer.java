@@ -15,6 +15,7 @@ import com.guillaumevdn.gcore.lib.location.Point;
 import com.guillaumevdn.gcore.lib.number.NumberUtils;
 import com.guillaumevdn.gcore.lib.player.PlayerUtils;
 import com.guillaumevdn.gcore.lib.serialization.Serializer;
+import com.guillaumevdn.gcore.lib.string.StringUtils;
 
 /**
  * @author GuillaumeVDN
@@ -191,7 +192,11 @@ public class PlaceholderContainer implements Comparable<PlaceholderContainer> {
 
 	public static final PlaceholderContainerBrackets MATH = register(new PlaceholderContainerBrackets("math", 1000, false, CollectionUtils.asList("§7Math expression : §8{math:EXPRESSION}"), (placeholderContent, player) -> {
 		if (placeholderContent.toLowerCase().startsWith("math:")) {
-			return new BigDecimal(NumberUtils.calculateExpression(placeholderContent.substring("math:".length()))).toPlainString();
+			String expression = placeholderContent.substring("math:".length());
+			if (StringUtils.hasPercentagePlaceholders(expression) && player == null) {
+				return null;  // if still has PlaceholderAPI placeholders, but no player, do not parse at all ; it's probably because we're parsing something with GENERIC for items, we'll reparse them later correctly using the player
+			}
+			return new BigDecimal(NumberUtils.calculateExpression(expression)).toPlainString();
 		}
 		return null;  // no match;
 	}));
@@ -199,6 +204,9 @@ public class PlaceholderContainer implements Comparable<PlaceholderContainer> {
 	public static final PlaceholderContainerBrackets ROUND = register(new PlaceholderContainerBrackets("mathround", 1001, false, CollectionUtils.asList("§7Math round : §8{mathround:places,EXPRESSION}"), (placeholderContent, player) -> {
 		if (placeholderContent.toLowerCase().startsWith("mathround:")) {
 			String content = placeholderContent.substring("mathround:".length());
+			if (StringUtils.hasPercentagePlaceholders(content) && player == null) {
+				return null;  // if still has PlaceholderAPI placeholders, but no player, do not parse at all ; it's probably because we're parsing something with GENERIC for items, we'll reparse them later correctly using the player
+			}
 			int index = content.indexOf(',');
 			if (index != -1) {
 				int places = NumberUtils.integerOrElse(content.substring(0, index), 0);

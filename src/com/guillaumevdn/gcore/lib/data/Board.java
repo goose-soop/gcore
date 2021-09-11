@@ -149,20 +149,22 @@ public abstract class Board {
 		if (GCore.inst() == null) {
 			return;
 		}
+
 		// no data saving
 		if (getBackEnd().equals(DataBackEnd.MYSQL) && (GCore.inst().getMySQLConnector() == null || !GCore.inst().getMySQLConnector().canConnect())) {
 			logger.error("Couldn't operate board " + getId() + ", no MySQL connector found");
 			return;
 		}
+
 		// perform
 		final long start = System.currentTimeMillis();
 		plugin.operate(thread, () -> {
 			try {
 				runner.run();
-			} catch (Throwable ignored) {
-				ignored.printStackTrace();
+				logger.info("Success : " + operationName + " (took " + (System.currentTimeMillis() - start) + " ms)");
+			} catch (Throwable error) {
+				logger.error("Failure : " + operationName + " (after " + (System.currentTimeMillis() - start) + " ms)", error);
 			}
-			logger.info("Success : " + operationName + " (took " + (System.currentTimeMillis() - start) + " ms)");
 			if (callback != null) {
 				callback.run();
 			}

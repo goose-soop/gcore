@@ -37,8 +37,9 @@ public class ActiveExtraElementGUI extends ActiveElementGUI {
 	protected final Stream<ItemHolder> modifiedContentsStream() {
 		Stream<ItemHolder> stream = getElement().getContents().stream().map(ElementGUIItem::getHolder);
 
-		List<ItemHolder> more = buildDynamic();
+		List<ItemHolder> more = new ArrayList<>();
 		this.more.forEach((__, holder) -> more.add(holder));
+		more.addAll(buildDynamic());
 
 		return more.isEmpty() ? stream : Stream.concat(stream, more.stream());
 	}

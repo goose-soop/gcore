@@ -226,6 +226,7 @@ public final class ElementItem extends ParseableContainerElement<ItemStack> {
 			flags.setValue(fl.isEmpty() ? null : Serializer.ITEM_FLAG.serialize(fl));
 			name.setValue(meta.hasDisplayName() ? CollectionUtils.asList(meta.getDisplayName()) : null);
 			lore.setValue(meta.hasLore() ? CollectionUtils.asList(meta.getLore()) : null);
+
 			// specific meta
 			MetaBook.importElements(this, meta);
 			MetaEnchantmentStorage.importElements(this, meta);
@@ -276,7 +277,11 @@ public final class ElementItem extends ParseableContainerElement<ItemStack> {
 		}
 		enchantments.parseNoCatch(replacer).ifPresentDo(enchants -> {
 			data.writeObject("enchantments", w -> {
-				enchants.forEach((enchantment, level) -> w.write(enchantment.getName(), level));
+				enchants.forEach((enchantment, level) -> {
+					if (level > 0) {
+						w.write(enchantment.getName(), level);
+					}
+				});
 			});
 		});
 		data.writeSerializedList("flags", flags.parseNoCatch(replacer).orNull());

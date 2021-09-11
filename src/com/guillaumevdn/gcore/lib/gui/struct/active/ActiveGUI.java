@@ -127,7 +127,7 @@ public abstract class ActiveGUI extends GUI {
 	}
 
 	public void refreshWithPlaceholders(String... placeholders) {
-		refreshIf(active -> active.getLastPlaceholders() != null && Stream.of(placeholders).anyMatch(pl -> active.getLastPlaceholders().contains(pl)));
+		refreshIf(active -> active.getLastPlaceholders() != null && (placeholders == null || placeholders.length == 0 || Stream.of(placeholders).anyMatch(pl -> active.getLastPlaceholders().contains(pl))));
 	}
 
 	public void refreshIf(Predicate<ActiveItemHolder> filter) {

@@ -23,6 +23,7 @@ import java.util.stream.Stream;
 
 import javax.annotation.Nonnull;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -41,7 +42,7 @@ import com.guillaumevdn.gcore.lib.tuple.LongIntegerPair;
 public final class StringUtils {
 
 	// ----- color formatting
-	public static final List<Character> FORMAT_CODES = CollectionUtils.asUnmodifiableList('1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'a', 'b', 'c', 'd', 'e', 'f', 'k', 'l', 'm', 'n', 'o', 'r');
+	public static final List<Character> FORMAT_CODES = CollectionUtils.asUnmodifiableList('1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'a', 'b', 'c', 'd', 'e', 'f', 'k', 'l', 'm', 'n', 'o', 'r', 'x');
 	public static final List<Character> FORMAT_CODES_HEX = CollectionUtils.asUnmodifiableList('1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z');
 
 	public static String format(String string) {
@@ -122,18 +123,36 @@ public final class StringUtils {
 	}
 
 	public static String retranslateColorCodes(String string) {
-		char[] chars = string.toCharArray();
-		for (int i = 0; i + 1 < chars.length; ++i) {
-			if (chars[i] == '§') {
+		char[] chars = string.replace('§', '&').toCharArray();
+		StringBuilder result = new StringBuilder(chars.length);
+		for (int i = 0; i < chars.length; ++i) {
+			if (string.startsWith("Regular string")) Bukkit.getLogger().info("-- " + chars[i]);
+
+			result.append(chars[i]);
+			if (chars[i] == '&') {
 				char format = Character.toLowerCase(chars[i + 1]);
-				if (FORMAT_CODES_HEX.contains(format)) {
-					chars[i] = '&';
-					chars[i + 1] = format; // to lower case
+				if (format == 'x') {
+					if (string.startsWith("Regular string")) Bukkit.getLogger().info("-- found x ; remaining is '" + string.replace('§', '&').substring(i) + "'");
+					if (i + 13 < chars.length && chars[i + 2] == '&' && chars[i + 4] == '&' && chars[i + 6] == '&' && chars[i + 8] == '&' && chars[i + 10] == '&' && chars[i + 12] == '&') {
+						result.append('#');
+						result.append(chars[i + 3]);
+						result.append(chars[i + 5]);
+						result.append(chars[i + 7]);
+						result.append(chars[i + 9]);
+						result.append(chars[i + 11]);
+						result.append(chars[i + 13]);
+						i += 13;  // loop does ++i too
+					}
+				} else if (FORMAT_CODES_HEX.contains(format)) {
+					result.append(format);  // to lower case
+					++i;  // loop does ++i too
 				}
-				// TODO : retranslate HEX codes
+				
 			}
+			
+			if (string.startsWith("Regular string")) Bukkit.getLogger().info(">> " + result.toString());
 		}
-		return new String(chars);
+		return result.toString();
 	}
 
 	/**
@@ -417,8 +436,8 @@ public final class StringUtils {
 		if (version.contains("-")) {
 			version = version.split("-")[0];
 		}
-		String result = "1"; // add 1 to consider the eventual 0 before
-		String[] temp = new String[3]; // up to 3 entries maximum, example : 1.0.0 will be converted to 1 100 000 000
+		String result = "1";  // add 1 to consider the eventual 0 before
+		String[] temp = new String[3];  // up to 3 entries maximum, example : 1.0.0 will be converted to 1 100 000 000
 		int i = 0;
 		for (String str : version.split("\\.")) {
 			temp[i++] = repeatString("0", partLength - str.length()) + str;
@@ -632,6 +651,10 @@ public final class StringUtils {
 		return hasBracketPlaceholders(line) || countChar(line, '%') >= 2;
 	}
 
+	public static boolean hasPercentagePlaceholders(String line) {
+		return countChar(line, '%') >= 2;
+	}
+
 	public static boolean hasPlaceholders(ItemStack item) {
 		ItemMeta meta = item == null ? null : item.getItemMeta();
 		return meta != null && (hasPlaceholders(meta.getDisplayName()) || hasPlaceholders(meta.getLore()));
@@ -663,13 +686,23 @@ public final class StringUtils {
 		LinkedList<Integer> lastStarts = new LinkedList<>();
 		for (int i = 0; i < string.length(); ++i) {
 			char c = string.charAt(i);
-			if (c == begin) {
-				if (i + 1 < string.length() && isAlphanumeric(string.charAt(i + 1))) {
-					lastStarts.add(i);
+			if (begin == end) {
+				if (c == begin) {
+					if (!lastStarts.isEmpty()) {
+						placeholders.add(string.substring(lastStarts.removeLast(), i + 1));
+					} else if (i + 1 < string.length() && isAlphanumeric(string.charAt(i + 1))) {
+						lastStarts.add(i);
+					}
 				}
-			} else if (c == end) {
-				if (!lastStarts.isEmpty()) {
-					placeholders.add(string.substring(lastStarts.removeLast(), i + 1));
+			} else {
+				if (c == begin) {
+					if (i + 1 < string.length() && isAlphanumeric(string.charAt(i + 1))) {
+						lastStarts.add(i);
+					}
+				} else if (c == end) {
+					if (!lastStarts.isEmpty()) {
+						placeholders.add(string.substring(lastStarts.removeLast(), i + 1));
+					}
 				}
 			}
 		}

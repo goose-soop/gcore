@@ -28,17 +28,17 @@ public interface Replacer {
 
 			// since we don't know in which order placeholders will go (containers that contain placeholders parsed by custom, or the opposite), we parse both twice (as long as there are placeholders)
 
-			if (data.getPlayer() != null) {
+			if (data.getCustom() != null && StringUtils.hasPlaceholders(string)) {
+				string = data.getCustom().apply(string);
+			}
+			if (StringUtils.hasPlaceholders(string)) {
 				string = PlaceholderContainer.parseAll(string, data.getPlayer());
 			}
 			if (data.getCustom() != null && StringUtils.hasPlaceholders(string)) {
 				string = data.getCustom().apply(string);
 			}
-			if (data.getPlayer() != null) {
+			if (StringUtils.hasPlaceholders(string)) {
 				string = PlaceholderContainer.parseAll(string, data.getPlayer());
-			}
-			if (data.getCustom() != null && StringUtils.hasPlaceholders(string)) {
-				string = data.getCustom().apply(string);
 			}
 		}
 		return string;
@@ -64,7 +64,7 @@ public interface Replacer {
 		} else {
 			parsed = clone ? CollectionUtils.asList(raw) : raw;
 		}
-		if (data.getPlayer() != null && StringUtils.hasPlaceholders(parsed)) {
+		if (StringUtils.hasPlaceholders(parsed)) {
 			for (int i = 0; i < parsed.size(); ++i) {
 				String r = parsed.get(i);
 				if (StringUtils.hasPlaceholders(r)) {
@@ -75,7 +75,7 @@ public interface Replacer {
 		if (data.getCustom() != null && StringUtils.hasPlaceholders(parsed)) {
 			parsed = data.getCustom().apply(parsed, false);
 		}
-		if (data.getPlayer() != null && StringUtils.hasPlaceholders(parsed)) {
+		if (StringUtils.hasPlaceholders(parsed)) {
 			for (int i = 0; i < parsed.size(); ++i) {
 				String r = parsed.get(i);
 				if (StringUtils.hasPlaceholders(r)) {

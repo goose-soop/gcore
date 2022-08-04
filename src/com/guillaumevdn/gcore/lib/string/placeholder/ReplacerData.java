@@ -16,6 +16,7 @@ public final class ReplacerData {
 	private Supplier<Player> player = null;
 	private Supplier<Location> location = null;
 	private StringReplacer custom = StringReplacer.empty();
+	private boolean silenceMathErrors = false;
 
 	// ----- get
 	@Nullable
@@ -36,6 +37,10 @@ public final class ReplacerData {
 	@Nonnull
 	public StringReplacer getCustom() {
 		return custom;
+	}
+
+	public boolean mustSilenceMathErrors() {
+		return silenceMathErrors;
 	}
 
 	// ----- set
@@ -79,6 +84,11 @@ public final class ReplacerData {
 
 	public ReplacerData formatNumbers(boolean formatNumbers) {
 		this.custom.formatNumbers(formatNumbers);
+		return this;
+	}
+
+	public ReplacerData silenceMathErrors(boolean silenceMathErrors) {
+		this.silenceMathErrors = silenceMathErrors;
 		return this;
 	}
 

@@ -8,9 +8,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -33,6 +31,8 @@ import com.guillaumevdn.gcore.lib.compatibility.Version;
 import com.guillaumevdn.gcore.lib.compatibility.material.Mat;
 import com.guillaumevdn.gcore.lib.compatibility.particle.Particle;
 import com.guillaumevdn.gcore.lib.compatibility.sound.Sound;
+import com.guillaumevdn.gcore.lib.concurrency.RWHashMap;
+import com.guillaumevdn.gcore.lib.data.board.Board;
 import com.guillaumevdn.gcore.lib.economy.Currency;
 import com.guillaumevdn.gcore.lib.element.struct.SuperElement;
 import com.guillaumevdn.gcore.lib.element.struct.container.typable.TypableElementType;
@@ -52,6 +52,7 @@ import com.guillaumevdn.gcore.lib.number.NumberUtils;
 import com.guillaumevdn.gcore.lib.object.ObjectUtils;
 import com.guillaumevdn.gcore.lib.particlescript.ParticleScript;
 import com.guillaumevdn.gcore.lib.permission.Permission;
+import com.guillaumevdn.gcore.lib.plugin.PluginUtils;
 import com.guillaumevdn.gcore.lib.reflection.Reflection;
 import com.guillaumevdn.gcore.lib.serialization.gson.SerializableGsonAdapter;
 import com.guillaumevdn.gcore.lib.string.StringUtils;
@@ -118,7 +119,7 @@ public abstract class Serializer<T> {
 	// ----- registration
 	// ----------------------------------------------------------------------------------------------------
 
-	private static final Map<Class, Serializer> registration = new HashMap<>();
+	private static final RWHashMap<Class, Serializer> registration = new RWHashMap<>(10, 1f);  // #2284, concurrent modification exception
 
 	public static <T> Serializer<T> find(T object) {
 		if (object == null) throw new NullPointerException();
@@ -126,10 +127,19 @@ public abstract class Serializer<T> {
 	}
 
 	public static <T> Serializer<T> find(Class<T> typeClass) {
-		for (Class reg : registration.keySet()) {
-			if (ObjectUtils.instanceOf(typeClass, reg)) {
-				return registration.get(reg);
-			}
+
+		if (String.class.equals(typeClass)) {
+			return (Serializer<T>) STRING;  // so feeeest
+		}
+
+		Serializer ser = registration.streamResult(str -> str
+				.filter(e -> ObjectUtils.instanceOf(typeClass, e.getKey()))
+				.findFirst()
+				.map(e -> e.getValue())
+				.orElse(null)
+				);
+		if (ser != null) {
+			return ser;
 		}
 		if (typeClass.isEnum()) {
 			return ofEnum((Class<? extends Enum>) typeClass);
@@ -138,7 +148,7 @@ public abstract class Serializer<T> {
 	}
 
 	public static <T> Collection<Serializer> values() {
-		return Collections.unmodifiableCollection(registration.values());
+		return Collections.unmodifiableCollection(registration.copyValues());
 	}
 
 	public static void unregister(Class<?> serializerClass) {
@@ -322,7 +332,7 @@ public abstract class Serializer<T> {
 	public static final Serializer<ParticleScript> PARTICLE_SCRIPT = of(ParticleScript.class, value -> value.getId(), string -> ConfigGCore.particleScripts.get(string));
 	public static final Serializer<ItemFlag> ITEM_FLAG = ofEnum(ItemFlag.class);
 	public static final LinearSerializer<OverrideClickType, OverrideClick> OVERRIDE_CLICK = Serializer.ofLinear(Serializer.ofEnum(OverrideClickType.class), OverrideClick.class, (type, params) -> new OverrideClick(type, params));
-	public static final Serializer<Permission> PERMISSION = of(Permission.class, value -> value.getName(), string -> new Permission(string, null));
+	public static final Serializer<Permission> PERMISSION = of(Permission.class, value -> value.getName(), string -> new Permission(string));
 	public static final Serializer<Point> POINT = of(Point.class,
 			value -> value.getWorld().getName() + "," + value.getX() + "," + value.getY() + "," + value.getZ(),
 			string -> {
@@ -338,6 +348,13 @@ public abstract class Serializer<T> {
 					throw new Error("couldn't deserialize point " + string, exception);
 				}
 			});
+	public static final Serializer<Board> BOARD = of(Board.class, b -> b.getId(), id -> {
+		return PluginUtils.getGPlugins().stream()
+				.flatMap(pl -> pl.getData().streamResult(str -> str.collect(Collectors.toList()).stream()))
+				.filter(b -> b.getKey().equalsIgnoreCase(id))
+				.findFirst().map(e -> e.getValue())
+				.orElse(null);
+	});
 
 	// ----------------------------------------------------------------------------------------------------
 	// ----- types : bukkit

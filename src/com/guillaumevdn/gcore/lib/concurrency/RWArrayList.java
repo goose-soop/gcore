@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.Spliterator;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -20,10 +21,9 @@ import java.util.stream.StreamSupport;
 
 import javax.annotation.Nullable;
 
-import com.guillaumevdn.gcore.lib.function.TriConsumer;
+import com.guillaumevdn.gcore.lib.collection.IteratorControls;
 import com.guillaumevdn.gcore.lib.object.ObjectUtils;
 import com.guillaumevdn.gcore.lib.string.StringUtils;
-import com.guillaumevdn.gcore.lib.wrapper.WrapperBoolean;
 
 /**
  * This is to avoid having to/forgetting to synchronize manually on this set.
@@ -97,19 +97,15 @@ public class RWArrayList<T> extends ArrayList<T> {
 		});
 	}
 
-	/**
-	 * @param consumer next element, remover (set to true to remove current element), breaker (set to true to stop iterating)
-	 */
-	public final void iterate(TriConsumer<T, WrapperBoolean /* remover */, WrapperBoolean /* breaker */> consumer) {
+	public final void iterate(BiConsumer<T, IteratorControls> consumer) {
 		lock.lockRead();
 		try {
+			IteratorControls iter = new IteratorControls();
 			Iterator<T> it = super.iterator();
-			WrapperBoolean remover = WrapperBoolean.of(false);
-			WrapperBoolean breaker = WrapperBoolean.of(false);
 			while (it.hasNext()) {
 				T next = it.next();
-				consumer.accept(next, remover, breaker);
-				if (remover.get()) {
+				consumer.accept(next, iter);
+				if (iter.mustRemove()) {
 					lock.unlockRead();
 					lock.lockWrite();  // wait until this set is good for modification
 					try {
@@ -120,11 +116,11 @@ public class RWArrayList<T> extends ArrayList<T> {
 					}
 					lock.lockRead();  // downgrade to read lock (by releasing read lock first) to have priority and continue reading
 					lock.unlockWrite();
-					remover.set(false);
 				}
-				if (breaker.get()) {
+				if (iter.mustStop()) {
 					break;
 				}
+				iter.reset();
 			}
 		} finally {
 			lock.unlockRead();
@@ -286,6 +282,13 @@ public class RWArrayList<T> extends ArrayList<T> {
 		});
 	}
 
+	@Nullable
+	public T getLast() {
+		return lock.read(() -> {
+			return super.isEmpty() ? null : super.get(super.size() - 1);
+		});
+	}
+
 	@Override
 	public int indexOf(Object o) {
 		return lock.read(() -> {
@@ -417,6 +420,12 @@ public class RWArrayList<T> extends ArrayList<T> {
 	public T remove(int index) {
 		return lock.write(() -> {
 			return super.remove(index);
+		});
+	}
+
+	public T removeLast() {
+		return lock.write(() -> {
+			return super.remove(super.size() - 1);
 		});
 	}
 

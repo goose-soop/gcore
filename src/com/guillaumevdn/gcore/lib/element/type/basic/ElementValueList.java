@@ -116,7 +116,7 @@ public abstract class ElementValueList<T> extends BasicElement<List<T>> {
 			protected boolean doFill() {
 
 				// current item
-				setPersistentItem(new GUIItem("current", 47, editorIcon()));
+				setPersistentItem(new GUIItem("current", 47, editorIcon(true)));
 
 				// set lines items
 				if (getRawValue() != null) {

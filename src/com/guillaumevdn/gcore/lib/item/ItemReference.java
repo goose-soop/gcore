@@ -125,7 +125,11 @@ public interface ItemReference {
 		if (!element.getType().readContains()) {
 			return new ItemReferenceElementNoType(element, replacer);
 		}
-		return of(element.parse(replacer).orNull());  // if type was written in config, MUST be valid configuration
+		ItemStack item = element.parse(replacer).orNull();  // if type was written in config, MUST be valid configuration ; if can't parse, still return a no type version, they'll have to investigate then
+		if (item == null) {
+			return new ItemReferenceElementNoType(element, replacer);
+		}
+		return of(item);
 	}
 
 }

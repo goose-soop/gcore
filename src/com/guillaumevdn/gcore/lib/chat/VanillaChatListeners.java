@@ -33,8 +33,10 @@ public class VanillaChatListeners implements Listener {
 				slashCount = 1;
 			}
 			PlayerChatEvent event = PlayerChatEvent.call(og.getPlayer(), slashCount, command.trim(), new HashSet<>());
-			og.setMessage(StringUtils.repeatString("/", event.getCommandSlashCount()) + event.getMessage().trim());
-			og.setCancelled(event.isCancelled());
+			if (event.getChangesToOG() > 0) {
+				og.setMessage(StringUtils.repeatString("/", event.getCommandSlashCount()) + event.getMessage().trim());
+				og.setCancelled(event.isCancelled());
+			}
 		}
 	}
 

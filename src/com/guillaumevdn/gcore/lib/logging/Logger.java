@@ -16,8 +16,6 @@ import org.bukkit.Bukkit;
 
 import com.guillaumevdn.gcore.ConfigGCore;
 import com.guillaumevdn.gcore.lib.GPlugin;
-import com.guillaumevdn.gcore.lib.concurrency.RWArrayList;
-import com.guillaumevdn.gcore.lib.concurrency.RWHashMap;
 import com.guillaumevdn.gcore.lib.exception.ConfigError;
 import com.guillaumevdn.gcore.lib.file.FileUtils;
 import com.guillaumevdn.gcore.lib.reflection.Reflection;
@@ -33,20 +31,14 @@ public class Logger {
 
 	private GPlugin plugin;
 	private String id;
-	private boolean logConsole, logFile, antiSpam;
+	private boolean logConsole, logFile;
 	private int fileLineLimit;
-	private RWArrayList<String> linesToSave = new RWArrayList<>(5);
 
 	public Logger(GPlugin plugin, String id, boolean logConsole, boolean logFile) {
-		this(plugin, id, logConsole, logFile, true);
-	}
-
-	public Logger(GPlugin plugin, String id, boolean logConsole, boolean logFile, boolean antiSpam) {
 		this.plugin = plugin;
 		this.id = id;
 		this.logConsole = logConsole;
 		this.logFile = logFile;
-		this.antiSpam = antiSpam;
 		this.fileLineLimit = REGULAR_LINE_LIMIT;
 	}
 
@@ -112,7 +104,7 @@ public class Logger {
 		log(LogLevel.DEBUG, line, true, false, null);
 	}
 
-	private transient RWHashMap<String, Long> lastLogged = new RWHashMap<>(10, 1f);  // #925, concurrent mod exception
+	//private transient RWHashMap<String, Long> lastLogged = new RWHashMap<>(10, 1f);  // #925, concurrent mod exception ; // UPDATE : this simply takes too much memory
 
 	public void log(LogLevel level, String line, boolean printIdInConsole, Throwable trace) {
 		log(level, line, printIdInConsole, false, trace);
@@ -121,12 +113,12 @@ public class Logger {
 	public void log(LogLevel level, String line, boolean printIdInConsole, boolean ignoreAntiSpam, Throwable trace) {
 		try {
 			// already logged recently
-			if (antiSpam && !ignoreAntiSpam) {
+			/*if (antiSpam && !ignoreAntiSpam) {
 				if (System.currentTimeMillis() - lastLogged.computeIfAbsent(line, __ -> 0L) < 1000L) {
 					return;
 				}
 				lastLogged.put(line, System.currentTimeMillis());
-			}
+			}*/
 			// log to console
 			if (isLogConsole() || level.equals(LogLevel.ERROR)) {
 				Bukkit.getConsoleSender().sendMessage(level.getConsoleColor() + (printIdInConsole ? "[" + id + "] " : "") + (trace != null && trace instanceof ConfigError ? line + ", " + trace.getMessage() : line));
@@ -136,10 +128,11 @@ public class Logger {
 			}
 			// log to file
 			if (logFile) {
-				linesToSave.add("[" + DATE_FORMAT.format(Calendar.getInstance().getTime()) + "] [" + level.getFilePrefix() + "] " + line);
+				String toWrite = "[" + DATE_FORMAT.format(Calendar.getInstance().getTime()) + "] [" + level.getFilePrefix() + "] " + line;
 				if (trace != null && !(trace instanceof ConfigError)) {
-					linesToSave.add(Reflection.stackTraceToString(trace));
+					toWrite += "\n" + Reflection.stackTraceToString(trace);
 				}
+				writeLineIfPersistent(toWrite);
 			}
 		} catch (Throwable logError) {
 			if (!(logError instanceof ConcurrentModificationException)) {
@@ -150,51 +143,87 @@ public class Logger {
 
 	// ----- saving
 	public final void startSaving() {
-		stopSaving();
+		/*stopSaving();
 		if (logFile) {
-			plugin.registerTask("logger_filesave_" + id.toLowerCase(), true, 20 * 30, () -> saveFileIfPersistent());
-		}
+			plugin.registerTask("logger_filesave_" + id.toLowerCase(), true, 20, () -> saveFileIfPersistent());
+		}*/
 	}
 
 	public final void stopSaving() {
-		plugin.stopTask("logger_filesave_" + id.toLowerCase());
+		//plugin.stopTask("logger_filesave_" + id.toLowerCase());
+		if (writer != null) {
+			try {
+				writer.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
-	public void saveFileIfPersistent() throws IOException {
-		if (logFile && !linesToSave.isEmpty()) {
-			File file = getFile();
-			try {
-				// get new final line count
-				int newLineCount = 0;
+	private static final long LINE_COUNT_CHECK_INTERVAL = 15L * 60L * 1000L;
+	private static final long REOPEN_INTERVAL = 15L * 60L * 1000L;
+	private transient long lastReopen = System.currentTimeMillis();
+	private transient long lastCheckedLineCount = System.currentTimeMillis();
+	private transient BufferedWriter writer = null;
+
+	private void writeLineIfPersistent(String line) throws IOException {
+		if (!logFile) {
+			return;
+		}
+
+		File file = getFile();
+		try {
+			// get new final line count
+			if (System.currentTimeMillis() - lastCheckedLineCount > LINE_COUNT_CHECK_INTERVAL) {
+				lastCheckedLineCount = System.currentTimeMillis();
 				if (file.exists()) {
+					int newLineCount = 0;
 					try (LineNumberReader reader = new LineNumberReader(new FileReader(file))) {
 						while (reader.readLine() != null) {
 							++newLineCount;
 						}
 					}
-				}
-				newLineCount += linesToSave.size();
-				// write lines
-				FileUtils.ensureExistence(file);
-				BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
-				linesToSave.forEach(line -> {
-					try {
-						writer.write(line + "\n");
-					} catch (IOException ignored) {
-						ignored.printStackTrace();
+
+					// maybe file has too many lines, so archive it
+					if (newLineCount > fileLineLimit) {
+						File archiveFile = getArchiveFile(ConfigGCore.timeNow());
+						FileUtils.delete(archiveFile);
+						file.renameTo(archiveFile);
 					}
-				});
-				linesToSave.clear();
-				writer.close();
-				// maybe file has too many lines, so archive it
-				if (newLineCount > fileLineLimit) {
-					File archiveFile = getArchiveFile(ConfigGCore.timeNow());
-					FileUtils.delete(archiveFile);
-					file.renameTo(archiveFile);
 				}
-			} catch (Throwable exception) {
-				throw new IOException("couldn't save lines for logger " + getId() + ", plugin " + plugin.getName(), exception);
 			}
+
+			// (re)open writer and write line
+			try {
+				if (writer == null || System.currentTimeMillis() - lastReopen > REOPEN_INTERVAL) {
+					lastReopen = System.currentTimeMillis();
+					if (writer != null) {
+						writer.close();
+					}
+					FileUtils.ensureExistence(file);
+					writer = new BufferedWriter(new FileWriter(file, true));
+				}
+				try {
+					writer.write(line + "\n");
+				} catch (IOException ignored) {
+					if ("Stream closed".equals(ignored.getMessage())) {
+						if (writer == null || System.currentTimeMillis() - lastReopen > REOPEN_INTERVAL) {
+							lastReopen = System.currentTimeMillis();
+							if (writer != null) {
+								writer.close();
+							}
+							FileUtils.ensureExistence(file);
+							writer = new BufferedWriter(new FileWriter(file, true));
+							writer.write(line + "\n");
+						}
+					}
+				}
+			} catch (IOException ignored) {
+				ignored.printStackTrace();
+				writer = null;
+			}
+		} catch (Throwable exception) {
+			throw new IOException("couldn't save lines for logger " + getId() + ", plugin " + plugin.getName(), exception);
 		}
 	}
 

@@ -14,12 +14,12 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
-import com.guillaumevdn.gcore.lib.function.QuadriConsumer;
+import com.guillaumevdn.gcore.lib.collection.IteratorControls;
 import com.guillaumevdn.gcore.lib.function.ThrowableBiConsumer;
-import com.guillaumevdn.gcore.lib.function.ThrowableQuadriConsumer;
+import com.guillaumevdn.gcore.lib.function.ThrowableTriConsumer;
+import com.guillaumevdn.gcore.lib.function.TriConsumer;
 import com.guillaumevdn.gcore.lib.object.ObjectUtils;
 import com.guillaumevdn.gcore.lib.string.StringUtils;
-import com.guillaumevdn.gcore.lib.wrapper.WrapperBoolean;
 
 /**
  * Uses a ReentrantReadWriteLock (allows multiple readers and prioritizes the only writer if any)
@@ -84,34 +84,46 @@ public class RWHashMap<K, V> extends HashMap<K, V> {
 		});
 	}
 
-	/**
-	 * @param consumer next key, next value, remover (set to true to remove current element), breaker (set to true to stop iterating)
-	 */
-	public final void iterateAndModify(QuadriConsumer<K, V, WrapperBoolean /* remover */, WrapperBoolean /* breaker */> consumer) {
+	public final void iterateAndModify(TriConsumer<K, V, IteratorControls> consumer) {
 		try {
-			iterateAndModifyOrThrow((key, value, remover, breaker) -> consumer.accept(key, value, remover, breaker));
+			iterateAndModifyOrThrow((key, value, iter) -> consumer.accept(key, value, iter));
 		} catch (Throwable exception) {
 			throw new RuntimeException(exception);
 		}
 	}
 
-	public final void iterateAndModifyOrThrow(ThrowableQuadriConsumer<K, V, WrapperBoolean /* remover */, WrapperBoolean /* breaker */> consumer) throws Throwable {
+	public final void iterateAndModifyOrThrow(ThrowableTriConsumer<K, V, IteratorControls> consumer) throws Throwable {
 		// always lock on write here
 		// if the method is called, it means we want to modify the map
 		// if this is called simultaneously and elements are removed, it would throw errors with the usual "read > write > read" process since the iterator would no longer be valid (ConcurrentModificationException)
 
 		lock.writeThrowable(() -> {
 			Iterator<Entry<K, V>> it = super.entrySet().iterator();
-			WrapperBoolean remover = WrapperBoolean.of(false);
-			WrapperBoolean breaker = WrapperBoolean.of(false);
+			IteratorControls iter = new IteratorControls();
+
 			while (it.hasNext()) {
 				Entry<K, V> next = it.next();
-				consumer.accept(next.getKey(), next.getValue(), remover, breaker);
-				if (remover.get()) {
+				consumer.accept(next.getKey(), next.getValue(), iter);
+				if (iter.mustRemove()) {
 					it.remove();
-					remover.set(false);
+					iter.reset();
 				}
-				if (breaker.get()) {
+				if (iter.mustStop()) {
+					break;
+				}
+			}
+		});
+	}
+
+	public final void iterateNoModifyOrThrow(ThrowableTriConsumer<K, V, IteratorControls> consumer) throws Throwable {
+		lock.readThrowable(() -> {
+			Iterator<Entry<K, V>> it = super.entrySet().iterator();
+			IteratorControls iter = new IteratorControls();
+
+			while (it.hasNext()) {
+				Entry<K, V> next = it.next();
+				consumer.accept(next.getKey(), next.getValue(), iter);
+				if (iter.mustStop()) {
 					break;
 				}
 			}

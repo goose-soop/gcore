@@ -308,7 +308,7 @@ descriptionPositionTypeClosestMythicMobMobs: |
 descriptionPositionTypeWorld: |
   &7De Wereld
 
-descriptionPositionTypeBiome: |
+descriptionPositionTypeBiomes: |
   &7De geaccepteerde biomes
 
 descriptionPositionTypeSingleLocation: |

@@ -104,6 +104,9 @@ controlTextSetRandom: |
 descriptionItemType: |
   &7Type d'item
 
+descriptionItemTypeHDB: |
+  &7ID HeadDatabase
+
 descriptionItemDurability: |
   &7Durabilité de l'item
 
@@ -314,11 +317,14 @@ descriptionPositionTypeClosestMythicMobMobs: |
 descriptionPositionTypeWorld: |
   &0Le Monde
 
-descriptionPositionTypeBiome: |
+descriptionPositionTypeBiomes: |
   &7Les biomes acceptés
 
 descriptionPositionTypeSingleLocation: |
   &7La location unique
+
+descriptionPositionTypeSingleRandomLocations: |
+  &7Une liste de locations dans laquelle la location unique sera sélectionnée
 
 descriptionPositionTypeRelativeSingleLocation: |
   &7La location unique relative

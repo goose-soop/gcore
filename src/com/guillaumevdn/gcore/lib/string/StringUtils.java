@@ -22,8 +22,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -66,11 +66,10 @@ public final class StringUtils {
 								code.append(chars[i + j]);
 								hex.append('§').append(chars[i + j]);
 							}
-							Integer.parseInt(code.toString(), 16); // make sure it's actually a correct code
+							Integer.parseInt(code.toString(), 16);  // make sure it's actually a correct code
 							builder.append("§x").append(hex);
 							i += 7;
 						} catch (NumberFormatException ignored) {
-							ignored.printStackTrace();
 							builder.append(chars[i]);
 						}
 					}
@@ -126,13 +125,13 @@ public final class StringUtils {
 		char[] chars = string.replace('§', '&').toCharArray();
 		StringBuilder result = new StringBuilder(chars.length);
 		for (int i = 0; i < chars.length; ++i) {
-			if (string.startsWith("Regular string")) Bukkit.getLogger().info("-- " + chars[i]);
+			//if (string.startsWith("Regular string")) Bukkit.getLogger().info("-- " + chars[i]);
 
 			result.append(chars[i]);
 			if (chars[i] == '&') {
 				char format = Character.toLowerCase(chars[i + 1]);
 				if (format == 'x') {
-					if (string.startsWith("Regular string")) Bukkit.getLogger().info("-- found x ; remaining is '" + string.replace('§', '&').substring(i) + "'");
+					//if (string.startsWith("Regular string")) Bukkit.getLogger().info("-- found x ; remaining is '" + string.replace('§', '&').substring(i) + "'");
 					if (i + 13 < chars.length && chars[i + 2] == '&' && chars[i + 4] == '&' && chars[i + 6] == '&' && chars[i + 8] == '&' && chars[i + 10] == '&' && chars[i + 12] == '&') {
 						result.append('#');
 						result.append(chars[i + 3]);
@@ -147,10 +146,10 @@ public final class StringUtils {
 					result.append(format);  // to lower case
 					++i;  // loop does ++i too
 				}
-				
+
 			}
-			
-			if (string.startsWith("Regular string")) Bukkit.getLogger().info(">> " + result.toString());
+
+			//if (string.startsWith("Regular string")) Bukkit.getLogger().info(">> " + result.toString());
 		}
 		return result.toString();
 	}
@@ -198,11 +197,12 @@ public final class StringUtils {
 		return result;
 	}
 
-	private static final Pattern regexColor = Pattern.compile("§[a-f0-9]{1}");
+	private static final Pattern regexColor = Pattern.compile("§([a-f0-9]{1}|#[0-9a-fA-F]{6}|x(§[0-9a-fA-F]){6})"); // Pattern.compile("§[a-f0-9]{1}");
 	private static final Pattern regexFormat = Pattern.compile("§[klmnor]{1}");
 
 	public static String getLastColors(String string) {
 		string = format(string);
+
 		// find matches
 		Matcher matcherColor = regexColor.matcher(string);
 		String lastColor = null;
@@ -218,6 +218,7 @@ public final class StringUtils {
 			lastFormat = matcherFormat.group();
 			lastFormatStart = matcherFormat.start();
 		}
+
 		// has format
 		if (lastFormat != null) {
 			// has color
@@ -232,6 +233,7 @@ public final class StringUtils {
 			// no color, just return format
 			return lastFormat;
 		}
+
 		// just color maybe
 		return lastColor != null ? lastColor : "";
 	}
@@ -246,8 +248,12 @@ public final class StringUtils {
 	}
 
 	public static String formatNumber(double number) {
+		return formatNumber(number, null);
+	}
+
+	public static String formatNumber(double number, @Nullable Integer forceFormattingDecimals) {
 		try {
-			String[] split = new BigDecimal(Math.abs(number)).setScale(ConfigGCore.numberFormattingDecimals, RoundingMode.HALF_DOWN).toPlainString().split("\\.");
+			String[] split = new BigDecimal(Math.abs(number)).setScale(forceFormattingDecimals != null ? forceFormattingDecimals : ConfigGCore.numberFormattingDecimals, RoundingMode.HALF_DOWN).toPlainString().split("\\.");
 			BigDecimal integer = new BigDecimal(split[0]);
 			// big numbers
 			String suffix = "";
@@ -280,6 +286,14 @@ public final class StringUtils {
 		} catch (NumberFormatException ignored) {  // #1110
 			return "" + number;
 		}
+	}
+
+	public static String formatNumberK(int number) {
+		if (number < 1000) {
+			return "" + number;
+		}
+		final int rem = number % 1000;
+		return (rem == 0 ? "" : "~") + ((int) Math.ceil(number / 1000)) + "k";
 	}
 
 	public static String makeProgressBar(double percentage, int barLength, String barChar, String barColor, String barEmpty) {
@@ -475,7 +489,7 @@ public final class StringUtils {
 	public static String separateAtUnderscore(String string) {
 		StringBuilder builder = new StringBuilder(string.length());
 		for (char ch : string.toCharArray()) {
-			if (ch == '_') {// monkaX
+			if (ch == '_') {  // monkaX
 				builder.append(' ');
 			} else {
 				builder.append(Character.toLowerCase(ch));
@@ -661,7 +675,7 @@ public final class StringUtils {
 	}
 
 	@Nonnull
-	public static Set<String> getPlaceholders(String string) {
+	public static Set<String> getPlaceholders(@Nullable String string) {
 		Set<String> placeholders = new HashSet<>();
 		if (string != null) {
 			doGetPlaceholders(string, '{', '}', placeholders);
@@ -671,7 +685,7 @@ public final class StringUtils {
 	}
 
 	@Nonnull
-	public static Set<String> getPlaceholders(List<String> list) {
+	public static Set<String> getPlaceholders(@Nullable List<String> list) {
 		Set<String> placeholders = new HashSet<>();
 		if (list != null) {
 			list.forEach(line -> {
@@ -739,6 +753,21 @@ public final class StringUtils {
 		}
 		if (!string.isEmpty()) {
 			result.add(string);
+		}
+		return result;
+	}
+
+	public static List<String> splitFromEnd(String string, String separator, int limit) {
+		if (string == null) return new ArrayList<>();
+		if (limit <= 0) limit = Integer.MAX_VALUE;
+		List<String> result = new ArrayList<>();
+		int index = -1;
+		while ((index = string.lastIndexOf(separator)) != -1 && --limit >= 0) {
+			result.add(0, string.substring(index + separator.length(), string.length()));
+			string = string.substring(0, index);
+		}
+		if (!string.isEmpty()) {
+			result.add(0, string);
 		}
 		return result;
 	}

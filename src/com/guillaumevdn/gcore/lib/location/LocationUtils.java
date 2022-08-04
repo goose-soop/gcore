@@ -19,6 +19,7 @@ import com.guillaumevdn.gcore.lib.compatibility.material.Mat;
 import com.guillaumevdn.gcore.lib.number.MinMaxDouble;
 import com.guillaumevdn.gcore.lib.number.MinMaxInteger;
 import com.guillaumevdn.gcore.lib.number.NumberUtils;
+import com.guillaumevdn.gcore.lib.tuple.FloatPair;
 import com.guillaumevdn.gcore.lib.tuple.Pair;
 
 /**
@@ -28,7 +29,7 @@ public final class LocationUtils {
 
 	// ----- get
 	public static List<Block> getSphereBlocks(Location center, int radius) {
-		List<Block> result = new ArrayList<>(); // a list so we don't check for duplicates every time we add one
+		List<Block> result = new ArrayList<>();  // a list so we don't check for duplicates every time we add one
 		for (int offx = -radius; offx <= radius; ++offx) {
 			for (int offy = -radius; offy <= radius; ++offy) {
 				for (int offz = -radius; offz <= radius; ++offz) {
@@ -43,7 +44,7 @@ public final class LocationUtils {
 	}
 
 	public static List<Block> getBlocksOnSphere(Location center, int radius) {
-		List<Block> result = new ArrayList<>(); // a list so we don't check for duplicates every time we add one
+		List<Block> result = new ArrayList<>();  // a list so we don't check for duplicates every time we add one
 		for (int offx = -radius; offx <= radius; ++offx) {
 			for (int offy = -radius; offy <= radius; ++offy) {
 				for (int offz = -radius; offz <= radius; ++offz) {
@@ -294,6 +295,20 @@ public final class LocationUtils {
 			}
 		}
 		return null;
+	}
+
+	// look
+	public static FloatPair getTargetLook(Location from, Location to) {
+		double x0 = from.getX(), y0 = from.getY(), z0 = from.getZ();
+		double x = to.getX(), y = to.getY(), z = to.getZ();
+		double dx = x - x0;
+		double dy = y - y0;
+		double dz = z - z0;
+		double r = Math.sqrt(dx * dx + dy * dy + dz * dz);
+		double yaw = -Math.atan2(dx, dz) / Math.PI * 180d;
+		if (yaw < 0) yaw = 360d + yaw;
+		double pitch = -Math.asin(dy / r) / Math.PI * 180d;
+		return FloatPair.of((float) yaw, (float) pitch);
 	}
 
 }

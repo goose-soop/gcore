@@ -1,9 +1,11 @@
 package com.guillaumevdn.gcore.lib.player;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+import java.util.WeakHashMap;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -14,12 +16,14 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import com.guillaumevdn.gcore.ConfigGCore;
 import com.guillaumevdn.gcore.TextGeneric;
+import com.guillaumevdn.gcore.lib.collection.LowerCaseHashMap;
 import com.guillaumevdn.gcore.lib.command.CommandCall;
-import com.guillaumevdn.gcore.lib.compatibility.Version;
 import com.guillaumevdn.gcore.lib.gui.struct.ClickCall;
 import com.guillaumevdn.gcore.lib.string.StringUtils;
 import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
+import com.guillaumevdn.gcore.lib.tuple.Pair;
 
 /**
  * @author GuillaumeVDN
@@ -27,16 +31,47 @@ import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
 public final class PlayerUtils {
 
 	public static List<Player> getOnline() {
-		return getOnlineStream().collect(Collectors.toList());
+		Object online = Bukkit.getOnlinePlayers();
+		if (online instanceof Collection) {  // on some servers (forge servers, #2462) it's actually a collection even in 1.7
+			return new ArrayList<>((Collection<? extends Player>) online);
+		} else {
+			Player[] array = (Player[]) online;
+			List<Player> result = new ArrayList<>(array.length);
+			for (int i = 0; i < array.length; ++i) {
+				result.add(array[i]);
+			}
+			return result;
+		}
+
+
+		/*if (Version.CURRENT.isLessOrEqualsTo(Version.MC_1_7_R4)) {
+			Player[] array = (Player[]) ((Object) Bukkit.getOnlinePlayers());
+			List<Player> result = new ArrayList<>(array.length);
+			for (int i = 0; i < array.length; ++i) {
+				result.add(array[i]);
+			}
+			return result;
+		} else {
+			return new ArrayList<>(Bukkit.getOnlinePlayers());
+		}*/
 	}
 
 	public static Stream<? extends Player> getOnlineStream() {
-		if (Version.CURRENT.isLessOrEqualsTo(Version.MC_1_7_R4)) {
+		Object online = Bukkit.getOnlinePlayers();
+		if (online instanceof Collection) {  // on some servers (forge servers, #2462) it's actually a collection even in 1.7
+			return ((Collection<? extends Player>) online).stream();
+		} else {
+			Player[] array = (Player[]) online;
+			return Arrays.stream(array);
+		}
+
+
+		/*if (Version.CURRENT.isLessOrEqualsTo(Version.MC_1_7_R4)) {
 			Object array = Bukkit.getOnlinePlayers();
 			return Arrays.stream((Player[]) array);
 		} else {
 			return Bukkit.getOnlinePlayers().stream();
-		}
+		}*/
 	}
 
 	public static List<Player> getOnline(Collection<UUID> uuids) {
@@ -57,6 +92,8 @@ public final class PlayerUtils {
 		return hasPermission0(target, permission);
 	}
 
+	public static transient WeakHashMap<CommandSender, LowerCaseHashMap<Pair<Long, Boolean>>> permissionCache = new WeakHashMap<>();
+
 	private static boolean hasPermission0(Object target, String permission) {
 		if (target instanceof Collection<?>) {
 			for (Object sub : ((Collection<?>) target)) {
@@ -67,7 +104,13 @@ public final class PlayerUtils {
 			return true;
 		} else if (target instanceof CommandSender) {
 			CommandSender sender = (CommandSender) target;
-			return sender.isOp() || sender.hasPermission(permission);
+			LowerCaseHashMap<Pair<Long, Boolean>> cache = permissionCache.computeIfAbsent(sender, __ -> new LowerCaseHashMap<>(2, 1f));
+			Pair<Long, Boolean> result = cache.get(permission);
+			if (result == null || System.currentTimeMillis() - result.getA() > ConfigGCore.permissionCacheRetainMillis) {
+				result = Pair.of(System.currentTimeMillis(), sender.isOp() || sender.hasPermission(permission));
+				cache.put(permission, result);
+			}
+			return result.getB();
 		} else if (target instanceof OfflinePlayer) {
 			OfflinePlayer player = (OfflinePlayer) target;
 			Player playerOnline = PlayerUtils.getOnline(player);

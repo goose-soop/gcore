@@ -17,6 +17,7 @@ import org.bukkit.entity.Player;
 
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.compatibility.Version;
+import com.guillaumevdn.gcore.lib.concurrency.RWHashMap;
 import com.guillaumevdn.gcore.lib.concurrency.RWHashSet;
 import com.guillaumevdn.gcore.lib.function.ThrowableConsumer;
 import com.guillaumevdn.gcore.lib.logic.ComparisonType;
@@ -29,12 +30,32 @@ import com.guillaumevdn.gcore.lib.string.StringUtils;
 public final class Reflection {
 
 	// ----- class
+	private static RWHashMap<Integer, Class> cache = new RWHashMap<>(10, 1f);
+
+	private static Class getClassMaybeCached(String path) throws Throwable {
+		int hash = path.hashCode();
+		Class clazz = cache.get(hash);
+		if (clazz == null) {
+			clazz = Class.forName(path);
+			cache.put(hash, clazz);
+		}
+		return clazz;
+	}
+
+	public static Class classOrNull(String path) {
+		try {
+			return getClassMaybeCached(path);
+		} catch (Throwable exception) {
+			return null;
+		}
+	}
+
 	public static Class getNmsClass(String path) throws Throwable {
-		return Class.forName(Version.CURRENT.getNMSPackage() + "." + path);
+		return getClassMaybeCached(Version.CURRENT.getNMSPackage() + "." + path);
 	}
 
 	public static Class getCraftbukkitClass(String path) throws Throwable {
-		return Class.forName(Version.CURRENT.getCraftbukkitPackage() + "." + path);
+		return getClassMaybeCached(Version.CURRENT.getCraftbukkitPackage() + "." + path);
 	}
 
 	public static Class safeArrayClass(Class typeClass, int depth) {
@@ -46,20 +67,12 @@ public final class Reflection {
 		}
 	}
 
-	public static Class classOrNull(String name) {
-		try {
-			return Class.forName(name);
-		} catch (Throwable exception) {
-			return null;
-		}
-	}
-
 	public static Class getArrayClass(Class typeClass) throws Throwable {
 		return getArrayClass(typeClass, 1);
 	}
 
 	public static Class getArrayClass(Class typeClass, int depth) throws Throwable {
-		return Class.forName(StringUtils.repeatString("[", depth) + "L" + typeClass.getName() + ";");
+		return getClassMaybeCached(StringUtils.repeatString("[", depth) + "L" + typeClass.getName() + ";");
 	}
 
 	public static <T> T[] createArray(Class<T> type, Collection<?> content) {
@@ -93,7 +106,7 @@ public final class Reflection {
 
 	// ----- enum
 	public static ReflectionEnum getEnum(String path) throws Throwable {
-		return ReflectionEnum.of(Class.forName(path));
+		return ReflectionEnum.of(getClassMaybeCached(path));
 	}
 
 	public static ReflectionEnum getNmsEnum(String path) throws Throwable {
@@ -101,7 +114,7 @@ public final class Reflection {
 	}
 
 	public static ReflectionFakeEnum getFakeEnum(String path) throws Throwable {
-		return ReflectionFakeEnum.of(Class.forName(path));
+		return ReflectionFakeEnum.of(getClassMaybeCached(path));
 	}
 
 	public static ReflectionFakeEnum getNmsFakeEnum(String path) throws Throwable {
@@ -131,7 +144,7 @@ public final class Reflection {
 	}
 
 	public static ReflectionObject invokeMethod(String path, String name, Object object, Object... params) throws Throwable {
-		return invokeMethod(Class.forName(path), name, object, params);
+		return invokeMethod(getClassMaybeCached(path), name, object, params);
 	}
 
 	public static ReflectionObject invokeMethod(Class clazz, String name, Object object, Object... params) throws Throwable {
@@ -156,7 +169,7 @@ public final class Reflection {
 	}
 
 	public static ReflectionObject newInstance(String path, Object... params) throws Throwable {
-		return newInstance(Class.forName(path), params);
+		return newInstance(getClassMaybeCached(path), params);
 	}
 
 	public static ReflectionObject newInstance(Class<?> clazz, Object... params) throws Throwable {
@@ -185,7 +198,7 @@ public final class Reflection {
 	}
 
 	public static ReflectionField getField(String path, String name) throws Throwable {
-		return new ReflectionField(Class.forName(path), name);
+		return new ReflectionField(getClassMaybeCached(path), name);
 	}
 
 	// ----- block
@@ -210,7 +223,7 @@ public final class Reflection {
 	}
 
 	public static void sendNmsPacket(Player player, Object packet) throws Throwable {
-		getPlayerConnection(player).invokeMethod("sendPacket", packet);
+		getPlayerConnection(player).invokeMethod(Version.ATLEAST_1_18 ? "a" : "sendPacket", packet);
 	}
 
 	public static void sendNmsPacket(Collection<Player> players, String path, Object... params) throws Throwable {

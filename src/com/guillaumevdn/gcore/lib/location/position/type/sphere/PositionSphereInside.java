@@ -19,10 +19,16 @@ public class PositionSphereInside implements Position {
 
 	private Location center;
 	private double radius;
+	private boolean allowGPS;
 
 	public PositionSphereInside(Location center, double radius) {
+		this(center, radius, true);
+	}
+
+	public PositionSphereInside(Location center, double radius, boolean allowGPS) {
 		this.center = center;
 		this.radius = radius;
+		this.allowGPS = allowGPS;
 	}
 
 	public Location getCenter() {
@@ -77,6 +83,9 @@ public class PositionSphereInside implements Position {
 
 	@Override
 	public Location findGPSFor(Player player) {
+		if (!allowGPS) {
+			return null;
+		}
 		if (match(player)) {
 			return null;
 		}

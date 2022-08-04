@@ -30,7 +30,6 @@ import com.guillaumevdn.gcore.data.usernpcs.UserNPCs;
 import com.guillaumevdn.gcore.lib.bukkit.BukkitThread;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.configuration.YMLConfiguration;
-import com.guillaumevdn.gcore.lib.data.board.keyed.KeyReference;
 import com.guillaumevdn.gcore.lib.legacy_npc.navigation.navigator.Navigator;
 import com.guillaumevdn.gcore.lib.legacy_npc.navigation.navigator.NavigatorResult;
 import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
@@ -142,7 +141,7 @@ public class NPCManager implements Listener {
 		// not shown
 		UserNPCs user = UserNPCs.get(player);
 		UserNPC userNpc = user.getNPC(id);
-		Replacer replacer = Replacer.of(player);
+		Replacer replacer = Replacer.justPlayer(player);
 		if (!userNpc.getShown(replacer)) {
 			return false;
 		}
@@ -257,7 +256,7 @@ public class NPCManager implements Listener {
 		// despawn and remove npcs
 		removeNpcs(player);
 		// dispose board element
-		BoardUsersNPCs.inst().disposeCacheElements(BukkitThread.ASYNC, CollectionUtils.asSet(KeyReference.of(player.getUniqueId())), null);
+		BoardUsersNPCs.inst().disposeCacheElements(BukkitThread.ASYNC, CollectionUtils.asSet(player.getUniqueId()), null);
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)

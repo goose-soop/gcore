@@ -104,6 +104,9 @@ controlTextSetRandom: |
 descriptionItemType: |
   &7Type of item
 
+descriptionItemTypeHDB: |
+  &7HeadDatabase ID
+
 descriptionItemDurability: |
   &7Durability of item
 
@@ -315,11 +318,14 @@ descriptionPositionTypeClosestMythicMobMobs: |
 descriptionPositionTypeWorld: |
   &7The world
 
-descriptionPositionTypeBiome: |
+descriptionPositionTypeBiomes: |
   &7The accepted biomes
 
 descriptionPositionTypeSingleLocation: |
   &7The single location
+
+descriptionPositionTypeSingleRandomLocations: |
+  &7A list of locations in which the random location will be choosen
 
 descriptionPositionTypeRelativeSingleLocation: |
   &7The relative single location

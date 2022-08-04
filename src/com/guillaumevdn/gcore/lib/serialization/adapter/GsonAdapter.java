@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 import com.guillaumevdn.gcore.lib.number.NumberUtils;
 import com.guillaumevdn.gcore.lib.serialization.data.DataIO;
@@ -70,29 +71,42 @@ public class GsonAdapter<T> extends TypeAdapter<T> {
 		else if (value instanceof Long) {
 			writer.value((Long) value);
 		}
-		else if (NumberUtils.longOrNull(value) != null) {
-			writer.value(Long.parseLong((String) value));
-		}
 		else if (value instanceof Integer) {
 			writer.value((Integer) value);
-		}
-		else if (NumberUtils.integerOrNull(value) != null) {
-			writer.value(Integer.parseInt((String) value));
 		}
 		else if (value instanceof Double) {
 			writer.value((Double) value);
 		}
-		else if (NumberUtils.doubleOrNull(value) != null) {
-			writer.value(Double.parseDouble((String) value));
-		}
 		else if (value instanceof Boolean) {
 			writer.value((Boolean) value);
 		}
-		else if (value instanceof String && (((String) value).equalsIgnoreCase("true") || ((String) value).equalsIgnoreCase("false"))) {
-			writer.value(Boolean.parseBoolean((String) value));
-		}
 		else if (value instanceof String) {
 			writer.value((String) value);
+			/* // This is taking too much performance for what it does. There's no point in checking that here
+			String v = (String) value;
+			if ((v.equalsIgnoreCase("true") || v.equalsIgnoreCase("false"))) {
+				writer.value(Boolean.parseBoolean(v));
+			} else {
+				Long l = NumberUtils.longOrNull(value);
+				if (l != null) {
+					writer.value(l);
+				} else {
+					Integer i = NumberUtils.integerOrNull(value);
+					if (i != null) {
+						writer.value(i);
+					} else {
+						Double d = NumberUtils.doubleOrNull(value);
+						if (d != null) {
+							writer.value(d);
+						} else {
+							writer.value(v);
+						}
+					}
+				}
+			}*/
+		}
+		else if (value instanceof UUID) {
+			writer.value(((UUID) value).toString());
 		}
 		else {
 			throw new IllegalArgumentException("can't write value of type " + value.getClass());

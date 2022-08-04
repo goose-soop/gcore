@@ -18,7 +18,6 @@ import com.guillaumevdn.gcore.lib.gui.element.item.type.IconNeed;
 import com.guillaumevdn.gcore.lib.gui.struct.ClickCall;
 import com.guillaumevdn.gcore.lib.gui.struct.ClickCall.ClickType;
 import com.guillaumevdn.gcore.lib.gui.struct.GUIItem;
-import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
 import com.guillaumevdn.gcore.lib.tuple.IntegerPair;
 
 public abstract class ActiveItemHolderElementGUIItem extends ActiveItemHolder {
@@ -37,19 +36,11 @@ public abstract class ActiveItemHolderElementGUIItem extends ActiveItemHolder {
 	@Override
 	protected final void buildItems(TriConsumer<Collection<? extends GUIItem>, Set<String>, Integer> callback) throws ParsingError {
 		ItemStack itemIcon = element.getType().getIconNeed().equals(IconNeed.REQUIRED) ? element.directParseNoCatchOrThrowParsingNull("icon", getInstance().getReplacer()) : element.directParseOrNull("icon", getInstance().getReplacer());
+
 		if (itemIcon != null) {
-			// we parsed the item using the instance replacer so that item properties are parsed properly (for example meta owner_name and such)
-			// reset name and lore (visible texts) to their original form ; placeholders will be parsed in the method below (and remembered for update efficiency)
-			ElementItem itemIconElement = element.getElementAs("icon");
-			String unparsedName = itemIconElement.getName().directParseOrNull(Replacer.GENERIC);
-			List<String> unparsedLore = itemIconElement.getLore().directParseOrNull(Replacer.GENERIC);
-			if (unparsedName != null && unparsedLore != null && !unparsedLore.isEmpty()) {
-				ItemMeta meta = itemIcon.getItemMeta();
-				meta.setDisplayName(unparsedName);
-				meta.setLore(unparsedLore);
-				itemIcon.setItemMeta(meta);
-			}
+			itemIcon = resetNameLorePlaceholders(itemIcon, element.getElementAs("icon"));
 		}
+
 		List<IntegerPair> locations = element.parseLocations(getInstance().getReplacer());
 		Sound clickSound = element.getClickSound().parse(getInstance().getReplacer()).orNull();
 		Map<ClickType, Consumer<ClickCall>> overrideClicks = element.parseOverrideClicks(getInstance().getReplacer());
@@ -57,5 +48,28 @@ public abstract class ActiveItemHolderElementGUIItem extends ActiveItemHolder {
 	}
 
 	protected abstract void buildItems(List<IntegerPair> locations, ItemStack itemIcon, Sound clickSound, Map<ClickType, Consumer<ClickCall>> overrideClicks, TriConsumer<Collection<? extends GUIItem>, Set<String>, Integer> callback) throws ParsingError;
+
+	public static ItemStack resetNameLorePlaceholders(ItemStack itemIcon, ElementItem itemIconElement) {
+		if (itemIcon != null) {
+			// we parsed the item using the instance replacer so that item properties are parsed properly (for example meta owner_name and such)
+			// reset name and lore (visible texts) to their original form ; placeholders will be parsed in the method below (and remembered for update efficiency)
+
+			String unparsedName = itemIconElement.getName().getRawValueLineOrDefault(0);
+			List<String> unparsedLore = itemIconElement.getLore().getRawValueOrDefaultCopy();
+
+			/* DON'T parse uting a generic replacer, it's pointless, and sends PAPI parsing with a null player, causing issues
+			String unparsedName = itemIconElement.getName().directParseOrNull(Replacer.GENERIC);
+			List<String> unparsedLore = itemIconElement.getLore().directParseOrNull(Replacer.GENERIC);*/
+
+			if (unparsedName != null && unparsedLore != null && !unparsedLore.isEmpty()) {
+				ItemMeta meta = itemIcon.getItemMeta();
+				meta.setDisplayName(unparsedName);
+				meta.setLore(unparsedLore);
+				itemIcon.setItemMeta(meta);
+			}
+		}
+
+		return itemIcon;
+	}
 
 }

@@ -38,8 +38,8 @@ public final class PluginUtils {
 	}
 
 	// ----- gplugins
-	public static List<GPlugin> getGPlugins() {
-		List<GPlugin> result = new ArrayList<>();
+	public static List<GPlugin<?, ?>> getGPlugins() {
+		List<GPlugin<?, ?>> result = new ArrayList<>();
 		for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
 			GPlugin gplugin = ObjectUtils.castOrNull(plugin, GPlugin.class);
 			if (gplugin != null) {

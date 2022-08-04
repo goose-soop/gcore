@@ -703,8 +703,15 @@ public class YMLConfiguration {
 	private final FakeConfigSuperElement fakeSuperElementParent = new FakeConfigSuperElement(this, "config");
 
 	public long readDurationMillis(String path) {
+		return readDurationMillis(path, 0L);
+	}
+
+	public long readDurationMillis(String path, long def) {
 		ElementDuration duration = readElement(path, (FakeConfigSuperElement parent, String id) -> new ElementDuration(parent, id, Need.optional(), null, null, null));
-		return duration.directParseOrElse(Replacer.GENERIC, 0L);
+		if (!duration.readContains()) {
+			return def;
+		}
+		return duration.directParseOrElse(Replacer.GENERIC, def);
 	}
 
 	public List<PotionEffect> readPotionEffectList(String path) {
@@ -716,9 +723,13 @@ public class YMLConfiguration {
 	}
 
 	public <T extends Element> T readElement(String path, Class<T> elementClass) {
+		return readElement(path, "config-" + path, elementClass);
+	}
+
+	public <T extends Element> T readElement(String path, String id, Class<T> elementClass) {
 		T element = null;
 		try {
-			element = Reflection.newInstance(elementClass, fakeSuperElementParent, "config-" + path, Need.optional(), null).get();  // classic element constructor ; different ones will need the method below
+			element = Reflection.newInstance(elementClass, fakeSuperElementParent, id, Need.optional(), null).get();  // classic element constructor ; different ones will need the method below
 		} catch (Throwable exception) {
 			throwError("couldn't load initialize of type " + elementClass.getName() + " at path " + path, exception);
 		}

@@ -4,13 +4,12 @@ import java.util.UUID;
 
 import org.bukkit.entity.Player;
 
+import com.guillaumevdn.gcore.lib.collection.IteratorControls;
 import com.guillaumevdn.gcore.lib.concurrency.RWHashMap;
-import com.guillaumevdn.gcore.lib.data.board.keyed.KeyReference;
-import com.guillaumevdn.gcore.lib.function.QuadriConsumer;
-import com.guillaumevdn.gcore.lib.function.ThrowableQuadriConsumer;
+import com.guillaumevdn.gcore.lib.function.ThrowableTriConsumer;
+import com.guillaumevdn.gcore.lib.function.TriConsumer;
 import com.guillaumevdn.gcore.lib.legacy_npc.NPCManager;
 import com.guillaumevdn.gcore.lib.serialization.data.DataIO;
-import com.guillaumevdn.gcore.lib.wrapper.WrapperBoolean;
 
 /**
  * @author GuillaumeVDN
@@ -18,18 +17,15 @@ import com.guillaumevdn.gcore.lib.wrapper.WrapperBoolean;
 public final class UserNPCs {
 
 	private final UUID uuid;
-	private final KeyReference<UUID> ref;
 	private RWHashMap<Integer, UserNPC> npcs;
 
 	public UserNPCs(UUID uuid) {
 		this.uuid = uuid;
-		this.ref = new KeyReference<>(uuid);
 		this.npcs = new RWHashMap<>(NPCManager.inst().getNPCsConfig().size(), 1f);
 	}
 
 	public UserNPCs(UUID uuid, RWHashMap<Integer, UserNPC> npcs) {
 		this.uuid = uuid;
-		this.ref = new KeyReference<>(uuid);
 		this.npcs = npcs;
 	}
 
@@ -38,8 +34,8 @@ public final class UserNPCs {
 		return uuid;
 	}
 
-	public final void iterateNPCs(QuadriConsumer<Integer, UserNPC, WrapperBoolean /* remover */, WrapperBoolean /* breaker */> consumer) { npcs.iterateAndModify(consumer); }
-	public final void iterateNPCsOrThrow(ThrowableQuadriConsumer<Integer, UserNPC, WrapperBoolean /* remover */, WrapperBoolean /* breaker */> consumer) throws Throwable { npcs.iterateAndModifyOrThrow(consumer); }
+	public final void iterateNPCs(TriConsumer<Integer, UserNPC, IteratorControls> consumer) { npcs.iterateAndModify(consumer); }
+	public final void iterateNPCsOrThrow(ThrowableTriConsumer<Integer, UserNPC, IteratorControls> consumer) throws Throwable { npcs.iterateAndModifyOrThrow(consumer); }
 
 	public UserNPC getNPC(int id) {
 		return npcs.get(id);
@@ -58,14 +54,14 @@ public final class UserNPCs {
 
 	// ----- methods
 	public void setToSave() {
-		BoardUsersNPCs.inst().addCachedToSave(ref);
+		BoardUsersNPCs.inst().addCachedToSave(uuid);
 	}
 
 	// ----- serialization
 	public void write(DataIO writer) throws Throwable {
 		writer.write("uuid", uuid);
 		writer.writeObjectOrThrow("npcs", npcsWriter -> {
-			npcs.iterateAndModifyOrThrow((id, npc, remover, breaker) -> {
+			npcs.iterateAndModifyOrThrow((id, npc, iter) -> {
 				npcsWriter.writeObjectOrThrow("" + id, w -> {
 					w.write("id", npc.getId());  // write id so the object is still written even if there's no modified data
 					w.write("shown", npc.getModifiedShown());

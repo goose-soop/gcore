@@ -32,4 +32,9 @@ public class TimeInMonth extends TimeIn {
 		return time.withDayOfMonth(dayOfMonth).withHour(hour).withMinute(minute).withSecond(0).withNano(0);
 	}
 
+	@Override
+	public ZonedDateTime getDelta(int delta) {
+		return getCurrent().plusMonths(delta);
+	}
+
 }

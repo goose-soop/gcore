@@ -62,6 +62,8 @@ import com.guillaumevdn.gcore.lib.element.type.basic.ElementLongList;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementMat;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementMatList;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementMonth;
+import com.guillaumevdn.gcore.lib.element.type.basic.ElementParticle;
+import com.guillaumevdn.gcore.lib.element.type.basic.ElementParticleList;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementPermission;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementPhysicalClickType;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementPhysicalClickTypeList;
@@ -556,6 +558,10 @@ public abstract class ContainerElement extends AbstractMapElement<String, Elemen
 	public final ElementMatList addMatList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementMatList(this, id, need, editorDescription)); }
 	public final ElementMonth addMonth(String id, Need need, Text editorDescription) { return add(new ElementMonth(this, id, need, editorDescription)); }
 	public final ElementMonth addMonth(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementMonth(this, id, need, editorDescription)); }
+	public final ElementParticle addParticle(String id, Need need, Text editorDescription) { return add(new ElementParticle(this, id, need, editorDescription)); }
+	public final ElementParticle addParticle(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementParticle(this, id, need, editorDescription)); }
+	public final ElementParticleList addParticleList(String id, Need need, Text editorDescription) { return add(new ElementParticleList(this, id, need, editorDescription)); }
+	public final ElementParticleList addParticleList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementParticleList(this, id, need, editorDescription)); }
 	public final com.guillaumevdn.gcore.lib.element.type.map.ElementPatternTypeColorMap addPatternTypeColorMap(String id, Need need, Text editorDescription) { return add(new com.guillaumevdn.gcore.lib.element.type.map.ElementPatternTypeColorMap(this, id, need, editorDescription)); }
 	public final com.guillaumevdn.gcore.lib.element.type.map.ElementPatternTypeColorMap addPatternTypeColorMap(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new com.guillaumevdn.gcore.lib.element.type.map.ElementPatternTypeColorMap(this, id, need, editorDescription)); }
 	public final ElementPermission addPermission(String id, Need need, Text editorDescription) { return add(new ElementPermission(this, id, need, editorDescription)); }

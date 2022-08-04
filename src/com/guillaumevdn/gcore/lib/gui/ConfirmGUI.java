@@ -87,7 +87,7 @@ public class ConfirmGUI extends ActiveExtraElementGUI {
 	// ----- static
 	public static void performOrConfirm(GPlugin owner, boolean mustConfirm, Player player, Text confirmLore, Replacer confirmLoreParser, Runnable doConfirm, Runnable doCancel) {
 		if (mustConfirm) {
-			new ConfirmGUI(owner, Replacer.of(player), confirmLore, confirmLoreParser, doConfirm, doCancel).openFor(player, null);
+			new ConfirmGUI(owner, Replacer.justPlayer(player), confirmLore, confirmLoreParser, doConfirm, doCancel).openFor(player, null);
 		} else {
 			doConfirm.run();
 		}

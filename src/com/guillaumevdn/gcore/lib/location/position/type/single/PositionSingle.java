@@ -20,12 +20,18 @@ public class PositionSingle implements Position {
 
 	private Location location;
 	private PointTolerance tolerance;
+	private boolean allowGPS;
 
 	public PositionSingle(Location location, PointTolerance tolerance) {
+		this(location, tolerance, true);
+	}
+
+	public PositionSingle(Location location, PointTolerance tolerance, boolean allowGPS) {
 		this.location = location.clone();
 		location.setX((double) location.getBlockX() + 0.5d);
 		location.setZ((double) location.getBlockZ() + 0.5d);
 		this.tolerance = tolerance;
+		this.allowGPS = allowGPS;
 	}
 
 	// ----- get
@@ -81,6 +87,9 @@ public class PositionSingle implements Position {
 
 	@Override
 	public Location findGPSFor(Player player) {
+		if (!allowGPS) {
+			return null;
+		}
 		if (match(player)) {
 			return null;
 		}

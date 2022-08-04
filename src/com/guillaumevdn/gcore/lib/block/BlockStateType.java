@@ -22,7 +22,7 @@ import com.guillaumevdn.gcore.lib.string.StringUtils;
  */
 public enum BlockStateType implements LinearObjectType {
 
-	AGE(CommonMats.WHITE_WOOL, "Ageable",  // TODO : <1.13, we'll need to use Crops and their data, it would be interesting
+	AGE(CommonMats.WHITE_WOOL, "Ageable",  // TODO : <1.13, we'll need to use Crops and their data, it would be nice
 			(state, data) -> data.invokeMethod("getAge").get(int.class) == state.getValidIntArgument(0),
 			(state, data) -> data.invokeMethod("setAge", state.getValidIntArgument(0))
 			),
@@ -37,6 +37,10 @@ public enum BlockStateType implements LinearObjectType {
 	BISECTED_HALF(CommonMats.IRON_DOOR, "Bisected",
 			(state, data) -> data.invokeMethod("getHalf").get().equals(state.getValidUnknownEnumTypeArgument("org.bukkit.block.data.Bisected$Half", 0)),
 			(state, data) -> data.invokeMethod("setHalf", state.getValidUnknownEnumTypeArgument("org.bukkit.block.data.Bisected$Half", 0))
+			),
+	CAVE_VINES_PLANT_BERRIES(CommonMats.LIME_DYE, "type.CaveVinesPlant",
+			(state, data) -> data.invokeMethod("isBerries").get().equals(state.getValidBooleanArgument(0)),
+			(state, data) -> data.invokeMethod("setBerries", state.getValidBooleanArgument(0))
 			),
 	FACE_ATTACHABLE(CommonMats.LEVER, "FaceAttachable",
 			(state, data) -> data.invokeMethod("getAttachedFace").get().equals(state.getValidUnknownEnumTypeArgument("org.bukkit.block.data.FaceAttachable$AttachedFace", 0)),

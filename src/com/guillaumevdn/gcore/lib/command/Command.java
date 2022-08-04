@@ -180,8 +180,9 @@ public class Command implements CommandExecutor, TabCompleter {
 			for (int i = 0; i < subcommand.getArguments().size(); ++i) {
 				Argument argument = subcommand.getArguments().get(i);
 				Object value = argument.consume(call);
-				// found
-				if (!argument.validateUse(sender)) {
+
+				// found ; validate use
+				if (value != null && !argument.validateUse(sender)) {
 					return true;
 				}
 				call.setArgumentValue(i, value);

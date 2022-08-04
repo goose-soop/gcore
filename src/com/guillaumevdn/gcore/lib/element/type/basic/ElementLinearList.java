@@ -82,8 +82,8 @@ public abstract class ElementLinearList<T extends LinearObjectType, L extends Li
 		}
 		// right-click : edit parameters
 		else if (call.getType().equals(ClickType.RIGHT)) {
-			WorkerGCore.inst().awaitChatWithSuggestedValue(call.getClicker(), TextEditorGeneric.messageElementBasicEditSuggestCurrent, getRawValueLineOrDefault(0), value -> {
-				Pair<T, List<String>> current = getCurrentPair(lineIndex);
+			Pair<T, List<String>> current = getCurrentPair(lineIndex);
+			WorkerGCore.inst().awaitChatWithSuggestedValue(call.getClicker(), TextEditorGeneric.messageElementBasicEditSuggestCurrent, StringUtils.toTextString(" ", current.getB()), value -> {
 				if (StringUtils.hasPlaceholders(value)) {
 					setNewValueLine(lineIndex, current.getA() == null ? null : current.getA().name() + " " + value);
 					call.getGUI().setRegularItem(buildEditorItem(call.getPageIndex(), call.getSlot()));

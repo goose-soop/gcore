@@ -83,7 +83,7 @@ public final class GcoreExport extends Subcommand {
 		String implementation = "unknown";
 		try { Class.forName("com.destroystokyo.paper.PaperConfig"); implementation = "paper"; } catch (Throwable ignored) {}
 		try { Class.forName("org.spigotmc.SpigotConfig"); implementation = "spigot"; } catch (Throwable ignored) {}
-		List<GPlugin> gplugins = PluginUtils.getGPlugins();
+		List<GPlugin<?, ?>> gplugins = PluginUtils.getGPlugins();
 		List<Plugin> plugins = CollectionUtils.asList(Bukkit.getPluginManager().getPlugins());
 		plugins.removeAll(gplugins);
 		File f = new File(temp + "/info.txt");

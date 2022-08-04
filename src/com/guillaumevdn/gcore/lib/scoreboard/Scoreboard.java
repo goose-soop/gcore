@@ -89,7 +89,7 @@ public final class Scoreboard {
 		getPlugin().operateSync(() -> {
 			// unset player
 			if (player.isOnline()) {
-				player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
+				player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
 			}
 			// unregister
 			for (Team team : teams.values()) {

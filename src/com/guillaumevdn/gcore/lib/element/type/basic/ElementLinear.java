@@ -53,8 +53,8 @@ public abstract class ElementLinear<T extends LinearObjectType, L extends Linear
 	public void onEditorClick(ClickCall call) {
 		// right-click : edit parameters
 		if (call.getType().equals(ClickType.RIGHT)) {
-			WorkerGCore.inst().awaitChatWithSuggestedValue(call.getClicker(), TextEditorGeneric.messageElementBasicEditSuggestCurrent, getRawValueLineOrDefault(0), value -> {
-				Pair<T, List<String>> current = getCurrentPair();
+			Pair<T, List<String>> current = getCurrentPair();
+			WorkerGCore.inst().awaitChatWithSuggestedValue(call.getClicker(), TextEditorGeneric.messageElementBasicEditSuggestCurrent, StringUtils.toTextString(" ", current.getB()), value -> {
 				if (StringUtils.hasPlaceholders(value)) {
 					setValue(current.getA() == null ? null : CollectionUtils.asList(current.getA().name() + " " + value));
 					getSuperElement().onEditorChange(this);

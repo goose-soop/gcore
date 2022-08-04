@@ -15,11 +15,11 @@
 #  user: 'username'
 #  pass: 'pwd'
 #  args: '&useSSL=false'
-#  pre8019: true  # set this to true if you're using MySQL < 8.0.19
+#  pre8019: true  # set this to true if you're using MySQL < 8.0.19, or MariaDB
 
-# Data back-end (NONE, JSON or MYSQL ; default is JSON if not specified)
+# Data back-end (NONE, JSON, SQLITE or MYSQL ; default is JSON if not specified)
 data_backend:
-  gcore_statistics_v8: JSON
+  gcore_statistics_v8: SQLITE
   gcore_users_npcs_v8: JSON
 
 # Log settings (errors will be shown in console no matter what)
@@ -131,6 +131,18 @@ currencies:
       enchantments:
         DURABILITY: 1
       flags: [HIDE_ENCHANTS, HIDE_ATTRIBUTES]
+  XP:
+    name: 'XP'
+    format_multiplier: 1.0
+    format_decimal_precision: 0
+    format_single: '{amount} XP'
+    format_multiple: '{amount} XP'
+    icon:
+      type: PAPER
+      name: '{formatted_amount}'
+      enchantments:
+        DURABILITY: 1
+      flags: [HIDE_ENCHANTS, HIDE_ATTRIBUTES]
   XP_LEVEL:
     name: 'XP levels'
     format_multiplier: 1.0
@@ -196,6 +208,9 @@ logspam_item_nbt: false
 
 # Set this to ASYNC if you see issues in timings due to tasks in CustomEventsListener
 custom_events_thread: SYNC
+
+# Permission cache retain time
+permission_cache_retain_time: 15 SECOND
 
 # Use this to force the plugin to use a specific version of Spigot
 #force_server_version: MC_1_12_R1

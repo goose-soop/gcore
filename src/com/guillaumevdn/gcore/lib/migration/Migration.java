@@ -50,7 +50,7 @@ public abstract class Migration {
 		this.backupFolder = backupFolder;
 		this.successFile = successFile;
 		this.hardlockFile = hardlockFile;
-		this.logger = new Logger(plugin, plugin.getName() + "-migration", true, false, false);
+		this.logger = new Logger(plugin, plugin.getName() + "-migration", true, false);
 	}
 
 	// ----- get
@@ -196,7 +196,7 @@ public abstract class Migration {
 		if (mustBackup) {
 			try {
 				FileUtils.delete(backupFolder);
-				FileUtils.copy(pluginFolder, backupFolder, CollectionUtils.asSet("plugin_log.log"));  // don't copy plugin log, it's irrelevant
+				FileUtils.copy(pluginFolder, backupFolder, CollectionUtils.asSet("plugin_log.log", "logs"));  // don't copy plugin log and log files
 			} catch (Throwable exception) {
 				fail("Couldn't create backup", exception, BackupBehavior.DELETE);
 				return false;

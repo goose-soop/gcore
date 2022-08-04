@@ -23,10 +23,11 @@ public final class LogicUtils {
 		if (logicString.isEmpty()) {
 			return true;
 		}
+
 		// read base groups
 		Merger merger = null;
 		int mergerCount = 0;
-		List<String> baseGroups = new ArrayList<>();
+		List<String> baseGroups = new ArrayList<>();  // groups found with mergers parenthesis, such as [...] AND/OR [...] or simply [...], or implicit groups (<elem1> AND <elem2> with no parenthesis [...])
 		int depth = 0;
 		int beginGroup = 0;
 		char[] chars = logicString.toCharArray();
@@ -46,7 +47,8 @@ public final class LogicUtils {
 			else if (ch == ']') {
 				--depth;
 				if (depth == 0) { // base group, so add
-					baseGroups.add(logicString.substring(beginGroup + 1, i));
+					baseGroups.add(logicString.substring(beginGroup + 1, i).trim());
+					beginGroup = i + 1;  // mark beginning of potential new implicit group
 				} else if (depth < 0) { // invalid group end, too much
 					throw new LogicError("invalid ] found at index " + i + " in '" + logicString + "'");
 				}
@@ -57,6 +59,7 @@ public final class LogicUtils {
 				if (Character.isWhitespace(ch)) {
 					continue;
 				}
+
 				// merger
 				if (mergerCount <= baseGroups.size() && i + 1 < chars.length && ((ch == '&' && chars[i + 1] == '&') || (ch == '|' && chars[i + 1] == '|'))) {
 					++i;
@@ -66,7 +69,18 @@ public final class LogicUtils {
 					}
 					merger = newMerger;
 					++mergerCount;
+
+					// consume implicit group if depth is 0
+					if (depth == 0) {
+						String implicitGroup = logicString.substring(beginGroup, i - 1).trim();
+
+						if (!implicitGroup.isEmpty()) {  // might be the case with strings such as [merged conditions] && <implicit group>
+							baseGroups.add(implicitGroup);
+						}
+						beginGroup = i + 1;  // mark beginning of new potential implicit group
+					}
 				}
+
 				// no merger found ; maybe depth is 0 and it's an unknown character because there's just no merger eyyyy
 				continue;
 				// throw new LogicError("invalid character '" + ch + "' found at index " + i + " in '" + logicString + "'");
@@ -75,9 +89,25 @@ public final class LogicUtils {
 		if (depth > 0) {
 			throw new LogicError("missing closing ] in '" + logicString + "'");
 		}
+
+		// add last implicit group if needed
+		if (beginGroup < chars.length) {
+			baseGroups.add(logicString.substring(beginGroup, chars.length).trim());
+		}
+
+		// no group was found, add a single one with the entire thing
+		if (baseGroups.isEmpty()) {
+			baseGroups.add(logicString);
+		}
+
+		// single group, but still has mergers (might still remain with strings such as [<some logic string>], wrapped entierly)
+		if (baseGroups.size() == 1 && (logicString.contains("&&") || logicString.contains("||"))) {
+			return match(baseGroups.get(0), replacer, addToListIfMatch);
+		}
+
 		// no subgroups
 		if (merger == null) {
-			return singleMatch(baseGroups.isEmpty() ? logicString : baseGroups.get(0), replacer, addToListIfMatch);
+			return singleMatch(baseGroups.get(0), replacer, addToListIfMatch);
 		}
 		// merger
 		else {
@@ -101,6 +131,7 @@ public final class LogicUtils {
 
 	private static boolean singleMatch(String logicString, Replacer replacer, List<Triple<Double, Double, ComparisonType>> addToListIfMatch) {
 		logicString = replacer.parse(logicString).trim();
+
 		// 'in' operator (|in|)
 		String[] inSplit = logicString.split("\\|in\\|");
 		if (inSplit.length > 1) {
@@ -115,6 +146,7 @@ public final class LogicUtils {
 			}
 			return false;
 		}
+
 		// find comparison
 		List<Pair<Integer, ComparisonType>> comparisons = new ArrayList<>();
 		main: for (int index = 0; index < logicString.length() - 1; ++index) {
@@ -130,10 +162,12 @@ public final class LogicUtils {
 				}
 			}
 		}
+
 		// no comparisons found
 		if (comparisons.isEmpty()) {
 			throw new LogicError("no valid operator found '" + logicString + "'");
 		}
+
 		// go through comparisons
 		int beginNext = 0;
 		for (int i = 0; i < comparisons.size(); ++i) {
@@ -167,6 +201,7 @@ public final class LogicUtils {
 				}
 			}
 		}
+
 		// good
 		return true;
 	}

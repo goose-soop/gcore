@@ -8,18 +8,18 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.Spliterator;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import com.guillaumevdn.gcore.lib.collection.IteratorControls;
 import com.guillaumevdn.gcore.lib.function.ThrowableConsumer;
-import com.guillaumevdn.gcore.lib.function.TriConsumer;
 import com.guillaumevdn.gcore.lib.object.ObjectUtils;
 import com.guillaumevdn.gcore.lib.object.Optional;
 import com.guillaumevdn.gcore.lib.string.StringUtils;
-import com.guillaumevdn.gcore.lib.wrapper.WrapperBoolean;
 
 /**
  * This is to avoid having to/forgetting to synchronize manually on this set.
@@ -81,19 +81,16 @@ public class RWHashSet<T> extends HashSet<T> {
 		});
 	}
 
-	/**
-	 * @param consumer next element, remover (set to true to remove current element), breaker (set to true to stop iterating)
-	 */
-	public final void iterate(TriConsumer<T, WrapperBoolean /* remover */, WrapperBoolean /* breaker */> consumer) {
+	public final void iterate(BiConsumer<T, IteratorControls> consumer) {
 		lock.lockRead();
 		try {
 			Iterator<T> it = super.iterator();
-			WrapperBoolean remover = WrapperBoolean.of(false);
-			WrapperBoolean breaker = WrapperBoolean.of(false);
+			IteratorControls iter = new IteratorControls();
+			
 			while (it.hasNext()) {
 				T next = it.next();
-				consumer.accept(next, remover, breaker);
-				if (remover.get()) {
+				consumer.accept(next, iter);
+				if (iter.mustRemove()) {
 					lock.unlockRead();
 					lock.lockWrite();  // wait until this set is good for modification
 					try {
@@ -104,9 +101,9 @@ public class RWHashSet<T> extends HashSet<T> {
 					}
 					lock.lockRead();  // downgrade to read lock (by releasing read lock first) to have priority and continue reading
 					lock.unlockWrite();
-					remover.set(false);
+					iter.reset();
 				}
-				if (breaker.get()) {
+				if (iter.mustStop()) {
 					break;
 				}
 			}
@@ -137,6 +134,18 @@ public class RWHashSet<T> extends HashSet<T> {
 			while (i.hasNext()) {
 				copy.add(i.next());
 			}
+			return copy;
+		});
+	}
+
+	public final HashSet<T> consume() {
+		return lock.write(() -> {
+			HashSet<T> copy = new HashSet<>();
+			Iterator<T> i = super.iterator();
+			while (i.hasNext()) {
+				copy.add(i.next());
+			}
+			super.clear();
 			return copy;
 		});
 	}
@@ -271,14 +280,14 @@ public class RWHashSet<T> extends HashSet<T> {
 	}
 
 	@Override
-	public final boolean contains(Object o) {
+	public boolean contains(Object o) {
 		return lock.read(() -> {
 			return super.contains(o);
 		});
 	}
 
 	@Override
-	public final boolean containsAll(Collection<?> c) {
+	public boolean containsAll(Collection<?> c) {
 		return lock.read(() -> {
 			return super.containsAll(c);
 		});
@@ -313,17 +322,17 @@ public class RWHashSet<T> extends HashSet<T> {
 	 */
 
 	@Override
-	public final boolean add(T e) {
+	public boolean add(T e) {
 		return lock.write(() -> super.add(e));
 	}
 
 	@Override
-	public final boolean addAll(Collection<? extends T> other) {
+	public boolean addAll(Collection<? extends T> other) {
 		return lock.write(() -> super.addAll(other));
 	}
 
 	@Override
-	public final boolean remove(Object o) {
+	public boolean remove(Object o) {
 		return lock.write(() -> super.remove(o));
 	}
 
@@ -334,7 +343,7 @@ public class RWHashSet<T> extends HashSet<T> {
 	}
 
 	@Override
-	public final boolean removeAll(Collection<?> c) {
+	public boolean removeAll(Collection<?> c) {
 		Objects.requireNonNull(c);
 		return removeIf(elem -> c.contains(elem));  // remove if other collection contain this element
 	}

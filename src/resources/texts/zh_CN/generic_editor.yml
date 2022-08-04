@@ -312,7 +312,7 @@ descriptionPositionTypeClosestMythicMobMobs: |
 descriptionPositionTypeWorld: |
   &7世界
 
-descriptionPositionTypeBiome: |
+descriptionPositionTypeBiomes: |
   &7接受的群系类型
 
 descriptionPositionTypeSingleLocation: |

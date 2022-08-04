@@ -21,7 +21,7 @@ public class NBTEntity extends NBTCompound {
 	private static ReflectionObject getTag(Entity entity) throws Throwable {
 		ReflectionObject nbtEntity = ReflectionObject.of(entity);
 		ReflectionObject tag = Reflection.newNmsInstance(Version.REMAPPED ? "nbt.NBTTagCompound" : "NBTTagCompound");
-		nbtEntity.invokeMethod("getHandle").invokeVoidMethod(Version.ATLEAST_1_16 ? "saveData" : "b", tag.get(Object.class));  // nbt entity isn't stored directly, so it needs an empty nbt compound to copy its properties to
+		nbtEntity.invokeMethod("getHandle").invokeVoidMethod(Version.ATLEAST_1_17 ? "b" : (Version.ATLEAST_1_16 ? "saveData" : "b"), tag.get(Object.class));  // nbt entity isn't stored directly, so it needs an empty nbt compound to copy its properties to
 		return tag;
 	}
 

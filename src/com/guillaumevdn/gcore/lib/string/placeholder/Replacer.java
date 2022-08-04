@@ -11,6 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
+import com.guillaumevdn.gcore.lib.concurrency.RWWeakHashMap;
 import com.guillaumevdn.gcore.lib.string.StringUtils;
 
 /**
@@ -32,13 +33,13 @@ public interface Replacer {
 				string = data.getCustom().apply(string);
 			}
 			if (StringUtils.hasPlaceholders(string)) {
-				string = PlaceholderContainer.parseAll(string, data.getPlayer());
+				string = PlaceholderReplacer.parseAll(string, data.getPlayer(), true /* silence math errors anyways first */);
 			}
 			if (data.getCustom() != null && StringUtils.hasPlaceholders(string)) {
 				string = data.getCustom().apply(string);
 			}
 			if (StringUtils.hasPlaceholders(string)) {
-				string = PlaceholderContainer.parseAll(string, data.getPlayer());
+				string = PlaceholderReplacer.parseAll(string, data.getPlayer(), getReplacerData().mustSilenceMathErrors());
 			}
 		}
 		return string;
@@ -68,7 +69,7 @@ public interface Replacer {
 			for (int i = 0; i < parsed.size(); ++i) {
 				String r = parsed.get(i);
 				if (StringUtils.hasPlaceholders(r)) {
-					parsed.set(i, PlaceholderContainer.parseAll(r, data.getPlayer()));
+					parsed.set(i, PlaceholderReplacer.parseAll(r, data.getPlayer(), true /* silence math errors anyways first */));
 				}
 			}
 		}
@@ -79,7 +80,7 @@ public interface Replacer {
 			for (int i = 0; i < parsed.size(); ++i) {
 				String r = parsed.get(i);
 				if (StringUtils.hasPlaceholders(r)) {
-					parsed.set(i, PlaceholderContainer.parseAll(r, data.getPlayer()));
+					parsed.set(i, PlaceholderReplacer.parseAll(r, data.getPlayer(), getReplacerData().mustSilenceMathErrors()));
 				}
 			}
 		}
@@ -173,6 +174,11 @@ public interface Replacer {
 		return this;
 	}
 
+	default Replacer silenceMathErrors(boolean silenceMathErrors) {
+		getReplacerData().silenceMathErrors(silenceMathErrors);
+		return this;
+	}
+
 	// ----- to string
 	default String describeReplacer() {
 		ReplacerData data = getReplacerData();
@@ -185,6 +191,12 @@ public interface Replacer {
 
 	// ----- creation
 	static final Replacer GENERIC = empty();
+	static final RWWeakHashMap<Player, Replacer> JUST_PLAYER_REPLACER_CACHE = new RWWeakHashMap<>(10, 1f);  // initializing a Replacer just for the player can be consuming if done often ; this optimizes a few things, especially in recurring tasks
+	// FIXME : ^ remove this cache if still issues
+
+	static Replacer justPlayer(Player player) {
+		return JUST_PLAYER_REPLACER_CACHE.computeIfAbsent(player, __ -> of(player));
+	}
 
 	static Replacer empty() {
 		return new SimpleReplacer(new ReplacerData());

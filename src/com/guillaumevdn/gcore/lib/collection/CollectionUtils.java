@@ -14,6 +14,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.WeakHashMap;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
@@ -22,13 +23,11 @@ import javax.annotation.Nullable;
 
 import com.guillaumevdn.gcore.lib.concurrency.RWHashSet;
 import com.guillaumevdn.gcore.lib.function.MapSupplier;
-import com.guillaumevdn.gcore.lib.function.QuadriConsumer;
-import com.guillaumevdn.gcore.lib.function.ThrowableTriConsumer;
+import com.guillaumevdn.gcore.lib.function.ThrowableBiConsumer;
 import com.guillaumevdn.gcore.lib.function.TriConsumer;
 import com.guillaumevdn.gcore.lib.number.NumberUtils;
 import com.guillaumevdn.gcore.lib.object.ObjectUtils;
 import com.guillaumevdn.gcore.lib.object.Optional;
-import com.guillaumevdn.gcore.lib.wrapper.WrapperBoolean;
 
 /**
  * @author GuillaumeVDN
@@ -289,83 +288,63 @@ public final class CollectionUtils {
 	}
 
 	// ----- iterate
-	public static <K, V> void iterateMap(Map<K, V> map, QuadriConsumer<K, V, WrapperBoolean, WrapperBoolean> consumer) {
-		iterate(map.entrySet().iterator(), (entry, remover, breaker) -> consumer.accept(entry.getKey(), entry.getValue(), remover, breaker));
+	public static <K, V> void iterateMap(Map<K, V> map, TriConsumer<K, V, IteratorControls> consumer) {
+		iterate(map.entrySet().iterator(), (entry, iter) -> consumer.accept(entry.getKey(), entry.getValue(), iter));
 	}
 
-	public static <T> void iterate(Collection<T> collection, TriConsumer<T, WrapperBoolean, WrapperBoolean> consumer) {
+	public static <T> void iterate(Collection<T> collection, BiConsumer<T, IteratorControls> consumer) {
 		iterate(collection.iterator(), consumer);
 	}
 
-	public static <T> void iterate(Iterator<T> iterator, TriConsumer<T, WrapperBoolean, WrapperBoolean> consumer) {
-		WrapperBoolean remover = WrapperBoolean.of(false);
-		WrapperBoolean breaker = WrapperBoolean.of(false);
+	public static <T> void iterate(Iterator<T> iterator, BiConsumer<T, IteratorControls> consumer) {
+		IteratorControls iter = new IteratorControls();
 		while (iterator.hasNext()) {
-			consumer.accept(iterator.next(), remover, breaker);
-			if (remover.get()) {
-				iterator.remove();
-				remover.set(false);
-			}
-			if (breaker.get()) {
-				return;
-			}
+			consumer.accept(iterator.next(), iter);
+			if (iter.mustRemove()) iterator.remove();
+			if (iter.mustStop()) return;
+			iter.reset();
 		}
 	}
 
-	public static <T> void iterateCatching(Collection<T> collection, ThrowableTriConsumer<T, WrapperBoolean, WrapperBoolean> consumer) {
-		WrapperBoolean remover = WrapperBoolean.of(false);
-		WrapperBoolean breaker = WrapperBoolean.of(false);
+	public static <T> void iterateCatching(Collection<T> collection, ThrowableBiConsumer<T, IteratorControls> consumer) {
+		IteratorControls iter = new IteratorControls();
 		for (Iterator<T> iterator = collection.iterator(); iterator.hasNext(); ) {
 			try {
-				consumer.accept(iterator.next(), remover, breaker);
+				consumer.accept(iterator.next(), iter);
 			} catch (Throwable exception) {
 				exception.printStackTrace();
 			}
-			if (remover.get()) {
-				iterator.remove();
-				remover.set(false);
-			}
-			if (breaker.get()) {
-				return;
-			}
+			if (iter.mustRemove()) iterator.remove();
+			if (iter.mustStop()) return;
+			iter.reset();
 		}
 	}
 
-	public static <T> void iterateNonNull(Collection<T> collection, TriConsumer<T, WrapperBoolean, WrapperBoolean> consumer) {
+	public static <T> void iterateNonNull(Collection<T> collection, BiConsumer<T, IteratorControls> consumer) {
 		if (collection != null) {
-			WrapperBoolean remover = WrapperBoolean.of(false);
-			WrapperBoolean breaker = WrapperBoolean.of(false);
+			IteratorControls iter = new IteratorControls();
 			for (Iterator<T> iterator = collection.iterator(); iterator.hasNext(); ) {
 				T next = iterator.next();
 				if (next != null) {
-					consumer.accept(next, remover, breaker);
-					if (remover.get()) {
-						iterator.remove();
-						remover.set(false);
-					}
-					if (breaker.get()) {
-						return;
-					}
+					consumer.accept(next, iter);
+					if (iter.mustRemove()) iterator.remove();
+					if (iter.mustStop()) return;
+					iter.reset();
 				}
 			}
 		}
 	}
 
-	public static <T> void iterateNonNullValues(Map<?, T> collection, TriConsumer<T, WrapperBoolean, WrapperBoolean> consumer) {
+	public static <T> void iterateNonNullValues(Map<?, T> collection, BiConsumer<T, IteratorControls> consumer) {
 		if (collection != null) {
-			WrapperBoolean remover = WrapperBoolean.of(false);
-			WrapperBoolean breaker = WrapperBoolean.of(false);
+			IteratorControls iter = new IteratorControls();
 			for (Iterator<T> iterator = collection.values().iterator(); iterator.hasNext(); ) {
 				T next = iterator.next();
 				if (next != null) {
-					consumer.accept(next, remover, breaker);
-					if (remover.get()) {
-						iterator.remove();
-						remover.set(false);
-					}
-					if (breaker.get()) {
-						return;
-					}
+					consumer.accept(next, iter);
+					if (iter.mustRemove()) iterator.remove();
+					if (iter.mustStop()) return;
+					iter.reset();
 				}
 			}
 		}
@@ -461,6 +440,21 @@ public final class CollectionUtils {
 			}
 		}
 		return diff;
+	}
+
+	public static <T> boolean allEqual(Collection<T> coll) {
+		if (coll.size() <= 1) {
+			return false;
+		}
+		Iterator<T> it = coll.iterator();
+		T first = it.next();
+		while (it.hasNext()) {
+			T t = it.next();
+			if (first == null ? t != null : !first.equals(t)) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	// ----- misc

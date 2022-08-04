@@ -70,7 +70,7 @@ public class ElementText extends BasicElement<Text> {
 			protected boolean doFill() {
 
 				// current
-				setPersistentItem(new GUIItem("current", 47, editorIcon()));
+				setPersistentItem(new GUIItem("current", 47, editorIcon(true)));
 
 				// set lines items
 				if (getRawValue() != null) {

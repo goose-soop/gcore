@@ -17,8 +17,26 @@ public class NBTItem extends NBTCompound {
 	private ItemStack initialItem;
 
 	public NBTItem(ItemStack item) throws Throwable {
-		super(null, "root", 0, ReflectionObject.of(Reflection.invokeCraftbukkitMethod("inventory.CraftItemStack", "asNMSCopy", null, item).invokeMethod("getTag").orElse(Reflection.newNmsInstance((Version.REMAPPED ? "nbt." : "") + "NBTTagCompound"))).invokeMethod("clone"));
+		this(item, true);
+	}
+
+	public NBTItem(ItemStack item, boolean clone) throws Throwable {
+		super(null, "root", 0, getTag(item, clone));
 		this.initialItem = item;
+	}
+
+	private static ReflectionObject getTag(ItemStack item, boolean clone) throws Throwable {
+		ReflectionObject nmsCopy = Reflection.invokeCraftbukkitMethod("inventory.CraftItemStack", "asNMSCopy", null, item);
+		if (Version.ATLEAST_1_18) {
+			return nmsCopy.invokeMethod(clone ? "getTagClone" : (Version.ATLEAST_1_19 ? "u" : "t")).orElse(Reflection.newNmsInstance("nbt.NBTTagCompound"));
+		} else {
+			ReflectionObject tag = nmsCopy.invokeMethod("getTag");
+			if (tag.justGet() != null) {
+				return clone ? tag.invokeMethod("clone") : tag;
+			} else {
+				return Reflection.newNmsInstance((Version.REMAPPED ? "nbt." : "") + "NBTTagCompound");
+			}
+		}
 	}
 
 	public NBTItem(ItemStack item, ReflectionObject tag) throws Throwable {
@@ -42,7 +60,7 @@ public class NBTItem extends NBTCompound {
 		// clone item and set tag
 		ItemStack item = initialItem.clone();
 		ReflectionObject nmsItem = Reflection.invokeCraftbukkitMethod("inventory.CraftItemStack", "asNMSCopy", null, item);
-		nmsItem.invokeMethod("setTag", (Object) getTag().get());
+		nmsItem.invokeMethod(Version.ATLEAST_1_18 ? "c" : "setTag", (Object) getTag().get());
 		ItemStack modified = Reflection.invokeCraftbukkitMethod("inventory.CraftItemStack", "asBukkitCopy", null, (Object) nmsItem.get()).get();
 		// reapply data and dura
 		/*if (durability != 0) modified = Compat.setDurability(modified, durability);
@@ -76,7 +94,9 @@ public class NBTItem extends NBTCompound {
 			"CustomModelData",
 			// skull profile
 			"SkullProfile",
-			"SkullOwner"
+			"SkullOwner",
+			// firework rocket
+			"Fireworks"
 			);
 
 }

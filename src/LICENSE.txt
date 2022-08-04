@@ -1,4 +1,4 @@
-COPYRIGHT 2015-2020 GUILLAUME 'GuillaumeVDN'/'PYRRH4' VANDENNEUCKER, SOME RIGHTS RESERVED.
+COPYRIGHT 2015-2022 GUILLAUME 'GuillaumeVDN'/'PYRRH4' VANDENNEUCKER, SOME RIGHTS RESERVED.
 By using this software, you agree to the following.
 
 Permission is GRANTED, free of charge, to anyone, to decompile, copy, modify or merge, copies or portions of this software.

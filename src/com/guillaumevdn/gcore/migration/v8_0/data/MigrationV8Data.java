@@ -18,7 +18,7 @@ import com.guillaumevdn.gcore.data.usernpcs.UserNPC;
 import com.guillaumevdn.gcore.data.usernpcs.UserNPCs;
 import com.guillaumevdn.gcore.lib.concurrency.RWHashMap;
 import com.guillaumevdn.gcore.lib.configuration.YMLConfiguration;
-import com.guillaumevdn.gcore.lib.data.Query;
+import com.guillaumevdn.gcore.lib.data.sql.Query;
 import com.guillaumevdn.gcore.lib.legacy_npc.ElementNPC;
 import com.guillaumevdn.gcore.lib.migration.BackupBehavior;
 import com.guillaumevdn.gcore.lib.migration.Migration;
@@ -66,7 +66,7 @@ public final class MigrationV8Data extends Migration {
 		// mysql
 		if (config.readString("data_backend.gcore_statistics_v8", "JSON").equalsIgnoreCase("MYSQL")) {
 			// connect
-			attemptOperation("connecting to MySQL", BackupBehavior.NONE, () -> {
+			attemptOperation("connecting to SQLConnector", BackupBehavior.NONE, () -> {
 				String host = config.readMandatoryString("mysql.host");
 				String name = config.readMandatoryString("mysql.name");
 				String usr = config.readMandatoryString("mysql.user");
@@ -76,7 +76,7 @@ public final class MigrationV8Data extends Migration {
 				mysql = new InstantMySQL(url, usr, pwd);
 			});
 			// create tables
-			attemptOperation("creating MySQL tables", BackupBehavior.NONE, () -> {
+			attemptOperation("creating SQLConnector tables", BackupBehavior.NONE, () -> {
 				mysql.performUpdateQuery(getPlugin(), new Query("DROP TABLE IF EXISTS gcore_users_npcs_v8;"
 						+ "CREATE TABLE gcore_users_npcs_v8("
 						+ "user_uuid CHAR(36) NOT NULL,"
@@ -85,13 +85,13 @@ public final class MigrationV8Data extends Migration {
 						+ ") ENGINE=InnoDB DEFAULT CHARSET = 'utf8';"));
 			});
 			// statistics
-			attemptOperation("copying MySQL statistics", BackupBehavior.NONE, () -> {
+			attemptOperation("copying SQLConnector statistics", BackupBehavior.NONE, () -> {
 				mysql.performUpdateQuery(getPlugin(), new Query("DROP TABLE IF EXISTS gcore_statistics_v8;"
 						+ "CREATE TABLE gcore_statistics_v8 LIKE gcore_statistics;"
 						+ "INSERT INTO gcore_statistics_v8 SELECT * FROM gcore_statistics;"));
 			});
 			// statistics
-			attemptOperation("converting MySQL users NPCs board", BackupBehavior.NONE, () -> {
+			attemptOperation("converting SQLConnector users NPCs board", BackupBehavior.NONE, () -> {
 				ResultSet set = mysql.performGetQuery(getPlugin(), new Query("SELECT * FROM gcore_users"));
 				while (set.next()) {
 					UUID uuid = null;

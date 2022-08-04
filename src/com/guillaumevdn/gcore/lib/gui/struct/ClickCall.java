@@ -114,6 +114,10 @@ public class ClickCall {
 			return name().contains("NUMBER");
 		}
 
+		public boolean isShift() {
+			return name().contains("SHIFT");
+		}
+
 	}
 
 }

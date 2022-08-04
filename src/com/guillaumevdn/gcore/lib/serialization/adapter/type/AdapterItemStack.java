@@ -10,6 +10,8 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import com.guillaumevdn.gcore.GCore;
+import com.guillaumevdn.gcore.integration.headdatabase.IntegrationInstanceHeadDatabase;
 import com.guillaumevdn.gcore.lib.compatibility.Compat;
 import com.guillaumevdn.gcore.lib.compatibility.Version;
 import com.guillaumevdn.gcore.lib.compatibility.material.Mat;
@@ -129,7 +131,21 @@ public final class AdapterItemStack extends DataAdapter<ItemStack> {
 			if (!type.canHaveItem()) {
 				throw new IllegalStateException("material type " + reader.readString("type") + " can't be represented as an item stack");
 			}
-			ItemStack item = type.newStack();
+			ItemStack item = null;
+			String typeHDB = reader.readString("typeHDB");
+			if (typeHDB != null) {
+				IntegrationInstanceHeadDatabase hdb = (IntegrationInstanceHeadDatabase) GCore.inst().getIntegration("HeadDatabase").getInstance();
+				if (hdb != null) {
+					try {
+						item = hdb.getItemStack(typeHDB);
+					} catch (Throwable exception) {
+						throw new IllegalStateException("an error occured while parsing HeadDatabase type " + typeHDB, exception);
+					}
+				}
+			}
+			if (item == null) {
+				item = type.newStack();
+			}
 			// durability
 			// only set that if it's not already specified in the type, and it's not an <1.13 item with legacy data
 			// because in legacy versions, data and durability must be the same for the variant to appear correctly, otherwise it displays the weird blank item

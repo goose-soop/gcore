@@ -7,8 +7,8 @@ import java.util.Map;
 
 import com.guillaumevdn.gcore.lib.configuration.YMLConfiguration;
 import com.guillaumevdn.gcore.lib.configuration.file.YMLError;
-import com.guillaumevdn.gcore.lib.data.Board;
 import com.guillaumevdn.gcore.lib.data.DataBackEnd;
+import com.guillaumevdn.gcore.lib.data.board.Board;
 import com.guillaumevdn.gcore.lib.exception.ConfigError;
 import com.guillaumevdn.gcore.lib.object.ObjectUtils;
 
@@ -42,7 +42,8 @@ public abstract class GPluginConfig {
 	}
 
 	public final DataBackEnd dataBackEnd(Board board) {
-		return dataBackEnds.getOrDefault(board.getId().toLowerCase(), DataBackEnd.JSON);
+		String id = board.getId().toLowerCase();
+		return dataBackEnds.getOrDefault(id, DataBackEnd.JSON);
 	}
 
 	public final boolean updateNotification() {

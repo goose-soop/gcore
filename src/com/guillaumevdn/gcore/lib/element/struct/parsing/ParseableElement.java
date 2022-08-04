@@ -46,7 +46,7 @@ public interface ParseableElement<T> extends IElement {
 			}
 			return parsed;
 		} catch (Throwable error) {
-			/* - actually don't valuesCache when errors because it might not be noticed then. prefer error spamming so that they actually fix it ; (there's already a logspam prevention in loggers as well)
+			/* - actually don't valuesCache when errors because it might not be noticed then. prefer error spamming so that they actually fix it
 			if (valuesCache != null) {
 				valuesCache.set(Optional.empty());
 			}*/

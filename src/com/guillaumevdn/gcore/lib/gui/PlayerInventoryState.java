@@ -20,7 +20,7 @@ public class PlayerInventoryState {
 	// ----- static base
 	public static final Integer OTHER_SLOTS_DIFF = -10;
 
-	private Inventory otherInventory = null;
+	private transient Inventory otherInventory = null;
 	private Map<Integer, ItemStack> items = new HashMap<>();
 
 	public PlayerInventoryState() {

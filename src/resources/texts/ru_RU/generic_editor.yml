@@ -312,7 +312,7 @@ descriptionPositionTypeClosestMythicMobMobs: |
 descriptionPositionTypeWorld: |
   &7Мир
 
-descriptionPositionTypeBiome: |
+descriptionPositionTypeBiomes: |
   &7Разрешенные биомы
 
 descriptionPositionTypeSingleLocation: |

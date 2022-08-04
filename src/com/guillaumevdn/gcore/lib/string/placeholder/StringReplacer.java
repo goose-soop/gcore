@@ -20,7 +20,7 @@ public final class StringReplacer {
 
 	//private static final Pattern PATTERN = Pattern.compile("\\{(.*?)\\}");  // scuffed ; it detects {math:{expression} as a placeholder inside {math:{expression}} and doesn't detect {expression} itself
 
-	private LowerCaseHashMap<Supplier<Object>> exactMatch = new LowerCaseHashMap<>(5, 1f);
+	private LowerCaseHashMap<Supplier<Object>> exactMatch = new LowerCaseHashMap<>(1, 1f);
 	private CustomMatcher customMatcher = null;
 	private String customMatcherDesc = null;
 	private boolean formatNumbers = true;
@@ -107,7 +107,7 @@ public final class StringReplacer {
 
 			// replace in string
 			if (match != null) {
-				String replacement = StringUtils.replacementToString(match, formatNumbers).replace("$", "\\$");
+				String replacement = StringUtils.replacementToString(match, formatNumbers); //.replace("$", "\\$");
 				result = result.substring(0, pair.getA()) + replacement + result.substring(pair.getB() + 1);
 				mustIgnore.clear();  // we changed things to the string ; retry everything else
 			} else {

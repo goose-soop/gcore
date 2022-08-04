@@ -72,6 +72,12 @@ public final class Mat extends Variant<MatData> {
 		MatCompatBlock.setBlock(block, this);
 	}
 
+	public void setBlockChange(Block block) {
+		block.getWorld().getPlayers().forEach(pl -> {
+			setBlockChange(block, pl);
+		});
+	}
+
 	public void setBlockChange(Block block, Player player) {
 		MatCompatBlock.setBlockChange(block, this, player);
 	}

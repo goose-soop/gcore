@@ -58,12 +58,28 @@ public interface Position {
 		Location loc = findRandom().clone();
 		loc.setY(y.getMin());
 		IntPredicate isYFree = offy -> {
-			Mat m = loc.getBlockY() + offy >= 256 ? null : Mat.fromBlock(loc.getBlock().getRelative(0, offy, 0)).orElse(null);
+			Mat m = loc.getBlockY() + offy >= 319 ? null : Mat.fromBlock(loc.getBlock().getRelative(0, offy, 0)).orElse(null);
 			return m != null && m.getData().isTraversable() && match(loc);
 		};
 		for (; loc.getY() <= y.getMax(); loc.add(0d, 1d, 0d)) {
 			Mat mat = Mat.fromBlock(loc.getBlock()).orElse(null);
 			if (mat != null && !mat.getData().isTraversable() && IntStream.range(1, height + 1).allMatch(isYFree)) {
+				return loc;
+			}
+		}
+		return null;
+	}
+
+	default Location findRandomFreeFor(int height) {
+		MinMaxDouble y = getRandomSolidAndFreeAboveYBounds();
+		Location loc = findRandom().clone();
+		loc.setY(y.getMin());
+		IntPredicate isYFree = offy -> {
+			Mat m = loc.getBlockY() + offy >= 319 ? null : Mat.fromBlock(loc.getBlock().getRelative(0, offy, 0)).orElse(null);
+			return m != null && m.getData().isTraversable() && match(loc);
+		};
+		for (; loc.getY() <= y.getMax(); loc.add(0d, 1d, 0d)) {
+			if (IntStream.range(0, height).allMatch(isYFree)) {
 				return loc;
 			}
 		}

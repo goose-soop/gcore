@@ -1,5 +1,6 @@
 package com.guillaumevdn.gcore.lib.chat;
 
+import java.util.Objects;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
@@ -23,6 +24,7 @@ public class PlayerChatEvent extends Event implements Cancellable {
 	private String message;
 	private Set<? extends CommandSender> recipients;
 	private boolean cancelled = false;
+	private int changesToOG = 0;
 
 	private PlayerChatEvent(Player sender, int commandSlashCount, String message, Set<? extends CommandSender> recipients) {
 		super(!Bukkit.isPrimaryThread());
@@ -45,6 +47,10 @@ public class PlayerChatEvent extends Event implements Cancellable {
 		return commandSlashCount;
 	}
 
+	public int getChangesToOG() {
+		return changesToOG;
+	}
+
 	/**
 	 * If this is a command, there'll be no / in front
 	 */
@@ -60,7 +66,7 @@ public class PlayerChatEvent extends Event implements Cancellable {
 	public boolean isCancelled() {
 		return cancelled;
 	}
-	
+
 	public boolean match(String configString, boolean startsWith) {
 		if (configString == null) return false;
 		int configSlashCount = StringUtils.countLeadingChar(configString, '/');
@@ -73,6 +79,9 @@ public class PlayerChatEvent extends Event implements Cancellable {
 
 	// ----- set
 	public void setMessage(String message) {
+		if (!Objects.equals(message, this.message)) {
+			++this.changesToOG;
+		}
 		this.message = message;
 	}
 
@@ -83,11 +92,17 @@ public class PlayerChatEvent extends Event implements Cancellable {
 		if (commandSlashCount <= 0) {
 			throw new IllegalArgumentException("invalid command slash count " + commandSlashCount);
 		}
+		if (commandSlashCount != this.commandSlashCount) {
+			++this.changesToOG;
+		}
 		this.commandSlashCount = commandSlashCount;
 	}
 
 	@Override
 	public void setCancelled(boolean cancelled) {
+		if (cancelled != this.cancelled) {
+			++this.changesToOG;
+		}
 		this.cancelled = cancelled;
 	}
 

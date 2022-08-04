@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.NavigableSet;
 import java.util.stream.Collectors;
 
 import org.bukkit.inventory.ItemStack;
@@ -16,9 +17,9 @@ import com.guillaumevdn.gcore.TextEditorGeneric;
 import com.guillaumevdn.gcore.WorkerGCore;
 import com.guillaumevdn.gcore.lib.GPlugin;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
+import com.guillaumevdn.gcore.lib.collection.SortedHashMap.Order;
+import com.guillaumevdn.gcore.lib.collection.SortedHashMap.Type;
 import com.guillaumevdn.gcore.lib.collection.SortedLowerCaseHashMap;
-import com.guillaumevdn.gcore.lib.collection.SortedLowerCaseHashMap.Order;
-import com.guillaumevdn.gcore.lib.collection.SortedLowerCaseHashMap.Type;
 import com.guillaumevdn.gcore.lib.compatibility.material.CommonMats;
 import com.guillaumevdn.gcore.lib.compatibility.material.Mat;
 import com.guillaumevdn.gcore.lib.configuration.YMLConfiguration;
@@ -45,7 +46,7 @@ public abstract class ElementsContainer<V extends SuperElement> {
 	private final String typeName;
 	private final Class<V> typeClass;
 	private final File baseFolder;
-	private SortedLowerCaseHashMap<V> elements = SortedLowerCaseHashMap.keySorted(10, 1f);
+	private SortedLowerCaseHashMap<V> elements = SortedLowerCaseHashMap.keySorted();
 	private final List<String> skipFiles;
 
 	public ElementsContainer(GPlugin plugin, String typeName, Class<V> typeClass, File baseFolder) {
@@ -77,12 +78,12 @@ public abstract class ElementsContainer<V extends SuperElement> {
 		return baseFolder;
 	}
 
-	public final List<String> keys() {
-		return elements.keySet();  // already immutable
+	public final NavigableSet<String> keySet() {
+		return elements.keySet();
 	}
 
 	public final Collection<V> values() {
-		return elements.values();  // already immutable
+		return elements.values();
 	}
 
 	public final boolean isEmpty() {
@@ -99,7 +100,7 @@ public abstract class ElementsContainer<V extends SuperElement> {
 
 	// ----- set
 	public final void load() throws Throwable {
-		elements = new SortedLowerCaseHashMap<>(Type.KEY_SORTED, Order.NATURAL, countCandidates(baseFolder), 1f);
+		elements = new SortedLowerCaseHashMap<>(Type.KEY_SORTED, Order.NATURAL/*, countCandidates(baseFolder), 1f*/);
 		doLoad(baseFolder);
 		if (!elements.isEmpty()) {
 			plugin.getMainLogger().info("Successfully loaded " + StringUtils.pluralizeAmountDesc(typeName, elements.size()) + (ConfigGCore.dontLogLoadedElementsNames ? "" : " : " + StringUtils.toTextString(", ", elements.keySet())));
@@ -110,7 +111,7 @@ public abstract class ElementsContainer<V extends SuperElement> {
 		return !file.getName().toLowerCase().endsWith(".yml") || file.getName().startsWith("SYSTEM_") || skipFiles.contains(FileUtils.getSimpleName(file));
 	}
 
-	private int countCandidates(File file) {
+	/*private int countCandidates(File file) {
 		if (!file.exists()) {  // might happen if the folder wasn't created yet
 			return 0;
 		}
@@ -123,7 +124,7 @@ public abstract class ElementsContainer<V extends SuperElement> {
 		} else {
 			return shouldSkipFile(file) ? 0 : 1;
 		}
-	}
+	}*/
 
 	private void doLoad(File file) throws Throwable {
 		if (!file.exists()) {  // might happen if the folder wasn't created yet
@@ -137,29 +138,36 @@ public abstract class ElementsContainer<V extends SuperElement> {
 			if (shouldSkipFile(file)) {
 				return;
 			}
-
-			// can't load for another reason
-			String id = FileUtils.getSimpleName(file).toLowerCase();
-			ensureCanLoad(file, id);
-
-			// duplicate ID
-			V elem = createElement(file, id);
-			V existing = getElement(id).orNull();
-			if (existing != null) {
-				throw new ConfigError("Found duplicate " + typeName + " id '" + id + "', first in " + existing.getConfiguration().getLogFilePath() + ", second in " + elem.getConfiguration().getLogFilePath());
-			}
-
-			// load element
-			setElement(elem);
-			elem.read();
-
-			// notify loading errors
-			/* now done in all elements
-			if (!elem.getLoadErrors().isEmpty()) {
-				getPlugin().getMainLogger().error("Errors were found when loading " + getTypeName() + " " + id + " :", true);
-				elem.getLoadErrors().forEach(error -> getPlugin().getMainLogger().error("- " + error, true));
-			}*/
+			doLoadFile(file);
 		}
+	}
+
+	protected void doLoadFile(File file) throws Throwable {
+		String id = FileUtils.getSimpleName(file).toLowerCase();
+		doLoadFile(file, id);
+	}
+
+	protected void doLoadFile(File file, String id) throws Throwable {
+		// can't load for some reason
+		ensureCanLoad(file, id);
+
+		// duplicate ID
+		V elem = createElement(file, id);
+		V existing = getElement(id).orNull();
+		if (existing != null) {
+			throw new ConfigError("Found duplicate " + typeName + " id '" + id + "', first in " + existing.getConfiguration().getLogFilePath() + ", second in " + elem.getConfiguration().getLogFilePath());
+		}
+
+		// load element
+		setElement(elem);
+		elem.read();
+
+		// notify loading errors
+		/* now done in all elements
+		if (!elem.getLoadErrors().isEmpty()) {
+			getPlugin().getMainLogger().error("Errors were found when loading " + getTypeName() + " " + id + " :", true);
+			elem.getLoadErrors().forEach(error -> getPlugin().getMainLogger().error("- " + error, true));
+		}*/
 	}
 
 	protected void ensureCanLoad(File file, String id) throws ConfigError {

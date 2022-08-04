@@ -15,7 +15,7 @@ import com.guillaumevdn.gcore.TextGeneric;
 import com.guillaumevdn.gcore.WorkerGCore;
 import com.guillaumevdn.gcore.lib.chat.PlayerChatEvent;
 import com.guillaumevdn.gcore.lib.string.StringUtils;
-import com.guillaumevdn.gcore.lib.tuple.Pair;
+import com.guillaumevdn.gcore.lib.tuple.Triple;
 
 /**
  * @author GuillaumeVDN
@@ -33,7 +33,7 @@ public class AwaitingLocationListeners implements Listener {
 			if (msg == null || StringUtils.unformat(msg).trim().toLowerCase().equals(TextGeneric.textCancel.parseLine())) {
 				event.setCancelled(true);
 				WorkerGCore.inst().consumeAwaitingLocationCancelChat(player);
-				Pair<Consumer<Location>, Runnable> awaitingLocation = WorkerGCore.inst().consumeAwaitingLocations(player);
+				Triple<Consumer<Location>, Runnable, Long> awaitingLocation = WorkerGCore.inst().consumeAwaitingLocations(player);
 				if (awaitingLocation != null) {
 					if (awaitingLocation.getB() != null) {
 						GCore.inst().operateSync(() -> awaitingLocation.getB().run());
@@ -46,7 +46,7 @@ public class AwaitingLocationListeners implements Listener {
 	@EventHandler(priority = EventPriority.NORMAL /* normal because sneak cancel GUI delay is LOWEST*/, ignoreCancelled = true)
 	public void event(PlayerToggleSneakEvent event) {
 		Player player = event.getPlayer();
-		Pair<Consumer<Location>, Runnable> awaitingLocation = WorkerGCore.inst().consumeAwaitingLocations(player);
+		Triple<Consumer<Location>, Runnable, Long> awaitingLocation = WorkerGCore.inst().consumeAwaitingLocations(player);
 		if (awaitingLocation != null) {
 			WorkerGCore.inst().consumeAwaitingLocationCancelChat(player);
 			event.setCancelled(true);

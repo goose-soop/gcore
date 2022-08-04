@@ -97,7 +97,7 @@ public class ProtocolEvents implements PacketListener, Listener {
 				final int button;
 				int mode;
 
-				if (Version.ATLEAST_1_17) {
+				if (Version.ATLEAST_1_17_1) {
 					actionId = event.getPacket().getIntegers().getValues().get(1);
 					slot = event.getPacket().getIntegers().getValues().get(2);
 					button = event.getPacket().getIntegers().getValues().get(3);

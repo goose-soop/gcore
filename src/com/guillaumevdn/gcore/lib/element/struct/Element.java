@@ -5,12 +5,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 
 import com.guillaumevdn.gcore.TextEditorGeneric;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
+import com.guillaumevdn.gcore.lib.compatibility.material.CommonMats;
 import com.guillaumevdn.gcore.lib.compatibility.material.Mat;
 import com.guillaumevdn.gcore.lib.configuration.YMLConfiguration;
 import com.guillaumevdn.gcore.lib.element.editor.EditorGUI;
@@ -214,7 +216,9 @@ public abstract class Element implements IElement, Comparable<Element> {
 	protected abstract void doWrite() throws Throwable;
 
 	// ----- editor
-	public abstract Mat editorIconType();
+	public Mat editorIconType() {
+		return CommonMats.COBBLESTONE;
+	}
 
 	public List<String> editorCurrentValue() {
 		return null;
@@ -227,12 +231,24 @@ public abstract class Element implements IElement, Comparable<Element> {
 				return null;
 			}
 			return (isCurrentlyDefault() ? TextEditorGeneric.elementCurrentValueNoneDefault : TextEditorGeneric.elementCurrentValueNone).parseLines();
-		} else if (value.size() == 1) {
-			return (isCurrentlyDefault() ? TextEditorGeneric.elementCurrentValueSingleDefault : TextEditorGeneric.elementCurrentValueSingle).replace("{value}", () -> value.get(0)).parseLines();
-		} else {
+		}
+		else if (value.size() == 1) {
+			if (value.get(0).contains("{value}")) {  // the value itself can contain the {value} placeholder... causes an infinite replacer loop #2345
+				Text text = isCurrentlyDefault() ? TextEditorGeneric.elementCurrentValueSingleDefault : TextEditorGeneric.elementCurrentValueSingle;
+				return Text.of(text.getCurrentLines().stream().map(str -> str.replace("{value}", "{current}")).collect(Collectors.toList())).replace("{current}", () -> value.get(0)).parseLines();
+			} else {
+				return (isCurrentlyDefault() ? TextEditorGeneric.elementCurrentValueSingleDefault : TextEditorGeneric.elementCurrentValueSingle).replace("{value}", () -> value.get(0)).parseLines();
+			}
+		}
+		else {
 			List<String> valueList = new ArrayList<>();
 			value.forEach(line -> valueList.addAll(TextEditorGeneric.elementCurrentValueListLine.replace("{line}", () -> line).parseLines()));
-			return (isCurrentlyDefault() ? TextEditorGeneric.elementCurrentValueListDefault : TextEditorGeneric.elementCurrentValueList).replace("{value}", () -> valueList).parseLines();
+			if (value.get(0).contains("{value}")) {  // the value itself can contain the {value} placeholder... causes an infinite replacer loop #2345
+				Text text = isCurrentlyDefault() ? TextEditorGeneric.elementCurrentValueListDefault : TextEditorGeneric.elementCurrentValueList;
+				return Text.of(text.getCurrentLines().stream().map(str -> str.replace("{value}", "{current}")).collect(Collectors.toList())).replace("{current}", () -> valueList).parseLines();
+			} else {
+				return (isCurrentlyDefault() ? TextEditorGeneric.elementCurrentValueListDefault : TextEditorGeneric.elementCurrentValueList).replace("{value}", () -> valueList).parseLines();
+			}
 		}
 	}
 
@@ -262,7 +278,11 @@ public abstract class Element implements IElement, Comparable<Element> {
 	}
 
 	public final ItemStack editorIcon() {
-		List<String> lore = editorIconLore();
+		return editorIcon(false);
+	}
+
+	public final ItemStack editorIcon(boolean nonControl) {
+		List<String> lore = nonControl ? nonControlEditorIconLore() : editorIconLore();
 		lore = lore == null ? null : StringUtils.splitLongText(lore, 50);
 		if (lore != null && lore.size() > 30) {
 			while (lore.size() > 30) lore.remove(lore.size() - 1);

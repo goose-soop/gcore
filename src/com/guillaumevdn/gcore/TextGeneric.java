@@ -22,6 +22,7 @@ public enum TextGeneric implements TextEnumElement {
 	commandParameterUsageOperation,
 	commandParameterUsageAmount,
 	commandParameterUsageSpecificEditor,
+	commandParameterUsageDate,
 	commandDescriptionGenericReload,
 	commandDescriptionGenericPluginState,
 	commandDescriptionGenericMigrate,

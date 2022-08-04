@@ -80,12 +80,12 @@ public class SectionNode extends ConfigNode {
 
 	// ----- set
 	public void purgeEmptySections() {
-		CollectionUtils.iterate(nodes, (next, remover, breaker) -> {
+		CollectionUtils.iterate(nodes, (next, it) -> {
 			SectionNode subSection = ObjectUtils.castOrNull(next, SectionNode.class);
 			if (subSection != null) {
 				subSection.purgeEmptySections();
 				if (subSection.nodes.isEmpty()) {
-					remover.set(true);
+					it.remove();
 				}
 			}
 		});

@@ -29,7 +29,9 @@ import org.bukkit.potion.PotionEffect;
 import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.lib.GPlugin;
 import com.guillaumevdn.gcore.lib.compatibility.nbt.NBTCompound;
+import com.guillaumevdn.gcore.lib.gui.InventoryState;
 import com.guillaumevdn.gcore.lib.serialization.Serializer;
+import com.guillaumevdn.gcore.lib.serialization.adapter.type.AdapterInventoryState;
 import com.guillaumevdn.gcore.lib.serialization.adapter.type.AdapterItemStack;
 import com.guillaumevdn.gcore.lib.serialization.adapter.type.AdapterNBTCompound;
 import com.guillaumevdn.gcore.lib.serialization.adapter.type.AdapterPotionEffect;
@@ -55,6 +57,7 @@ public final class FileUtils {
 				.registerTypeAdapter(Text.class, new GsonAdapterText())
 				.registerTypeAdapter(ItemStack.class, AdapterItemStack.INSTANCE.getGsonAdapter())
 				.registerTypeAdapter(NBTCompound.class, AdapterNBTCompound.INSTANCE.getGsonAdapter())
+				.registerTypeAdapter(InventoryState.class, AdapterInventoryState.INSTANCE.getGsonAdapter())
 				.registerTypeAdapter(PotionEffect.class, AdapterPotionEffect.INSTANCE.getGsonAdapter())
 				;
 		for (Serializer serializer : Serializer.values()) {

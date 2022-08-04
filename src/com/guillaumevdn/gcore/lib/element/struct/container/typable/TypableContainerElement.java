@@ -53,6 +53,10 @@ public abstract class TypableContainerElement<T extends TypableElementType> exte
 		return type;
 	}
 
+	public final <TT extends T> TT getTypeAs() {
+		return (TT) getType();
+	}
+
 	public void onTypeChange(T oldType, T newType) {
 	}
 

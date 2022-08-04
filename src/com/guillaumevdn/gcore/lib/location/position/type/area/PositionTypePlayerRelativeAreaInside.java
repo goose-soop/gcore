@@ -38,7 +38,7 @@ public class PositionTypePlayerRelativeAreaInside extends PositionType {
 	public Position doParse(ElementPosition position, Replacer replacer) throws ParsingError {
 		Location a = position.getElementAs("bound1", ElementRelativeLocation.class).parseNoCatchOrThrowParsingNull(replacer);
 		Location b = position.getElementAs("bound2", ElementRelativeLocation.class).parseNoCatchOrThrowParsingNull(replacer);
-		return new PositionAreaInside(a, b);
+		return new PositionAreaInside(a, b, false);
 	}
 
 }

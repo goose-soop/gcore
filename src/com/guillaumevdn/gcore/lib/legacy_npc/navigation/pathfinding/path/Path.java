@@ -1,9 +1,10 @@
 package com.guillaumevdn.gcore.lib.legacy_npc.navigation.pathfinding.path;
 
+import java.util.function.BiConsumer;
+
+import com.guillaumevdn.gcore.lib.collection.IteratorControls;
 import com.guillaumevdn.gcore.lib.concurrency.RWArrayList;
-import com.guillaumevdn.gcore.lib.function.TriConsumer;
 import com.guillaumevdn.gcore.lib.legacy_npc.navigation.pathfinding.Point;
-import com.guillaumevdn.gcore.lib.wrapper.WrapperBoolean;
 
 /**
  * @author GuillaumeVDN
@@ -30,7 +31,7 @@ public final class Path {
 		return points.isEmpty() ? null : points.get(points.size() - 1);
 	}
 
-	public void iteratePoints(TriConsumer<ExploringPathPoint, WrapperBoolean, WrapperBoolean> consumer) {
+	public void iteratePoints(BiConsumer<ExploringPathPoint, IteratorControls> consumer) {
 		points.iterate(consumer);
 	}
 

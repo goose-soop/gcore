@@ -18,10 +18,16 @@ import com.guillaumevdn.gcore.lib.number.MinMaxDouble;
 public class PositionAreaInside implements Position {
 
 	private Location a, b;
+	private boolean allowGPS;
 
 	public PositionAreaInside(Location a, Location b) {
+		this(a, b, true);
+	}
+
+	public PositionAreaInside(Location a, Location b, boolean allowGPS) {
 		this.a = a;
 		this.b = b;
+		this.allowGPS = allowGPS;
 	}
 
 	// ----- methods
@@ -68,6 +74,9 @@ public class PositionAreaInside implements Position {
 
 	@Override
 	public Location findGPSFor(Player player) {
+		if (!allowGPS) {
+			return null;
+		}
 		if (match(player)) {
 			return null;
 		}

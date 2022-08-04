@@ -34,10 +34,13 @@ public class PositionTypeWorldguardRegionInside extends PositionType {
 	// ----- parse
 	@Override
 	public Position doParse(ElementPosition position, Replacer replacer) throws ParsingError {
-		WGRegion region = position.getElementAs("region", ElementWorldguardRegion.class).parseNoCatchOrThrowParsingNull(replacer);
+		ElementWorldguardRegion regionElement = position.getElementAs("region");
+		WGRegion region = regionElement.parseNoCatchOrThrowParsingNull(replacer);
 		Pair<Point, Point> bounds = WorldGuardCompat.getRegionBounds(region.getWorld(), region.getRegionId());
-		//Bukkit.getLogger().info("region " + region.getWorld() + "/" + region.getRegionId() + ", bounds " + bounds + ", region " + WorldGuardCompat.getRegion(region.getWorld(), region.getRegionId()));
-		return bounds == null || bounds.getA() == null || bounds.getB() == null ? null : new PositionAreaInside(bounds.getA().toLocation(), bounds.getB().toLocation());
+		if (bounds == null || bounds.getA() == null || bounds.getB() == null) {
+			throw new ParsingError(regionElement, "no region found " + regionElement.getWorld().getRawValueLine(0) + "/" + regionElement.getRawValueLine(0));
+		}
+		return new PositionAreaInside(bounds.getA().toLocation(), bounds.getB().toLocation());
 	}
 
 }

@@ -40,7 +40,7 @@ public class PositionTypePlayerRelativeSingle extends PositionType {
 	public Position doParse(ElementPosition position, Replacer replacer) throws ParsingError {
 		Location location = position.getElementAs("location", ElementRelativeLocation.class).parseNoCatchOrThrowParsingNull(replacer);
 		PointTolerance pointTolerance = position.getElementAs("point_tolerance", ElementPointTolerance.class).parseNoCatchOrThrowParsingNull(replacer);
-		return new PositionSingle(location, pointTolerance);
+		return new PositionSingle(location, pointTolerance, false);
 	}
 
 }

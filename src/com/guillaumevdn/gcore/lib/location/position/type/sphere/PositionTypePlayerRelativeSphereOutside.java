@@ -39,7 +39,7 @@ public class PositionTypePlayerRelativeSphereOutside extends PositionType {
 	public Position doParse(ElementPosition position, Replacer replacer) throws ParsingError {
 		Location center = position.getElementAs("center", ElementRelativeLocation.class).parseNoCatchOrThrowParsingNull(replacer);
 		double radius = position.getElementAs("radius", ElementDouble.class).parseNoCatchOrThrowParsingNull(replacer);
-		return new PositionSphereOutside(center, radius);
+		return new PositionSphereOutside(center, radius, false);
 	}
 
 }

@@ -20,6 +20,7 @@ import com.guillaumevdn.gcore.lib.gui.struct.ClickCall;
 import com.guillaumevdn.gcore.lib.gui.struct.ClickCall.ClickType;
 import com.guillaumevdn.gcore.lib.gui.struct.GUIItem;
 import com.guillaumevdn.gcore.lib.item.ItemUtils;
+import com.guillaumevdn.gcore.lib.serialization.Serializer;
 import com.guillaumevdn.gcore.lib.string.StringUtils;
 import com.guillaumevdn.gcore.lib.string.Text;
 
@@ -32,6 +33,11 @@ public abstract class ListElement<T extends Element> extends MapElement<String, 
 
 	public ListElement(boolean allowCompactNestedWrite, Element parent, String id, Need need, Text editorDescription) {
 		super(String.class, parent, id, need, editorDescription);
+		this.allowCompactNestedWrite = allowCompactNestedWrite;
+	}
+
+	protected ListElement(boolean allowCompactNestedWrite, Serializer<String> keySerializer, Element parent, String id, Need need, Text editorDescription) {
+		super(keySerializer, parent, id, need, editorDescription);
 		this.allowCompactNestedWrite = allowCompactNestedWrite;
 	}
 

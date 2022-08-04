@@ -20,7 +20,7 @@ public class InventoryState {
 
 	public static final Integer OTHER_SLOTS_DIFF = -10;
 
-	private Inventory inventory;
+	private transient Inventory inventory;
 	private Map<Integer, ItemStack> items = new HashMap<>();
 
 	public InventoryState(Inventory inventory, int startSlot, int endSlot) {
@@ -34,6 +34,11 @@ public class InventoryState {
 		}
 	}
 
+	public InventoryState(Map<Integer, ItemStack> items) {
+		this.inventory = null;
+		this.items = items;
+	}
+
 	// ----- get
 	public Inventory getInventory() {
 		return inventory;
@@ -41,6 +46,12 @@ public class InventoryState {
 
 	public Map<Integer, ItemStack> getItems() {
 		return items;
+	}
+
+	// ----- set
+	@Deprecated
+	public void setInventory(Inventory inventory) {
+		this.inventory = inventory;
 	}
 
 	// ----- compare

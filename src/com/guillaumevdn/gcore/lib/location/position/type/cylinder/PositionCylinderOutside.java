@@ -19,11 +19,17 @@ public class PositionCylinderOutside implements Position {
 
 	private Location center;
 	private double radius;
+	private boolean allowGPS;
 
 	public PositionCylinderOutside(Location center, double radius) {
+		this(center, radius, true);
+	}
+
+	public PositionCylinderOutside(Location center, double radius, boolean allowGPS) {
 		this.center = center.clone();
 		center.setY(1d);
 		this.radius = radius;
+		this.allowGPS = allowGPS;
 	}
 
 	// ----- methods
@@ -75,6 +81,9 @@ public class PositionCylinderOutside implements Position {
 
 	@Override
 	public Location findGPSFor(Player player) {
+		if (!allowGPS) {
+			return null;
+		}
 		if (match(player)) {
 			return null;
 		}

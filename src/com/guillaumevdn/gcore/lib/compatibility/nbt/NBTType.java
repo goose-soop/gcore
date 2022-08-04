@@ -69,12 +69,12 @@ public enum NBTType {
 
 	// ----- do
 	public <T> T getValue(NBTCompound compound, String key) throws Throwable {
-		ReflectionObject value = compound.getTag().invokeMethod("get", key);
+		ReflectionObject value = compound.getTag().invokeMethod(Version.ATLEAST_1_18 ? "c" : "get", key);
 		return value.justGet() == null ? null : value.getField(dataFieldName).get();
 	}
 
 	public void setValue(NBTCompound compound, String key, Object object) throws Throwable {
-		compound.getTag().invokeMethod("set", key, newNmsWrapper(object).get());
+		compound.getTag().invokeMethod(Version.ATLEAST_1_18 ? "a" : "set", key, newNmsWrapper(object).get());
 	}
 
 	public ReflectionObject newNmsWrapper(Object value) throws Throwable {
@@ -83,7 +83,7 @@ public enum NBTType {
 
 	// ----- static
 	public static ReflectionObject getObject(NBTCompound compound, String key) throws Throwable {
-		return compound.getTag().invokeMethod("get", key);
+		return compound.getTag().invokeMethod(Version.ATLEAST_1_18 ? "c" : "get", key);
 	}
 
 	public static NBTType getByWrappedClass(Object wrapper) throws Throwable {
@@ -119,7 +119,7 @@ public enum NBTType {
 
 	public static ReflectionObject createListTag(NBTType type) throws Throwable {
 		ReflectionObject tag = Reflection.newNmsInstance(Version.REMAPPED ? "nbt.NBTTagList" : "NBTTagList");
-		tag.setField("type", (byte) type.getInternalId());
+		tag.setField(Version.REMAPPED ? "w" : "type", (byte) type.getInternalId());
 		return tag;
 	}
 

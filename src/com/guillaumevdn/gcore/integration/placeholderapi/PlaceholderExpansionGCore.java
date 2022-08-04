@@ -36,7 +36,7 @@ public class PlaceholderExpansionGCore extends PlaceholderExpansion {
 	}
 
 	@Override
-	public boolean canRegister(){
+	public boolean canRegister() {
 		return true;
 	}
 
@@ -50,12 +50,19 @@ public class PlaceholderExpansionGCore extends PlaceholderExpansion {
 				return parse(otherPlayer, params.substring(0, last));
 			}
 		}
+
+		// parsing without a player
+		if (player == null) {
+			return null;  // might happen, for instance, when parsing placeholders temporarily, in GUIs ; it's important to return null so that it will be replaced later
+		}
+
 		// this player
 		return parse(player, params);
 	}
 
 	private static String parse(Player player, String params) {
 		params = params.toLowerCase();
+
 		// statistic
 		if (params.startsWith("statistic_")) {
 			Statistic stat = Statistic.safeValueOf(params.substring("statistic_".length()));
@@ -65,6 +72,7 @@ public class PlaceholderExpansionGCore extends PlaceholderExpansion {
 			}
 			return ConfigGCore.unknownPlaceholderResult;
 		}
+
 		// invalid placeholder
 		return null;
 	}

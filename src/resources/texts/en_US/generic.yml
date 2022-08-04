@@ -21,6 +21,7 @@ commandParameterUsageReset: reset
 commandParameterUsageOperation: operation
 commandParameterUsageAmount: amount
 commandParameterUsageSpecificEditor: editor
+commandParameterUsageDate: date
 commandDescriptionGenericReload: reload the plugin
 commandDescriptionGenericPluginState: information about the plugin internal state
 commandDescriptionGenericMigrate: re-run a migration

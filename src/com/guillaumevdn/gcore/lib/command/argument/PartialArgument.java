@@ -23,13 +23,12 @@ public abstract class PartialArgument<T> extends Argument<T> {
 
 	// ----- do
 	@Override
-	public final T consume(CommandCall call) {
+	public T consume(CommandCall call) {
 		if (call.getArguments().isEmpty()) {
 			return null;
 		}
 		for (int i = 0; i < call.getArguments().size(); ++i) {
 			String arg = call.getArguments().get(i).toLowerCase();
-			// exact
 			T value = exactMatch(call, arg);
 			if (value == null) {
 				List<T> matches = partialMatches(call, arg).collect(Collectors.toList());

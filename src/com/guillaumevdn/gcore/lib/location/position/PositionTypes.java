@@ -22,6 +22,7 @@ import com.guillaumevdn.gcore.lib.location.position.type.cylinder.PositionTypePl
 import com.guillaumevdn.gcore.lib.location.position.type.single.PositionTypeClosestEntityRelativeSingle;
 import com.guillaumevdn.gcore.lib.location.position.type.single.PositionTypePlayerRelativeSingle;
 import com.guillaumevdn.gcore.lib.location.position.type.single.PositionTypeSingle;
+import com.guillaumevdn.gcore.lib.location.position.type.single.PositionTypeSingleRandom;
 import com.guillaumevdn.gcore.lib.location.position.type.sphere.PositionTypeClosestEntityRelativeSphereInside;
 import com.guillaumevdn.gcore.lib.location.position.type.sphere.PositionTypeClosestEntityRelativeSphereOutside;
 import com.guillaumevdn.gcore.lib.location.position.type.sphere.PositionTypePlayerRelativeSphereInside;
@@ -43,6 +44,7 @@ public final class PositionTypes extends TypableElementTypes<PositionType> {
 
 	public final PositionTypeWorlds		 							WORLDS 										= register(new PositionTypeWorlds("WORLDS"));
 	public final PositionTypeBiomes		 							BIOMES 										= register(new PositionTypeBiomes("BIOMES"));
+	public final PositionTypeSingleRandom 							SINGLE_RANDOM								= register(new PositionTypeSingleRandom("SINGLE_RANDOM"));
 
 	public final PositionTypeSingle 								SINGLE 										= register(new PositionTypeSingle("SINGLE"));
 	public final PositionTypePlayerRelativeSingle					PLAYER_RELATIVE_SINGLE						= register(new PositionTypePlayerRelativeSingle("PLAYER_RELATIVE_SINGLE"));

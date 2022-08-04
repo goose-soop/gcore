@@ -99,7 +99,7 @@ public final class NpcProtocols {
 
 	// ----- https://wiki.vg/Entity_metadata#Player
 	public Map<Integer, Object> getDefaultHumanEntityMetadata() {
-		if (Version.MC_1_9_R2.equals(Version.CURRENT)) {
+		if (Version.MC_1_9_R2.isCurrent()) {
 			return CollectionUtils.asMap(
 					12, (byte) 127  // displayed skin part
 					);
@@ -107,7 +107,7 @@ public final class NpcProtocols {
 			return CollectionUtils.asMap(
 					13, (byte) 127  // displayed skin part
 					);
-		} else if (Version.MC_1_14_R1.equals(Version.CURRENT)) {
+		} else if (Version.MC_1_14_R1.isCurrent()) {
 			return CollectionUtils.asMap(
 					15, (byte) 127  // displayed skin part
 					);
@@ -124,9 +124,13 @@ public final class NpcProtocols {
 	}
 
 	public Object createPlayerInfo(Object gameProfile, GameMode gameMode, int entityId, String name) throws Throwable {
-		ReflectionObject gm = Reflection.invokeNmsMethod((Version.REMAPPED ? "world.level." : "") + "EnumGamemode", "getById", null, gameMode.getValue());
+		ReflectionObject gm = Reflection.invokeNmsMethod((Version.REMAPPED ? "world.level." : "") + "EnumGamemode", Version.ATLEAST_1_18 ? "a" : "getById", null, gameMode.getValue());
 		if (Version.REMAPPED) {
-			return Reflection.newNmsInstance("network.protocol.game.PacketPlayOutPlayerInfo$PlayerInfoData", gameProfile, entityId, gm.get(), createNMSText(name)).get();
+			if (Version.ATLEAST_1_19) {
+				return Reflection.newNmsInstance("network.protocol.game.PacketPlayOutPlayerInfo$PlayerInfoData", gameProfile, entityId, gm.get(), createNMSText(name), null /* public key, can be null apparently */).get();
+			} else {
+				return Reflection.newNmsInstance("network.protocol.game.PacketPlayOutPlayerInfo$PlayerInfoData", gameProfile, entityId, gm.get(), createNMSText(name)).get();
+			}
 		} else {
 			return Reflection.newNmsInstance("PacketPlayOutPlayerInfo$PlayerInfoData", null, gameProfile, entityId, gm.get(), createNMSText(name)).get();
 		}

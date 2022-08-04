@@ -39,7 +39,7 @@ import com.guillaumevdn.gcore.lib.compatibility.bossbar.Bossbar;
 import com.guillaumevdn.gcore.lib.concurrency.RWLowerCaseHashMap;
 import com.guillaumevdn.gcore.lib.configuration.YMLConfiguration;
 import com.guillaumevdn.gcore.lib.configuration.file.YMLError;
-import com.guillaumevdn.gcore.lib.data.Board;
+import com.guillaumevdn.gcore.lib.data.board.Board;
 import com.guillaumevdn.gcore.lib.exception.ConfigError;
 import com.guillaumevdn.gcore.lib.file.FileUtils;
 import com.guillaumevdn.gcore.lib.file.ResourceExtractor;
@@ -86,7 +86,7 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 	private final RWLowerCaseHashMap<Integration> integrations = new RWLowerCaseHashMap<>(5, 1f);
 	private Metrics metrics = null;
 
-	private Logger mainLogger = new Logger(this, getName() + "-" + getDescription().getVersion(), true, true, false);  // define it temporarily for start
+	private Logger mainLogger = new Logger(this, getName() + "-" + getDescription().getVersion(), true, false);  // define it temporarily for start ; don't log in file at first, it can break migrations on windows
 	private boolean activated = false;
 	private Object lifecycleReference = new Object();  // changed on every reload ; allows to create WeakHashMap caches that reset on reload
 	private Gson gson = createGsonBuilder().create();
@@ -243,6 +243,9 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 	protected void registerAndEnableIntegrations() {
 	}
 
+	protected void registerAndEnableIntegrationsPostConfig() {
+	}
+
 	protected void onGPluginEnable(GPlugin plugin) {
 	}
 
@@ -357,14 +360,12 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 				}
 			}
 
-			// register and enable integrations before configuration if this is not GCore : things in integrations might be needed to load config
-			if (!GCore.inst().equals(this)) {
-				try {
-					registerAndEnableIntegrations();
-				} catch (Throwable exception) {
-					failEnable("Couldn't enable integrations", exception);
-					return;
-				}
+			// register and enable integrations before configuration
+			try {
+				registerAndEnableIntegrations();
+			} catch (Throwable exception) {
+				failEnable("Couldn't enable integrations (pre-config)", exception);
+				return;
 			}
 
 			// load config
@@ -391,14 +392,12 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 				return;
 			}
 
-			// register and enable integrations after configuration if this is GCore : position/time frame types need CommonMats to load
-			if (GCore.inst().equals(this)) {
-				try {
-					registerAndEnableIntegrations();
-				} catch (Throwable exception) {
-					failEnable("Couldn't enable integrations", exception);
-					return;
-				}
+			// register and enable integrations after configuration
+			try {
+				registerAndEnableIntegrationsPostConfig();
+			} catch (Throwable exception) {
+				failEnable("Couldn't enable integrations (post-config)", exception);
+				return;
 			}
 
 			// load permission container
@@ -457,20 +456,20 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 			registerListener("bossbar", new Listener() {
 				@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 				public void event(PlayerQuitEvent event) {
-					bossbars.iterateAndModify((id, bossbar, remover, breaker) -> {
+					bossbars.iterateAndModify((id, bossbar, iter) -> {
 						bossbar.handleDisconnect(event.getPlayer());
 						if (bossbar.getPlayers().isEmpty()) {
-							remover.set(true);
+							iter.remove();
 						}
 					});
 				}
 				@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 				public void event(PlayerTeleportEvent event) {
-					bossbars.iterateAndModify((id, bossbar, remover, breaker) -> bossbar.handleTeleport(event.getPlayer()));
+					bossbars.iterateAndModify((id, bossbar, iter) -> bossbar.handleTeleport(event.getPlayer()));
 				}
 				@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 				public void event(PlayerRespawnEvent event) {
-					bossbars.iterateAndModify((id, bossbar, remover, breaker) -> bossbar.handleTeleport(event.getPlayer()));
+					bossbars.iterateAndModify((id, bossbar, iter) -> bossbar.handleTeleport(event.getPlayer()));
 				}
 			});
 
@@ -554,7 +553,7 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 						return true;
 					}
 				});
-				mainLogger.saveFileIfPersistent();
+				//mainLogger.saveFileIfPersistent();
 				onDisable();
 			} catch (Throwable ignored) {
 				ignored.printStackTrace();
@@ -612,7 +611,7 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 
 			// save and cancel loggers
 			loggers.forEachThrowable((__, logger) -> {
-				logger.saveFileIfPersistent();
+				//logger.saveFileIfPersistent();
 				logger.stopSaving();
 			});
 			loggers.clear();
@@ -622,8 +621,9 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 
 		// save data and stop saving
 		data.forEach((id, board) -> {
-			board.saveNeeded(BukkitThread.current(), null);
+			board.saveNeeded(BukkitThread.current());
 			board.stopSaving();
+			board.shutdown();
 		});
 		data.clear();
 
@@ -724,7 +724,7 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 								new JsonMessage()
 								.append("§dPlease make sure to ").build()
 								.append("§l§5update").setURL("https://www.spigotmc.org/resources/" + getSpigotResourceId() + "/updates/").build()
-								.append(" §dto " + getName() + " v" + response + " :)").build()
+								.append("§d to " + getName() + " v" + response + " :)").build()
 								.send((Player) sender);
 							} else {
 								sender.sendMessage("§dPlease make sure to §l§5update §dto " + getName() + " v" + response + " :)");

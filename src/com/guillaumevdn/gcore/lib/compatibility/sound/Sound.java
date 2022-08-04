@@ -34,7 +34,7 @@ public class Sound extends Variant<SoundData> {
 	}
 
 	public void play(Object target, Location forceLocation) {
-		play(target, 1F, 1F, forceLocation);
+		play(target, 1f, 1f, forceLocation);
 	}
 
 	public void play(Object target, float volume, float pitch) {
@@ -47,11 +47,14 @@ public class Sound extends Variant<SoundData> {
 				play(sub, volume, pitch, forceLocation);
 			}
 		} else if (target instanceof OfflinePlayer) {
-			Player player = PlayerUtils.getOnline((OfflinePlayer) target);
+			final Player player = PlayerUtils.getOnline((OfflinePlayer) target);
 			if (player != null) player.playSound(forceLocation != null ? forceLocation : player.getLocation(), getData().getDataInstance(), volume, pitch);
 		} else if (target instanceof UUID) {
-			Player player = Bukkit.getPlayer((UUID) target);
+			final Player player = Bukkit.getPlayer((UUID) target);
 			if (player != null) player.playSound(forceLocation != null ? forceLocation : player.getLocation(), getData().getDataInstance(), volume, pitch);
+		} else if (target instanceof Location) {
+			final Location loc = (Location) target;
+			play(loc.getWorld().getPlayers(), volume, pitch, loc);
 		}
 	}
 

@@ -125,6 +125,10 @@ public class Point {
 		return Serializer.POINT.serialize(this);
 	}
 
+	public static Point fromString(String raw) {
+		return Serializer.POINT.deserialize(raw);
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

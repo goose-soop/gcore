@@ -53,7 +53,6 @@ public final class Statistic {
 	}
 
 	// ----- registration
-
 	private static LowerCaseHashMap<Statistic> registered = new LowerCaseHashMap<>(10, 0.75f);
 
 	public static Collection<Statistic> values() {
@@ -74,6 +73,10 @@ public final class Statistic {
 		Statistic statistic = new Statistic(id);
 		registered.put(id, statistic);
 		return statistic;
+	}
+
+	public static void unregisterAll() {
+		registered.clear();
 	}
 
 }

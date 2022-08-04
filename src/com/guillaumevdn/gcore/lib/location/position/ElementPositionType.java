@@ -19,10 +19,10 @@ public final class ElementPositionType extends ElementTypableElementType<Positio
 		super(PositionTypes.inst(), parent, id, editorDescription);
 	}
 
-	private static RWWeakHashMap<Object, List<PositionType>> cache = new RWWeakHashMap<>(1, 1f);
+	public static RWWeakHashMap<Object, List<PositionType>> valuesCache = new RWWeakHashMap<>(1, 1f);
 	@Override
 	protected List<PositionType> cacheOrBuild() {
-		return cachedOrBuild(cache, () -> PositionTypes.inst().values().stream().sorted(Comparator.comparing(e -> e.getId())));
+		return cachedOrBuild(valuesCache, () -> PositionTypes.inst().values().stream().sorted(Comparator.comparing(e -> e.getId())));
 	}
 
 	@Override

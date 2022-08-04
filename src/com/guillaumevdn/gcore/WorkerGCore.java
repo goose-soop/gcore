@@ -28,6 +28,7 @@ import com.guillaumevdn.gcore.lib.plugin.PluginUtils;
 import com.guillaumevdn.gcore.lib.reflection.ReflectionObject;
 import com.guillaumevdn.gcore.lib.string.Text;
 import com.guillaumevdn.gcore.lib.tuple.Pair;
+import com.guillaumevdn.gcore.lib.tuple.Triple;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
@@ -80,7 +81,7 @@ public class WorkerGCore {
 	// ----- await inputs
 	private Map<UUID, Pair<Consumer<String>, Runnable>> awaitingChats = new HashMap<>(1);
 	private Set<UUID> awaitingLocationsCancelChat = new HashSet<>(1);
-	private Map<UUID, Pair<Consumer<Location>, Runnable>> awaitingLocations = new HashMap<>(1);
+	private Map<UUID, Triple<Consumer<Location>, Runnable, Long>> awaitingLocations = new HashMap<>(1);  // third is the timestamp when it was asked ; because the GUI button is often shift + click, the GUI is closed and so the player shifts automatically quickly ; set a 1s delay
 	private Set<UUID> awaitingItemsCancelChat = new HashSet<>(1);
 	private Map<UUID, Pair<Consumer<ItemStack>, Runnable>> awaitingItems = new HashMap<>(1);
 
@@ -100,8 +101,13 @@ public class WorkerGCore {
 		return awaitingLocationsCancelChat.remove(player.getUniqueId());
 	}
 
-	public Pair<Consumer<Location>, Runnable> consumeAwaitingLocations(Player player) {
-		return awaitingLocations.remove(player.getUniqueId());
+	public Triple<Consumer<Location>, Runnable, Long> consumeAwaitingLocations(Player player) {
+		Triple<Consumer<Location>, Runnable, Long> awaiting = awaitingLocations.get(player.getUniqueId());
+		if (awaiting != null && System.currentTimeMillis() - awaiting.getC() > 1000L) {
+			awaitingLocations.remove(player.getUniqueId());
+			return awaiting;
+		}
+		return null;
 	}
 
 	public boolean hasAwaitingItemCancelChat(Player player) {
@@ -147,14 +153,14 @@ public class WorkerGCore {
 	public void awaitLocation(Player player, Text message, Consumer<Location> onSelect, Runnable onCancel) {
 		// cancel current
 		Pair<Consumer<String>, Runnable> currentChat = awaitingChats.remove(player.getUniqueId());
-		Pair<Consumer<Location>, Runnable> currentLocation = awaitingLocations.remove(player.getUniqueId());
+		Triple<Consumer<Location>, Runnable, Long> currentLocation = awaitingLocations.remove(player.getUniqueId());
 		if (currentChat != null && currentChat.getB() != null) currentChat.getB().run();
 		if (currentLocation != null && currentLocation.getB() != null) currentLocation.getB().run();
 		// ask
 		if (message != null) {
 			message.replace("{cancel}", () -> TextGeneric.textCancel.parseLine()).send(player);
 		}
-		awaitingLocations.put(player.getUniqueId(), Pair.of(onSelect, onCancel));
+		awaitingLocations.put(player.getUniqueId(), Triple.of(onSelect, onCancel, System.currentTimeMillis()));
 		awaitingLocationsCancelChat.add(player.getUniqueId());
 	}
 
@@ -176,7 +182,7 @@ public class WorkerGCore {
 	private RWHashMap<UUID, GameProfile> profileCache = new RWHashMap<>(10, 1f);
 	private final GameProfile DEFAULT_PROFILE = fromTexture(UUID.randomUUID(), "Steve", "ewogICJ0aW1lc3RhbXAiIDogMTYwODAzMTQ1MTk2MSwKICAicHJvZmlsZUlkIiA6ICJlYzU2MTUzOGYzZmQ0NjFkYWZmNTA4NmIyMjE1NGJjZSIsCiAgInByb2ZpbGVOYW1lIiA6ICJBbGV4IiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzFhNGFmNzE4NDU1ZDRhYWI1MjhlN2E2MWY4NmZhMjVlNmEzNjlkMTc2OGRjYjEzZjdkZjMxOWE3MTNlYjgxMGIiCiAgICB9CiAgfQp9", "J4QNnTc0p9NbhK5zkD5pd+N2lKtH/0y884MOFQyxVGcUYDuSaa5XkkoLBTe/iaOICjarfwd1gLgNNg8XqAW3imb7bsOlN1D+3A3POkjlrdTKgLqFU9ouGwhdhh6rbMa6Sz6Ir6b8bgbeniEKYQxzOjyLbZwaDfJgXycPuQ7dnXiycVrgMYAcSHv3FH/K2Fm4RfjeIWJctWWsgpZdxmX9E0o83LEKlqEH6bT1aMTVnWJDRcak9A/OR6iSwz6ABrsWzARtlwi10mVwZUEQovByOo+UHxGfQErWm6kXbn7U/faDI3Gfq3ovvP/KyhGjB64gYQN0OWFt99N8FM+jWnPuRxVZlH0jx0Sxe2PGPvNy/lwD4gDbJfKScMSsapYZqbTenZ4QakqPVfGYI23JdQMC3IcTjuz4hHlKNjF+AgGZEqz/gDyKUT+95eOJH+8Kr0+KCzmKaL2zKY1/or7zcCsaeAyY/M+trfr6nARfFVBInHVYLHkOPkRSj3xvjNKW1sP4szJvxhQ/V968ipydRTlnQ67H8J8Laz5TDxxB2uQlRkGi6bvk1T7LSNNY/GSTovJVatR9adxTjbndby+DmrfFb666XjZ6kJshwEsudnQs2BU/jG9zi3tvCKoma/d6LbcSr2hfSYCl+ErWCFDSuVB4zJZa5rOLGW2Ea5s1ePFeHiM=");
 
-	private void fetchProfile(final UUID ownerUUID, String ownerName, String skinData, String skinSignature, Consumer<GameProfile> callback) {
+	public void fetchProfile(final UUID ownerUUID, String ownerName, String skinData, String skinSignature, Consumer<GameProfile> callback) {
 		// has data
 		if (skinData != null) {
 			callback.accept(fromTexture(ownerUUID, ownerName, skinData, skinSignature));

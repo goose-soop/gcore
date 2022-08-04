@@ -346,7 +346,8 @@ public final class DataIO {
 			for (String elementKey : mapReader.getKeys()) {
 				K elementK = keySerializer.deserialize(elementKey);
 				if (elementK != null) {
-					V elementValue = valueDeserializer.apply(elementKey, elementK, mapReader.readObject(elementKey));
+					DataIO rawValue = mapReader.readObject(elementKey);
+					V elementValue = valueDeserializer.apply(elementKey, elementK, rawValue);
 					if (elementValue != null) {
 						map.put(elementK, elementValue);
 					}

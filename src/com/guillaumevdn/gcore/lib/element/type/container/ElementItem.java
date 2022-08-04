@@ -2,13 +2,16 @@ package com.guillaumevdn.gcore.lib.element.type.container;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.TextEditorGeneric;
 import com.guillaumevdn.gcore.WorkerGCore;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
@@ -48,6 +51,7 @@ import com.guillaumevdn.gcore.lib.serialization.Serializer;
 import com.guillaumevdn.gcore.lib.serialization.adapter.type.AdapterItemStack;
 import com.guillaumevdn.gcore.lib.serialization.adapter.type.AdapterNBTCompound;
 import com.guillaumevdn.gcore.lib.serialization.data.DataIO;
+import com.guillaumevdn.gcore.lib.string.StringUtils;
 import com.guillaumevdn.gcore.lib.string.Text;
 import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
 
@@ -59,6 +63,7 @@ public final class ElementItem extends ParseableContainerElement<ItemStack> {
 	private final ElementItemMode mode;
 
 	private final ElementMat type;
+	private final ElementString typeHDB;
 	private final ElementInteger durability;
 	private final ElementInteger amount;
 
@@ -76,6 +81,7 @@ public final class ElementItem extends ParseableContainerElement<ItemStack> {
 		this.mode = mode;
 
 		type = addMat("type", mode.requireType() ? Need.required() : Need.optional(), TextEditorGeneric.descriptionItemType);
+		typeHDB = !GCore.inst().getIntegration("HeadDatabase").isActivated() ? null : addString("type_hdb", Need.optional(), TextEditorGeneric.descriptionItemTypeHDB);
 		durability = addInteger("durability", Need.optional(0), TextEditorGeneric.descriptionItemDurability);
 		amount = !mode.allowAmount() ? null : addInteger("amount", Need.optional(1), TextEditorGeneric.descriptionItemAmount);
 
@@ -145,6 +151,11 @@ public final class ElementItem extends ParseableContainerElement<ItemStack> {
 		return type;
 	}
 
+	@Nullable
+	public ElementString getTypeHDB() {
+		return typeHDB;
+	}
+
 	public ElementInteger getDurability() {
 		return durability;
 	}
@@ -181,6 +192,14 @@ public final class ElementItem extends ParseableContainerElement<ItemStack> {
 		return nbt;
 	}
 
+	@Nonnull
+	public Set<String> getNameLorePlaceholders() {
+		Set<String> placeholders = StringUtils.getPlaceholders(getName().getRawValueLineOrDefault(0));
+		placeholders.addAll(StringUtils.getPlaceholders(getLore().getRawValueOrDefaultCopy()));
+		return placeholders;
+
+	}
+
 	// ----- read/import
 	@Override
 	protected void doRead() throws Throwable {
@@ -214,7 +233,7 @@ public final class ElementItem extends ParseableContainerElement<ItemStack> {
 		// meta
 		if (value.hasItemMeta()) {
 			ItemMeta meta = value.getItemMeta();
-			unbreakable.setValue(Compat.isUnbreakable(meta) ? null : CollectionUtils.asList("true"));
+			unbreakable.setValue(Compat.isUnbreakable(meta) ? CollectionUtils.asList("true") : null);
 			if (Version.ATLEAST_1_14) {
 				customModelData.setValue(meta.hasCustomModelData() ? CollectionUtils.asList("" + meta.getCustomModelData()) : null);
 			}
@@ -265,6 +284,9 @@ public final class ElementItem extends ParseableContainerElement<ItemStack> {
 		// wrap in DataIO and then use the adapter, so it's consistent with json/config
 		DataIO data = new DataIO();
 		data.write("type", type.parseNoCatchOrThrowParsingNull(replacer));
+		if (typeHDB != null && typeHDB.readContains()) {
+			data.write("typeHDB", typeHDB.parseNoCatchOrThrowParsingNull(replacer));
+		}
 		data.write("durability", durability.parseNoCatch(replacer).orNull());
 		if (amount != null) {
 			data.write("amount", amount.parseNoCatch(replacer).orNull());

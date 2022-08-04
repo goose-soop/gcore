@@ -2,8 +2,10 @@ package com.guillaumevdn.gcore.lib.chat;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -36,36 +38,48 @@ public class JsonMessage {
 		Compat.sendJsonChat(players, msg + "]}]");
 	}
 
-	/**
-	 * @author JustisR
-	 */
 	public static class JsonStringBuilder {
+
+		private static final Map<ChatColor, String> FORMAT_CODES = CollectionUtils.asMap(
+				ChatColor.MAGIC, "obfuscated",
+				ChatColor.BOLD, "bold",
+				ChatColor.STRIKETHROUGH, "strikethrough",
+				ChatColor.UNDERLINE, "underlined",
+				ChatColor.ITALIC, "italic"
+				);
 
 		private final JsonMessage message;
 		private final String string = ",{\"text\":\"\",\"extra\":[";
 		private List<String> parts = new ArrayList<>();
 		private String hover = "", click = "";
 
-		private JsonStringBuilder(JsonMessage jsonMessage, String text) {
+		private JsonStringBuilder(JsonMessage jsonMessage, String rawText) {
 			message = jsonMessage;
+
 			// unformatted text
-			if (!text.contains("§")) {
-				parts.add("{\"text\":\"" + text + "\"}");
+			if (!rawText.contains("§")) {
+				parts.add("{\"text\":\"" + rawText + "\"}");
 			}
 			// formatted
 			else {
-				String[] split = text.split(String.valueOf(ChatColor.COLOR_CHAR));
+				String[] split = rawText.split(String.valueOf(ChatColor.COLOR_CHAR));
+
+				String textColor = "white";
+				Set<String> textFormat = new HashSet<>();
+
 				for (int i = 0; i < split.length; ++i) {
 					// empty text
 					if (split[i].isEmpty()) {
 						parts.add("{\"text\":\"\"}");
 					}
+
 					// with color
 					else {
+						String text = split[i];
 						String ch = split[i].substring(0, 1);
-						// hex color code
+
+						// hex code
 						if (ch.equalsIgnoreCase("x")) {
-							// get code
 							String code = "";
 							int j = i + 1;
 							for (; j < split.length && j < i + 6; ++j) {
@@ -73,21 +87,43 @@ public class JsonMessage {
 							}
 							String last = j < split.length ? split[j] : null;
 							if (last != null && !last.isEmpty()) {  // valid hex code
-								parts.add("{\"text\":\"" + last.substring(1) + "\",\"color\":\"#" + (code + last.charAt(0)).toUpperCase() + "\"}");
+								textColor = "#" + (code + last.charAt(0)).toUpperCase();
+								textFormat.clear();
+
+								text = last.substring(1);
 								i = j;
-							} else {  // invalid code
-								parts.add("{\"text\":\"" + split[i] + "\"}");
+							} else {  // invalid hex code
+								textColor = "white";
+								textFormat.clear();
 							}
 						}
 						// regular code
 						else {
+							text = split[i].substring(1);
+
 							ChatColor color = ChatColor.getByChar(ch);
 							if (color != null) {
-								parts.add("{\"text\":\"" + split[i].substring(1) + "\",\"color\":\"" + color.name().toLowerCase(Locale.US) + "\"}");
+								String format = FORMAT_CODES.get(color);
+								if (format != null) {
+									textFormat.add(format);
+								} else {
+									textFormat.clear();
+									textColor = color.name().toLowerCase();
+								}
 							} else {  // unknown color code
-								parts.add("{\"text\":\"" + split[i] + "\"}");
+								textFormat.clear();
+								textColor = "white";
 							}
 						}
+
+						// add text with color and all format codes
+						String json = "{\"text\":\"" + text + "\",\"color\":\"" + textColor + "\"";
+						for (String format : textFormat) {
+							json += ",\"" + format + "\":true";
+						}
+						json += "}";
+
+						parts.add(json);
 					}
 				}
 			}

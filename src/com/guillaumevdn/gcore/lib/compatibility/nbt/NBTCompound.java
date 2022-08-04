@@ -31,16 +31,16 @@ public class NBTCompound extends NBTBase {
 	}*/
 
 	public final NBTType getValueType(String key) throws Throwable {
-		return NBTType.getByWrappedClass(getTag().invokeMethod("get", key).get());
+		return NBTType.getByWrappedClass(getTag().invokeMethod(Version.ATLEAST_1_18 ? "c" : "get", key).get());
 	}
 
 	// ----- keys
 	public final Set<String> getKeys() throws Throwable {
-		return getTag().invokeMethod(Version.ATLEAST_1_13 ? "getKeys" : "c").get();
+		return getTag().invokeMethod(Version.ATLEAST_1_18 ? "d" : (Version.ATLEAST_1_13 ? "getKeys" : "c")).get();
 	}
 
 	public final boolean hasKey(String key) throws Throwable {
-		return getTag().invokeMethod("hasKey", key).get();
+		return getTag().invokeMethod(Version.ATLEAST_1_18 ? "e" : "hasKey", key).get();
 	}
 
 	// ----- get value
@@ -105,7 +105,7 @@ public class NBTCompound extends NBTBase {
 
 	// ----- set value
 	public final void remove(String key) throws Throwable {
-		getTag().invokeMethod("remove", key);
+		getTag().invokeMethod(Version.ATLEAST_1_18 ? "r" : "remove", key);
 	}
 
 	public final void set(String key, Object value) throws Throwable {
@@ -161,13 +161,13 @@ public class NBTCompound extends NBTBase {
 
 	public final void setList(String key, NBTList list) throws Throwable {
 		list.parent = this;
-		getTag().invokeMethod("set", key, list.getTag().get());
+		getTag().invokeMethod(Version.ATLEAST_1_18 ? "a" : "set", key, list.getTag().get());
 		ConfigGCore.logspamItemNbt(this, () -> "Set list " + key + " of size " + list.size() + " and type " + list.getValueType());
 	}
 
 	public final void setCompound(String key, NBTCompound compound) throws Throwable {
 		compound.parent = this;
-		getTag().invokeMethod("set", key, compound.getTag().get());
+		getTag().invokeMethod(Version.ATLEAST_1_18 ? "a" : "set", key, compound.getTag().get());
 		ConfigGCore.logspamItemNbt(this, () -> "Set compound " + key + " with keys " + compound.getKeys());
 	}
 

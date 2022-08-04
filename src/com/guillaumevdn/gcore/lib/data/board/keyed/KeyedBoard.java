@@ -1,10 +1,7 @@
 package com.guillaumevdn.gcore.lib.data.board.keyed;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -15,24 +12,22 @@ import java.util.stream.Stream;
 import com.guillaumevdn.gcore.lib.GPlugin;
 import com.guillaumevdn.gcore.lib.bukkit.BukkitThread;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
+import com.guillaumevdn.gcore.lib.collection.IteratorControls;
 import com.guillaumevdn.gcore.lib.concurrency.RWHashMap;
 import com.guillaumevdn.gcore.lib.concurrency.RWHashSet;
-import com.guillaumevdn.gcore.lib.data.Board;
-import com.guillaumevdn.gcore.lib.data.BoardType;
-import com.guillaumevdn.gcore.lib.data.DataBackEnd;
-import com.guillaumevdn.gcore.lib.file.FileUtils;
-import com.guillaumevdn.gcore.lib.function.QuadriConsumer;
+import com.guillaumevdn.gcore.lib.data.board.Board;
+import com.guillaumevdn.gcore.lib.data.board.BoardType;
 import com.guillaumevdn.gcore.lib.function.ThrowableRunnable;
+import com.guillaumevdn.gcore.lib.function.TriConsumer;
 import com.guillaumevdn.gcore.lib.string.StringUtils;
-import com.guillaumevdn.gcore.lib.wrapper.WrapperBoolean;
 
 /**
  * @author GuillaumeVDN
  */
-public abstract class KeyedBoard<K, V, R extends KeyReference<K>> extends Board {
+public abstract class KeyedBoard<K, V> extends Board<ConnectorKeyed<K, V>> {
 
+	private final RWHashMap<K, V> cache = new RWHashMap<>(10, 1f);
 	private final Class<V> valueClass;
-	protected final RWHashMap<K, V> cache = new RWHashMap<>(10, 1f);
 
 	public KeyedBoard(GPlugin plugin, String id, BoardType type, Class<V> valueClass, int saveDelayTicks) {
 		super(plugin, id, type, saveDelayTicks);
@@ -51,19 +46,27 @@ public abstract class KeyedBoard<K, V, R extends KeyReference<K>> extends Board 
 		return cache.get(key);
 	}
 
-	public final V getCachedValue(R key) {
-		return cache.get(key.getKey());
+	public final Map<K, V> copyCache() {
+		return cache.copy();
+	}
+
+	public final Set<K> copyCacheKeys() {
+		return cache.copyKeys();
 	}
 
 	public final List<V> copyCacheValues() {
 		return cache.copyValues();
 	}
 
+	public final <RES> RES streamResult(Function<Stream<Map.Entry<K, V>>, RES> operator) {
+		return cache.streamResult(operator);
+	}
+
 	public final <RES> RES streamResultValues(Function<Stream<V>, RES> operator) {
 		return cache.streamResultValues(operator);
 	}
 
-	public final void iterateAndModifyCache(QuadriConsumer<K, V, WrapperBoolean /* remover */, WrapperBoolean /* breaker */> consumer) {
+	public final void iterateAndModifyCache(TriConsumer<K, V, IteratorControls> consumer) {
 		cache.iterateAndModify(consumer);
 	}
 
@@ -71,222 +74,143 @@ public abstract class KeyedBoard<K, V, R extends KeyReference<K>> extends Board 
 		cache.forEach(consumer);
 	}
 
+	public final V computeCacheIfAbsent(K key, Function<K, V> ifAbsent) {
+		return cache.computeIfAbsent(key, ifAbsent);
+	}
+
+	public final V putInCache(K key, V value) {
+		return cache.put(key, value);
+	}
+
+	public final V removeFromCache(K key) {
+		return cache.remove(key);
+	}
+
+	public final void clearCache() {
+		cache.clear();
+	}
+
 	// ----------------------------------------------------------------------------------------------------
 	// ----- save
 	// ----------------------------------------------------------------------------------------------------
 
-	private transient RWHashSet<R> toSave = new RWHashSet<>(5);
+	private transient RWHashSet<K> toSave = new RWHashSet<>(5);
 
 	@Override
 	public boolean mustSaveSomething() {
 		return !toSave.isEmpty();
 	}
 
-	public final void addCachedToSave(R element) {
+	public final void addCachedToSave(K element) {
 		toSave.add(element);
 	}
 
-	protected final void removeCachedToSaveIf(Predicate<R> filter) {
+	protected final void removeCachedToSaveIf(Predicate<K> filter) {
 		toSave.removeIf(filter);
 	}
 
 	@Override
-	public final void saveNeeded(BukkitThread thread, ThrowableRunnable callback) {
-		pushElements(thread, toSave.copy(), callback);
+	public final void saveNeeded(BukkitThread thread) {
+		toSave.consume().forEach(r -> {
+			pushElements(thread, CollectionUtils.asSet(r), null);
+		});
 	}
 
 	// ----------------------------------------------------------------------------------------------------
 	// ----- data
 	// ----------------------------------------------------------------------------------------------------
 
-	public final void pullElements(BukkitThread thread, Set<R> references, ThrowableRunnable callback) {
-		if (references.isEmpty()) {
+	public final void pullElements(BukkitThread thread, Set<K> keys, ThrowableRunnable callback) {
+		if (keys.isEmpty()) {
 			return;
 		}
-		operate(thread, "pull board elements " + StringUtils.toTextString(", ", references), () -> {
-			toSave.removeAll(references);
-			references.forEach(ref -> pulledElement(thread, ref, getCachedValue(ref)));
+		operate(thread, "pull board elements " + StringUtils.toTextString(", ", keys), () -> {
+			toSave.removeAll(keys);
+			keys.forEach(key -> pulledElement(thread, key, getCachedValue(key)));
 			if (callback != null) {
 				callback.run();
 			}
 		}, () -> {
-			toSave.removeAll(references);
-			if (DataBackEnd.MYSQL.equals(getBackEnd())) {
-				remotePullElementsMySQL(references);
-			} else if (DataBackEnd.JSON.equals(getBackEnd())) {
-				remotePullElementsJson(references);
-			}
+			toSave.removeAll(keys);
+			operateOnConnector(c -> c.remotePullElements(keys));
 		});
 	}
 
-	protected void pulledElement(BukkitThread thread, R reference, V value) {
+	protected void pulledElement(BukkitThread thread, K key, V value) {
 	}
 
-	public final void pushElements(BukkitThread thread, Set<R> references, ThrowableRunnable callback) {
-		if (references.isEmpty()) {
+	public final void pushElements(BukkitThread thread, Set<K> keys, ThrowableRunnable callback) {
+		if (keys.isEmpty()) {
 			return;
 		}
-		beforePushElements(thread, references);
-		operate(thread, "push board elements " + references, callback, () -> {
-			toSave.removeAll(references);
-			if (DataBackEnd.MYSQL.equals(getBackEnd())) {
-				remotePushElementsMySQL(references);
-			} else if (DataBackEnd.JSON.equals(getBackEnd())) {
-				remotePushElementsJson(references);
-			}
+		beforePushElements(thread, keys);
+		operate(thread, "push board elements " + keys, callback, () -> {
+			toSave.removeAll(keys);
+			operateOnConnector(c -> c.remotePushElements(keys));
 		});
 	}
 
-	protected void beforePushElements(BukkitThread thread, Set<R> references) {
+	protected void beforePushElements(BukkitThread thread, Set<K> keys) {
 	}
 
-	public final void deleteElements(BukkitThread thread, Set<R> references, ThrowableRunnable callback) {
-		if (references.isEmpty()) {
+	public final void deleteElements(BukkitThread thread, Set<K> keys, ThrowableRunnable callback) {
+		if (keys.isEmpty()) {
 			return;
 		}
-		references.forEach(ref -> beforeDeleteElement(thread, ref, getCachedValue(ref)));
-		operate(thread, "delete board elements " + references, callback, () -> {
-			toSave.removeAll(references);
-			references.forEach(ref -> cache.remove(ref.getKey()));
-			if (DataBackEnd.MYSQL.equals(getBackEnd())) {
-				remoteDeleteElementsMySQL(references);
-			} else if (DataBackEnd.JSON.equals(getBackEnd())) {
-				remoteDeleteElementsJson(references);
-			}
+		keys.forEach(key -> beforeDeleteElement(thread, key, getCachedValue(key)));
+		operate(thread, "delete board elements " + keys, callback, () -> {
+			toSave.removeAll(keys);
+			keys.forEach(key -> cache.remove(key));
+			operateOnConnector(c -> c.remoteDeleteElements(keys));
 		});
 	}
 
-	public abstract void removeElementsFromCache(Set<R> references);
-
-	protected void beforeDeleteElement(BukkitThread thread, R reference, V value) {
+	public void removeElementsFromCache(Set<K> keys) {
+		keys.forEach(key -> removeFromCache(key));
 	}
 
-	public final void disposeCacheElements(BukkitThread thread, R reference, ThrowableRunnable callback) {
-		disposeCacheElements(thread, CollectionUtils.asSet(reference), callback);
+	protected void beforeDeleteElement(BukkitThread thread, K key, V value) {
 	}
 
-	public final void disposeCacheElements(BukkitThread thread, Set<R> references, ThrowableRunnable callback) {
-		if (references.isEmpty()) {
+	public final void disposeCacheElement(BukkitThread thread, K key, ThrowableRunnable callback) {
+		disposeCacheElements(thread, CollectionUtils.asSet(key), callback);
+	}
+
+	public final void disposeCacheElements(BukkitThread thread, Set<K> keys, ThrowableRunnable callback) {
+		if (keys.isEmpty()) {
 			return;
 		}
-		references.forEach(ref -> beforeDisposeCacheElement(thread, ref, getCachedValue(ref)));  // this might set some more elements to save
+		keys.forEach(key -> beforeDisposeCacheElement(thread, key, getCachedValue(key)));  // this might set some more elements to save
 
 		// disposing means "saving if needed and then remove from valuesCache" ; if elements don't need to be saved, remove directly from valuesCache
-		Set<R> mustPush = references.stream().filter(ref -> toSave.contains(ref)).collect(Collectors.toSet());
-		Set<R> musntPush = references.stream().filter(ref -> !toSave.contains(ref)).collect(Collectors.toSet());
+		Set<K> mustPush = keys.stream().filter(key -> toSave.contains(key)).collect(Collectors.toSet());
+		Set<K> musntPush = keys.stream().filter(key -> !toSave.contains(key)).collect(Collectors.toSet());
 		removeElementsFromCache(musntPush);
-		musntPush.forEach(ref -> disposedCacheElement(ref));;
+		musntPush.forEach(key -> disposedCacheElement(key));;
 
 		// push needed elements, then remove from valuesCache
 		pushElements(thread, mustPush, () -> {
 			removeElementsFromCache(mustPush);
-			mustPush.forEach(ref -> disposedCacheElement(ref));
+			mustPush.forEach(key -> disposedCacheElement(key));
 			if (callback != null) {
 				callback.run();
 			}
 		});
-	}
 
-	protected void beforeDisposeCacheElement(BukkitThread thread, R reference, V value) {
-	}
-
-	protected void disposedCacheElement(R reference) {
-	}
-
-	// ----------------------------------------------------------------------------------------------------
-	// ----- json
-	// ----------------------------------------------------------------------------------------------------
-
-	// ----- wrapper and file
-	public abstract File getRoot();
-	public abstract File getFile(K key);
-	public abstract K getKey(File file);
-
-	// ----- init
-	@Override
-	protected final void remoteInitJson() throws Throwable {
-		getRoot().mkdirs();
-	}
-
-	// ----- pull
-	@Override
-	protected void remotePullAllJson() throws Throwable {
-		File root = getRoot();
-		if (root.exists()) {
-			Set<KeyReference<K>> keys = new HashSet<>();
-			for (File file : root.listFiles()) {
-				if (file.isFile()) {
-					K key = getKey(file);
-					if (key != null) {
-						keys.add(new KeyReference<>(key));
-					}
-				}
-			}
-			remotePullKeysJson(keys);
-		}
-	}
-
-	protected final void remotePullElementsJson(Set<R> references) throws Throwable {
-		remotePullKeysJson(references.stream().map(ref -> new KeyReference<K>(ref.getKey())).collect(Collectors.toSet()));
-	}
-
-	protected final void remotePullKeysJson(Set<KeyReference<K>> keys) throws Throwable {
-		for (KeyReference<K> ref : keys) {
-			K key = ref.getKey();
-			File file = getFile(key);
-			if (file.exists()) {
-				try (FileReader reader = new FileReader(file)) {
-					V value = valueFromJson(reader);
-					if (value != null) {
-						cache.put(key, value);
-					}
-				}
+		// if there's nothing to push, call callback instantly
+		if (mustPush.isEmpty() && callback != null) {
+			try {
+				callback.run();
+			} catch (Throwable exeption) {
+				exeption.printStackTrace();
 			}
 		}
 	}
 
-	protected V valueFromJson(FileReader reader) {  // this can be overriden because for complex values such as maps gson seems to be drunk and puts keys/values as raw string in the map
-		return getPlugin().getPrettyGson().fromJson(reader, valueClass);
+	protected void beforeDisposeCacheElement(BukkitThread thread, K key, V value) {
 	}
 
-	// ----- push
-	protected final void remotePushElementsJson(Set<R> references) throws Throwable {
-		remotePushKeysJson(references.stream().map(ref -> new KeyReference<K>(ref.getKey())).collect(Collectors.toSet()));
+	protected void disposedCacheElement(K key) {
 	}
-
-	protected final void remotePushKeysJson(Set<KeyReference<K>> keys) throws Throwable {
-		for (KeyReference<K> ref : keys) {
-			K key = ref.getKey();
-			V value = cache.get(key);
-			File file = getFile(key);
-			if (value == null) {
-				FileUtils.delete(file);
-			} else {
-				FileUtils.reset(file);
-				try (FileWriter writer = new FileWriter(file)) {
-					valueToJson(value, writer);
-				}
-			}
-		}
-	}
-
-	protected void valueToJson(V value, FileWriter writer) {  // this can be overriden because for complex values such as maps gson seems to be drunk and puts keys/values as raw string in the map
-		getPlugin().getPrettyGson().toJson(value, valueClass, writer);
-	}
-
-	// ----- delete
-	protected final void remoteDeleteElementsJson(Set<R> references) throws Throwable {
-		// at this point, values have been removed from valuesCache
-		// this method will delete the file if no value, or update with remaining values
-		remotePushElementsJson(references);
-	}
-
-	// ----------------------------------------------------------------------------------------------------
-	// ----- mysql
-	// ----------------------------------------------------------------------------------------------------
-
-	protected abstract void remotePullElementsMySQL(Set<R> references) throws Throwable;
-	protected abstract void remotePushElementsMySQL(Set<R> references) throws Throwable;
-	protected abstract void remoteDeleteElementsMySQL(Set<R> references) throws Throwable;
 
 }

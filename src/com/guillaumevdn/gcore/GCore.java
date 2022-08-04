@@ -2,9 +2,11 @@ package com.guillaumevdn.gcore;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.plugin.Plugin;
 
 import com.guillaumevdn.gcore.command.GcoreBlockMat;
 import com.guillaumevdn.gcore.command.GcoreBlockMaterial;
+import com.guillaumevdn.gcore.command.GcoreBoardConvert;
 import com.guillaumevdn.gcore.command.GcoreBoardElementPrint;
 import com.guillaumevdn.gcore.command.GcoreExport;
 import com.guillaumevdn.gcore.command.GcoreImpl;
@@ -12,26 +14,32 @@ import com.guillaumevdn.gcore.command.GcoreItemRead;
 import com.guillaumevdn.gcore.command.GcoreItemReadChat;
 import com.guillaumevdn.gcore.command.GcoreItemReadClick;
 import com.guillaumevdn.gcore.command.GcoreNpcReset;
+import com.guillaumevdn.gcore.command.GcorePermsReset;
 import com.guillaumevdn.gcore.command.GcorePlugins;
+import com.guillaumevdn.gcore.command.GcoreBoardStringElementPrint;
 import com.guillaumevdn.gcore.data.BoardStatistics;
 import com.guillaumevdn.gcore.data.usernpcs.BoardUsersNPCs;
 import com.guillaumevdn.gcore.data.usernpcs.UserNPCs;
 import com.guillaumevdn.gcore.integration.citizens.IntegrationInstanceCitizens;
 import com.guillaumevdn.gcore.integration.deluxechat.IntegrationDeluxeChat;
-import com.guillaumevdn.gcore.integration.mythicmobs.IntegrationInstanceMythicMobs;
+import com.guillaumevdn.gcore.integration.headdatabase.IntegrationInstanceHeadDatabase;
+import com.guillaumevdn.gcore.integration.mythicmobs.v4.IntegrationInstanceMythicMobsV4;
+import com.guillaumevdn.gcore.integration.mythicmobs.v5.IntegrationInstanceMythicMobsV5;
 import com.guillaumevdn.gcore.integration.placeholderapi.IntegrationInstancePlaceholderAPI;
 import com.guillaumevdn.gcore.lib.GPlugin;
 import com.guillaumevdn.gcore.lib.chat.AwaitingChatListeners;
 import com.guillaumevdn.gcore.lib.chat.VanillaChatListeners;
-import com.guillaumevdn.gcore.lib.data.MySQLConnector;
+import com.guillaumevdn.gcore.lib.data.sql.MySQLHandler;
 import com.guillaumevdn.gcore.lib.gui.element.item.type.GUIItemTypes;
 import com.guillaumevdn.gcore.lib.integration.Integration;
 import com.guillaumevdn.gcore.lib.integration.IntegrationListeners;
 import com.guillaumevdn.gcore.lib.location.AwaitingItemListeners;
 import com.guillaumevdn.gcore.lib.location.AwaitingLocationListeners;
 import com.guillaumevdn.gcore.lib.location.position.PositionTypes;
+import com.guillaumevdn.gcore.lib.plugin.PluginUtils;
 import com.guillaumevdn.gcore.lib.serialization.Serializer;
 import com.guillaumevdn.gcore.lib.serialization.adapter.type.AdapterUserNPCs;
+import com.guillaumevdn.gcore.lib.string.StringUtils;
 import com.guillaumevdn.gcore.lib.string.TextFile;
 import com.guillaumevdn.gcore.lib.time.frame.TimeFrameTypes;
 import com.guillaumevdn.gcore.libs.com.google.gson.GsonBuilder;
@@ -41,6 +49,7 @@ import com.guillaumevdn.gcore.migration.v8_0.config.MigrationV8Config;
 import com.guillaumevdn.gcore.migration.v8_0.data.MigrationV8Data;
 import com.guillaumevdn.gcore.migration.v8_24.MigrationV8_24;
 import com.guillaumevdn.gcore.migration.v8_25.MigrationV8_25;
+import com.guillaumevdn.gcore.migration.v8_30.MigrationV8_30;
 import com.guillaumevdn.gcore.migration.v8_5.MigrationV8_5;
 import com.guillaumevdn.gcore.migration.v8_9.MigrationV8_9;
 
@@ -58,7 +67,9 @@ public final class GCore extends GPlugin<ConfigGCore, PermissionGCore> {
 				MigrationV8_5.class,
 				MigrationV8_9.class,
 				MigrationV8_24.class,
-				MigrationV8_25.class
+				MigrationV8_25.class,
+				MigrationV8_30.class
+				// __MigrationV8_36.class
 				);
 		instance = this;
 	}
@@ -83,7 +94,7 @@ public final class GCore extends GPlugin<ConfigGCore, PermissionGCore> {
 	PositionTypes positionTypes = null;
 	GUIItemTypes guiItemTypes = null;
 
-	private MySQLConnector mysqlConnector = new MySQLConnector();
+	private MySQLHandler mysqlHandler = new MySQLHandler();
 	private WorkerGCore worker;
 
 	public TimeFrameTypes getTimeFrameTypes() {
@@ -98,8 +109,8 @@ public final class GCore extends GPlugin<ConfigGCore, PermissionGCore> {
 		return guiItemTypes;
 	}
 
-	public MySQLConnector getMySQLConnector() {
-		return mysqlConnector;
+	public MySQLHandler getMySQLHandler() {
+		return mysqlHandler;
 	}
 
 	public WorkerGCore getWorler() {
@@ -122,9 +133,24 @@ public final class GCore extends GPlugin<ConfigGCore, PermissionGCore> {
 
 	@Override
 	protected void registerAndEnableIntegrations() {
+		registerAndEnableIntegration(new Integration<>(this, "HeadDatabase", IntegrationInstanceHeadDatabase.class));
+	}
+
+	@Override
+	protected void registerAndEnableIntegrationsPostConfig() {
 		registerAndEnableIntegration(new Integration<>(this, "Citizens", IntegrationInstanceCitizens.class));
-		registerAndEnableIntegration(new Integration<>(this, "MythicMobs", IntegrationInstanceMythicMobs.class));
 		registerAndEnableIntegration(new Integration<>(this, "PlaceholderAPI", IntegrationInstancePlaceholderAPI.class));
+
+		Plugin mm = PluginUtils.getPlugin("MythicMobs");
+		if (mm != null) {
+			int current = StringUtils.getUniqueVersionNumber(mm.getDescription().getVersion().split("-")[0]);
+			boolean v5 = current >= StringUtils.getUniqueVersionNumber("5.0.0");
+			if (v5) {
+				registerAndEnableIntegration(new Integration<>(this, "MythicMobs", IntegrationInstanceMythicMobsV5.class));
+			} else {
+				registerAndEnableIntegration(new Integration<>(this, "MythicMobs", IntegrationInstanceMythicMobsV4.class));
+			}
+		}
 	}
 
 	@Override
@@ -137,7 +163,7 @@ public final class GCore extends GPlugin<ConfigGCore, PermissionGCore> {
 	protected void enable() throws Throwable {
 		// avoid some class errors
 		getClassLoader().loadClass("com.guillaumevdn.gcore.lib.player.PlayerUtils");
-		getClassLoader().loadClass("com.guillaumevdn.gcore.lib.data.Query");
+		getClassLoader().loadClass("com.guillaumevdn.gcore.lib.data.sql.Query");
 		getClassLoader().loadClass("com.guillaumevdn.gcore.lib.function.ThrowableConsumer");
 
 		try {  // those occur with GCoreLegacy for some reason
@@ -149,8 +175,8 @@ public final class GCore extends GPlugin<ConfigGCore, PermissionGCore> {
 
 		// try to connect to mysql
 		try {
-			mysqlConnector.updateCanConnect();
-			if (mysqlConnector.canConnect()) {
+			mysqlHandler.updateCanConnect();
+			if (mysqlHandler.canConnect()) {
 				getMainLogger().info("Connected to MySQL");
 			}
 		} catch (Throwable exception) {
@@ -184,6 +210,7 @@ public final class GCore extends GPlugin<ConfigGCore, PermissionGCore> {
 		getMainCommand().setSubcommand(new GcorePlugins());
 		getMainCommand().setSubcommand(new GcoreExport());
 		getMainCommand().setSubcommand(new GcoreNpcReset());
+		getMainCommand().setSubcommand(new GcorePermsReset());
 		getMainCommand().setSubcommand(new GcoreItemRead());
 		getMainCommand().setSubcommand(new GcoreItemReadChat());
 		getMainCommand().setSubcommand(new GcoreItemReadClick());
@@ -191,6 +218,8 @@ public final class GCore extends GPlugin<ConfigGCore, PermissionGCore> {
 		getMainCommand().setSubcommand(new GcoreBlockMaterial());
 		getMainCommand().setSubcommand(new GcoreImpl());
 		getMainCommand().setSubcommand(new GcoreBoardElementPrint());
+		getMainCommand().setSubcommand(new GcoreBoardStringElementPrint());
+		getMainCommand().setSubcommand(new GcoreBoardConvert());
 	}
 
 	@Override

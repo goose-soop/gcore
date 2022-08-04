@@ -28,6 +28,7 @@ public class ElementDuration extends ParseableContainerElement<Long> {
 
 	protected ElementInteger time;
 	protected ElementTimeUnit unit;
+	private String rawPlaceholderValue = null;  // when the entire value is a placeholder
 
 	public ElementDuration(Element parent, String id, Need need, Integer defaultTime, TimeUnit defaultUnit, Text editorDescription) {
 		super(parent, id, need, editorDescription);
@@ -75,6 +76,7 @@ public class ElementDuration extends ParseableContainerElement<Long> {
 			time.setValue(CollectionUtils.asList("" + (milliseconds / 1000L / 60L / 60L / 24L)));
 			unit.setValue(CollectionUtils.asList(TimeUnit.DAY.name()));
 		}
+		rawPlaceholderValue = null;
 	}
 
 	// ----- load
@@ -83,9 +85,14 @@ public class ElementDuration extends ParseableContainerElement<Long> {
 		YMLConfiguration config = getSuperElement().getConfiguration();
 		String path = getConfigurationPath();
 		try {
-			String[] value = config.readString(path, "").split(" ");
+			String raw = config.readString(path, "");
+			String[] value = raw.split(" ");
 			if (value.length != 2) {
-				getSuperElement().addLoadError("Invalid " + getTypeName() + " at path " + path + ", is should be <time amount> <time unit>");
+				if (StringUtils.hasPlaceholders(raw)) {
+					rawPlaceholderValue = raw;
+				} else {
+					getSuperElement().addLoadError("Invalid " + getTypeName() + " at path " + path + ", is should be <time amount> <time unit>");
+				}
 			} else {
 				this.time.setValue(CollectionUtils.asList(value[0]));
 				this.unit.setValue(CollectionUtils.asList(value[1].toLowerCase().endsWith("s") ? value[1].substring(0, value[1].length() - 1) : value[1]));
@@ -102,15 +109,20 @@ public class ElementDuration extends ParseableContainerElement<Long> {
 	protected void doWrite() throws Throwable {
 		YMLConfiguration config = getSuperElement().getConfiguration();
 		String path = getConfigurationPath();
-		String time = this.time.getRawValueLine(0);
-		String defaultTime = this.time.getDefaultValueLine(0);
-		String unit = this.unit.getRawValueLine(0);
-		String defaultUnit = this.unit.getDefaultValueLine(0);
 
-		if ((time == null && unit == null) || (!getNeed().equals(NeedType.REQUIRED) && StringUtils.equalsIgnoreCaseNullable(time, defaultTime) && StringUtils.equalsIgnoreCaseNullable(unit, defaultUnit))) {
-			config.write(path, null);
+		if (rawPlaceholderValue != null) {
+			config.write(path, rawPlaceholderValue);
 		} else {
-			config.write(path, (time != null ? time : (defaultTime != null ? defaultTime : 1)) + " " + (unit != null ? unit : (defaultUnit != null ? defaultUnit : TimeUnit.SECOND)));
+			String time = this.time.getRawValueLine(0);
+			String defaultTime = this.time.getDefaultValueLine(0);
+			String unit = this.unit.getRawValueLine(0);
+			String defaultUnit = this.unit.getDefaultValueLine(0);
+
+			if ((time == null && unit == null) || (!getNeed().equals(NeedType.REQUIRED) && StringUtils.equalsIgnoreCaseNullable(time, defaultTime) && StringUtils.equalsIgnoreCaseNullable(unit, defaultUnit))) {
+				config.write(path, null);
+			} else {
+				config.write(path, (time != null ? time : (defaultTime != null ? defaultTime : 1)) + " " + (unit != null ? unit : (defaultUnit != null ? defaultUnit : TimeUnit.SECOND)));
+			}
 		}
 	}
 
@@ -120,6 +132,14 @@ public class ElementDuration extends ParseableContainerElement<Long> {
 		// don't contain and optional, means it's null : don't throw parsing errors
 		if (!readContains() && !isRequiredInContext() && time.getDefaultValue() == null && unit.getDefaultValue() == null) {
 			return null;
+		}
+		if (rawPlaceholderValue != null) {
+			String[] value = replacer.parse(rawPlaceholderValue).split(" ");
+			if (value.length != 2) {
+				throw new ParsingError(this, "Invalid " + getTypeName() + ", is should be <time amount> <time unit>");
+			}
+			this.time.setValue(CollectionUtils.asList(value[0]));
+			this.unit.setValue(CollectionUtils.asList(value[1].toLowerCase().endsWith("s") ? value[1].substring(0, value[1].length() - 1) : value[1]));
 		}
 		int time = this.time.parseNoCatchOrThrowParsingNull(replacer);
 		TimeUnit unit = this.unit.parseNoCatchOrThrowParsingNull(replacer);

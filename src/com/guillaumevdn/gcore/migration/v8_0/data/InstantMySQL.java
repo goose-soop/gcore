@@ -7,7 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import com.guillaumevdn.gcore.lib.GPlugin;
-import com.guillaumevdn.gcore.lib.data.Query;
+import com.guillaumevdn.gcore.lib.data.sql.Query;
 
 /**
  * @author GuillaumeVDN

@@ -16,7 +16,6 @@ import com.guillaumevdn.gcore.lib.legacy_npc.NPC;
 import com.guillaumevdn.gcore.lib.legacy_npc.NPCManager;
 import com.guillaumevdn.gcore.lib.object.NeedType;
 import com.guillaumevdn.gcore.lib.string.TextElement;
-import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
 
 /**
  * @author GuillaumeVDN
@@ -43,7 +42,7 @@ public final class GcoreNpcReset extends Subcommand {
 				if (npc != null) {
 					manager.removeNpc(target, npc);
 				}
-				BoardUsersNPCs.inst().createAndSpawnDefault(target, user, npcConfig, Replacer.of(target));
+				BoardUsersNPCs.inst().createAndSpawnDefault(target, user, npcConfig);
 				call.getSender().sendMessage("§aReset NPC " + id + " for " + target.getName());
 			}
 		});

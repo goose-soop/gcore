@@ -131,6 +131,11 @@ public abstract class BasicElement<T> extends Element implements ParseableElemen
 		return rawValue != null ? rawValue : (defaultValue != null ? defaultValue : def);
 	}
 
+	public final List<String> getRawValueOrDefaultCopy() {
+		List<String> value = getRawValueOrDefaultOr(null);
+		return value != null ? CollectionUtils.asList(value) : null;
+	}
+
 	public final String getRawValueLineOrDefault(int index) {
 		loadRawValue();
 		return rawValue != null && index < rawValue.size() ? rawValue.get(index) : (defaultValue != null && index < defaultValue.size() ? defaultValue.get(index) : null);

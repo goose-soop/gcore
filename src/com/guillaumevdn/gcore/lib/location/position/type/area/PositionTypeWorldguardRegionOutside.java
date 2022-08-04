@@ -34,8 +34,12 @@ public class PositionTypeWorldguardRegionOutside extends PositionType {
 	// ----- parse
 	@Override
 	public Position doParse(ElementPosition position, Replacer replacer) throws ParsingError {
-		WGRegion region = position.getElementAs("region", ElementWorldguardRegion.class).parseNoCatchOrThrowParsingNull(replacer);
+		ElementWorldguardRegion regionElement = position.getElementAs("region");
+		WGRegion region = regionElement.parseNoCatchOrThrowParsingNull(replacer);
 		Pair<Point, Point> bounds = WorldGuardCompat.getRegionBounds(region.getWorld(), region.getRegionId());
+		if (bounds == null || bounds.getA() == null || bounds.getB() == null) {
+			throw new ParsingError(regionElement, "no region found " + regionElement.getWorld().getRawValueLine(0) + "/" + regionElement.getRawValueLine(0));
+		}
 		return new PositionAreaOutside(bounds.getA().toLocation(), bounds.getB().toLocation());
 	}
 

@@ -64,8 +64,28 @@ public final class WorldGuardCompat {
 				if (region.justGet() == null) return null;
 				ReflectionObject regionMin = region.invokeMethod("getMinimumPoint");
 				ReflectionObject regionMax = region.invokeMethod("getMaximumPoint");
-				Point min = new Point(world.getName(), regionMin.invokeMethod("getX").get(), regionMin.invokeMethod("getY").get(), regionMin.invokeMethod("getZ").get());
-				Point max = new Point(world.getName(), regionMax.invokeMethod("getX").get(), regionMax.invokeMethod("getY").get(), regionMax.invokeMethod("getZ").get());
+
+				int minX, minY, minZ;
+				int maxX, maxY, maxZ;
+
+				if (Version.ATLEAST_1_13) {
+					minX = regionMin.invokeMethod("getX").get();
+					minY = regionMin.invokeMethod("getY").get();
+					minZ = regionMin.invokeMethod("getZ").get();
+					maxX = regionMax.invokeMethod("getX").get();
+					maxY = regionMax.invokeMethod("getY").get();
+					maxZ = regionMax.invokeMethod("getZ").get();
+				} else {
+					minX = regionMin.invokeMethod("getX").get(Double.class).intValue();
+					minY = regionMin.invokeMethod("getY").get(Double.class).intValue();
+					minZ = regionMin.invokeMethod("getZ").get(Double.class).intValue();
+					maxX = regionMax.invokeMethod("getX").get(Double.class).intValue();
+					maxY = regionMax.invokeMethod("getY").get(Double.class).intValue();
+					maxZ = regionMax.invokeMethod("getZ").get(Double.class).intValue();
+				}
+
+				Point min = new Point(world.getName(), minX, minY, minZ);
+				Point max = new Point(world.getName(), maxX, maxY, maxZ);
 				return Pair.of(min, max);
 			});
 

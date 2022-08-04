@@ -3,8 +3,6 @@ package com.guillaumevdn.gcore.lib.permission;
 import java.util.Collections;
 import java.util.Map;
 
-import javax.annotation.Nullable;
-
 import com.guillaumevdn.gcore.lib.GPlugin;
 import com.guillaumevdn.gcore.lib.collection.LowerCaseHashMap;
 
@@ -37,20 +35,12 @@ public abstract class PermissionContainer {
 
 	// ----- set
 	public final Permission setAdmin(String name) {
-		return setAdmin(name, null);
-	}
-
-	public final Permission setAdmin(String name, @Nullable String alternativeName) {
 		if (admin != null) throw new IllegalStateException();
-		return admin = set(name, alternativeName);
+		return admin = set(name);
 	}
 
 	public final Permission set(String name) {
-		return set(name, null);
-	}
-
-	public final Permission set(String name, @Nullable String alternativeName) {
-		Permission permission = new Permission(name, alternativeName);
+		Permission permission = new Permission(name);
 		permissions.put(name, permission);
 		return permission;
 	}

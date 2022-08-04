@@ -48,7 +48,8 @@ public class ArgumentInteger extends Argument<Integer> {
 	public static enum TabCompleteMode {
 
 		_1_2_3_4_5_6_7_8_9_10(CollectionUtils.asList("1", "2", "3", "4", "5", "6", "7", "8", "9", "10")),
-		_1_2_5_10(CollectionUtils.asList("1", "2", "5", "10"))
+		_1_2_5_10(CollectionUtils.asList("1", "2", "5", "10")),
+		_10_15_30_60_90_120(CollectionUtils.asList("10", "15", "30", "60", "90", "120"))
 		;
 
 		private List<String> list;

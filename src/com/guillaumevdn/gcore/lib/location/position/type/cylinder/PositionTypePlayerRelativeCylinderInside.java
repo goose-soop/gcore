@@ -39,7 +39,7 @@ public class PositionTypePlayerRelativeCylinderInside extends PositionType {
 	public Position doParse(ElementPosition position, Replacer replacer) throws ParsingError {
 		Location center = position.getElementAs("center", ElementRelativeLocation.class).parseNoCatchOrThrowParsingNull(replacer);
 		double radius = position.getElementAs("radius", ElementDouble.class).parseNoCatchOrThrowParsingNull(replacer);
-		return new PositionCylinderInside(center, radius);
+		return new PositionCylinderInside(center, radius, false);
 	}
 
 }

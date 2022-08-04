@@ -25,11 +25,11 @@ public final class MojangUtils {
 	@Nullable
 	public static UUID fetchUUID(String name) throws Throwable {
 		NameAnswer answer = jsonRequest("https://api.mojang.com/users/profiles/minecraft/" + name + "?at=" + (System.currentTimeMillis() / 1000L - 100L) + "&unsigned=false", NameAnswer.class);
-		if (answer != null && answer.trimmedUUID != null) {  // content and uuid found
+		if (answer != null && answer.id != null) {  // content and uuid found
 			StringBuilder builder = new StringBuilder(36);
-			char[] ch = answer.trimmedUUID.toCharArray();
+			char[] ch = answer.id.toCharArray();
 			for (int i = 0; i < ch.length; ++i) {
-				if (i == 8 || i == 13 || i == 18 || i == 23) {
+				if (i == 8 || i == 12 || i == 16 || i == 20) {
 					builder.append('-');
 				}
 				builder.append(ch[i]);
@@ -45,20 +45,20 @@ public final class MojangUtils {
 		String suuid = UUIDTypeAdapter.fromUUID(uuid);
 		ProfileAnswer answer = jsonRequest("https://sessionserver.mojang.com/session/minecraft/profile/" + suuid + "?unsigned=false", ProfileAnswer.class);
 		if (answer == null) return null;
-		if (answer.name == null) throw new Error("No name found");
-		if (answer.properties == null || answer.properties.isEmpty()) throw new Error("No properties found (" + suuid + ")");
+		if (answer.name == null) return null; // throw new Error("No name found");
+		if (answer.properties == null || answer.properties.isEmpty()) return null; // throw new Error("No properties found (" + suuid + ")");
 		for (ProfileProperty property : answer.properties) {
 			if (property.name.equalsIgnoreCase("textures")) {
 				// find textures
-				if (property.value == null) throw new Error("No value found in textures property (" + suuid + ")");
-				if (property.signature == null) throw new Error("No signature found in textures property (" + suuid + ")");
+				if (property.value == null) return null;  // throw new Error("No value found in textures property (" + suuid + ")");
+				if (property.signature == null) return null;  // throw new Error("No signature found in textures property (" + suuid + ")");
 				// we good
 				GameProfile profile = new GameProfile(uuid, answer.name);
 				profile.getProperties().put("textures", new Property("textures", property.value, property.signature));
 				return profile;
 			}
 		}
-		throw new Error("No textures property found (" + suuid + ")");
+		return null;  // throw new Error("No textures property found (" + suuid + ")");
 	}
 
 	@Nullable
@@ -89,7 +89,7 @@ public final class MojangUtils {
 	}
 
 	private static class NameAnswer {
-		private String trimmedUUID;
+		private String id;
 	}
 
 	private static class ProfileAnswer {

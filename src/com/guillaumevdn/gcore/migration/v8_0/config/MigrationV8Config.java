@@ -54,7 +54,7 @@ public final class MigrationV8Config extends Migration {
 
 		// make sure all .yml files can be loaded with our new parser
 		List<String> errors = new ArrayList<>();
-		attemptFilesOperation("making sure all files can be loaded by the new YAML parser", "file", BackupBehavior.RESTORE, getPluginFolder(), FILTER_YML,
+		attemptFilesOperation("making sure all files can be loaded by the new YAML parser", "file", BackupBehavior.RESTORE, getPluginFolder(), filterYMLIfNotOneOf("texts.yml"),
 				file -> {
 					try {
 						new YMLConfiguration(getPlugin(), file);
@@ -306,8 +306,14 @@ public final class MigrationV8Config extends Migration {
 	public static final ReflectionProcedureFunction<String, ReflectionObject> UNSERIALIZE_NBT = new ReflectionProcedureFunction<String, ReflectionObject>()
 			.set(serialized -> {
 				if (serialized != null) {
-					ByteArrayInputStream in = new ByteArrayInputStream(Reflection.invokeMethod(Version.ATLEAST_1_14 ? "org.bukkit.craftbukkit.libs.org.apache.commons.codec.binary.Base64" : "org.apache.commons.codec.binary.Base64", "decodeBase64", null, serialized).get(new byte[0].getClass()));
-					return Reflection.invokeNmsMethod("NBTCompressedStreamTools", "a", null, in);
+					byte[] inp;
+					try {
+						inp = Reflection.invokeMethod("org.bukkit.craftbukkit.libs.org.apache.commons.codec.binary.Base64", "decodeBase64", null, serialized).get(new byte[0].getClass());
+					} catch (Throwable ignored) {
+						inp = Reflection.invokeMethod("org.apache.commons.codec.binary.Base64", "decodeBase64", null, serialized).get(new byte[0].getClass());
+					}
+					ByteArrayInputStream in = new ByteArrayInputStream(inp);
+					return Reflection.invokeNmsMethod((Version.REMAPPED ? "nbt." : "") + "NBTCompressedStreamTools", "a", null, in);
 				}
 				return null;
 			});

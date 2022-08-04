@@ -25,7 +25,7 @@ import com.guillaumevdn.gcore.lib.compatibility.sound.Sounds;
 import com.guillaumevdn.gcore.lib.compatibility.variants.Variants;
 import com.guillaumevdn.gcore.lib.configuration.YMLConfiguration;
 import com.guillaumevdn.gcore.lib.configuration.file.YMLError;
-import com.guillaumevdn.gcore.lib.data.MySQL;
+import com.guillaumevdn.gcore.lib.data.sql.SQLConnector;
 import com.guillaumevdn.gcore.lib.economy.Currency;
 import com.guillaumevdn.gcore.lib.exception.ConfigError;
 import com.guillaumevdn.gcore.lib.file.FileUtils;
@@ -86,6 +86,8 @@ public class ConfigGCore extends GPluginConfig {
 	public static boolean ignoreInvalidElementValues;
 	public static boolean logspamItemNbt;
 	public static boolean dontCacheOfflinePlayersOnLoad;
+
+	public static long permissionCacheRetainMillis;
 
 	public static boolean mySQLPre8019;
 
@@ -233,6 +235,7 @@ public class ConfigGCore extends GPluginConfig {
 		logspamItemNbt = baseConfig.readBoolean("logspam_item_nbt", false);
 		customEventsThread = baseConfig.readEnum("custom_events_thread", BukkitThread.SYNC, BukkitThread.class);
 		dontCacheOfflinePlayersOnLoad = baseConfig.readBoolean("dont_cache_offline_players_on_load", false);
+		permissionCacheRetainMillis = baseConfig.readDurationMillis("permission_cache_retain_time", 15000L);
 		mySQLPre8019 = baseConfig.readBoolean("mysql.pre8019", true);
 
 		// data
@@ -243,7 +246,7 @@ public class ConfigGCore extends GPluginConfig {
 			String pwd = baseConfig.readMandatoryString("mysql.pass");
 			String customArgs = baseConfig.readString("mysql.args", "");
 			String url = "jdbc:mysql://" + host + "/" + name + "?allowMultiQueries=true" + customArgs;
-			GCore.inst().getMySQLConnector().setMysql(new MySQL(url, usr, pwd));
+			GCore.inst().getMySQLHandler().setConnector(new SQLConnector(url, usr, pwd));
 		}
 
 		// gui

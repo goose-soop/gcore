@@ -11,8 +11,8 @@ import org.bukkit.inventory.ItemStack;
 
 import com.guillaumevdn.gcore.ConfigGCore;
 import com.guillaumevdn.gcore.GCore;
-import com.guillaumevdn.gcore.lib.number.NumberUtils;
 import com.guillaumevdn.gcore.lib.plugin.PluginUtils;
+import com.guillaumevdn.gcore.lib.string.StringUtils;
 
 /**
  * @author GuillaumeVDN
@@ -125,7 +125,8 @@ public abstract class Currency {
 		if (formatMultiplier != 1d) {
 			amount = amount * formatMultiplier;
 		}
-		return (amount > 1d ? formatMultiple : formatSingle).replace("{amount}", NumberUtils.roundString(amount, formatDecimalPrecision));
+		return (amount > 1d ? formatMultiple : formatSingle).replace("{amount}", StringUtils.formatNumber(amount, formatDecimalPrecision));
+		//return (amount > 1d ? formatMultiple : formatSingle).replace("{amount}", NumberUtils.roundString(amount, formatDecimalPrecision));
 	}
 
 	public double get(OfflinePlayer player) {
@@ -222,5 +223,6 @@ public abstract class Currency {
 	public static final Currency PLAYER_POINTS = register(new CurrencyPlayerPoints("PLAYER_POINTS"));
 	public static final Currency TOKEN_ENCHANT = register(new CurrencyTokenEnchant("TOKEN_ENCHANT"));
 	public static final Currency XP_LEVEL = register(new CurrencyXPLevel("XP_LEVEL"));
+	public static final Currency XP = register(new CurrencyXP("XP"));
 
 }

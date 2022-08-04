@@ -15,7 +15,6 @@ public class TimeInWeek extends TimeIn {
 		this.day = day;
 	}
 
-	// ----- get
 	public DayOfWeek getDay() {
 		return day;
 	}
@@ -23,6 +22,11 @@ public class TimeInWeek extends TimeIn {
 	@Override
 	public ZonedDateTime getCurrent() {
 		return ZonedDateTime.now().with(day).withHour(hour).withMinute(minute).withSecond(0).withNano(0);
+	}
+
+	@Override
+	public ZonedDateTime getDelta(int delta) {
+		return getCurrent().plusWeeks(delta);
 	}
 
 }

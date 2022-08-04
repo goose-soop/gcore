@@ -50,7 +50,7 @@ public abstract class ElementTypableElementType<T extends TypableElementType> ex
 						parent.changeType(value);
 					}
 				} catch (ClassCastException ignored) {}
-				
+
 				// reopen GUI (that refreshes it since it's an editor GUI)
 				call.reopenGUI();
 				getSuperElement().onEditorChange(this);

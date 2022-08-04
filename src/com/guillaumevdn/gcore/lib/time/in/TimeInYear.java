@@ -1,7 +1,7 @@
 package com.guillaumevdn.gcore.lib.time.in;
 
-import java.time.ZonedDateTime;
 import java.time.Month;
+import java.time.ZonedDateTime;
 
 /**
  * @author GuillaumeVDN
@@ -17,7 +17,6 @@ public class TimeInYear extends TimeIn {
 		this.dayOfMonth = dayOfMonth;
 	}
 
-	// ----- get
 	public Month getMonth() {
 		return month;
 	}
@@ -29,6 +28,11 @@ public class TimeInYear extends TimeIn {
 	@Override
 	public ZonedDateTime getCurrent() {
 		return ZonedDateTime.now().with(month).withDayOfMonth(dayOfMonth).withHour(hour).withMinute(minute).withSecond(0).withNano(0);
+	}
+
+	@Override
+	public ZonedDateTime getDelta(int delta) {
+		return getCurrent().plusYears(delta);
 	}
 
 }

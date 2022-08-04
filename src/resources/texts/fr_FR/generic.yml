@@ -21,6 +21,7 @@ commandParameterUsageReset: réinitialiser
 commandParameterUsageOperation: opération
 commandParameterUsageAmount: montant
 commandParameterUsageSpecificEditor: éditeur
+commandParameterUsageTarget: player
 commandDescriptionGenericReload: redémarrer le plugin
 commandDescriptionGenericPluginState: informations sur l'état interne du plugin
 commandDescriptionGenericMigrate: relancer une migration

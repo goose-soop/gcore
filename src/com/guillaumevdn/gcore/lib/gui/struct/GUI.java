@@ -39,7 +39,8 @@ public class GUI {
 	// ----- options
 	public static enum Option {
 		DONT_UNREGISTER_ON_CLOSE,
-		AUTO_BACK_ITEM
+		AUTO_BACK_ITEM,
+		RAW_NAME
 	}
 
 	private static final int MAX_LENGTH = 25;
@@ -67,8 +68,15 @@ public class GUI {
 	public GUI(GPlugin plugin, String id, String name, GUIType type, List<Integer> regularItemSlots, Option... options) {
 		this.plugin = plugin;
 		this.id = id;
+		Set<Option> opts = new HashSet<>();
+		for (Option option : options) {
+			if (option != null) {
+				opts.add(option);
+			}
+		}
+		this.options = Collections.unmodifiableSet(opts);
 		String n = StringUtils.unformat(name);
-		if (n.length() > MAX_LENGTH) {
+		if (!this.options.contains(Option.RAW_NAME) && n.length() > MAX_LENGTH) {
 			/*
 			 * Faut compter les couleurs nécessaires pour arriver au cut pour que le nom qu'on a cut, unformatté, ait la même taille que le cut normal
 			 * Perso j'ai la flemme
@@ -103,13 +111,6 @@ public class GUI {
 			this.name = name;
 		}
 		this.type = type;
-		Set<Option> opts = new HashSet<>();
-		for (Option option : options) {
-			if (option != null) {
-				opts.add(option);
-			}
-		}
-		this.options = Collections.unmodifiableSet(opts);
 		this.regularItemSlots = regularItemSlots;
 		if (this.options.contains(Option.AUTO_BACK_ITEM) && type.getBackItemSlot() != -1) regularItemSlots.remove((Integer) (this.backItemSlot = type.getBackItemSlot()));
 		this.handler = ConfigGCore.allowProtocolGUIs && PluginUtils.isPluginEnabled("ProtocolLib") ? new ProtocolHandler(this) : new VanillaHandler(this);
@@ -288,9 +289,11 @@ public class GUI {
 			} else if (preferredLocation.getB() == backItemSlot) {
 				throw new IllegalArgumentException("can't set persistent item " + item.getId() + " in GUI " + getId() + ", preferred slot " + preferredLocation.getB() + " is the back item slot");
 			}
-			GUIItem existing = getPersistentItem(preferredLocation.getB());
-			if (existing != null && !existing.getId().equals(item.getId()) && (existing instanceof BorderGUIItem ? item instanceof BorderGUIItem : true)) {
-				throw new IllegalArgumentException("can't set persistent item " + item.getId() + " in GUI " + getId() + ", preferred slot " + preferredLocation.getB() + " already has persistent item " + existing.getId());
+			if (!(item instanceof BorderGUIItem /* border items will simply be skipped on these slots */)) {
+				GUIItem existing = getPersistentItem(preferredLocation.getB());
+				if (existing != null && !existing.getId().equals(item.getId()) && !(existing instanceof BorderGUIItem) /* existing border items will simply be overriden */) {
+					throw new IllegalArgumentException("can't set persistent item " + item.getId() + " in GUI " + getId() + ", preferred slot " + preferredLocation.getB() + " already has persistent item " + existing.getId());
+				}
 			}
 		}
 
@@ -310,16 +313,22 @@ public class GUI {
 		List<GUIItem> existingRegularItems = new ArrayList<>();
 		List<IntegerPair> locations = new ArrayList<>();
 		item.getPreferredLocations().forEach(preferredLocation -> {
+			// do not override item, if there's already a non-border item
+			GUIItem existingPersistent = getPersistentItem(preferredLocation.getB());
+			if (existingPersistent != null && !existingPersistent.equals(item) && !(existingPersistent instanceof BorderGUIItem)) {
+				return;
+			}
+			// set item
 			for (int pageIndex = 0; pageIndex < handler.getPageCount(); ++pageIndex) {
 				// control item
 				if ((pageIndex > 0 && preferredLocation.getB() == type.getPreviousPageItemSlot()) || (pageIndex + 1 < handler.getPageCount() && preferredLocation.getB() == type.getNextPageItemSlot()) || preferredLocation.getB() == backItemSlot) {
 					continue;
 				}
 				// remove existing regular item if any
-				GUIItem existingItem = getRegularItem(pageIndex, preferredLocation.getB());
-				if (existingItem != null) {
+				GUIItem existingRegular = getRegularItem(pageIndex, preferredLocation.getB());
+				if (existingRegular != null) {
 					handler.clearPageItem(pageIndex, preferredLocation.getB());
-					existingRegularItems.add(existingItem);
+					existingRegularItems.add(existingRegular);
 				}
 				// set item
 				handler.setPageItem(pageIndex, preferredLocation.getB(), item.getItem());
@@ -415,13 +424,21 @@ public class GUI {
 		// add persistent items
 		persistentItems.forEach((__, persistentItem) -> {
 			persistentItem.getPreferredLocations().forEach(preferredLocation -> {
-				if ((pageIndex == 0 ? true : preferredLocation.getB() != type.getPreviousPageItemSlot())) {
-					handler.setPageItem(pageIndex, preferredLocation.getB(), persistentItem.getItem());
-					// update locations
-					List<IntegerPair> locations = CollectionUtils.asList(persistentItem.getLocations());
-					locations.add(IntegerPair.of(pageIndex, preferredLocation.getB()));
-					persistentItem.setLocations(locations);
+				// do not set if it's a previous page item slot
+				if (pageIndex != 0 && preferredLocation.getB() == type.getPreviousPageItemSlot()) {
+					return;
 				}
+				// do not override item, if there's already a non-border item
+				GUIItem existingPersistent = getPersistentItem(preferredLocation.getB());
+				if (existingPersistent != null && !existingPersistent.equals(persistentItem) && !(existingPersistent instanceof BorderGUIItem)) {
+					return;
+				}
+				// set item
+				handler.setPageItem(pageIndex, preferredLocation.getB(), persistentItem.getItem());
+				// update locations
+				List<IntegerPair> locations = CollectionUtils.asList(persistentItem.getLocations());
+				locations.add(IntegerPair.of(pageIndex, preferredLocation.getB()));
+				persistentItem.setLocations(locations);
 			});
 		});
 		// update existing items

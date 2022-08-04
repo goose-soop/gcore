@@ -1,17 +1,18 @@
 package com.guillaumevdn.gcore.lib.collection;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NavigableSet;
 import java.util.Objects;
+import java.util.TreeMap;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import com.guillaumevdn.gcore.lib.object.ObjectUtils;
 
@@ -22,7 +23,8 @@ public class SortedHashMap<K, V> implements Cloneable {
 
 	private final Type type;
 	private final Order order;
-	private final Map<K, V> map = new HashMap<>();
+	private final TreeMap<K, V> map;
+	private final Map<K, V> refMap;  // only for value-sorted maps
 	private final Comparator<K> keyComparator;
 
 	public SortedHashMap(final Type type, final Order order) {
@@ -43,29 +45,40 @@ public class SortedHashMap<K, V> implements Cloneable {
 						return order.signum;
 					}
 					// compare by key
-					return order.signum * ((Comparable<K>) k1).compareTo(k2);
+					int comp = ((Comparable<K>) k1).compareTo(k2);
+					if (comp == 0) {
+						comp = k1.hashCode() - k2.hashCode();
+					}
+					return order.signum * comp;
 				}
 			};
+			refMap = null;
 		}
 		// value sorted
 		else {
+			refMap = new HashMap<>();
 			keyComparator = new Comparator<K>() {
 				@Override
 				public int compare(final K k1, final K k2) {
 					// null or not comparable
-					V v1 = map.get(k1);
+					V v1 = refMap.get(k1);
 					if (v1 == null || !(v1 instanceof Comparable<?>)) {
 						return -order.signum;
 					}
-					V v2 = map.get(k2);
+					V v2 = refMap.get(k2);
 					if (v2 == null || !(v2 instanceof Comparable<?>)) {
 						return order.signum;
 					}
 					// compare by value
-					return order.signum * ((Comparable<V>) v1).compareTo(v2);
+					int comp = ((Comparable<V>) v1).compareTo(v2);
+					if (comp == 0) {
+						comp = v1.hashCode() - v2.hashCode();
+					}
+					return order.signum * comp;
 				}
 			};
 		}
+		map = new TreeMap<>(keyComparator);
 	}
 
 	// ----- methods
@@ -82,6 +95,9 @@ public class SortedHashMap<K, V> implements Cloneable {
 	 */
 	public void clear() {
 		map.clear();
+		if (refMap != null) {
+			refMap.clear();
+		}
 	}
 
 	/**
@@ -109,6 +125,14 @@ public class SortedHashMap<K, V> implements Cloneable {
 	}
 
 	/**
+	 * @param key the key
+	 * @return the value associated with this key, or the provided value
+	 */
+	public V getOrDefault(String key, V def) {
+		return map.getOrDefault(key, def);
+	}
+
+	/**
 	 * @return true if the map is empty
 	 */
 	public boolean isEmpty() {
@@ -116,28 +140,18 @@ public class SortedHashMap<K, V> implements Cloneable {
 	}
 
 	/**
-	 * @return an immutable set of keys for this map, eventually sorted depending on this map type
+	 * @return a set of keys for this map, eventually sorted depending on this map type
 	 */
-	public List<K> keys() {
-		return keys(Function.identity());
-	}
-
-	/**
-	 * @return an immutable set of keys for this map, eventually sorted depending on this map type
-	 */
-	public <T> List<T> keys(Function<K, T> mapper) {
-		return Collections.unmodifiableList(map.keySet().stream().sorted(keyComparator).map(mapper).collect(Collectors.toList()));
+	public NavigableSet<K> keySet() {
+		return map.navigableKeySet();
 	}
 
 	/**
 	 * @return an immutable set of keys for this map, sorted and reverted depending on this map type
 	 * @throws IllegalStateException if the set isn't sorted
 	 */
-	public List<K> revertedKeySet() {
-		if (keyComparator == null) {
-			throw new IllegalStateException("map isn't sorted");
-		}
-		return Collections.unmodifiableList(CollectionUtils.asRevertSet(CollectionUtils.asSortedSet(map.keySet(), keyComparator)));
+	public List<K> copyRevertedKeySet() {
+		return CollectionUtils.asRevertSet(map.navigableKeySet());
 	}
 
 	/**
@@ -147,15 +161,26 @@ public class SortedHashMap<K, V> implements Cloneable {
 	 * @return the value previously associated with this key (a null value might mean that it was mapped with a null value, or that there was no mapping as well)
 	 */
 	public V put(K key, V value) {
-		return map.put(key, value);
+		if (refMap != null) {  // bah évidemment ça ça se met avant espèce de giga débile vu qu'on s'en sert pour sort
+			refMap.put(key, value);
+		}
+		V v = map.put(key, value);
+		return v;
 	}
 
 	public void putAll(Map<? extends K, ? extends V> putAll) {
+		if (refMap != null) {
+			refMap.putAll(putAll);
+		}
 		map.putAll(putAll);
 	}
 
 	public V computeIfAbsent(K key, Supplier<V> ifAbsent) {
-		return map.computeIfAbsent(key, __ -> ifAbsent.get());
+		if (refMap != null) {
+			refMap.computeIfAbsent(key, __ -> ifAbsent.get());
+		}
+		V v = map.computeIfAbsent(key, __ -> ifAbsent.get());
+		return v;
 	}
 
 	/**
@@ -164,7 +189,11 @@ public class SortedHashMap<K, V> implements Cloneable {
 	 * @return the value previously associated with this key (a null value might mean that it was mapped with a null value, or that there was no mapping as well)
 	 */
 	public V remove(K key) {
-		return map.remove(key);
+		V v = map.remove(key);
+		if (refMap != null) {
+			refMap.remove(key);
+		}
+		return v;
 	}
 
 	/**
@@ -175,11 +204,18 @@ public class SortedHashMap<K, V> implements Cloneable {
 	}
 
 	/**
+	 * @return a list of keys for this map, eventually sorted depending on this map type
+	 */
+	public Collection<V> values() {
+		return map.values();
+	}
+
+	/**
 	 * @return an immutable list of keys for this map, eventually sorted depending on this map type
 	 */
-	public List<V> values() {
+	public List<V> copyRevertedValues() {
 		List<V> list = new ArrayList<V>();
-		for (K k : keys()) {
+		for (K k : copyRevertedKeySet()) {
 			list.add(get(k));
 		}
 		return Collections.unmodifiableList(list);
@@ -191,7 +227,7 @@ public class SortedHashMap<K, V> implements Cloneable {
 			return "{}";
 		}
 		String str = "{ ";
-		for (K k : keys()) {
+		for (K k : keySet()) {
 			V v = get(k);
 			str += "[" + (k == null ? "null" : k.toString()) + ", " + (v == null ? "null" : v.toString()) + "], ";
 		}
@@ -216,7 +252,7 @@ public class SortedHashMap<K, V> implements Cloneable {
 			return false;
 		}
 		SortedHashMap<K, V> other = (SortedHashMap<K, V>) obj;
-		return other.type.equals(type) && other.order.equals(order) && other.keys().equals(keys());
+		return other.type.equals(type) && other.order.equals(order) && other.keySet().equals(keySet());
 	}
 
 	@Override
@@ -228,7 +264,7 @@ public class SortedHashMap<K, V> implements Cloneable {
 
 	// ----- methods
 	public K getKeyByValue(V value) {
-		for (K key : keys()) {
+		for (K key : keySet()) {
 			if (get(key).equals(value)) {
 				return key;
 			}
@@ -238,7 +274,7 @@ public class SortedHashMap<K, V> implements Cloneable {
 
 	public K getKeyAt(int index) {
 		if (index < 0 || index >= map.size()) throw new IndexOutOfBoundsException("index " + index + ", size " + map.size());
-		Iterator<K> iterator = keys().iterator();
+		Iterator<K> iterator = keySet().iterator();
 		int i = -1;
 		while (iterator.hasNext()) {
 			K key = iterator.next();
@@ -259,7 +295,7 @@ public class SortedHashMap<K, V> implements Cloneable {
 
 	public int indexOf(K key) {
 		int i = -1;
-		for (K k : keys()) {
+		for (K k : keySet()) {
 			++i;
 			if (key == null ? k == null : key.equals(k)) {
 				return i;
@@ -270,8 +306,8 @@ public class SortedHashMap<K, V> implements Cloneable {
 
 	public void forEach(BiConsumer<K, V> action) {
 		Objects.requireNonNull(action);
-		keys().forEach(key -> {
-			action.accept(key, get(key));
+		map.entrySet().forEach(entry -> {
+			action.accept(entry.getKey(), entry.getValue());
 		});
 	}
 

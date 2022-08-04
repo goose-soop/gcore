@@ -15,11 +15,12 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
-import com.guillaumevdn.gcore.lib.function.QuadriConsumer;
-import com.guillaumevdn.gcore.lib.function.ThrowableQuadriConsumer;
+import com.guillaumevdn.gcore.lib.collection.IteratorControls;
+import com.guillaumevdn.gcore.lib.function.ThrowableRunnable;
+import com.guillaumevdn.gcore.lib.function.ThrowableTriConsumer;
+import com.guillaumevdn.gcore.lib.function.TriConsumer;
 import com.guillaumevdn.gcore.lib.object.ObjectUtils;
 import com.guillaumevdn.gcore.lib.string.StringUtils;
-import com.guillaumevdn.gcore.lib.wrapper.WrapperBoolean;
 
 /**
  * Since this can remove things when reading, we need standard synchronization
@@ -48,6 +49,12 @@ public class RWWeakHashMap<K, V> extends WeakHashMap<K, V> {
 		} catch (Throwable error) {
 			throw error;
 			// throw new RuntimeException("ERROR WHILE LOCKED, thread " + Thread.currentThread().toString(), error);
+		}
+	}
+
+	public void lockThrowable(ThrowableRunnable operation) throws Throwable {
+		synchronized (this) {
+			operation.run();
 		}
 	}
 
@@ -90,34 +97,62 @@ public class RWWeakHashMap<K, V> extends WeakHashMap<K, V> {
 		});
 	}
 
-	/**
-	 * @param consumer next key, next value, remover (set to true to remove current element), breaker (set to true to stop iterating)
-	 */
-	public final void iterate(QuadriConsumer<K, V, WrapperBoolean /* remover */, WrapperBoolean /* breaker */> consumer) {
+	public final void iterate(TriConsumer<K, V, IteratorControls> consumer) {
 		try {
-			iterateOrThrow((key, value, remover, breaker) -> consumer.accept(key, value, remover, breaker));
+			iterateOrThrow((key, value, iter) -> consumer.accept(key, value, iter));
 		} catch (Throwable exception) {
 			throw new RuntimeException(exception);
 		}
 	}
 
-	public final void iterateOrThrow(ThrowableQuadriConsumer<K, V, WrapperBoolean /* remover */, WrapperBoolean /* breaker */> consumer) throws Throwable {
+	public final void iterateOrThrow(ThrowableTriConsumer<K, V, IteratorControls> consumer) throws Throwable {
 		lock(() -> {
 			Iterator<Entry<K, V>> it = super.entrySet().iterator();
-			WrapperBoolean remover = WrapperBoolean.of(false);
-			WrapperBoolean breaker = WrapperBoolean.of(false);
+			IteratorControls iter = new IteratorControls();
+			
 			while (it.hasNext()) {
 				Entry<K, V> next = it.next();
 				try {
-					consumer.accept(next.getKey(), next.getValue(), remover, breaker);
+					consumer.accept(next.getKey(), next.getValue(), iter);
 				} catch (Throwable exception) {
 					exception.printStackTrace();
 				}
-				if (remover.get()) {
+				if (iter.mustRemove()) {
 					it.remove();
-					remover.set(false);
+					iter.reset();
 				}
-				if (breaker.get()) {
+				if (iter.mustStop()) {
+					break;
+				}
+			}
+		});
+	}
+
+	public final void iterateAndModify(TriConsumer<K, V, IteratorControls> consumer) {
+		try {
+			iterateAndModifyOrThrow((key, value, iter) -> consumer.accept(key, value, iter));
+		} catch (Throwable exception) {
+			throw new RuntimeException(exception);
+		}
+	}
+
+	public final void iterateAndModifyOrThrow(ThrowableTriConsumer<K, V, IteratorControls> consumer) throws Throwable {
+		// always lock on write here
+		// if the method is called, it means we want to modify the map
+		// if this is called simultaneously and elements are removed, it would throw errors with the usual "read > write > read" process since the iterator would no longer be valid (ConcurrentModificationException)
+
+		lockThrowable(() -> {
+			Iterator<Entry<K, V>> it = super.entrySet().iterator();
+			IteratorControls iter = new IteratorControls();
+			
+			while (it.hasNext()) {
+				Entry<K, V> next = it.next();
+				consumer.accept(next.getKey(), next.getValue(), iter);
+				if (iter.mustRemove()) {
+					it.remove();
+					iter.reset();
+				}
+				if (iter.mustStop()) {
 					break;
 				}
 			}

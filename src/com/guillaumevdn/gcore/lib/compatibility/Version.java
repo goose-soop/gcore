@@ -34,6 +34,11 @@ public enum Version {
 	MC_1_17_R1(CollectionUtils.asList("1.17"), "v1_17_R1", true),
 	MC_1_17_R2(CollectionUtils.asList("1.17.1"), "v1_17_R1", true),
 
+	MC_1_18_R1(CollectionUtils.asList("1.18"), "v1_18_R1", true),
+	MC_1_18_R2(CollectionUtils.asList("1.18.2"), "v1_18_R2", true),
+
+	MC_1_19_R1(CollectionUtils.asList("1.19"), "v1_19_R1", true),
+
 	UNSUPPORTED(CollectionUtils.asList("UNSUPPORTED"), null)  // this will be used if we find a package name that's not listed above (a not yet updated newer version most likely)
 	;
 
@@ -53,6 +58,8 @@ public enum Version {
 	public static final boolean ATLEAST_1_16 = CURRENT.isMoreOrEqualsTo(MC_1_16_R1);
 	public static final boolean ATLEAST_1_17 = CURRENT.isMoreOrEqualsTo(MC_1_17_R1);
 	public static final boolean ATLEAST_1_17_1 = CURRENT.isMoreOrEqualsTo(MC_1_17_R2);
+	public static final boolean ATLEAST_1_18 = CURRENT.isMoreOrEqualsTo(MC_1_18_R1);
+	public static final boolean ATLEAST_1_19 = CURRENT.isMoreOrEqualsTo(MC_1_19_R1);
 	public static final boolean REMAPPED = CURRENT.useRemappedNMSPackages();
 
 	private List<String> names;
@@ -101,6 +108,10 @@ public enum Version {
 
 	public boolean isMoreOrEqualsTo(Version version) {
 		return compareTo(version) >= 0;
+	}
+
+	public boolean isCurrent() {
+		return equals(CURRENT);
 	}
 
 	// ----- static methods

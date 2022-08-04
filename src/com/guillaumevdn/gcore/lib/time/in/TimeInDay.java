@@ -11,10 +11,14 @@ public class TimeInDay extends TimeIn {
 		super(hour, minute);
 	}
 
-	// ----- get
 	@Override
 	public ZonedDateTime getCurrent() {
 		return ZonedDateTime.now().withHour(hour).withMinute(minute).withSecond(0).withNano(0);
+	}
+
+	@Override
+	public ZonedDateTime getDelta(int delta) {
+		return getCurrent().plusDays(delta);
 	}
 
 }

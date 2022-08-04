@@ -2,6 +2,7 @@ package com.guillaumevdn.gcore.lib.command;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.bukkit.command.CommandSender;
@@ -11,11 +12,14 @@ import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.command.argument.Arg;
 import com.guillaumevdn.gcore.lib.command.argument.Argument;
 import com.guillaumevdn.gcore.lib.command.argument.ArgumentDouble;
+import com.guillaumevdn.gcore.lib.command.argument.ArgumentDynamicFakeEnum;
 import com.guillaumevdn.gcore.lib.command.argument.ArgumentEnum;
+import com.guillaumevdn.gcore.lib.command.argument.ArgumentFakeEnum;
 import com.guillaumevdn.gcore.lib.command.argument.ArgumentFixed;
 import com.guillaumevdn.gcore.lib.command.argument.ArgumentInfinite;
 import com.guillaumevdn.gcore.lib.command.argument.ArgumentInteger;
 import com.guillaumevdn.gcore.lib.command.argument.ArgumentInteger.TabCompleteMode;
+import com.guillaumevdn.gcore.lib.command.argument.ArgumentLocalDate;
 import com.guillaumevdn.gcore.lib.command.argument.ArgumentOfflinePlayer;
 import com.guillaumevdn.gcore.lib.command.argument.ArgumentPlayer;
 import com.guillaumevdn.gcore.lib.command.argument.ArgumentString;
@@ -100,12 +104,24 @@ public abstract class Subcommand extends UsageRestriction {
 		return addArgument(new ArgumentEnum<E>(need, playerOnly, permission, usage, enumClass));
 	}
 
+	public final <E> ArgumentFakeEnum<E> addArgumentFakeEnum(NeedType need, boolean playerOnly, Permission permission, Text usage, Class<E> valueClass, List<E> values) {
+		return addArgument(new ArgumentFakeEnum<E>(need, playerOnly, permission, usage, valueClass, values));
+	}
+
+	public final <E> ArgumentDynamicFakeEnum<E> addArgumentDynamicFakeEnum(NeedType need, boolean playerOnly, Permission permission, Text usage, Class<E> valueClass, Supplier<List<E>> valuesSupplier) {
+		return addArgument(new ArgumentDynamicFakeEnum<E>(need, playerOnly, permission, usage, valueClass, valuesSupplier));
+	}
+
 	public final ArgumentInteger addArgumentInteger(NeedType need, boolean playerOnly, Permission permission, Text usage, TabCompleteMode mode) {
 		return addArgument(new ArgumentInteger(need, playerOnly, permission, usage, mode));
 	}
 
 	public final ArgumentDouble addArgumentDouble(NeedType need, boolean playerOnly, Permission permission, Text usage, TabCompleteMode mode) {
 		return addArgument(new ArgumentDouble(need, playerOnly, permission, usage, mode));
+	}
+
+	public final ArgumentLocalDate addArgumentLocalDate(NeedType need, boolean playerOnly, Permission permission, Text usage) {
+		return addArgument(new ArgumentLocalDate(need, playerOnly, permission, usage));
 	}
 
 	public final Parameter addParameter(boolean playerOnly, Permission permission, String... aliases) {

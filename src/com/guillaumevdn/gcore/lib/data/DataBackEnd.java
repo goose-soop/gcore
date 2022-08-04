@@ -5,8 +5,9 @@ package com.guillaumevdn.gcore.lib.data;
  */
 public enum DataBackEnd {
 
+	NONE,
 	JSON,
-	MYSQL,
-	NONE;
+	SQLITE,
+	MYSQL;
 
 }

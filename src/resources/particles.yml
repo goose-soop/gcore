@@ -146,6 +146,29 @@ WATER_DROP: |
   >=1.8 WATER_DROP
   ? droplet
 
+# -------------------- Uncategorized --------------------
+
+BLOCK_CRACK: |
+  <1.13 BLOCK_CRACK
+
+ITEM_CRACK: |
+  ? ITEM_CRACK
+
+BLOCK_DUST: |
+  <=1.13 BLOCK_DUST
+
+FALLING_LAVA: |
+  ? FALLING_LAVA
+
+FALLING_WATER: |
+  ? FALLING_WATER
+
+FLASH: |
+  ? FLASH
+
+LANDING_LAVA: |
+  ? LANDING_LAVA
+
 # -------------------- 1.8 --------------------
 
 BARRIER: |
@@ -258,25 +281,18 @@ FALLING_OBSIDIAN_TEAR: |
 WARPED_SPORE: |
   >=1.16 WARPED_SPORE
 
-# -------------------- Uncategorized --------------------
+# -------------------- 1.18 --------------------
 
-BLOCK_CRACK: |
-  <1.13 BLOCK_CRACK
+BLOCK_MARKER: |
+  >=1.18 BLOCK_MARKER
 
-ITEM_CRACK: |
-  ? ITEM_CRACK
+# -------------------- 1.19 --------------------
 
-BLOCK_DUST: |
-  <=1.13 BLOCK_DUST
+SCULK_CHARGE: |
+  >=1.19 SCULK_CHARGE
 
-FALLING_LAVA: |
-  ? FALLING_LAVA
+SCULK_CHARGE_POP: |
+  >=1.19 SCULK_CHARGE_POP
 
-FALLING_WATER: |
-  ? FALLING_WATER
-
-FLASH: |
-  ? FLASH
-
-LANDING_LAVA: |
-  ? LANDING_LAVA
+SCULK_SOUL: |
+  >=1.19 SCULK_SOUL

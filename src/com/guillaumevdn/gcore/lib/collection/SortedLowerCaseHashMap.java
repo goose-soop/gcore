@@ -1,16 +1,13 @@
 package com.guillaumevdn.gcore.lib.collection;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.NavigableSet;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
+import com.guillaumevdn.gcore.lib.collection.SortedHashMap.Order;
+import com.guillaumevdn.gcore.lib.collection.SortedHashMap.Type;
 import com.guillaumevdn.gcore.lib.object.ObjectUtils;
 
 /**
@@ -18,59 +15,19 @@ import com.guillaumevdn.gcore.lib.object.ObjectUtils;
  */
 public class SortedLowerCaseHashMap<V> implements Cloneable {
 
-	private final Type type;
-	private final Order order;
-	private final LowerCaseHashMap<V> map;
-	private final Comparator<String> keyComparator;
+	private final SortedHashMap<String, V> map;
 
-	public SortedLowerCaseHashMap(Type type, Order order, int initialCapacity, float loadFactor) {
-		if (type == null) throw new IllegalArgumentException("type can't be null");
-		if (order == null) throw new IllegalArgumentException("order can't be null");
-		this.type = type;
-		this.order = order;
-		this.map = new LowerCaseHashMap<>(initialCapacity, loadFactor);
-
-		// key sorted
-		if (type.equals(Type.KEY_SORTED)) {
-			keyComparator = new Comparator<String>() {
-				@Override
-				public int compare(final String k1, final String k2) {
-					// null
-					if (k1 == null) return -order.signum;
-					if (k2 == null) return order.signum;
-					// compare by key
-					return order.signum * k1.compareTo(k2);
-				}
-			};
-		}
-		// value sorted
-		else {
-			keyComparator = new Comparator<String>() {
-				@Override
-				public int compare(final String k1, final String k2) {
-					// null or not comparable
-					V v1 = map.get(k1);
-					if (v1 == null || !(v1 instanceof Comparable<?>)) {
-						return -order.signum;
-					}
-					V v2 = map.get(k2);
-					if (v2 == null || !(v2 instanceof Comparable<?>)) {
-						return order.signum;
-					}
-					// compare by value
-					return order.signum * ((Comparable<V>) v1).compareTo(v2);
-				}
-			};
-		}
+	public SortedLowerCaseHashMap(Type type, Order order) {
+		this.map = new SortedHashMap<>(type, order);
 	}
 
 	// ----- methods
 	public final Type getType() {
-		return type;
+		return map.getType();
 	}
 
 	public final Order getOrder() {
-		return order;
+		return map.getOrder();
 	}
 
 	/**
@@ -85,7 +42,7 @@ public class SortedLowerCaseHashMap<V> implements Cloneable {
 	 * @return true if the map contains a value for this key
 	 */
 	public boolean containsKey(String key) {
-		return map.containsKey(key);
+		return map.containsKey(lower(key));
 	}
 
 	/**
@@ -101,7 +58,7 @@ public class SortedLowerCaseHashMap<V> implements Cloneable {
 	 * @return the value associated with this key (a null value might mean that it's mapped with a null value, or that there's no mapping as well)
 	 */
 	public V get(String key) {
-		return map.get(key);
+		return map.get(lower(key));
 	}
 
 	/**
@@ -109,7 +66,7 @@ public class SortedLowerCaseHashMap<V> implements Cloneable {
 	 * @return the value associated with this key, or the provided value
 	 */
 	public V getOrDefault(String key, V def) {
-		return map.getOrDefault(key, def);
+		return map.getOrDefault(lower(key), def);
 	}
 
 	/**
@@ -122,26 +79,16 @@ public class SortedLowerCaseHashMap<V> implements Cloneable {
 	/**
 	 * @return an immutable set of keys for this map, eventually sorted depending on this map type
 	 */
-	public List<String> keySet() {
-		return keySet(Function.identity());
-	}
-
-	/**
-	 * @return an immutable set of keys for this map, eventually sorted depending on this map type
-	 */
-	public <T> List<T> keySet(Function<String, T> mapper) {
-		return Collections.unmodifiableList(map.keySet().stream().sorted(keyComparator).map(mapper).collect(Collectors.toList()));
+	public NavigableSet<String> keySet() {
+		return map.keySet();
 	}
 
 	/**
 	 * @return an immutable set of keys for this map, sorted and reverted depending on this map type
 	 * @throws IllegalStateException if the set isn't sorted
 	 */
-	public List<String> revertedKeySet() {
-		if (keyComparator == null) {
-			throw new IllegalStateException("map isn't sorted");
-		}
-		return Collections.unmodifiableList(CollectionUtils.asRevertSet(CollectionUtils.asSortedSet(map.keySet(), keyComparator)));
+	public List<String> copyRevertedKeySet() {
+		return map.copyRevertedKeySet();
 	}
 
 	/**
@@ -151,11 +98,11 @@ public class SortedLowerCaseHashMap<V> implements Cloneable {
 	 * @return the value previously associated with this key (a null value might mean that it was mapped with a null value, or that there was no mapping as well)
 	 */
 	public V put(String key, V value) {
-		return map.put(key, value);
+		return map.put(lower(key), value);
 	}
 
 	public void putAll(Map<String, ? extends V> putAll) {
-		map.putAll(putAll);
+		putAll.forEach((key, value) -> put(key, value));
 	}
 
 	/**
@@ -164,7 +111,7 @@ public class SortedLowerCaseHashMap<V> implements Cloneable {
 	 * @return the value previously associated with this key (a null value might mean that it was mapped with a null value, or that there was no mapping as well)
 	 */
 	public V remove(String key) {
-		return map.remove(key);
+		return map.remove(lower(key));
 	}
 
 	/**
@@ -175,50 +122,27 @@ public class SortedLowerCaseHashMap<V> implements Cloneable {
 	}
 
 	/**
-	 * @return an immutable list of keys for this map, eventually sorted depending on this map type
+	 * @return a list of keys for this map, eventually sorted depending on this map type
 	 */
-	public List<V> values() {
-		List<V> list = new ArrayList<V>();
-		for (String k : keySet()) {
-			list.add(get(k));
-		}
-		return Collections.unmodifiableList(list);
+	public Collection<V> values() {
+		return map.values();
 	}
 
 	/**
 	 * @return an immutable list of keys for this map, eventually sorted depending on this map type
 	 */
-	public List<V> revertedValues() {
-		List<V> list = new ArrayList<V>();
-		for (String k : revertedKeySet()) {
-			list.add(get(k));
-		}
-		return Collections.unmodifiableList(list);
+	public List<V> copyRevertedValues() {
+		return map.copyRevertedValues();
 	}
 
 	@Override
 	public String toString() {
-		if (isEmpty()) {
-			return "{}";
-		}
-		String str = "{ ";
-		for (String k : keySet()) {
-			V v = get(k);
-			str += "[" + (k == null ? "null" : k.toString()) + ", " + (v == null ? "null" : v.toString()) + "], ";
-		}
-		str = str.substring(0, str.length() - ", ".length()) + " }";
-		return str;
+		return map.toString();
 	}
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((keyComparator == null) ? 0 : keyComparator.hashCode());
-		result = prime * result + ((map == null) ? 0 : map.hashCode());
-		result = prime * result + ((order == null) ? 0 : order.hashCode());
-		result = prime * result + ((type == null) ? 0 : type.hashCode());
-		return result;
+		return map.hashCode();
 	}
 
 	@Override
@@ -227,108 +151,75 @@ public class SortedLowerCaseHashMap<V> implements Cloneable {
 			return false;
 		}
 		SortedLowerCaseHashMap<V> other = (SortedLowerCaseHashMap<V>) obj;
-		return other.type.equals(type) && other.order.equals(order) && other.keySet().equals(keySet());
+		return other.map.equals(map);
 	}
 
 	@Override
 	public SortedLowerCaseHashMap<V> clone() {
-		SortedLowerCaseHashMap<V> clone = new SortedLowerCaseHashMap<V>(getType(), getOrder(), size(), 1f);
+		SortedLowerCaseHashMap<V> clone = new SortedLowerCaseHashMap<V>(getType(), getOrder());
 		forEach((key, value) -> clone.put(key, value));
 		return this;
 	}
 
 	// ----- methods
 	public String getKeyByValue(V value) {
-		for (String key : keySet()) {
-			if (get(key).equals(value)) {
-				return key;
-			}
-		}
-		return null;
+		return map.getKeyByValue(value);
 	}
 
 	public String getKeyAt(int index) {
-		if (index < 0 || index >= map.size()) throw new IndexOutOfBoundsException("index " + index + ", size " + map.size());
-		Iterator<String> iterator = keySet().iterator();
-		int i = -1;
-		while (iterator.hasNext()) {
-			String key = iterator.next();
-			if (++i == index) {
-				return key;
-			}
-		}
-		return null;
+		return map.getKeyAt(index);
 	}
 
 	public V getValueAt(int index) {
-		return get(getKeyAt(index));
+		return map.getValueAt(index);
 	}
 
 	public V removeKeyAt(int index) {
-		return remove(getKeyAt(index));
+		return map.removeKeyAt(index);
 	}
 
 	public int indexOf(String key) {
-		int i = -1;
-		for (String k : keySet()) {
-			++i;
-			if (key == null ? k == null : key.equals(k)) {
-				return i;
-			}
-		}
-		return -1;
+		return map.indexOf(lower(key));
 	}
 
 	public void forEach(BiConsumer<String, V> action) {
-		Objects.requireNonNull(action);
-		keySet().forEach(key -> {
-			action.accept(key, get(key));
-		});
-	}
-
-	// ----- type enum
-	public static enum Type {
-		KEY_SORTED, VALUE_SORTED;
-	}
-
-	// ----- order enum
-	public static enum Order {
-
-		NATURAL(1),
-		REVERSE(-1);
-
-		private final int signum;
-
-		private Order(int value) {
-			this.signum = value;
-		}
-
+		map.forEach(action);
 	}
 
 	// ----- static methods
-	public static <TV> SortedLowerCaseHashMap<TV> asMap(Type type, Order order, int initialCapacity, float loadFactor, Object... objects) {
+	public static <TV> SortedLowerCaseHashMap<TV> asMap(Type type, Order order, Object... objects) {
 		if (objects.length != 0 && objects.length % 2 != 0) throw new IllegalArgumentException("size isn't a multiple of 2");
-		SortedLowerCaseHashMap<TV> map = new SortedLowerCaseHashMap<>(type, order, initialCapacity, loadFactor);
+		SortedLowerCaseHashMap<TV> map = new SortedLowerCaseHashMap<>(type, order);
 		for (int i = 0; i < objects.length; i += 2) {
 			map.put((String) objects[i], (TV) objects[i + 1]);
 		}
 		return map;
 	}
 
-	public static <TV> SortedLowerCaseHashMap<TV> keySorted(int initialCapacity, float loadFactor) {
-		return new SortedLowerCaseHashMap<>(Type.KEY_SORTED, Order.NATURAL, initialCapacity, loadFactor);
+	public static <TV> SortedLowerCaseHashMap<TV> keySorted() {
+		return new SortedLowerCaseHashMap<>(Type.KEY_SORTED, Order.NATURAL);
 	}
 
-	public static <TV> SortedLowerCaseHashMap<TV> keySortedReverse(int initialCapacity, float loadFactor) {
-		return new SortedLowerCaseHashMap<>(Type.KEY_SORTED, Order.REVERSE, initialCapacity, loadFactor);
+	public static <TV> SortedLowerCaseHashMap<TV> keySortedReverse() {
+		return new SortedLowerCaseHashMap<>(Type.KEY_SORTED, Order.REVERSE);
 	}
 
-	public static <TV> SortedLowerCaseHashMap<TV> valueSorted(int initialCapacity, float loadFactor) {
-		return new SortedLowerCaseHashMap<>(Type.VALUE_SORTED, Order.NATURAL, initialCapacity, loadFactor);
+	public static <TV> SortedLowerCaseHashMap<TV> valueSorted() {
+		return new SortedLowerCaseHashMap<>(Type.VALUE_SORTED, Order.NATURAL);
 	}
 
-	public static <TV> SortedLowerCaseHashMap<TV> valueSortedReverse(int initialCapacity, float loadFactor) {
-		return new SortedLowerCaseHashMap<>(Type.VALUE_SORTED, Order.REVERSE, initialCapacity, loadFactor);
+	public static <TV> SortedLowerCaseHashMap<TV> valueSortedReverse() {
+		return new SortedLowerCaseHashMap<>(Type.VALUE_SORTED, Order.REVERSE);
+	}
+
+	private static String lower(Object key) {
+		if (key == null) {
+			return null;
+		}
+		if (!ObjectUtils.instanceOf(key, String.class)) {
+			throw new IllegalArgumentException("key isn't a string : " + key);
+		}
+		return ((String) key).toLowerCase();
 	}
 
 }

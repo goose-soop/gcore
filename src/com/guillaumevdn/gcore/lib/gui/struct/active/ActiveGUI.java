@@ -10,11 +10,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import com.guillaumevdn.gcore.lib.GPlugin;
+import com.guillaumevdn.gcore.lib.bukkit.BukkitThread;
 import com.guillaumevdn.gcore.lib.concurrency.RWLowerCaseHashMap;
 import com.guillaumevdn.gcore.lib.gui.element.item.ElementGUIItemHolder;
 import com.guillaumevdn.gcore.lib.gui.element.item.type.GUIItemType;
 import com.guillaumevdn.gcore.lib.gui.struct.ClickCall;
 import com.guillaumevdn.gcore.lib.gui.struct.GUI;
+import com.guillaumevdn.gcore.lib.gui.struct.GUIItem;
 import com.guillaumevdn.gcore.lib.gui.struct.GUIType;
 import com.guillaumevdn.gcore.lib.number.NumberUtils;
 import com.guillaumevdn.gcore.lib.object.ObjectUtils;
@@ -28,6 +30,7 @@ public abstract class ActiveGUI extends GUI {
 	private final Replacer replacer;
 	private final RWLowerCaseHashMap<ActiveItemHolder> activeHolders = new RWLowerCaseHashMap<>(5, 1f);  // otherwise sometimes concurrent modification exception #1143
 	private final RWLowerCaseHashMap<Object> lifecycleData = new RWLowerCaseHashMap<>(1, 1f);  // this allows to store temporary values, such as interactions with player inventory slots
+	private boolean asyncInit = false;  // when building GUIs with a great amount of players heads to fetch, this avoids creating too many async threads
 
 	public ActiveGUI(GPlugin plugin, String id, String name, GUIType type, Replacer replacer, Option... options) {
 		super(plugin, id, name, type, NumberUtils.range(0, type.getSize() -1), options);
@@ -53,6 +56,10 @@ public abstract class ActiveGUI extends GUI {
 		return activeHolders.streamResultValues(str -> str.filter(active -> active.getLastItems() != null && active.getLastItems().stream().anyMatch(it -> it.isInLocation(page, slot))).findAny().orElse(null));
 	}
 
+	protected void setAsyncInit() {
+		this.asyncInit = true;
+	}
+
 	// ----- lifecycle
 
 	// fill starts a new GUI lifecycle (initialize or refill)
@@ -66,8 +73,12 @@ public abstract class ActiveGUI extends GUI {
 		activeHolders.clear();
 		getContents().forEach(holder -> {
 			ActiveItemHolder active = holder.newActive(this);
-			active.init();
 			activeHolders.put(holder.getId(), active);
+		});
+
+		// init holders
+		(asyncInit ? BukkitThread.ASYNC : BukkitThread.current()).operate(getPlugin(), () -> {
+			activeHolders.forEach((__, active) -> active.init());
 		});
 
 		return true;
@@ -80,10 +91,13 @@ public abstract class ActiveGUI extends GUI {
 	}
 
 	public final void directRemove(ItemHolder holder) {  // called in some GUIs, such as GUIs that remove elements dynamically when the player does actions ; to avoid refreshing the whole thing
-		ActiveItemHolder active = activeHolders.remove(holder.getId());
+		final ActiveItemHolder active = activeHolders.remove(holder.getId());
 		if (active != null) {
-			boolean persistent = holder.parsePersistent(this);
-			active.getLastItems().forEach(item -> removeItem(item, persistent));
+			final Collection<? extends GUIItem> last = active.getLastItems();
+			if (last != null) {
+				boolean persistent = holder.parsePersistent(this);
+				last.forEach(item -> removeItem(item, persistent));
+			}
 		}
 	}
 
@@ -148,9 +162,9 @@ public abstract class ActiveGUI extends GUI {
 
 	@Override
 	public void onPlayerInventoryClick(ClickCall call, ItemStack item) {
-		activeHolders.iterateAndModify((__, active, remover, breaker) -> {
+		activeHolders.iterateAndModify((__, active, iter) -> {
 			if (active.onPlayerInventoryClick(call, item)) {
-				breaker.set(true);
+				iter.stop();
 			}
 		});
 	}

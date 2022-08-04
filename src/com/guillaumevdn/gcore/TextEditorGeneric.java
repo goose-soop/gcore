@@ -49,6 +49,7 @@ public enum TextEditorGeneric implements TextEnumElement {
 
 	// ----- item
 	descriptionItemType,
+	descriptionItemTypeHDB,
 	descriptionItemDurability,
 	descriptionItemAmount,
 	descriptionItemUnbreakable,
@@ -138,6 +139,7 @@ public enum TextEditorGeneric implements TextEnumElement {
 	descriptionPositionTypeWorld,
 	descriptionPositionTypeBiomes,
 	descriptionPositionTypeSingleLocation,
+	descriptionPositionTypeSingleRandomLocations,
 	descriptionPositionTypeRelativeSingleLocation,
 	descriptionPositionTypePointTolerance,
 

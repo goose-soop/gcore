@@ -172,10 +172,14 @@ public class ElementNotify extends ContainerElement {
 	}
 
 	public void sendAll(Collection<Player> players, Replacer replacer, @Nullable Location soundLocation) {
+		sendAll(players, replacer, soundLocation, null);
+	}
+
+	public void sendAll(Collection<Player> players, Replacer replacer, @Nullable Location soundLocation, @Nullable Double forceBossbarProgress) {
 		if (!readContains()) return;
 		sendMessage(players, replacer);
 		sendActionbar(players, replacer);
-		sendBossbar(players, replacer);
+		sendBossbar(players, replacer, null, forceBossbarProgress, null);
 		sendTitle(players, replacer);
 		playSound(players, replacer, soundLocation);
 	}
@@ -237,7 +241,6 @@ public class ElementNotify extends ContainerElement {
 		directParseAndIfPresentDo("bossbar", "bossbar_color", "bossbar_style", "bossbar_flags", replacer, (String bossbar, BossbarColor color, BossbarStyle style, List<BossbarFlag> flags) -> {
 			players.forEach(player -> {
 				Long bossbarDurationMillis = forceDurationMillis != null ? forceDurationMillis : this.bossbarDuration.parse(replacer).orNull();
-
 
 				// already active, simply update parameters to avoid the ugly unregister/register animation
 				Bossbar instance = lastBossbars.remove(player);

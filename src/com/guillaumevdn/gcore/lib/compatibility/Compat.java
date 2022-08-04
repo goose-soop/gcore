@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
@@ -97,6 +98,12 @@ public final class Compat {
 			.setIf(Version.IS_1_7, (players, json) -> {
 				Object component = Reflection.invokeNmsMethod("ChatSerializer", "a", null, json).get();
 				Reflection.sendNmsPacket(players, "PacketPlayOutChat", component);
+			})
+			.orIf(Version.ATLEAST_1_19, (players, json) -> {
+				// TODO : find a cooler packet solution with new encryption system
+				for (Player pl : players) {
+					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tellraw " + pl.getName() + " " + json);
+				}
 			})
 			.orIf(Version.ATLEAST_1_17, (players, json) -> {
 				ReflectionEnum messageTypeEnum = Reflection.getNmsEnum("network.chat.ChatMessageType");

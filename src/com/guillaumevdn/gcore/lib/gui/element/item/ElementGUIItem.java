@@ -99,16 +99,22 @@ public class ElementGUIItem extends TypableContainerElement<GUIItemType> {
 	}
 
 	public List<IntegerPair> parseLocations(Replacer replacer) {
+		return parseLocations(locations.parse(replacer).orEmptyList());
+	}
+
+	public static List<IntegerPair> parseLocations(List<String> raw) {
 		List<IntegerPair> result = new ArrayList<>();
-		for (String location : locations.parse(replacer).orEmptyList()) {
-			try {
-				String[] split = location.split(",");
-				if (split.length == 1) {
-					result.add(IntegerPair.of(-1, Integer.parseInt(split[0])));
-				} else if (split.length == 2) {
-					result.add(IntegerPair.of(Integer.parseInt(split[0]), Integer.parseInt(split[1])));
-				}
-			} catch (Throwable ignored) {}
+		if (raw != null) {
+			for (String location : raw) {
+				try {
+					String[] split = location.split(",");
+					if (split.length == 1) {
+						result.add(IntegerPair.of(-1, Integer.parseInt(split[0])));
+					} else if (split.length == 2) {
+						result.add(IntegerPair.of(Integer.parseInt(split[0]), Integer.parseInt(split[1])));
+					}
+				} catch (Throwable ignored) {}
+			}
 		}
 		return result;
 	}

@@ -751,51 +751,52 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 	}
 
 	private boolean readTexts(String langId) throws Throwable {
-		File defaultFolder = getDefaultTextsFolder();
-		File langFolder = new File(getDataFolder() + "/texts/" + langId);
+		final File defaultFolder = getDefaultTextsFolder();
+		final File langFolder = new File(getDataFolder() + "/texts/" + langId);
 		Bukkit.getConsoleSender().sendMessage("§a[" + getName() + "-" + getDescription().getVersion() + "] Loading texts...");
 		try {
-			if (langFolder.isDirectory()) {
-				textFiles.forEachThrowable((String __, TextFile<?> textFile) -> {
-					// read file
-					File langFile = new File(langFolder + "/" + textFile.getFilePath());
-					LowerCaseHashMap<List<String>> texts = readTextsFromFile(textFile.getValues().keySet(), langFile);
-					// mark texts as loaded and get missing texts to add to file
-					LowerCaseHashMap<Text> missing = new LowerCaseHashMap<>(10, 0.75f);
-					Set<String> missingDisplay = new HashSet<>();
-					for (String textId : textFile.getValues().keySet()) {
-						Text text = textFile.getValues().get(textId);
-						List<String> loadedLines = texts.get(textId);
-						if (loadedLines != null) {
-							text.setLines(loadedLines);
+			textFiles.forEachThrowable((String __, TextFile<?> textFile) -> {
+				// read file
+				final File langFile = new File(langFolder + "/" + textFile.getFilePath());
+				final LowerCaseHashMap<List<String>> texts = readTextsFromFile(textFile.getValues().keySet(), langFile);
+
+				// mark texts as loaded and get missing texts to add to file
+				final LowerCaseHashMap<Text> missing = new LowerCaseHashMap<>(10, 0.75f);
+				final Set<String> missingDisplay = new HashSet<>();
+				for (String textId : textFile.getValues().keySet()) {
+					final Text text = textFile.getValues().get(textId);
+					final List<String> loadedLines = texts.get(textId);
+					if (loadedLines != null) {
+						text.setLines(loadedLines);
+					} else {
+						missing.put(textId, text);
+						missingDisplay.add(textId);
+					}
+				}
+
+				// load missing texts
+				if (!missing.isEmpty()) {
+					// read missing texts from defaults (lang + en_US)
+					final File defaultFile = new File(defaultFolder + "/" + langId + "/" + textFile.getFilePath());
+					final File defaultFileEng = new File(defaultFolder + "/en_US/" + textFile.getFilePath());
+					final LowerCaseHashMap<List<String>> missingTexts = readTextsFromFile(missing.keySet(), defaultFile);
+					final LowerCaseHashMap<List<String>> missingTextsEng = readTextsFromFile(missing.keySet(), defaultFileEng);
+
+					// load default texts
+					missing.forEach((textId, text) -> {
+						final List<String> lines = missingTexts.getOrDefault(textId, missingTextsEng.get(textId));
+						if (lines != null) {
+							text.setLines(lines);
 						} else {
-							missing.put(textId, text);
-							missingDisplay.add(textId);
+							mainLogger.warning("Text " + textId + " doesn't exist in default files (not even in english)");
 						}
-					}
-					// load missing texts
-					if (!missing.isEmpty()) {
-						// read missing texts from file
-						String defaultLang = langId;
-						File defaultFile = new File(defaultFolder + "/" + defaultLang + "/" + textFile.getFilePath());
-						if (!defaultFile.exists()) {
-							defaultFile = new File(defaultFolder + "/" + (defaultLang = "en_US") + "/" + textFile.getFilePath());
-						}
-						if (defaultFile.exists()) {
-							// load default texts
-							LowerCaseHashMap<List<String>> missingTexts = readTextsFromFile(missing.keySet(), defaultFile);
-							if (!missingTexts.isEmpty()) {
-								missingTexts.forEach((missingTextId, defaultLines) -> {
-									Text text = missing.get(missingTextId);
-									text.setLines(defaultLines);
-								});
-							}
-							// log
-							mainLogger.warning("Loaded " + StringUtils.pluralizeAmountDesc("missing text", missing.size()) + " from default lang " + defaultLang + " for " + textFile.getFilePath() + (textFile.getFilePath().contains("editor") && ConfigGCore.dontLogMissingEditorTexts ? "" : " : " + StringUtils.toTextString(", ", missingDisplay)));
-						}
-					}
-				});
-			}
+					});
+
+					// log
+					mainLogger.warning("Loaded " + StringUtils.pluralizeAmountDesc("missing text", missing.size()) + " from default lang for " + textFile.getFilePath() + (textFile.getFilePath().contains("editor") && ConfigGCore.dontLogMissingEditorTexts ? "" : " : " + StringUtils.toTextString(", ", missingDisplay)));
+				}
+			});
+
 			return true;
 		} catch (Throwable exception) {
 			YMLError causeYML = ObjectUtils.findCauseOrNull(exception, YMLError.class);

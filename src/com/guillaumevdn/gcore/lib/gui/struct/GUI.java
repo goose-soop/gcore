@@ -1,7 +1,6 @@
 package com.guillaumevdn.gcore.lib.gui.struct;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -74,7 +73,7 @@ public class GUI {
 				opts.add(option);
 			}
 		}
-		this.options = Collections.unmodifiableSet(opts);
+		this.options = opts; // Collections.unmodifiableSet(opts);
 		String n = StringUtils.unformat(name);
 		if (!this.options.contains(Option.RAW_NAME) && n.length() > MAX_LENGTH) {
 			/*

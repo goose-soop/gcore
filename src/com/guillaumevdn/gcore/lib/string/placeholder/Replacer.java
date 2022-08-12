@@ -33,7 +33,7 @@ public interface Replacer {
 				string = data.getCustom().apply(string);
 			}
 			if (StringUtils.hasPlaceholders(string)) {
-				string = PlaceholderReplacer.parseAll(string, data.getPlayer(), true /* silence math errors anyways first */);
+				string = PlaceholderReplacer.parseAll(string, data.getPlayer(), true /* always silence math errors at first try */);
 			}
 			if (data.getCustom() != null && StringUtils.hasPlaceholders(string)) {
 				string = data.getCustom().apply(string);

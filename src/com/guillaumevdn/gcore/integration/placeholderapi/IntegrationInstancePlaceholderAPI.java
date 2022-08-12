@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.lib.integration.Integration;
 import com.guillaumevdn.gcore.lib.integration.IntegrationInstance;
+import com.guillaumevdn.gcore.lib.string.StringUtils;
 
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.clip.placeholderapi.PlaceholderAPIPlugin;
@@ -46,7 +47,7 @@ public class IntegrationInstancePlaceholderAPI extends IntegrationInstance {
 
 	// ----- utils
 	public String parse(Player player, String string) {
-		return PlaceholderAPI.setPlaceholders(player, string);
+		return StringUtils.format(PlaceholderAPI.setPlaceholders(player, string));
 	}
 
 }

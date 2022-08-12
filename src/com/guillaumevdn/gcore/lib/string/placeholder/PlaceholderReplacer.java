@@ -133,7 +133,7 @@ public class PlaceholderReplacer implements Comparable<PlaceholderReplacer> {
 
 		// placeholderAPI
 		if (StringUtils.hasPercentagePlaceholders(line) && player != null) {  // #2749 no longer parse PAPI without a player ; when player is null, some placeholder expansions return "" instead of null as they should, which removes the placeholder completely
-			Integration integration = GCore.inst().getIntegration("PlaceholderAPI");
+			final Integration integration = GCore.inst().getIntegration("PlaceholderAPI");
 			if (integration.getInstance() != null) {
 				line = ((com.guillaumevdn.gcore.integration.placeholderapi.IntegrationInstancePlaceholderAPI) integration.getInstance()).parse(player, line);
 			}

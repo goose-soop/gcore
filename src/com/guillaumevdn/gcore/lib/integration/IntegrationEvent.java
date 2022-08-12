@@ -61,16 +61,18 @@ public class IntegrationEvent<T extends Event> {
 
 	// ----- listener
 	private Listener listener = null;
-	
+
 	public void registerListener() {
 		unregisterListener();
 		Bukkit.getPluginManager().registerEvent(eventClass, listener = new Listener() {}, priority, new EventExecutor() {
 			@Override
 			public void execute(Listener listener, Event evt) throws EventException {
-				T event = (T) evt;
-				if (event != null) {
-					performer.accept(event);
-				}
+				try {
+					T event = (T) evt;
+					if (event != null) {
+						performer.accept(event);
+					}
+				} catch (ClassCastException ignored) {}  // seems to happen sometimes even though I asked for a class ? https://pastebin.com/raw/Lnsuv5QB
 			}
 		}, integration.getIntegration().getPlugin());
 	}

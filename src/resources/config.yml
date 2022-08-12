@@ -210,7 +210,7 @@ logspam_item_nbt: false
 custom_events_thread: SYNC
 
 # Permission cache retain time
-permission_cache_retain_time: 15 SECOND
+permission_cache_retain_time: 10 SECOND
 
 # Use this to force the plugin to use a specific version of Spigot
 #force_server_version: MC_1_12_R1

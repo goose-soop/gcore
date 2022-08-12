@@ -714,12 +714,24 @@ public class YMLConfiguration {
 		return duration.directParseOrElse(Replacer.GENERIC, def);
 	}
 
+	public int readDurationTicks(String path) {
+		return readDurationTicks(path, 0L);
+	}
+
+	public int readDurationTicks(String path, long def) {
+		return (int) (readDurationMillis(path, def) / 50L);
+	}
+
 	public List<PotionEffect> readPotionEffectList(String path) {
 		return readElement(path, (FakeConfigSuperElement parent, String id) -> new ElementPotionEffectList(parent, id, Need.optional(), null)).parse(Replacer.GENERIC).orEmptyList();
 	}
 
 	public ElementNotify readNotify(String path) {
 		return readElement(path, ElementNotify.class);
+	}
+
+	public ElementNotify readNotify(String path, String id) {
+		return readElement(path, id, ElementNotify.class);
 	}
 
 	public <T extends Element> T readElement(String path, Class<T> elementClass) {

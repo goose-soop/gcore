@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.gui.ItemFlag;
 import com.guillaumevdn.gcore.lib.object.ObjectUtils;
@@ -101,9 +102,11 @@ public final class Compat {
 			})
 			.orIf(Version.ATLEAST_1_19, (players, json) -> {
 				// TODO : find a cooler packet solution with new encryption system
-				for (Player pl : players) {
-					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tellraw " + pl.getName() + " " + json);
-				}
+				GCore.inst().operateSync(() -> {
+					for (Player pl : players) {
+						Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tellraw " + pl.getName() + " " + json);
+					}
+				});
 			})
 			.orIf(Version.ATLEAST_1_17, (players, json) -> {
 				ReflectionEnum messageTypeEnum = Reflection.getNmsEnum("network.chat.ChatMessageType");

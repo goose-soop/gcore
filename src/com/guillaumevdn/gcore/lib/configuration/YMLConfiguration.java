@@ -24,6 +24,7 @@ import com.guillaumevdn.gcore.lib.element.type.container.ElementNotify;
 import com.guillaumevdn.gcore.lib.element.type.list.ElementPotionEffectList;
 import com.guillaumevdn.gcore.lib.exception.ConfigError;
 import com.guillaumevdn.gcore.lib.number.NumberUtils;
+import com.guillaumevdn.gcore.lib.permission.Permission;
 import com.guillaumevdn.gcore.lib.reflection.Reflection;
 import com.guillaumevdn.gcore.lib.serialization.Serializer;
 import com.guillaumevdn.gcore.lib.serialization.adapter.type.AdapterItemStack;
@@ -859,6 +860,15 @@ public class YMLConfiguration {
 
 	public Location readMandatoryLocation(String path) {
 		return readMandatoryValue(path, Serializer.LOCATION);
+	}
+
+	// ----- get permission
+	public Permission readPermission(String path, Permission def) {
+		return readValue(path, def, Serializer.PERMISSION);
+	}
+
+	public Permission readMandatoryPermission(String path) {
+		return readMandatoryValue(path, Serializer.PERMISSION);
 	}
 
 	// ----- set

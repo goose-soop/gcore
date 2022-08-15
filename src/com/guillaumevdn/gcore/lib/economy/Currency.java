@@ -11,6 +11,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.guillaumevdn.gcore.ConfigGCore;
 import com.guillaumevdn.gcore.GCore;
+import com.guillaumevdn.gcore.TextGeneric;
 import com.guillaumevdn.gcore.lib.plugin.PluginUtils;
 import com.guillaumevdn.gcore.lib.string.StringUtils;
 
@@ -141,6 +142,20 @@ public abstract class Currency {
 			return 0d;
 		}
 
+	}
+
+	public boolean ensureHas(OfflinePlayer player, double amount, boolean notify) {
+		final double balance = get(player);
+		if (balance >= amount) {
+			return true;
+		}
+		if (notify) {
+			TextGeneric.messageMustHaveCurrency
+			.replace("{balance}", () -> format(balance))
+			.replace("{money}", () -> format(amount))
+			.send(player);
+		}
+		return false;
 	}
 
 	public boolean give(OfflinePlayer player, double amount) {

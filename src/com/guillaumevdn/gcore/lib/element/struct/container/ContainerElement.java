@@ -30,6 +30,7 @@ import com.guillaumevdn.gcore.lib.element.type.basic.ElementChancePercentage;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementClickType;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementColor;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementColorList;
+import com.guillaumevdn.gcore.lib.element.type.basic.ElementCommandList;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementComparisonType;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementConfigSection;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementCurrency;
@@ -93,6 +94,7 @@ import com.guillaumevdn.gcore.lib.element.type.container.ElementFireworkEffect;
 import com.guillaumevdn.gcore.lib.element.type.container.ElementItem;
 import com.guillaumevdn.gcore.lib.element.type.container.ElementItemMode;
 import com.guillaumevdn.gcore.lib.element.type.container.ElementItemsNeeded;
+import com.guillaumevdn.gcore.lib.element.type.container.ElementMatRestriction;
 import com.guillaumevdn.gcore.lib.element.type.container.ElementNotify;
 import com.guillaumevdn.gcore.lib.element.type.container.ElementPotionEffect;
 import com.guillaumevdn.gcore.lib.element.type.container.ElementRelativeLocation;
@@ -438,6 +440,8 @@ public abstract class ContainerElement extends AbstractMapElement<String, Elemen
 	public final ElementColor addColor(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementColor(this, id, need, editorDescription)); }
 	public final ElementColorList addColorList(String id, Need need, Text editorDescription) { return add(new ElementColorList(this, id, need, editorDescription)); }
 	public final ElementColorList addColorList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementColorList(this, id, need, editorDescription)); }
+	public final ElementCommandList addCommandList(String id, Need need, Text editorDescription) { return add(new ElementCommandList(this, id, need, editorDescription)); }
+	public final ElementCommandList addCommandList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementCommandList(this, id, need, editorDescription)); }
 	public final ElementCommandRestriction addCommandRestriction(String id, Need need, Text editorDescription) { return add(new ElementCommandRestriction(this, id, need, editorDescription)); }
 	public final ElementCommandRestriction addCommandRestriction(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementCommandRestriction(this, id, need, editorDescription)); }
 	public final ElementComparisonType addComparisonType(String id, Need need, Text editorDescription) { return add(new ElementComparisonType(this, id, need, editorDescription)); }
@@ -556,6 +560,8 @@ public abstract class ContainerElement extends AbstractMapElement<String, Elemen
 	public final ElementMat addMat(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementMat(this, id, need, editorDescription)); }
 	public final ElementMatList addMatList(String id, Need need, Text editorDescription) { return add(new ElementMatList(this, id, need, editorDescription)); }
 	public final ElementMatList addMatList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementMatList(this, id, need, editorDescription)); }
+	public final ElementMatRestriction addMatRestriction(String id, Need need, Text editorDescription) { return add(new ElementMatRestriction(this, id, need, editorDescription)); }
+	public final ElementMatRestriction addMatRestriction(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementMatRestriction(this, id, need, editorDescription)); }
 	public final ElementMonth addMonth(String id, Need need, Text editorDescription) { return add(new ElementMonth(this, id, need, editorDescription)); }
 	public final ElementMonth addMonth(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementMonth(this, id, need, editorDescription)); }
 	public final ElementParticle addParticle(String id, Need need, Text editorDescription) { return add(new ElementParticle(this, id, need, editorDescription)); }

@@ -788,7 +788,7 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 						if (lines != null) {
 							text.setLines(lines);
 						} else {
-							mainLogger.warning("Text " + textId + " doesn't exist in default files (not even in english)");
+							mainLogger.warning("Text " + textId + " doesn't exist in default files (not even in en_US)");
 						}
 					});
 

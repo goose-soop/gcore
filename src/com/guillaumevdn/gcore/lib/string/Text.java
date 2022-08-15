@@ -3,9 +3,11 @@ package com.guillaumevdn.gcore.lib.string;
 import java.util.List;
 import java.util.function.Supplier;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.player.PlayerUtils;
 import com.guillaumevdn.gcore.lib.string.placeholder.CustomMatcher;
 import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
@@ -60,6 +62,10 @@ public interface Text {
 
 	default void send(Object target, CommandSender cc, boolean onlyCC) {
 		parseLines().forEach(line -> PlayerUtils.sendMessage(target, line, cc, onlyCC));
+	}
+
+	default void broadcast() {
+		send(CollectionUtils.asListMultiple(CommandSender.class, PlayerUtils.getOnline(), Bukkit.getConsoleSender()));
 	}
 
 	// ----- replace and parse/send directly
@@ -127,6 +133,10 @@ public interface Text {
 
 		public void send(Object target, CommandSender cc, boolean onlyCC) {
 			parseLines().forEach(line -> PlayerUtils.sendMessage(target, line, cc, onlyCC));
+		}
+
+		public void broadcast() {
+			send(CollectionUtils.asListMultiple(CommandSender.class, PlayerUtils.getOnline(), Bukkit.getConsoleSender()));
 		}
 
 	}

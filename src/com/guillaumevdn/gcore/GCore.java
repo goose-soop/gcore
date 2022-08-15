@@ -8,6 +8,8 @@ import com.guillaumevdn.gcore.command.GcoreBlockMat;
 import com.guillaumevdn.gcore.command.GcoreBlockMaterial;
 import com.guillaumevdn.gcore.command.GcoreBoardConvert;
 import com.guillaumevdn.gcore.command.GcoreBoardElementPrint;
+import com.guillaumevdn.gcore.command.GcoreBoardStringElementPrint;
+import com.guillaumevdn.gcore.command.GcoreBoardUUIDElementPrint;
 import com.guillaumevdn.gcore.command.GcoreExport;
 import com.guillaumevdn.gcore.command.GcoreImpl;
 import com.guillaumevdn.gcore.command.GcoreItemRead;
@@ -16,7 +18,6 @@ import com.guillaumevdn.gcore.command.GcoreItemReadClick;
 import com.guillaumevdn.gcore.command.GcoreNpcReset;
 import com.guillaumevdn.gcore.command.GcorePermsReset;
 import com.guillaumevdn.gcore.command.GcorePlugins;
-import com.guillaumevdn.gcore.command.GcoreBoardStringElementPrint;
 import com.guillaumevdn.gcore.data.BoardStatistics;
 import com.guillaumevdn.gcore.data.usernpcs.BoardUsersNPCs;
 import com.guillaumevdn.gcore.data.usernpcs.UserNPCs;
@@ -219,6 +220,7 @@ public final class GCore extends GPlugin<ConfigGCore, PermissionGCore> {
 		getMainCommand().setSubcommand(new GcoreImpl());
 		getMainCommand().setSubcommand(new GcoreBoardElementPrint());
 		getMainCommand().setSubcommand(new GcoreBoardStringElementPrint());
+		getMainCommand().setSubcommand(new GcoreBoardUUIDElementPrint());
 		getMainCommand().setSubcommand(new GcoreBoardConvert());
 	}
 

@@ -390,6 +390,14 @@ descriptionCommandRestrictionWhitelist: |
 descriptionCommandRestrictionBlacklist: |
   &7A list of commands that will always be forbidden
 
+# -------------------- Command restriction --------------------
+
+descriptionMatRestrictionWhitelist: |
+  &7To have a fixed list of allowed materials
+
+descriptionMatRestrictionBlacklist: |
+  &7A list of materials that will always be forbidden
+
 # -------------------- Dynmap marker --------------------
 
 descriptionDynmapMarkerLocation: |

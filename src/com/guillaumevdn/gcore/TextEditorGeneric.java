@@ -168,6 +168,10 @@ public enum TextEditorGeneric implements TextEnumElement {
 	descriptionCommandRestrictionWhitelist,
 	descriptionCommandRestrictionBlacklist,
 
+	// ----- mat restriction
+	descriptionMatRestrictionWhitelist,
+	descriptionMatRestrictionBlacklist,
+
 	// ----- dynmap marker
 	descriptionDynmapMarkerLocation,
 	descriptionDynmapMarkerText,

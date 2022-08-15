@@ -102,6 +102,16 @@ public final class NumberUtils {
 		return format.format(value).replace(',', '.');  // happens sometimes for some reason, wrong locale maybe
 	}
 
+	public static String roundStringFillZerosRight(double value, int places) {
+		String format = roundString(value, places);
+		final String[] split = format.split("\\.");
+		if (split.length <= 1) {
+			return split[0] + "." + StringUtils.repeatString("0", places);
+		} else {
+			return format + StringUtils.repeatString("0", places - split[1].length());
+		}
+	}
+
 	// ----- float
 	public static Float floatOrNull(Object raw) {
 		try {

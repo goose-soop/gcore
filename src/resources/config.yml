@@ -173,6 +173,7 @@ unknown_placeholder_result: '/'
 # Number formatting
 number_formatting_decimals: 2
 number_formatting_separate_thousands: ','
+number_formatting_separate_thousands_start_at: 1000
 number_formatting_big_numbers: true # turns 10,000,000 into "10 million", for instance
 
 # Console log levels colors

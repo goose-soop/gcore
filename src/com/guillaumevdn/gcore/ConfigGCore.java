@@ -1,6 +1,7 @@
 package com.guillaumevdn.gcore;
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -74,6 +75,7 @@ public class ConfigGCore extends GPluginConfig {
 
 	public static int numberFormattingDecimals;
 	public static String numberFormattingSeparateThousands;
+	public static BigDecimal numberFormattingSeparateThousandsStartAt;
 	public static boolean numberFormattingBigNumbers;
 
 	public static BukkitThread customEventsThread;
@@ -213,6 +215,7 @@ public class ConfigGCore extends GPluginConfig {
 		numberFormattingDecimals = baseConfig.readMandatoryInteger("number_formatting_decimals");
 		numberFormattingSeparateThousands = baseConfig.readString("number_formatting_separate_thousands", "");
 		if (numberFormattingSeparateThousands.isEmpty()) numberFormattingSeparateThousands = null;
+		numberFormattingSeparateThousandsStartAt = BigDecimal.valueOf(baseConfig.readLong("number_formatting_separate_thousands_start_at", 1000L));
 		numberFormattingBigNumbers = baseConfig.readBoolean("number_formatting_big_numbers", false);
 		baseConfig.readKeysForSection("console_log_level_colors").forEach(key -> {
 			LogLevel level = ObjectUtils.safeValueOf(key, LogLevel.class);

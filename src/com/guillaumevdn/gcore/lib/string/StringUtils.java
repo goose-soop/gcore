@@ -255,6 +255,7 @@ public final class StringUtils {
 		try {
 			String[] split = new BigDecimal(Math.abs(number)).setScale(forceFormattingDecimals != null ? forceFormattingDecimals : ConfigGCore.numberFormattingDecimals, RoundingMode.HALF_DOWN).toPlainString().split("\\.");
 			BigDecimal integer = new BigDecimal(split[0]);
+
 			// big numbers
 			String suffix = "";
 			if (ConfigGCore.numberFormattingBigNumbers) {
@@ -269,9 +270,10 @@ public final class StringUtils {
 					integer = integer.divide(MILLION);
 				}
 			}
+
 			// separate thousands
 			String integerFormat = integer.toPlainString();
-			if (ConfigGCore.numberFormattingSeparateThousands != null) {
+			if (ConfigGCore.numberFormattingSeparateThousands != null && integer.compareTo(ConfigGCore.numberFormattingSeparateThousandsStartAt) >= 0) {
 				String todo = integerFormat;
 				integerFormat = "";
 				while (todo.length() > 3) {
@@ -280,6 +282,7 @@ public final class StringUtils {
 				}
 				integerFormat = todo + integerFormat;
 			}
+
 			// done
 			Integer decimals = split.length == 2 ? NumberUtils.integerOrNull(split[1]) : null;
 			return (number < 0d ? "-" : "") + integerFormat + (decimals != null && decimals != 0 ? "." + split[1] : "") + suffix;

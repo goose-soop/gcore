@@ -58,6 +58,18 @@ public abstract class Element implements IElement, Comparable<Element> {
 		return parent;
 	}
 
+	public final <T extends Element> T getParentAsOrNull(Class<T> elementClass) {
+		return ObjectUtils.castOrNull(getParent(), elementClass);
+	}
+
+	public final <T extends Element> T getAncestorAsOrNull(Class<T> elementClass) {
+		final T parent = getParentAsOrNull(elementClass);
+		if (parent != null) {
+			return parent;
+		}
+		return getParent() != null ? getParent().getAncestorAsOrNull(elementClass) : null;
+	}
+
 	@Override
 	public final SuperElement getSuperElement() {
 		// super element must be the highest parent in chain

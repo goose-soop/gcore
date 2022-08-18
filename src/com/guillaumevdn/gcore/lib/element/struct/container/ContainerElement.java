@@ -107,6 +107,8 @@ import com.guillaumevdn.gcore.lib.element.type.list.ElementPositionList;
 import com.guillaumevdn.gcore.lib.element.type.list.ElementPotionEffectList;
 import com.guillaumevdn.gcore.lib.element.type.map.ElementCurrencyDoubleMap;
 import com.guillaumevdn.gcore.lib.element.type.map.ElementEnchantmentLevelMap;
+import com.guillaumevdn.gcore.lib.element.type.map.ElementEntityTypeDoubleMap;
+import com.guillaumevdn.gcore.lib.element.type.map.ElementMatDoubleMap;
 import com.guillaumevdn.gcore.lib.element.type.map.ElementStringMap;
 import com.guillaumevdn.gcore.lib.function.QuadriConsumer;
 import com.guillaumevdn.gcore.lib.function.QuintConsumer;
@@ -486,6 +488,8 @@ public abstract class ContainerElement extends AbstractMapElement<String, Elemen
 	public final ElementEnchantmentLevelMap addEnchantmentLevelMap(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementEnchantmentLevelMap(this, id, need, editorDescription)); }
 	public final ElementEntityType addEntityType(String id, Need need, Text editorDescription) { return add(new ElementEntityType(this, id, need, editorDescription)); }
 	public final ElementEntityType addEntityType(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementEntityType(this, id, need, editorDescription)); }
+	public final ElementEntityTypeDoubleMap addEntityTypeDoubleMap(String id, Need need, Text editorDescription) { return add(new ElementEntityTypeDoubleMap(this, id, need, editorDescription)); }
+	public final ElementEntityTypeDoubleMap addEntityTypeDoubleMap(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementEntityTypeDoubleMap(this, id, need, editorDescription)); }
 	public final ElementEntityTypeList addEntityTypeList(String id, Need need, Text editorDescription) { return add(new ElementEntityTypeList(this, id, need, editorDescription)); }
 	public final ElementEntityTypeList addEntityTypeList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementEntityTypeList(this, id, need, editorDescription)); }
 	public final ElementFireworkEffect addFireworkEffect(String id, Need need, Text editorDescription) { return add(new ElementFireworkEffect(this, id, need, editorDescription)); }
@@ -558,6 +562,8 @@ public abstract class ContainerElement extends AbstractMapElement<String, Elemen
 	public final ElementNotify addNotify(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementNotify(this, id, need, editorDescription)); }
 	public final ElementMat addMat(String id, Need need, Text editorDescription) { return add(new ElementMat(this, id, need, editorDescription)); }
 	public final ElementMat addMat(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementMat(this, id, need, editorDescription)); }
+	public final ElementMatDoubleMap addMatDoubleMap(String id, Need need, Text editorDescription) { return add(new ElementMatDoubleMap(this, id, need, editorDescription)); }
+	public final ElementMatDoubleMap addMatDoubleMap(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementMatDoubleMap(this, id, need, editorDescription)); }
 	public final ElementMatList addMatList(String id, Need need, Text editorDescription) { return add(new ElementMatList(this, id, need, editorDescription)); }
 	public final ElementMatList addMatList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementMatList(this, id, need, editorDescription)); }
 	public final ElementMatRestriction addMatRestriction(String id, Need need, Text editorDescription) { return add(new ElementMatRestriction(this, id, need, editorDescription)); }

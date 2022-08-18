@@ -118,6 +118,14 @@ public class ClickCall {
 			return name().contains("SHIFT");
 		}
 
+		public boolean isLeft() {
+			return name().contains("LEFT");
+		}
+
+		public boolean isRight() {
+			return name().contains("RIGHT");
+		}
+
 	}
 
 }

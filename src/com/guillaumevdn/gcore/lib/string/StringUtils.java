@@ -513,6 +513,10 @@ public final class StringUtils {
 		return count > 1 ? "s" : "";
 	}
 
+	public static String pluralize(double count) {
+		return pluralize((int) Math.ceil(count));
+	}
+
 	public static String toTextString(String separator, Object... objects) {
 		return toTextString(separator, CollectionUtils.asList(objects));
 	}

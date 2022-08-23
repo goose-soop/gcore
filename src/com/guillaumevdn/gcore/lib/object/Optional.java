@@ -45,6 +45,10 @@ public final class Optional<T> {
 		return value != null ? value : (def != null ? def.get() : null);
 	}
 
+	public <TT> TT orElseAs(Supplier<T> def) {
+		return (TT) orElse(def);
+	}
+	
 	public Optional<T> orElseOptional(Optional<T> def) {
 		return value != null ? this : def;
 	}
@@ -55,6 +59,10 @@ public final class Optional<T> {
 
 	public T orNull() {
 		return value;
+	}
+	
+	public <TT> TT orNullAs() {
+		return (TT) value;
 	}
 
 	public T orEmptyList() {
@@ -74,16 +82,29 @@ public final class Optional<T> {
 	}
 
 	// ----- do
-	public <R> Optional<R> ifPresentMapCastOrNull(Class<R> castClass) {
+	public <R> Optional<R> mapCastOrNull(Class<R> castClass) {
 		return isPresent() ? of(ObjectUtils.castOrNull(value, castClass)) : empty();
 	}
 
-	public <R> Optional<R> ifPresentMap(Function<T, R> mapper) {
+	public <R> Optional<R> ifPresentMapCastOrNull(Class<R> castClass) {
+		return mapCastOrNull(castClass);
+	}
+
+	public <R> Optional<R> map(Function<T, R> mapper) {
 		return isPresent() ? of(mapper.apply(value)) : empty();
 	}
 
-	public <R> Optional<R> ifPresentMapOptional(Function<T, Optional<R>> mapper) {
+	public <R> Optional<R> ifPresentMap(Function<T, R> mapper) {
+		return map(mapper);
+	}
+
+	public <R> Optional<R> mapOptional(Function<T, Optional<R>> mapper) {
 		return isPresent() ? mapper.apply(value) : empty();
+	}
+
+	@Deprecated
+	public <R> Optional<R> ifPresentMapOptional(Function<T, Optional<R>> mapper) {
+		return mapOptional(mapper);
 	}
 
 	public OptionalIfPresentFail ifPresentDo(Consumer<T> ifPresent) {

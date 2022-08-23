@@ -212,6 +212,13 @@ public class PlaceholderReplacer implements Comparable<PlaceholderReplacer> {
 		return null;  // no match;
 	}));
 
+	public static final PlaceholderReplacer ONLINE_PLAYERS_COUNT = register(new PlaceholderReplacer("online_players_cont", 1, false, CollectionUtils.asList("§7Player name : §8{player}"), (placeholderContent, player) -> {
+		if (placeholderContent.equalsIgnoreCase("online_players_cont")) {
+			return StringUtils.formatNumber((int) PlayerUtils.getOnlineStream().count());
+		}
+		return null;  // no match;
+	}));
+
 	public static final PlaceholderReplacer RANDOM_IN_LIST = register(new PlaceholderReplacer("random_in_list", 1, false, CollectionUtils.asList("§7Random in list : §8{random_in_list:value1,value2,value3,...}"), (placeholderContent, player) -> {
 		if (placeholderContent.toLowerCase().startsWith("random_in_list:")) {
 			String[] split = placeholderContent.substring("random_in_list:".length()).split(",");

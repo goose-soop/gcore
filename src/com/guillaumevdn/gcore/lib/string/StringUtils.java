@@ -295,8 +295,21 @@ public final class StringUtils {
 		if (number < 1000) {
 			return "" + number;
 		}
-		final int rem = number % 1000;
-		return (rem == 0 ? "" : "~") + ((int) Math.ceil(number / 1000)) + "k";
+		/*int rem = number % 1000;
+		String result = "" + ((int) Math.ceil(number / 1000));
+		if (rem != 0) {
+			if (rem < 10) {
+				result += ".00" + rem;
+			} else if (rem < 100) {
+				result += ".0" + rem;
+			} else {
+				result += "." + rem;
+			}
+		}
+		result += "k";
+		return result;*/
+
+		return toTextString(((double) number) / 1000d, 2) + "k";
 	}
 
 	public static String makeProgressBar(double percentage, int barLength, String barChar, String barColor, String barEmpty) {

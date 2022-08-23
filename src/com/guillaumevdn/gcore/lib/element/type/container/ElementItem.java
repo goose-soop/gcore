@@ -3,6 +3,7 @@ package com.guillaumevdn.gcore.lib.element.type.container;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -203,7 +204,11 @@ public final class ElementItem extends ParseableContainerElement<ItemStack> {
 	// ----- read/import
 	@Override
 	protected void doRead() throws Throwable {
-		List<String> keys = getSuperElement().getConfiguration().readKeysForSectionCopyIfEmpty(getConfigurationPath());  // this creates a new list
+		final List<String> keys = getSuperElement().getConfiguration().readKeysForSectionCopyIfEmpty(getConfigurationPath())  // this creates a new list
+				.stream()
+				.map(str -> str.toLowerCase())
+				.collect(Collectors.toList());
+
 		type.read();  // read type first so it'll trigger watcher that will add elements
 
 		// read elements
@@ -211,7 +216,7 @@ public final class ElementItem extends ParseableContainerElement<ItemStack> {
 			if (!element.equals(type)) {
 				element.read();
 			}
-			keys.remove(element.getId());
+			keys.remove(element.getId().toLowerCase());
 		}
 
 		// look for unknown options and log them

@@ -8,6 +8,7 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import com.guillaumevdn.gcore.lib.block.ElementBlockStateList;
 import com.guillaumevdn.gcore.lib.collection.LowerCaseArrayList;
@@ -349,10 +350,14 @@ public abstract class ContainerElement extends AbstractMapElement<String, Elemen
 	@Override
 	protected void doRead() throws Throwable {
 		// read elements
-		List<String> keys = getSuperElement().getConfiguration().readKeysForSectionCopyIfEmpty(getConfigurationPath());  // this creates a new list
+		final List<String> keys = getSuperElement().getConfiguration().readKeysForSectionCopyIfEmpty(getConfigurationPath())  // this creates a new list
+				.stream()
+				.map(str -> str.toLowerCase())
+				.collect(Collectors.toList());
+
 		for (Element element : values()) {
 			element.read();
-			keys.remove(element.getId());
+			keys.remove(element.getId().toLowerCase());
 		}
 
 		// look for unknown options and log them

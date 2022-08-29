@@ -32,7 +32,7 @@ messageCommandMissingArgument: |
   &7Il manque l'argument &c{argument}&7. Ajoutez &d? &7après une commande pour obtenir de l'aide.
 
 messageCommandMissingArgumentFound: |
-  &7Il m'anque l'argument &c{argument} &7(trouvés : {found}). Ajoutez &d? &7après une commande pour obtenir de l'aide.
+  &7Il manque l'argument &c{argument} &7(trouvés : {found}). Ajoutez &d? &7après une commande pour obtenir de l'aide.
 
 messageCommandUnnecessaryArguments: |
   &7Arguments en trop : &c{unnecessary}&7. Ajoutez &d? &7après une commande pour obtenir de l'aide.

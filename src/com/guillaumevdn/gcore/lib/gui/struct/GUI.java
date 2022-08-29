@@ -582,6 +582,9 @@ public class GUI {
 	/** @return true if the GUI was opened */
 	private final boolean doOpenFor(Player player, int pageIndex, ClickCall fromCall) {
 
+		final ClickCall previousFromCall = getFromCall(player);
+		setFromCall(player, fromCall);  // some GUIs will use this as early as the items building step, so do it first
+
 		// create a page if has none
 		if (handler.getPageCount() == 0) {
 			createPage();
@@ -592,6 +595,7 @@ public class GUI {
 			activate();
 			lastFilled = System.currentTimeMillis();
 			if (!doFill()) {
+				setFromCall(player, previousFromCall);  // revert from call, since we didn't open it
 				return false;
 			}
 		}
@@ -601,6 +605,7 @@ public class GUI {
 			if (lastFilled == 0L) {
 				lastFilled = System.currentTimeMillis();
 				if (!doFill()) {
+					setFromCall(player, previousFromCall);  // revert from call, since we didn't open it
 					return false;
 				}
 			}
@@ -631,8 +636,6 @@ public class GUI {
 
 		// open page
 		handler.openPage(player, pageIndex);
-		setFromCall(player, fromCall);
-
 		return true;
 	}
 

@@ -47,6 +47,10 @@ public abstract class ActiveGUI extends GUI {
 		return lifecycleData;
 	}
 
+	public final boolean hasLifecycleData(String key) {
+		return lifecycleData.containsKey(key);
+	}
+
 	@Nonnull
 	public Replacer getReplacer() {
 		return replacer;

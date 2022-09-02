@@ -96,6 +96,7 @@ public final class MetaPotion {
 				List<DataIO> list = new ArrayList<>();
 				for (PotionEffect effect : meta.getCustomEffects()) {
 					DataIO d = new DataIO();
+					d.write("version", AdapterPotionEffect.INSTANCE.getVersion());
 					AdapterPotionEffect.INSTANCE.write(effect, d);
 					list.add(d);
 				}
@@ -125,10 +126,12 @@ public final class MetaPotion {
 			}
 			// custom effects
 			List<DataIO> customEffects = reader.readDirectList("customEffects");
-			if (customEffects != null) for (DataIO d : customEffects) {
-				PotionEffect effect = AdapterPotionEffect.INSTANCE.read(d);
-				if (effect != null) {
-					meta.addCustomEffect(effect, true); // true to overwrite existing effect with the same type
+			if (customEffects != null) {
+				for (DataIO d : customEffects) {
+					PotionEffect effect = AdapterPotionEffect.INSTANCE.read(d);
+					if (effect != null) {
+						meta.addCustomEffect(effect, true /* overwrite existing effect with the same type */);
+					}
 				}
 			}
 		}
@@ -172,6 +175,7 @@ public final class MetaPotion {
 			List<DataIO> list = new ArrayList<>();
 			for (PotionEffect effect : effects) {
 				DataIO d = new DataIO();
+				d.write("version", AdapterPotionEffect.INSTANCE.getVersion());
 				AdapterPotionEffect.INSTANCE.write(effect, d);
 				list.add(d);
 			}

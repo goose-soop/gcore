@@ -91,7 +91,6 @@ public final class EntityUtils {
 				.flicker(NumberUtils.random())
 				.build());
 		firework.setFireworkMeta(meta);
-
 	}
 
 }

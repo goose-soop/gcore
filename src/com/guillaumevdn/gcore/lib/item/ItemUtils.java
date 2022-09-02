@@ -16,6 +16,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
@@ -24,6 +25,7 @@ import com.guillaumevdn.gcore.TextGeneric;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.compatibility.Compat;
 import com.guillaumevdn.gcore.lib.compatibility.Version;
+import com.guillaumevdn.gcore.lib.compatibility.material.CommonMats;
 import com.guillaumevdn.gcore.lib.compatibility.material.Mat;
 import com.guillaumevdn.gcore.lib.compatibility.nbt.NBTItem;
 import com.guillaumevdn.gcore.lib.gui.ItemFlag;
@@ -490,6 +492,15 @@ public final class ItemUtils {
 		return item;
 	}
 
+	public static ItemStack createFireworkItem(int power, int amount) {
+		final ItemStack item = CommonMats.FIREWORK_ROCKET.newStack();
+		final FireworkMeta meta = (FireworkMeta) item.getItemMeta();
+		meta.setPower(power);
+		item.setItemMeta(meta);
+		item.setAmount(amount);
+		return item;
+	}
+
 	// ----- modification
 	/** @return the same item */
 	public static ItemStack addAllFlags(ItemStack item) {
@@ -529,6 +540,14 @@ public final class ItemUtils {
 			ItemMeta meta = item.getItemMeta();
 			Compat.addItemFlags(meta, ItemFlag.HIDE_ENCHANTS);
 			item.setItemMeta(meta);
+		}
+		return item;
+	}
+
+	public static ItemStack setUnbreakable(ItemStack item, boolean unbreakable) {
+		final ItemMeta meta = item.getItemMeta();
+		if (meta != null) {
+			Compat.setUnbreakable(meta, unbreakable);
 		}
 		return item;
 	}

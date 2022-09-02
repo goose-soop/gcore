@@ -48,6 +48,7 @@ public final class CommonMats {
 	public static final Mat FURNACE_MINECART = Mat.firstFromIdOrDataName("FURNACE_MINECART").get();
 	public static final Mat FISHING_ROD = Mat.firstFromIdOrDataName("FISHING_ROD").get();
 	public static final Mat FIRE = Mat.firstFromIdOrDataName("FIRE").get();
+	public static final Mat FIREWORK_ROCKET = Mat.firstFromIdOrDataName("FIREWORK_ROCKET").get();
 	public static final Mat GLASS_BOTTLE = Mat.firstFromIdOrDataName("GLASS_BOTTLE").get();
 	public static final Mat GLOWSTONE = Mat.firstFromIdOrDataName("GLOWSTONE").get();
 	public static final Mat GOLDEN_APPLE = Mat.firstFromIdOrDataName("GOLDEN_APPLE").get();

@@ -43,9 +43,18 @@ public final class DataIO {
 	public Set<String> getKeys() {
 		return objects.keySet();
 	}
+	
+	public boolean hasKey(String key) {
+		return objects.containsKey(key);
+	}
 
 	public boolean isEmpty() {
 		return objects.isEmpty();
+	}
+
+	@Override
+	public String toString() {
+		return objects.toString();
 	}
 
 	// ----- write

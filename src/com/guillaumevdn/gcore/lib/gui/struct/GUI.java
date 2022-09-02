@@ -172,6 +172,21 @@ public class GUI {
 		return handler.getViewerPage(player);
 	}
 
+	public final <G extends GUI> G castThisOrParentFromCall(Player player, Class<G> clazz) {
+		G gui = ObjectUtils.castOrNull(this, clazz);
+		if (gui == null) {
+			ClickCall c = this.getFromCall(player);
+			for (int tries = 0; c != null && tries < 25 /* more than enough, but necessary #1897 #1932 */; ++tries) {
+				gui = ObjectUtils.castOrNull(c.getGUI(), clazz);
+				if (gui != null) {
+					break;
+				}
+				c = c.getGUI().getFromCall(player);
+			}
+		}
+		return gui;
+	}
+
 	// ----- set
 
 	protected void setPlugin(GPlugin plugin) {  // this can be useful, for the confirm GUI for instance

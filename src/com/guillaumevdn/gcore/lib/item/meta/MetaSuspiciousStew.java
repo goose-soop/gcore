@@ -42,7 +42,7 @@ public final class MetaSuspiciousStew {
 			}
 			return false;
 		}
-		
+
 		// seems good
 		return true;
 	}
@@ -51,10 +51,11 @@ public final class MetaSuspiciousStew {
 		SuspiciousStewMeta meta = ObjectUtils.castOrNull(itemMeta, SuspiciousStewMeta.class);
 		if (meta != null) {
 			// custom effects
-			if (meta.hasCustomEffects()) {
+			if (meta.hasCustomEffects() && !writer.hasKey("customEffects") /* same field name in other metas */) {
 				List<DataIO> list = new ArrayList<>();
 				for (PotionEffect effect : meta.getCustomEffects()) {
 					DataIO d = new DataIO();
+					d.write("version", AdapterPotionEffect.INSTANCE.getVersion());
 					AdapterPotionEffect.INSTANCE.write(effect, d);
 					list.add(d);
 				}
@@ -88,15 +89,18 @@ public final class MetaSuspiciousStew {
 	}
 
 	public static void writeElements(ElementItem item, DataIO writer, Replacer replacer) throws Throwable {
-		item.parseElementAsList("custom_effects", PotionEffect.class, replacer).ifPresentDoThrowable(effects -> {
-			List<DataIO> list = new ArrayList<>();
-			for (PotionEffect effect : effects) {
-				DataIO d = new DataIO();
-				AdapterPotionEffect.INSTANCE.write(effect, d);
-				list.add(d);
-			}
-			writer.writeDirectList("customEffects", list);
-		});
+		if (!writer.hasKey("customEffects") /* same field name in other metas */) {
+			item.parseElementAsList("custom_effects", PotionEffect.class, replacer).ifPresentDoThrowable(effects -> {
+				List<DataIO> list = new ArrayList<>();
+				for (PotionEffect effect : effects) {
+					DataIO d = new DataIO();
+					d.write("version", AdapterPotionEffect.INSTANCE.getVersion());
+					AdapterPotionEffect.INSTANCE.write(effect, d);
+					list.add(d);
+				}
+				writer.writeDirectList("customEffects", list);
+			});
+		}
 	}
 
 	public static void importElements(ElementItem item, ItemMeta itemMeta) {

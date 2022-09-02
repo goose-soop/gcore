@@ -158,6 +158,10 @@ public abstract class Currency {
 		return false;
 	}
 
+	public boolean ensureHasAndTake(OfflinePlayer player, double amount, boolean notify) {
+		return ensureHas(player, amount, notify) && take(player, amount);
+	}
+
 	public boolean give(OfflinePlayer player, double amount) {
 		if (!isEnabled()) {
 			GCore.inst().getMainLogger().warning("Tried to give currency " + id + " to " + player.getName() + " but currency isn't enabled");

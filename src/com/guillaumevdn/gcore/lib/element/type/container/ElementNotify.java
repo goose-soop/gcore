@@ -260,6 +260,7 @@ public class ElementNotify extends ContainerElement {
 				else {
 					if (bossbarDurationMillis != null) {
 						instance = BossbarCompat.sendTemp(getSuperElement().getPlugin(), bossbar, forceColor != null ? forceColor : color, style, flags, CollectionUtils.asList(player), bossbarDurationMillis, forceProgress);
+						instance.setTitle(bossbar);  // immediately re-send title, otherwise hex codes will not display properly when there are multiple boss bars on the screen
 					} else {
 						instance = new Bossbar(getSuperElement().getPlugin(), "notify_" + UUID.randomUUID(), bossbar, forceColor != null ? forceColor : color, style, flags, forceProgress != null ? forceProgress : 1f, CollectionUtils.asList(player));
 						instance.start();

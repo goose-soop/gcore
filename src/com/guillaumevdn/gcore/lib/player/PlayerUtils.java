@@ -18,6 +18,7 @@ import org.bukkit.entity.Player;
 
 import com.guillaumevdn.gcore.ConfigGCore;
 import com.guillaumevdn.gcore.TextGeneric;
+import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.collection.LowerCaseHashMap;
 import com.guillaumevdn.gcore.lib.command.CommandCall;
 import com.guillaumevdn.gcore.lib.gui.struct.ClickCall;
@@ -76,6 +77,10 @@ public final class PlayerUtils {
 
 	public static List<Player> getOnline(Collection<UUID> uuids) {
 		return uuids.stream().map(uuid -> Bukkit.getPlayer(uuid)).filter(pl -> pl != null).collect(Collectors.toList());
+	}
+
+	public static List<? extends CommandSender> getOnlineAndConsole() {
+		return CollectionUtils.asListMultiple(CommandSender.class, getOnline(), Bukkit.getConsoleSender());
 	}
 
 	public static List<UUID> getUniqueIds(Collection<Player> players) {

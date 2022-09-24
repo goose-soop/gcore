@@ -16,6 +16,7 @@ import com.guillaumevdn.gcore.command.GcoreItemRead;
 import com.guillaumevdn.gcore.command.GcoreItemReadChat;
 import com.guillaumevdn.gcore.command.GcoreItemReadClick;
 import com.guillaumevdn.gcore.command.GcoreNpcReset;
+import com.guillaumevdn.gcore.command.GcoreNpcResetEveryone;
 import com.guillaumevdn.gcore.command.GcorePermsReset;
 import com.guillaumevdn.gcore.command.GcorePlugins;
 import com.guillaumevdn.gcore.data.BoardStatistics;
@@ -53,6 +54,7 @@ import com.guillaumevdn.gcore.migration.v8_25.MigrationV8_25;
 import com.guillaumevdn.gcore.migration.v8_30.MigrationV8_30;
 import com.guillaumevdn.gcore.migration.v8_5.MigrationV8_5;
 import com.guillaumevdn.gcore.migration.v8_9.MigrationV8_9;
+import com.guillaumevdn.gcore.task.OfflineUserNPCsActionsProcessor;
 
 /**
  * @author GuillaumeVDN
@@ -207,10 +209,14 @@ public final class GCore extends GPlugin<ConfigGCore, PermissionGCore> {
 		registerListener("awaiting_item", new AwaitingItemListeners());
 		registerListener("integration", new IntegrationListeners());
 
+		// tasks
+		registerTask("offline_user_npcs_actions_processor", true, 5, new OfflineUserNPCsActionsProcessor());
+
 		// gcore command
 		getMainCommand().setSubcommand(new GcorePlugins());
 		getMainCommand().setSubcommand(new GcoreExport());
 		getMainCommand().setSubcommand(new GcoreNpcReset());
+		getMainCommand().setSubcommand(new GcoreNpcResetEveryone());
 		getMainCommand().setSubcommand(new GcorePermsReset());
 		getMainCommand().setSubcommand(new GcoreItemRead());
 		getMainCommand().setSubcommand(new GcoreItemReadChat());

@@ -14,6 +14,7 @@ public final class CommonMats {
 	public static final Mat ANVIL = Mat.firstFromIdOrDataName("ANVIL").get();
 	public static final Mat APPLE = Mat.firstFromIdOrDataName("APPLE").get();
 	public static final Mat ARROW = Mat.firstFromIdOrDataName("ARROW").get();
+	public static final Mat BARRIER = Mat.firstFromIdOrDataName("BARRIER").get();
 	public static final Mat BEDROCK = Mat.firstFromIdOrDataName("BEDROCK").get();
 	public static final Mat BUCKET = Mat.firstFromIdOrDataName("BUCKET").get();
 	public static final Mat BOOKSHELF = Mat.firstFromIdOrDataName("BOOKSHELF").get();

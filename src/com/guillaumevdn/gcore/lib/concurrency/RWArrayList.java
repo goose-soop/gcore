@@ -138,6 +138,18 @@ public class RWArrayList<T> extends ArrayList<T> {
 		});
 	}
 
+	public final ArrayList<T> consume() {
+		return lock.write(() -> {
+			ArrayList<T> copy = new ArrayList<>();
+			Iterator<T> i = super.iterator();
+			while (i.hasNext()) {
+				copy.add(i.next());
+			}
+			super.clear();
+			return copy;
+		});
+	}
+
 	public final <R> R streamResult(Function<Stream<T>, R> operator) {
 		return lock.read(() -> {
 			return operator.apply(StreamSupport.stream(super.spliterator(), false));

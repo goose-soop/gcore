@@ -112,6 +112,16 @@ public final class NumberUtils {
 		}
 	}
 
+	private static final double DOUBLE_COMPARISON_THRESHOLD = 0.0001d;
+
+	public static boolean doubleEquals(double a, double b) {
+		return doubleEquals(a, b, DOUBLE_COMPARISON_THRESHOLD);
+	}
+
+	public static boolean doubleEquals(double a, double b, double threshold) {
+		return Math.abs(a - b) <= threshold;
+	}
+
 	// ----- float
 	public static Float floatOrNull(Object raw) {
 		try {

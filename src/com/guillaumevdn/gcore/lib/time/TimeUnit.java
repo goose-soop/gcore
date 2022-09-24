@@ -28,4 +28,8 @@ public enum TimeUnit {
 		return toMillis.apply(duration);
 	}
 
+	public int toTicks(long duration) {
+		return (int) (toMillis(duration) / 50L);
+	}
+
 }

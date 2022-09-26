@@ -29,4 +29,10 @@ public class ElementCommandList extends ElementStringList {
 		players.forEach(pl -> execute(pl, replacer));
 	}
 
+	public void execute(Replacer replacer) {
+		final Replacer rep = replacer == null ? Replacer.empty() : replacer.cloneReplacer();
+		final List<String> commands = parse(rep).orEmptyList();
+		commands.forEach(cmd -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd));
+	}
+
 }

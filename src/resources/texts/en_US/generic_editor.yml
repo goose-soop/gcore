@@ -374,6 +374,9 @@ descriptionRelativeLocationVerticalOffset: |
 descriptionRelativeLocationDistance: |
   &7The distance from base location
 
+descriptionRelativeLocationBaseRotationAware: |
+  &7If the rotation of the base location (if available) should be taken into consideration
+
 # -------------------- World restriction --------------------
 
 descriptionWorldRestrictionWhitelist: |

@@ -13,6 +13,7 @@ import com.guillaumevdn.gcore.lib.element.struct.Need;
 import com.guillaumevdn.gcore.lib.element.struct.container.ParseableContainerElement;
 import com.guillaumevdn.gcore.lib.element.struct.parsing.ParsedCache;
 import com.guillaumevdn.gcore.lib.element.struct.parsing.ParsingError;
+import com.guillaumevdn.gcore.lib.element.type.basic.ElementBoolean;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementDouble;
 import com.guillaumevdn.gcore.lib.string.Text;
 import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
@@ -25,30 +26,12 @@ public class ElementRelativeLocation extends ParseableContainerElement<Location>
 	private ElementDouble horizontalAngle = addDouble("horizontal_angle", Need.optional(0d), 0d, 360d, TextEditorGeneric.descriptionRelativeLocationHorizontalAngle);
 	private ElementDouble distance = addDouble("distance", Need.optional(0d), TextEditorGeneric.descriptionRelativeLocationDistance);
 	private ElementDouble verticalOffset = addDouble("vertical_offset", Need.optional(0d), TextEditorGeneric.descriptionRelativeLocationVerticalOffset);
+	private ElementBoolean baseRotationAware = addBoolean("base_rotation_aware", Need.optional(true), TextEditorGeneric.descriptionRelativeLocationBaseRotationAware);
 
 	public ElementRelativeLocation(Element parent, String id, Need need, Text editorDescription) {
 		super(parent, id, need, editorDescription);
 	}
 
-	@Override
-	public List<String> editorCurrentValue() {
-		List<String> desc = new ArrayList<>();
-		double horizontalAngle = this.horizontalAngle.parseGeneric().orElse(0d);
-		if (horizontalAngle != 0d) {
-			desc.add("rotation : " + horizontalAngle + "°");
-		}
-		double verticalOffset = this.verticalOffset.parseGeneric().orElse(0d);
-		if (verticalOffset != 0d) {
-			desc.add("vertical offset : " + verticalOffset + "m");
-		}
-		double distance = this.distance.parseGeneric().orElse(0d);
-		if (distance != 0d) {
-			desc.add("distance from base : " + distance + "m");
-		}
-		return desc.isEmpty() ? null : desc;
-	}
-
-	// ----- get
 	public ElementDouble getHorizontalAngle() {
 		return horizontalAngle;
 	}
@@ -61,7 +44,10 @@ public class ElementRelativeLocation extends ParseableContainerElement<Location>
 		return verticalOffset;
 	}
 
-	// ----- parse
+	public ElementBoolean getBaseRotationAware() {
+		return baseRotationAware;
+	}
+
 	@Override
 	public ParsedCache<Location> getCache() {
 		return null;  // don't valuesCache obviously since this relies on volatile data
@@ -69,31 +55,57 @@ public class ElementRelativeLocation extends ParseableContainerElement<Location>
 
 	@Override
 	public Location doParse(Replacer replacer) throws ParsingError {
-		Location relativeTo = replacer.getReplacerData().getLocationOrPlayer();
+		final Location relativeTo = replacer.getReplacerData().getLocationOrPlayer();
 		if (relativeTo == null) {
 			throw new ParsingError(this, "no location found for replacer");
 		}
 		if (!readContains()) {
 			return relativeTo.clone();
 		}
+
 		// parse
-		double horizontalAngle = getHorizontalAngle().parseNoCatchOrThrowParsingNull(replacer);
-		double verticalOffset = getVerticalOffset().parseNoCatchOrThrowParsingNull(replacer);
-		double distance = getDistance().parseNoCatchOrThrowParsingNull(replacer);
+		final double horizontalAngle = getHorizontalAngle().parseNoCatchOrThrowParsingNull(replacer);
+		final double verticalOffset = getVerticalOffset().parseNoCatchOrThrowParsingNull(replacer);
+		final double distance = getDistance().parseNoCatchOrThrowParsingNull(replacer);
+		final boolean baseRotationAware = getBaseRotationAware().parseNoCatchOrThrowParsingNull(replacer);
+
 		// adapt and return
-		double sign = Math.signum(distance);
-		double dist = Math.abs(distance);
-		double horizontalRad = Math.toRadians(-horizontalAngle - relativeTo.getYaw());
-		double x = relativeTo.getX() + sign * (dist * Math.sin(horizontalRad));
-		double y = relativeTo.getY() + verticalOffset;
-		double z = relativeTo.getZ() + sign * (dist * Math.cos(horizontalRad));
-		return new Location(relativeTo.getWorld(), x, y, z);
+		final double sign = Math.signum(distance);
+		final double dist = Math.abs(distance);
+		final double horizontalRad = Math.toRadians(-horizontalAngle - (baseRotationAware ? relativeTo.getYaw() : 0d));
+		final double x = relativeTo.getX() + sign * (dist * Math.sin(horizontalRad));
+		final double y = relativeTo.getY() + verticalOffset;
+		final double z = relativeTo.getZ() + sign * (dist * Math.cos(horizontalRad));
+
+		return new Location(relativeTo.getWorld(), x, y, z, relativeTo.getYaw(), relativeTo.getPitch());
 	}
 
 	// ----- editor
 	@Override
 	public Mat editorIconType() {
 		return CommonMats.REPEATER;
+	}
+
+	@Override
+	public List<String> editorCurrentValue() {
+		final List<String> desc = new ArrayList<>();
+		final double horizontalAngle = this.horizontalAngle.parseGeneric().orElse(0d);
+		if (horizontalAngle != 0d) {
+			desc.add("rotation : " + horizontalAngle + "°");
+		}
+		final double verticalOffset = this.verticalOffset.parseGeneric().orElse(0d);
+		if (verticalOffset != 0d) {
+			desc.add("vertical offset : " + verticalOffset + "m");
+		}
+		final double distance = this.distance.parseGeneric().orElse(0d);
+		if (distance != 0d) {
+			desc.add("distance from base : " + distance + "m");
+		}
+		final boolean baseRotationAware = this.baseRotationAware.parseGeneric().orElse(false);
+		if (baseRotationAware) {
+			desc.add("rotation aware : yes");
+		}
+		return desc.isEmpty() ? null : desc;
 	}
 
 }

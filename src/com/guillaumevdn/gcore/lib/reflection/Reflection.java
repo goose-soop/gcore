@@ -194,11 +194,11 @@ public final class Reflection {
 
 	// ----- field
 	public static ReflectionField getNmsField(String path, String name) throws Throwable {
-		return new ReflectionField(getNmsClass(path), name);
+		return ReflectionField.of(getNmsClass(path), name);
 	}
 
 	public static ReflectionField getField(String path, String name) throws Throwable {
-		return new ReflectionField(getClassMaybeCached(path), name);
+		return ReflectionField.of(getClassMaybeCached(path), name);
 	}
 
 	// ----- block

@@ -33,6 +33,7 @@ public final class CommonMats {
 	public static final Mat COMMAND_BLOCK = Mat.firstFromIdOrDataName("COMMAND_BLOCK").get();
 	public static final Mat COMPARATOR = Mat.firstFromIdOrDataName("COMPARATOR").get();
 	public static final Mat COMPASS = Mat.firstFromIdOrDataName("COMPASS").get();
+	public static final Mat CREEPER_HEAD = Mat.firstFromIdOrDataName("CREEPER_HEAD").get();
 	public static final Mat CYAN_WOOL = Mat.firstFromIdOrDataName("CYAN_WOOL").get();
 	public static final Mat DETECTOR_RAIL = Mat.firstFromIdOrDataName("DETECTOR_RAIL").get();
 	public static final Mat DIAMOND_BOOTS = Mat.firstFromIdOrDataName("DIAMOND_BOOTS").get();

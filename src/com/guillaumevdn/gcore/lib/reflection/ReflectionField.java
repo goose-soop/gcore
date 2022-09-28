@@ -3,6 +3,7 @@ package com.guillaumevdn.gcore.lib.reflection;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
+import com.guillaumevdn.gcore.lib.concurrency.RWHashMap;
 import com.guillaumevdn.gcore.libs.com.google.gson.internal.JavaVersion;
 
 /**
@@ -12,7 +13,7 @@ public class ReflectionField {
 
 	private Field field = null;
 
-	ReflectionField(Class<?> clazz, String name) throws Throwable {
+	private ReflectionField(Class<?> clazz, String name) throws Throwable {
 		Class<?> original = clazz;
 		while (field == null && (clazz != null && !clazz.isPrimitive() && !clazz.equals(Object.class))) {
 			try {
@@ -75,6 +76,20 @@ public class ReflectionField {
 					);
 		}
 		return this;
+	}
+
+	// ----- valuesCache
+	private static RWHashMap<Integer, ReflectionField> cache = new RWHashMap<>(10, 1f);
+
+	public static ReflectionField of(Class<?> clazz, String name) throws Throwable {
+		int hash = clazz.getName().hashCode();
+		hash = hash * 31 + name.hashCode();
+		hash = 31 * hash + name.hashCode();
+		ReflectionField field = cache.get(hash);
+		if (field == null) {
+			cache.put(hash, field = new ReflectionField(clazz, name));
+		}
+		return field;
 	}
 
 }

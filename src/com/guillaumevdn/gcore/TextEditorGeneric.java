@@ -160,6 +160,8 @@ public enum TextEditorGeneric implements TextEnumElement {
 	descriptionRelativeLocationVerticalOffset,
 	descriptionRelativeLocationDistance,
 	descriptionRelativeLocationBaseRotationAware,
+	descriptionRelativeLocationAddYaw,
+	descriptionRelativeLocationAddPitch,
 
 	// ----- world restriction
 	descriptionWorldRestrictionWhitelist,

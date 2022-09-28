@@ -15,6 +15,7 @@ import com.guillaumevdn.gcore.lib.element.struct.parsing.ParsedCache;
 import com.guillaumevdn.gcore.lib.element.struct.parsing.ParsingError;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementBoolean;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementDouble;
+import com.guillaumevdn.gcore.lib.element.type.basic.ElementFloat;
 import com.guillaumevdn.gcore.lib.string.Text;
 import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
 
@@ -27,6 +28,8 @@ public class ElementRelativeLocation extends ParseableContainerElement<Location>
 	private ElementDouble distance = addDouble("distance", Need.optional(0d), TextEditorGeneric.descriptionRelativeLocationDistance);
 	private ElementDouble verticalOffset = addDouble("vertical_offset", Need.optional(0d), TextEditorGeneric.descriptionRelativeLocationVerticalOffset);
 	private ElementBoolean baseRotationAware = addBoolean("base_rotation_aware", Need.optional(true), TextEditorGeneric.descriptionRelativeLocationBaseRotationAware);
+	private ElementFloat addYaw = addFloat("add_yaw", Need.optional(0f), 0f, 360f, TextEditorGeneric.descriptionRelativeLocationAddYaw);
+	private ElementFloat addPitch = addFloat("add_pitch", Need.optional(0f), -90f, 90f, TextEditorGeneric.descriptionRelativeLocationAddPitch);
 
 	public ElementRelativeLocation(Element parent, String id, Need need, Text editorDescription) {
 		super(parent, id, need, editorDescription);
@@ -46,6 +49,14 @@ public class ElementRelativeLocation extends ParseableContainerElement<Location>
 
 	public ElementBoolean getBaseRotationAware() {
 		return baseRotationAware;
+	}
+
+	public ElementFloat getAddYaw() {
+		return addYaw;
+	}
+
+	public ElementFloat getAddPitch() {
+		return addPitch;
 	}
 
 	@Override
@@ -77,7 +88,10 @@ public class ElementRelativeLocation extends ParseableContainerElement<Location>
 		final double y = relativeTo.getY() + verticalOffset;
 		final double z = relativeTo.getZ() + sign * (dist * Math.cos(horizontalRad));
 
-		return new Location(relativeTo.getWorld(), x, y, z, relativeTo.getYaw(), relativeTo.getPitch());
+		final float yaw = relativeTo.getYaw() + getAddYaw().parse(replacer).orElse(0f);
+		final float pitch = relativeTo.getPitch() + getAddPitch().parse(replacer).orElse(0f);
+
+		return new Location(relativeTo.getWorld(), x, y, z, yaw, pitch);
 	}
 
 	// ----- editor

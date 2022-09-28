@@ -82,12 +82,12 @@ public class ReflectionObject {
 	}
 
 	public ReflectionObject getField(String name) throws Throwable {
-		return new ReflectionField(object.getClass(), name).retrieve(object);
+		return ReflectionField.of(object.getClass(), name).retrieve(object);
 	}
 
 	/** @return this object, for chaining convenience because it's cool */
 	public ReflectionObject setField(String name, Object value) throws Throwable {
-		new ReflectionField(object.getClass(), name).set(object, value);
+		ReflectionField.of(object.getClass(), name).set(object, value);
 		return this;
 	}
 

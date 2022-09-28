@@ -377,6 +377,12 @@ descriptionRelativeLocationDistance: |
 descriptionRelativeLocationBaseRotationAware: |
   &7If the rotation of the base location (if available) should be taken into consideration
 
+descriptionRelativeLocationAddYaw: |
+  &7The angle to add to the resulting location yaw
+
+descriptionRelativeLocationAddPitch: |
+  &7The angle to add to the resulting location pitch
+
 # -------------------- World restriction --------------------
 
 descriptionWorldRestrictionWhitelist: |

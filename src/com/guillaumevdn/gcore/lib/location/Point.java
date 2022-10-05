@@ -1,6 +1,7 @@
 package com.guillaumevdn.gcore.lib.location;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -43,6 +44,10 @@ public class Point {
 
 	public String getWorldName() {
 		return world;
+	}
+
+	public Chunk getChunk() {
+		return getWorld().getChunkAt(x >> 4, z >> 4);
 	}
 
 	public int getX() {

@@ -277,84 +277,7 @@ public class Command implements CommandExecutor, TabCompleter {
 			}
 		}
 		if (subcommand != null) {
-			// can't use subcommand
-			if (!subcommand.canUse(sender)) {
-				return EMPTY_TAB_COMPLETE;
-			}
-			// parse arguments
-			CommandCall call = new CommandCall(this, subcommand, sender, original, arguments, parameters, true);
-			Argument lastParsedArgument = null;
-			for (int i = 0; i < subcommand.getArguments().size(); ++i) {
-				Argument argument = subcommand.getArguments().get(i);
-				Object value = argument.consume(call);
-				// found
-				if (!argument.canUse(sender)) {
-					return EMPTY_TAB_COMPLETE;
-				}
-				call.setArgumentValue(i, value);
-				if (value != null) {
-					lastParsedArgument = argument;
-				}
-			}
-			final Argument lastParsedArgumentF = lastParsedArgument;  // dummy dum dum
-			// incompatible arguments
-			for (List<Arg> incompatible : subcommand.getIncompatible()) {
-				Arg has1 = null;
-				for (Arg inc : incompatible) {
-					if (inc.has(call)) {
-						if (has1 == null) {
-							has1 = inc;
-						} else {
-							return EMPTY_TAB_COMPLETE;
-						}
-					}
-				}
-			}
-			// don't suggest new arguments if previous argument couldn't be parsed
-			String previous = original.length < 3 /* 2 would check the subcommand alias */ ? "" : original[original.length - 2];
-			if (!previous.isEmpty() && previous.charAt(0) != '-' && arguments.contains(previous) /* still contains means it can't be parsed */) {
-				return EMPTY_TAB_COMPLETE;
-			}
-			// -
-			String currentLower = original[original.length - 1].toLowerCase();
-			// suggesting parameter
-			if (!currentLower.isEmpty() && currentLower.charAt(0) == '-') {
-				String p = currentLower.substring(1);
-				List<String> suggest = subcommand.getParameters().stream()
-						.filter(param -> p.isEmpty() || param.getAliases().stream().anyMatch(alias -> alias.startsWith(p)))
-						.filter(param -> !param.has(call))
-						.flatMap(param -> param.getTabComplete().stream())
-						.collect(Collectors.toList());
-				if (suggest.size() <= 1) {
-					return EMPTY_TAB_COMPLETE;  // most likely found param or incorrect param, either way don't suggest new arguments because there's no space
-				}
-				return suggest;  // only suggest params if start with hyphen
-			}
-			// not a parameter
-			else {
-				// don't suggest new arguments if there's no space behind an argument we just successfully parsed
-				/*if (!current.isEmpty() && !arguments.contains(current)) {
-					return EMPTY_TAB_COMPLETE;
-				}*/
-				List<String> suggest = new ArrayList<>();
-				// if there's nothing yet, suggest parameters as well
-				if (currentLower.isEmpty()) {
-					suggest.addAll(subcommand.getParameters().stream().filter(param -> !param.has(call)).flatMap(param -> param.getTabComplete().stream()).collect(Collectors.toList()));
-				}
-				// and suggest arguments that start with the current typed thing
-				final Subcommand subcommandF = subcommand;
-				suggest.addAll(subcommand.getArguments().stream()
-						.filter(arg -> arg.canUse(sender))
-						.filter(arg -> arg.get(call) == null || (arg == lastParsedArgumentF && !currentLower.isEmpty())) // show tab completion for the entire current argument, only if we're still typing it 
-						.filter(arg -> subcommandF.getIncompatible().stream().allMatch(incompatible -> !incompatible.contains(arg) || incompatible.stream().allMatch(inc -> !inc.has(call))))  // don't suggest arguments that are incompatible with already typed arguments
-						.map(arg -> arg.tabComplete(call))
-						.filter(tabComplete -> tabComplete != null)
-						.flatMap(tabComplete -> tabComplete.stream())
-						.filter(elem -> currentLower.isEmpty() || elem.toLowerCase().startsWith(currentLower))
-						.collect(Collectors.toList()));
-				// done
-				return suggest;
-			}
+			return suggestSubcommand(subcommand, arguments, parameters, sender, label, original);
 		}
 		// unknown subcommand
 		else {
@@ -362,17 +285,111 @@ public class Command implements CommandExecutor, TabCompleter {
 			if (original.length > 1) {
 				return EMPTY_TAB_COMPLETE;
 			}
+
+			final List<String> suggest = new ArrayList<>(0);
+
 			// suggest all subcommands
 			if (arguments.isEmpty()) {
-				return subcommands.stream().filter(sub -> sub.canUse(sender)).map(sub -> sub.getAliases().get(0)).collect(Collectors.toList());
+				suggest.addAll(subcommands.stream().filter(sub -> sub.canUse(sender)).map(sub -> sub.getAliases().get(0)).collect(Collectors.toList()));
+				if (base != null) {
+					suggest.addAll(suggestSubcommand(base, arguments, parameters, sender, label, original));
+				}
 			}
-			// suggest subcommand
-			if (arguments.size() == 1) {
-				String arg = arguments.get(0).toLowerCase();
-				return subcommands.stream().filter(sub -> sub.getAliases().stream().anyMatch(alias -> alias.startsWith(arg))).filter(sub -> sub.canUse(sender)).map(sub -> sub.getAliases().get(0)).collect(Collectors.toList());
+			// suggest subcommand that we're currently typing
+			else if (arguments.size() == 1) {
+				final String arg = arguments.get(0).toLowerCase();
+				suggest.addAll(subcommands.stream().filter(sub -> sub.getAliases().stream().anyMatch(alias -> alias.startsWith(arg))).filter(sub -> sub.canUse(sender)).map(sub -> sub.getAliases().get(0)).collect(Collectors.toList()));
 			}
-			// no suggestion :saperlipopette:
+
+			// add base subcommand
+			if (base != null) {
+				suggest.addAll(suggestSubcommand(base, arguments, parameters, sender, label, original));
+			}
+
+			return suggest;
+		}
+	}
+
+	private List<String> suggestSubcommand(Subcommand subcommand, List<String> arguments, List<String> parameters,
+			CommandSender sender, String label, String[] original) {
+		// can't use subcommand
+		if (!subcommand.canUse(sender)) {
 			return EMPTY_TAB_COMPLETE;
+		}
+
+		// parse arguments
+		CommandCall call = new CommandCall(this, subcommand, sender, original, arguments, parameters, true);
+		Argument lastParsedArgument = null;
+		for (int i = 0; i < subcommand.getArguments().size(); ++i) {
+			Argument argument = subcommand.getArguments().get(i);
+			Object value = argument.consume(call);
+			// found
+			if (!argument.canUse(sender)) {
+				return EMPTY_TAB_COMPLETE;
+			}
+			call.setArgumentValue(i, value);
+			if (value != null) {
+				lastParsedArgument = argument;
+			}
+		}
+		final Argument lastParsedArgumentF = lastParsedArgument;  // dummy dum dum
+		// incompatible arguments
+		for (List<Arg> incompatible : subcommand.getIncompatible()) {
+			Arg has1 = null;
+			for (Arg inc : incompatible) {
+				if (inc.has(call)) {
+					if (has1 == null) {
+						has1 = inc;
+					} else {
+						return EMPTY_TAB_COMPLETE;
+					}
+				}
+			}
+		}
+		// don't suggest new arguments if previous argument couldn't be parsed
+		String previous = original.length < 3 /* 2 would check the subcommand alias */ ? "" : original[original.length - 2];
+		if (!previous.isEmpty() && previous.charAt(0) != '-' && arguments.contains(previous) /* still contains means it can't be parsed */) {
+			return EMPTY_TAB_COMPLETE;
+		}
+		// -
+		String currentLower = original[original.length - 1].toLowerCase();
+		// suggesting parameter
+		if (!currentLower.isEmpty() && currentLower.charAt(0) == '-') {
+			String p = currentLower.substring(1);
+			List<String> suggest = subcommand.getParameters().stream()
+					.filter(param -> p.isEmpty() || param.getAliases().stream().anyMatch(alias -> alias.startsWith(p)))
+					.filter(param -> !param.has(call))
+					.flatMap(param -> param.getTabComplete().stream())
+					.collect(Collectors.toList());
+			if (suggest.size() <= 1) {
+				return EMPTY_TAB_COMPLETE;  // most likely found param or incorrect param, either way don't suggest new arguments because there's no space
+			}
+			return suggest;  // only suggest params if start with hyphen
+		}
+		// not a parameter
+		else {
+			// don't suggest new arguments if there's no space behind an argument we just successfully parsed
+			/*if (!current.isEmpty() && !arguments.contains(current)) {
+							return EMPTY_TAB_COMPLETE;
+						}*/
+			List<String> suggest = new ArrayList<>();
+			// if there's nothing yet, suggest parameters as well
+			if (currentLower.isEmpty()) {
+				suggest.addAll(subcommand.getParameters().stream().filter(param -> !param.has(call)).flatMap(param -> param.getTabComplete().stream()).collect(Collectors.toList()));
+			}
+			// and suggest arguments that start with the current typed thing
+			final Subcommand subcommandF = subcommand;
+			suggest.addAll(subcommand.getArguments().stream()
+					.filter(arg -> arg.canUse(sender))
+					.filter(arg -> arg.get(call) == null || (arg == lastParsedArgumentF && !currentLower.isEmpty())) // show tab completion for the entire current argument, only if we're still typing it 
+					.filter(arg -> subcommandF.getIncompatible().stream().allMatch(incompatible -> !incompatible.contains(arg) || incompatible.stream().allMatch(inc -> !inc.has(call))))  // don't suggest arguments that are incompatible with already typed arguments
+					.map(arg -> arg.tabComplete(call))
+					.filter(tabComplete -> tabComplete != null)
+					.flatMap(tabComplete -> tabComplete.stream())
+					.filter(elem -> currentLower.isEmpty() || elem.toLowerCase().startsWith(currentLower))
+					.collect(Collectors.toList()));
+			// done
+			return suggest;
 		}
 	}
 

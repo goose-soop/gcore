@@ -95,7 +95,7 @@ public abstract class Currency {
 			}
 
 			// config
-			String path = "currencies." + getId();
+			final String path = "currencies." + getId();
 			formatSingle = ConfigGCore.baseConfig.readMandatoryString(path + ".format_single");
 			formatMultiple = ConfigGCore.baseConfig.readMandatoryString(path + ".format_multiple");
 			formatDecimalPrecision = ConfigGCore.baseConfig.readMandatoryInteger(path + ".format_decimal_precision");

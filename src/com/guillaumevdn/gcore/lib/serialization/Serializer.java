@@ -46,6 +46,7 @@ import com.guillaumevdn.gcore.lib.gui.element.item.overrideclick.OverrideClickTy
 import com.guillaumevdn.gcore.lib.gui.element.item.type.GUIItemType;
 import com.guillaumevdn.gcore.lib.gui.element.item.type.GUIItemTypes;
 import com.guillaumevdn.gcore.lib.location.Point;
+import com.guillaumevdn.gcore.lib.location.VectorPoint;
 import com.guillaumevdn.gcore.lib.location.position.PositionType;
 import com.guillaumevdn.gcore.lib.location.position.PositionTypes;
 import com.guillaumevdn.gcore.lib.number.NumberUtils;
@@ -344,6 +345,21 @@ public abstract class Serializer<T> {
 				// decode
 				try {
 					return new Point(split[0], Integer.parseInt(split[1]), Integer.parseInt(split[2]), Integer.parseInt(split[3]));
+				} catch (Throwable exception) {
+					throw new Error("couldn't deserialize point " + string, exception);
+				}
+			});
+	public static final Serializer<VectorPoint> VECTOR_POINT = of(VectorPoint.class,
+			value -> value.getX() + "," + value.getY() + "," + value.getZ(),
+			string -> {
+				// not enough params
+				String[] split = string.split(",");
+				if (split.length < 3) {
+					return null;
+				}
+				// decode
+				try {
+					return VectorPoint.from(Integer.parseInt(split[0]), Integer.parseInt(split[1]), Integer.parseInt(split[2]));
 				} catch (Throwable exception) {
 					throw new Error("couldn't deserialize point " + string, exception);
 				}

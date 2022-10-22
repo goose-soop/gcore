@@ -74,7 +74,7 @@ public abstract class KeyedBoardRemote<K, V> extends KeyedBoard<K, V> {
 	// ----- set
 	// ----------------------------------------------------------------------------------------------------
 
-	public final void putValue(K key, V value, Runnable onPush, boolean mustCache) {
+	public final void putValue(K key, V value, Runnable pushCallback, boolean mustCache) {
 		// valuesCache new value
 		if (mustCache) {
 			putInCache(key, value);
@@ -82,8 +82,8 @@ public abstract class KeyedBoardRemote<K, V> extends KeyedBoard<K, V> {
 		// push element
 		pushElements(BukkitThread.ASYNC, CollectionUtils.asSet(key), () -> {
 			try {
-				if (onPush != null) {
-					onPush.run();
+				if (pushCallback != null) {
+					pushCallback.run();
 				}
 			} catch (Throwable exception) {
 				throw exception;

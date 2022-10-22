@@ -59,6 +59,7 @@ public class ConfigGCore extends GPluginConfig {
 	public static List<String> commandsAliasesItemRead;
 	public static List<String> commandsAliasesItemReadChat;
 	public static List<String> commandsAliasesItemReadClick;
+	public static List<String> commandsAliasesItemSetNBTString;
 	public static List<String> commandsAliasesExport;
 
 	// ----- variants
@@ -151,6 +152,7 @@ public class ConfigGCore extends GPluginConfig {
 		commandsAliasesItemRead = CollectionUtils.asLowercaseList(baseConfig.readStringList("commands_aliases.itemread", CollectionUtils.asList("itemread", "ir")));
 		commandsAliasesItemReadChat = CollectionUtils.asLowercaseList(baseConfig.readStringList("commands_aliases.itemreadchat", CollectionUtils.asList("itemreadchat", "irc")));
 		commandsAliasesItemReadClick = CollectionUtils.asLowercaseList(baseConfig.readStringList("commands_aliases.itemreadclick", CollectionUtils.asList("itemreadclick", "irclick")));
+		commandsAliasesItemSetNBTString = CollectionUtils.asLowercaseList(baseConfig.readStringList("commands_aliases.itemsetnbtstring", CollectionUtils.asList("itemsetnbtstring", "isnbtstring")));
 		commandsAliasesExport = CollectionUtils.asLowercaseList(baseConfig.readMandatoryStringList("commands_aliases.export"));
 
 		// materials

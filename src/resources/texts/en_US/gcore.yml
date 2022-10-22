@@ -38,6 +38,7 @@ commandDescriptionGcoreExport: export GCore-dependant plugins data
 commandDescriptionGcoreItemRead: read item to configuration
 commandDescriptionGcoreItemReadChat: read item to chat
 commandDescriptionGcoreItemReadClick: read items from inventory clicks
+commandDescriptionGcoreItemSetNBTString: set a NBT string for the item in your hand
 
 messageItemReadNull: |
   &cThis item can't be exported to configuration. Please hold an item in your hand.

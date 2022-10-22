@@ -215,6 +215,30 @@ public final class ItemUtils {
 		return remaining;
 	}
 
+	public static int takeInHand(Player player, ItemStack item, ItemCheck check) {
+		return takeInHand(player, item, item.getAmount(), check);
+	}
+
+	public static int takeInHand(Player player, ItemStack item, int amount, ItemCheck check) {
+		return takeInHand(player, ItemReference.of(item), amount, check);
+	}
+
+	public static int takeInHand(Player player, ItemReference item, int amount, ItemCheck check) {
+		int remaining = amount;
+		final ItemStack handItem = player.getItemInHand();
+		if (handItem != null && match(handItem, item, check)) {
+			int canTake = handItem.getAmount() >= remaining ? remaining : handItem.getAmount();
+			remaining -= canTake;
+			if (canTake >= handItem.getAmount()) {
+				player.setItemInHand(null);
+			} else {
+				handItem.setAmount(handItem.getAmount() - canTake);
+				player.setItemInHand(handItem);
+			}
+		}
+		return remaining;
+	}
+
 	public static List<Integer> findMatchingLocations(Inventory inventory, ItemStack item, ItemCheck check) {
 		return findMatchingLocations(inventory, ItemReference.of(item), check);
 	}

@@ -15,6 +15,7 @@ import com.guillaumevdn.gcore.command.GcoreImpl;
 import com.guillaumevdn.gcore.command.GcoreItemRead;
 import com.guillaumevdn.gcore.command.GcoreItemReadChat;
 import com.guillaumevdn.gcore.command.GcoreItemReadClick;
+import com.guillaumevdn.gcore.command.GcoreItemSetNBTString;
 import com.guillaumevdn.gcore.command.GcoreNpcReset;
 import com.guillaumevdn.gcore.command.GcoreNpcResetEveryone;
 import com.guillaumevdn.gcore.command.GcorePermsReset;
@@ -221,6 +222,7 @@ public final class GCore extends GPlugin<ConfigGCore, PermissionGCore> {
 		getMainCommand().setSubcommand(new GcoreItemRead());
 		getMainCommand().setSubcommand(new GcoreItemReadChat());
 		getMainCommand().setSubcommand(new GcoreItemReadClick());
+		getMainCommand().setSubcommand(new GcoreItemSetNBTString());
 		getMainCommand().setSubcommand(new GcoreBlockMat());
 		getMainCommand().setSubcommand(new GcoreBlockMaterial());
 		getMainCommand().setSubcommand(new GcoreImpl());

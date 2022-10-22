@@ -105,7 +105,7 @@ public class PlayerDataSaver {
 		for (PotionEffectType effect : PotionEffectType.values()) {
 			try {
 				player.removePotionEffect(effect);
-			} catch (Throwable ignored) {}// FUCK
+			} catch (Throwable ignored) {}
 		}
 	}
 

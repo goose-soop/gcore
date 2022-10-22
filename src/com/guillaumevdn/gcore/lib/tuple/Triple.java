@@ -13,11 +13,11 @@ public class Triple<A, B, C> {
 	private B b;
 	private C c;
 
-	private Triple() {
+	protected Triple() {
 		this(null, null, null);
 	}
 
-	private Triple(A a, B b, C c) {
+	protected Triple(A a, B b, C c) {
 		this.a = a;
 		this.b = b;
 		this.c = c;

@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 
 import com.guillaumevdn.gcore.ConfigGCore;
 import com.guillaumevdn.gcore.lib.compatibility.variants.Variant;
+import com.guillaumevdn.gcore.lib.location.Point;
 import com.guillaumevdn.gcore.lib.object.Optional;
 import com.guillaumevdn.gcore.lib.player.PlayerUtils;
 
@@ -55,6 +56,9 @@ public class Sound extends Variant<SoundData> {
 		} else if (target instanceof Location) {
 			final Location loc = (Location) target;
 			play(loc.getWorld().getPlayers(), volume, pitch, loc);
+		} else if (target instanceof Point) {
+			final Point point = (Point) target;
+			play(point.getWorld().getPlayers(), volume, pitch, point.toLocation());
 		}
 	}
 

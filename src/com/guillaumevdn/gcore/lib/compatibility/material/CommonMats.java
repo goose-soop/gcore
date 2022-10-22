@@ -33,9 +33,11 @@ public final class CommonMats {
 	public static final Mat COMMAND_BLOCK = Mat.firstFromIdOrDataName("COMMAND_BLOCK").get();
 	public static final Mat COMPARATOR = Mat.firstFromIdOrDataName("COMPARATOR").get();
 	public static final Mat COMPASS = Mat.firstFromIdOrDataName("COMPASS").get();
+	public static final Mat CRAFTING_TABLE = Mat.firstFromIdOrDataName("CRAFTING_TABLE").get();
 	public static final Mat CREEPER_HEAD = Mat.firstFromIdOrDataName("CREEPER_HEAD").get();
 	public static final Mat CYAN_WOOL = Mat.firstFromIdOrDataName("CYAN_WOOL").get();
 	public static final Mat DETECTOR_RAIL = Mat.firstFromIdOrDataName("DETECTOR_RAIL").get();
+	public static final Mat DIAMOND_BLOCK = Mat.firstFromIdOrDataName("DIAMOND_BLOCK").get();
 	public static final Mat DIAMOND_BOOTS = Mat.firstFromIdOrDataName("DIAMOND_BOOTS").get();
 	public static final Mat DIAMOND_SWORD = Mat.firstFromIdOrDataName("DIAMOND_SWORD").get();
 	public static final Mat DIAMOND_PICKAXE = Mat.firstFromIdOrDataName("DIAMOND_PICKAXE").get();
@@ -47,6 +49,7 @@ public final class CommonMats {
 	public static final Mat ENDER_CHEST = Mat.firstFromIdOrDataName("ENDER_CHEST").get();
 	public static final Mat EXPERIENCE_BOTTLE = Mat.firstFromIdOrDataName("EXPERIENCE_BOTTLE").get();
 	public static final Mat ENDER_EYE = Mat.firstFromIdOrDataName("ENDER_EYE").get();
+	public static final Mat FURNACE = Mat.firstFromIdOrDataName("FURNACE").get();
 	public static final Mat FURNACE_MINECART = Mat.firstFromIdOrDataName("FURNACE_MINECART").get();
 	public static final Mat FISHING_ROD = Mat.firstFromIdOrDataName("FISHING_ROD").get();
 	public static final Mat FIRE = Mat.firstFromIdOrDataName("FIRE").get();
@@ -69,6 +72,7 @@ public final class CommonMats {
 	public static final Mat ICE = Mat.firstFromIdOrDataName("ICE").get();
 	public static final Mat IRON_DOOR = Mat.firstFromIdOrDataName("IRON_DOOR").get();
 	public static final Mat IRON_INGOT = Mat.firstFromIdOrDataName("IRON_INGOT").get();
+	public static final Mat ITEM_FRAME = Mat.firstFromIdOrDataName("ITEM_FRAME").get();
 	public static final Mat JUKEBOX = Mat.firstFromIdOrDataName("JUKEBOX").get();
 	public static final Mat LIGHT_BLUE_DYE = Mat.firstFromIdOrDataName("LIGHT_BLUE_DYE").get();
 	public static final Mat LIGHT_BLUE_WOOL = Mat.firstFromIdOrDataName("LIGHT_BLUE_WOOL").get();
@@ -98,6 +102,7 @@ public final class CommonMats {
 	public static final Mat STICK = Mat.firstFromIdOrDataName("STICK").get();
 	public static final Mat TNT = Mat.firstFromIdOrDataName("TNT").get();
 	public static final Mat TORCH = Mat.firstFromIdOrDataName("TORCH").get();
+	public static final Mat TRIPWIRE = Mat.firstFromIdOrDataName("TRIPWIRE").get();
 	public static final Mat WATER_BUCKET = Mat.firstFromIdOrDataName("WATER_BUCKET").get();
 	public static final Mat WHITE_WOOL = Mat.firstFromIdOrDataName("WHITE_WOOL").get();
 	public static final Mat WOODEN_SWORD = Mat.firstFromIdOrDataName("WOODEN_SWORD").get();

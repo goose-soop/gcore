@@ -238,7 +238,12 @@ public class ElementNotify extends ContainerElement {
 	}
 
 	public void sendBossbar(Collection<Player> players, Replacer replacer, Long forceDurationMillis, Double forceProgress, BossbarColor forceColor) {
+		//Bukkit.getLogger().info("[debug WarnD] ------------ BEGIN");
+
 		directParseAndIfPresentDo("bossbar", "bossbar_color", "bossbar_style", "bossbar_flags", replacer, (String bossbar, BossbarColor color, BossbarStyle style, List<BossbarFlag> flags) -> {
+
+			//Bukkit.getLogger().info("[debug WarnD] parsed " + bossbar + ", in config " + getElementAs("bossbar", ElementString.class).getRawValue());
+
 			players.forEach(player -> {
 				Long bossbarDurationMillis = forceDurationMillis != null ? forceDurationMillis : this.bossbarDuration.parse(replacer).orNull();
 
@@ -255,18 +260,23 @@ public class ElementNotify extends ContainerElement {
 					} else {
 						instance.setProgress(forceProgress != null ? forceProgress : 1f);
 					}
+					//Bukkit.getLogger().info("[debug WarnD] sending bossbar (case 1) : '" + bossbar + "'");
 				}
 				// not active, create new
 				else {
 					if (bossbarDurationMillis != null) {
 						instance = BossbarCompat.sendTemp(getSuperElement().getPlugin(), bossbar, forceColor != null ? forceColor : color, style, flags, CollectionUtils.asList(player), bossbarDurationMillis, forceProgress);
 						instance.setTitle(bossbar);  // immediately re-send title, otherwise hex codes will not display properly when there are multiple boss bars on the screen
+						//Bukkit.getLogger().info("[debug WarnD] sending bossbar (case 2) : '" + bossbar + "'");
 					} else {
 						instance = new Bossbar(getSuperElement().getPlugin(), "notify_" + UUID.randomUUID(), bossbar, forceColor != null ? forceColor : color, style, flags, forceProgress != null ? forceProgress : 1f, CollectionUtils.asList(player));
 						instance.start();
+						//Bukkit.getLogger().info("[debug WarnD] sending bossbar (case 3) : '" + bossbar + "'");
 					}
 				}
 				lastBossbars.put(player, instance);
+
+				//Bukkit.getLogger().info("[debug WarnD] END ------------");
 			});
 		});
 	}

@@ -51,7 +51,7 @@ public abstract class ConnectorBiKeyedSQL<K, K2, V> extends ConnectorBiKeyed<K, 
 	@Override
 	public void remoteInit() throws Throwable {
 		if (handler instanceof SQLiteHandler) {
-			handler.performUpdateQuery(board.getPlugin(), board.getLogger(),
+			handler.performUpdateQuery(board.getLogger(),
 					"CREATE TABLE IF NOT EXISTS " + tableName() + " ("
 							+ "`key` INTEGER PRIMARY KEY,"  // in SQLite a primary key int will auto-increment by itself
 							+ keyName() + " " + keyType() + " NOT NULL,"
@@ -60,7 +60,7 @@ public abstract class ConnectorBiKeyedSQL<K, K2, V> extends ConnectorBiKeyed<K, 
 							+ ");"
 					);
 		} else {
-			handler.performUpdateQuery(board.getPlugin(), board.getLogger(),
+			handler.performUpdateQuery(board.getLogger(),
 					"CREATE TABLE IF NOT EXISTS " + tableName() + " ("
 							+ "`key` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,"
 							+ keyName() + " " + keyType() + " NOT NULL,"
@@ -99,7 +99,7 @@ public abstract class ConnectorBiKeyedSQL<K, K2, V> extends ConnectorBiKeyed<K, 
 	}
 
 	private void remotePull(Query query, Runnable beforeSetProcessing) throws Throwable {
-		handler.performGetQuery(board.getPlugin(), board.getLogger(), query, set -> {
+		handler.performGetQuery(board.getLogger(), query, set -> {
 			if (beforeSetProcessing != null) {
 				beforeSetProcessing.run();
 			}
@@ -138,7 +138,7 @@ public abstract class ConnectorBiKeyedSQL<K, K2, V> extends ConnectorBiKeyed<K, 
 			Query query = buildRemoteDeleteElementsMySQLQuery(references);
 
 			if (handler instanceof SQLiteHandler) {  // one query at once in SQLite, no semicolons
-				handler.performUpdateQuery(board.getPlugin(), board.getLogger(), query);
+				handler.performUpdateQuery(board.getLogger(), query);
 				query = new Query();
 			}
 
@@ -150,14 +150,14 @@ public abstract class ConnectorBiKeyedSQL<K, K2, V> extends ConnectorBiKeyed<K, 
 				query.add((++i != 0 ? "," : "") + "(" + Query.escapeValue(ref.getA().toString()) + "," + Query.escapeValue(ref.getB().toString()) + "," + vstr + ")");
 			}
 			query.add(";");
-			handler.performUpdateQuery(board.getPlugin(), board.getLogger(), query);
+			handler.performUpdateQuery(board.getLogger(), query);
 		}
 	}
 
 	@Override
 	public void remoteDeleteElements(Set<Pair<K, K2>> references) throws Throwable {
 		if (references.isEmpty()) return; // let's avoid deleting the whole table just because there's no WHERE clause
-		handler.performUpdateQuery(board.getPlugin(), board.getLogger(), buildRemoteDeleteElementsMySQLQuery(references));
+		handler.performUpdateQuery(board.getLogger(), buildRemoteDeleteElementsMySQLQuery(references));
 	}
 
 	private Query buildRemoteDeleteElementsMySQLQuery(Collection<? extends Pair<K, K2>> references) {

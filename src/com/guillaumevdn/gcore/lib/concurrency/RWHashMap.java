@@ -30,10 +30,15 @@ public class RWHashMap<K, V> extends HashMap<K, V> {
 
 	private static final long serialVersionUID = -7860239421985019956L;
 
-	// -------------------- constructor --------------------
+	private final RWLock lock;
 
 	public RWHashMap(int initialCapacity, float loadFactor) {
+		this(initialCapacity, loadFactor, new RWLock());
+	}
+
+	protected RWHashMap(int initialCapacity, float loadFactor, RWLock lock) {
 		super(initialCapacity, loadFactor);
+		this.lock = lock;
 	}
 
 	// -------------------- key modifier for subclasses --------------------
@@ -41,10 +46,6 @@ public class RWHashMap<K, V> extends HashMap<K, V> {
 	protected K keyModifier(Object key) {
 		return (K) key;
 	}
-
-	// -------------------- lock --------------------
-
-	private final RWLock lock = new RWLock();
 
 	// -------------------- sets/iteration --------------------
 
@@ -108,6 +109,21 @@ public class RWHashMap<K, V> extends HashMap<K, V> {
 					it.remove();
 					iter.reset();
 				}
+				if (iter.mustStop()) {
+					break;
+				}
+			}
+		});
+	}
+
+	public final void iterateNoModify(TriConsumer<K, V, IteratorControls> consumer) {
+		lock.read(() -> {
+			Iterator<Entry<K, V>> it = super.entrySet().iterator();
+			IteratorControls iter = new IteratorControls();
+
+			while (it.hasNext()) {
+				Entry<K, V> next = it.next();
+				consumer.accept(next.getKey(), next.getValue(), iter);
 				if (iter.mustStop()) {
 					break;
 				}

@@ -31,14 +31,19 @@ public class Logger {
 
 	private GPlugin plugin;
 	private String id;
-	private boolean logConsole, logFile;
+	private boolean logConsole, logFile, logSQL;
 	private int fileLineLimit;
 
 	public Logger(GPlugin plugin, String id, boolean logConsole, boolean logFile) {
+		this(plugin, id, logConsole, logFile, true);
+	}
+
+	public Logger(GPlugin plugin, String id, boolean logConsole, boolean logFile, boolean logSQL) {
 		this.plugin = plugin;
 		this.id = id;
 		this.logConsole = logConsole;
 		this.logFile = logFile;
+		this.logSQL = logSQL;
 		this.fileLineLimit = REGULAR_LINE_LIMIT;
 	}
 
@@ -65,6 +70,10 @@ public class Logger {
 
 	public final boolean isLogFile() {
 		return logFile;
+	}
+
+	public final boolean isLogSQL() {
+		return logSQL;
 	}
 
 	// ----- methods

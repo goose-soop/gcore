@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 
@@ -52,6 +53,23 @@ public class AwaitingLocationListeners implements Listener {
 			event.setCancelled(true);
 			awaitingLocation.getA().accept(player.getLocation().clone());
 		}
+	}
+
+	@EventHandler(priority = EventPriority.NORMAL /* normal because sneak cancel GUI delay is LOWEST*/, ignoreCancelled = true)
+	public void event(PlayerInteractEvent event) {
+		if (!event.getAction().toString().contains("CLICK_BLOCK")) {
+			return;
+		}
+
+		final Player player = event.getPlayer();
+		final Triple<Consumer<Location>, Runnable, Long> awaitingLocation = WorkerGCore.inst().consumeAwaitingLocations(player);
+		if (awaitingLocation == null) {
+			return;
+		}
+
+		WorkerGCore.inst().consumeAwaitingLocationCancelChat(player);
+		event.setCancelled(true);
+		awaitingLocation.getA().accept(event.getClickedBlock().getLocation().clone());
 	}
 
 	@EventHandler

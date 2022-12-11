@@ -19,8 +19,10 @@ public abstract class GPluginConfig {
 
 	private boolean logMainConsole = true;
 	private boolean logMainFile = true;
+	private boolean logMainSQL = true;
 	private List<String> logDataConsole = null;
 	private List<String> logDataFile = null;
+	private List<String> logDataSQL = null;
 	private final Map<String, DataBackEnd> dataBackEnds = new HashMap<>(3);
 	private boolean updateNotification = true;
 
@@ -33,12 +35,20 @@ public abstract class GPluginConfig {
 		return logMainFile;
 	}
 
+	public final boolean logMainSQL() {
+		return logMainSQL;
+	}
+
 	public final boolean logDataConsole(Board board) {
 		return logDataConsole == null || logDataConsole.contains(board.getId().toLowerCase());
 	}
 
 	public boolean logDataFile(Board board) {
 		return logDataFile == null || logDataFile.contains(board.getId().toLowerCase());
+	}
+
+	public final boolean logDataSQL(Board board) {
+		return logDataSQL == null || logDataSQL.contains(board.getId().toLowerCase());
 	}
 
 	public final DataBackEnd dataBackEnd(Board board) {
@@ -57,11 +67,14 @@ public abstract class GPluginConfig {
 			if (config != null) {
 				logMainConsole = config.readBoolean("log.main.console", true);
 				logMainFile = config.readBoolean("log.main.file", true);
+				logMainSQL = config.readBoolean("log.main.sql", true);
 				logDataConsole = new ArrayList<>();
 				logDataFile = new ArrayList<>();
+				logDataSQL = new ArrayList<>();
 				for (String boardId : config.readKeysForSection("log.data")) {
 					if (config.readBoolean("log.data." + boardId + ".console", true)) logDataConsole.add(boardId.toLowerCase());
 					if (config.readBoolean("log.data." + boardId + ".file", true)) logDataFile.add(boardId.toLowerCase());
+					if (config.readBoolean("log.data." + boardId + ".sql", true)) logDataSQL.add(boardId.toLowerCase());
 				}
 				for (String boardId : config.readKeysForSection("data_backend")) {
 					dataBackEnds.put(boardId.toLowerCase(), config.readEnum("data_backend." + boardId, DataBackEnd.JSON, DataBackEnd.class));

@@ -50,6 +50,7 @@ public class ArgumentInteger extends Argument<Integer> {
 		_1_2_3_4_5_6_7_8_9_10(CollectionUtils.asList("1", "2", "3", "4", "5", "6", "7", "8", "9", "10")),
 		_1_2_5_10(CollectionUtils.asList("1", "2", "5", "10")),
 		_10_15_30_60_90_120(CollectionUtils.asList("10", "15", "30", "60", "90", "120")),
+		_10_100_1000_10000_100000(CollectionUtils.asList("10", "100", "1000", "1000", "10000", "100000")),
 		DECIMALS(CollectionUtils.asList("0.5", "1", "1.5", "2", "2.5")),
 		;
 

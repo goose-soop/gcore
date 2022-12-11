@@ -9,6 +9,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.function.BiFunction;
 
+import javax.annotation.Nullable;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
@@ -89,6 +91,7 @@ public class ConfigGCore extends GPluginConfig {
 	public static boolean ignoreInvalidElementValues;
 	public static boolean logspamItemNbt;
 	public static boolean dontCacheOfflinePlayersOnLoad;
+	public static boolean dontFetchPlayerProfiles;
 
 	public static long permissionCacheRetainMillis;
 
@@ -240,11 +243,12 @@ public class ConfigGCore extends GPluginConfig {
 		logspamItemNbt = baseConfig.readBoolean("logspam_item_nbt", false);
 		customEventsThread = baseConfig.readEnum("custom_events_thread", BukkitThread.SYNC, BukkitThread.class);
 		dontCacheOfflinePlayersOnLoad = baseConfig.readBoolean("dont_cache_offline_players_on_load", false);
+		dontFetchPlayerProfiles = baseConfig.readBoolean("dont_fetch_player_profiles", false);
 		permissionCacheRetainMillis = baseConfig.readDurationMillis("permission_cache_retain_time", 15000L);
 		mySQLPre8019 = baseConfig.readBoolean("mysql.pre8019", true);
 
 		// data
-		if (baseConfig.contains("mysql")) {
+		/*if (baseConfig.contains("mysql")) {
 			String host = baseConfig.readMandatoryString("mysql.host");
 			String name = baseConfig.readMandatoryString("mysql.name");
 			String usr = baseConfig.readMandatoryString("mysql.user");
@@ -252,7 +256,7 @@ public class ConfigGCore extends GPluginConfig {
 			String customArgs = baseConfig.readString("mysql.args", "");
 			String url = "jdbc:mysql://" + host + "/" + name + "?allowMultiQueries=true" + customArgs;
 			GCore.inst().getMySQLHandler().setConnector(new SQLConnector(url, usr, pwd));
-		}
+		}*/
 
 		// gui
 		guiItemRefreshTicksPlaceholders = baseConfig.readMandatoryInteger("gui_items_refresh_ticks_placeholder");
@@ -281,6 +285,20 @@ public class ConfigGCore extends GPluginConfig {
 
 		// done, load loggers from base config
 		return baseConfig;
+	}
+
+	@Nullable
+	public static SQLConnector createMySQLConnector(GPlugin plugin) {
+		if (baseConfig.contains("mysql")) {
+			String host = baseConfig.readMandatoryString("mysql.host");
+			String name = baseConfig.readMandatoryString("mysql.name");
+			String usr = baseConfig.readMandatoryString("mysql.user");
+			String pwd = baseConfig.readMandatoryString("mysql.pass");
+			String customArgs = baseConfig.readString("mysql.args", "");
+			String url = "jdbc:mysql://" + host + "/" + name + "?allowMultiQueries=true" + customArgs;
+			return new SQLConnector(plugin, url, usr, pwd);
+		}
+		return null;
 	}
 
 	private void loadParticleScripts(File file) throws Throwable {

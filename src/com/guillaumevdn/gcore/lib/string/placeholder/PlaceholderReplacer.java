@@ -205,6 +205,13 @@ public class PlaceholderReplacer implements Comparable<PlaceholderReplacer> {
 		return null;  // no match;
 	}));
 
+	public static final PlaceholderReplacer PLAYER_DISPLAYNAME = register(new PlaceholderReplacer("player_displayname", 1, true, CollectionUtils.asList("§7Player display name : §8{player_displayname}"), (placeholderContent, player) -> {
+		if (placeholderContent.equalsIgnoreCase("player_displayname")) {
+			return player.getDisplayName();
+		}
+		return null;  // no match;
+	}));
+
 	public static final PlaceholderReplacer PLAYER = register(new PlaceholderReplacer("player", 1, true, CollectionUtils.asList("§7Player name : §8{player}"), (placeholderContent, player) -> {
 		if (placeholderContent.equalsIgnoreCase("player")) {
 			return player.getName();

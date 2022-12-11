@@ -8,6 +8,7 @@ import java.util.function.Function;
 
 import com.guillaumevdn.gcore.ConfigGCore;
 import com.guillaumevdn.gcore.lib.logging.Logger;
+import com.guillaumevdn.gcore.lib.serialization.Serializer;
 
 /**
  * @author GuillaumeVDN
@@ -52,7 +53,7 @@ public final class Query {
 	}
 
 	public void logTo(Logger logger) {
-		if (logger != null) {
+		if (logger != null && logger.isLogSQL()) {
 			logger.info("\n--------- PERFORMING QUERY ----------" + logToString() + "\n--------------------------------");
 		}
 	}
@@ -91,7 +92,8 @@ public final class Query {
 		int i = -1;
 		for (T key : keysToString) {
 			if (++i != 0) query += ",";
-			query += escapeValue(String.valueOf(key));
+			final Serializer<T> serializer = Serializer.find((Class<T>) key.getClass());
+			query += escapeValue(serializer.serialize(key));
 		}
 		query += ")";
 		return query;
@@ -123,7 +125,8 @@ public final class Query {
 			String data = getData.apply(key);
 			if (data != null && !data.equals("null")) {  // happens to WarnD sometimes, this writes a null value directly into the database, causing quests to reset ; this avoids it, although further investigation is needed to find the cause
 				String q = ++i != 0 ? "," : "";
-				q += "(" + Query.escapeValue(String.valueOf(key)) + "," + Query.escapeValue(data) + ")";
+				final Serializer<T> serializer = Serializer.find((Class<T>) key.getClass());
+				q += "(" + Query.escapeValue(serializer.serialize(key)) + "," + Query.escapeValue(data) + ")";
 				query.add(q);
 			}
 		}

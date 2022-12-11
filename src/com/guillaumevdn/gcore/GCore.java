@@ -98,7 +98,7 @@ public final class GCore extends GPlugin<ConfigGCore, PermissionGCore> {
 	PositionTypes positionTypes = null;
 	GUIItemTypes guiItemTypes = null;
 
-	private MySQLHandler mysqlHandler = new MySQLHandler();
+	//private MySQLHandler mysqlHandler = new MySQLHandler();
 	private WorkerGCore worker;
 
 	public TimeFrameTypes getTimeFrameTypes() {
@@ -113,8 +113,12 @@ public final class GCore extends GPlugin<ConfigGCore, PermissionGCore> {
 		return guiItemTypes;
 	}
 
-	public MySQLHandler getMySQLHandler() {
+	/*public MySQLHandler getMySQLHandler() {
 		return mysqlHandler;
+	}*/
+	@Deprecated
+	public MySQLHandler getMySQLHandler() {
+		return new MySQLHandler(ConfigGCore.createMySQLConnector(this));
 	}
 
 	public WorkerGCore getWorler() {
@@ -178,14 +182,14 @@ public final class GCore extends GPlugin<ConfigGCore, PermissionGCore> {
 		} catch (Throwable ignored) {}
 
 		// try to connect to mysql
-		try {
+		/*try {
 			mysqlHandler.updateCanConnect();
 			if (mysqlHandler.canConnect()) {
 				getMainLogger().info("Connected to MySQL");
 			}
 		} catch (Throwable exception) {
 			getMainLogger().error("couldn't initialize mysql connection, no data will be saved on database during this session", exception);
-		}
+		}*/
 
 		// init worker
 		getMainLogger().info("Initializing worker and caches");

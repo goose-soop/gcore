@@ -36,6 +36,11 @@ public class RWHashSet<T> extends HashSet<T> {
 		super(initialCapacity);
 	}
 
+	public RWHashSet(Collection<T> coll) {
+		super(coll.size());
+		addAll(coll);
+	}
+
 	// -------------------- lock --------------------
 
 	private final RWLock lock = new RWLock();
@@ -86,7 +91,7 @@ public class RWHashSet<T> extends HashSet<T> {
 		try {
 			Iterator<T> it = super.iterator();
 			IteratorControls iter = new IteratorControls();
-			
+
 			while (it.hasNext()) {
 				T next = it.next();
 				consumer.accept(next, iter);

@@ -120,6 +120,8 @@ public final class PlayerUtils {
 			OfflinePlayer player = (OfflinePlayer) target;
 			Player playerOnline = PlayerUtils.getOnline(player);
 			return playerOnline == null ? player.isOp() : hasPermission0(playerOnline, permission);
+		} else if (target instanceof CommandCall) {
+			return hasPermission0(((CommandCall) target).getSender(), permission);
 		} else if (target instanceof UUID) {
 			return hasPermission(Bukkit.getOfflinePlayer((UUID) target), permission);
 		} else if (target instanceof Replacer) {

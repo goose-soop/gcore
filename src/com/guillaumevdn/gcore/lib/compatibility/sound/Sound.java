@@ -6,11 +6,13 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.guillaumevdn.gcore.ConfigGCore;
 import com.guillaumevdn.gcore.lib.compatibility.variants.Variant;
 import com.guillaumevdn.gcore.lib.location.Point;
+import com.guillaumevdn.gcore.lib.object.ObjectUtils;
 import com.guillaumevdn.gcore.lib.object.Optional;
 import com.guillaumevdn.gcore.lib.player.PlayerUtils;
 
@@ -49,6 +51,9 @@ public class Sound extends Variant<SoundData> {
 			}
 		} else if (target instanceof OfflinePlayer) {
 			final Player player = PlayerUtils.getOnline((OfflinePlayer) target);
+			if (player != null) player.playSound(forceLocation != null ? forceLocation : player.getLocation(), getData().getDataInstance(), volume, pitch);
+		} else if (target instanceof CommandSender) {
+			final Player player = ObjectUtils.castOrNull(target, Player.class);
 			if (player != null) player.playSound(forceLocation != null ? forceLocation : player.getLocation(), getData().getDataInstance(), volume, pitch);
 		} else if (target instanceof UUID) {
 			final Player player = Bukkit.getPlayer((UUID) target);

@@ -2,6 +2,8 @@ package com.guillaumevdn.gcore.lib.command;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -50,6 +52,7 @@ public class CommandCall {
 		return sender;
 	}
 
+	@Nullable
 	public Player getSenderPlayer() {
 		return senderPlayer;
 	}

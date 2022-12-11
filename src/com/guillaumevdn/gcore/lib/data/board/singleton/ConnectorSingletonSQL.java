@@ -39,14 +39,14 @@ public abstract class ConnectorSingletonSQL<W> implements BoardConnector {
 	@Override
 	public void remoteInit() throws Throwable {
 		if (handler instanceof SQLiteHandler) {
-			handler.performUpdateQuery(board.getPlugin(), board.getLogger(),
+			handler.performUpdateQuery(board.getLogger(),
 					"CREATE TABLE IF NOT EXISTS " + tableName() + "("
 							+ "version SMALLINT NOT NULL PRIMARY KEY,"
 							+ "data LONGTEXT NOT NULL"
 							+ ");"
 					);
 		} else {
-			handler.performUpdateQuery(board.getPlugin(), board.getLogger(),
+			handler.performUpdateQuery(board.getLogger(),
 					"CREATE TABLE IF NOT EXISTS " + tableName() + "("
 							+ "version SMALLINT NOT NULL,"
 							+ "data LONGTEXT NOT NULL,"
@@ -59,7 +59,7 @@ public abstract class ConnectorSingletonSQL<W> implements BoardConnector {
 	@Override
 	public final void remotePullAll() throws Throwable {
 		Query query = new Query("SELECT * FROM " + tableName() + " WHERE version = " + dataVersion() + ";");
-		handler.performGetQuery(board.getPlugin(), board.getLogger(), query, set -> {
+		handler.performGetQuery(board.getLogger(), query, set -> {
 			if (set.next()) {
 				try {
 					String json = set.getString("data");
@@ -98,7 +98,7 @@ public abstract class ConnectorSingletonSQL<W> implements BoardConnector {
 					+ ";");
 		}
 
-		handler.performUpdateQuery(board.getPlugin(), board.getLogger(), insertQuery);
+		handler.performUpdateQuery(board.getLogger(), insertQuery);
 	}
 
 	protected abstract void unwrapJsonData(W wrapper);

@@ -7,7 +7,7 @@ import org.bukkit.entity.Entity;
  */
 public enum VehicleType {
 
-	BOAT, MINECART, HORSE, DONKEY, MULE, LLAMA, PIG;
+	BOAT, MINECART, HORSE, DONKEY, MULE, LLAMA, PIG, STRIDER;
 
 	public static VehicleType fromEntity(Entity vehicle) {
 		if (vehicle != null) {

@@ -43,8 +43,7 @@ public class PlaceholderExpansionGCore extends PlaceholderExpansion {
 	@Override
 	public String onPlaceholderRequest(Player player, String params) {
 		// other player
-		int last = params.lastIndexOf('_');
-		if (last != -1) {
+		for (int last = params.length(); (last = params.lastIndexOf('_', last - 1)) != -1; ) {
 			Player otherPlayer = Bukkit.getPlayer(params.substring(last + 1));
 			if (otherPlayer != null) {
 				return parse(otherPlayer, params.substring(0, last));

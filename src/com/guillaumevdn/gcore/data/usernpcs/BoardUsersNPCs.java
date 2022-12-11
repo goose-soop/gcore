@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import com.guillaumevdn.gcore.ConfigGCore;
 import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.lib.bukkit.BukkitThread;
 import com.guillaumevdn.gcore.lib.compatibility.Version;
@@ -15,6 +16,7 @@ import com.guillaumevdn.gcore.lib.data.board.keyed.ConnectorKeyed;
 import com.guillaumevdn.gcore.lib.data.board.keyed.ConnectorKeyedJson;
 import com.guillaumevdn.gcore.lib.data.board.keyed.ConnectorKeyedSQL;
 import com.guillaumevdn.gcore.lib.data.board.keyed.KeyedBoardRemote;
+import com.guillaumevdn.gcore.lib.data.sql.MySQLHandler;
 import com.guillaumevdn.gcore.lib.data.sql.SQLHandler;
 import com.guillaumevdn.gcore.lib.data.sql.SQLiteHandler;
 import com.guillaumevdn.gcore.lib.file.FileUtils;
@@ -160,12 +162,12 @@ public class BoardUsersNPCs extends KeyedBoardRemote<UUID, UserNPCs> {
 
 	@Override
 	protected ConnectorKeyed<UUID, UserNPCs> createConnectorMySQL() {
-		return createConnectorSQL(GCore.inst().getMySQLHandler());
+		return createConnectorSQL(new MySQLHandler(ConfigGCore.createMySQLConnector(getPlugin())));
 	}
 
 	@Override
 	protected ConnectorKeyed<UUID, UserNPCs> createConnectorSQLite() {
-		return createConnectorSQL(new SQLiteHandler(GCore.inst().getDataFile("data_v8/users_npcs.sqlite.db")));
+		return createConnectorSQL(new SQLiteHandler(getPlugin(), GCore.inst().getDataFile("data_v8/users_npcs.sqlite.db")));
 	}
 
 }

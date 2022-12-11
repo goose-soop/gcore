@@ -341,14 +341,21 @@ public final class StringUtils {
 		return formatDurationTicks(ticks, true);
 	}
 
-	public static String formatDurationTicks(long ticks, boolean allowSecs) {
+	public static String formatDurationTicks(long ticks, boolean allowSecondsDecimals) {
 		int seconds = (int) (ticks / 20L);
-		float secondsDecimals = !allowSecs ? 0f : (float) (((double) (ticks % 20L)) / 20d);
+		float secondsDecimals = !allowSecondsDecimals ? 0f : (float) (((double) (ticks % 20L)) / 20d);
 		return formatDurationSeconds(seconds, secondsDecimals);
 	}
 
 	public static String formatDurationMillis(long millis) {
-		return formatDurationSeconds((int) (millis / 1000L), 0f);
+		return formatDurationMillis(millis, false);
+	}
+
+	public static String formatDurationMillis(long millis, boolean allowSecondsDecimals) {
+		int seconds = (int) (millis / 1000L);
+		float secondsDecimals = !allowSecondsDecimals ? 0f : (float) (((double) (millis % 1000L)) / 1000d);
+
+		return formatDurationSeconds(seconds, secondsDecimals);
 	}
 
 	public static String formatDurationMillisWithSecondDecimals(long millis) {
@@ -625,7 +632,7 @@ public final class StringUtils {
 	}
 
 	public static String snakeCaseToCamelCase(String string) {
-		StringBuilder builder = new StringBuilder(string.length() * 2);  // worst case
+		final StringBuilder builder = new StringBuilder(string.length() * 2);  // worst case
 		boolean upNext = false;
 		for (char ch : string.toCharArray()) {
 			if (ch == '_') {

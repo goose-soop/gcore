@@ -15,7 +15,7 @@ import com.guillaumevdn.gcore.lib.gui.struct.GUIItem;
  * Represents an active ItemHolder, built for one GUI
  * It's built when the GUI is loaded or refreshed, and destroyed when the GUI is destroyed
  * -> each ItemHolder will produce exactly one ActiveItemHolders in each GUI lifecycle (by default, if not forced manually)
- * -> the ActiveGUIItems are the one in charge of creating, removing and refreshing their icons (GUIItem)
+ * -> the active holders are the ones in charge of creating, removing and refreshing their icons (GUIItem)
  * @author GuillaumeVDN
  */
 public abstract class ActiveItemHolder {

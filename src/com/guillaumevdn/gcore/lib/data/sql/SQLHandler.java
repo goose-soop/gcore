@@ -13,9 +13,29 @@ public interface SQLHandler {
 
 	void shutdown();
 
-	boolean performUpdateQuery(GPlugin plugin, Logger logQueryTo, String query);
-	boolean performUpdateQuery(GPlugin plugin, Logger logQueryTo, Query query);
-	boolean performGetQuery(GPlugin plugin, Logger logQueryTo, String query, ThrowableConsumer<ResultSet> syncProcessor);
-	boolean performGetQuery(GPlugin plugin, Logger logQueryTo, Query query, ThrowableConsumer<ResultSet> syncProcessor);
+	@Deprecated
+	default boolean performUpdateQuery(GPlugin plugin, Logger logQueryTo, String query) {
+		return performUpdateQuery(logQueryTo, query);
+	}
+
+	@Deprecated
+	default boolean performUpdateQuery(GPlugin plugin, Logger logQueryTo, Query query) {
+		return performUpdateQuery(logQueryTo, query);
+	}
+
+	@Deprecated
+	default boolean performGetQuery(GPlugin plugin, Logger logQueryTo, String query, ThrowableConsumer<ResultSet> syncProcessor) {
+		return performGetQuery(logQueryTo, query, syncProcessor);
+	}
+
+	@Deprecated
+	default boolean performGetQuery(GPlugin plugin, Logger logQueryTo, Query query, ThrowableConsumer<ResultSet> syncProcessor) {
+		return performGetQuery(logQueryTo, query, syncProcessor);
+	}
+
+	boolean performUpdateQuery(Logger logQueryTo, String query);
+	boolean performUpdateQuery(Logger logQueryTo, Query query);
+	boolean performGetQuery(Logger logQueryTo, String query, ThrowableConsumer<ResultSet> syncProcessor);
+	boolean performGetQuery(Logger logQueryTo, Query query, ThrowableConsumer<ResultSet> syncProcessor);
 
 }

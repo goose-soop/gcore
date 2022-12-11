@@ -19,6 +19,10 @@ public class ElementCommandList extends ElementStringList {
 		super(parent, id, need, editorDescription);
 	}
 
+	public void execute(OfflinePlayer player) {
+		execute(player, null);
+	}
+
 	public void execute(OfflinePlayer player, Replacer replacer) {
 		final Replacer rep = replacer == null ? Replacer.empty() : replacer.cloneReplacer();
 		final List<String> commands = parse(rep.with("{player}", () -> player.getName())).orEmptyList();

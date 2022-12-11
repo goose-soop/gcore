@@ -176,10 +176,14 @@ public class ElementNotify extends ContainerElement {
 	}
 
 	public void sendAll(Collection<Player> players, Replacer replacer, @Nullable Location soundLocation, @Nullable Double forceBossbarProgress) {
+		sendAll(players, replacer, soundLocation, forceBossbarProgress, null);
+	}
+
+	public void sendAll(Collection<Player> players, Replacer replacer, @Nullable Location soundLocation, @Nullable Double forceBossbarProgress, @Nullable BossbarColor forceBossbarColor) {
 		if (!readContains()) return;
 		sendMessage(players, replacer);
 		sendActionbar(players, replacer);
-		sendBossbar(players, replacer, null, forceBossbarProgress, null);
+		sendBossbar(players, replacer, null, forceBossbarProgress, forceBossbarColor);
 		sendTitle(players, replacer);
 		playSound(players, replacer, soundLocation);
 	}

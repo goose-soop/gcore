@@ -166,7 +166,7 @@ public abstract class ActiveGUI extends GUI {
 
 	@Override
 	public void onPlayerInventoryClick(ClickCall call, ItemStack item) {
-		activeHolders.iterateAndModify((__, active, iter) -> {
+		activeHolders.iterateNoModify((__, active, iter) -> {
 			if (active.onPlayerInventoryClick(call, item)) {
 				iter.stop();
 			}

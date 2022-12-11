@@ -35,7 +35,7 @@ public final class Bossbar {
 		this.color = color;
 		this.style = style;
 		this.flags = flags == null ? new ArrayList<>() : flags;
-		this.progress = Math.max(Math.min(progress, 1d), 0d);
+		this.progress = !Double.isFinite(progress) ? 1d : Math.max(Math.min(progress, 1d), 0d);
 		this.players = CollectionUtils.asSet(players);
 	}
 
@@ -79,7 +79,7 @@ public final class Bossbar {
 	}
 
 	public void setProgress(double progress) {
-		this.progress = Math.max(Math.min(progress, 1d), 0d);
+		this.progress = !Double.isFinite(progress) ? 1d : Math.max(Math.min(progress, 1d), 0d);
 		BossbarCompat.setProgress(this);
 	}
 

@@ -66,6 +66,7 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 	private final int spigotResourceId;
 	private final String mainCommandName;
 	private final String mainCommandHelpAlias;
+	protected boolean mainCommandUtils = true;
 	private final Class<C> configurationClass;
 	private final Class<P> permissionContainerClass;
 	private final String dataContainerFolderName;
@@ -415,13 +416,15 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 			}
 
 			// initialize main command
-			mainCommand = registerCommand(new Command(this, mainCommandName, mainCommandName, buildMainCommandBase()));
+			mainCommand = registerCommand(new Command(this, mainCommandName, mainCommandHelpAlias, buildMainCommandBase()));
 			mainCommand.setSubcommand(new GenericReload(this));
-			mainCommand.setSubcommand(new GenericMigrate(this));
-			mainCommand.setSubcommand(new GenericPluginState(this));
+			if (mainCommandUtils) {
+				mainCommand.setSubcommand(new GenericMigrate(this));
+				mainCommand.setSubcommand(new GenericPluginState(this));
+			}
 
 			// register main logger
-			registerLogger(mainLogger = new Logger(this, getName() + "-" + getDescription().getVersion(), getConfiguration().logMainConsole(), getConfiguration().logMainFile()));
+			registerLogger(mainLogger = new Logger(this, getName() + "-" + getDescription().getVersion(), getConfiguration().logMainConsole(), getConfiguration().logMainFile(), getConfiguration().logMainSQL()));
 
 			// register data
 			try {

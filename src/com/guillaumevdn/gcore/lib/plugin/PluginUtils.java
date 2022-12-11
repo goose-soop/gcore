@@ -29,9 +29,13 @@ public final class PluginUtils {
 	}
 
 	public static Plugin getPlugin(String plugin) {
+		return getPluginC(plugin);
+	}
+
+	public static <P extends Plugin> P getPluginC(String plugin) {
 		for (Plugin pl : Bukkit.getPluginManager().getPlugins()) {
 			if (pl.getName().equalsIgnoreCase(plugin)) {
-				return pl;
+				return (P) pl;
 			}
 		}
 		return null;

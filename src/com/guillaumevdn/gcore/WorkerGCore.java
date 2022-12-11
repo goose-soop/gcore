@@ -189,6 +189,12 @@ public class WorkerGCore {
 		}
 		// no data
 		else if (ownerUUID != null || ownerName != null) {
+			// disabled in config, don't fetch at all
+			if (ConfigGCore.dontFetchPlayerProfiles) {
+				callback.accept(DEFAULT_PROFILE);
+				return;
+			}
+
 			//Bukkit.getLogger().info("-- must fetch profile for uuid " + ownerUUID + " / " + ownerName);
 			UUID actualUUID = ownerUUID;
 			// if offline mode, force fetching of UUID

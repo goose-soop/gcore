@@ -48,6 +48,7 @@ public enum TextGeneric implements TextEnumElement {
 	durationFormatMS,
 	durationFormatHMS,
 	durationFormatDHMS,
+	durationFormatDays,
 
 	// ----- cost
 	messageMustHaveCurrency,

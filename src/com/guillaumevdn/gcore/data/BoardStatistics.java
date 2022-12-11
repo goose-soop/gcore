@@ -11,10 +11,12 @@ import java.util.UUID;
 
 import org.bukkit.entity.Player;
 
+import com.guillaumevdn.gcore.ConfigGCore;
 import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.lib.data.board.keyed.bi.BiKeyedBoardRemote;
 import com.guillaumevdn.gcore.lib.data.board.keyed.bi.ConnectorBiKeyedJson;
 import com.guillaumevdn.gcore.lib.data.board.keyed.bi.ConnectorBiKeyedSQL;
+import com.guillaumevdn.gcore.lib.data.sql.MySQLHandler;
 import com.guillaumevdn.gcore.lib.data.sql.SQLHandler;
 import com.guillaumevdn.gcore.lib.data.sql.SQLiteHandler;
 import com.guillaumevdn.gcore.lib.file.FileUtils;
@@ -132,12 +134,12 @@ public class BoardStatistics extends BiKeyedBoardRemote<Statistic, UUID, Double>
 
 	@Override
 	protected ConnectorBiKeyedSQL<Statistic, UUID, Double> createConnectorMySQL() {
-		return createConnectorSQL(GCore.inst().getMySQLHandler());
+		return createConnectorSQL(new MySQLHandler(ConfigGCore.createMySQLConnector(getPlugin())));
 	}
 
 	@Override
 	protected ConnectorBiKeyedSQL<Statistic, UUID, Double> createConnectorSQLite() {
-		return createConnectorSQL(new SQLiteHandler(GCore.inst().getDataFile("data_v8/statistics.sqlite.db")));
+		return createConnectorSQL(new SQLiteHandler(getPlugin(), GCore.inst().getDataFile("data_v8/statistics.sqlite.db")));
 	}
 
 }

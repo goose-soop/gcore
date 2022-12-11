@@ -3,16 +3,16 @@
 # 作者: GuillaumeVDN
 # 語言: 中文繁體
 # 翻譯: Kevin
-# Discord: ༄༊࿆さくらじま まいོྂཾ࿐#0001
-# 如在翻譯上有任何疑慮歡迎私訊༄༊࿆さくらじま まいོྂཾ࿐#0001
+# Discord: Krick#9685
+# 如在翻譯上有任何疑慮歡迎私訊 Krick#9685 或加入 https://discord.gg/V5Vw3KGzzq 聯絡我
 # 在插件上有任何疑慮請至 https://discord.com/invite/wSm9A8Y 尋求幫助
 # ===================
 # GCore language files (zh_TW)
 # Author: GuillaumeVDN
 # Language: Chinese Traditional
 # Translation: Kevin
-# Discord: ༄༊࿆さくらじま まいོྂཾ࿐#0001
-# If you have any doubts about translation, please send a private message ༄༊࿆さくらじま まいོྂཾ࿐#0001
+# Discord: Krick#9685
+# If you have any doubts about translation, please send a private message Krick#9685 or join https://discord.gg/V5Vw3KGzzq
 # If you have any concerns about the plugin, please go to https://discord.com/invite/wSm9A8Y for help
 # ===================
 
@@ -28,11 +28,11 @@ elementTypeMandatory: |
 elementTypeOptional: |
   &a這是個可選的{type}
 
-elementCurrentValue無: |
+elementCurrentValueNone: |
   &9當前值:
   &7無
 
-elementCurrentValue無Default: |
+elementCurrentValueNoneDefault: |
   &9當前值(默認):
   &7無
 
@@ -121,6 +121,9 @@ controlTextSetRandom: |
 
 descriptionItemType: |
   &7物品類型
+
+descriptionItemTypeHDB: |
+  &7HeadDatabase 識別ID
 
 descriptionItemDurability: |
   &7物品耐久度
@@ -404,6 +407,14 @@ descriptionCommandRestrictionWhitelist: |
 
 descriptionCommandRestrictionBlacklist: |
   &7禁止使用的指令
+
+# -------------------- 指令限制 --------------------
+
+descriptionMatRestrictionWhitelist: |
+  &7固定的允許材料清單
+
+descriptionMatRestrictionBlacklist: |
+  &7永遠被禁止的材料清單
 
 # -------------------- Dynmap標記 --------------------
 

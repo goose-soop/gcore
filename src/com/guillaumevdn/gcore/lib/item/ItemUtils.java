@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import javax.annotation.Nullable;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.SkullType;
@@ -543,10 +545,32 @@ public final class ItemUtils {
 		if (clone) {
 			item = item.clone();
 		}
-		ItemMeta meta = item.getItemMeta();
-		List<String> lore = meta.getLore() != null ? meta.getLore() : new ArrayList<>();
-		lore.addAll(toAdd);
-		meta.setLore(lore);
+		final ItemMeta meta = item.getItemMeta();
+		if (meta != null) {  // has happened
+			final List<String> lore = meta.getLore() != null ? meta.getLore() : new ArrayList<>();
+			lore.addAll(toAdd);
+			meta.setLore(lore);
+			item.setItemMeta(meta);
+		}
+		return item;
+	}
+
+	public static ItemStack maybeReplaceNameAndAddLore(ItemStack item, @Nullable String name, @Nullable List<String> loreToAdd, boolean clone) {
+		if (clone) {
+			item = item.clone();
+		}
+		final ItemMeta meta = item.getItemMeta();
+
+		if (name != null) {
+			meta.setDisplayName(name);
+		}
+
+		if (loreToAdd != null) {
+			final List<String> lore = meta.getLore() != null ? meta.getLore() : new ArrayList<>();
+			lore.addAll(loreToAdd);
+			meta.setLore(lore);
+		}
+
 		item.setItemMeta(meta);
 		return item;
 	}

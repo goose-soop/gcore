@@ -548,7 +548,7 @@ public class GUI {
 	// ----- open and fill
 	/** @return true if the GUI must be opened after refilling it */
 	public boolean refill() {
-		Map<Player, Integer> viewers = getViewers();
+		final Map<Player, Integer> viewers = getViewers();
 
 		// clear/fill
 		clear();

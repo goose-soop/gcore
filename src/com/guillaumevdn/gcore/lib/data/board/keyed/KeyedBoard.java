@@ -1,5 +1,6 @@
 package com.guillaumevdn.gcore.lib.data.board.keyed;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,7 +36,7 @@ public abstract class KeyedBoard<K, V> extends Board<ConnectorKeyed<K, V>> {
 	}
 
 	// ----------------------------------------------------------------------------------------------------
-	// ----- get
+	// 		 get
 	// ----------------------------------------------------------------------------------------------------
 
 	public final Class<V> getValueClass() {
@@ -91,7 +92,7 @@ public abstract class KeyedBoard<K, V> extends Board<ConnectorKeyed<K, V>> {
 	}
 
 	// ----------------------------------------------------------------------------------------------------
-	// ----- save
+	// 		 save
 	// ----------------------------------------------------------------------------------------------------
 
 	private transient RWHashSet<K> toSave = new RWHashSet<>(5);
@@ -99,6 +100,10 @@ public abstract class KeyedBoard<K, V> extends Board<ConnectorKeyed<K, V>> {
 	@Override
 	public boolean mustSaveSomething() {
 		return !toSave.isEmpty();
+	}
+
+	public Set<K> getToSave() {
+		return Collections.unmodifiableSet(toSave.copy());
 	}
 
 	public final void addCachedToSave(K element) {
@@ -110,14 +115,14 @@ public abstract class KeyedBoard<K, V> extends Board<ConnectorKeyed<K, V>> {
 	}
 
 	@Override
-	public final void saveNeeded(BukkitThread thread) {
+	public void saveNeeded(BukkitThread thread, ThrowableRunnable callback) {
 		toSave.consume().forEach(r -> {
-			pushElements(thread, CollectionUtils.asSet(r), null);
+			pushElements(thread, CollectionUtils.asSet(r), callback);
 		});
 	}
 
 	// ----------------------------------------------------------------------------------------------------
-	// ----- data
+	// 		 data
 	// ----------------------------------------------------------------------------------------------------
 
 	public final void pullElements(BukkitThread thread, Set<K> keys, ThrowableRunnable callback) {
@@ -147,10 +152,14 @@ public abstract class KeyedBoard<K, V> extends Board<ConnectorKeyed<K, V>> {
 		operate(thread, "push board elements " + keys, callback, () -> {
 			toSave.removeAll(keys);
 			operateOnConnector(c -> c.remotePushElements(keys));
+			pushedElements(thread, keys);
 		});
 	}
 
 	protected void beforePushElements(BukkitThread thread, Set<K> keys) {
+	}
+
+	protected void pushedElements(BukkitThread thread, Set<K> keys) {
 	}
 
 	public final void deleteElements(BukkitThread thread, Set<K> keys, ThrowableRunnable callback) {

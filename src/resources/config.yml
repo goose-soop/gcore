@@ -33,6 +33,7 @@ log:
     gcore_statistics_v8:
       console: false
       file: false
+      sql: false
 
 # --------------------------------------------------
 # Commands
@@ -218,6 +219,9 @@ permission_cache_retain_time: 10 SECOND
 
 # Use this to disable loading of offline players' cache if it's causing delays on load
 #dont_cache_offline_players_on_load: true
+
+# Use this to disable player's profile fetching (for head items skins, mainly)
+#dont_fetch_player_profiles: true
 
 # --------------------------------------------------
 # GUI

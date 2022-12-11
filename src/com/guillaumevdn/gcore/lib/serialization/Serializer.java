@@ -87,7 +87,7 @@ public abstract class Serializer<T> {
 		this.registered = register;
 	}
 
-	// ----- get
+	// 		 get
 	public final String getTypeName() {
 		return typeName;
 	}
@@ -104,7 +104,7 @@ public abstract class Serializer<T> {
 		return registered;
 	}
 
-	// ----- serialization
+	// 		 serialization
 	public abstract String serialize(T value);
 	public abstract T deserialize(String string);
 
@@ -117,7 +117,7 @@ public abstract class Serializer<T> {
 	}
 
 	// ----------------------------------------------------------------------------------------------------
-	// ----- registration
+	// 		 registration
 	// ----------------------------------------------------------------------------------------------------
 
 	private static final RWHashMap<Class, Serializer> registration = new RWHashMap<>(10, 1f);  // #2284, concurrent modification exception
@@ -156,11 +156,11 @@ public abstract class Serializer<T> {
 		registration.remove(serializerClass);
 	}
 
-	// ----- init
+	// 		 init
 	public static void init() {}
 
 	// ----------------------------------------------------------------------------------------------------
-	// ----- creation
+	// 		 creation
 	// ----------------------------------------------------------------------------------------------------
 
 	public static <T> Serializer<T> of(Class<T> typeClass, Function<T, String> serializer, Function<String, T> deserializer) {
@@ -250,7 +250,7 @@ public abstract class Serializer<T> {
 	}
 
 	// ----------------------------------------------------------------------------------------------------
-	// ----- types : java
+	// 		 types : java
 	// ----------------------------------------------------------------------------------------------------
 
 	public static final Serializer<String> STRING = of(String.class, value -> value, string -> string);
@@ -320,7 +320,7 @@ public abstract class Serializer<T> {
 	});
 
 	// ----------------------------------------------------------------------------------------------------
-	// ----- types : mine
+	// 		 types : mine
 	// ----------------------------------------------------------------------------------------------------
 
 	public static final Serializer<TimeFrameType> TIME_FRAME_TYPE = ofTypable(TimeFrameType.class, () -> TimeFrameTypes.inst());
@@ -335,7 +335,7 @@ public abstract class Serializer<T> {
 	public static final LinearSerializer<OverrideClickType, OverrideClick> OVERRIDE_CLICK = Serializer.ofLinear(Serializer.ofEnum(OverrideClickType.class), OverrideClick.class, (type, params) -> new OverrideClick(type, params));
 	public static final Serializer<Permission> PERMISSION = of(Permission.class, value -> value.getName(), string -> new Permission(string));
 	public static final Serializer<Point> POINT = of(Point.class,
-			value -> value.getWorld().getName() + "," + value.getX() + "," + value.getY() + "," + value.getZ(),
+			value -> value.getWorldName() + "," + value.getX() + "," + value.getY() + "," + value.getZ(),
 			string -> {
 				// not enough params
 				String[] split = string.split(",");
@@ -373,7 +373,7 @@ public abstract class Serializer<T> {
 	});
 
 	// ----------------------------------------------------------------------------------------------------
-	// ----- types : bukkit
+	// 		 types : bukkit
 	// ----------------------------------------------------------------------------------------------------
 
 	public static final Serializer NAMESPACED_KEY = !Version.ATLEAST_1_12 ? null : of(org.bukkit.NamespacedKey.class, value -> value.getNamespace() + ":" + value.getKey(), string -> {
@@ -442,13 +442,13 @@ public abstract class Serializer<T> {
 			});
 
 	// ----------------------------------------------------------------------------------------------------
-	// ----- types : linear
+	// 		 types : linear
 	// ----------------------------------------------------------------------------------------------------
 
 	public static final LinearSerializer<BlockStateType, BlockState> BLOCK_STATE = Serializer.ofLinear(Serializer.ofEnum(BlockStateType.class), BlockState.class, (type, params) -> new BlockState(type, params));
 
 	// ----------------------------------------------------------------------------------------------------
-	// ----- types : variants
+	// 		 types : variants
 	// ----------------------------------------------------------------------------------------------------
 
 	public static final Serializer<Sound> SOUND = of(Sound.class, value -> value.getId(), string -> Sound.firstFromIdOrDataName(string).orNull());

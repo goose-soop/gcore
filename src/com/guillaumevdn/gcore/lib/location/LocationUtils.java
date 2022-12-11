@@ -207,11 +207,31 @@ public final class LocationUtils {
 		return location.getY() >= y.getMin() && location.getY() <= y.getMax() && location.getX() >= x.getMin() && location.getX() <= x.getMax() && location.getZ() >= z.getMin() && location.getZ() <= z.getMax();
 	}
 
+	public static boolean isLocationContainedMinMax(Location location, Point min, Point max) {
+		return isLocationContainedMinMax(location, min, max, true);
+	}
+
+	public static boolean isLocationContainedMinMax(Location location, Point min, Point max, boolean checkY) {
+		return (!checkY || (location.getBlockY() >= min.getY() && location.getBlockY() <= max.getY())) && location.getBlockX() >= min.getX() && location.getBlockX() <= max.getX() && location.getBlockZ() >= min.getZ() && location.getBlockZ() <= max.getZ();
+	}
+
+	public static boolean isLocationContainedMinMax(Point point, Point min, Point max) {
+		return isLocationContainedMinMax(point, min, max, true);
+	}
+
+	public static boolean isLocationContainedMinMax(Point point, Point min, Point max, boolean checkY) {
+		return (!checkY || (point.getY() >= min.getY() && point.getY() <= max.getY())) && point.getX() >= min.getX() && point.getX() <= max.getX() && point.getZ() >= min.getZ() && point.getZ() <= max.getZ();
+	}
+
 	public static boolean isLocationContained(Location location, Location a, Location b) {
 		MinMaxDouble x = MinMaxDouble.of(a.getX(), b.getX());
 		MinMaxDouble y = MinMaxDouble.of(a.getY(), b.getY());
 		MinMaxDouble z = MinMaxDouble.of(a.getZ(), b.getZ());
 		return location.getY() >= y.getMin() && location.getY() <= y.getMax() && location.getX() >= x.getMin() && location.getX() <= x.getMax() && location.getZ() >= z.getMin() && location.getZ() <= z.getMax();
+	}
+
+	public static boolean isInRadius(Player player, Location center, double radius) {
+		return player.getWorld().equals(center.getWorld()) && player.getLocation().distance(center) <= radius;
 	}
 
 	public static Pair<Point, Point> minMaxPoints(Point a, Point b) {
@@ -309,6 +329,41 @@ public final class LocationUtils {
 		if (yaw < 0) yaw = 360d + yaw;
 		double pitch = -Math.asin(dy / r) / Math.PI * 180d;
 		return FloatPair.of((float) yaw, (float) pitch);
+	}
+
+	public static BlockFace getFacingCardinalDirection(Player player) {
+		double rotation = (player.getLocation().getYaw()) % 360f;
+		if (rotation < 0d) {
+			rotation += 360d;
+		}
+		if ((0d <= rotation) && (rotation < 22.5d)) {
+			return BlockFace.NORTH;
+		}
+		if ((22.5d <= rotation) && (rotation < 67.5d)) {
+			return BlockFace.NORTH_EAST;
+		}
+		if ((67.5d <= rotation) && (rotation < 112.5d)) {
+			return BlockFace.EAST;
+		}
+		if ((112.5d <= rotation) && (rotation < 157.5d)) {
+			return BlockFace.SOUTH_EAST;
+		}
+		if ((157.5d <= rotation) && (rotation < 202.5d)) {
+			return BlockFace.SOUTH;
+		}
+		if ((202.5d <= rotation) && (rotation < 247.5d)) {
+			return BlockFace.SOUTH_WEST;
+		}
+		if ((247.5d <= rotation) && (rotation < 292.5d)) {
+			return BlockFace.WEST;
+		}
+		if ((292.5d <= rotation) && (rotation < 337.5d)) {
+			return BlockFace.NORTH_WEST;
+		}
+		if ((337.5d <= rotation) && (rotation < 360d)) {
+			return BlockFace.NORTH;
+		}
+		return null;
 	}
 
 }

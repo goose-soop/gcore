@@ -8,7 +8,7 @@ import com.guillaumevdn.gcore.lib.function.ThrowableRunnable;
 /**
  * @author GuillaumeVDN
  */
-public final class RWLock {
+public class RWLock {
 
 	private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock(true);  // fair lock
 

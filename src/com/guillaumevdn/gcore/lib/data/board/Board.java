@@ -25,6 +25,7 @@ public abstract class Board<C extends BoardConnector> {
 
 	private BukkitTask savingTask = null;
 	private boolean initialized = false;
+	private boolean localPulledAll = false;
 
 	public Board(GPlugin plugin, String id, BoardType boardType, int saveDelayTicks) {
 		this.plugin = plugin;
@@ -32,7 +33,11 @@ public abstract class Board<C extends BoardConnector> {
 		this.boardType = boardType;
 		this.saveDelayTicks = saveDelayTicks;
 		String loggerId = "data-" + id;
-		plugin.registerLogger(logger = new Logger(plugin, plugin.getName() + "-" + loggerId, plugin.getConfiguration().logDataConsole(this), plugin.getConfiguration().logDataFile(this)));
+		plugin.registerLogger(logger = new Logger(plugin, plugin.getName() + "-" + loggerId,
+				plugin.getConfiguration().logDataConsole(this),
+				plugin.getConfiguration().logDataFile(this),
+				plugin.getConfiguration().logDataSQL(this)
+				));
 	}
 
 	// ----- connector
@@ -100,8 +105,12 @@ public abstract class Board<C extends BoardConnector> {
 		return initialized;
 	}
 
+	public final boolean didPullAllLocal() {
+		return localPulledAll;
+	}
+
 	// ----------------------------------------------------------------------------------------------------
-	// ----- saving
+	// 		 saving
 	// ----------------------------------------------------------------------------------------------------
 
 	public final void startSaving() {
@@ -116,12 +125,17 @@ public abstract class Board<C extends BoardConnector> {
 		getPlugin().stopTask("board_saving_" + getId());
 	}
 
-	public abstract void saveNeeded(BukkitThread thread);
+	public void saveNeeded(BukkitThread thread) {
+		saveNeeded(thread, null);
+	}
+	public void saveNeeded(BukkitThread thread, ThrowableRunnable callback) {
+		saveNeeded(thread);  // by default, use saveNeeded to avoid breaking API change
+	}
 
 	public abstract boolean mustSaveSomething();
 
 	// ----------------------------------------------------------------------------------------------------
-	// ----- data
+	// 		 data
 	// ----------------------------------------------------------------------------------------------------
 
 	public final void initialize(BukkitThread thread, ThrowableRunnable callback) {
@@ -133,11 +147,12 @@ public abstract class Board<C extends BoardConnector> {
 			initialized = true;
 			onInitialized();
 			if (boardType.equals(BoardType.LOCAL)) {
-				pullAll(thread, callback);
+				pullAll(thread, () -> {
+					localPulledAll = true;
+					if (callback != null) callback.run();
+				});
 			} else {
-				if (callback != null) {
-					callback.run();
-				}
+				if (callback != null) callback.run();
 			}
 		}, () -> {
 			operateOnConnector(BoardConnector::remoteInit);
@@ -166,10 +181,14 @@ public abstract class Board<C extends BoardConnector> {
 			connector.shutdown();
 			connector = null;
 		}
+		onShutdown();
+	}
+
+	protected void onShutdown() {
 	}
 
 	// ----------------------------------------------------------------------------------------------------
-	// ----- remote
+	// 		 remote
 	// ----------------------------------------------------------------------------------------------------
 
 	protected final void operate(BukkitThread thread, final String operationName, final ThrowableRunnable callback, final ThrowableRunnable runner) {
@@ -178,14 +197,8 @@ public abstract class Board<C extends BoardConnector> {
 			return;
 		}
 
-		// no data saving
-		if (getBackEnd().equals(DataBackEnd.MYSQL) && (GCore.inst().getMySQLHandler() == null || !GCore.inst().getMySQLHandler().canConnect())) {
-			logger.error("Couldn't operate board " + getId() + ", no SQLConnector connector found");
-			return;
-		}
-
 		// perform
-		Error origin = new Error("An error occured while performing operation");
+		final Error origin = new Error("An error occured while performing operation");
 		final long start = System.currentTimeMillis();
 		plugin.operate(thread, () -> {
 			try {

@@ -66,10 +66,10 @@ public class GcoreBoardConvert extends Subcommand {
 			return;
 		}
 
-		if (toBackEnd.equals(DataBackEnd.MYSQL) && !GCore.inst().getMySQLHandler().canConnect()) {
+		/*if (toBackEnd.equals(DataBackEnd.MYSQL) && !GCore.inst().getMySQLHandler().canConnect()) {
 			call.getSender().sendMessage("§7Could not connect to MySQL. Make sure the identifiers are correctly configured in §cGCore/config.yml§7.");
 			return;
-		}
+		}*/
 
 		GPlugin<?, ?> plugin = board.getPlugin();
 		if (mustConfirm.add(call.getSender())) {

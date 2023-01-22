@@ -16,7 +16,6 @@ public class ArgumentString extends Argument<String> {
 		super(need, playerOnly, permission, usage);
 	}
 
-	// ----- do
 	@Override
 	public String consume(CommandCall call) {
 		return call.getArguments().isEmpty() ? null : call.getArguments().remove(0);

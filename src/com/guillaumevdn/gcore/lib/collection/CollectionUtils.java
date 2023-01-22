@@ -432,6 +432,10 @@ public final class CollectionUtils {
 		return false;
 	}
 
+	public static <T> List<T> diff(Collection<T> a, Collection<T> b) {
+		return findNew(a, b);
+	}
+
 	public static <T> List<T> findNew(Collection<T> previous, Collection<T> next) {
 		List<T> diff = new ArrayList<>(next.size());
 		for (T elem : next) {

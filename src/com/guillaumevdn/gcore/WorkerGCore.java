@@ -9,6 +9,8 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
+import javax.annotation.Nullable;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -29,6 +31,8 @@ import com.guillaumevdn.gcore.lib.reflection.ReflectionObject;
 import com.guillaumevdn.gcore.lib.string.Text;
 import com.guillaumevdn.gcore.lib.tuple.Pair;
 import com.guillaumevdn.gcore.lib.tuple.Triple;
+import com.guillaumevdn.gcore.lib.wrapper.Wrapper;
+import com.guillaumevdn.gcore.lib.wrapper.WrapperString;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
@@ -58,7 +62,8 @@ public class WorkerGCore {
 	}
 
 	// ----- offline players
-	private LowerCaseHashMap<Pair<UUID, String>> offlinePlayersUUIDs = new LowerCaseHashMap<>(10, 0.75f);
+	private final LowerCaseHashMap<Pair<UUID, String>> offlinePlayersUUIDs = new LowerCaseHashMap<>(10, 0.75f);
+	private final RWHashMap<UUID, String> offlinePlayersNames = new RWHashMap<>(10, 0.75f);
 
 	public void registerOfflinePlayer(String name, UUID uuid) {
 		if (name != null) {
@@ -76,6 +81,48 @@ public class WorkerGCore {
 
 	public Stream<String> getOfflinePlayersNames() {
 		return offlinePlayersUUIDs.values().stream().map(Pair::getB);
+	}
+
+	public String getOrFetchOfflinePlayerNameAsync(OfflinePlayer player) {
+		final WrapperString wrapper = WrapperString.of("<?>");  // ewww
+		getOrFetchOfflinePlayerName(player, name -> {
+			wrapper.set(name);
+		});
+		return wrapper.get();
+	}
+
+	public void getOrFetchOfflinePlayerName(OfflinePlayer player, Consumer<String> callback) {
+		String name = player.getName();
+		if (name == null) {
+			name = offlinePlayersNames.get(player.getUniqueId());
+		}
+		if (name != null) {
+			callback.accept(name);
+		} else {
+			fetchProfile(player.getUniqueId(), null, null, null, profile -> {
+				final String n = profile != null && profile.getName() != null ? profile.getName() : "<name?>";
+				offlinePlayersNames.put(player.getUniqueId(), n);
+				callback.accept(n);
+			});
+		}
+	}
+
+	@Nullable
+	public UUID getOrFetchOfflinePlayerUUIDAsync(String name) {
+		final Wrapper<UUID> wrapper = Wrapper.of(null);  // ewww
+		getOrFetchOfflinePlayerUUID(name, uuid -> {
+			wrapper.set(uuid);
+		});
+		return wrapper.get();
+	}
+
+	public void getOrFetchOfflinePlayerUUID(String name, Consumer<UUID> callback) {
+		fetchProfile(null, name, null, null, profile -> {
+			final UUID uuid = profile != null ? profile.getId() : null;
+			final String n = profile != null && profile.getName() != null ? profile.getName() : "<name?>";
+			offlinePlayersNames.put(uuid, n);
+			callback.accept(uuid);
+		});
 	}
 
 	// ----- await inputs
@@ -126,8 +173,11 @@ public class WorkerGCore {
 		// cancel current
 		Pair<Consumer<String>, Runnable> currentChat = awaitingChats.remove(player.getUniqueId());
 		if (currentChat != null && currentChat.getB() != null) currentChat.getB().run();
+
 		// ask
-		player.closeInventory();
+		GCore.inst().operateSync(() -> {
+			player.closeInventory();
+		});
 		if (message != null) {
 			message.replace("{cancel}", () -> TextGeneric.textCancel.parseLine()).send(player);
 		}
@@ -138,8 +188,11 @@ public class WorkerGCore {
 		// cancel current
 		Pair<Consumer<String>, Runnable> currentChat = awaitingChats.remove(player.getUniqueId());
 		if (currentChat != null && currentChat.getB() != null) currentChat.getB().run();
+
 		// ask
-		player.closeInventory();
+		GCore.inst().operateSync(() -> {
+			player.closeInventory();
+		});
 		if (suggestValue != null && !suggestValue.isEmpty()) {
 			JsonMessage json = new JsonMessage();
 			json.append(message.replace("{cancel}", () -> TextGeneric.textCancel.parseLine()).parseLine()).setSuggest(suggestValue).build();

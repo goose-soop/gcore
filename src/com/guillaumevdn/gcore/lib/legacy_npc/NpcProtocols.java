@@ -2,6 +2,7 @@ package com.guillaumevdn.gcore.lib.legacy_npc;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -42,7 +43,11 @@ public final class NpcProtocols {
 
 	public NpcProtocols() throws Throwable {
 		slotEnum = Reflection.getNmsEnum((Version.REMAPPED ? "world.entity." : "") + "EnumItemSlot");
-		playerInfoActionEnum = Reflection.getNmsEnum((Version.REMAPPED ? "network.protocol.game." : "") + "PacketPlayOutPlayerInfo$EnumPlayerInfoAction");
+		if (Version.ATLEAST_1_19_3) {
+			playerInfoActionEnum = Reflection.getNmsEnum((Version.REMAPPED ? "network.protocol.game." : "") + "ClientboundPlayerInfoUpdatePacket$a");
+		} else {
+			playerInfoActionEnum = Reflection.getNmsEnum((Version.REMAPPED ? "network.protocol.game." : "") + "PacketPlayOutPlayerInfo$EnumPlayerInfoAction");
+		}
 		slots = CollectionUtils.asMap(
 				0, slotEnum.valueOf("MAINHAND").get(),
 				1, slotEnum.valueOf("OFFHAND").get(),
@@ -284,10 +289,12 @@ public final class NpcProtocols {
 		if (Version.ATLEAST_1_15) {
 			// create game profile
 			final WrappedGameProfile gameProfile = new WrappedGameProfile(UUID.randomUUID(), name.length() <= 16 ? name : name.substring(0, 16));
+
 			// skin
 			if (skinData != null && skinSignature != null) {
 				gameProfile.getProperties().put("textures", new WrappedSignedProperty("textures", skinData, skinSignature));
 			}
+
 			// create spawn packet
 			PacketContainer spawnPacket = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.NAMED_ENTITY_SPAWN);
 			spawnPacket.getIntegers().write(0, entityId);
@@ -297,36 +304,49 @@ public final class NpcProtocols {
 			spawnPacket.getBytes().write(0, (byte) (location.getYaw() * 256f / 360f));
 			spawnPacket.getBytes().write(1, (byte) (location.getPitch() * 256f / 360f));
 			spawnPacket.getSpecificModifier(UUID.class).write(0, gameProfile.getUUID());
+
 			// create metadata packet
 			WrappedDataWatcher metadata = createMetadata(getDefaultHumanEntityMetadata());
 			PacketContainer metadataPacket = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.ENTITY_METADATA);
 			metadataPacket.getIntegers().write(0, entityId);
 			metadataPacket.getWatchableCollectionModifier().write(0, metadata.getWatchableObjects());
+
 			// create info packet
-			PacketContainer infoPacket = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.PLAYER_INFO);
-			infoPacket.getSpecificModifier(infoActionEnum).write(0, playerInfoActionEnum.valueOf("ADD_PLAYER").get());
-			infoPacket.getSpecificModifier(List.class).write(0, Arrays.asList(createPlayerInfo(gameProfile.getHandle(), GameMode.SURVIVAL, 0, " ")));
+			final PacketContainer infoPacket = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.PLAYER_INFO);
+			if (Version.ATLEAST_1_19_3) {
+				infoPacket.getSpecificModifier(EnumSet.class).write(0, EnumSet.of(playerInfoActionEnum.valueOf("ADD_PLAYER").get()));
+				infoPacket.getSpecificModifier(List.class).write(0, Arrays.asList(createPlayerInfo(gameProfile.getHandle(), GameMode.SURVIVAL, 0, " ")));
+			} else {
+				infoPacket.getSpecificModifier(infoActionEnum).write(0, playerInfoActionEnum.valueOf("ADD_PLAYER").get());
+				infoPacket.getSpecificModifier(List.class).write(0, Arrays.asList(createPlayerInfo(gameProfile.getHandle(), GameMode.SURVIVAL, 0, " ")));
+			}
+
 			// send packets
 			sendPacket(player, infoPacket);
 			sendPacket(player, spawnPacket);
 			sendPacket(player, metadataPacket);
-			// more info
-			new BukkitRunnable() {
+
+			// remove info later
+			/*new BukkitRunnable() {
 				@Override
 				public void run() {
 					try {
-						// create packet
-						PacketContainer packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.PLAYER_INFO);
-						Object playerInfo = createPlayerInfo(gameProfile.getHandle(), GameMode.SURVIVAL, 0, " ");
-						packet.getSpecificModifier(infoActionEnum).write(0, playerInfoActionEnum.valueOf("REMOVE_PLAYER").get());
-						packet.getSpecificModifier(List.class).write(0, Arrays.asList(playerInfo));
-						// send packet
+						final PacketContainer packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.PLAYER_INFO);
+						if (Version.ATLEAST_1_19_3) {
+							infoPacket.getSpecificModifier(List.class).write(0, Arrays.asList(gameProfile.getUUID()));
+						} else {
+							Object playerInfo = createPlayerInfo(gameProfile.getHandle(), GameMode.SURVIVAL, 0, " ");
+							packet.getSpecificModifier(infoActionEnum).write(0, playerInfoActionEnum.valueOf("REMOVE_PLAYER").get());
+							packet.getSpecificModifier(List.class).write(0, Arrays.asList(playerInfo));
+						}
+
 						sendPacket(player, packet);
 					} catch (Throwable exception) {
 						exception.printStackTrace();
 					}
 				}
-			}.runTaskLater(GCore.inst(), 40L);
+			}.runTaskLater(GCore.inst(), 40L);*/
+
 			// update look
 			sendTarget(player, entityId, location.getYaw(), location.getPitch());
 		}

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
@@ -29,7 +30,7 @@ public final class LocationUtils {
 
 	// ----- get
 	public static List<Block> getSphereBlocks(Location center, int radius) {
-		List<Block> result = new ArrayList<>();  // a list so we don't check for duplicates every time we add one
+		List<Block> result = new ArrayList<>();
 		for (int offx = -radius; offx <= radius; ++offx) {
 			for (int offy = -radius; offy <= radius; ++offy) {
 				for (int offz = -radius; offz <= radius; ++offz) {
@@ -44,22 +45,44 @@ public final class LocationUtils {
 	}
 
 	public static List<Block> getBlocksOnSphere(Location center, int radius) {
-		List<Block> result = new ArrayList<>();  // a list so we don't check for duplicates every time we add one
+		final List<Block> result = new ArrayList<>();
+		forLocationsOnSphere(center, radius, loc -> result.add(loc.getBlock()));
+		return result;
+	}
+
+	public static void forLocationsOnSphere(Location center, int radius, Consumer<Location> forEach) {
 		for (int offx = -radius; offx <= radius; ++offx) {
 			for (int offy = -radius; offy <= radius; ++offy) {
 				for (int offz = -radius; offz <= radius; ++offz) {
-					Location b = center.clone().add(offx, offy, offz);
-					if (b.distance(center) >= radius - 1) {
-						result.add(b.getBlock());
+					final Location loc = center.clone().add(offx, offy, offz);
+					if (loc.distance(center) >= radius - 1) {
+						forEach.accept(loc);
 					}
 				}
 			}
 		}
-		return result;
+	}
+
+	public static void forLocationsOnCircle(Location center, int radius, Consumer<Location> forEach) {
+		/*for (int offx = -radius; offx <= radius; ++offx) {
+			for (int offz = -radius; offz <= radius; ++offz) {
+				final Location loc = center.clone().add(offx, 0, offz);
+				if (loc.distance(center) >= radius - 1) {
+					forEach.accept(loc);
+				}
+			}
+		}*/
+		for (int x = -radius; x < radius; x++) {
+			for (int z = -radius; z < radius; z++) {
+				if (Math.sqrt((x * x) + (z * z)) <= radius) {
+					forEach.accept(center.clone().add(x, 0, z));
+				}
+			}
+		}
 	}
 
 	public static List<Block> getAreaBlocks(Location a, Location b) {
-		List<Block> result = new ArrayList<>(); // a list so we don't check for duplicates every time we add one
+		List<Block> result = new ArrayList<>();
 		MinMaxInteger xm = MinMaxInteger.of(a.getBlockX(), b.getBlockX());
 		MinMaxInteger ym = MinMaxInteger.of(a.getBlockY(), b.getBlockY());
 		MinMaxInteger zm = MinMaxInteger.of(a.getBlockZ(), b.getBlockZ());

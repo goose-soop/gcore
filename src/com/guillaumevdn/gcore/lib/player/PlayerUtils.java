@@ -184,6 +184,24 @@ public final class PlayerUtils {
 		return null;
 	}
 
+	public static OfflinePlayer getOfflineWhoPlayedBefore(String name) {
+		final Player online = Bukkit.getPlayer(name);
+		if (online != null) {
+			return online;
+		}
+		final OfflinePlayer player = Bukkit.getOfflinePlayer(name);
+		return player != null && player.hasPlayedBefore() ? player : null;
+	}
+
+	public static OfflinePlayer getOfflineWhoPlayedBefore(UUID uuid) {
+		final Player online = Bukkit.getPlayer(uuid);
+		if (online != null) {
+			return online;
+		}
+		final OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
+		return player != null && player.hasPlayedBefore() ? player : null;
+	}
+
 	public static void clear(Player player) {
 		player.getInventory().clear();
 		player.getInventory().setHelmet(null);

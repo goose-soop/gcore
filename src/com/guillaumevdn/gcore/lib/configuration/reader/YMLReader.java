@@ -134,8 +134,11 @@ public class YMLReader {
 		if (NumberUtils.doubleOrNull(value) != null || NumberUtils.integerOrNull(value) != null || NumberUtils.longOrNull(value) != null || value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false")) {
 			return value;
 		}
-		// contains :
+		// contains : or ,
 		if (value.contains(":")) {
+			return "'" + value.replace("'", "''") + "'";
+		}
+		if (value.contains(",")) {
 			return "'" + value.replace("'", "''") + "'";
 		}
 		// starting or ending with a non-alphanumeric character

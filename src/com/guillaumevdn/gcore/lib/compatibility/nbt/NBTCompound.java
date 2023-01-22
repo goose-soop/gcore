@@ -36,7 +36,7 @@ public class NBTCompound extends NBTBase {
 
 	// ----- keys
 	public final Set<String> getKeys() throws Throwable {
-		return getTag().invokeMethod(Version.ATLEAST_1_18 ? "d" : (Version.ATLEAST_1_13 ? "getKeys" : "c")).get();
+		return getTag().invokeMethod(Version.ATLEAST_1_19_3 ? "e" : (Version.ATLEAST_1_18 ? "d" : (Version.ATLEAST_1_13 ? "getKeys" : "c"))).get();
 	}
 
 	public final boolean hasKey(String key) throws Throwable {

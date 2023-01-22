@@ -42,23 +42,23 @@ public final class MojangUtils {
 	@Nullable
 	public static GameProfile fetchProfile(UUID uuid) throws Throwable {
 		if (uuid == null) return null;  // I am haunted by this
-		String suuid = UUIDTypeAdapter.fromUUID(uuid);
-		ProfileAnswer answer = jsonRequest("https://sessionserver.mojang.com/session/minecraft/profile/" + suuid + "?unsigned=false", ProfileAnswer.class);
+		final String suuid = UUIDTypeAdapter.fromUUID(uuid);
+		final ProfileAnswer answer = jsonRequest("https://sessionserver.mojang.com/session/minecraft/profile/" + suuid + "?unsigned=false", ProfileAnswer.class);
 		if (answer == null) return null;
 		if (answer.name == null) return null; // throw new Error("No name found");
+
+		final GameProfile profile = new GameProfile(uuid, answer.name);
+
 		if (answer.properties == null || answer.properties.isEmpty()) return null; // throw new Error("No properties found (" + suuid + ")");
 		for (ProfileProperty property : answer.properties) {
 			if (property.name.equalsIgnoreCase("textures")) {
-				// find textures
-				if (property.value == null) return null;  // throw new Error("No value found in textures property (" + suuid + ")");
-				if (property.signature == null) return null;  // throw new Error("No signature found in textures property (" + suuid + ")");
-				// we good
-				GameProfile profile = new GameProfile(uuid, answer.name);
+				if (property.value == null) break;  // throw new Error("No value found in textures property (" + suuid + ")");
+				if (property.signature == null) break;  // throw new Error("No signature found in textures property (" + suuid + ")");
 				profile.getProperties().put("textures", new Property("textures", property.value, property.signature));
-				return profile;
 			}
 		}
-		return null;  // throw new Error("No textures property found (" + suuid + ")");
+
+		return profile;
 	}
 
 	@Nullable

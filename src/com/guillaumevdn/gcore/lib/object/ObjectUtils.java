@@ -112,7 +112,20 @@ public final class ObjectUtils {
 	public static UUID uuidOrNull(String string) {
 		try {
 			return UUID.fromString(string);
-		} catch (Throwable ignored) {}
+		} catch (Throwable ignored) {
+			try {
+				// maybe unhyphenated ?
+				final StringBuilder builder = new StringBuilder(36);
+				char[] ch = string.toCharArray();
+				for (int i = 0; i < ch.length; ++i) {
+					if (i == 8 || i == 12 || i == 16 || i == 20) {
+						builder.append('-');
+					}
+					builder.append(ch[i]);
+				}
+				return UUID.fromString(builder.toString());
+			} catch (Throwable ignored2) {}
+		}
 		return null;
 	}
 

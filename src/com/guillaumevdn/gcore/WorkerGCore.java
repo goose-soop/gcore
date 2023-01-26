@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
@@ -25,7 +27,7 @@ import com.guillaumevdn.gcore.lib.compatibility.material.CommonMats;
 import com.guillaumevdn.gcore.lib.concurrency.RWHashMap;
 import com.guillaumevdn.gcore.lib.legacy_npc.NPCManager;
 import com.guillaumevdn.gcore.lib.legacy_npc.NpcProtocols;
-import com.guillaumevdn.gcore.lib.player.MojangUtils;
+import com.guillaumevdn.gcore.lib.player./*MojangUtils*/MineToolsUtils;
 import com.guillaumevdn.gcore.lib.plugin.PluginUtils;
 import com.guillaumevdn.gcore.lib.reflection.ReflectionObject;
 import com.guillaumevdn.gcore.lib.string.Text;
@@ -232,15 +234,24 @@ public class WorkerGCore {
 	}
 
 	// ----- game profile / skull items
+	private static final Predicate<String> USERNAME_MATCHER = Pattern.compile("\\w{3,16}").asPredicate();
+	private final static GameProfile DEFAULT_PROFILE = fromTexture(UUID.randomUUID(), "Steve", "ewogICJ0aW1lc3RhbXAiIDogMTYwODAzMTQ1MTk2MSwKICAicHJvZmlsZUlkIiA6ICJlYzU2MTUzOGYzZmQ0NjFkYWZmNTA4NmIyMjE1NGJjZSIsCiAgInByb2ZpbGVOYW1lIiA6ICJBbGV4IiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzFhNGFmNzE4NDU1ZDRhYWI1MjhlN2E2MWY4NmZhMjVlNmEzNjlkMTc2OGRjYjEzZjdkZjMxOWE3MTNlYjgxMGIiCiAgICB9CiAgfQp9", "J4QNnTc0p9NbhK5zkD5pd+N2lKtH/0y884MOFQyxVGcUYDuSaa5XkkoLBTe/iaOICjarfwd1gLgNNg8XqAW3imb7bsOlN1D+3A3POkjlrdTKgLqFU9ouGwhdhh6rbMa6Sz6Ir6b8bgbeniEKYQxzOjyLbZwaDfJgXycPuQ7dnXiycVrgMYAcSHv3FH/K2Fm4RfjeIWJctWWsgpZdxmX9E0o83LEKlqEH6bT1aMTVnWJDRcak9A/OR6iSwz6ABrsWzARtlwi10mVwZUEQovByOo+UHxGfQErWm6kXbn7U/faDI3Gfq3ovvP/KyhGjB64gYQN0OWFt99N8FM+jWnPuRxVZlH0jx0Sxe2PGPvNy/lwD4gDbJfKScMSsapYZqbTenZ4QakqPVfGYI23JdQMC3IcTjuz4hHlKNjF+AgGZEqz/gDyKUT+95eOJH+8Kr0+KCzmKaL2zKY1/or7zcCsaeAyY/M+trfr6nARfFVBInHVYLHkOPkRSj3xvjNKW1sP4szJvxhQ/V968ipydRTlnQ67H8J8Laz5TDxxB2uQlRkGi6bvk1T7LSNNY/GSTovJVatR9adxTjbndby+DmrfFb666XjZ6kJshwEsudnQs2BU/jG9zi3tvCKoma/d6LbcSr2hfSYCl+ErWCFDSuVB4zJZa5rOLGW2Ea5s1ePFeHiM=");
 	private RWHashMap<UUID, GameProfile> profileCache = new RWHashMap<>(10, 1f);
-	private final GameProfile DEFAULT_PROFILE = fromTexture(UUID.randomUUID(), "Steve", "ewogICJ0aW1lc3RhbXAiIDogMTYwODAzMTQ1MTk2MSwKICAicHJvZmlsZUlkIiA6ICJlYzU2MTUzOGYzZmQ0NjFkYWZmNTA4NmIyMjE1NGJjZSIsCiAgInByb2ZpbGVOYW1lIiA6ICJBbGV4IiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzFhNGFmNzE4NDU1ZDRhYWI1MjhlN2E2MWY4NmZhMjVlNmEzNjlkMTc2OGRjYjEzZjdkZjMxOWE3MTNlYjgxMGIiCiAgICB9CiAgfQp9", "J4QNnTc0p9NbhK5zkD5pd+N2lKtH/0y884MOFQyxVGcUYDuSaa5XkkoLBTe/iaOICjarfwd1gLgNNg8XqAW3imb7bsOlN1D+3A3POkjlrdTKgLqFU9ouGwhdhh6rbMa6Sz6Ir6b8bgbeniEKYQxzOjyLbZwaDfJgXycPuQ7dnXiycVrgMYAcSHv3FH/K2Fm4RfjeIWJctWWsgpZdxmX9E0o83LEKlqEH6bT1aMTVnWJDRcak9A/OR6iSwz6ABrsWzARtlwi10mVwZUEQovByOo+UHxGfQErWm6kXbn7U/faDI3Gfq3ovvP/KyhGjB64gYQN0OWFt99N8FM+jWnPuRxVZlH0jx0Sxe2PGPvNy/lwD4gDbJfKScMSsapYZqbTenZ4QakqPVfGYI23JdQMC3IcTjuz4hHlKNjF+AgGZEqz/gDyKUT+95eOJH+8Kr0+KCzmKaL2zKY1/or7zcCsaeAyY/M+trfr6nARfFVBInHVYLHkOPkRSj3xvjNKW1sP4szJvxhQ/V968ipydRTlnQ67H8J8Laz5TDxxB2uQlRkGi6bvk1T7LSNNY/GSTovJVatR9adxTjbndby+DmrfFb666XjZ6kJshwEsudnQs2BU/jG9zi3tvCKoma/d6LbcSr2hfSYCl+ErWCFDSuVB4zJZa5rOLGW2Ea5s1ePFeHiM=");
 
-	public void fetchProfile(final UUID ownerUUID, String ownerName, String skinData, String skinSignature, Consumer<GameProfile> callback) {
-		// has data
+	public void fetchProfile(@Nullable UUID ownerUUID, @Nullable String ownerName, Consumer<GameProfile> callback) {
+		fetchProfile(ownerUUID, ownerName, null, null, callback);
+	}
+
+	public void fetchProfile(@Nullable UUID ownerUUID, @Nullable String ownerName, @Nullable String skinData, @Nullable String skinSignature, Consumer<GameProfile> callback) {
+		if (ownerName != null && !USERNAME_MATCHER.test(ownerName)) {
+			ownerName = null;
+		}
+
+		// has data already
 		if (skinData != null) {
 			callback.accept(fromTexture(ownerUUID, ownerName, skinData, skinSignature));
 		}
-		// no data
+		// no data, fetch it
 		else if (ownerUUID != null || ownerName != null) {
 			// disabled in config, don't fetch at all
 			if (ConfigGCore.dontFetchPlayerProfiles) {
@@ -248,61 +259,78 @@ public class WorkerGCore {
 				return;
 			}
 
-			//Bukkit.getLogger().info("-- must fetch profile for uuid " + ownerUUID + " / " + ownerName);
-			UUID actualUUID = ownerUUID;
-			// if offline mode, force fetching of UUID
-			if (!Bukkit.getOnlineMode() && ownerName != null) {
-				//Bukkit.getLogger().info("offline mode, must fetch UUID by name");
-				actualUUID = null;
-			}
-			// maybe fix UUID if player connected once
-			else if (ownerUUID == null) {
-				OfflinePlayer pl = Bukkit.getOfflinePlayer(ownerName);
-				if (pl != null && pl.getLastPlayed() > 0L) {
-					actualUUID = pl.getUniqueId();
+			// determine UUID to use for fetching
+			final UUID correctUUID;
+			if (Bukkit.getOnlineMode()) {
+				// ... online mode : either use said UUID or attempt to check server name cache
+				if (ownerUUID != null) {
+					correctUUID = ownerUUID;
+				} else {
+					final OfflinePlayer pl = Bukkit.getOfflinePlayer(ownerName);
+					if (pl != null && pl.getLastPlayed() > 0L) {
+						correctUUID = pl.getUniqueId();
+					} else {
+						correctUUID = null;
+					}
+				}
+			} else {
+				// ... offline mode : force fetching of UUID if has a name
+				if (ownerName != null) {
+					correctUUID = null;
+				} else {
+					correctUUID = ownerUUID;
 				}
 			}
-			// cached
-			GameProfile cached = profileCache.get(ownerUUID);
-			if (cached != null) {
-				callback.accept(cached);
+
+			// no correct UUID, fetch it from name
+			if (correctUUID == null) {
+				if (ownerName == null) {
+					callback.accept(null);
+				} else {
+					final String ownerNameF = ownerName;
+					GCore.inst().operateAsync(() -> {
+						final UUID fetchedUUID = MineToolsUtils.fetchUUID(ownerNameF);
+						fetchProfileByUUID(fetchedUUID != null ? fetchedUUID : ownerUUID, ownerUUID, callback);
+					}, error -> {
+						error.printStackTrace();
+						callback.accept(null);
+					});
+				}
 				return;
 			}
-			// find by UUID or fetch name
-			Consumer<UUID> fetcher = uuid -> {
-				GCore.inst().operateAsync(() -> {
-					//Bukkit.getLogger().info("fetching profile by uuid " + uuid);
-					GameProfile profile = uuid == null ? null : MojangUtils.fetchProfile(uuid);  // nullable
-					if (profile == null) {
-						//Bukkit.getLogger().info("no profile found, default profile");
-						profile = DEFAULT_PROFILE;
-					}
-					profileCache.put(uuid, profile);
-					if (ownerUUID != null && !uuid.equals(ownerUUID)) {
-						profileCache.put(ownerUUID, profile);
-					}
-					callback.accept(profile);
-				}, error -> {
-					error.printStackTrace();
-					callback.accept(null);
-				});
-			};
-			if (actualUUID != null) {
-				fetcher.accept(actualUUID);
+
+			// has correct UUID, use it
+			final GameProfile cached = profileCache.get(ownerUUID);
+			if (cached != null) {
+				callback.accept(cached);
 			} else {
-				GCore.inst().operateAsync(() -> {
-					//Bukkit.getLogger().info("ownerName " + ownerName + " found, fetch uuid");
-					UUID fetch = MojangUtils.fetchUUID(ownerName);
-					fetcher.accept(fetch != null ? fetch : ownerUUID);
-				}, error -> {
-					error.printStackTrace();
-					callback.accept(null);
-				});
+				fetchProfileByUUID(correctUUID, ownerUUID, callback);
 			}
+		}
+		// no data and nothing to fetch from
+		else {
+			callback.accept(DEFAULT_PROFILE);
 		}
 	}
 
-	private GameProfile fromTexture(UUID ownerUUID, String ownerName, String skinData, String skinSignature) {
+	private void fetchProfileByUUID(UUID correctUUID, UUID originalUUID, Consumer<GameProfile> callback) {
+		GCore.inst().operateAsync(() -> {
+			GameProfile profile = correctUUID == null ? null : MineToolsUtils.fetchProfile(correctUUID);  // nullable
+			if (profile == null) {
+				profile = DEFAULT_PROFILE;
+			}
+			profileCache.put(correctUUID, profile);
+			if (originalUUID != null && !originalUUID.equals(correctUUID)) {
+				profileCache.put(correctUUID, profile);
+			}
+			callback.accept(profile);
+		}, error -> {
+			error.printStackTrace();
+			callback.accept(null);
+		});
+	}
+
+	private static GameProfile fromTexture(UUID ownerUUID, String ownerName, String skinData, String skinSignature) {
 		GameProfile profile = new GameProfile(ownerUUID != null ? ownerUUID : UUID.randomUUID(), ownerName != null ? ownerName : "SomeGuy");
 		profile.getProperties().put("textures", skinSignature != null ? new Property("textures", skinData, skinSignature) : new Property("textures", skinData));
 		return profile;
@@ -326,7 +354,7 @@ public class WorkerGCore {
 		};
 		if (!Bukkit.getOnlineMode()) {  // fetch UUID by name if it's an offline server, to get the correct skin
 			GCore.inst().operateAsync(() -> {
-				UUID uuid = MojangUtils.fetchUUID(owner.getName());
+				UUID uuid = /*MojangUtils*/MineToolsUtils.fetchUUID(owner.getName());
 				run.accept(uuid != null ? uuid : owner.getUniqueId());
 			});
 		} else {

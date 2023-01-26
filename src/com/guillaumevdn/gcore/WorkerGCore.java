@@ -28,6 +28,7 @@ import com.guillaumevdn.gcore.lib.concurrency.RWHashMap;
 import com.guillaumevdn.gcore.lib.legacy_npc.NPCManager;
 import com.guillaumevdn.gcore.lib.legacy_npc.NpcProtocols;
 import com.guillaumevdn.gcore.lib.player./*MojangUtils*/MineToolsUtils;
+import com.guillaumevdn.gcore.lib.player.PlayerUtils;
 import com.guillaumevdn.gcore.lib.plugin.PluginUtils;
 import com.guillaumevdn.gcore.lib.reflection.ReflectionObject;
 import com.guillaumevdn.gcore.lib.string.Text;
@@ -234,7 +235,8 @@ public class WorkerGCore {
 	}
 
 	// ----- game profile / skull items
-	private static final Predicate<String> USERNAME_MATCHER = Pattern.compile("\\w{3,16}").asPredicate();
+	private static final Pattern USERNAME_PATTERN = Pattern.compile("\\w{3,16}");
+	private static final Predicate<String> USERNAME_MATCHER = string -> USERNAME_PATTERN.matcher(string).matches();
 	private final static GameProfile DEFAULT_PROFILE = fromTexture(UUID.randomUUID(), "Steve", "ewogICJ0aW1lc3RhbXAiIDogMTYwODAzMTQ1MTk2MSwKICAicHJvZmlsZUlkIiA6ICJlYzU2MTUzOGYzZmQ0NjFkYWZmNTA4NmIyMjE1NGJjZSIsCiAgInByb2ZpbGVOYW1lIiA6ICJBbGV4IiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzFhNGFmNzE4NDU1ZDRhYWI1MjhlN2E2MWY4NmZhMjVlNmEzNjlkMTc2OGRjYjEzZjdkZjMxOWE3MTNlYjgxMGIiCiAgICB9CiAgfQp9", "J4QNnTc0p9NbhK5zkD5pd+N2lKtH/0y884MOFQyxVGcUYDuSaa5XkkoLBTe/iaOICjarfwd1gLgNNg8XqAW3imb7bsOlN1D+3A3POkjlrdTKgLqFU9ouGwhdhh6rbMa6Sz6Ir6b8bgbeniEKYQxzOjyLbZwaDfJgXycPuQ7dnXiycVrgMYAcSHv3FH/K2Fm4RfjeIWJctWWsgpZdxmX9E0o83LEKlqEH6bT1aMTVnWJDRcak9A/OR6iSwz6ABrsWzARtlwi10mVwZUEQovByOo+UHxGfQErWm6kXbn7U/faDI3Gfq3ovvP/KyhGjB64gYQN0OWFt99N8FM+jWnPuRxVZlH0jx0Sxe2PGPvNy/lwD4gDbJfKScMSsapYZqbTenZ4QakqPVfGYI23JdQMC3IcTjuz4hHlKNjF+AgGZEqz/gDyKUT+95eOJH+8Kr0+KCzmKaL2zKY1/or7zcCsaeAyY/M+trfr6nARfFVBInHVYLHkOPkRSj3xvjNKW1sP4szJvxhQ/V968ipydRTlnQ67H8J8Laz5TDxxB2uQlRkGi6bvk1T7LSNNY/GSTovJVatR9adxTjbndby+DmrfFb666XjZ6kJshwEsudnQs2BU/jG9zi3tvCKoma/d6LbcSr2hfSYCl+ErWCFDSuVB4zJZa5rOLGW2Ea5s1ePFeHiM=");
 	private RWHashMap<UUID, GameProfile> profileCache = new RWHashMap<>(10, 1f);
 
@@ -266,20 +268,12 @@ public class WorkerGCore {
 				if (ownerUUID != null) {
 					correctUUID = ownerUUID;
 				} else {
-					final OfflinePlayer pl = Bukkit.getOfflinePlayer(ownerName);
-					if (pl != null && pl.getLastPlayed() > 0L) {
-						correctUUID = pl.getUniqueId();
-					} else {
-						correctUUID = null;
-					}
+					final OfflinePlayer pl = PlayerUtils.getOfflineWhoPlayedBefore(ownerName);
+					correctUUID = pl != null ? pl.getUniqueId() : null;
 				}
 			} else {
 				// ... offline mode : force fetching of UUID if has a name
-				if (ownerName != null) {
-					correctUUID = null;
-				} else {
-					correctUUID = ownerUUID;
-				}
+				correctUUID = ownerName != null ? null : ownerUUID;
 			}
 
 			// no correct UUID, fetch it from name

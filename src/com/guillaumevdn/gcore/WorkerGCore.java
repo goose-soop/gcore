@@ -237,8 +237,11 @@ public class WorkerGCore {
 	// ----- game profile / skull items
 	private static final Pattern USERNAME_PATTERN = Pattern.compile("\\w{3,16}");
 	private static final Predicate<String> USERNAME_MATCHER = string -> USERNAME_PATTERN.matcher(string).matches();
-	private final static GameProfile DEFAULT_PROFILE = fromTexture(UUID.randomUUID(), "Steve", "ewogICJ0aW1lc3RhbXAiIDogMTYwODAzMTQ1MTk2MSwKICAicHJvZmlsZUlkIiA6ICJlYzU2MTUzOGYzZmQ0NjFkYWZmNTA4NmIyMjE1NGJjZSIsCiAgInByb2ZpbGVOYW1lIiA6ICJBbGV4IiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzFhNGFmNzE4NDU1ZDRhYWI1MjhlN2E2MWY4NmZhMjVlNmEzNjlkMTc2OGRjYjEzZjdkZjMxOWE3MTNlYjgxMGIiCiAgICB9CiAgfQp9", "J4QNnTc0p9NbhK5zkD5pd+N2lKtH/0y884MOFQyxVGcUYDuSaa5XkkoLBTe/iaOICjarfwd1gLgNNg8XqAW3imb7bsOlN1D+3A3POkjlrdTKgLqFU9ouGwhdhh6rbMa6Sz6Ir6b8bgbeniEKYQxzOjyLbZwaDfJgXycPuQ7dnXiycVrgMYAcSHv3FH/K2Fm4RfjeIWJctWWsgpZdxmX9E0o83LEKlqEH6bT1aMTVnWJDRcak9A/OR6iSwz6ABrsWzARtlwi10mVwZUEQovByOo+UHxGfQErWm6kXbn7U/faDI3Gfq3ovvP/KyhGjB64gYQN0OWFt99N8FM+jWnPuRxVZlH0jx0Sxe2PGPvNy/lwD4gDbJfKScMSsapYZqbTenZ4QakqPVfGYI23JdQMC3IcTjuz4hHlKNjF+AgGZEqz/gDyKUT+95eOJH+8Kr0+KCzmKaL2zKY1/or7zcCsaeAyY/M+trfr6nARfFVBInHVYLHkOPkRSj3xvjNKW1sP4szJvxhQ/V968ipydRTlnQ67H8J8Laz5TDxxB2uQlRkGi6bvk1T7LSNNY/GSTovJVatR9adxTjbndby+DmrfFb666XjZ6kJshwEsudnQs2BU/jG9zi3tvCKoma/d6LbcSr2hfSYCl+ErWCFDSuVB4zJZa5rOLGW2Ea5s1ePFeHiM=");
 	private RWHashMap<UUID, GameProfile> profileCache = new RWHashMap<>(10, 1f);
+
+	private static GameProfile defaultProfile(UUID ownerUUID, String ownerName) {
+		return gameProfile(ownerUUID != null ? ownerUUID : UUID.randomUUID(), ownerName != null ? ownerName : "Unknown", "ewogICJ0aW1lc3RhbXAiIDogMTYwODAzMTQ1MTk2MSwKICAicHJvZmlsZUlkIiA6ICJlYzU2MTUzOGYzZmQ0NjFkYWZmNTA4NmIyMjE1NGJjZSIsCiAgInByb2ZpbGVOYW1lIiA6ICJBbGV4IiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzFhNGFmNzE4NDU1ZDRhYWI1MjhlN2E2MWY4NmZhMjVlNmEzNjlkMTc2OGRjYjEzZjdkZjMxOWE3MTNlYjgxMGIiCiAgICB9CiAgfQp9", "J4QNnTc0p9NbhK5zkD5pd+N2lKtH/0y884MOFQyxVGcUYDuSaa5XkkoLBTe/iaOICjarfwd1gLgNNg8XqAW3imb7bsOlN1D+3A3POkjlrdTKgLqFU9ouGwhdhh6rbMa6Sz6Ir6b8bgbeniEKYQxzOjyLbZwaDfJgXycPuQ7dnXiycVrgMYAcSHv3FH/K2Fm4RfjeIWJctWWsgpZdxmX9E0o83LEKlqEH6bT1aMTVnWJDRcak9A/OR6iSwz6ABrsWzARtlwi10mVwZUEQovByOo+UHxGfQErWm6kXbn7U/faDI3Gfq3ovvP/KyhGjB64gYQN0OWFt99N8FM+jWnPuRxVZlH0jx0Sxe2PGPvNy/lwD4gDbJfKScMSsapYZqbTenZ4QakqPVfGYI23JdQMC3IcTjuz4hHlKNjF+AgGZEqz/gDyKUT+95eOJH+8Kr0+KCzmKaL2zKY1/or7zcCsaeAyY/M+trfr6nARfFVBInHVYLHkOPkRSj3xvjNKW1sP4szJvxhQ/V968ipydRTlnQ67H8J8Laz5TDxxB2uQlRkGi6bvk1T7LSNNY/GSTovJVatR9adxTjbndby+DmrfFb666XjZ6kJshwEsudnQs2BU/jG9zi3tvCKoma/d6LbcSr2hfSYCl+ErWCFDSuVB4zJZa5rOLGW2Ea5s1ePFeHiM=");
+	}
 
 	public void fetchProfile(@Nullable UUID ownerUUID, @Nullable String ownerName, Consumer<GameProfile> callback) {
 		fetchProfile(ownerUUID, ownerName, null, null, callback);
@@ -251,13 +254,13 @@ public class WorkerGCore {
 
 		// has data already
 		if (skinData != null) {
-			callback.accept(fromTexture(ownerUUID, ownerName, skinData, skinSignature));
+			callback.accept(gameProfile(ownerUUID, ownerName, skinData, skinSignature));
 		}
 		// no data, fetch it
 		else if (ownerUUID != null || ownerName != null) {
 			// disabled in config, don't fetch at all
 			if (ConfigGCore.dontFetchPlayerProfiles) {
-				callback.accept(DEFAULT_PROFILE);
+				callback.accept(defaultProfile(ownerUUID, ownerName));
 				return;
 			}
 
@@ -279,44 +282,41 @@ public class WorkerGCore {
 			// no correct UUID, fetch it from name
 			if (correctUUID == null) {
 				if (ownerName == null) {
-					callback.accept(null);
+					callback.accept(defaultProfile(ownerUUID, ownerName));
 				} else {
 					final String ownerNameF = ownerName;
 					GCore.inst().operateAsync(() -> {
 						final UUID fetchedUUID = MineToolsUtils.fetchUUID(ownerNameF);
-						fetchProfileByUUID(fetchedUUID != null ? fetchedUUID : ownerUUID, ownerUUID, callback);
+						fetchProfileByUUID(fetchedUUID != null ? fetchedUUID : ownerUUID, ownerNameF, callback);
 					}, error -> {
 						error.printStackTrace();
-						callback.accept(null);
+						callback.accept(defaultProfile(ownerUUID, ownerNameF));
 					});
 				}
 				return;
 			}
 
 			// has correct UUID, use it
-			final GameProfile cached = profileCache.get(ownerUUID);
+			final GameProfile cached = profileCache.get(correctUUID);
 			if (cached != null) {
 				callback.accept(cached);
 			} else {
-				fetchProfileByUUID(correctUUID, ownerUUID, callback);
+				fetchProfileByUUID(correctUUID, ownerName, callback);
 			}
 		}
 		// no data and nothing to fetch from
 		else {
-			callback.accept(DEFAULT_PROFILE);
+			callback.accept(defaultProfile(ownerUUID, ownerName));
 		}
 	}
 
-	private void fetchProfileByUUID(UUID correctUUID, UUID originalUUID, Consumer<GameProfile> callback) {
+	private void fetchProfileByUUID(UUID correctUUID, @Nullable String originalName, Consumer<GameProfile> callback) {
 		GCore.inst().operateAsync(() -> {
 			GameProfile profile = correctUUID == null ? null : MineToolsUtils.fetchProfile(correctUUID);  // nullable
 			if (profile == null) {
-				profile = DEFAULT_PROFILE;
+				profile = defaultProfile(correctUUID, originalName);
 			}
 			profileCache.put(correctUUID, profile);
-			if (originalUUID != null && !originalUUID.equals(correctUUID)) {
-				profileCache.put(correctUUID, profile);
-			}
 			callback.accept(profile);
 		}, error -> {
 			error.printStackTrace();
@@ -324,8 +324,8 @@ public class WorkerGCore {
 		});
 	}
 
-	private static GameProfile fromTexture(UUID ownerUUID, String ownerName, String skinData, String skinSignature) {
-		GameProfile profile = new GameProfile(ownerUUID != null ? ownerUUID : UUID.randomUUID(), ownerName != null ? ownerName : "SomeGuy");
+	private static GameProfile gameProfile(UUID ownerUUID, String ownerName, String skinData, String skinSignature) {
+		final GameProfile profile = new GameProfile(ownerUUID != null ? ownerUUID : UUID.randomUUID(), ownerName != null ? ownerName : "SomeGuy");
 		profile.getProperties().put("textures", skinSignature != null ? new Property("textures", skinData, skinSignature) : new Property("textures", skinData));
 		return profile;
 	}

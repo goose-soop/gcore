@@ -153,10 +153,11 @@ public interface Text {
 	}
 
 	public static Text of(String... lines) {
-		return new TextElement(lines);
+		return of(CollectionUtils.asList(lines));
 	}
 
 	public static Text of(List<String> lines) {
+		StringUtils.format(lines);
 		return new TextElement(lines);
 	}
 

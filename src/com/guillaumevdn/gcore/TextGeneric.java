@@ -12,6 +12,7 @@ public enum TextGeneric implements TextEnumElement {
 	messageNoPermission,
 	messageInvalidPlayer,
 	messageInvalidOfflinePlayer,
+	messageInvalidNumber,
 	messageCC,
 	messageSilentCC,
 	textCancel,

@@ -27,6 +27,7 @@ import com.guillaumevdn.gcore.lib.compatibility.material.CommonMats;
 import com.guillaumevdn.gcore.lib.concurrency.RWHashMap;
 import com.guillaumevdn.gcore.lib.legacy_npc.NPCManager;
 import com.guillaumevdn.gcore.lib.legacy_npc.NpcProtocols;
+import com.guillaumevdn.gcore.lib.number.NumberUtils;
 import com.guillaumevdn.gcore.lib.player./*MojangUtils*/MineToolsUtils;
 import com.guillaumevdn.gcore.lib.player.PlayerUtils;
 import com.guillaumevdn.gcore.lib.plugin.PluginUtils;
@@ -204,6 +205,18 @@ public class WorkerGCore {
 			message.replace("{cancel}", () -> TextGeneric.textCancel.parseLine()).send(player);
 		}
 		awaitingChats.put(player.getUniqueId(), Pair.of(onChat, onCancel));
+	}
+
+	public void awaitChatInteger(Player player, Text message, Consumer<Integer> onChat, Runnable onCancel) {
+		awaitChat(player, message, raw -> {
+			final Integer integer = NumberUtils.integerOrNull(raw);
+			if (integer == null) {
+				TextGeneric.messageInvalidNumber.replace("{value}", () -> raw).send(player);
+				awaitChatInteger(player, message, onChat, onCancel);
+				return;
+			}
+			onChat.accept(integer);
+		}, onCancel);
 	}
 
 	public void awaitLocation(Player player, Text message, Consumer<Location> onSelect, Runnable onCancel) {

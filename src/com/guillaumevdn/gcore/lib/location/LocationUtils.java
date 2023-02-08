@@ -314,7 +314,7 @@ public final class LocationUtils {
 		return new Vector(rotatedX, rotatedY, rotatedZ);
 	}
 
-	// ----- block type
+	// ----- block
 	public static boolean isTraversable(Block block) {
 		return Mat.fromBlock(block).orAir().getData().isTraversable();
 	}

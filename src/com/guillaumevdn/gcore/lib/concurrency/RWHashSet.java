@@ -17,6 +17,7 @@ import java.util.stream.StreamSupport;
 
 import com.guillaumevdn.gcore.lib.collection.IteratorControls;
 import com.guillaumevdn.gcore.lib.function.ThrowableConsumer;
+import com.guillaumevdn.gcore.lib.number.NumberUtils;
 import com.guillaumevdn.gcore.lib.object.ObjectUtils;
 import com.guillaumevdn.gcore.lib.object.Optional;
 import com.guillaumevdn.gcore.lib.string.StringUtils;
@@ -366,6 +367,27 @@ public class RWHashSet<T> extends HashSet<T> {
 				}
 			}
 			return modified;
+		});
+	}
+
+	/* -------------------- extra methods  -------------------- */
+
+	public final T random() {
+		return lock.read(() -> {
+			final int size = super.size();
+			if (size != 0) {
+				final int index = NumberUtils.random(0, size - 1);
+				final Iterator<T> it = super.iterator();
+				int i = -1;
+
+				while (it.hasNext()) {
+					final T elem = it.next();
+					if (++i == index) {
+						return elem;
+					}
+				}
+			}
+			return null;
 		});
 	}
 

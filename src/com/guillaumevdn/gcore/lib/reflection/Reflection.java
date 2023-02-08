@@ -209,7 +209,7 @@ public final class Reflection {
 	public static ReflectionObject processBlockData(ReflectionObject block, ThrowableConsumer<ReflectionObject> dataProcessor) throws Throwable {
 		ReflectionObject data = block.invokeMethod("getBlockData");
 		dataProcessor.accept(data);
-		block.invokeMethod("setBlockData", data.get());
+		block.invokeMethod("setBlockData", (Object) data.get());
 		return block;
 	}
 

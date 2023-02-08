@@ -32,7 +32,7 @@ final class MatCompatBlock {
 					Block top = block.getRelative(BlockFace.UP);
 					top.setType(material);
 					Reflection.processBlockData(top, data -> {
-						data.invokeMethod("setHalf", Reflection.getEnum("org.bukkit.block.data.Bisected$Half").safeValueOf("TOP").get());
+						data.invokeMethod("setHalf", (Object) Reflection.getEnum("org.bukkit.block.data.Bisected$Half").safeValueOf("TOP").get());
 					});
 				}
 				// set block whatsoever

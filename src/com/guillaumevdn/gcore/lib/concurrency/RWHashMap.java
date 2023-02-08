@@ -148,12 +148,24 @@ public class RWHashMap<K, V> extends HashMap<K, V> {
 
 	public final HashMap<K, V> copy() {
 		return lock.read(() -> {
-			HashMap<K, V> copy = new HashMap<>(super.size());
-			Iterator<Entry<K, V>> it = super.entrySet().iterator();
-			while (it.hasNext()) {
-				Entry<K, V> next = it.next();
-				copy.put(next.getKey(), next.getValue());
-			}
+			return unsafeCopy();
+		});
+	}
+
+	private final HashMap<K, V> unsafeCopy() {
+		HashMap<K, V> copy = new HashMap<>(super.size());
+		Iterator<Entry<K, V>> it = super.entrySet().iterator();
+		while (it.hasNext()) {
+			Entry<K, V> next = it.next();
+			copy.put(next.getKey(), next.getValue());
+		}
+		return copy;
+	}
+
+	public final HashMap<K, V> consume() {
+		return lock.write(() -> {
+			final HashMap<K, V> copy = unsafeCopy();
+			super.clear();
 			return copy;
 		});
 	}

@@ -22,6 +22,7 @@ import java.util.stream.StreamSupport;
 import javax.annotation.Nullable;
 
 import com.guillaumevdn.gcore.lib.collection.IteratorControls;
+import com.guillaumevdn.gcore.lib.number.NumberUtils;
 import com.guillaumevdn.gcore.lib.object.ObjectUtils;
 import com.guillaumevdn.gcore.lib.string.StringUtils;
 
@@ -508,6 +509,15 @@ public class RWArrayList<T> extends ArrayList<T> {
 			});
 		}
 		return exists;
+	}
+
+	/* -------------------- extra methods  -------------------- */
+
+	public final T random() {
+		return lock.read(() -> {
+			final int size = super.size();
+			return size == 0 ? null : super.get(NumberUtils.random(0, size - 1));
+		});
 	}
 
 }

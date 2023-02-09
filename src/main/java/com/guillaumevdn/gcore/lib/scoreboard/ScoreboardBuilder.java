@@ -1,0 +1,41 @@
+package com.guillaumevdn.gcore.lib.scoreboard;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Stream;
+
+/**
+ * @author GuillaumeVDN
+ */
+public final class ScoreboardBuilder {
+
+	private String title = null;
+	private List<String> entries = new ArrayList<>();
+
+	// ----- get
+	public String getTitle() {
+		return title;
+	}
+
+	public Stream<String> entries() {
+		return entries.stream().limit(15);
+	}
+
+	// ----- set
+	public ScoreboardBuilder title(String title) {
+		this.title = title.length() > 32 ? title.substring(0, 32) : title;
+		return this;
+	}
+
+	public ScoreboardBuilder add(String text) {
+		entries.add(text.replace("§§", "§"));
+		return this;
+	}
+
+	public ScoreboardBuilder addAll(Collection<String> text) {
+		text.forEach(line -> add(line));
+		return this;
+	}
+
+}

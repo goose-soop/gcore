@@ -1,0 +1,62 @@
+package com.guillaumevdn.gcore.lib.element.type.basic;
+
+import com.guillaumevdn.gcore.lib.compatibility.material.CommonMats;
+import com.guillaumevdn.gcore.lib.compatibility.material.Mat;
+import com.guillaumevdn.gcore.lib.element.struct.Element;
+import com.guillaumevdn.gcore.lib.element.struct.Need;
+import com.guillaumevdn.gcore.lib.element.struct.parsing.ParsingError;
+import com.guillaumevdn.gcore.lib.string.StringUtils;
+import com.guillaumevdn.gcore.lib.string.Text;
+
+/**
+ * @author GuillaumeVDN
+ */
+public class ElementDoubleList extends ElementValueList<Double> {
+
+	private final double min, max;
+
+	public ElementDoubleList(Element parent, String id, Need need, Text editorDescription) {
+		this(parent, id, need, -Double.MAX_VALUE, editorDescription);
+	}
+
+	public ElementDoubleList(Element parent, String id, Need need, double min, Text editorDescription) {
+		this(parent, id, need, min, Double.MAX_VALUE, editorDescription);
+	}
+
+	public ElementDoubleList(Element parent, String id, Need need, double min, double max, Text editorDescription) {
+		super(Double.class, parent, id, need, editorDescription);
+		this.min = min;
+		this.max = max;
+	}
+
+	// ----- get
+	public final double getMin() {
+		return min;
+	}
+
+	public final double getMax() {
+		return max;
+	}
+
+	// ----- parse
+	@Override
+	protected void validate(Double value) throws ParsingError {
+		if (value < min) {
+			throw new ParsingError(this, "Number should be at least " + min);
+		} else if (value > max) {
+			throw new ParsingError(this, "Number should be at most " + max);
+		}
+	}
+
+	// ----- editor
+	@Override
+	public Mat editorIconType() {
+		return CommonMats.LIME_DYE;
+	}
+
+	@Override
+	protected String editorNewLine() {
+		return StringUtils.toTextString(Math.pow(10d, (double) (getRawValueOrDefault() == null ? 0 : getRawValueOrDefault().size())), 2);
+	}
+
+}

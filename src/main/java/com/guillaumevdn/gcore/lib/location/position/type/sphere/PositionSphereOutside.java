@@ -1,0 +1,97 @@
+package com.guillaumevdn.gcore.lib.location.position.type.sphere;
+
+import java.util.List;
+
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.entity.Player;
+
+import com.guillaumevdn.gcore.lib.block.BlockState;
+import com.guillaumevdn.gcore.lib.compatibility.material.Mat;
+import com.guillaumevdn.gcore.lib.location.LocationUtils;
+import com.guillaumevdn.gcore.lib.location.position.Position;
+import com.guillaumevdn.gcore.lib.number.MinMaxDouble;
+
+/**
+ * @author GuillaumeVDN
+ */
+public class PositionSphereOutside implements Position {
+
+	private Location center;
+	private double radius;
+	private boolean allowGPS;
+
+	public PositionSphereOutside(Location center, double radius) {
+		this(center, radius, true);
+	}
+
+	public PositionSphereOutside(Location center, double radius, boolean allowGPS) {
+		this.center = center;
+		this.radius = radius;
+		this.allowGPS = allowGPS;
+	}
+
+	// ----- methods
+	@Override
+	public boolean match(Location loc) {
+		if (loc == null) {
+			return false;
+		}
+		return !loc.getWorld().equals(center.getWorld()) || loc.distance(center) > radius;
+	}
+
+	@Override
+	public World getWorld() {
+		return center.getWorld();
+	}
+
+	@Override
+	public boolean canFindRandom() {
+		return true;
+	}
+
+	@Override
+	public Location findRandom() {
+		return LocationUtils.findRandomInSphere(center, radius, radius * 2d);
+	}
+
+	@Override
+	public int findSafeRandomMaxY() {
+		return center.getBlockY() + ((int) radius) * 2;
+	}
+
+	@Override
+	public MinMaxDouble getRandomSolidAndFreeAboveYBounds() {
+		return MinMaxDouble.of(0d, 255d);
+	}
+
+	@Override
+	public Location findClosestTo(Location loc) {
+		if (!loc.getWorld().equals(center.getWorld())) {
+			return loc;
+		}
+		return loc.distance(center) > radius ? loc.clone() : LocationUtils.findClosestOnSphereOutline(center, radius, loc);
+	}
+
+	@Override
+	public Location findGPSFor(Player player) {
+		if (!allowGPS) {
+			return null;
+		}
+		if (match(player)) {
+			return null;
+		}
+		return LocationUtils.findClosestOnSphereOutline(center, radius, player.getLocation());
+	}
+
+	@Override
+	public boolean canFill() {
+		return true;
+	}
+
+	@Override
+	public void fill(Mat blockType, List<BlockState> blockStates) {
+		LocationUtils.getBlocksOnSphere(center, (int) radius).forEach(block -> LocationUtils.setBlock(block, blockType, blockStates));
+	}
+
+}

@@ -54,6 +54,12 @@
 	                            <copy file="target/${project.artifactId}-${project.version}-jar-with-dependencies.jar"
 	                            	tofile="C:/Users/vande/Desktop/Dropbox/Development/Spigot servers/1.19/plugins/${project.artifactId}.jar"
 	                            	overwrite="true" />
+	                            <copy file="target/${project.artifactId}-${project.version}-jar-with-dependencies.jar"
+	                            	tofile="C:/Users/vande/Desktop/Dropbox/Development/Spigot servers/Bungeecord 1.19.2/server a/plugins/${project.artifactId}.jar"
+	                            	overwrite="true" />
+	                            <copy file="target/${project.artifactId}-${project.version}-jar-with-dependencies.jar"
+	                            	tofile="C:/Users/vande/Desktop/Dropbox/Development/Spigot servers/Bungeecord 1.19.2/server b/plugins/${project.artifactId}.jar"
+	                            	overwrite="true" />
 	                        </target>
 	                    </configuration>
 	                    <goals>

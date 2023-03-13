@@ -67,6 +67,10 @@ public final class NumberUtils {
 		return nb * nb;
 	}
 
+	public static int clamp(int nb, int min, int max) {
+		return Math.max(min, Math.min(max, nb));
+	}
+
 	// ----- long
 	public static Long longOrNull(Object raw) {
 		try {
@@ -122,6 +126,10 @@ public final class NumberUtils {
 		return Math.abs(a - b) <= threshold;
 	}
 
+	public static double clamp(double nb, double min, double max) {
+		return Math.max(min, Math.min(max, nb));
+	}
+
 	// ----- float
 	public static Float floatOrNull(Object raw) {
 		try {
@@ -129,6 +137,10 @@ public final class NumberUtils {
 		} catch (Throwable ignored) {
 			return null;
 		}
+	}
+
+	public static float clamp(float nb, float min, float max) {
+		return Math.max(min, Math.min(max, nb));
 	}
 
 	// ----- byte

@@ -737,12 +737,10 @@ public class GUI {
 	}
 
 	public static boolean hasOpenGUI(Player player) {
-		if (!player.getOpenInventory().getTopInventory().getType().equals(InventoryType.CRAFTING)) {  // default opened view is the player's crafting inventory
+		if (!player.getOpenInventory().getTopInventory().getType().equals(InventoryType.CRAFTING))  // default opened view is the player's crafting inventory
 			return true;
-		}
-		if (getOpenGUI(player) != null) {
+		if (getOpenGUI(player) != null)
 			return true;
-		}
 		return false;
 	}
 

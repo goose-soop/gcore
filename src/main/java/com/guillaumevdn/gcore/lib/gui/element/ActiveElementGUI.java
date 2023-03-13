@@ -6,6 +6,7 @@ import java.util.stream.Stream;
 
 import com.guillaumevdn.gcore.lib.gui.element.item.ElementGUIItem;
 import com.guillaumevdn.gcore.lib.gui.element.item.ElementGUIItemHolder;
+import com.guillaumevdn.gcore.lib.gui.struct.GUI;
 import com.guillaumevdn.gcore.lib.gui.struct.GUIType;
 import com.guillaumevdn.gcore.lib.gui.struct.active.ActiveGUI;
 import com.guillaumevdn.gcore.lib.gui.struct.active.ItemHolder;
@@ -43,6 +44,10 @@ public class ActiveElementGUI extends ActiveGUI {
 
 	protected Stream<ItemHolder> modifiedContentsStream() {
 		return element.getContents().stream().map(ElementGUIItem::getHolder);
+	}
+
+	public static boolean isActiveElementGUI(GUI gui, ElementGUI element) {
+		return gui instanceof ActiveElementGUI && gui.getId().startsWith("instance_" + element.getId() + "_");
 	}
 
 }

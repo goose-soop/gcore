@@ -43,7 +43,7 @@ public final class DataIO {
 	public Set<String> getKeys() {
 		return objects.keySet();
 	}
-	
+
 	public boolean hasKey(String key) {
 		return objects.containsKey(key);
 	}

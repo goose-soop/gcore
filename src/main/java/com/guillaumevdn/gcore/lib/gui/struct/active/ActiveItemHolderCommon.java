@@ -24,7 +24,7 @@ public abstract class ActiveItemHolderCommon extends ActiveItemHolder {
 	@Override
 	protected final void buildItems(TriConsumer<Collection<? extends GUIItem>, Set<String>, Integer> callback) throws ParsingError {
 		build((icon, placeholders, forcedDelay, locations, performer) -> {
-			GUIItem item = new GUIItem(getHolder().getId(), locations, icon, performer);
+			final GUIItem item = new GUIItem(getHolder().getId(), locations, icon, performer);
 			callback.accept(CollectionUtils.asList(item), placeholders, forcedDelay);
 		});
 	}

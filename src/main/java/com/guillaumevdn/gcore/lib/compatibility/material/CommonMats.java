@@ -72,6 +72,7 @@ public final class CommonMats {
 	public static final Mat IRON_DOOR = Mat.firstFromIdOrDataName("IRON_DOOR").get();
 	public static final Mat IRON_INGOT = Mat.firstFromIdOrDataName("IRON_INGOT").get();
 	public static final Mat ITEM_FRAME = Mat.firstFromIdOrDataName("ITEM_FRAME").get();
+	public static final Mat IRON_SWORD = Mat.firstFromIdOrDataName("IRON_SWORD").get();
 	public static final Mat JUKEBOX = Mat.firstFromIdOrDataName("JUKEBOX").get();
 	public static final Mat LEVER = Mat.firstFromIdOrDataName("LEVER").get();
 	public static final Mat LIME_DYE = Mat.firstFromIdOrDataName("LIME_DYE").get();

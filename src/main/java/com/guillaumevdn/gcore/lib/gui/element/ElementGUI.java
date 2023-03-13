@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.TextEditorGeneric;
@@ -18,8 +20,10 @@ import com.guillaumevdn.gcore.lib.element.struct.container.ContainerElement;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementString;
 import com.guillaumevdn.gcore.lib.gui.element.item.ElementGUIItem;
 import com.guillaumevdn.gcore.lib.gui.struct.ElementGUIType;
+import com.guillaumevdn.gcore.lib.gui.struct.GUI;
 import com.guillaumevdn.gcore.lib.gui.struct.GUIType;
 import com.guillaumevdn.gcore.lib.object.Optional;
+import com.guillaumevdn.gcore.lib.plugin.PluginUtils;
 import com.guillaumevdn.gcore.lib.string.Text;
 import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
 
@@ -54,8 +58,15 @@ public class ElementGUI extends ContainerElement implements SuperElement {
 		return type;
 	}
 
-	// ----- default implementation
+	public List<ActiveElementGUI> getActiveGUIs() {
+		return PluginUtils.getGPlugins().stream()
+				.flatMap(pl -> (Stream<GUI>) pl.getGUIs().stream())
+				.filter(gui -> ActiveElementGUI.isActiveElementGUI(gui, this))
+				.map(gui -> (ActiveElementGUI) gui)
+				.collect(Collectors.toList());
+	}
 
+	// ----- default implementation
 	public List<ElementGUIItem> getContents() {
 		return defaultContents.values();
 	}
@@ -69,14 +80,12 @@ public class ElementGUI extends ContainerElement implements SuperElement {
 	}
 
 	// ----- editor
-
 	@Override
 	public Mat editorIconType() {
 		return CommonMats.CHEST;
 	}
 
 	// ----- super element
-
 	private File file;
 	private List<String> loadErrors = new ArrayList<>();
 	protected YMLConfiguration config = null;

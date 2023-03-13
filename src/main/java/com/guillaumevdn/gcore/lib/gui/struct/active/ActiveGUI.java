@@ -47,6 +47,11 @@ public abstract class ActiveGUI extends GUI {
 		return lifecycleData;
 	}
 
+	public final boolean getLifecycleDataBoolean(String key) {
+		final Object value = lifecycleData.get(key);
+		return value != null && (boolean) value;
+	}
+
 	public final boolean hasLifecycleData(String key) {
 		return lifecycleData.containsKey(key);
 	}
@@ -95,11 +100,15 @@ public abstract class ActiveGUI extends GUI {
 	}
 
 	public final void directRemove(ItemHolder holder) {  // called in some GUIs, such as GUIs that remove elements dynamically when the player does actions ; to avoid refreshing the whole thing
-		final ActiveItemHolder active = activeHolders.remove(holder.getId());
+		directRemove(holder.getId());
+	}
+
+	public final void directRemove(String holderId) {  // called in some GUIs, such as GUIs that remove elements dynamically when the player does actions ; to avoid refreshing the whole thing
+		final ActiveItemHolder active = activeHolders.remove(holderId);
 		if (active != null) {
 			final Collection<? extends GUIItem> last = active.getLastItems();
 			if (last != null) {
-				boolean persistent = holder.parsePersistent(this);
+				boolean persistent = active.getHolder().parsePersistent(this);
 				last.forEach(item -> removeItem(item, persistent));
 			}
 		}
@@ -162,6 +171,10 @@ public abstract class ActiveGUI extends GUI {
 			return;
 		}
 		activeHolders.forEach((__, active) -> active.tick());
+		onTick();
+	}
+
+	protected void onTick() {
 	}
 
 	@Override

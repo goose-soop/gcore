@@ -510,7 +510,7 @@ public final class StringUtils {
 	}
 
 	public static String separateAtUnderscore(String string) {
-		StringBuilder builder = new StringBuilder(string.length());
+		final StringBuilder builder = new StringBuilder(string.length());
 		for (char ch : string.toCharArray()) {
 			if (ch == '_') {  // monkaX
 				builder.append(' ');
@@ -519,6 +519,10 @@ public final class StringUtils {
 			}
 		}
 		return builder.toString();
+	}
+
+	public static String enumToPascalCase(Enum value) {
+		return capitalize(separateAtUnderscore(value.name().toLowerCase()));
 	}
 
 	public static String pluralizeAmountDesc(String singularDesc, int count) {

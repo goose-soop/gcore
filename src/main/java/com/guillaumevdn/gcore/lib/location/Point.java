@@ -5,6 +5,7 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.util.Vector;
 
 import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.lib.compatibility.material.Mat;
@@ -83,6 +84,24 @@ public class Point {
 		this.z = z;
 	}
 
+	public Point withX(int x) {
+		final Point clone = clone();
+		clone.setX(x);
+		return clone;
+	}
+
+	public Point withY(int y) {
+		final Point clone = clone();
+		clone.setY(y);
+		return clone;
+	}
+
+	public Point withtZ(int z) {
+		final Point clone = clone();
+		clone.setZ(z);
+		return clone;
+	}
+
 	// ----- methods
 	public Location toLocation() {
 		World world = getWorld();
@@ -92,6 +111,10 @@ public class Point {
 	public Block toBlock() {
 		World world = getWorld();
 		return world == null ? null : getWorld().getBlockAt(x, y, z);
+	}
+
+	public Vector toVector() {
+		return new Vector(x, y, z);
 	}
 
 	public void setType(Mat type) {
@@ -123,6 +146,10 @@ public class Point {
 		return Math.sqrt(Math.pow(location.getX() - this.getX(), 2d) + Math.pow(location.getZ() - this.getZ(), 2d) + Math.pow(location.getZ() - this.getZ(), 2d));
 	}
 
+	public double distance(Vector location) {
+		return Math.sqrt(Math.pow(location.getX() - this.getX(), 2d) + Math.pow(location.getZ() - this.getZ(), 2d) + Math.pow(location.getZ() - this.getZ(), 2d));
+	}
+
 	// ----- transform
 	public Point getRelative(int x, int y, int z) {
 		return new Point(world, this.x + x, this.y + y, this.z + z);
@@ -136,6 +163,22 @@ public class Point {
 
 	public static Point fromString(String raw) {
 		return Serializer.POINT.deserialize(raw);
+	}
+
+	public static Point from(Location location) {
+		return new Point(location);
+	}
+
+	public static Point from(Block block) {
+		return new Point(block);
+	}
+
+	public static Point from(World world, int x, int y, int z) {
+		return new Point(world.getName(), x, y, z);
+	}
+
+	public static Point from(String world, int x, int y, int z) {
+		return new Point(world, x, y, z);
 	}
 
 	@Override
@@ -170,6 +213,11 @@ public class Point {
 		if (z != other.z)
 			return false;
 		return true;
+	}
+
+	@Override
+	protected Point clone() {
+		return new Point(world, x, y, z);
 	}
 
 }

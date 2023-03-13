@@ -22,9 +22,13 @@ import java.util.stream.StreamSupport;
 import javax.annotation.Nullable;
 
 import com.guillaumevdn.gcore.lib.collection.IteratorControls;
+import com.guillaumevdn.gcore.lib.function.ThrowableBiConsumer;
+import com.guillaumevdn.gcore.lib.function.TriConsumer;
 import com.guillaumevdn.gcore.lib.number.NumberUtils;
 import com.guillaumevdn.gcore.lib.object.ObjectUtils;
 import com.guillaumevdn.gcore.lib.string.StringUtils;
+import com.guillaumevdn.gcore.lib.wrapper.WrapperBoolean;
+import com.guillaumevdn.gcore.lib.wrapper.WrapperInteger;
 
 /**
  * This is to avoid having to/forgetting to synchronize manually on this set.
@@ -94,6 +98,39 @@ public class RWArrayList<T> extends ArrayList<T> {
 			Iterator<T> it = super.iterator();
 			while (it.hasNext()) {
 				action.accept(it.next());
+			}
+		});
+	}
+
+	public final void forEachEnumerate(BiConsumer<Integer, ? super T> action) {
+		lock.read(() -> {
+			final Iterator<T> it = super.iterator();
+			int index = -1;
+			while (it.hasNext()) {
+				action.accept(++index, it.next());
+			}
+		});
+	}
+
+	public final void forEachEnumerate(TriConsumer<Integer, ? super T, WrapperBoolean> action) {
+		lock.read(() -> {
+			final Iterator<T> it = super.iterator();
+			final WrapperBoolean breaker = WrapperBoolean.of(false);
+			int index = -1;
+			while (it.hasNext()) {
+				action.accept(++index, it.next(), breaker);
+				if (breaker.get())
+					break;
+			}
+		});
+	}
+
+	public final void forEachEnumerateThrowable(ThrowableBiConsumer<Integer, ? super T> action) throws Throwable {
+		lock.readThrowable(() -> {
+			final Iterator<T> it = super.iterator();
+			int index = -1;
+			while (it.hasNext()) {
+				action.accept(++index, it.next());
 			}
 		});
 	}
@@ -389,10 +426,17 @@ public class RWArrayList<T> extends ArrayList<T> {
 	public boolean addAll(int index, Collection<? extends T> c) {
 		return lock.write(() -> {
 			super.ensureCapacity(super.size() + c.size());
-			int i = index - 1;
-			for (T e : c) {
-				super.add(++i, elementModifier(e));
+
+			final RWArrayList<? extends T> listRW = ObjectUtils.castOrNull(c, RWArrayList.class);
+			final WrapperInteger i = WrapperInteger.of(index - 1);
+			if (listRW != null) {
+				listRW.forEach(e -> super.add(i.alter(1), elementModifier(e)));
+			} else {
+				for (T e : c) {
+					super.add(i.alter(1), elementModifier(e));
+				}
 			}
+
 			return c.size() != 0;
 		});
 	}
@@ -401,9 +445,15 @@ public class RWArrayList<T> extends ArrayList<T> {
 	public final boolean addAll(Collection<? extends T> c) {
 		return lock.write(() -> {
 			super.ensureCapacity(super.size() + c.size());
-			for (T e : c) {
-				super.add(elementModifier(e));
+
+			final RWArrayList<? extends T> listRW = ObjectUtils.castOrNull(c, RWArrayList.class);
+			if (listRW != null) {
+				listRW.forEach(e -> super.add(elementModifier(e)));
+			} else {
+				for (T e : c)
+					super.add(elementModifier(e));
 			}
+
 			return c.size() != 0;
 		});
 	}

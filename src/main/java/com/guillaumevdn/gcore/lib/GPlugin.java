@@ -483,7 +483,10 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 			data.forEach((__, board) -> board.initialize(BukkitThread.ASYNC, () -> board.startSaving()));
 
 			// register commands
-			commands.forEach((__, command) -> getCommand(command.getName()).setExecutor(command));
+			commands.forEach((__, command) -> {
+				getCommand(command.getName()).setExecutor(command);
+				command.getSubcommands().forEach(cmd -> cmd.registered());
+			});
 
 			// register listeners
 			listeners.forEach((__, listener) -> {
@@ -594,7 +597,10 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 			HandlerList.unregisterAll(this);
 
 			// unregister commands
-			commands.forEach((id, command) -> getCommand(command.getName()).setExecutor(null));
+			commands.forEach((id, command) -> {
+				getCommand(command.getName()).setExecutor(null);
+				command.getSubcommands().forEach(cmd -> cmd.unregistered());
+			});
 			commands.clear();
 
 			// cancel tasks

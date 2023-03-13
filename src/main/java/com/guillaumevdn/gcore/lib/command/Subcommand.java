@@ -141,6 +141,12 @@ public abstract class Subcommand extends UsageRestriction {
 	// ----- do
 	public abstract void perform(CommandCall call);
 
+	public void registered() {
+	}
+
+	public void unregistered() {
+	}
+
 	// ----- help/text
 	public void logMissingArgument(Argument argument, CommandCall call) {
 		List<String> found = getArguments().stream()

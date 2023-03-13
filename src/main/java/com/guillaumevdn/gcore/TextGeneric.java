@@ -13,6 +13,8 @@ public enum TextGeneric implements TextEnumElement {
 	messageInvalidPlayer,
 	messageInvalidOfflinePlayer,
 	messageInvalidNumber,
+	messageInvalidNumberRangeMin,
+	messageInvalidNumberRangeMax,
 	messageCC,
 	messageSilentCC,
 	textCancel,

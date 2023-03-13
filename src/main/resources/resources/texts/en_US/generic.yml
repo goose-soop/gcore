@@ -8,6 +8,10 @@ messageInvalidOfflinePlayer: |
   &7Player &c{value} &7is invalid.
 messageInvalidNumber: |
   &7Number &c{value} &7is invalid.
+messageInvalidNumberRangeMin: |
+  &7Number &c{value} &7should be at least &c{min}&7.
+messageInvalidNumberRangeMax: |
+  &7Number &c{value} &7should be at most &c{max}&7.
 
 messageCC: '&d (cc. of {og})'
 messageSilentCC: '&d (cc. of {og}, silent)'

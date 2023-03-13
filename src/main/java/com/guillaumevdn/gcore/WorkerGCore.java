@@ -208,11 +208,25 @@ public class WorkerGCore {
 	}
 
 	public void awaitChatInteger(Player player, Text message, Consumer<Integer> onChat, Runnable onCancel) {
+		awaitChatInteger(player, message, Integer.MIN_VALUE, Integer.MAX_VALUE, onChat, onCancel);
+	}
+
+	public void awaitChatInteger(Player player, Text message, int min, int max, Consumer<Integer> onChat, Runnable onCancel) {
 		awaitChat(player, message, raw -> {
 			final Integer integer = NumberUtils.integerOrNull(raw);
 			if (integer == null) {
 				TextGeneric.messageInvalidNumber.replace("{value}", () -> raw).send(player);
-				awaitChatInteger(player, message, onChat, onCancel);
+				awaitChatInteger(player, message, min, max, onChat, onCancel);
+				return;
+			}
+			if (integer < min) {
+				TextGeneric.messageInvalidNumberRangeMin.replace("{value}", () -> raw).replace("{min}", () -> min).send(player);
+				awaitChatInteger(player, message, min, max, onChat, onCancel);
+				return;
+			}
+			if (integer > max) {
+				TextGeneric.messageInvalidNumberRangeMax.replace("{value}", () -> raw).replace("{max}", () -> max).send(player);
+				awaitChatInteger(player, message, min, max, onChat, onCancel);
 				return;
 			}
 			onChat.accept(integer);

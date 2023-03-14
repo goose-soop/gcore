@@ -44,10 +44,12 @@ public abstract class Board<C extends BoardConnector> {
 	protected final void operateOnConnector(ThrowableConsumer<C> operator) throws Throwable {
 		if (connector != null) {
 			operator.accept(connector);
+		} else if (!DataBackEnd.NONE.equals(getBackEnd())) {
+			getLogger().error("Tried to operate on connector but no connector found even though back-end is " + getBackEnd(), new Error());
 		}
 	}
 
-	protected final void initConnector(DataBackEnd backEnd) {
+	public final void initializeConnector(DataBackEnd backEnd) {
 		connector = createConnector(backEnd);
 	}
 
@@ -139,10 +141,10 @@ public abstract class Board<C extends BoardConnector> {
 	// ----------------------------------------------------------------------------------------------------
 
 	public final void initialize(BukkitThread thread, ThrowableRunnable callback) {
-		if (initialized) {
+		if (initialized)
 			throw new IllegalStateException("board " + getId() + " is already initialized");
-		}
-		initConnector(getBackEnd());
+		if (!DataBackEnd.NONE.equals(getBackEnd()) && connector == null)
+			throw new IllegalStateException("board " + getId() + " must have a connector before being initialized with back-end " + getBackEnd());
 		operate(thread, "initialize board", () -> {
 			initialized = true;
 			onInitialized();

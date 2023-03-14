@@ -59,6 +59,10 @@ public abstract class KeyedBoard<K, V> extends Board<ConnectorKeyed<K, V>> {
 		return cache.copyValues();
 	}
 
+	public final int cacheSize() {
+		return cache.size();
+	}
+
 	public final <RES> RES streamResult(Function<Stream<Map.Entry<K, V>>, RES> operator) {
 		return cache.streamResult(operator);
 	}
@@ -126,9 +130,9 @@ public abstract class KeyedBoard<K, V> extends Board<ConnectorKeyed<K, V>> {
 	// ----------------------------------------------------------------------------------------------------
 
 	public final void pullElements(BukkitThread thread, Set<K> keys, ThrowableRunnable callback) {
-		if (keys.isEmpty()) {
+		if (keys.isEmpty())
 			return;
-		}
+
 		operate(thread, "pull board elements " + StringUtils.toTextString(", ", keys), () -> {
 			toSave.removeAll(keys);
 			keys.forEach(key -> pulledElement(thread, key, getCachedValue(key)));
@@ -137,7 +141,9 @@ public abstract class KeyedBoard<K, V> extends Board<ConnectorKeyed<K, V>> {
 			}
 		}, () -> {
 			toSave.removeAll(keys);
-			operateOnConnector(c -> c.remotePullElements(keys));
+			operateOnConnector(c -> {
+				c.remotePullElements(keys);
+			});
 		});
 	}
 

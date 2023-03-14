@@ -480,6 +480,7 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 			loggers.forEach((__, logger) -> logger.startSaving());
 
 			// initialize data boards
+			data.forEach((__, board) -> board.initializeConnector(board.getBackEnd()));  // initialize connectors for each board now, otherwise if boards are inter-dependant it might cause data deletion (ex. qc users will load from qc quests instantly even though connector is not yet loaded, causing quests references to be removed from qc user because board "can't find them")
 			data.forEach((__, board) -> board.initialize(BukkitThread.ASYNC, () -> board.startSaving()));
 
 			// register commands

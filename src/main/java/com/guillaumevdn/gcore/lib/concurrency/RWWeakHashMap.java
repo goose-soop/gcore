@@ -109,7 +109,7 @@ public class RWWeakHashMap<K, V> extends WeakHashMap<K, V> {
 		lock(() -> {
 			Iterator<Entry<K, V>> it = super.entrySet().iterator();
 			IteratorControls iter = new IteratorControls();
-			
+
 			while (it.hasNext()) {
 				Entry<K, V> next = it.next();
 				try {
@@ -144,7 +144,7 @@ public class RWWeakHashMap<K, V> extends WeakHashMap<K, V> {
 		lockThrowable(() -> {
 			Iterator<Entry<K, V>> it = super.entrySet().iterator();
 			IteratorControls iter = new IteratorControls();
-			
+
 			while (it.hasNext()) {
 				Entry<K, V> next = it.next();
 				consumer.accept(next.getKey(), next.getValue(), iter);
@@ -161,14 +161,18 @@ public class RWWeakHashMap<K, V> extends WeakHashMap<K, V> {
 
 	public final WeakHashMap<K, V> copy() {
 		return lock(() -> {
-			WeakHashMap<K, V> copy = new WeakHashMap<>(super.size());
-			Iterator<Entry<K, V>> it = super.entrySet().iterator();
-			while (it.hasNext()) {
-				Entry<K, V> next = it.next();
-				copy.put(next.getKey(), next.getValue());
-			}
-			return copy;
+			return unsafeCopy();
 		});
+	}
+
+	private final WeakHashMap<K, V> unsafeCopy() {
+		WeakHashMap<K, V> copy = new WeakHashMap<>(super.size());
+		Iterator<Entry<K, V>> it = super.entrySet().iterator();
+		while (it.hasNext()) {
+			Entry<K, V> next = it.next();
+			copy.put(next.getKey(), next.getValue());
+		}
+		return copy;
 	}
 
 	public final Set<K> copyKeys() {
@@ -180,6 +184,14 @@ public class RWWeakHashMap<K, V> extends WeakHashMap<K, V> {
 	public final List<V> copyValues() {
 		return lock(() -> {
 			return CollectionUtils.asList(super.values());
+		});
+	}
+
+	public final WeakHashMap<K, V> consume() {
+		return lock(() -> {
+			final WeakHashMap<K, V> copy = unsafeCopy();
+			super.clear();
+			return copy;
 		});
 	}
 

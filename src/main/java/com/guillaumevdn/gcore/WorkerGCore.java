@@ -21,17 +21,21 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import com.guillaumevdn.gcore.lib.chat.JsonMessage;
+import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.collection.LowerCaseHashMap;
 import com.guillaumevdn.gcore.lib.compatibility.Version;
 import com.guillaumevdn.gcore.lib.compatibility.material.CommonMats;
+import com.guillaumevdn.gcore.lib.compatibility.material.Mat;
 import com.guillaumevdn.gcore.lib.concurrency.RWHashMap;
 import com.guillaumevdn.gcore.lib.legacy_npc.NPCManager;
 import com.guillaumevdn.gcore.lib.legacy_npc.NpcProtocols;
 import com.guillaumevdn.gcore.lib.number.NumberUtils;
+import com.guillaumevdn.gcore.lib.object.ObjectUtils;
 import com.guillaumevdn.gcore.lib.player./*MojangUtils*/MineToolsUtils;
 import com.guillaumevdn.gcore.lib.player.PlayerUtils;
 import com.guillaumevdn.gcore.lib.plugin.PluginUtils;
 import com.guillaumevdn.gcore.lib.reflection.ReflectionObject;
+import com.guillaumevdn.gcore.lib.string.StringUtils;
 import com.guillaumevdn.gcore.lib.string.Text;
 import com.guillaumevdn.gcore.lib.tuple.Pair;
 import com.guillaumevdn.gcore.lib.tuple.Triple;
@@ -207,6 +211,12 @@ public class WorkerGCore {
 		awaitingChats.put(player.getUniqueId(), Pair.of(onChat, onCancel));
 	}
 
+	public void awaitChatOrNone(Player player, Text message, String noneText, Consumer<String> onChat, Runnable onCancel) {
+		awaitChat(player, message, raw -> {
+			onChat.accept(raw.equalsIgnoreCase(noneText) ? null : raw);
+		}, onCancel);
+	}
+
 	public void awaitChatInteger(Player player, Text message, Consumer<Integer> onChat, Runnable onCancel) {
 		awaitChatInteger(player, message, Integer.MIN_VALUE, Integer.MAX_VALUE, onChat, onCancel);
 	}
@@ -230,6 +240,30 @@ public class WorkerGCore {
 				return;
 			}
 			onChat.accept(integer);
+		}, onCancel);
+	}
+
+	public <E extends Enum<E>> void awaitChatEnum(Player player, Text message, Class<E> enumClass, Consumer<E> onChat, Runnable onCancel) {
+		awaitChat(player, message, raw -> {
+			final E value = ObjectUtils.safeValueOf(raw, enumClass);
+			if (value == null) {
+				TextGeneric.messageInvalidEnum.replace("{value}", () -> raw).replace("{values}", () -> StringUtils.toTextString(", ", CollectionUtils.asList(enumClass.getEnumConstants()))).send(player);
+				awaitChatEnum(player, message, enumClass, onChat, onCancel);
+				return;
+			}
+			onChat.accept(value);
+		}, onCancel);
+	}
+
+	public void awaitChatMat(Player player, Text message, Consumer<Mat> onChat, Runnable onCancel) {
+		awaitChat(player, message, raw -> {
+			final Mat value = Mat.firstFromIdOrDataName(raw).orElse(null);
+			if (value == null) {
+				TextGeneric.messageInvalidEnumNoList.replace("{value}", () -> raw).send(player);
+				awaitChatMat(player, message, onChat, onCancel);
+				return;
+			}
+			onChat.accept(value);
 		}, onCancel);
 	}
 

@@ -42,6 +42,7 @@ public final class CommonMats {
 	public static final Mat DIAMOND_SWORD = Mat.firstFromIdOrDataName("DIAMOND_SWORD").get();
 	public static final Mat DIAMOND_PICKAXE = Mat.firstFromIdOrDataName("DIAMOND_PICKAXE").get();
 	public static final Mat DIRT = Mat.firstFromIdOrDataName("DIRT").get();
+	public static final Mat DIRT_PATH = Mat.firstFromIdOrDataName("DIRT_PATH").get();
 	public static final Mat ELYTRA = !Version.ATLEAST_1_9 ? null : Mat.firstFromIdOrDataName("ELYTRA").get();
 	public static final Mat EMERALD = Mat.firstFromIdOrDataName("EMERALD").get();
 	public static final Mat ENCHANTED_BOOK = Mat.firstFromIdOrDataName("ENCHANTED_BOOK").get();
@@ -109,6 +110,7 @@ public final class CommonMats {
 	public static final Mat TRIPWIRE = Mat.firstFromIdOrDataName("TRIPWIRE").get();
 	public static final Mat TRIPWIRE_HOOK = Mat.firstFromIdOrDataName("TRIPWIRE_HOOK").get();
 	public static final Mat WATER_BUCKET = Mat.firstFromIdOrDataName("WATER_BUCKET").get();
+	public static final Mat WHEAT = Mat.firstFromIdOrDataName("WHEAT").get();
 	public static final Mat WHITE_WOOL = Mat.firstFromIdOrDataName("WHITE_WOOL").get();
 	public static final Mat WOODEN_SWORD = Mat.firstFromIdOrDataName("WOODEN_SWORD").get();
 	public static final Mat WRITABLE_BOOK = Mat.firstFromIdOrDataName("WRITABLE_BOOK").get();

@@ -12,6 +12,10 @@ messageInvalidNumberRangeMin: |
   &7Number &c{value} &7should be at least &c{min}&7.
 messageInvalidNumberRangeMax: |
   &7Number &c{value} &7should be at most &c{max}&7.
+messageInvalidEnum: |
+  &7Value &c{value} &7is invalid, it should be one of &c{values}&7.
+messageInvalidEnumNoList: |
+  &7Value &c{value} &7is invalid.
 
 messageCC: '&d (cc. of {og})'
 messageSilentCC: '&d (cc. of {og}, silent)'

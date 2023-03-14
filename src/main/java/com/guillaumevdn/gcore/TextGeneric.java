@@ -15,6 +15,8 @@ public enum TextGeneric implements TextEnumElement {
 	messageInvalidNumber,
 	messageInvalidNumberRangeMin,
 	messageInvalidNumberRangeMax,
+	messageInvalidEnum,
+	messageInvalidEnumNoList,
 	messageCC,
 	messageSilentCC,
 	textCancel,

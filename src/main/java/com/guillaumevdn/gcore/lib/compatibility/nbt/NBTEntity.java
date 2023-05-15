@@ -27,7 +27,7 @@ public class NBTEntity extends NBTCompound {
 
 	// ----- methods
 	public void applyTag() throws Throwable {
-		ReflectionObject.of(entity).invokeMethod("getHandle").invokeVoidMethod(Version.ATLEAST_1_16 ? "loadData" : "a", getTag().justGet());  // load data from the nbt tag to the entity
+		ReflectionObject.of(entity).invokeMethod("getHandle").invokeVoidMethod(Version.ATLEAST_1_17 ? "a" : (Version.ATLEAST_1_16 ? "loadData" : "a"), getTag().justGet());  // load data from the nbt tag to the entity
 	}
 
 }

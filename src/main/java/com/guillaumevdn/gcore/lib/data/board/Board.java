@@ -31,7 +31,8 @@ public abstract class Board<C extends BoardConnector> {
 		this.plugin = plugin;
 		this.id = id;
 		this.boardType = boardType;
-		this.saveDelayTicks = saveDelayTicks;
+		Integer ticks = plugin.getConfiguration().dataSaveTicks(this);
+		this.saveDelayTicks = ticks != null ? ticks : saveDelayTicks;
 		String loggerId = "data-" + id;
 		plugin.registerLogger(logger = new Logger(plugin, plugin.getName() + "-" + loggerId,
 				plugin.getConfiguration().logDataConsole(this),

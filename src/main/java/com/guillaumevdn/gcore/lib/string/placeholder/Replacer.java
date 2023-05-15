@@ -41,6 +41,9 @@ public interface Replacer {
 			if (StringUtils.hasPlaceholders(string)) {
 				string = PlaceholderReplacer.parseAll(string, data.getPlayer(), getReplacerData().mustSilenceMathErrors());
 			}
+
+			if (string.contains("@removeline"))
+				string = "";
 		}
 		return string;
 	}
@@ -82,6 +85,13 @@ public interface Replacer {
 				if (StringUtils.hasPlaceholders(r)) {
 					parsed.set(i, PlaceholderReplacer.parseAll(r, data.getPlayer(), getReplacerData().mustSilenceMathErrors()));
 				}
+			}
+		}
+
+		for (int i = 0; i < parsed.size(); ++i) {
+			if (parsed.get(i).contains("@removeline")) {
+				parsed.remove(i);
+				--i;
 			}
 		}
 

@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 import com.guillaumevdn.gcore.lib.configuration.YMLConfiguration;
 import com.guillaumevdn.gcore.lib.configuration.file.YMLError;
 import com.guillaumevdn.gcore.lib.data.DataBackEnd;
@@ -24,6 +26,7 @@ public abstract class GPluginConfig {
 	private List<String> logDataFile = null;
 	private List<String> logDataSQL = null;
 	private final Map<String, DataBackEnd> dataBackEnds = new HashMap<>(3);
+	private final Map<String, Integer> dataSaveTicks = new HashMap<>(3);
 	private boolean updateNotification = true;
 
 	// ----- get
@@ -56,6 +59,11 @@ public abstract class GPluginConfig {
 		return dataBackEnds.getOrDefault(id, DataBackEnd.JSON);
 	}
 
+	public final @Nullable Integer dataSaveTicks(Board board) {
+		String id = board.getId().toLowerCase();
+		return dataSaveTicks.get(id);
+	}
+
 	public final boolean updateNotification() {
 		return updateNotification;
 	}
@@ -78,6 +86,9 @@ public abstract class GPluginConfig {
 				}
 				for (String boardId : config.readKeysForSection("data_backend")) {
 					dataBackEnds.put(boardId.toLowerCase(), config.readEnum("data_backend." + boardId, DataBackEnd.JSON, DataBackEnd.class));
+				}
+				for (String boardId : config.readKeysForSection("data_save_ticks")) {
+					dataSaveTicks.put(boardId.toLowerCase(), config.readMandatoryInteger("data_save_ticks." + boardId));
 				}
 				updateNotification = config.readBoolean("update_notification", true);
 			}

@@ -25,7 +25,7 @@ public final class GcoreItemSetNBTString extends Subcommand {
 	final ArgumentInfinite argValue = addArgumentInfinite(NeedType.REQUIRED, false, null, Text.of("value"));
 
 	public GcoreItemSetNBTString() {
-		super(true, PermissionGCore.inst().gcoreAdmin, TextGCore.commandDescriptionGcoreItemRead, ConfigGCore.commandsAliasesItemSetNBTString);
+		super(true, PermissionGCore.inst().gcoreAdmin, TextGCore.commandDescriptionGcoreItemSetNBTString, ConfigGCore.commandsAliasesItemSetNBTString);
 	}
 
 	@Override

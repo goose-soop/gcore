@@ -58,7 +58,7 @@ public final class Excluder implements TypeAdapterFactory, Cloneable {
   private List<ExclusionStrategy> serializationStrategies = Collections.emptyList();
   private List<ExclusionStrategy> deserializationStrategies = Collections.emptyList();
 
-  @Override protected Excluder clone() {
+  protected @Override Excluder clone() {
     try {
       return (Excluder) super.clone();
     } catch (CloneNotSupportedException e) {

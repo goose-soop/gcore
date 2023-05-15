@@ -5,6 +5,8 @@ import java.util.function.Supplier;
 
 import javax.annotation.Nonnull;
 
+import org.bukkit.entity.Player;
+
 import com.guillaumevdn.gcore.lib.element.struct.IElement;
 import com.guillaumevdn.gcore.lib.element.struct.SuperElement;
 import com.guillaumevdn.gcore.lib.object.Optional;
@@ -23,6 +25,10 @@ public interface ParseableElement<T> extends IElement {
 
 	default Optional<T> parseGeneric() {
 		return parse(Replacer.GENERIC);
+	}
+
+	default Optional<T> parseJustPlayer(Player player) {
+		return parse(Replacer.justPlayer(player));
 	}
 
 	default Optional<T> parse(@Nonnull Replacer replacer) {  // used most of the time

@@ -14,7 +14,7 @@ public final class CommonMats {
 	public static final Mat ANVIL = Mat.firstFromIdOrDataName("ANVIL").get();
 	public static final Mat APPLE = Mat.firstFromIdOrDataName("APPLE").get();
 	public static final Mat ARROW = Mat.firstFromIdOrDataName("ARROW").get();
-	public static final Mat BARRIER = Mat.firstFromIdOrDataName("BARRIER").get();
+	public static final Mat BARRIER = !Version.ATLEAST_1_8 ? null : Mat.firstFromIdOrDataName("BARRIER").get();
 	public static final Mat BEDROCK = Mat.firstFromIdOrDataName("BEDROCK").get();
 	public static final Mat BUCKET = Mat.firstFromIdOrDataName("BUCKET").get();
 	public static final Mat BOOKSHELF = Mat.firstFromIdOrDataName("BOOKSHELF").get();
@@ -42,7 +42,6 @@ public final class CommonMats {
 	public static final Mat DIAMOND_SWORD = Mat.firstFromIdOrDataName("DIAMOND_SWORD").get();
 	public static final Mat DIAMOND_PICKAXE = Mat.firstFromIdOrDataName("DIAMOND_PICKAXE").get();
 	public static final Mat DIRT = Mat.firstFromIdOrDataName("DIRT").get();
-	public static final Mat DIRT_PATH = Mat.firstFromIdOrDataName("DIRT_PATH").get();
 	public static final Mat ELYTRA = !Version.ATLEAST_1_9 ? null : Mat.firstFromIdOrDataName("ELYTRA").get();
 	public static final Mat EMERALD = Mat.firstFromIdOrDataName("EMERALD").get();
 	public static final Mat ENCHANTED_BOOK = Mat.firstFromIdOrDataName("ENCHANTED_BOOK").get();
@@ -110,6 +109,8 @@ public final class CommonMats {
 	public static final Mat TRIPWIRE = Mat.firstFromIdOrDataName("TRIPWIRE").get();
 	public static final Mat TRIPWIRE_HOOK = Mat.firstFromIdOrDataName("TRIPWIRE_HOOK").get();
 	public static final Mat WATER_BUCKET = Mat.firstFromIdOrDataName("WATER_BUCKET").get();
+	public static final Mat WARPED_SIGN = !Version.ATLEAST_1_16 ? null : Mat.firstFromIdOrDataName("WARPED_SIGN").get();
+	public static final Mat WARPED_WALL_SIGN = !Version.ATLEAST_1_16 ? null : Mat.firstFromIdOrDataName("WARPED_WALL_SIGN").get();
 	public static final Mat WHEAT = Mat.firstFromIdOrDataName("WHEAT").get();
 	public static final Mat WHITE_WOOL = Mat.firstFromIdOrDataName("WHITE_WOOL").get();
 	public static final Mat WOODEN_SWORD = Mat.firstFromIdOrDataName("WOODEN_SWORD").get();

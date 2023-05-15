@@ -34,7 +34,7 @@ public final class Bossbar {
 		this.title = title.length() > 64 ? title.substring(0, 64) : title;
 		this.color = color;
 		this.style = style;
-		this.flags = flags == null ? new ArrayList<>() : flags;
+		this.flags = flags == null ? new ArrayList<>(0) : flags;
 		this.progress = !Double.isFinite(progress) ? 1d : Math.max(Math.min(progress, 1d), 0d);
 		this.players = CollectionUtils.asSet(players);
 	}
@@ -149,9 +149,8 @@ public final class Bossbar {
 
 	public void start() {
 		active = true;
-		if (instances != null) {
+		if (instances != null)
 			stop();
-		}
 		plugin.registerBossbar(this);
 		instances = new HashMap<>(1);
 		players.forEach(player -> BossbarCompat.addPlayer(this, player));

@@ -2,9 +2,11 @@ package com.guillaumevdn.gcore.lib.legacy_npc;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 
 import org.bukkit.GameMode;
@@ -16,7 +18,12 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.wrappers.EnumWrappers;
+import com.comphenix.protocol.wrappers.PlayerInfoData;
+import com.comphenix.protocol.wrappers.WrappedChatComponent;
+import com.comphenix.protocol.wrappers.WrappedDataValue;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
+import com.comphenix.protocol.wrappers.WrappedDataWatcher.Registry;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher.Serializer;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher.WrappedDataWatcherObject;
 import com.comphenix.protocol.wrappers.WrappedGameProfile;
@@ -25,6 +32,7 @@ import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.compatibility.Compat;
 import com.guillaumevdn.gcore.lib.compatibility.Version;
+import com.guillaumevdn.gcore.lib.object.ObjectUtils;
 import com.guillaumevdn.gcore.lib.reflection.Reflection;
 import com.guillaumevdn.gcore.lib.reflection.ReflectionEnum;
 import com.guillaumevdn.gcore.lib.reflection.ReflectionObject;
@@ -68,20 +76,30 @@ public final class NpcProtocols {
 	}
 
 	// ----- data
-	public void sendMetadata(Player player, WrappedDataWatcher data, int entityId) {
+	public static void sendMetadata(Player player, Map<Integer, Object> metadata, int entityId) {
 		PacketContainer packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.ENTITY_METADATA);
 		packet.getIntegers().write(0, entityId);
-		packet.getWatchableCollectionModifier().write(0, data.getWatchableObjects());
+		if (Version.ATLEAST_1_19_3)
+			packet.getDataValueCollectionModifier().write(0, createMetadataCollection(metadata));
+		else
+			packet.getWatchableCollectionModifier().write(0, createMetadata(metadata).getWatchableObjects());
 		sendPacket(player, packet);
 	}
 
-	public WrappedDataWatcher createMetadata(Map<Integer, Object> map) {
+	private static Serializer byteSerializer = null;
+	private static Serializer integerSerializer = null;
+	private static Serializer booleanSerializer = null;
+	private static Serializer floatSerializer = null;
+
+	public static synchronized WrappedDataWatcher createMetadata(Map<Integer, Object> map) {
 		WrappedDataWatcher data = new WrappedDataWatcher();
 		if (Version.ATLEAST_1_13) {
-			Serializer byteSerializer = WrappedDataWatcher.Registry.get(Byte.class);
-			Serializer integerSerializer = WrappedDataWatcher.Registry.get(Integer.class);
-			Serializer booleanSerializer = WrappedDataWatcher.Registry.get(Boolean.class);
-			Serializer floatSerializer = WrappedDataWatcher.Registry.get(Float.class);
+			if (byteSerializer == null) {
+				byteSerializer = Registry.get(Byte.class);
+				integerSerializer = Registry.get(Integer.class);
+				booleanSerializer = Registry.get(Boolean.class);
+				floatSerializer = Registry.get(Float.class);
+			}
 			for (Map.Entry<Integer, Object> entry : map.entrySet()) {
 				if (entry.getValue() instanceof Byte) {
 					data.setObject(new WrappedDataWatcherObject(entry.getKey(), byteSerializer), entry.getValue());
@@ -100,6 +118,28 @@ public final class NpcProtocols {
 			}
 		}
 		return data;
+	}
+
+	public static synchronized List<WrappedDataValue> createMetadataCollection(Map<Integer, Object> map) {
+		if (byteSerializer == null) {
+			byteSerializer = Registry.get(Byte.class);
+			integerSerializer = Registry.get(Integer.class);
+			booleanSerializer = Registry.get(Boolean.class);
+			floatSerializer = Registry.get(Float.class);
+		}
+
+		final List<WrappedDataValue> list = new ArrayList<>();
+		for (final Entry<Integer, Object> entry : map.entrySet()) {
+			if (ObjectUtils.instanceOf(entry.getValue(), Byte.class))
+				list.add(new WrappedDataValue(entry.getKey(), byteSerializer, entry.getValue()));
+			else if (ObjectUtils.instanceOf(entry.getValue(), Integer.class))
+				list.add(new WrappedDataValue(entry.getKey(), integerSerializer, entry.getValue()));
+			else if (ObjectUtils.instanceOf(entry.getValue(), Boolean.class))
+				list.add(new WrappedDataValue(entry.getKey(), booleanSerializer, entry.getValue()));
+			else if (ObjectUtils.instanceOf(entry.getValue(), Float.class))
+				list.add(new WrappedDataValue(entry.getKey(), floatSerializer, entry.getValue()));
+		}
+		return list;
 	}
 
 	// ----- https://wiki.vg/Entity_metadata#Player
@@ -128,10 +168,12 @@ public final class NpcProtocols {
 		return null;
 	}
 
-	public Object createPlayerInfo(Object gameProfile, GameMode gameMode, int entityId, String name) throws Throwable {
+	public Object createPlayerInfo(UUID uuid, Object gameProfile, GameMode gameMode, int entityId, String name) throws Throwable {
 		ReflectionObject gm = Reflection.invokeNmsMethod((Version.REMAPPED ? "world.level." : "") + "EnumGamemode", Version.ATLEAST_1_18 ? "a" : "getById", null, gameMode.getValue());
 		if (Version.REMAPPED) {
-			if (Version.ATLEAST_1_19) {
+			if (Version.ATLEAST_1_19_3)
+				return Reflection.newNmsInstance("network.protocol.game.ClientboundPlayerInfoUpdatePacket$b", uuid, gameProfile, false, 0, gm.get(), Compat.createChatComponentIfNonEmptyOrNull(name), null /* chat session, can be null apparently */).get();
+			else if (Version.ATLEAST_1_19) {
 				return Reflection.newNmsInstance("network.protocol.game.PacketPlayOutPlayerInfo$PlayerInfoData", gameProfile, entityId, gm.get(), createNMSText(name), null /* public key, can be null apparently */).get();
 			} else {
 				return Reflection.newNmsInstance("network.protocol.game.PacketPlayOutPlayerInfo$PlayerInfoData", gameProfile, entityId, gm.get(), createNMSText(name)).get();
@@ -306,19 +348,25 @@ public final class NpcProtocols {
 			spawnPacket.getSpecificModifier(UUID.class).write(0, gameProfile.getUUID());
 
 			// create metadata packet
-			WrappedDataWatcher metadata = createMetadata(getDefaultHumanEntityMetadata());
 			PacketContainer metadataPacket = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.ENTITY_METADATA);
 			metadataPacket.getIntegers().write(0, entityId);
-			metadataPacket.getWatchableCollectionModifier().write(0, metadata.getWatchableObjects());
+			if (Version.ATLEAST_1_19_3) {
+				metadataPacket.getDataValueCollectionModifier().write(0, createMetadataCollection(getDefaultHumanEntityMetadata()));
+			} else {
+				metadataPacket.getWatchableCollectionModifier().write(0, createMetadata(getDefaultHumanEntityMetadata()).getWatchableObjects());
+			}
 
 			// create info packet
 			final PacketContainer infoPacket = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.PLAYER_INFO);
+			final Object pre119PlayerInfo;
 			if (Version.ATLEAST_1_19_3) {
+				pre119PlayerInfo = null;
 				infoPacket.getSpecificModifier(EnumSet.class).write(0, EnumSet.of(playerInfoActionEnum.valueOf("ADD_PLAYER").get()));
-				infoPacket.getSpecificModifier(List.class).write(0, Arrays.asList(createPlayerInfo(gameProfile.getHandle(), GameMode.SURVIVAL, 0, " ")));
+				infoPacket.getPlayerInfoDataLists().write(1, Collections.singletonList(new PlayerInfoData(gameProfile, 0, EnumWrappers.NativeGameMode.SURVIVAL, WrappedChatComponent.fromText(" "))));
 			} else {
+				pre119PlayerInfo = createPlayerInfo(gameProfile.getUUID(), gameProfile.getHandle(), GameMode.SURVIVAL, 0, " ");
 				infoPacket.getSpecificModifier(infoActionEnum).write(0, playerInfoActionEnum.valueOf("ADD_PLAYER").get());
-				infoPacket.getSpecificModifier(List.class).write(0, Arrays.asList(createPlayerInfo(gameProfile.getHandle(), GameMode.SURVIVAL, 0, " ")));
+				infoPacket.getSpecificModifier(List.class).write(0, Arrays.asList(pre119PlayerInfo));
 			}
 
 			// send packets
@@ -327,7 +375,7 @@ public final class NpcProtocols {
 			sendPacket(player, metadataPacket);
 
 			// remove info later
-			/*new BukkitRunnable() {
+			new BukkitRunnable() {
 				@Override
 				public void run() {
 					try {
@@ -335,9 +383,8 @@ public final class NpcProtocols {
 						if (Version.ATLEAST_1_19_3) {
 							infoPacket.getSpecificModifier(List.class).write(0, Arrays.asList(gameProfile.getUUID()));
 						} else {
-							Object playerInfo = createPlayerInfo(gameProfile.getHandle(), GameMode.SURVIVAL, 0, " ");
 							packet.getSpecificModifier(infoActionEnum).write(0, playerInfoActionEnum.valueOf("REMOVE_PLAYER").get());
-							packet.getSpecificModifier(List.class).write(0, Arrays.asList(playerInfo));
+							packet.getSpecificModifier(List.class).write(0, Arrays.asList(pre119PlayerInfo));
 						}
 
 						sendPacket(player, packet);
@@ -345,7 +392,7 @@ public final class NpcProtocols {
 						exception.printStackTrace();
 					}
 				}
-			}.runTaskLater(GCore.inst(), 40L);*/
+			}.runTaskLater(GCore.inst(), 5L);
 
 			// update look
 			sendTarget(player, entityId, location.getYaw(), location.getPitch());
@@ -357,11 +404,13 @@ public final class NpcProtocols {
 			if (skinData != null && skinSignature != null) {
 				gameProfile.getProperties().put("textures", new WrappedSignedProperty("textures", skinData, skinSignature));
 			}
+
 			// send info packet
 			PacketContainer infoPacket = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.PLAYER_INFO);
 			infoPacket.getSpecificModifier(infoActionEnum).write(0, playerInfoActionEnum.valueOf("ADD_PLAYER").get());
-			infoPacket.getSpecificModifier(List.class).write(0, Arrays.asList(createPlayerInfo(gameProfile.getHandle(), GameMode.SURVIVAL, 0, " ")));
+			infoPacket.getSpecificModifier(List.class).write(0, Arrays.asList(createPlayerInfo(gameProfile.getUUID(), gameProfile.getHandle(), GameMode.SURVIVAL, 0, " ")));
 			sendPacket(player, infoPacket);
+
 			// send spawn packet
 			PacketContainer spawnPacket = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.NAMED_ENTITY_SPAWN);
 			spawnPacket.getIntegers().write(0, entityId);
@@ -373,6 +422,7 @@ public final class NpcProtocols {
 			spawnPacket.getDataWatcherModifier().write(0, metadata);
 			spawnPacket.getSpecificModifier(UUID.class).write(0, gameProfile.getUUID());
 			sendPacket(player, spawnPacket);
+
 			// more info
 			new BukkitRunnable() {
 				@Override
@@ -380,7 +430,7 @@ public final class NpcProtocols {
 					try {
 						// create packet
 						PacketContainer packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.PLAYER_INFO);
-						Object playerInfo = createPlayerInfo(gameProfile.getHandle(), GameMode.SURVIVAL, 0, " ");
+						Object playerInfo = createPlayerInfo(gameProfile.getUUID(), gameProfile.getHandle(), GameMode.SURVIVAL, 0, " ");
 						packet.getSpecificModifier(infoActionEnum).write(0, playerInfoActionEnum.valueOf("REMOVE_PLAYER").get());
 						packet.getSpecificModifier(List.class).write(0, Arrays.asList(playerInfo));
 						// send packet
@@ -390,6 +440,7 @@ public final class NpcProtocols {
 					}
 				}
 			}.runTaskLater(GCore.inst(), 20L);
+
 			// update look
 			sendTarget(player, entityId, location.getYaw(), location.getPitch());
 		}
@@ -415,7 +466,7 @@ public final class NpcProtocols {
 			// create info packet
 			PacketContainer infoPacket = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.PLAYER_INFO);
 			infoPacket.getSpecificModifier(infoActionEnum).write(0, playerInfoActionEnum.valueOf("ADD_PLAYER").get());
-			infoPacket.getSpecificModifier(List.class).write(0, Arrays.asList(createPlayerInfo(gameProfile.getHandle(), GameMode.SURVIVAL, 0, " ")));
+			infoPacket.getSpecificModifier(List.class).write(0, Arrays.asList(createPlayerInfo(gameProfile.getUUID(), gameProfile.getHandle(), GameMode.SURVIVAL, 0, " ")));
 			// send packets
 			sendPacket(player, infoPacket);
 			sendPacket(player, spawnPacket);
@@ -427,7 +478,7 @@ public final class NpcProtocols {
 						// create packet
 						PacketContainer packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.PLAYER_INFO);
 						Object playerInfo;
-						playerInfo = createPlayerInfo(gameProfile.getHandle(), GameMode.SURVIVAL, 0, " ");
+						playerInfo = createPlayerInfo(gameProfile.getUUID(), gameProfile.getHandle(), GameMode.SURVIVAL, 0, " ");
 						packet.getSpecificModifier(infoActionEnum).write(0, playerInfoActionEnum.valueOf("REMOVE_PLAYER").get());
 						packet.getSpecificModifier(List.class).write(0, Arrays.asList(playerInfo));
 						// send packet
@@ -451,7 +502,7 @@ public final class NpcProtocols {
 	}
 
 	// ----- send packet
-	public void sendPacket(Player player, PacketContainer packet) {
+	public static void sendPacket(Player player, PacketContainer packet) {
 		try {
 			ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet);
 		} catch (Exception exception) {

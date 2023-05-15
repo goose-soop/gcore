@@ -21,6 +21,8 @@ import com.guillaumevdn.gcore.TextGeneric;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.collection.LowerCaseHashMap;
 import com.guillaumevdn.gcore.lib.command.CommandCall;
+import com.guillaumevdn.gcore.lib.concurrency.RWArrayList;
+import com.guillaumevdn.gcore.lib.concurrency.RWHashSet;
 import com.guillaumevdn.gcore.lib.gui.struct.ClickCall;
 import com.guillaumevdn.gcore.lib.string.StringUtils;
 import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
@@ -43,18 +45,6 @@ public final class PlayerUtils {
 			}
 			return result;
 		}
-
-
-		/*if (Version.CURRENT.isLessOrEqualsTo(Version.MC_1_7_R4)) {
-			Player[] array = (Player[]) ((Object) Bukkit.getOnlinePlayers());
-			List<Player> result = new ArrayList<>(array.length);
-			for (int i = 0; i < array.length; ++i) {
-				result.add(array[i]);
-			}
-			return result;
-		} else {
-			return new ArrayList<>(Bukkit.getOnlinePlayers());
-		}*/
 	}
 
 	public static Stream<? extends Player> getOnlineStream() {
@@ -65,14 +55,6 @@ public final class PlayerUtils {
 			Player[] array = (Player[]) online;
 			return Arrays.stream(array);
 		}
-
-
-		/*if (Version.CURRENT.isLessOrEqualsTo(Version.MC_1_7_R4)) {
-			Object array = Bukkit.getOnlinePlayers();
-			return Arrays.stream((Player[]) array);
-		} else {
-			return Bukkit.getOnlinePlayers().stream();
-		}*/
 	}
 
 	public static List<Player> getOnline(Collection<UUID> uuids) {
@@ -145,6 +127,10 @@ public final class PlayerUtils {
 			CommandSender targetSender = (CommandSender) target;
 			if (!onlyCC) targetSender.sendMessage(message);
 			if (cc != null && (onlyCC || !cc.equals(target))) cc.sendMessage(message + (onlyCC ? TextGeneric.messageSilentCC : TextGeneric.messageCC).replace("{og}", () -> targetSender.getName()).parseLine());
+		} else if (target instanceof RWArrayList<?>) {
+			((RWArrayList<?>) target).forEach(sub -> sendMessage(sub, message, cc, onlyCC));
+		}  else if (target instanceof RWHashSet<?>) {
+			((RWHashSet<?>) target).forEach(sub -> sendMessage(sub, message, cc, onlyCC));
 		} else if (target instanceof Collection<?>) {
 			for (Object sub : ((Collection<?>) target)) {
 				sendMessage(sub, message, cc, onlyCC);

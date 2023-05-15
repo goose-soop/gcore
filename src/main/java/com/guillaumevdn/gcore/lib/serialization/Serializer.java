@@ -46,6 +46,7 @@ import com.guillaumevdn.gcore.lib.gui.element.item.overrideclick.OverrideClickTy
 import com.guillaumevdn.gcore.lib.gui.element.item.type.GUIItemType;
 import com.guillaumevdn.gcore.lib.gui.element.item.type.GUIItemTypes;
 import com.guillaumevdn.gcore.lib.location.Point;
+import com.guillaumevdn.gcore.lib.location.Region;
 import com.guillaumevdn.gcore.lib.location.VectorPoint;
 import com.guillaumevdn.gcore.lib.location.position.PositionType;
 import com.guillaumevdn.gcore.lib.location.position.PositionTypes;
@@ -334,6 +335,7 @@ public abstract class Serializer<T> {
 	public static final Serializer<ItemFlag> ITEM_FLAG = ofEnum(ItemFlag.class);
 	public static final LinearSerializer<OverrideClickType, OverrideClick> OVERRIDE_CLICK = Serializer.ofLinear(Serializer.ofEnum(OverrideClickType.class), OverrideClick.class, (type, params) -> new OverrideClick(type, params));
 	public static final Serializer<Permission> PERMISSION = of(Permission.class, value -> value.getName(), string -> new Permission(string));
+
 	public static final Serializer<Point> POINT = of(Point.class,
 			value -> value.getWorldName() + "," + value.getX() + "," + value.getY() + "," + value.getZ(),
 			string -> {
@@ -349,6 +351,7 @@ public abstract class Serializer<T> {
 					throw new Error("couldn't deserialize point " + string, exception);
 				}
 			});
+
 	public static final Serializer<VectorPoint> VECTOR_POINT = of(VectorPoint.class,
 			value -> value.getX() + "," + value.getY() + "," + value.getZ(),
 			string -> {
@@ -360,6 +363,20 @@ public abstract class Serializer<T> {
 				// decode
 				try {
 					return VectorPoint.from(Integer.parseInt(split[0]), Integer.parseInt(split[1]), Integer.parseInt(split[2]));
+				} catch (Throwable exception) {
+					throw new Error("couldn't deserialize point " + string, exception);
+				}
+			});
+
+
+	public static final Serializer<Region> REGION = of(Region.class,
+			value -> POINT.serialize(value.getMin()) + "@@@" + POINT.serialize(value.getMax()),
+			string -> {
+				String[] split = string.split("@@@");
+				if (split.length != 2)
+					return null;
+				try {
+					return new Region(POINT.deserialize(split[0]), POINT.deserialize(split[1]));
 				} catch (Throwable exception) {
 					throw new Error("couldn't deserialize point " + string, exception);
 				}

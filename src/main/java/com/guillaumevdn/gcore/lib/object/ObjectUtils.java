@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -130,15 +131,30 @@ public final class ObjectUtils {
 	}
 
 	// ----- cast
+	public static <T> void forCasted(Object object, Class<T> castClass, Consumer<T> ifCasted) {
+		ifCanBeCasted(object, castClass, ifCasted);
+	}
+	public static <T> void forCasted(Object a, Object b, Class<T> castClass, BiConsumer<T, T> ifCasted) {
+		final T castedA = castOrNull(a, castClass);
+		final T castedB = castOrNull(b, castClass);
+		if (castedA != null && castedB != null)
+			ifCasted.accept(castedA, castedB);
+	}
+	public static <A, B> void forCasted(Object a, Object b, Class<A> castClassA, Class<B> castClassB, BiConsumer<A, B> ifCasted) {
+		final A castedA = castOrNull(a, castClassA);
+		final B castedB = castOrNull(b, castClassB);
+		if (castedA != null && castedB != null)
+			ifCasted.accept(castedA, castedB);
+	}
+
 	public static <T> void ifCanBeCasted(Object object, Class<T> castClass, Consumer<T> consumer) {
-		T casted = castOrNull(object, castClass);
-		if (casted != null) {
+		final T casted = castOrNull(object, castClass);
+		if (casted != null)
 			consumer.accept(casted);
-		}
 	}
 
 	public static <T, R> Optional<R> ifCanBeCastedDo(Object object, Class<T> castClass, Function<T, R> consumer) {
-		T casted = castOrNull(object, castClass);
+		final T casted = castOrNull(object, castClass);
 		return Optional.of(casted == null ? null : consumer.apply(casted));
 	}
 

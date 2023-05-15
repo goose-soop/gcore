@@ -1,10 +1,6 @@
 package com.guillaumevdn.gcore;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -27,6 +23,9 @@ import com.guillaumevdn.gcore.lib.compatibility.Version;
 import com.guillaumevdn.gcore.lib.compatibility.material.CommonMats;
 import com.guillaumevdn.gcore.lib.compatibility.material.Mat;
 import com.guillaumevdn.gcore.lib.concurrency.RWHashMap;
+import com.guillaumevdn.gcore.lib.concurrency.RWWeakHashMap;
+import com.guillaumevdn.gcore.lib.element.struct.container.typable.TypableElementType;
+import com.guillaumevdn.gcore.lib.element.struct.container.typable.TypableElementTypes;
 import com.guillaumevdn.gcore.lib.legacy_npc.NPCManager;
 import com.guillaumevdn.gcore.lib.legacy_npc.NpcProtocols;
 import com.guillaumevdn.gcore.lib.number.NumberUtils;
@@ -37,6 +36,7 @@ import com.guillaumevdn.gcore.lib.plugin.PluginUtils;
 import com.guillaumevdn.gcore.lib.reflection.ReflectionObject;
 import com.guillaumevdn.gcore.lib.string.StringUtils;
 import com.guillaumevdn.gcore.lib.string.Text;
+import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
 import com.guillaumevdn.gcore.lib.tuple.Pair;
 import com.guillaumevdn.gcore.lib.tuple.Triple;
 import com.guillaumevdn.gcore.lib.wrapper.Wrapper;
@@ -134,52 +134,52 @@ public class WorkerGCore {
 	}
 
 	// ----- await inputs
-	private Map<UUID, Pair<Consumer<String>, Runnable>> awaitingChats = new HashMap<>(1);
-	private Set<UUID> awaitingLocationsCancelChat = new HashSet<>(1);
-	private Map<UUID, Triple<Consumer<Location>, Runnable, Long>> awaitingLocations = new HashMap<>(1);  // third is the timestamp when it was asked ; because the GUI button is often shift + click, the GUI is closed and so the player shifts automatically quickly ; set a 1s delay
-	private Set<UUID> awaitingItemsCancelChat = new HashSet<>(1);
-	private Map<UUID, Pair<Consumer<ItemStack>, Runnable>> awaitingItems = new HashMap<>(1);
+	private final RWWeakHashMap<Player, Pair<Consumer<String>, Runnable>> awaitingChats = new RWWeakHashMap<>(1, 1f);
+	private final RWWeakHashMap<Player, Object> awaitingLocationsCancelChat = new RWWeakHashMap<>(1, 1f);
+	private final RWWeakHashMap<Player, Triple<Consumer<Location>, Runnable, Long>> awaitingLocations = new RWWeakHashMap<>(1, 1f);  // third is the timestamp when it was asked ; because the editor GUI button to trigger this is often shift + click, the GUI is closed and so the player shifts automatically quickly ; set a 1s delay
+	private final RWWeakHashMap<Player, Object> awaitingItemsCancelChat = new RWWeakHashMap<>(1, 1f);
+	private final RWWeakHashMap<Player, Pair<Consumer<ItemStack>, Runnable>> awaitingItems = new RWWeakHashMap<>(1, 1f);
 
 	public boolean hasAwaitingChat(Player player) {
-		return player != null && awaitingChats.containsKey(player.getUniqueId());
+		return player != null && awaitingChats.containsKey(player);
 	}
 
 	public Pair<Consumer<String>, Runnable> consumeAwaitingChat(Player player) {
-		return awaitingChats.remove(player.getUniqueId());
+		return awaitingChats.remove(player);
 	}
 
 	public boolean hasAwaitingLocationCancelChat(Player player) {
-		return player != null && awaitingLocationsCancelChat.contains(player.getUniqueId());
+		return player != null && awaitingLocationsCancelChat.containsKey(player);
 	}
 
 	public boolean consumeAwaitingLocationCancelChat(Player player) {
-		return awaitingLocationsCancelChat.remove(player.getUniqueId());
+		return awaitingLocationsCancelChat.remove(player) != null;
 	}
 
 	public Triple<Consumer<Location>, Runnable, Long> consumeAwaitingLocations(Player player) {
-		Triple<Consumer<Location>, Runnable, Long> awaiting = awaitingLocations.get(player.getUniqueId());
+		Triple<Consumer<Location>, Runnable, Long> awaiting = awaitingLocations.get(player);
 		if (awaiting != null && System.currentTimeMillis() - awaiting.getC() > 1000L) {
-			awaitingLocations.remove(player.getUniqueId());
+			awaitingLocations.remove(player);
 			return awaiting;
 		}
 		return null;
 	}
 
 	public boolean hasAwaitingItemCancelChat(Player player) {
-		return player != null && awaitingItemsCancelChat.contains(player.getUniqueId());
+		return player != null && awaitingItemsCancelChat.containsKey(player);
 	}
 
 	public boolean consumeAwaitingItemCancelChat(Player player) {
-		return awaitingItemsCancelChat.remove(player.getUniqueId());
+		return awaitingItemsCancelChat.remove(player) != null;
 	}
 
 	public Pair<Consumer<ItemStack>, Runnable> consumeAwaitingItems(Player player) {
-		return awaitingItems.remove(player.getUniqueId());
+		return awaitingItems.remove(player);
 	}
 
 	public void awaitChat(Player player, Text message, Consumer<String> onChat, Runnable onCancel) {
 		// cancel current
-		Pair<Consumer<String>, Runnable> currentChat = awaitingChats.remove(player.getUniqueId());
+		Pair<Consumer<String>, Runnable> currentChat = awaitingChats.remove(player);
 		if (currentChat != null && currentChat.getB() != null) currentChat.getB().run();
 
 		// ask
@@ -189,12 +189,12 @@ public class WorkerGCore {
 		if (message != null) {
 			message.replace("{cancel}", () -> TextGeneric.textCancel.parseLine()).send(player);
 		}
-		awaitingChats.put(player.getUniqueId(), Pair.of(onChat, onCancel));
+		awaitingChats.put(player, Pair.of(onChat, onCancel));
 	}
 
 	public void awaitChatWithSuggestedValue(Player player, Text message, String suggestValue, Consumer<String> onChat, Runnable onCancel) {
 		// cancel current
-		Pair<Consumer<String>, Runnable> currentChat = awaitingChats.remove(player.getUniqueId());
+		Pair<Consumer<String>, Runnable> currentChat = awaitingChats.remove(player);
 		if (currentChat != null && currentChat.getB() != null) currentChat.getB().run();
 
 		// ask
@@ -208,7 +208,7 @@ public class WorkerGCore {
 		} else {
 			message.replace("{cancel}", () -> TextGeneric.textCancel.parseLine()).send(player);
 		}
-		awaitingChats.put(player.getUniqueId(), Pair.of(onChat, onCancel));
+		awaitingChats.put(player, Pair.of(onChat, onCancel));
 	}
 
 	public void awaitChatOrNone(Player player, Text message, String noneText, Consumer<String> onChat, Runnable onCancel) {
@@ -255,6 +255,18 @@ public class WorkerGCore {
 		}, onCancel);
 	}
 
+	public <T extends TypableElementType> void awaitChatType(Player player, Text message, TypableElementTypes<T> types, Consumer<T> onChat, Runnable onCancel) {
+		awaitChat(player, message, raw -> {
+			final T value = types.safeValueOf(raw);
+			if (value == null) {
+				TextGeneric.messageInvalidEnum.replace("{value}", () -> raw).replace("{values}", () -> StringUtils.toTextString(", ", types.values())).send(player);
+				awaitChatType(player, message, types, onChat, onCancel);
+				return;
+			}
+			onChat.accept(value);
+		}, onCancel);
+	}
+
 	public void awaitChatMat(Player player, Text message, Consumer<Mat> onChat, Runnable onCancel) {
 		awaitChat(player, message, raw -> {
 			final Mat value = Mat.firstFromIdOrDataName(raw).orElse(null);
@@ -268,31 +280,34 @@ public class WorkerGCore {
 	}
 
 	public void awaitLocation(Player player, Text message, Consumer<Location> onSelect, Runnable onCancel) {
+		awaitLocation(player, message, Replacer.GENERIC, onSelect, onCancel);
+	}
+	public void awaitLocation(Player player, Text message, Replacer messageReplacer, Consumer<Location> onSelect, Runnable onCancel) {
 		// cancel current
-		Pair<Consumer<String>, Runnable> currentChat = awaitingChats.remove(player.getUniqueId());
-		Triple<Consumer<Location>, Runnable, Long> currentLocation = awaitingLocations.remove(player.getUniqueId());
+		Pair<Consumer<String>, Runnable> currentChat = awaitingChats.remove(player);
+		Triple<Consumer<Location>, Runnable, Long> currentLocation = awaitingLocations.remove(player);
 		if (currentChat != null && currentChat.getB() != null) currentChat.getB().run();
 		if (currentLocation != null && currentLocation.getB() != null) currentLocation.getB().run();
 		// ask
 		if (message != null) {
-			message.replace("{cancel}", () -> TextGeneric.textCancel.parseLine()).send(player);
+			message.replace(messageReplacer).replace("{cancel}", () -> TextGeneric.textCancel.parseLine()).send(player);
 		}
-		awaitingLocations.put(player.getUniqueId(), Triple.of(onSelect, onCancel, System.currentTimeMillis()));
-		awaitingLocationsCancelChat.add(player.getUniqueId());
+		awaitingLocations.put(player, Triple.of(onSelect, onCancel, System.currentTimeMillis()));
+		awaitingLocationsCancelChat.put(player, "");
 	}
 
 	public void awaitItem(Player player, Text message, Consumer<ItemStack> onSelect, Runnable onCancel) {
 		// cancel current
-		Pair<Consumer<String>, Runnable> currentChat = awaitingChats.remove(player.getUniqueId());
-		Pair<Consumer<ItemStack>, Runnable> currentLocation = awaitingItems.remove(player.getUniqueId());
+		Pair<Consumer<String>, Runnable> currentChat = awaitingChats.remove(player);
+		Pair<Consumer<ItemStack>, Runnable> currentLocation = awaitingItems.remove(player);
 		if (currentChat != null && currentChat.getB() != null) currentChat.getB().run();
 		if (currentLocation != null && currentLocation.getB() != null) currentLocation.getB().run();
 		// ask
 		if (message != null) {
 			message.replace("{cancel}", () -> TextGeneric.textCancel.parseLine()).send(player);
 		}
-		awaitingItems.put(player.getUniqueId(), Pair.of(onSelect, onCancel));
-		awaitingItemsCancelChat.add(player.getUniqueId());
+		awaitingItems.put(player, Pair.of(onSelect, onCancel));
+		awaitingItemsCancelChat.put(player, "");
 	}
 
 	// ----- game profile / skull items

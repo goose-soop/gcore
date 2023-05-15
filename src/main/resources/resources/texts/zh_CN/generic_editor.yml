@@ -1,8 +1,28 @@
-# -------------------- Element --------------------
+# ===================
+# GCore 语言文件 (zh_CN)
+# 本翻译使用 GCore 版本: 8.45.0
+# 作者: GuillaumeVDN
+# 语言: 中文简体
+# 翻译: Kevin
+# Discord: Krick#9685
+# 如在翻译上有任何疑虑欢迎私讯 Krick#9685
+# 在插件上有任何疑虑请至 https://discord.com/invite/wSm9A8Y 寻求帮助
+# ===================
+# GCore language files (zh_CN)
+# This translation uses GCore version: 8.45.0
+# Author: GuillaumeVDN
+# Language: Chinese
+# Translation: Kevin
+# Discord: Krick#9685
+# If you have any doubts about translation, please send a private message Krick#9685
+# If you have any concerns about the plugin, please go to https://discord.com/invite/wSm9A8Y for help
+# ===================
+
+# -------------------- 元素 --------------------
 
 guiSelectTitle: 选择
 guiSearchName: |
-  &d搜索值（在聊天框中输入）
+  &d搜索值(在聊天框中输入)
 
 elementTypeMandatory: |
   &c必填元素{type}
@@ -10,35 +30,35 @@ elementTypeMandatory: |
 elementTypeOptional: |
   &a这是个可选的{type}
 
-elementCurrentValue无: |
-  &9当前值：
+elementCurrentValueNone: |
+  &9当前值:
   &7无
 
-elementCurrentValue无Default: |
-  &9当前值（默认）：
+elementCurrentValueNoneDefault: |
+  &9当前值(默认):
   &7无
 
 elementCurrentValueSingle: |
-  &9当前值：
+  &9当前值:
   &b{value}
 
 elementCurrentValueSingleDefault: |
-  &9当前值（默认）：
+  &9当前值(默认):
   &7{value}
 
 elementCurrentValueList: |
-  &9当前值：
+  &9当前值:
   {value}
 
 elementCurrentValueListDefault: |
-  &9当前值（默认）：
+  &9当前值(默认):
   {value}
 
 elementCurrentValueListLine: |
   &9- &b{line}
 
 elementDescription: |
-  &9描述：
+  &9描述:
   &7{description}
 
 elementElementCountSingle: |
@@ -50,7 +70,7 @@ elementElementCountPlural: |
 elementListElement: |
   &b{element}
 
-# -------------------- Ctrls --------------------
+# -------------------- 控件 --------------------
 
 controlEdit: |
   &d[左击]编辑
@@ -99,10 +119,13 @@ controlAddElementWithDefault: |
 controlTextSetRandom: |
   &6标记为随机
 
-# -------------------- Item --------------------
+# -------------------- 物品 --------------------
 
 descriptionItemType: |
   &7物品类型
+
+descriptionItemTypeHDB: |
+  &7HeadDatabase 识别ID
 
 descriptionItemDurability: |
   &7物品耐久度
@@ -184,7 +207,7 @@ descriptionItemSkullId: |
   &7头颅所有者(UUID)
 
 descriptionItemSkullName: |
-  &7头颅所有者（名称）
+  &7头颅所有者(名称)
 
 descriptionItemSkullData: |
   &7皮肤数据
@@ -264,7 +287,7 @@ descriptionGuiItemLocations: |
   &7如果该物品是常驻的，则不需要设置页数
 
 descriptionGuiItemPersistent: |
-  &7使该物品常驻（每一页的该栏都显示该物品）
+  &7使该物品常驻(每一页的该栏都显示该物品)
 
 descriptionGuiItemClickSound: |
   &7当玩家点击该物品时播放音效
@@ -281,6 +304,9 @@ descriptionGuiItemDynamicBorderLinearIconOn: |
 descriptionGuiItemDynamicBorderLinearIconOff: |
   &7未激活物品的图标。
 
+descriptionGuiItemDynamicBorderLinearRefreshTicks: |
+  &7更新延迟(以滴答为单位)
+
 # -------------------- 位置 --------------------
 
 descriptionPositionType: |
@@ -292,7 +318,7 @@ descriptionPositionTypeClosestEntityTypes: |
 
 descriptionPositionTypeClosestEntityNames: |
   &7允许的实体名
-  &留空则允许任意名称（或未命名）
+  &留空则允许任意名称(或未命名)
 
 descriptionPositionTypeClosestEntityColors: |
   &7允许的实体颜色
@@ -317,6 +343,9 @@ descriptionPositionTypeBiomes: |
 
 descriptionPositionTypeSingleLocation: |
   &7单个位置
+
+descriptionPositionTypeSingleRandomLocations: |
+  &7将选择随机位置的位置列表
 
 descriptionPositionTypeRelativeSingleLocation: |
   &7相对单个位置
@@ -348,12 +377,20 @@ descriptionPositionTypeSphereCenter: |
 descriptionPositionTypeSphereRadius: |
   &7球体半径
 
+descriptionRelativeLocationBaseRotationAware: |
+  &7如果应考虑基准位置的旋转 (如果可用)
+
 descriptionPositionTypeCylinderCenter: |
-  &7圆柱中心（忽略Y轴）
+  &7圆柱中心(忽略Y轴)
 
 descriptionPositionTypeCylinderRadius: |
   &7圆柱半径
 
+descriptionRelativeLocationAddYaw: |
+  &7添加到结果位置偏航的角度
+
+descriptionRelativeLocationAddPitch: |
+  &7添加到结果位置间距的角度
 # -------------------- 相对位置 --------------------
 
 descriptionRelativeLocationHorizontalAngle: |
@@ -381,7 +418,15 @@ descriptionCommandRestrictionWhitelist: |
 descriptionCommandRestrictionBlacklist: |
   &7禁止使用的指令
 
-# -------------------- Dynmap marker --------------------
+# -------------------- 指令限制 --------------------
+
+descriptionMatRestrictionWhitelist: |
+  &7固定的允许材料清单
+
+descriptionMatRestrictionBlacklist: |
+  &7永远被禁止的材料清单
+
+# -------------------- Dynmap标记 --------------------
 
 descriptionDynmapMarkerLocation: |
   &7标记位置
@@ -426,7 +471,7 @@ descriptionFireworkEffectFlicker: |
 descriptionFireworkEffectTrail: |
   &7让烟花留下轨迹
 
-# -------------------- Time --------------------
+# -------------------- 时间 --------------------
 
 descriptionElementTimeMonth: |
   &7月
@@ -497,13 +542,13 @@ descriptionNotifyTitleSubtitle: |
   &7发送子标题
 
 descriptionNotifyTitleFadeIn: |
-  &7标题淡入时间（单位为刻）
+  &7标题淡入时间(单位为刻)
 
 descriptionNotifyTitleDuration: |
-  &7标题显示时间（单位为刻）
+  &7标题显示时间(单位为刻)
 
 descriptionNotifyTitleFadeOut: |
-  &7标题淡出时间（单位为刻）
+  &7标题淡出时间(单位为刻)
 
 descriptionNotifySound: |
   &7播放音效
@@ -523,31 +568,34 @@ descriptionTimeFrameInDayStart: |
   &7开始天数
 
 descriptionTimeFrameInDayEnd: |
-  &7结束天数（可在开始天数前）
+  &7结束天数(可在开始天数前)
 
 descriptionTimeFrameInWeekStart: |
   &7开始周数
 
 descriptionTimeFrameInWeekEnd: |
-  &7结束周数（可在开始周数前）
+  &7结束周数(可在开始周数前)
 
 descriptionTimeFrameInMonthStart: |
   &7开始月份
 
 descriptionTimeFrameInMonthEnd: |
-  &7结束月份（可在开始月份前）
+  &7结束月份(可在开始月份前)
 
 descriptionTimeFrameInYearStart: |
   &7开始年份
 
 descriptionTimeFrameInYearEnd: |
-  &7结束年份（可在开始年份前）
+  &7结束年份(可在开始年份前)
 
 descriptionTimeFrameLimitedStart: |
   &7开始时间
 
 descriptionTimeFrameLimitedEnd: |
   &7结束时间
+
+descriptionTimeFrameRepeatPeriodDuration: |
+  &7期间持续时间
 
 # -------------------- Messages --------------------
 
@@ -570,7 +618,7 @@ messageElementBasicEditSearchMatch: |
   &7已找到并选取&a{value}&7。
 
 messageElementBasicListLineEdit: |
-  &7请在聊天框输入新的值，或输入&c{cancel}&7以取消。 点击该消息查看当前值。
+  &7请在聊天框输入新的值，或输入&c{cancel}&7以取消。点击该消息查看当前值。
 
 messageElementBasicListSwap: |
   &7请按其它数字键以切换，按其它键以取消。
@@ -591,10 +639,10 @@ messageElementCreateEnterId: |
   &7请在聊天框输入新的ID，或输入&c{cancel}&7以取消。
 
 messageElementCreateInvalidId: |
-  &7值&c{value}&7无效：仅允许字母、数字或&c_&7。
+  &7值&c{value}&7无效: 仅允许字母、数字或&c_&7。
 
 messageElementCreateAlreadyExists: |
   &7元素&c{value}&7已存在。
 
 messageCantImportValue: |
-  &c无法使用该值：{error}
+  &c无法使用该值: {error}

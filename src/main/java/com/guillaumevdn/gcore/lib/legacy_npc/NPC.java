@@ -232,7 +232,7 @@ public class NPC {
 	private void updateStatus() {
 		// update status
 		Map<Integer, Object> map = CollectionUtils.asMap(0, NPCStatus.getMasked(status.toArray(new NPCStatus[status.size()])));
-		NpcProtocols.inst().sendMetadata(player, NpcProtocols.inst().createMetadata(map), getEntityId());
+		NpcProtocols.sendMetadata(player, map, getEntityId());
 	}
 
 	public void setStatus(NPCStatus... status) {

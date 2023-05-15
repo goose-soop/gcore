@@ -12,6 +12,7 @@ import com.guillaumevdn.gcore.command.GcoreBoardStringElementPrint;
 import com.guillaumevdn.gcore.command.GcoreBoardUUIDElementPrint;
 import com.guillaumevdn.gcore.command.GcoreExport;
 import com.guillaumevdn.gcore.command.GcoreImpl;
+import com.guillaumevdn.gcore.command.GcoreItemChatHover;
 import com.guillaumevdn.gcore.command.GcoreItemRead;
 import com.guillaumevdn.gcore.command.GcoreItemReadChat;
 import com.guillaumevdn.gcore.command.GcoreItemReadClick;
@@ -226,6 +227,7 @@ public final class GCore extends GPlugin<ConfigGCore, PermissionGCore> {
 		getMainCommand().setSubcommand(new GcoreItemRead());
 		getMainCommand().setSubcommand(new GcoreItemReadChat());
 		getMainCommand().setSubcommand(new GcoreItemReadClick());
+		getMainCommand().setSubcommand(new GcoreItemChatHover());
 		getMainCommand().setSubcommand(new GcoreItemSetNBTString());
 		getMainCommand().setSubcommand(new GcoreBlockMat());
 		getMainCommand().setSubcommand(new GcoreBlockMaterial());

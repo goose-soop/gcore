@@ -1,18 +1,20 @@
 # ===================
 # GCore 語言文件 (zh_TW)
+# 本翻譯使用 GCore 版本: 8.45.0
 # 作者: GuillaumeVDN
 # 語言: 中文繁體
 # 翻譯: Kevin
 # Discord: Krick#9685
-# 如在翻譯上有任何疑慮歡迎私訊 Krick#9685 或加入 https://discord.gg/V5Vw3KGzzq 聯絡我
+# 如在翻譯上有任何疑慮歡迎私訊 Krick#9685
 # 在插件上有任何疑慮請至 https://discord.com/invite/wSm9A8Y 尋求幫助
 # ===================
 # GCore language files (zh_TW)
+# This translation uses GCore version: 8.45.0
 # Author: GuillaumeVDN
 # Language: Chinese Traditional
 # Translation: Kevin
 # Discord: Krick#9685
-# If you have any doubts about translation, please send a private message Krick#9685 or join https://discord.gg/V5Vw3KGzzq
+# If you have any doubts about translation, please send a private message Krick#9685
 # If you have any concerns about the plugin, please go to https://discord.com/invite/wSm9A8Y for help
 # ===================
 
@@ -30,17 +32,17 @@ messagePluginManipulateError: |
 messagePluginInternalState: |
   &7&m            &r &7{plugin} &7&m            &r
   &7版本 : &a{version}
-  &7生命週期參考 : &a{lifecycle_reference}
-  &7註冊數據板 : &a{data_boards}
-  &7註冊記錄器 : &a{loggers}
-  &7註冊的集成 : &a{integrations}
-  &7註冊的bossbars : &a{bossbars}
-  &7註冊的GUIs : &a{guis}
+  &7生命週期 : &a{lifecycle_reference}
+  &7已註冊數據板 : &a{data_boards}
+  &7已註冊記錄器 : &a{loggers}
+  &7已註冊的集成 : &a{integrations}
+  &7已註冊的Boss欄 : &a{bossbars}
+  &7已註冊的GUI介面 : &a{guis}
   &7已註冊的任務 : &a{tasks}
-  &7註冊聽眾 : &a{listeners}
+  &7已註冊的事件監聽器 : &a{listeners}
 
 messagePluginList: |
-  &7共有&a{count}&7款插件，已激活&a{active}&7個，未激活&7{inactive}&7個: {plugins}
+  &7共有&a{count}&7款插件，已啟用&a{active}&7個，未啟用&7{inactive}&7個: {plugins}
 
 messageGcoreExportFile: |
   &7&a{plugins}的數據和配置文件&7已導出到&a{file}&7。請將其分享給插件開發者。
@@ -55,7 +57,8 @@ commandDescriptionGcorePlugins: 列出以GCore為前置的插件
 commandDescriptionGcoreExport: 導出以GCore為前置的插件數據
 commandDescriptionGcoreItemRead: 將物品寫入配置中
 commandDescriptionGcoreItemReadChat: 從聊天室中輸入以讀取項目
-commandDescriptionGcoreItemReadClick: 從庫存點擊中以讀取項目
+commandDescriptionGcoreItemReadClick: 從背包中點擊以讀取項目
+commandDescriptionGcoreItemSetNBTString: 為你手中的物品設置一個NBT標籤
 
 messageItemReadNull: |
   &c該物品無法導出到配置中。請手持一件物品。

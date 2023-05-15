@@ -39,6 +39,7 @@ public enum Version {
 
 	MC_1_19_R1(CollectionUtils.asList("1.19"), "v1_19_R1", true),
 	MC_1_19_R2(CollectionUtils.asList("1.19.3"), "v1_19_R2", true),
+	MC_1_19_R3(CollectionUtils.asList("1.19.4"), "v1_19_R3", true),
 
 	UNSUPPORTED(CollectionUtils.asList("UNSUPPORTED"), null)  // this will be used if we find a package name that's not listed above (a not yet updated newer version most likely)
 	;

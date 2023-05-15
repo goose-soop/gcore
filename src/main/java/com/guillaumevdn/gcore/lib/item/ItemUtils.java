@@ -575,6 +575,26 @@ public final class ItemUtils {
 		return item;
 	}
 
+	public static ItemStack cloneWithOtherNameAndLore(ItemStack original, ItemStack copyMetaFrom) {
+		final ItemStack clone = original.clone();
+		final ItemMeta cloneMeta = clone.getItemMeta();
+
+		if (cloneMeta != null) {
+			final ItemMeta meta = copyMetaFrom.getItemMeta();
+			if (meta != null) {
+				if (meta.hasDisplayName())
+					cloneMeta.setDisplayName(meta.getDisplayName());
+
+				if (meta.hasLore())
+					cloneMeta.setLore(meta.getLore());
+
+				clone.setItemMeta(cloneMeta);
+			}
+		}
+
+		return clone;
+	}
+
 	/** @return either a copy OR the same item if already is glowing */
 	public static ItemStack maybeAddGlow(ItemStack item) {
 		return maybeAddGlow(item, true);

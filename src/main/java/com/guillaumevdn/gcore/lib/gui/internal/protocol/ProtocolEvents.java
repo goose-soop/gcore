@@ -2,6 +2,7 @@ package com.guillaumevdn.gcore.lib.gui.internal.protocol;
 
 import java.util.Map;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -262,6 +263,8 @@ public class ProtocolEvents implements PacketListener, Listener {
 					GcoreItemReadClick.logItem(player, handler.getPageItem(pageIndex, slot));
 				}
 			}
+
+			Bukkit.getPluginManager().callEvent(new ProtocolGUIClickedEvent(handler.getGUI(), player, click, pageIndex, slot));
 		}, error -> {
 			handler.getGUI().getPlugin().getMainLogger().error("couldn't perform click effects in GUI " + handler.getGUI().getId() + " at slot " + slot + " of page " + pageIndex, error);
 		});

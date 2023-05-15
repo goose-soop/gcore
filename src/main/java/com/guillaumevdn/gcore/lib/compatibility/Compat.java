@@ -94,6 +94,10 @@ public final class Compat {
 		SEND_ACTIONBAR.process(player, actionbar);
 	}
 
+	public static void sendActionbar(Collection<Player> players, String actionbar) {
+		players.forEach(pl -> sendActionbar(pl, actionbar));
+	}
+
 	// ----- send json message
 	private static final ReflectionProcedureBiConsumer<Collection<Player>, String> SEND_JSON_CHAT = new ReflectionProcedureBiConsumer<Collection<Player>, String>()
 			.setIf(Version.IS_1_7, (players, json) -> {

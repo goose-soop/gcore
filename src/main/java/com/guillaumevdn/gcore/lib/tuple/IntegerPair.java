@@ -4,7 +4,7 @@ package com.guillaumevdn.gcore.lib.tuple;
  * @author GuillaumeVDN
  */
 public class IntegerPair extends Pair<Integer, Integer> {
-	
+
 	private IntegerPair() {
 		super();
 	}
@@ -13,7 +13,10 @@ public class IntegerPair extends Pair<Integer, Integer> {
 		super(a, b);
 	}
 
-	// ----- static
+	public @Override IntegerPair clone() {
+		return of(getA(), getB());
+	}
+
 	public static IntegerPair of(Integer a, Integer b) {
 		return new IntegerPair(a, b);
 	}

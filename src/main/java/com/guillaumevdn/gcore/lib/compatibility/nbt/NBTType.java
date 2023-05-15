@@ -28,8 +28,8 @@ public enum NBTType {
 	STRING("NBTTagString", String.class, 8, CollectionUtils.asMap(Version.MC_1_17_R1, "A")),
 	BYTE_ARRAY("NBTTagByteArray", byte[].class, 7, CollectionUtils.asMap(Version.MC_1_17_R1, "c")),
 	INT_ARRAY("NBTTagIntArray", int[].class, 11, CollectionUtils.asMap(Version.MC_1_17_R1, "c")),
-	LIST("NBTTagList", null, 9),
-	COMPOUND("NBTTagCompound", null, 10);
+	LIST("NBTTagList", null, 9, CollectionUtils.asMap(Version.MC_1_17_R1, "c")),
+	COMPOUND("NBTTagCompound", null, 10, CollectionUtils.asMap(Version.MC_1_17_R1, "x"));
 
 	private String nmsClass;
 	private Class<?> valueClass;

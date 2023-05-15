@@ -224,10 +224,12 @@ public final class LocationUtils {
 	}
 
 	public static boolean isLocationContained(Location location, Point a, Point b) {
-		MinMaxDouble x = MinMaxDouble.of(a.getX(), b.getX());
-		MinMaxDouble y = MinMaxDouble.of(a.getY(), b.getY());
-		MinMaxDouble z = MinMaxDouble.of(a.getZ(), b.getZ());
-		return location.getY() >= y.getMin() && location.getY() <= y.getMax() && location.getX() >= x.getMin() && location.getX() <= x.getMax() && location.getZ() >= z.getMin() && location.getZ() <= z.getMax();
+		MinMaxInteger x = MinMaxInteger.of(a.getX(), b.getX());
+		MinMaxInteger y = MinMaxInteger.of(a.getY(), b.getY());
+		MinMaxInteger z = MinMaxInteger.of(a.getZ(), b.getZ());
+		return location.getY() >= y.getMin() && location.getY() <= y.getMax() + 0.99d
+				&& location.getX() >= x.getMin() && location.getX() <= x.getMax() + 0.99d
+				&& location.getZ() >= z.getMin() && location.getZ() <= z.getMax() + 0.99d;
 	}
 
 	public static boolean isLocationContainedMinMax(Location location, Point min, Point max) {
@@ -295,10 +297,10 @@ public final class LocationUtils {
 
 	// https://stackoverflow.com/questions/31225062/rotating-a-vector-by-angle-and-axis-in-java
 
-	private static final Vector upRotationAxis = new Vector(0d, 1d, 0d);
+	public static final Vector UP_AXIS = new Vector(0d, 1d, 0d);
 
 	public static Vector rotateVector(Vector vec, double angleInRadians) {
-		return rotateVector(vec, angleInRadians, upRotationAxis);
+		return rotateVector(vec, angleInRadians, UP_AXIS);
 	}
 
 	public static Vector rotateVector(Vector vec, double angleInRadians, Vector rotationAxis) {
@@ -387,6 +389,35 @@ public final class LocationUtils {
 			return BlockFace.NORTH;
 		}
 		return null;
+	}
+
+	public static Location setLocationFacingCardinalDirection(Location loc, BlockFace facing) {
+		loc.setYaw(getYawFromCardinalDirection(facing));
+		return loc;
+	}
+
+	public static float getYawFromCardinalDirection(BlockFace face) {
+		switch (face) {
+		case NORTH: return 180f;
+		case NORTH_EAST: return 315f;
+		case EAST: return 270f;
+		case SOUTH_EAST: return 285f;
+		case SOUTH: return 0f;
+		case SOUTH_WEST: return 45f;
+		case WEST: return 90f;
+		case NORTH_WEST: return 135f;
+		default: return 0f;
+		}
+	}
+
+	public static BlockFace getRightNeighbourOfCardinalDirection(BlockFace face) {
+		switch (face) {
+		case NORTH: return BlockFace.EAST;
+		case EAST: return BlockFace.SOUTH;
+		case SOUTH: return BlockFace.WEST;
+		case WEST: return BlockFace.NORTH;
+		default: return null;
+		}
 	}
 
 }

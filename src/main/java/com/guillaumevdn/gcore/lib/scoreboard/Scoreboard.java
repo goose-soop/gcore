@@ -169,12 +169,14 @@ public final class Scoreboard {
 			}
 
 			// reset scores of entries that are still present on the bukkit scoreboard but should be removed
+			/*bukkit.getEntries().stream().filter(oldEntry -> !newEntries.stream().anyMatch(newEntry -> newEntry.getName().equals(oldEntry))).forEach(entry -> {
+			});*/
 			currentEntries.stream().filter(entry -> !newEntries.contains(entry)).forEach(entry -> {
 				//Bukkit.getLogger().info(">>>>> reset entry " + entry);
 				entry.reset(bukkit);
 			});
 
-			//Bukkit.getLogger().info("-- scores remaining : " + ReflectionObject.of(bukkit).getField("board").getField("playerScores").invokeMethod("keySet"));
+			//Bukkit.getLogger().info("-- scores remaining : " + bukkit.getEntries());
 
 			// set new scores
 			currentEntries = newEntries;  // we do be collecting garbage
@@ -188,10 +190,7 @@ public final class Scoreboard {
 	private static ScoreboardEntry buildEntry(String text, Map<String, Integer> offsets) {
 
 		/**
-		 * DO NOT EVER TOUCH THIS CODE AGAIN
-		 * IT WORKS
-		 * I SWEAR TO GOD
-		 * DO NOT TOUCH IT
+		 * Do not ever touch this code again, it works, I swear to god don't do it
 		 */
 
 		// no need for teams

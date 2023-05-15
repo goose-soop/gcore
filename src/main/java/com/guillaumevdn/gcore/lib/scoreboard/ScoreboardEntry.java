@@ -1,6 +1,6 @@
 package com.guillaumevdn.gcore.lib.scoreboard;
 
-import java.util.Objects;
+import java.util.UUID;
 
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Team;
@@ -10,6 +10,7 @@ import org.bukkit.scoreboard.Team;
  */
 public class ScoreboardEntry {
 
+	private final int hashCode = UUID.randomUUID().hashCode();
 	private String name, prefix, suffix;
 	private Team team = null;
 	private int score = -1;
@@ -67,19 +68,17 @@ public class ScoreboardEntry {
 	}
 
 	// ----- obj
-	@Override
-	public int hashCode() {
-		return Objects.hash(prefix, name, suffix);
+
+	public @Override int hashCode() {
+		return hashCode;
 	}
 
-	@Override
-	public boolean equals(Object other) {
+	public @Override boolean equals(Object other) {
 		return other != null && hashCode() == other.hashCode();
 	}
 
-	@Override
-	public String toString() {
-		return (prefix == null ? "/" : prefix) + "__" + (name.isEmpty() ? "/" : name) + "__" + (suffix == null ? "/" : suffix);
+	public @Override String toString() {
+		return "(" + (prefix == null ? "/" : prefix) + ", " + (name.isEmpty() ? "/" : name) + ", " + (suffix == null ? "/" : suffix) + ")";
 	}
 
 }

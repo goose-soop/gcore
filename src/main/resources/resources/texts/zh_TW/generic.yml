@@ -1,18 +1,20 @@
 # ===================
 # GCore 語言文件 (zh_TW)
+# 本翻譯使用 GCore 版本: 8.45.0
 # 作者: GuillaumeVDN
 # 語言: 中文繁體
 # 翻譯: Kevin
 # Discord: Krick#9685
-# 如在翻譯上有任何疑慮歡迎私訊 Krick#9685 或加入 https://discord.gg/V5Vw3KGzzq 聯絡我
+# 如在翻譯上有任何疑慮歡迎私訊 Krick#9685
 # 在插件上有任何疑慮請至 https://discord.com/invite/wSm9A8Y 尋求幫助
 # ===================
 # GCore language files (zh_TW)
+# This translation uses GCore version: 8.45.0
 # Author: GuillaumeVDN
 # Language: Chinese Traditional
 # Translation: Kevin
 # Discord: Krick#9685
-# If you have any doubts about translation, please send a private message Krick#9685 or join https://discord.gg/V5Vw3KGzzq
+# If you have any doubts about translation, please send a private message Krick#9685
 # If you have any concerns about the plugin, please go to https://discord.com/invite/wSm9A8Y for help
 # ===================
 
@@ -26,6 +28,17 @@ messageInvalidPlayer: |
 
 messageInvalidOfflinePlayer: |
   &7玩家&c{value}&7無效。
+
+messageInvalidNumber: |
+  &7號碼 &c{value} &7無效。
+messageInvalidNumberRangeMin: |
+  &7號碼 &c{value} &7至少應為 &c{min}&7。
+messageInvalidNumberRangeMax: |
+  &7號碼 &c{value} &7最多應該是 &c{max}&7。
+messageInvalidEnum: |
+  &7Value &c{value} &7無效，它應該是 &c{values}&7 之一。
+messageInvalidEnumNoList: |
+  &7Value &c{value} &7無效。
 
 messageCC: '&d (cc&7.of {og})'
 messageSilentCC: '&d (cc&7.of {og}, silent)'

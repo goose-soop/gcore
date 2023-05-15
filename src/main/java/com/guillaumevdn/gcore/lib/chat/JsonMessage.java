@@ -9,10 +9,14 @@ import java.util.Set;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.json.simple.JSONObject;
 
+import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.compatibility.Compat;
+import com.guillaumevdn.gcore.lib.compatibility.nbt.NBTItem;
+import com.guillaumevdn.gcore.lib.player.PlayerUtils;
 import com.guillaumevdn.gcore.lib.string.StringUtils;
 
 /**
@@ -36,6 +40,10 @@ public class JsonMessage {
 
 	public void send(Collection<Player> players) {
 		Compat.sendJsonChat(players, msg + "]}]");
+	}
+
+	public void broadcast() {
+		send(PlayerUtils.getOnline());
 	}
 
 	public static class JsonStringBuilder {
@@ -138,6 +146,16 @@ public class JsonMessage {
 			return this;
 		}
 
+		/** Adapted from https://github.com/dadus33-plugins/ChatItem/blob/v2/src/main/java/me/dadus33/chatitem/chatmanager/v1/json/JSONManipulator.java */
+		public JsonStringBuilder setHover(ItemStack item) {
+			try {
+				hover = ",\"hoverEvent\":{\"action\":\"show_item\",\"value\":\"" + esc(itemJson(item)) + "\"}";
+			} catch (Throwable error) {
+				GCore.inst().getMainLogger().error("Couldn't add item hover to json message : " + item, error);
+			}
+			return this;
+		}
+
 		public JsonStringBuilder setURL(String link) {
 			click = ",\"clickEvent\":{\"action\":\"open_url\",\"value\":\"" + esc(link).replace("§", "&") + "\"}";
 			return this;
@@ -159,6 +177,24 @@ public class JsonMessage {
 			builder.append("]" + hover + click + "}");
 			message.msg = builder.toString();
 			return message;
+		}
+
+		/** Adapted from https://github.com/dadus33-plugins/ChatItem/blob/v2/src/main/java/me/dadus33/chatitem/chatmanager/v1/json/JSONManipulator.java */
+		private static final String itemJson(ItemStack item) throws Throwable {
+			final NBTItem nbt = new NBTItem(item);
+			final String id = nbt.hasKey("id") ? nbt.getString("id").replace("\"", "") : item.getType().name().toLowerCase();
+
+			final StringBuilder builder = new StringBuilder("{id:\"" + id + "\",Count:" + item.getAmount() + "b");
+			if (!nbt.hasKey("Damage"))  // for new versions
+				builder.append(",Damage:").append(item.getDurability()).append("s");  // append the durability data
+
+			if (nbt.getKeys().isEmpty()) {
+				builder.append("}");
+				return builder.toString();
+			}
+
+			builder.append(",tag:" + nbt.getTag().justGet().toString() + "}");
+			return builder.toString();
 		}
 
 	}

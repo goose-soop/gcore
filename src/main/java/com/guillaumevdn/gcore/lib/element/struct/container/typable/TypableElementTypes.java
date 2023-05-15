@@ -2,6 +2,7 @@ package com.guillaumevdn.gcore.lib.element.struct.container.typable;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.function.BiConsumer;
 
 import com.guillaumevdn.gcore.lib.concurrency.RWLowerCaseHashMap;
 
@@ -24,6 +25,10 @@ public abstract class TypableElementTypes<T extends TypableElementType> {
 
 	public final Collection<T> values() {
 		return Collections.unmodifiableCollection(types.copyValues());
+	}
+
+	public void iterateValues(BiConsumer<String, T> consumer) {
+		types.forEach(consumer);
 	}
 
 	public abstract T defaultValue();

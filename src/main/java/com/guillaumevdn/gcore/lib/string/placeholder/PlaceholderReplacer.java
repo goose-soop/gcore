@@ -3,17 +3,18 @@ package com.guillaumevdn.gcore.lib.string.placeholder;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 import java.util.function.BiFunction;
 
 import org.bukkit.entity.Player;
 
+import com.guillaumevdn.gcore.ConfigGCore;
 import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.collection.SortedHashMap;
 import com.guillaumevdn.gcore.lib.exception.CalculationError;
 import com.guillaumevdn.gcore.lib.integration.Integration;
 import com.guillaumevdn.gcore.lib.location.Point;
+import com.guillaumevdn.gcore.lib.logic.LogicUtils;
 import com.guillaumevdn.gcore.lib.number.NumberUtils;
 import com.guillaumevdn.gcore.lib.player.PlayerUtils;
 import com.guillaumevdn.gcore.lib.serialization.Serializer;
@@ -58,9 +59,8 @@ public class PlaceholderReplacer implements Comparable<PlaceholderReplacer> {
 	// ----- methods
 	private String replace(String placeholder, Player player, boolean silenceMathErrors) {
 		try {
-			if (!needPlayer || player != null) {
+			if (!needPlayer || player != null)
 				return replacer.apply(placeholder, player);
-			}
 		} catch (Throwable exception) {
 			if (!(exception instanceof CalculationError) || !silenceMathErrors) {
 				GCore.inst().getMainLogger().error("Couldn't parse '" + placeholder + "' for placeholder container " + id + " (invalid placeholder ?)", exception);
@@ -93,18 +93,34 @@ public class PlaceholderReplacer implements Comparable<PlaceholderReplacer> {
 
 		// bracket placeholders
 		if (StringUtils.hasBracketPlaceholders(line)) {
-			Stack<Integer> starts = new Stack<>();
+			//final Stack<Integer> starts = new Stack<>();
+			int start = -1;
+			int mustIgnoreEnds = 0;
+
 			for (int i = 0; i < line.length(); ++i) {
 				char c = line.charAt(i);
 				if (c == '{') {
-					starts.push(i);
+					//starts.push(i);
+					if (start == -1)
+						start = i;
+					else
+						++mustIgnoreEnds;
+
+					//Bukkit.getLogger().info("> Start, i = " + i + " ; start " + start + " ; mustIgnoreEnds " + mustIgnoreEnds);
 				} else if (c == '}') {
-					if (starts.isEmpty()) {
+					/*if (starts.isEmpty())
+						break;  // invalid placeholder string*/
+					if (start == -1)
 						break;  // invalid placeholder string
+					if (mustIgnoreEnds != 0) {
+						--mustIgnoreEnds;
+						continue;
 					}
 
+					//Bukkit.getLogger().info("> End, i = " + i + " ; start " + start + " ; mustIgnoreEnds " + mustIgnoreEnds + " ; going to try to parse with " + registered.keySet());
+
 					// find replacement
-					int start = starts.pop();
+					//int start = starts.pop();
 					String placeholder = line.substring(start + 1, i);
 					String replacement = null;
 					//PlaceholderReplacer replacementRep = null;
@@ -123,7 +139,7 @@ public class PlaceholderReplacer implements Comparable<PlaceholderReplacer> {
 						line = line.substring(0, start) + replacement + line.substring(i + 1);  // this will not contain the placeholder
 						i = start - 1;  // restart at start (-1 because loop++), maybe we replaced a new placeholder
 
-						//Bukkit.getLogger().info("> Restart, i = " + i + ", line = '" + line + "' ; starts " + starts);
+						//Bukkit.getLogger().info(">> Restart, i = " + i + ", line = '" + line + "' ; start " + start + " ; mustIgnoreEnds " + mustIgnoreEnds);
 					}
 
 					// no match ; just continue, ignore this placeholder
@@ -226,22 +242,17 @@ public class PlaceholderReplacer implements Comparable<PlaceholderReplacer> {
 		return null;  // no match;
 	}));
 
-	public static final PlaceholderReplacer RANDOM_IN_LIST = register(new PlaceholderReplacer("random_in_list", 1, false, CollectionUtils.asList("§7Random in list : §8{random_in_list:value1,value2,value3,...}"), (placeholderContent, player) -> {
-		if (placeholderContent.toLowerCase().startsWith("random_in_list:")) {
-			String[] split = placeholderContent.substring("random_in_list:".length()).split(",");
-			return split.length == 0 ? "0" : split[NumberUtils.random(0, split.length - 1)];
+	public static final PlaceholderReplacer UNKNOWN_PLACEHOLDER = register(new PlaceholderReplacer("unknown_placeholder", 1, false, CollectionUtils.asList("§7General unknown placeholder text : §8{unknown_placeholder}"), (placeholderContent, player) -> {
+		if (placeholderContent.equalsIgnoreCase("unknown_placeholder")) {
+			return ConfigGCore.unknownPlaceholderResult;
 		}
 		return null;  // no match;
 	}));
 
-	public static final PlaceholderReplacer TRIENAL_CONDITIONS = register(new PlaceholderReplacer("trienal_conditions", 2, true, CollectionUtils.asList("§7Condition : §8{permission:PERM,IF_HAS,IF_HASNT}"), (placeholderContent, player) -> {
-		if (placeholderContent.toLowerCase().startsWith("permission:")) {
-			String[] split = placeholderContent.substring("permission:".length()).split(",");
-			if (PlayerUtils.hasPermission(player, split[0])) {
-				return split[1];
-			} else {
-				return split[2];
-			}
+	public static final PlaceholderReplacer RANDOM_IN_LIST = register(new PlaceholderReplacer("random_in_list", 1, false, CollectionUtils.asList("§7Random in list : §8{random_in_list:value1,value2,value3,...}"), (placeholderContent, player) -> {
+		if (placeholderContent.toLowerCase().startsWith("random_in_list:")) {
+			String[] split = placeholderContent.substring("random_in_list:".length()).split(",");
+			return split.length == 0 ? "0" : split[NumberUtils.random(0, split.length - 1)];
 		}
 		return null;  // no match;
 	}));
@@ -293,6 +304,29 @@ public class PlaceholderReplacer implements Comparable<PlaceholderReplacer> {
 				double calc = NumberUtils.calculateExpression(content.substring(index + 1));
 				return "" + NumberUtils.round(calc, places);
 			}
+		}
+		return null;  // no match;
+	}));
+
+	public static final PlaceholderReplacer TRIENAL_CONDITIONS = register(new PlaceholderReplacer("trienal_conditions", 1002, true, CollectionUtils.asList("§7Permission ternary : §8{permission:PERM,IF_HAS,IF_HASNT}"), (placeholderContent, player) -> {
+		if (placeholderContent.toLowerCase().startsWith("permission:")) {
+			final String[] split = placeholderContent.substring("permission:".length()).split(",");
+			if (PlayerUtils.hasPermission(player, split[0])) {
+				return split[1];
+			} else {
+				return split[2];
+			}
+		}
+		return null;  // no match;
+	}));
+
+	public static final PlaceholderReplacer LOGIC_TERNARY = register(new PlaceholderReplacer("logic_ternary", 1002, false, CollectionUtils.asList("§7Logic ternary : §8{logic:LOGIC,IF_MATCH,IF_DOESNT_MATCH}"), (placeholderContent, player) -> {
+		if (placeholderContent.toLowerCase().startsWith("logic:")) {
+			final String[] split = placeholderContent.substring("logic:".length()).split(",");
+			if (LogicUtils.match(split[0], Replacer.GENERIC))
+				return split[1];
+			else
+				return split[2];
 		}
 		return null;  // no match;
 	}));

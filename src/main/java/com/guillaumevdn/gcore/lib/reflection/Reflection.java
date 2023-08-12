@@ -215,7 +215,7 @@ public final class Reflection {
 
 	// ----- packet
 	public static ReflectionObject getPlayerConnection(Player player) throws Throwable {
-		return ReflectionObject.of(player).invokeMethod("getHandle").getField(Version.ATLEAST_1_17 ? "b" : "playerConnection");
+		return ReflectionObject.of(player).invokeMethod("getHandle").getField(Version.ATLEAST_1_20 ? "c" : Version.ATLEAST_1_17 ? "b" : "playerConnection");
 	}
 
 	public static void sendNmsPacket(Player player, String path, Object... params) throws Throwable {

@@ -13,6 +13,7 @@ import com.guillaumevdn.gcore.lib.compatibility.Version;
 import com.guillaumevdn.gcore.lib.element.editor.SlotPlacement;
 import com.guillaumevdn.gcore.lib.element.struct.Need;
 import com.guillaumevdn.gcore.lib.element.type.basic.ElementString;
+import com.guillaumevdn.gcore.lib.element.type.basic.ElementUUID;
 import com.guillaumevdn.gcore.lib.element.type.container.ElementItem;
 import com.guillaumevdn.gcore.lib.item.ItemCheck;
 import com.guillaumevdn.gcore.lib.item.ItemReference;
@@ -123,7 +124,7 @@ public final class MetaSkull {
 			} catch (Throwable exeption) {
 				exeption.printStackTrace();
 			}
-			item.getElementAs("owner_id", ElementString.class).setValue(id != null ? CollectionUtils.asList(id) : null);
+			item.getElementAs("owner_id", ElementUUID.class).setValue(id != null ? CollectionUtils.asList(id) : null);
 			item.getElementAs("owner_name", ElementString.class).setValue(name != null ? CollectionUtils.asList(name) : null);
 			item.getElementAs("skin_data", ElementString.class).setValue(data != null ? CollectionUtils.asList(data) : null);
 			item.getElementAs("skin_signature", ElementString.class).setValue(signature != null ? CollectionUtils.asList(signature) : null);

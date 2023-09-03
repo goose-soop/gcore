@@ -36,5 +36,4 @@ public abstract class ActiveItemHolderElementGUIItemCommon extends ActiveItemHol
 	}
 
 	protected abstract void build(@Nullable ItemStack itemIcon, QuadriConsumer<ItemStack, Set<String>, Integer, Consumer<ClickCall>> callback) throws ParsingError;
-
 }

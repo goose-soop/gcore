@@ -42,5 +42,4 @@ public abstract class ExtraElementGUIItemHolder extends ItemHolder {
 	}
 
 	protected abstract void build(ItemStack itemIcon, QuadriConsumer<ItemStack, Set<String>, Integer, Consumer<ClickCall>> callback) throws ParsingError;
-
 }

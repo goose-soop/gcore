@@ -6,7 +6,6 @@ import java.util.stream.Stream;
 
 import javax.annotation.Nonnull;
 
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import com.guillaumevdn.gcore.lib.GPlugin;
@@ -114,7 +113,7 @@ public abstract class ActiveGUI extends GUI {
 		}
 	}
 
-	@Override
+	/*@Override
 	public boolean openFor(Player player, int pageIndex, ClickCall fromCall) {
 		int viewers = getViewers().size();
 		boolean opened = super.openFor(player, pageIndex, fromCall);
@@ -125,10 +124,18 @@ public abstract class ActiveGUI extends GUI {
 			});
 		}
 		return opened;
+	}*/
+
+	@Override
+	public void onActivate() {
+		getPlugin().registerTask("gui_tick_" + getId(), true, 1, () -> {
+			tick();
+		});
 	}
 
 	@Override
 	public void onDeactivate() {
+		getPlugin().stopTask("gui_tick_" + getId());
 		activeHolders.forEach((__, active) -> active.onDestroy());
 	}
 
@@ -166,10 +173,8 @@ public abstract class ActiveGUI extends GUI {
 	}
 
 	private void tick() {
-		if (!isActive() || getViewers().isEmpty()) {
-			getPlugin().stopTask("gui_tick_" + getId());
+		if (!isActive() || getViewers().isEmpty())
 			return;
-		}
 		activeHolders.forEach((__, active) -> active.tick());
 		onTick();
 	}

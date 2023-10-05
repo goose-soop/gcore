@@ -18,12 +18,8 @@ repositories {
     maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
     maven("https://libraries.minecraft.net/")
     maven("https://maven.citizensnpcs.co/repo")
-    maven("https://mvn.lumine.io/repository/maven-public/")
     maven("https://repo.dmulloy2.net/repository/public/")
     maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
-    maven("https://maven.enginehub.org/repo/")
-    maven("https://jitpack.io")
-    maven("https://repo.codemc.io/repository/maven-public/")
     maven("https://repo.rosewooddev.io/repository/public/")
 }
 

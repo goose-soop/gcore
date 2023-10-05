@@ -3,8 +3,9 @@ name: GCore
 description: Core library for GuillaumeVDN's plugins
 author: GuillaumeVDN
 website: www.guillaumevdn.com
+
 # techy
-version: ${project.version}
+version: ${version}
 api-version: 1.13
 main: com.guillaumevdn.gcore.GCore
 softdepend:
@@ -20,11 +21,13 @@ softdepend:
 loadbefore:
   - GCoreLegacy
   - QuestCreator
+
 # commands
 commands:
   gcore:
     aliases: [gcore]
     description: 'Main command for GCore'
+
 # permissions
 permissions:
   # (super)

@@ -1,33 +1,27 @@
 package com.guillaumevdn.gcore.integration.chatcontrol;
 
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.mineacademy.chatcontrol.api.event.PrePrivateMessageEvent;
-
-import com.guillaumevdn.gcore.lib.chat.PlayerChatEvent;
-import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
-import com.guillaumevdn.gcore.lib.object.ObjectUtils;
+//import org.mineacademy.chatcontrol.api.event.PrePrivateMessageEvent;
 
 /**
  * @author GuillaumeVDN
  */
-public final class ListenerPreMessagePrivateEvent implements Listener {
+public final class ListenerPreMessagePrivateEvent implements Listener
+{
 
-	// ----- on doit faire ceux-là à la main vu que monsieur obfusque ses plugins jusqu'à l'os
+    // le plugin est obfusqué d'une manière sus et gradle n'arrive pas à le compiler, tant pis pour lui, pas le temps de faire ça
 
-	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-	public void event(PrePrivateMessageEvent og) {
-		Player player = ObjectUtils.castOrNull(og.getSender(), Player.class);
-		if (player != null) {
-			PlayerChatEvent event = PlayerChatEvent.call(player, og.getMessage(), CollectionUtils.asSet(og.getRecipient()));
-			og.setMessage(event.getMessage());
-			og.setCancelled(event.isCancelled());
-			if (event.getRecipients().isEmpty()) {
-				og.setCancelled(true);
-			}
-		}
-	}
+    /*@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void event(PrePrivateMessageEvent og) {
+        Player player = ObjectUtils.castOrNull(og.getSender(), Player.class);
+        if (player != null) {
+            PlayerChatEvent event = PlayerChatEvent.call(player, og.getMessage(), CollectionUtils.asSet(og.getRecipient()));
+            og.setMessage(event.getMessage());
+            og.setCancelled(event.isCancelled());
+            if (event.getRecipients().isEmpty()) {
+                og.setCancelled(true);
+            }
+        }
+    }*/
 
 }

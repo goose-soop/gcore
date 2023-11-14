@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.guillaumevdn"
-version = "8.47.3"
+version = "8.48.0"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8

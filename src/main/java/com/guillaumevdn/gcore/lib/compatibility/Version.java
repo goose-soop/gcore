@@ -68,6 +68,7 @@ public enum Version
     public static final boolean ATLEAST_1_19 = CURRENT.isMoreOrEqualsTo(MC_1_19_R1);
     public static final boolean ATLEAST_1_19_3 = CURRENT.isMoreOrEqualsTo(MC_1_19_R2);
     public static final boolean ATLEAST_1_20 = CURRENT.isMoreOrEqualsTo(MC_1_20_R1);
+    public static final boolean ATLEAST_1_20_2 = CURRENT.isMoreOrEqualsTo(MC_1_20_R2);
     public static final boolean REMAPPED = CURRENT.useRemappedNMSPackages();
 
     private List<String> names;

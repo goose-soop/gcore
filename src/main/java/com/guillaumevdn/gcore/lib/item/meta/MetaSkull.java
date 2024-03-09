@@ -65,7 +65,9 @@ public final class MetaSkull {
             String data = reader.readString("skinData");
             String signature = reader.readString("skinSignature");
             if (data != null || uuid != null || name != null) {  // either we build it from data or we rebuild it from a name
-                GameProfile profile = new GameProfile(uuid == null && name == null ? UUID.randomUUID() : uuid, name == null ? "Name" : name);
+                GameProfile profile =
+                    Version.ATLEAST_1_20 ? new GameProfile(uuid == null ? UUID.randomUUID() : uuid, name == null ? "Name" : name) :
+                        new GameProfile(uuid == null && name == null ? UUID.randomUUID() : uuid, name);
                 if (data != null) {
                     profile.getProperties().put("textures", signature != null ? new Property("textures", data, signature) : new Property("textures", data));
                 }

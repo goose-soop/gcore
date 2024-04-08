@@ -8,9 +8,7 @@ import java.util.List;
 /**
  * @author GuillaumeVDN
  */
-public enum Version
-{
-
+public enum Version {
     // ----- values ; versions are checked from bottom to top so it'll take latest if necessary
 
     UNKNOWN(CollectionUtils.asList("UNKNOWN"), null),
@@ -44,6 +42,7 @@ public enum Version
 
     MC_1_20_R1(CollectionUtils.asList("1.20", "1.20.1"), "v1_20_R1", true),
     MC_1_20_R2(CollectionUtils.asList("1.20.2"), "v1_20_R2", true),
+    MC_1_20_R3(CollectionUtils.asList("1.20.4"), "v1_20_R3", true),
 
     UNSUPPORTED(CollectionUtils.asList("UNSUPPORTED"), null)  // this will be used if we find a package name that's not listed above (a not yet updated newer version most likely)
     ;

@@ -25,7 +25,7 @@ repositories {
 
 dependencies {
     compileOnly("com.googlecode.json-simple:json-simple:1.1.1")
-    compileOnly("org.spigotmc:spigot-api:1.20.2-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT")
     compileOnly("com.mojang:authlib:1.5.26")
     compileOnly("net.citizensnpcs:citizens-main:2.0.30-SNAPSHOT") { exclude(group = "*", module = "*") }
     compileOnly("com.comphenix.protocol:ProtocolLib:5.1.0")

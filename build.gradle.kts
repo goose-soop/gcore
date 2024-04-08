@@ -61,7 +61,7 @@ tasks.register("copyFiles") {
     doLast {
         copy {
             from("$buildDir/libs/GCore.jar")
-            into("C:/Users/vande/Desktop/Dropbox/Development/Spigot servers/1.20/plugins")
+            into("/home/guillaumevdn/Projects/plugins-servers/spigot-1.20.4/plugins")
         }
     }
 }

@@ -11,6 +11,7 @@ import java.util.UUID;
 
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -338,8 +339,12 @@ public final class NpcProtocols {
 			}
 
 			// create spawn packet
-			PacketContainer spawnPacket = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.NAMED_ENTITY_SPAWN);
+			PacketContainer spawnPacket = ProtocolLibrary.getProtocolManager().createPacket(
+				Version.ATLEAST_1_20_2 ? PacketType.Play.Server.SPAWN_ENTITY : PacketType.Play.Server.NAMED_ENTITY_SPAWN
+			);
 			spawnPacket.getIntegers().write(0, entityId);
+			if (Version.ATLEAST_1_20_2)
+				spawnPacket.getEntityTypeModifier().write(0, EntityType.PLAYER);
 			spawnPacket.getDoubles().write(0, location.getX());
 			spawnPacket.getDoubles().write(1, location.getY());
 			spawnPacket.getDoubles().write(2, location.getZ());

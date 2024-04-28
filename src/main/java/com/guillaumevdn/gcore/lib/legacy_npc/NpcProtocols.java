@@ -364,7 +364,18 @@ public final class NpcProtocols {
 			// create info packet
 			final PacketContainer infoPacket = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.PLAYER_INFO);
 			final Object pre119PlayerInfo;
-			if (Version.ATLEAST_1_19_3) {
+			if (Version.ATLEAST_1_20_2) {
+				pre119PlayerInfo = null;
+				infoPacket.getSpecificModifier(EnumSet.class).write(0, EnumSet.of(playerInfoActionEnum.valueOf("ADD_PLAYER").get()));
+
+				Object playerGameMode = Reflection.invokeNmsMethod("world.level.EnumGamemode", "a", null, 0).get();
+				Object playerInfo = Reflection.newNmsInstance(
+					"network.protocol.game.ClientboundPlayerInfoUpdatePacket$b",
+					gameProfile.getUUID(), gameProfile.getHandle(), false, 0, playerGameMode, WrappedChatComponent.fromText(" ").getHandle(), null
+				).get();
+
+				infoPacket.getModifier().write(1, Arrays.asList(playerInfo));
+			} else if (Version.ATLEAST_1_19_3) {
 				pre119PlayerInfo = null;
 				infoPacket.getSpecificModifier(EnumSet.class).write(0, EnumSet.of(playerInfoActionEnum.valueOf("ADD_PLAYER").get()));
 				infoPacket.getPlayerInfoDataLists().write(1, Collections.singletonList(new PlayerInfoData(gameProfile, 0, EnumWrappers.NativeGameMode.SURVIVAL, WrappedChatComponent.fromText(" "))));

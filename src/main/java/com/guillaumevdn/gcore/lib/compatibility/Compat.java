@@ -38,6 +38,9 @@ public final class Compat {
 			.setIf(Version.IS_1_7, string -> {
 				return Reflection.invokeNmsMethod("ChatSerializer", "a", null, "{\"text\": \"" + string.replace("\"", "\\\"") + "\"}");
 			})
+			.orIf(Version.CURRENT == Version.MC_1_20_R2, string -> {
+				return Reflection.invokeNmsMethod((Version.REMAPPED ? "network.chat." : "") + "IChatBaseComponent$ChatSerializer", "b", null, "{\"text\": \"" + string.replace("\"", "\\\"") + "\"}");
+			})
 			.orElse(string -> {
 				return Reflection.invokeNmsMethod((Version.REMAPPED ? "network.chat." : "") + "IChatBaseComponent$ChatSerializer", "a", null, "{\"text\": \"" + string.replace("\"", "\\\"") + "\"}");
 			})

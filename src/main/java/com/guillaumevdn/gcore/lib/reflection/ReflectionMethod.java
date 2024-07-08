@@ -58,11 +58,34 @@ public class ReflectionMethod {
 			}
 		}
 		if (method == null) {
-			Reflection.logAndRethrowError(new NoSuchMethodException(),
-					"Class " + original
+			String log = "Class " + original
 					+ "\nName '" + name + "'"
 					+ "\nParameters '" + StringUtils.toTextString(", ", CollectionUtils.asList(params).stream().map(param -> param == null ? "null" : param.getName())) + "'"
-					);
+					+ "\n\nAvailable methods:";
+			
+			// log every available method
+			classes = CollectionUtils.asList(original);
+			explored = new HashSet<>();
+
+			while (!classes.isEmpty()) {
+				Class<?> clazz = classes.remove(0);
+				log += "\n\n... from class " + clazz + ":";
+				for (Method meth : clazz.getDeclaredMethods()) {
+					log += "\n- " + meth.getName() + "(" + StringUtils.toTextString(", ", CollectionUtils.asList(meth.getParameters()).stream().map(param -> param.getType()) + ")");
+				}
+				// set parent class to explore
+				Class<?> parent = clazz.getSuperclass();
+				if (parent != null && canCheck(parent)) {
+					classes.add(parent);
+				}
+				for (Class<?> inter : original.getInterfaces()) {
+					if (inter != null && canCheck(inter) && explored.add(inter)) {
+						classes.add(inter);
+					}
+				}
+			}
+
+			Reflection.logAndRethrowError(new NoSuchMethodException(), log);
 		}
 	}
 

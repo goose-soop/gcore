@@ -74,7 +74,7 @@ public interface ItemReference {
 
 	// ----- PotionMeta
 
-	<T> T getBasePotionData();
+	<T> T getBasePotionDataOrType();
 	Color getPotionColor();
 	boolean hasPotionCustomEffects();
 	List<PotionEffect> getPotionCustomEffects();

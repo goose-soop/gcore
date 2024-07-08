@@ -27,7 +27,15 @@ public class NBTItem extends NBTCompound {
 
 	private static ReflectionObject getTag(ItemStack item, boolean clone) throws Throwable {
 		ReflectionObject nmsCopy = Reflection.invokeCraftbukkitMethod("inventory.CraftItemStack", "asNMSCopy", null, item);
-		if (Version.ATLEAST_1_18) {
+		if (Version.ATLEAST_1_20_5) {
+			final Object registryAccess = Reflection.invokeCraftbukkitMethod("CraftRegistry", "getMinecraftRegistry", null).get();
+			final ReflectionObject tag = nmsCopy.invokeMethod("a", registryAccess);
+			if (tag.justGet() != null) {
+				return tag;
+			} else {
+				return Reflection.newNmsInstance("nbt.NBTTagCompound");
+			}
+		} else if (Version.ATLEAST_1_18) {
 			return nmsCopy
 					.invokeMethod(clone ? "getTagClone" :
 						(Version.ATLEAST_1_20 ? "v" : (Version.ATLEAST_1_19 ? "u" : "t")))

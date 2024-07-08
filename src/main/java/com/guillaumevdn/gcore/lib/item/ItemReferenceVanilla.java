@@ -20,11 +20,14 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.inventory.meta.SpawnEggMeta;
 import org.bukkit.potion.PotionEffect;
 
+import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.lib.compatibility.Compat;
+import com.guillaumevdn.gcore.lib.compatibility.Version;
 import com.guillaumevdn.gcore.lib.compatibility.material.Mat;
 import com.guillaumevdn.gcore.lib.compatibility.nbt.NBTItem;
 import com.guillaumevdn.gcore.lib.gui.ItemFlag;
 import com.guillaumevdn.gcore.lib.object.ObjectUtils;
+import com.guillaumevdn.gcore.lib.reflection.ReflectionObject;
 
 /**
  * @author GuillaumeVDN
@@ -187,8 +190,16 @@ final class ItemReferenceVanilla implements ItemReference {
 	// ----- PotionMeta
 
 	@Override
-	public Object getBasePotionData() {
-		return ((PotionMeta) this.meta).getBasePotionData();
+	public Object getBasePotionDataOrType() {
+		if (Version.ATLEAST_1_20_5) {
+			return ((PotionMeta) this.meta).getBasePotionType();
+		}
+		try {
+			return ReflectionObject.of((PotionMeta) this.meta).invokeMethod("getBasePotionData").get();
+		} catch (Throwable exception) {
+			GCore.inst().getMainLogger().error("Could not get base potion data", exception);
+			return null;
+		}
 	}
 
 	@Override
@@ -222,7 +233,15 @@ final class ItemReferenceVanilla implements ItemReference {
 
 	@Override
 	public DyeColor getBaseColor() {
-		return ((org.bukkit.inventory.meta.BannerMeta) this.meta).getBaseColor();
+		if (Version.ATLEAST_1_20_5) {
+			return null;
+		}
+		try {
+			return ReflectionObject.of((org.bukkit.inventory.meta.BannerMeta) this.meta).invokeMethod("getBaseColor").get();
+		} catch (Throwable exception) {
+			GCore.inst().getMainLogger().error("Could not get base color", exception);
+			return null;
+		}
 	}
 
 	@Override

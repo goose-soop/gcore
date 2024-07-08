@@ -192,7 +192,7 @@ final class ItemReferenceElementNoType implements ItemReference {
 	// ----- PotionMeta
 
 	@Override
-	public Object getBasePotionData() {
+	public Object getBasePotionDataOrType() {
 		return null;
 	}
 

@@ -10,6 +10,7 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionType;
 
+import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.TextEditorGeneric;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.compatibility.Version;
@@ -24,6 +25,8 @@ import com.guillaumevdn.gcore.lib.item.ItemCheck;
 import com.guillaumevdn.gcore.lib.item.ItemReference;
 import com.guillaumevdn.gcore.lib.item.PotionExtra;
 import com.guillaumevdn.gcore.lib.object.ObjectUtils;
+import com.guillaumevdn.gcore.lib.reflection.Reflection;
+import com.guillaumevdn.gcore.lib.reflection.ReflectionObject;
 import com.guillaumevdn.gcore.lib.serialization.Serializer;
 import com.guillaumevdn.gcore.lib.serialization.adapter.type.AdapterPotionEffect;
 import com.guillaumevdn.gcore.lib.serialization.data.DataIO;
@@ -39,17 +42,40 @@ public final class MetaPotion {
 		PotionMeta meta = ObjectUtils.castOrNull(itemMeta, PotionMeta.class);  // might be null if exact match is false
 
 		// base
-		if (Version.ATLEAST_1_9) {
-			org.bukkit.potion.PotionData baseMeta = meta == null ? null : meta.getBasePotionData();
-			org.bukkit.potion.PotionData baseRef = reference.getBasePotionData();
-			if (baseMeta == null) return false;
-			if (!baseMeta.getType().equals(baseRef.getType())) return false;
+		if (Version.ATLEAST_1_20_5) {
+			final PotionType baseType = meta == null ? null : meta.getBasePotionType();
+			final PotionType refType = reference.getBasePotionDataOrType();
+
+			if (baseType == null) return false;
+
+			final PotionType realBaseType = PotionType.valueOf(baseType.name().replace("LONG_", "").replace("STRONG_", ""));
+			final PotionType realRefType = PotionType.valueOf(refType.name().replace("LONG_", "").replace("STRONG_", ""));
+
+			if (realBaseType != realRefType) return false;
 			if (check.isExact()) {
-				if (baseMeta.isExtended() != baseRef.isExtended()) return false;
-				if (baseMeta.isUpgraded() != baseRef.isUpgraded()) return false;
+				if (baseType.name().startsWith("LONG_") != refType.name().startsWith("LONG_")) return false;
+				if (baseType.name().startsWith("STRONG_") != refType.name().startsWith("STRONG_")) return false;
 			} else {
-				if (baseRef.isExtended() && (baseMeta == null || !baseMeta.isExtended())) return false;
-				if (baseRef.isUpgraded() && (baseMeta == null || !baseMeta.isUpgraded())) return false;
+				if (refType.name().startsWith("LONG_") && !baseType.name().startsWith("LONG_")) return false;
+				if (refType.name().startsWith("STRONG_") && !baseType.name().startsWith("STRONG_")) return false;
+			}
+		} else if (Version.ATLEAST_1_9) {
+			try {
+				final ReflectionObject baseMeta = meta == null ? null : ReflectionObject.of(meta).invokeMethod("getBasePotionData");
+				final ReflectionObject baseRef = ReflectionObject.of(reference.getBasePotionDataOrType());
+
+				if (baseMeta == null) return false;
+				if (!baseMeta.invokeMethod("getType").equals(baseRef.invokeMethod("getType"))) return false;
+				if (check.isExact()) {
+					if (baseMeta.invokeMethod("isExtended").get(boolean.class) != baseRef.invokeMethod("isExtended").get(boolean.class)) return false;
+					if (baseMeta.invokeMethod("isUpgraded").get(boolean.class) != baseRef.invokeMethod("isUpgraded").get(boolean.class)) return false;
+				} else {
+					if (baseRef.invokeMethod("isExtended").get(boolean.class) && (baseMeta == null || !baseMeta.invokeMethod("isExtended").get(boolean.class))) return false;
+					if (baseRef.invokeMethod("isUpgraded").get(boolean.class) && (baseMeta == null || !baseMeta.invokeMethod("isUpgraded").get(boolean.class))) return false;
+				}
+			} catch (Throwable exception) {
+				GCore.inst().getMainLogger().error("Could not check potion meta", exception);
+				return false;
 			}
 		}
 
@@ -79,11 +105,13 @@ public final class MetaPotion {
 		PotionMeta meta = ObjectUtils.castOrNull(itemMeta, PotionMeta.class);
 		if (meta != null) {
 			// base
-			if (Version.ATLEAST_1_9) {
-				org.bukkit.potion.PotionData base = meta.getBasePotionData();
-				writer.write("potionType", base.getType());
-				if (base.isExtended()) writer.write("extended", base.isExtended());
-				if (base.isUpgraded()) writer.write("upgraded", base.isUpgraded());
+			if (Version.ATLEAST_1_20_5) {
+				writer.write("potionType", meta.getBasePotionType());
+			} else if (Version.ATLEAST_1_9) {
+				final ReflectionObject base = ReflectionObject.of(meta).invokeMethod("getBasePotionData");
+				writer.write("potionType", base.invokeMethod("getType").get());
+				if (base.invokeMethod("isExtended").get(boolean.class)) writer.write("extended", true);
+				if (base.invokeMethod("isUpgraded").get(boolean.class)) writer.write("upgraded", true);
 			}
 			// color
 			if (Version.ATLEAST_1_12) {
@@ -111,10 +139,11 @@ public final class MetaPotion {
 			// base
 			if (Version.ATLEAST_1_9) {
 				PotionType type = reader.readEnum("potionType", PotionType.class);
-				if (type != null) {
+				if (type != null && !Version.ATLEAST_1_20_5) {
 					Boolean extended = reader.readBoolean("extended");
 					Boolean upgraded = reader.readBoolean("upgraded");
-					meta.setBasePotionData(new org.bukkit.potion.PotionData(type, extended != null && extended, upgraded != null && upgraded));
+					final Object potionData = Reflection.newInstance(Class.forName("org.bukkit.potion.PotionData"), type, extended != null && extended, upgraded != null && upgraded).get();
+					ReflectionObject.of(meta).invokeMethod("setBasePotionData", potionData);
 				}
 			}
 			// color
@@ -186,10 +215,21 @@ public final class MetaPotion {
 	public static void importElements(ElementItem item, ItemMeta itemMeta) {
 		PotionMeta meta = ObjectUtils.castOrNull(itemMeta, PotionMeta.class);
 		if (meta != null) {
-			if (Version.ATLEAST_1_9) {
-				org.bukkit.potion.PotionData base = meta.getBasePotionData();
-				item.getElementAs("potion_type", ElementPotionType.class).setValue(CollectionUtils.asList(base.getType().name()));
-				item.getElementAs("potion_extra", ElementPotionExtra.class).setValue(base.isExtended() ? CollectionUtils.asList(PotionExtra.EXTENDED.name()) : (base.isUpgraded() ? CollectionUtils.asList(PotionExtra.UPGRADED.name()) : null));
+			if (Version.ATLEAST_1_20_5) {
+				item.getElementAs("potion_type", ElementPotionType.class).setValue(CollectionUtils.asList(meta.getBasePotionType().name()));
+			} else if (Version.ATLEAST_1_9) {
+				try {
+					final ReflectionObject base = ReflectionObject.of(meta).invokeMethod("getBasePotionData");
+					item.getElementAs("potion_type", ElementPotionType.class).setValue(CollectionUtils.asList(base.invokeMethod("getType").invokeMethod("name").get(String.class)));
+					item.getElementAs("potion_extra", ElementPotionExtra.class).setValue(
+						base.invokeMethod("isExtended").get(boolean.class)
+							? CollectionUtils.asList(PotionExtra.EXTENDED.name())
+							: (base.invokeMethod("isUpgraded").get(boolean.class) ? CollectionUtils.asList(PotionExtra.UPGRADED.name()) : null)
+						);
+				} catch (Throwable exception) {
+					GCore.inst().getMainLogger().error("Could not import potion meta", exception);
+					return;
+				}
 			}
 			if (Version.ATLEAST_1_12) {
 				item.getElementAs("color", ElementColor.class).setValue(meta.hasColor() ? CollectionUtils.asList(Serializer.COLOR.serialize(meta.getColor())) : null);

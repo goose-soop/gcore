@@ -16,6 +16,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.SkullType;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -34,6 +35,17 @@ import java.util.stream.Stream;
  */
 public final class ItemUtils
 {
+	public static final Enchantment ENCHANTMENT_BANE_OF_ARTHROPODS;
+
+	static {
+		Enchantment rocketType = null;
+		try {
+			rocketType = Enchantment.getByName("DAMAGE_ARTHROPODS");
+		} catch (IllegalArgumentException e) {
+			rocketType = Enchantment.BANE_OF_ARTHROPODS;
+		}
+		ENCHANTMENT_BANE_OF_ARTHROPODS = rocketType;
+	}
 
     // ----- text
     public static String describeSingleLine(ItemStack item) {
@@ -602,7 +614,7 @@ public final class ItemUtils
     public static ItemStack maybeAddGlow(ItemStack item, boolean addGlow) {
         if (addGlow && item.getEnchantments().isEmpty()) {
             item = item.clone();
-            item.addUnsafeEnchantment(Enchantment.DAMAGE_ARTHROPODS, 1);
+            item.addUnsafeEnchantment(ENCHANTMENT_BANE_OF_ARTHROPODS, 1);
             ItemMeta meta = item.getItemMeta();
             Compat.addItemFlags(meta, ItemFlag.HIDE_ENCHANTS);
             item.setItemMeta(meta);

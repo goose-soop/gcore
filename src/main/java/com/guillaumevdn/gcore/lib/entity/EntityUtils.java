@@ -26,6 +26,27 @@ import com.guillaumevdn.gcore.lib.number.NumberUtils;
  * @author GuillaumeVDN
  */
 public final class EntityUtils {
+	public static final EntityType ENTITY_TYPE_FIREWORK_ROCKET;
+	public static final EntityType ENTITY_TYPE_END_CRYSTAL;
+
+	static {
+		EntityType rocketType = null;
+		EntityType crystalType = null;
+
+		try {
+			rocketType = EntityType.valueOf("FIREWORK");
+		} catch (IllegalArgumentException e) {
+			rocketType = EntityType.FIREWORK_ROCKET;
+		}
+		try {
+			crystalType = EntityType.valueOf("ENDER_CRYSTAL");
+		} catch (IllegalArgumentException e) {
+			crystalType = EntityType.END_CRYSTAL;
+		}
+
+		ENTITY_TYPE_FIREWORK_ROCKET = rocketType;
+		ENTITY_TYPE_END_CRYSTAL = crystalType;
+	}
 
 	// ----- find
 	public static List<Entity> getEntitiesInSquare(Location center, double range, Function<Entity, Boolean> validator) {
@@ -81,7 +102,7 @@ public final class EntityUtils {
 
 	// ----- misc
 	public static void spawnRandomFirework(Location location) {
-		Firework firework = (Firework) location.getWorld().spawnEntity(location, EntityType.FIREWORK);
+		Firework firework = (Firework) location.getWorld().spawnEntity(location, ENTITY_TYPE_FIREWORK_ROCKET);
 		FireworkMeta meta = firework.getFireworkMeta();
 		meta.addEffect(FireworkEffect.builder()
 				.with(CollectionUtils.randomArray(FireworkEffect.Type.values()))

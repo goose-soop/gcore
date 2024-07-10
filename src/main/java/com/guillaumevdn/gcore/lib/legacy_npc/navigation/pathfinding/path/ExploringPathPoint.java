@@ -16,7 +16,8 @@ public class ExploringPathPoint {
 
 	private Movement movementToPoint;
 	private Point point;
-	private Set<Offset> offsetsToIgnore = new HashSet<>();  // remember offsets to ignore from a here, since we might recheck the same origin multiple times (if a movement is found before checking all offsets, and later discontinued)
+	private Set<Offset> offsetsToIgnore = new HashSet<>(); // remember offsets to ignore from a here, since we might recheck the same origin multiple times (if
+															// a movement is found before checking all offsets, and later discontinued)
 
 	public ExploringPathPoint(Movement movementToPoint, Point point) {
 		this.movementToPoint = movementToPoint;

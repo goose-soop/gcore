@@ -14,10 +14,7 @@ import com.guillaumevdn.gcore.lib.function.ThrowableRunnable;
  */
 public enum BukkitThread {
 
-	FORCE_SYNC,
-	FORCE_ASYNC,
-	SYNC,
-	ASYNC;
+	FORCE_SYNC, FORCE_ASYNC, SYNC, ASYNC;
 
 	private final boolean isSync = !name().contains("ASYNC");
 
@@ -27,7 +24,8 @@ public enum BukkitThread {
 
 	public void operate(GPlugin plugin, ThrowableRunnable callable, Consumer<Throwable> onError) {
 		try {
-			if (plugin.isReloading() || !plugin.isEnabled() /* use isEnabled and not isActivated here, otherwise tasks on plugin startup will not run correctly */) {
+			if (plugin.isReloading()
+					|| !plugin.isEnabled() /* use isEnabled and not isActivated here, otherwise tasks on plugin startup will not run correctly */) {
 				callable.run();
 			} else if (equals(BukkitThread.ASYNC)) {
 				if (Bukkit.isPrimaryThread()) {
@@ -61,7 +59,8 @@ public enum BukkitThread {
 
 	public BukkitTask operateLater(GPlugin plugin, ThrowableRunnable callable, Consumer<Throwable> onError, long ticks) {
 		try {
-			if (plugin.isReloading() || !plugin.isEnabled() /* use isEnabled and not isActivated here, otherwise tasks on plugin startup will not run correctly */) {
+			if (plugin.isReloading()
+					|| !plugin.isEnabled() /* use isEnabled and not isActivated here, otherwise tasks on plugin startup will not run correctly */) {
 				callable.run();
 			} else if (ticks <= 0L) {
 				operate(plugin, callable, onError);
@@ -83,6 +82,7 @@ public enum BukkitThread {
 	private BukkitRunnable buildRunnable(ThrowableRunnable callable, Consumer<Throwable> onError) {
 		Error origin = new Error("An error occured while performing " + name() + " operation");
 		return new BukkitRunnable() {
+
 			@Override
 			public void run() {
 				try {
@@ -96,6 +96,7 @@ public enum BukkitThread {
 					}
 				}
 			}
+
 		};
 	}
 

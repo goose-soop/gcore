@@ -12,7 +12,7 @@ import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonWriter;
  * @author GuillaumeVDN
  */
 public class SerializableGsonAdapter<T> extends TypeAdapter<T> {
-	
+
 	private final Serializer<T> serializer;
 
 	public SerializableGsonAdapter(Serializer<T> serializer) {

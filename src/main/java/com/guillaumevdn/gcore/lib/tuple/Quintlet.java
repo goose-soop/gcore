@@ -82,9 +82,11 @@ public class Quintlet<A, B, C, D, E> {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) return true;
+		if (this == obj)
+			return true;
 		Quintlet<A, B, C, D, E> other = ObjectUtils.castOrNull(obj, getClass());
-		return other != null && Objects.deepEquals(a, other.a) && Objects.deepEquals(b, other.b) && Objects.deepEquals(c, other.c) && Objects.deepEquals(d, other.d) && Objects.deepEquals(e, other.e);
+		return other != null && Objects.deepEquals(a, other.a) && Objects.deepEquals(b, other.b) && Objects.deepEquals(c, other.c)
+				&& Objects.deepEquals(d, other.d) && Objects.deepEquals(e, other.e);
 	}
 
 	// ----- static

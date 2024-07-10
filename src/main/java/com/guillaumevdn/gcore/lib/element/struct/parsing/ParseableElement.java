@@ -19,9 +19,13 @@ import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
 public interface ParseableElement<T> extends IElement {
 
 	String getTypeName();
+
 	String getConfigurationPath();
+
 	SuperElement getSuperElement();
-	ParsedCache<T> getCache();  // if not null, will allow the thing to be cached whatever the replacer is (it means there are no placeholders : the parsed value will be the same for every replacer)
+
+	ParsedCache<T> getCache(); // if not null, will allow the thing to be cached whatever the replacer is (it means there are no placeholders : the
+								// parsed value will be the same for every replacer)
 
 	default Optional<T> parseGeneric() {
 		return parse(Replacer.GENERIC);
@@ -31,7 +35,7 @@ public interface ParseableElement<T> extends IElement {
 		return parse(Replacer.justPlayer(player));
 	}
 
-	default Optional<T> parse(@Nonnull Replacer replacer) {  // used most of the time
+	default Optional<T> parse(@Nonnull Replacer replacer) { // used most of the time
 		try {
 			return parseNoCatch(replacer);
 		} catch (Throwable error) {
@@ -40,7 +44,7 @@ public interface ParseableElement<T> extends IElement {
 		}
 	}
 
-	default Optional<T> parseNoCatch(@Nonnull Replacer replacer) throws ParsingError {  // useful when parsing some containers
+	default Optional<T> parseNoCatch(@Nonnull Replacer replacer) throws ParsingError { // useful when parsing some containers
 		ParsedCache<T> cache = getCache();
 		if (cache != null && cache.isPresent()) {
 			return cache.get();
@@ -52,10 +56,10 @@ public interface ParseableElement<T> extends IElement {
 			}
 			return parsed;
 		} catch (Throwable error) {
-			/* - actually don't valuesCache when errors because it might not be noticed then. prefer error spamming so that they actually fix it
-			if (valuesCache != null) {
-				valuesCache.set(Optional.empty());
-			}*/
+			/*
+			 * - actually don't valuesCache when errors because it might not be noticed then. prefer error spamming so that they
+			 * actually fix it if (valuesCache != null) { valuesCache.set(Optional.empty()); }
+			 */
 			throw error instanceof ParsingError ? (ParsingError) error : new ParsingError(this, error);
 		}
 	}
@@ -79,7 +83,7 @@ public interface ParseableElement<T> extends IElement {
 		return parse(replacer).ifPresentDo(ifPresent);
 	}
 
-	default T parseNoCatchOrThrowParsingNull(@Nonnull Replacer replacer) throws ParsingError {  // useful when parsing some containers
+	default T parseNoCatchOrThrowParsingNull(@Nonnull Replacer replacer) throws ParsingError { // useful when parsing some containers
 		return parseNoCatch(replacer).orThrowParsingNull(this);
 	}
 

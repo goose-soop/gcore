@@ -50,18 +50,24 @@ public class ElementNotify extends ContainerElement {
 
 	private ElementText message = addText("message", Need.optional(), TextEditorGeneric.descriptionNotifyMessage);
 	private ElementString actionbar = addString("actionbar", Need.optional(), TextEditorGeneric.descriptionNotifyActionbar);
-	private ElementDuration actionbarDuration = addDuration("actionbar_duration", Need.optional(), 10, TimeUnit.SECOND, TextEditorGeneric.descriptionNotifyActionbarDuration);
+	private ElementDuration actionbarDuration = addDuration("actionbar_duration", Need.optional(), 10, TimeUnit.SECOND,
+			TextEditorGeneric.descriptionNotifyActionbarDuration);
 
 	private ElementString bossbar = addString("bossbar", Need.optional(), SlotPlacement.START_ROW, TextEditorGeneric.descriptionNotifyBossbar);
-	private ElementBossbarColor bossbarColor = addBossbarColor("bossbar_color", Need.optional(BossbarColor.BLUE), TextEditorGeneric.descriptionNotifyBossbarColor);
-	private ElementBossbarStyle bossbarStyle = addBossbarStyle("bossbar_style", Need.optional(BossbarStyle.SOLID), TextEditorGeneric.descriptionNotifyBossbarStyle);
-	private ElementBossbarFlagList bossbarFlags = addBossbarFlagList("bossbar_flags", Need.optional(new ArrayList<>()), TextEditorGeneric.descriptionNotifyBossbarFlags);
-	private ElementDuration bossbarDuration = addDuration("bossbar_duration", Need.optional(), 10, TimeUnit.SECOND, TextEditorGeneric.descriptionNotifyBossbarDuration);
+	private ElementBossbarColor bossbarColor = addBossbarColor("bossbar_color", Need.optional(BossbarColor.BLUE),
+			TextEditorGeneric.descriptionNotifyBossbarColor);
+	private ElementBossbarStyle bossbarStyle = addBossbarStyle("bossbar_style", Need.optional(BossbarStyle.SOLID),
+			TextEditorGeneric.descriptionNotifyBossbarStyle);
+	private ElementBossbarFlagList bossbarFlags = addBossbarFlagList("bossbar_flags", Need.optional(new ArrayList<>()),
+			TextEditorGeneric.descriptionNotifyBossbarFlags);
+	private ElementDuration bossbarDuration = addDuration("bossbar_duration", Need.optional(), 10, TimeUnit.SECOND,
+			TextEditorGeneric.descriptionNotifyBossbarDuration);
 
 	private ElementString title = addString("title", Need.optional(), SlotPlacement.START_ROW, TextEditorGeneric.descriptionNotifyTitle);
 	private ElementString titleSubtitle = addString("title_subtitle", Need.optional(), TextEditorGeneric.descriptionNotifyTitleSubtitle);
 	private ElementDuration titleFadeIn = addDuration("title_fade_in", Need.optional(), 10, TimeUnit.TICK, TextEditorGeneric.descriptionNotifyTitleFadeIn);
-	private ElementDuration titleDuration = addDuration("title_duration", Need.optional(), 4, TimeUnit.SECOND, TextEditorGeneric.descriptionNotifyTitleDuration);
+	private ElementDuration titleDuration = addDuration("title_duration", Need.optional(), 4, TimeUnit.SECOND,
+			TextEditorGeneric.descriptionNotifyTitleDuration);
 	private ElementDuration titleFadeOut = addDuration("title_fade_out", Need.optional(), 10, TimeUnit.TICK, TextEditorGeneric.descriptionNotifyTitleFadeOut);
 
 	private ElementSound sound = addSound("sound", Need.optional(), SlotPlacement.START_ROW, TextEditorGeneric.descriptionNotifySound);
@@ -179,8 +185,10 @@ public class ElementNotify extends ContainerElement {
 		sendAll(players, replacer, soundLocation, forceBossbarProgress, null);
 	}
 
-	public void sendAll(Collection<Player> players, Replacer replacer, @Nullable Location soundLocation, @Nullable Double forceBossbarProgress, @Nullable BossbarColor forceBossbarColor) {
-		if (!readContains()) return;
+	public void sendAll(Collection<Player> players, Replacer replacer, @Nullable Location soundLocation, @Nullable Double forceBossbarProgress,
+			@Nullable BossbarColor forceBossbarColor) {
+		if (!readContains())
+			return;
 		sendMessage(players, replacer);
 		sendActionbar(players, replacer);
 		sendBossbar(players, replacer, null, forceBossbarProgress, forceBossbarColor);
@@ -210,9 +218,11 @@ public class ElementNotify extends ContainerElement {
 				if (allowLoop) {
 					stopLastActionbar(player);
 					if (durationTicks > 50) {
-						lastActionbarTasks.put(player, new BukkitRunnable() {  // use a bukkit task here so it can be cancelled easily too
+						lastActionbarTasks.put(player, new BukkitRunnable() { // use a bukkit task here so it can be cancelled easily too
+
 							private int remainingTicks = durationTicks;
 							private int ticksBeforeUpdate = 50;
+
 							@Override
 							public void run() {
 								if (--remainingTicks <= 0) {
@@ -226,6 +236,7 @@ public class ElementNotify extends ContainerElement {
 									ticksBeforeUpdate = 50;
 								}
 							}
+
 						}.runTaskTimerAsynchronously(GCore.inst(), 1L, 1L));
 					}
 				}
@@ -242,47 +253,53 @@ public class ElementNotify extends ContainerElement {
 	}
 
 	public void sendBossbar(Collection<Player> players, Replacer replacer, Long forceDurationMillis, Double forceProgress, BossbarColor forceColor) {
-		//Bukkit.getLogger().info("[debug WarnD] ------------ BEGIN");
+		// Bukkit.getLogger().info("[debug WarnD] ------------ BEGIN");
 
-		directParseAndIfPresentDo("bossbar", "bossbar_color", "bossbar_style", "bossbar_flags", replacer, (String bossbar, BossbarColor color, BossbarStyle style, List<BossbarFlag> flags) -> {
+		directParseAndIfPresentDo("bossbar", "bossbar_color", "bossbar_style", "bossbar_flags", replacer,
+				(String bossbar, BossbarColor color, BossbarStyle style, List<BossbarFlag> flags) -> {
 
-			//Bukkit.getLogger().info("[debug WarnD] parsed " + bossbar + ", in config " + getElementAs("bossbar", ElementString.class).getRawValue());
+					// Bukkit.getLogger().info("[debug WarnD] parsed " + bossbar + ", in config " + getElementAs("bossbar",
+					// ElementString.class).getRawValue());
 
-			players.forEach(player -> {
-				Long bossbarDurationMillis = forceDurationMillis != null ? forceDurationMillis : this.bossbarDuration.parse(replacer).orNull();
+					players.forEach(player -> {
+						Long bossbarDurationMillis = forceDurationMillis != null ? forceDurationMillis : this.bossbarDuration.parse(replacer).orNull();
 
-				// already active, simply update parameters to avoid the ugly unregister/register animation
-				Bossbar instance = lastBossbars.remove(player);
-				if (instance != null && instance.isActive()) {
-					instance.setTitle(bossbar);
-					instance.setColor(forceColor != null ? forceColor : color);
-					instance.setStyle(style);
-					instance.setFlags(flags);
-					if (bossbarDurationMillis != null) {
-						int ticks = (int) (bossbarDurationMillis / 50L);
-						instance.changeTemp(ticks, forceProgress);
-					} else {
-						instance.setProgress(forceProgress != null ? forceProgress : 1f);
-					}
-					//Bukkit.getLogger().info("[debug WarnD] sending bossbar (case 1) : '" + bossbar + "'");
-				}
-				// not active, create new
-				else {
-					if (bossbarDurationMillis != null) {
-						instance = BossbarCompat.sendTemp(getSuperElement().getPlugin(), bossbar, forceColor != null ? forceColor : color, style, flags, CollectionUtils.asList(player), bossbarDurationMillis, forceProgress);
-						instance.setTitle(bossbar);  // immediately re-send title, otherwise hex codes will not display properly when there are multiple boss bars on the screen
-						//Bukkit.getLogger().info("[debug WarnD] sending bossbar (case 2) : '" + bossbar + "'");
-					} else {
-						instance = new Bossbar(getSuperElement().getPlugin(), "notify_" + UUID.randomUUID(), bossbar, forceColor != null ? forceColor : color, style, flags, forceProgress != null ? forceProgress : 1f, CollectionUtils.asList(player));
-						instance.start();
-						//Bukkit.getLogger().info("[debug WarnD] sending bossbar (case 3) : '" + bossbar + "'");
-					}
-				}
-				lastBossbars.put(player, instance);
+						// already active, simply update parameters to avoid the ugly unregister/register animation
+						Bossbar instance = lastBossbars.remove(player);
+						if (instance != null && instance.isActive()) {
+							instance.setTitle(bossbar);
+							instance.setColor(forceColor != null ? forceColor : color);
+							instance.setStyle(style);
+							instance.setFlags(flags);
+							if (bossbarDurationMillis != null) {
+								int ticks = (int) (bossbarDurationMillis / 50L);
+								instance.changeTemp(ticks, forceProgress);
+							} else {
+								instance.setProgress(forceProgress != null ? forceProgress : 1f);
+							}
+							// Bukkit.getLogger().info("[debug WarnD] sending bossbar (case 1) : '" + bossbar + "'");
+						}
+						// not active, create new
+						else {
+							if (bossbarDurationMillis != null) {
+								instance = BossbarCompat.sendTemp(getSuperElement().getPlugin(), bossbar, forceColor != null ? forceColor : color, style, flags,
+										CollectionUtils.asList(player), bossbarDurationMillis, forceProgress);
+								instance.setTitle(bossbar); // immediately re-send title, otherwise hex codes will not display properly when there are multiple
+															// boss bars on the screen
+								// Bukkit.getLogger().info("[debug WarnD] sending bossbar (case 2) : '" + bossbar + "'");
+							} else {
+								instance = new Bossbar(getSuperElement().getPlugin(), "notify_" + UUID.randomUUID(), bossbar,
+										forceColor != null ? forceColor : color, style, flags, forceProgress != null ? forceProgress : 1f,
+										CollectionUtils.asList(player));
+								instance.start();
+								// Bukkit.getLogger().info("[debug WarnD] sending bossbar (case 3) : '" + bossbar + "'");
+							}
+						}
+						lastBossbars.put(player, instance);
 
-				//Bukkit.getLogger().info("[debug WarnD] END ------------");
-			});
-		});
+						// Bukkit.getLogger().info("[debug WarnD] END ------------");
+					});
+				});
 	}
 
 	public void sendTitle(Collection<Player> players, Replacer replacer) {

@@ -11,7 +11,7 @@ import com.guillaumevdn.gcore.lib.object.ObjectUtils;
  * @author GuillaumeVDN
  */
 public abstract class SimpleExistingVariantData<T, E extends Enum<E>> extends SimpleVariantData<E> {
-	
+
 	private final T dataInstance;
 
 	public SimpleExistingVariantData(Version version, ComparisonType versionComparison, String dataName, T dataInstance, List<E> extra) {
@@ -27,7 +27,8 @@ public abstract class SimpleExistingVariantData<T, E extends Enum<E>> extends Si
 	// ----- object
 	@Override
 	public boolean equals(Object obj) {
-		if (!super.equals(obj)) return false;
+		if (!super.equals(obj))
+			return false;
 		SimpleExistingVariantData other = ObjectUtils.castOrNull(obj, getClass());
 		return other != null && Objects.deepEquals(dataInstance, other.dataInstance);
 	}

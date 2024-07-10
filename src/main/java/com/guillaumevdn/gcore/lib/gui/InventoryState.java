@@ -59,7 +59,8 @@ public class InventoryState {
 		return findChanges(items, newState.items);
 	}
 
-	public static Pair<Map<Integer, ItemStack>, Map<Integer, ItemStack>> findChanges(Map<Integer, ItemStack> initialItems, Map<Integer, ItemStack> currentItems) {
+	public static Pair<Map<Integer, ItemStack>, Map<Integer, ItemStack>> findChanges(Map<Integer, ItemStack> initialItems,
+			Map<Integer, ItemStack> currentItems) {
 		// get all slots
 		Set<Integer> slots = new HashSet<>();
 		slots.addAll(initialItems.keySet());
@@ -70,9 +71,11 @@ public class InventoryState {
 		for (int slot : slots) {
 			// get items and clone them
 			ItemStack initialItem = initialItems.get(slot);
-			if (initialItem != null) initialItem = initialItem.clone();
+			if (initialItem != null)
+				initialItem = initialItem.clone();
 			ItemStack currentItem = currentItems.get(slot);
-			if (currentItem != null) currentItem = currentItem.clone();
+			if (currentItem != null)
+				currentItem = currentItem.clone();
 			// still has item on the slot
 			if (!Mat.isVoid(currentItem)) {
 				// had an item before
@@ -84,7 +87,8 @@ public class InventoryState {
 					}
 					// same type of item
 					else {
-						int delta = currentItem.getAmount() - initialItem.getAmount();  // correct order ; will be positive if we have more, negative if we have less
+						int delta = currentItem.getAmount() - initialItem.getAmount(); // correct order ; will be positive if we have more, negative if we have
+																						// less
 						if (delta > 0) {
 							currentItem.setAmount(delta);
 							added.put(slot, currentItem);

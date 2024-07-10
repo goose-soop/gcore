@@ -38,40 +38,53 @@ import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
 public final class MetaPotion {
 
 	public static boolean match(ItemMeta itemMeta, ItemReference reference, ItemCheck check) {
-		if (!reference.hasMeta(PotionMeta.class)) return true;
-		PotionMeta meta = ObjectUtils.castOrNull(itemMeta, PotionMeta.class);  // might be null if exact match is false
+		if (!reference.hasMeta(PotionMeta.class))
+			return true;
+		PotionMeta meta = ObjectUtils.castOrNull(itemMeta, PotionMeta.class); // might be null if exact match is false
 
 		// base
 		if (Version.ATLEAST_1_20_5) {
 			final PotionType baseType = meta == null ? null : meta.getBasePotionType();
 			final PotionType refType = reference.getBasePotionDataOrType();
 
-			if (baseType == null) return false;
+			if (baseType == null)
+				return false;
 
 			final PotionType realBaseType = PotionType.valueOf(baseType.name().replace("LONG_", "").replace("STRONG_", ""));
 			final PotionType realRefType = PotionType.valueOf(refType.name().replace("LONG_", "").replace("STRONG_", ""));
 
-			if (realBaseType != realRefType) return false;
+			if (realBaseType != realRefType)
+				return false;
 			if (check.isExact()) {
-				if (baseType.name().startsWith("LONG_") != refType.name().startsWith("LONG_")) return false;
-				if (baseType.name().startsWith("STRONG_") != refType.name().startsWith("STRONG_")) return false;
+				if (baseType.name().startsWith("LONG_") != refType.name().startsWith("LONG_"))
+					return false;
+				if (baseType.name().startsWith("STRONG_") != refType.name().startsWith("STRONG_"))
+					return false;
 			} else {
-				if (refType.name().startsWith("LONG_") && !baseType.name().startsWith("LONG_")) return false;
-				if (refType.name().startsWith("STRONG_") && !baseType.name().startsWith("STRONG_")) return false;
+				if (refType.name().startsWith("LONG_") && !baseType.name().startsWith("LONG_"))
+					return false;
+				if (refType.name().startsWith("STRONG_") && !baseType.name().startsWith("STRONG_"))
+					return false;
 			}
 		} else if (Version.ATLEAST_1_9) {
 			try {
 				final ReflectionObject baseMeta = meta == null ? null : ReflectionObject.of(meta).invokeMethod("getBasePotionData");
 				final ReflectionObject baseRef = ReflectionObject.of(reference.getBasePotionDataOrType());
 
-				if (baseMeta == null) return false;
-				if (!baseMeta.invokeMethod("getType").equals(baseRef.invokeMethod("getType"))) return false;
+				if (baseMeta == null)
+					return false;
+				if (!baseMeta.invokeMethod("getType").equals(baseRef.invokeMethod("getType")))
+					return false;
 				if (check.isExact()) {
-					if (baseMeta.invokeMethod("isExtended").get(boolean.class) != baseRef.invokeMethod("isExtended").get(boolean.class)) return false;
-					if (baseMeta.invokeMethod("isUpgraded").get(boolean.class) != baseRef.invokeMethod("isUpgraded").get(boolean.class)) return false;
+					if (baseMeta.invokeMethod("isExtended").get(boolean.class) != baseRef.invokeMethod("isExtended").get(boolean.class))
+						return false;
+					if (baseMeta.invokeMethod("isUpgraded").get(boolean.class) != baseRef.invokeMethod("isUpgraded").get(boolean.class))
+						return false;
 				} else {
-					if (baseRef.invokeMethod("isExtended").get(boolean.class) && (baseMeta == null || !baseMeta.invokeMethod("isExtended").get(boolean.class))) return false;
-					if (baseRef.invokeMethod("isUpgraded").get(boolean.class) && (baseMeta == null || !baseMeta.invokeMethod("isUpgraded").get(boolean.class))) return false;
+					if (baseRef.invokeMethod("isExtended").get(boolean.class) && (baseMeta == null || !baseMeta.invokeMethod("isExtended").get(boolean.class)))
+						return false;
+					if (baseRef.invokeMethod("isUpgraded").get(boolean.class) && (baseMeta == null || !baseMeta.invokeMethod("isUpgraded").get(boolean.class)))
+						return false;
 				}
 			} catch (Throwable exception) {
 				GCore.inst().getMainLogger().error("Could not check potion meta", exception);
@@ -81,18 +94,24 @@ public final class MetaPotion {
 
 		// color
 		if (Version.ATLEAST_1_12) {
-			if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getColor(), reference.getPotionColor()))) return false;
-			else if (!check.isExact() && reference.getPotionColor() != null && (meta == null || reference.getPotionColor().equals(meta.getColor()))) return false;
+			if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getColor(), reference.getPotionColor())))
+				return false;
+			else if (!check.isExact() && reference.getPotionColor() != null && (meta == null || reference.getPotionColor().equals(meta.getColor())))
+				return false;
 		}
 
 		// effects
 		if (check.isExact()) {
-			if (meta.hasCustomEffects() != reference.hasPotionCustomEffects() || meta.getCustomEffects().size() != reference.getPotionCustomEffects().size()) return false;
+			if (meta.hasCustomEffects() != reference.hasPotionCustomEffects() || meta.getCustomEffects().size() != reference.getPotionCustomEffects().size())
+				return false;
 		} else {
-			if (reference.hasPotionCustomEffects() && (meta == null || !meta.hasCustomEffects())) return false;
+			if (reference.hasPotionCustomEffects() && (meta == null || !meta.hasCustomEffects()))
+				return false;
 		}
 		for (PotionEffect refEffect : reference.getPotionCustomEffects()) {
-			if (!meta.getCustomEffects().stream().anyMatch(metaEffect -> metaEffect.getType().equals(refEffect.getType()))) {  // just check type ; extended/upgraded will have been checked above
+			if (!meta.getCustomEffects().stream().anyMatch(metaEffect -> metaEffect.getType().equals(refEffect.getType()))) { // just check type ;
+																																// extended/upgraded will have
+																																// been checked above
 				return false;
 			}
 		}
@@ -110,8 +129,10 @@ public final class MetaPotion {
 			} else if (Version.ATLEAST_1_9) {
 				final ReflectionObject base = ReflectionObject.of(meta).invokeMethod("getBasePotionData");
 				writer.write("potionType", base.invokeMethod("getType").get());
-				if (base.invokeMethod("isExtended").get(boolean.class)) writer.write("extended", true);
-				if (base.invokeMethod("isUpgraded").get(boolean.class)) writer.write("upgraded", true);
+				if (base.invokeMethod("isExtended").get(boolean.class))
+					writer.write("extended", true);
+				if (base.invokeMethod("isUpgraded").get(boolean.class))
+					writer.write("upgraded", true);
 			}
 			// color
 			if (Version.ATLEAST_1_12) {
@@ -142,7 +163,8 @@ public final class MetaPotion {
 				if (type != null && !Version.ATLEAST_1_20_5) {
 					Boolean extended = reader.readBoolean("extended");
 					Boolean upgraded = reader.readBoolean("upgraded");
-					final Object potionData = Reflection.newInstance(Class.forName("org.bukkit.potion.PotionData"), type, extended != null && extended, upgraded != null && upgraded).get();
+					final Object potionData = Reflection
+							.newInstance(Class.forName("org.bukkit.potion.PotionData"), type, extended != null && extended, upgraded != null && upgraded).get();
 					ReflectionObject.of(meta).invokeMethod("setBasePotionData", potionData);
 				}
 			}
@@ -175,10 +197,12 @@ public final class MetaPotion {
 				hasNextRow = true;
 			}
 			if (Version.ATLEAST_1_12) {
-				item.addColor("color", Need.optional(), hasNextRow ? SlotPlacement.ANY : SlotPlacement.START_ROW, TextEditorGeneric.descriptionItemLeatherArmorColor);
+				item.addColor("color", Need.optional(), hasNextRow ? SlotPlacement.ANY : SlotPlacement.START_ROW,
+						TextEditorGeneric.descriptionItemLeatherArmorColor);
 				hasNextRow = true;
 			}
-			item.addPotionEffectList("custom_effects", Need.optional(), hasNextRow ? SlotPlacement.ANY : SlotPlacement.START_ROW, TextEditorGeneric.descriptionItemPotionCustomEffects);
+			item.addPotionEffectList("custom_effects", Need.optional(), hasNextRow ? SlotPlacement.ANY : SlotPlacement.START_ROW,
+					TextEditorGeneric.descriptionItemPotionCustomEffects);
 		}
 	}
 
@@ -220,19 +244,19 @@ public final class MetaPotion {
 			} else if (Version.ATLEAST_1_9) {
 				try {
 					final ReflectionObject base = ReflectionObject.of(meta).invokeMethod("getBasePotionData");
-					item.getElementAs("potion_type", ElementPotionType.class).setValue(CollectionUtils.asList(base.invokeMethod("getType").invokeMethod("name").get(String.class)));
-					item.getElementAs("potion_extra", ElementPotionExtra.class).setValue(
-						base.invokeMethod("isExtended").get(boolean.class)
-							? CollectionUtils.asList(PotionExtra.EXTENDED.name())
-							: (base.invokeMethod("isUpgraded").get(boolean.class) ? CollectionUtils.asList(PotionExtra.UPGRADED.name()) : null)
-						);
+					item.getElementAs("potion_type", ElementPotionType.class)
+							.setValue(CollectionUtils.asList(base.invokeMethod("getType").invokeMethod("name").get(String.class)));
+					item.getElementAs("potion_extra", ElementPotionExtra.class)
+							.setValue(base.invokeMethod("isExtended").get(boolean.class) ? CollectionUtils.asList(PotionExtra.EXTENDED.name())
+									: (base.invokeMethod("isUpgraded").get(boolean.class) ? CollectionUtils.asList(PotionExtra.UPGRADED.name()) : null));
 				} catch (Throwable exception) {
 					GCore.inst().getMainLogger().error("Could not import potion meta", exception);
 					return;
 				}
 			}
 			if (Version.ATLEAST_1_12) {
-				item.getElementAs("color", ElementColor.class).setValue(meta.hasColor() ? CollectionUtils.asList(Serializer.COLOR.serialize(meta.getColor())) : null);
+				item.getElementAs("color", ElementColor.class)
+						.setValue(meta.hasColor() ? CollectionUtils.asList(Serializer.COLOR.serialize(meta.getColor())) : null);
 			}
 			ElementPotionEffectList list = item.getElementAs("custom_effects");
 			list.clear();

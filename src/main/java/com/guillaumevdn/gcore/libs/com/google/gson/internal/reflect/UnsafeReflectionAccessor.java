@@ -43,9 +43,8 @@ final class UnsafeReflectionAccessor extends ReflectionAccessor {
         // unsafe couldn't be found, so try using accessible anyway
         ao.setAccessible(true);
       } catch (SecurityException e) {
-        throw new JsonIOException("Gson couldn't modify fields for " + ao
-          + "\nand sun.misc.Unsafe not found.\nEither write a custom type adapter,"
-          + " or make fields accessible, or include sun.misc.Unsafe.", e);
+        throw new JsonIOException("Gson couldn't modify fields for " + ao + "\nand sun.misc.Unsafe not found.\nEither write a custom type adapter,"
+            + " or make fields accessible, or include sun.misc.Unsafe.", e);
       }
     }
   }
@@ -55,8 +54,8 @@ final class UnsafeReflectionAccessor extends ReflectionAccessor {
     if (theUnsafe != null && overrideField != null) {
       try {
         Method method = unsafeClass.getMethod("objectFieldOffset", Field.class);
-        long overrideOffset = (Long) method.invoke(theUnsafe, overrideField);  // long overrideOffset = theUnsafe.objectFieldOffset(overrideField);
-        Method putBooleanMethod = unsafeClass.getMethod("putBoolean",  Object.class, long.class, boolean.class);
+        long overrideOffset = (Long) method.invoke(theUnsafe, overrideField); // long overrideOffset = theUnsafe.objectFieldOffset(overrideField);
+        Method putBooleanMethod = unsafeClass.getMethod("putBoolean", Object.class, long.class, boolean.class);
         putBooleanMethod.invoke(theUnsafe, ao, overrideOffset, true); // theUnsafe.putBoolean(ao, overrideOffset, true);
         return true;
       } catch (Exception ignored) { // do nothing
@@ -83,4 +82,5 @@ final class UnsafeReflectionAccessor extends ReflectionAccessor {
       return null;
     }
   }
+
 }

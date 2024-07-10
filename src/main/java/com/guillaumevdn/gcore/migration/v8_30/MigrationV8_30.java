@@ -26,7 +26,7 @@ public final class MigrationV8_30 extends MigrationNextMinor {
 				if (!config.contains(path)) {
 					config.write(path + ".name", "XP");
 					config.write(path + ".format_multiplier", 1d);
-					config.write(path + ".format_decimal_precision", 0);  // all three currencies are integers
+					config.write(path + ".format_decimal_precision", 0); // all three currencies are integers
 					config.write(path + ".format_single", "{amount} XP");
 					config.write(path + ".format_multiple", "{amount} XP");
 					config.write(path + ".icon.type", "PAPER");

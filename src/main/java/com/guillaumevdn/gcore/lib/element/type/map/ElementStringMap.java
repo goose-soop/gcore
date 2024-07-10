@@ -31,7 +31,7 @@ public class ElementStringMap extends MapElement<String, ElementString> implemen
 	@Override
 	public ElementString createElement(String elementId) {
 		ElementString elem = new ElementString(this, elementId, Need.optional(), null);
-		elem.setValue(CollectionUtils.asList("value"));  // set a value to force it to save
+		elem.setValue(CollectionUtils.asList("value")); // set a value to force it to save
 		return elem;
 	}
 

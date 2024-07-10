@@ -26,6 +26,7 @@ import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonReader;
 import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonWriter;
 
 final class TypeAdapterRuntimeTypeWrapper<T> extends TypeAdapter<T> {
+
   private final Gson context;
   private final TypeAdapter<T> delegate;
   private final Type type;
@@ -41,7 +42,6 @@ final class TypeAdapterRuntimeTypeWrapper<T> extends TypeAdapter<T> {
     return delegate.read(in);
   }
 
-  
   @Override
   public void write(JsonWriter out, T value) throws IOException {
     // Order of preference for choosing type adapters
@@ -73,10 +73,10 @@ final class TypeAdapterRuntimeTypeWrapper<T> extends TypeAdapter<T> {
    * Finds a compatible runtime type if it is more specific
    */
   private Type getRuntimeTypeIfMoreSpecific(Type type, Object value) {
-    if (value != null
-        && (type == Object.class || type instanceof TypeVariable<?> || type instanceof Class<?>)) {
+    if (value != null && (type == Object.class || type instanceof TypeVariable<?> || type instanceof Class<?>)) {
       type = value.getClass();
     }
     return type;
   }
+
 }

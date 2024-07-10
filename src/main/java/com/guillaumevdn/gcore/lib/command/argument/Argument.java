@@ -47,6 +47,7 @@ public abstract class Argument<T> extends UsageRestriction implements Arg {
 
 	// ----- do
 	public abstract T consume(CommandCall call);
+
 	public abstract List<String> tabComplete(CommandCall call);
 
 }

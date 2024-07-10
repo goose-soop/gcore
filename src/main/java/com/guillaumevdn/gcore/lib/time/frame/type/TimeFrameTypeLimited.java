@@ -38,8 +38,10 @@ public class TimeFrameTypeLimited extends TimeFrameType {
 			return null;
 		}
 		// invalid bounds
-		TimeInYear startTime = frame.getElement("start").orNull().readContains() ? frame.getElementAs("start", ElementTimeInYear.class).parse(replacer).orNull() : null;
-		TimeInYear endTime = frame.getElement("end").orNull().readContains() ? frame.getElementAs("end", ElementTimeInYear.class).parse(replacer).orNull() : null;
+		TimeInYear startTime = frame.getElement("start").orNull().readContains() ? frame.getElementAs("start", ElementTimeInYear.class).parse(replacer).orNull()
+				: null;
+		TimeInYear endTime = frame.getElement("end").orNull().readContains() ? frame.getElementAs("end", ElementTimeInYear.class).parse(replacer).orNull()
+				: null;
 		if (startTime == null || endTime == null) {
 			return null;
 		}

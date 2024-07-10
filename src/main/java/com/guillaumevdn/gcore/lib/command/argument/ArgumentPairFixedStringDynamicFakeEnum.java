@@ -27,7 +27,8 @@ public class ArgumentPairFixedStringDynamicFakeEnum<E> extends PartialArgument<E
 	private Map<String, E> serializedValues;
 	private List<String> tabComplete;
 
-	public ArgumentPairFixedStringDynamicFakeEnum(NeedType need, boolean playerOnly, Permission permission, Text usage, List<String> fixedStrings, Class<E> typeClass, Supplier<List<E>> valuesSupplier) {
+	public ArgumentPairFixedStringDynamicFakeEnum(NeedType need, boolean playerOnly, Permission permission, Text usage, List<String> fixedStrings,
+			Class<E> typeClass, Supplier<List<E>> valuesSupplier) {
 		super(need, playerOnly, permission, usage);
 		this.fixedStrings = fixedStrings;
 		this.valuesSupplier = valuesSupplier;
@@ -64,7 +65,8 @@ public class ArgumentPairFixedStringDynamicFakeEnum<E> extends PartialArgument<E
 		refetchValues();
 
 		for (int i = 0; i < call.getArguments().size(); ++i) {
-			if (i + 1 >= call.getArguments().size()) break;
+			if (i + 1 >= call.getArguments().size())
+				break;
 			String string = call.getArguments().get(i);
 			if (fixedStrings.contains(string.toLowerCase())) {
 				E value = exactMatch(call, call.getArguments().get(i + 1));

@@ -24,15 +24,23 @@ import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
 public interface ItemReference {
 
 	boolean isVoid();
+
 	Mat getType();
+
 	int getDurability();
+
 	int getCustomModelData();
+
 	boolean isUnbreakable();
+
 	boolean hasEnchants();
+
 	Map<Enchantment, Integer> getEnchants();
+
 	List<ItemFlag> getFlags();
 
 	String getDisplayName();
+
 	List<String> getLore();
 
 	NBTItem getNBTItem() throws Throwable;
@@ -42,30 +50,37 @@ public interface ItemReference {
 	// ----- BookMeta
 
 	boolean hasAuthor();
+
 	String getAuthor();
 
 	boolean hasTitle();
+
 	String getTitle();
 
 	boolean hasGeneration();
+
 	<T> T getGeneration();
 
 	boolean hasPages();
+
 	List<String> getPages();
 
 	// ----- EnchantmentStorageMeta
 
 	boolean hasStoredEnchants();
+
 	Map<Enchantment, Integer> getStoredEnchants();
 
 	// ----- FireworkEffectMeta
 
 	boolean hasEffect();
+
 	FireworkEffect getEffect();
 
 	// ----- FireworkMeta
 
 	boolean hasEffects();
+
 	List<FireworkEffect> getEffects();
 
 	// ----- LeatherArmorMeta
@@ -75,18 +90,23 @@ public interface ItemReference {
 	// ----- PotionMeta
 
 	<T> T getBasePotionDataOrType();
+
 	Color getPotionColor();
+
 	boolean hasPotionCustomEffects();
+
 	List<PotionEffect> getPotionCustomEffects();
 
 	// ----- SkullMeta
 
 	boolean hasOwner();
+
 	String getOwner();
 
 	// ----- org.bukkit.inventory.meta.BannerMeta
 
 	DyeColor getBaseColor();
+
 	<T> T getPatterns();
 
 	// ----- SpawnEggMeta
@@ -96,23 +116,29 @@ public interface ItemReference {
 	// ----- org.bukkit.inventory.meta.KnowledgeBookMeta
 
 	boolean hasRecipes();
+
 	<T> T getRecipes();
 
 	// ----- org.bukkit.inventory.meta.TropicalFishBucketMeta
 
 	boolean hasVariant();
+
 	DyeColor getBodyColor();
+
 	DyeColor getPatternColor();
+
 	<T> T getPattern();
 
 	// ----- org.bukkit.inventory.meta.CrossbowMeta
 
 	boolean hasChargedProjectiles();
+
 	List<ItemStack> getChargedProjectiles();
 
 	// ----- org.bukkit.inventory.meta.SuspiciousStewMeta
 
 	boolean hasSuspiciousCustomEffects();
+
 	List<PotionEffect> getSuspiciousCustomEffects();
 
 	// ----- static
@@ -125,7 +151,8 @@ public interface ItemReference {
 		if (!element.getType().readContains()) {
 			return new ItemReferenceElementNoType(element, replacer);
 		}
-		ItemStack item = element.parse(replacer).orNull();  // if type was written in config, MUST be valid configuration ; if can't parse, still return a no type version, they'll have to investigate then
+		ItemStack item = element.parse(replacer).orNull(); // if type was written in config, MUST be valid configuration ; if can't parse, still return a no
+															// type version, they'll have to investigate then
 		if (item == null) {
 			return new ItemReferenceElementNoType(element, replacer);
 		}

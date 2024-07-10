@@ -22,7 +22,7 @@ public class RWWrapper<T> {
 
 	public T getOr(Supplier<T> def) {
 		T value = get();
-		return value != null ? value : def.get();  // run supplier outside of lock
+		return value != null ? value : def.get(); // run supplier outside of lock
 	}
 
 	// ----- set

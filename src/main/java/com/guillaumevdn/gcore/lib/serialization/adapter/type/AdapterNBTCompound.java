@@ -144,7 +144,8 @@ public final class AdapterNBTCompound extends DataAdapter<NBTCompound> {
 			}
 		}
 		NBTList list = new NBTList(parent, name, depth, NBTType.createListTag(type));
-		final NBTType tt = type; ConfigGCore.logspamItemNbt(list, () -> "List " + name + ", type " + tt);
+		final NBTType tt = type;
+		ConfigGCore.logspamItemNbt(list, () -> "List " + name + ", type " + tt);
 		// list of list
 		if (type.equals(NBTType.LIST)) {
 			for (int index = 0; index < reading.size(); ++index) {
@@ -155,14 +156,16 @@ public final class AdapterNBTCompound extends DataAdapter<NBTCompound> {
 		else if (type.equals(NBTType.COMPOUND)) {
 			for (int index = 0; index < reading.size(); ++index) {
 				NBTCompound comp = readCompound(list, "" + index, depth + 1, (DataIO) reading.get(index));
-				final int i = index; ConfigGCore.logspamItemNbt(list, () -> " Read compound " + i + " with keys " + comp.getKeys());
+				final int i = index;
+				ConfigGCore.logspamItemNbt(list, () -> " Read compound " + i + " with keys " + comp.getKeys());
 				list.addCompound(comp);
 			}
 		}
 		// list of values
 		else if (!type.equals(NBTType.UNKNOWN)) {
 			for (int index = 0; index < reading.size(); ++index) {
-				final int i = index; ConfigGCore.logspamItemNbt(list, () -> " Read value " + i + " : " + reading.get(i));
+				final int i = index;
+				ConfigGCore.logspamItemNbt(list, () -> " Read value " + i + " : " + reading.get(i));
 				list.add(type, reading.get(index));
 			}
 		}

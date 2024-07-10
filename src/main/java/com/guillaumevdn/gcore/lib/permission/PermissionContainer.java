@@ -29,13 +29,15 @@ public abstract class PermissionContainer {
 	}
 
 	public final Permission getAdminPermission() {
-		if (admin == null) throw new IllegalStateException();
+		if (admin == null)
+			throw new IllegalStateException();
 		return admin;
 	}
 
 	// ----- set
 	public final Permission setAdmin(String name) {
-		if (admin != null) throw new IllegalStateException();
+		if (admin != null)
+			throw new IllegalStateException();
 		return admin = set(name);
 	}
 

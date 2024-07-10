@@ -22,10 +22,8 @@ public class TimeFrameTypeNone extends TimeFrameType {
 	@Override
 	public Pair<ZonedDateTime, ZonedDateTime> getBounds(ElementTimeFrame frame, Replacer replacer, int offset) {
 		// 10 years ought to be enough
-		return Pair.of(
-				ConfigGCore.timeNow().minusYears(10L).withHour(0).withMinute(0).withSecond(0),
-				ConfigGCore.timeNow().plusYears(10L).withHour(23).withMinute(59).withSecond(59)
-				);
+		return Pair.of(ConfigGCore.timeNow().minusYears(10L).withHour(0).withMinute(0).withSecond(0),
+				ConfigGCore.timeNow().plusYears(10L).withHour(23).withMinute(59).withSecond(59));
 	}
 
 }

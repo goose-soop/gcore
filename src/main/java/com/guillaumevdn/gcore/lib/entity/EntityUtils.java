@@ -26,6 +26,7 @@ import com.guillaumevdn.gcore.lib.number.NumberUtils;
  * @author GuillaumeVDN
  */
 public final class EntityUtils {
+
 	public static final EntityType ENTITY_TYPE_FIREWORK_ROCKET;
 	public static final EntityType ENTITY_TYPE_END_CRYSTAL;
 
@@ -53,7 +54,8 @@ public final class EntityUtils {
 		List<Entity> entities = new ArrayList<>();
 		for (Entity entity : center.getWorld().getEntities()) {
 			Location loc = entity.getLocation();
-			if (Math.abs(center.getX() - loc.getX()) <= range && Math.abs(center.getY() - loc.getY()) <= range && Math.abs(center.getZ() - loc.getZ()) <= range && (validator == null || validator.apply(entity))) {
+			if (Math.abs(center.getX() - loc.getX()) <= range && Math.abs(center.getY() - loc.getY()) <= range && Math.abs(center.getZ() - loc.getZ()) <= range
+					&& (validator == null || validator.apply(entity))) {
 				entities.add(entity);
 			}
 		}
@@ -104,13 +106,10 @@ public final class EntityUtils {
 	public static void spawnRandomFirework(Location location) {
 		Firework firework = (Firework) location.getWorld().spawnEntity(location, ENTITY_TYPE_FIREWORK_ROCKET);
 		FireworkMeta meta = firework.getFireworkMeta();
-		meta.addEffect(FireworkEffect.builder()
-				.with(CollectionUtils.randomArray(FireworkEffect.Type.values()))
+		meta.addEffect(FireworkEffect.builder().with(CollectionUtils.randomArray(FireworkEffect.Type.values()))
 				.withColor(Color.fromRGB(NumberUtils.random(0, 255), NumberUtils.random(0, 255), NumberUtils.random(0, 255)))
-				.withFade(Color.fromRGB(NumberUtils.random(0, 255), NumberUtils.random(0, 255), NumberUtils.random(0, 255)))
-				.trail(NumberUtils.random())
-				.flicker(NumberUtils.random())
-				.build());
+				.withFade(Color.fromRGB(NumberUtils.random(0, 255), NumberUtils.random(0, 255), NumberUtils.random(0, 255))).trail(NumberUtils.random())
+				.flicker(NumberUtils.random()).build());
 		firework.setFireworkMeta(meta);
 	}
 

@@ -5,8 +5,6 @@ package com.guillaumevdn.gcore.lib.serialization.data;
  */
 public enum DataType {
 
-	OBJECT,
-	LIST,
-	VALUE;
+	OBJECT, LIST, VALUE;
 
 }

@@ -65,8 +65,7 @@ public final class BossbarCompat {
 				FakeDragon instance = new FakeDragon(bossbar, player);
 				instance.sendSpawn();
 				bossbar.getInstances().put(player, ReflectionObject.of(instance));
-			})
-			.setIf(Version.ATLEAST_1_9, (bossbar, player) -> {
+			}).setIf(Version.ATLEAST_1_9, (bossbar, player) -> {
 				getModernInstance(bossbar, player).invokeMethod("addPlayer", player);
 			});
 
@@ -81,8 +80,7 @@ public final class BossbarCompat {
 				if (instance != null) {
 					instance.get(FakeDragon.class).sendDestroy();
 				}
-			})
-			.setIf(Version.ATLEAST_1_9, (bossbar, player) -> {
+			}).setIf(Version.ATLEAST_1_9, (bossbar, player) -> {
 				forExistingModernInstance(bossbar, instance -> {
 					instance.invokeMethod("removePlayer", player);
 				});
@@ -93,83 +91,78 @@ public final class BossbarCompat {
 	}
 
 	// ----- set title
-	private static final ReflectionProcedureConsumer<Bossbar> SET_TITLE = new ReflectionProcedureConsumer<Bossbar>()
-			.set((bossbar) -> {
-				refreshExistingLegacyInstance(bossbar);
-			})
-			.setIf(Version.ATLEAST_1_9, (bossbar) -> {
-				forExistingModernInstance(bossbar, instance -> {
-					instance.invokeMethod("setTitle", bossbar.getTitle());
-				});
-			});
+	private static final ReflectionProcedureConsumer<Bossbar> SET_TITLE = new ReflectionProcedureConsumer<Bossbar>().set((bossbar) -> {
+		refreshExistingLegacyInstance(bossbar);
+	}).setIf(Version.ATLEAST_1_9, (bossbar) -> {
+		forExistingModernInstance(bossbar, instance -> {
+			instance.invokeMethod("setTitle", bossbar.getTitle());
+		});
+	});
 
 	public static void setTitle(Bossbar bossbar) {
 		SET_TITLE.process(bossbar);
 	}
 
 	// ----- set progress
-	private static final ReflectionProcedureConsumer<Bossbar> SET_PROGRESS = new ReflectionProcedureConsumer<Bossbar>()
-			.set((bossbar) -> {
-				refreshExistingLegacyInstance(bossbar);
-			})
-			.setIf(Version.ATLEAST_1_9, (bossbar) -> {
-				forExistingModernInstance(bossbar, instance -> {
-					instance.invokeMethod("setProgress", bossbar.getProgress());
-				});
-			});
+	private static final ReflectionProcedureConsumer<Bossbar> SET_PROGRESS = new ReflectionProcedureConsumer<Bossbar>().set((bossbar) -> {
+		refreshExistingLegacyInstance(bossbar);
+	}).setIf(Version.ATLEAST_1_9, (bossbar) -> {
+		forExistingModernInstance(bossbar, instance -> {
+			instance.invokeMethod("setProgress", bossbar.getProgress());
+		});
+	});
 
 	public static void setProgress(Bossbar bossbar) {
 		SET_PROGRESS.process(bossbar);
 	}
 
 	// ----- set color
-	private static final ReflectionProcedureConsumer<Bossbar> SET_COLOR = new ReflectionProcedureConsumer<Bossbar>()
-			.setIf(Version.ATLEAST_1_9, (bossbar) -> {
-				forExistingModernInstance(bossbar, instance -> {
-					Object style = Reflection.getEnum("org.bukkit.boss.BarColor").valueOf(bossbar.getColor().name()).justGet();
-					instance.invokeMethod("setColor", style);
-				});
-			});
+	private static final ReflectionProcedureConsumer<Bossbar> SET_COLOR = new ReflectionProcedureConsumer<Bossbar>().setIf(Version.ATLEAST_1_9, (bossbar) -> {
+		forExistingModernInstance(bossbar, instance -> {
+			Object style = Reflection.getEnum("org.bukkit.boss.BarColor").valueOf(bossbar.getColor().name()).justGet();
+			instance.invokeMethod("setColor", style);
+		});
+	});
 
 	public static void setColor(Bossbar bossbar) {
 		SET_COLOR.process(bossbar);
 	}
 
 	// ----- set style
-	private static final ReflectionProcedureConsumer<Bossbar> SET_STYLE = new ReflectionProcedureConsumer<Bossbar>()
-			.setIf(Version.ATLEAST_1_9, (bossbar) -> {
-				forExistingModernInstance(bossbar, instance -> {
-					Object style = Reflection.getEnum("org.bukkit.boss.BarStyle").valueOf(bossbar.getStyle().name()).justGet();
-					instance.invokeMethod("setStyle", style);
-				});
-			});
+	private static final ReflectionProcedureConsumer<Bossbar> SET_STYLE = new ReflectionProcedureConsumer<Bossbar>().setIf(Version.ATLEAST_1_9, (bossbar) -> {
+		forExistingModernInstance(bossbar, instance -> {
+			Object style = Reflection.getEnum("org.bukkit.boss.BarStyle").valueOf(bossbar.getStyle().name()).justGet();
+			instance.invokeMethod("setStyle", style);
+		});
+	});
 
 	public static void setStyle(Bossbar bossbar) {
 		SET_STYLE.process(bossbar);
 	}
 
 	// ----- set flags
-	private static final ReflectionProcedureConsumer<Bossbar> SET_FLAGS = new ReflectionProcedureConsumer<Bossbar>()
-			.setIf(Version.ATLEAST_1_9, (bossbar) -> {
-				forExistingModernInstance(bossbar, instance -> {
-					for (BossbarFlag bossbarFlag : BossbarFlag.values()) {
-						Object flag = Reflection.getEnum("org.bukkit.boss.BarFlag").valueOf(bossbarFlag.name()).justGet();
-						instance.invokeMethod(bossbar.getFlags().contains(bossbarFlag) ? "addFlag" : "removeFlag", flag);
-					}
-				});
-			});
+	private static final ReflectionProcedureConsumer<Bossbar> SET_FLAGS = new ReflectionProcedureConsumer<Bossbar>().setIf(Version.ATLEAST_1_9, (bossbar) -> {
+		forExistingModernInstance(bossbar, instance -> {
+			for (BossbarFlag bossbarFlag : BossbarFlag.values()) {
+				Object flag = Reflection.getEnum("org.bukkit.boss.BarFlag").valueOf(bossbarFlag.name()).justGet();
+				instance.invokeMethod(bossbar.getFlags().contains(bossbarFlag) ? "addFlag" : "removeFlag", flag);
+			}
+		});
+	});
 
 	public static void setFlags(Bossbar bossbar) {
 		SET_FLAGS.process(bossbar);
 	}
 
 	// ----- send temporary
-	public static Bossbar sendTemp(GPlugin plugin, String title, BossbarColor color, BossbarStyle style, Collection<BossbarFlag> flags, Collection<Player> players, long millis, Double noAutoProgressForceProgress) {
+	public static Bossbar sendTemp(GPlugin plugin, String title, BossbarColor color, BossbarStyle style, Collection<BossbarFlag> flags,
+			Collection<Player> players, long millis, Double noAutoProgressForceProgress) {
 		int ticks = (int) (millis / 50L);
 		return ticks <= 0 ? null : sendTemp(plugin, title, color, style, flags, players, ticks, noAutoProgressForceProgress);
 	}
 
-	public static Bossbar sendTemp(GPlugin plugin, String title, BossbarColor color, BossbarStyle style, Collection<BossbarFlag> flags, Collection<Player> players, int ticks, Double noAutoProgressForceProgress) {
+	public static Bossbar sendTemp(GPlugin plugin, String title, BossbarColor color, BossbarStyle style, Collection<BossbarFlag> flags,
+			Collection<Player> players, int ticks, Double noAutoProgressForceProgress) {
 		Bossbar bossbar = new Bossbar(plugin, "temp_" + UUID.randomUUID(), title, color, style, flags, 1f, players);
 		bossbar.startTemp(ticks, noAutoProgressForceProgress);
 		return bossbar;

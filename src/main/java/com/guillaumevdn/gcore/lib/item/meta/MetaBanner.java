@@ -32,14 +32,19 @@ import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
 public final class MetaBanner {
 
 	public static boolean match(ItemMeta itemMeta, ItemReference reference, ItemCheck check) {
-		if (!reference.hasMeta(BannerMeta.class)) return true;
-		BannerMeta meta = ObjectUtils.castOrNull(itemMeta, BannerMeta.class);  // might be null if exact match is false
+		if (!reference.hasMeta(BannerMeta.class))
+			return true;
+		BannerMeta meta = ObjectUtils.castOrNull(itemMeta, BannerMeta.class); // might be null if exact match is false
 
 		// base color (<1.13, now stored as material type)
 		if (!Version.ATLEAST_1_13) {
 			try {
-				if (check.isExact() && (meta == null || !Objects.deepEquals(ReflectionObject.of(meta).invokeMethod("getBaseColor").justGet(), reference.getBaseColor()))) return false;
-				else if (!check.isExact() && reference.getBaseColor() != null && (meta == null || !Objects.deepEquals(ReflectionObject.of(meta).invokeMethod("getBaseColor").justGet(), reference.getBaseColor()))) return false;
+				if (check.isExact()
+						&& (meta == null || !Objects.deepEquals(ReflectionObject.of(meta).invokeMethod("getBaseColor").justGet(), reference.getBaseColor())))
+					return false;
+				else if (!check.isExact() && reference.getBaseColor() != null
+						&& (meta == null || !Objects.deepEquals(ReflectionObject.of(meta).invokeMethod("getBaseColor").justGet(), reference.getBaseColor())))
+					return false;
 			} catch (Throwable e) {
 				GCore.inst().getMainLogger().error("Could not check potion meta", e);
 				return false;
@@ -48,10 +53,12 @@ public final class MetaBanner {
 
 		// patterns
 		if (check.isExact()) {
-			if (!CollectionUtils.contentEquals(meta.getPatterns(), reference.getPatterns())) return false;
+			if (!CollectionUtils.contentEquals(meta.getPatterns(), reference.getPatterns()))
+				return false;
 		} else {
 			List<Pattern> refPatterns = reference.getPatterns();
-			if (refPatterns != null && !refPatterns.isEmpty() && (meta == null || meta.getPatterns() == null)) return false;
+			if (refPatterns != null && !refPatterns.isEmpty() && (meta == null || meta.getPatterns() == null))
+				return false;
 			main: for (Pattern refPattern : refPatterns) {
 				for (Pattern pattern : meta.getPatterns()) {
 					if (pattern.equals(refPattern)) {
@@ -107,7 +114,8 @@ public final class MetaBanner {
 			if (!Version.ATLEAST_1_13) {
 				item.addDyeColor("base_color", Need.optional(), SlotPlacement.START_ROW, TextEditorGeneric.descriptionItemBannerBaseColor);
 			}
-			item.addPatternTypeColorMap("patterns", Need.optional(), Version.ATLEAST_1_13 ? SlotPlacement.START_ROW : SlotPlacement.ANY, TextEditorGeneric.descriptionItemBannerPatterns);
+			item.addPatternTypeColorMap("patterns", Need.optional(), Version.ATLEAST_1_13 ? SlotPlacement.START_ROW : SlotPlacement.ANY,
+					TextEditorGeneric.descriptionItemBannerPatterns);
 		}
 	}
 
@@ -130,7 +138,8 @@ public final class MetaBanner {
 		if (meta != null) {
 			if (!Version.ATLEAST_1_13) {
 				try {
-					item.getElementAs("base_color", ElementDyeColor.class).setValue(CollectionUtils.asList(ReflectionObject.of(meta).invokeMethod("getBaseColor").invokeMethod("name").get(String.class)));
+					item.getElementAs("base_color", ElementDyeColor.class)
+							.setValue(CollectionUtils.asList(ReflectionObject.of(meta).invokeMethod("getBaseColor").invokeMethod("name").get(String.class)));
 				} catch (Throwable e) {
 					GCore.inst().getMainLogger().error("Could not import potion meta", e);
 				}

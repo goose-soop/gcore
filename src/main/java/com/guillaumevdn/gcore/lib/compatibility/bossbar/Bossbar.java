@@ -28,7 +28,8 @@ public final class Bossbar {
 	private double progress;
 	private Set<Player> players;
 
-	public Bossbar(GPlugin plugin, String id, String title, BossbarColor color, BossbarStyle style, Collection<BossbarFlag> flags, double progress, Collection<Player> players) {
+	public Bossbar(GPlugin plugin, String id, String title, BossbarColor color, BossbarStyle style, Collection<BossbarFlag> flags, double progress,
+			Collection<Player> players) {
 		this.plugin = plugin;
 		this.id = id;
 		this.title = title.length() > 64 ? title.substring(0, 64) : title;

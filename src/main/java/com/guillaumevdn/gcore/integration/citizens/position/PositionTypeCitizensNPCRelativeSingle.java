@@ -35,7 +35,8 @@ public class PositionTypeCitizensNPCRelativeSingle extends PositionTypeCitizensN
 	// ----- parse
 	@Override
 	protected Position doParse(ElementPosition position, NPC npc, Replacer replacer) throws ParsingError {
-		Location location = position.getElementAs("location", ElementRelativeLocation.class).parseNoCatchOrThrowParsingNull(replacer.cloneReplacer().with(npc.getEntity().getLocation()));
+		Location location = position.getElementAs("location", ElementRelativeLocation.class)
+				.parseNoCatchOrThrowParsingNull(replacer.cloneReplacer().with(npc.getEntity().getLocation()));
 		PointTolerance pointTolerance = position.getElementAs("point_tolerance", ElementPointTolerance.class).parseNoCatchOrThrowParsingNull(replacer);
 		return new PositionSingle(location, pointTolerance);
 	}

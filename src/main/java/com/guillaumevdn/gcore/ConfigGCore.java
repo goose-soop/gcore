@@ -116,7 +116,8 @@ public class ConfigGCore extends GPluginConfig {
 	public static void logspamItemNbt(NBTBase nbt, ThrowableSupplier<String> line, boolean prefix) {
 		if (logspamItemNbt) {
 			try {
-				Bukkit.getConsoleSender().sendMessage((prefix ? LogLevel.DEBUG.getConsoleColor() + "[GCore] " : "") + (nbt == null ? "" : StringUtils.repeatString(">", nbt.getDepth() + 1) + " ") + line.get());
+				Bukkit.getConsoleSender().sendMessage((prefix ? LogLevel.DEBUG.getConsoleColor() + "[GCore] " : "")
+						+ (nbt == null ? "" : StringUtils.repeatString(">", nbt.getDepth() + 1) + " ") + line.get());
 			} catch (Throwable exception) {
 				GCore.inst().getMainLogger().error("Couldn't logspam item/nbt on nbt " + nbt, exception);
 			}
@@ -147,15 +148,22 @@ public class ConfigGCore extends GPluginConfig {
 		baseConfig = GCore.inst().loadConfigurationFile("config.yml");
 
 		// commands aliases
-		genericCommandsAliasesReload = CollectionUtils.asLowercaseList(baseConfig.readStringList("generic_commands_aliases.reload", CollectionUtils.asList("reload", "rl")));
-		genericCommandsAliasesPluginState = CollectionUtils.asLowercaseList(baseConfig.readStringList("generic_commands_aliases.pluginstate", CollectionUtils.asList("pluginstate", "plstate")));
-		genericCommandsAliasesMigrate = CollectionUtils.asLowercaseList(baseConfig.readStringList("generic_commands_aliases.migrate", CollectionUtils.asList("migrate")));
+		genericCommandsAliasesReload = CollectionUtils
+				.asLowercaseList(baseConfig.readStringList("generic_commands_aliases.reload", CollectionUtils.asList("reload", "rl")));
+		genericCommandsAliasesPluginState = CollectionUtils
+				.asLowercaseList(baseConfig.readStringList("generic_commands_aliases.pluginstate", CollectionUtils.asList("pluginstate", "plstate")));
+		genericCommandsAliasesMigrate = CollectionUtils
+				.asLowercaseList(baseConfig.readStringList("generic_commands_aliases.migrate", CollectionUtils.asList("migrate")));
 		commandsAliasesPlugins = CollectionUtils.asLowercaseList(baseConfig.readMandatoryStringList("commands_aliases.plugins"));
 		commandsAliasesPlugins = CollectionUtils.asLowercaseList(baseConfig.readMandatoryStringList("commands_aliases.plugins"));
-		commandsAliasesItemRead = CollectionUtils.asLowercaseList(baseConfig.readStringList("commands_aliases.itemread", CollectionUtils.asList("itemread", "ir")));
-		commandsAliasesItemReadChat = CollectionUtils.asLowercaseList(baseConfig.readStringList("commands_aliases.itemreadchat", CollectionUtils.asList("itemreadchat", "irc")));
-		commandsAliasesItemReadClick = CollectionUtils.asLowercaseList(baseConfig.readStringList("commands_aliases.itemreadclick", CollectionUtils.asList("itemreadclick", "irclick")));
-		commandsAliasesItemSetNBTString = CollectionUtils.asLowercaseList(baseConfig.readStringList("commands_aliases.itemsetnbtstring", CollectionUtils.asList("itemsetnbtstring", "isnbtstring")));
+		commandsAliasesItemRead = CollectionUtils
+				.asLowercaseList(baseConfig.readStringList("commands_aliases.itemread", CollectionUtils.asList("itemread", "ir")));
+		commandsAliasesItemReadChat = CollectionUtils
+				.asLowercaseList(baseConfig.readStringList("commands_aliases.itemreadchat", CollectionUtils.asList("itemreadchat", "irc")));
+		commandsAliasesItemReadClick = CollectionUtils
+				.asLowercaseList(baseConfig.readStringList("commands_aliases.itemreadclick", CollectionUtils.asList("itemreadclick", "irclick")));
+		commandsAliasesItemSetNBTString = CollectionUtils
+				.asLowercaseList(baseConfig.readStringList("commands_aliases.itemsetnbtstring", CollectionUtils.asList("itemsetnbtstring", "isnbtstring")));
 		commandsAliasesExport = CollectionUtils.asLowercaseList(baseConfig.readMandatoryStringList("commands_aliases.export"));
 
 		// materials
@@ -167,16 +175,20 @@ public class ConfigGCore extends GPluginConfig {
 		} catch (Throwable exception) {
 			YMLError causeYML = ObjectUtils.findCauseOrNull(exception, YMLError.class);
 			ConfigError causeConfig = ObjectUtils.findCauseOrNull(exception, ConfigError.class);
-			if (causeYML != null) throw new ConfigError("Couldn't load materials : " + causeYML.getMessage());
-			if (causeConfig != null) throw causeConfig;
+			if (causeYML != null)
+				throw new ConfigError("Couldn't load materials : " + causeYML.getMessage());
+			if (causeConfig != null)
+				throw causeConfig;
 			throw new Error("Couldn't load materials", exception);
 		}
 		try {
 			CommonMats.init();
 		} catch (Throwable exception) {
 			ConfigError causeConfig = ObjectUtils.findCauseOrNull(exception, ConfigError.class);
-			if (causeConfig != null) throw new ConfigError(causeConfig.getMessage() + " (when loading common materials)");
-			else throw new Error("Couldn't load common materials", exception);
+			if (causeConfig != null)
+				throw new ConfigError(causeConfig.getMessage() + " (when loading common materials)");
+			else
+				throw new Error("Couldn't load common materials", exception);
 		}
 
 		// sounds
@@ -186,9 +198,11 @@ public class ConfigGCore extends GPluginConfig {
 			sounds = loadVariants(new Sounds(regenerate));
 		} catch (Throwable exception) {
 			YMLError causeYML = ObjectUtils.findCauseOrNull(exception, YMLError.class);
-			if (causeYML != null) throw new ConfigError("Couldn't load sounds : " + causeYML.getMessage());
+			if (causeYML != null)
+				throw new ConfigError("Couldn't load sounds : " + causeYML.getMessage());
 			ConfigError causeConfig = ObjectUtils.findCauseOrNull(exception, ConfigError.class);
-			if (causeConfig != null) throw causeConfig;
+			if (causeConfig != null)
+				throw causeConfig;
 			throw new Error("Couldn't load sounds", exception);
 		}
 
@@ -199,9 +213,11 @@ public class ConfigGCore extends GPluginConfig {
 			particles = loadVariants(new Particles(regenerate));
 		} catch (Throwable exception) {
 			YMLError causeYML = ObjectUtils.findCauseOrNull(exception, YMLError.class);
-			if (causeYML != null) throw new ConfigError("Couldn't load particles : " + causeYML.getMessage());
+			if (causeYML != null)
+				throw new ConfigError("Couldn't load particles : " + causeYML.getMessage());
 			ConfigError causeConfig = ObjectUtils.findCauseOrNull(exception, ConfigError.class);
-			if (causeConfig != null) throw causeConfig;
+			if (causeConfig != null)
+				throw causeConfig;
 			throw new Error("Couldn't load particles", exception);
 		}
 
@@ -219,7 +235,8 @@ public class ConfigGCore extends GPluginConfig {
 		unknownPlaceholderResult = baseConfig.readMandatoryString("unknown_placeholder_result");
 		numberFormattingDecimals = baseConfig.readMandatoryInteger("number_formatting_decimals");
 		numberFormattingSeparateThousands = baseConfig.readString("number_formatting_separate_thousands", "");
-		if (numberFormattingSeparateThousands.isEmpty()) numberFormattingSeparateThousands = null;
+		if (numberFormattingSeparateThousands.isEmpty())
+			numberFormattingSeparateThousands = null;
 		numberFormattingSeparateThousandsStartAt = BigDecimal.valueOf(baseConfig.readLong("number_formatting_separate_thousands_start_at", 1000L));
 		numberFormattingBigNumbers = baseConfig.readBoolean("number_formatting_big_numbers", false);
 		baseConfig.readKeysForSection("console_log_level_colors").forEach(key -> {
@@ -248,15 +265,13 @@ public class ConfigGCore extends GPluginConfig {
 		mySQLPre8019 = baseConfig.readBoolean("mysql.pre8019", true);
 
 		// data
-		/*if (baseConfig.contains("mysql")) {
-			String host = baseConfig.readMandatoryString("mysql.host");
-			String name = baseConfig.readMandatoryString("mysql.name");
-			String usr = baseConfig.readMandatoryString("mysql.user");
-			String pwd = baseConfig.readMandatoryString("mysql.pass");
-			String customArgs = baseConfig.readString("mysql.args", "");
-			String url = "jdbc:mysql://" + host + "/" + name + "?allowMultiQueries=true" + customArgs;
-			GCore.inst().getMySQLHandler().setConnector(new SQLConnector(url, usr, pwd));
-		}*/
+		/*
+		 * if (baseConfig.contains("mysql")) { String host = baseConfig.readMandatoryString("mysql.host"); String name =
+		 * baseConfig.readMandatoryString("mysql.name"); String usr = baseConfig.readMandatoryString("mysql.user"); String pwd =
+		 * baseConfig.readMandatoryString("mysql.pass"); String customArgs = baseConfig.readString("mysql.args", ""); String url
+		 * = "jdbc:mysql://" + host + "/" + name + "?allowMultiQueries=true" + customArgs;
+		 * GCore.inst().getMySQLHandler().setConnector(new SQLConnector(url, usr, pwd)); }
+		 */
 
 		// gui
 		guiItemRefreshTicksPlaceholders = baseConfig.readMandatoryInteger("gui_items_refresh_ticks_placeholder");
@@ -270,9 +285,12 @@ public class ConfigGCore extends GPluginConfig {
 				int back = baseConfig.readInteger("gui_type_slots." + rawType + ".back", -1);
 				int previousPage = baseConfig.readInteger("gui_type_slots." + rawType + ".previous_page", -1);
 				int nextPage = baseConfig.readInteger("gui_type_slots." + rawType + ".next_page", -1);
-				if (back >= -1 && back < type.getSize()) type.setBackItemSlot(back);
-				if (previousPage >= -1 && previousPage < type.getSize()) type.setPreviousPageItemSlot(previousPage);
-				if (nextPage >= -1 && nextPage < type.getSize()) type.setNextPageItemSlot(nextPage);
+				if (back >= -1 && back < type.getSize())
+					type.setBackItemSlot(back);
+				if (previousPage >= -1 && previousPage < type.getSize())
+					type.setPreviousPageItemSlot(previousPage);
+				if (nextPage >= -1 && nextPage < type.getSize())
+					type.setNextPageItemSlot(nextPage);
 			}
 		}
 		guiConfirm = loadGUI(GCore.inst(), "guis/SYSTEM_confirm.yml", (file, id) -> new ConfirmGUIElement(file, id));

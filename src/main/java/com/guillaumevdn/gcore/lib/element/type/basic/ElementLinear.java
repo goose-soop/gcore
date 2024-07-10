@@ -54,22 +54,23 @@ public abstract class ElementLinear<T extends LinearObjectType, L extends Linear
 		// right-click : edit parameters
 		if (call.getType().equals(ClickType.RIGHT)) {
 			Pair<T, List<String>> current = getCurrentPair();
-			WorkerGCore.inst().awaitChatWithSuggestedValue(call.getClicker(), TextEditorGeneric.messageElementBasicEditSuggestCurrent, StringUtils.toTextString(" ", current.getB()), value -> {
-				if (StringUtils.hasPlaceholders(value)) {
-					setValue(current.getA() == null ? null : CollectionUtils.asList(current.getA().name() + " " + value));
-					getSuperElement().onEditorChange(this);
-				} else {
-					try {
-						L parsed = current == null || current.getA() == null ? null : doParseString(current.getA().name() + " " + value);
-						setValue(parsed == null ? null : CollectionUtils.asList(getSerializer().serialize(parsed)));
-						call.getGUI().setRegularItem(buildEditorItem(call.getPageIndex(), call.getSlot()));
-						getSuperElement().onEditorChange(this);
-					} catch (ParsingError error) {
-						error.send(call.getClicker());
-					}
-				}
-				call.reopenGUI();
-			}, () -> call.reopenGUI());
+			WorkerGCore.inst().awaitChatWithSuggestedValue(call.getClicker(), TextEditorGeneric.messageElementBasicEditSuggestCurrent,
+					StringUtils.toTextString(" ", current.getB()), value -> {
+						if (StringUtils.hasPlaceholders(value)) {
+							setValue(current.getA() == null ? null : CollectionUtils.asList(current.getA().name() + " " + value));
+							getSuperElement().onEditorChange(this);
+						} else {
+							try {
+								L parsed = current == null || current.getA() == null ? null : doParseString(current.getA().name() + " " + value);
+								setValue(parsed == null ? null : CollectionUtils.asList(getSerializer().serialize(parsed)));
+								call.getGUI().setRegularItem(buildEditorItem(call.getPageIndex(), call.getSlot()));
+								getSuperElement().onEditorChange(this);
+							} catch (ParsingError error) {
+								error.send(call.getClicker());
+							}
+						}
+						call.reopenGUI();
+					}, () -> call.reopenGUI());
 		}
 		// shift + left-click : select type
 		else if (call.getType().equals(ClickType.SHIFT_LEFT)) {

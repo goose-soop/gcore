@@ -19,7 +19,8 @@ public final class GenericMigrate extends Subcommand {
 	private final ArgumentString argVersion = addArgumentString(NeedType.REQUIRED, false, null, Text.of("migration version"));
 
 	public GenericMigrate(GPlugin plugin) {
-		super(false, plugin.getPermissionContainer().getAdminPermission(), TextGeneric.commandDescriptionGenericMigrate, ConfigGCore.genericCommandsAliasesMigrate);
+		super(false, plugin.getPermissionContainer().getAdminPermission(), TextGeneric.commandDescriptionGenericMigrate,
+				ConfigGCore.genericCommandsAliasesMigrate);
 		this.plugin = plugin;
 	}
 
@@ -27,7 +28,8 @@ public final class GenericMigrate extends Subcommand {
 	public void perform(CommandCall call) {
 		String version = argVersion.get(call);
 		String migrationClassName = "MigrationV" + version.replace('.', '_');
-		Class<? extends Migration> migrationClass = ((GPlugin<?, ?>) plugin).getMigrations().stream().filter(cls -> cls.getSimpleName().equals(migrationClassName)).findAny().orElse(null);
+		Class<? extends Migration> migrationClass = ((GPlugin<?, ?>) plugin).getMigrations().stream()
+				.filter(cls -> cls.getSimpleName().equals(migrationClassName)).findAny().orElse(null);
 
 		if (migrationClass == null) {
 			call.getSender().sendMessage("§cThere's no migration with version '" + version + "'.");

@@ -16,6 +16,11 @@
 
 package com.guillaumevdn.gcore.libs.com.google.gson.internal.bind;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import com.guillaumevdn.gcore.libs.com.google.gson.Gson;
 import com.guillaumevdn.gcore.libs.com.google.gson.TypeAdapter;
 import com.guillaumevdn.gcore.libs.com.google.gson.TypeAdapterFactory;
@@ -25,24 +30,22 @@ import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonReader;
 import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonToken;
 import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonWriter;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 /**
- * Adapts types whose static type is only 'Object'. Uses getClass() on
- * serialization and a primitive/Map/List on deserialization.
+ * Adapts types whose static type is only 'Object'. Uses getClass() on serialization and a primitive/Map/List on
+ * deserialization.
  */
 public final class ObjectTypeAdapter extends TypeAdapter<Object> {
+
   public static final TypeAdapterFactory FACTORY = new TypeAdapterFactory() {
-    
-    @Override public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
+
+    @Override
+    public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
       if (type.getRawType() == Object.class) {
         return (TypeAdapter<T>) new ObjectTypeAdapter(gson);
       }
       return null;
     }
+
   };
 
   private final Gson gson;
@@ -51,7 +54,8 @@ public final class ObjectTypeAdapter extends TypeAdapter<Object> {
     this.gson = gson;
   }
 
-  @Override public Object read(JsonReader in) throws IOException {
+  @Override
+  public Object read(JsonReader in) throws IOException {
     JsonToken token = in.peek();
     switch (token) {
     case BEGIN_ARRAY:
@@ -90,8 +94,8 @@ public final class ObjectTypeAdapter extends TypeAdapter<Object> {
     }
   }
 
-  
-  @Override public void write(JsonWriter out, Object value) throws IOException {
+  @Override
+  public void write(JsonWriter out, Object value) throws IOException {
     if (value == null) {
       out.nullValue();
       return;
@@ -106,4 +110,5 @@ public final class ObjectTypeAdapter extends TypeAdapter<Object> {
 
     typeAdapter.write(out, value);
   }
+
 }

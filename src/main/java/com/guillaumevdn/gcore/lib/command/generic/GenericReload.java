@@ -15,7 +15,8 @@ public final class GenericReload extends Subcommand {
 	private final GPlugin plugin;
 
 	public GenericReload(GPlugin plugin) {
-		super(false, plugin.getPermissionContainer().getAdminPermission(), TextGeneric.commandDescriptionGenericReload, ConfigGCore.genericCommandsAliasesReload);
+		super(false, plugin.getPermissionContainer().getAdminPermission(), TextGeneric.commandDescriptionGenericReload,
+				ConfigGCore.genericCommandsAliasesReload);
 		this.plugin = plugin;
 	}
 

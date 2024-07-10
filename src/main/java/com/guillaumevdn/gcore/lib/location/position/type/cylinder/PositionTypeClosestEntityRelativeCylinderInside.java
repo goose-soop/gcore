@@ -43,7 +43,8 @@ public class PositionTypeClosestEntityRelativeCylinderInside extends PositionTyp
 	@Override
 	public Position doParse(ElementPosition position, Replacer replacer) throws ParsingError {
 		Entity entity = PositionTypeClosestEntityRelativeSingle.findMatching(position, replacer);
-		if (entity == null) return null;
+		if (entity == null)
+			return null;
 		Location center = position.getElementAs("center", ElementRelativeLocation.class).parseNoCatchOrThrowParsingNull(replacer);
 		double radius = position.getElementAs("radius", ElementDouble.class).parseNoCatchOrThrowParsingNull(replacer);
 		return new PositionCylinderInside(center, radius);

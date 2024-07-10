@@ -38,10 +38,11 @@ public abstract class ElementAbstractDefaultEnumMap<E, V extends Element> extend
 	@Override
 	protected void editorAskKeyAndCreateAndAddElement(ClickCall call, BiConsumer<E, V> onCreate, Runnable onCancel) {
 		if (values != null) {
-			EnumSelectorGUI.openSelector(call.getClicker(), false, getKeySerializer(), () -> values.stream().filter(key -> !keys().contains(key)).collect(Collectors.toList()), editorIconType(), key -> {
-				V value = createAndAddElement(key);
-				onCreate.accept(key, value);
-			}, onCancel);
+			EnumSelectorGUI.openSelector(call.getClicker(), false, getKeySerializer(),
+					() -> values.stream().filter(key -> !keys().contains(key)).collect(Collectors.toList()), editorIconType(), key -> {
+						V value = createAndAddElement(key);
+						onCreate.accept(key, value);
+					}, onCancel);
 		} else {
 			LinkedHashMap<E, Mat> remaining = new LinkedHashMap<>();
 			valuesIcons.forEach((key, icon) -> {

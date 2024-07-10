@@ -30,12 +30,12 @@ public class ReaderListEz implements ThrowableFunction<ReaderContext, Boolean> {
 				listIndent += context.getIndentLevel();
 				s = s.substring(context.getIndentLevel().length());
 			}
-			/*  actually ignore extra indentation for this, lines are trimmed anyway
-			if (!s.isEmpty() && s.charAt(0) == ' ') {
-				context.throwIndentError(peek, listIndent.length(), false);
-			}*/
+			/*
+			 * actually ignore extra indentation for this, lines are trimmed anyway if (!s.isEmpty() && s.charAt(0) == ' ') {
+			 * context.throwIndentError(peek, listIndent.length(), false); }
+			 */
 			// read lines
-			List<String> list = new ArrayList<>(1);  // I'd rather take a little more time when loading than having many collections with a 10% fill ratio
+			List<String> list = new ArrayList<>(1); // I'd rather take a little more time when loading than having many collections with a 10% fill ratio
 			while ((peek = context.peekLine()) != null) {
 				// element
 				if (peek.getLine().startsWith(listIndent)) {

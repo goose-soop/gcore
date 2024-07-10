@@ -10,6 +10,7 @@ import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
 public interface TextEnumElement extends Text {
 
 	String getId();
+
 	TextElement getText();
 
 	// ----- override methods with text
@@ -44,5 +45,5 @@ public interface TextEnumElement extends Text {
 	default List<String> parseLines(Replacer replacer) {
 		return getText().parseLines(replacer);
 	}
-	
+
 }

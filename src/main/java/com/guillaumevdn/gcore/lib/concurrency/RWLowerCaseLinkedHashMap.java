@@ -3,8 +3,9 @@ package com.guillaumevdn.gcore.lib.concurrency;
 import com.guillaumevdn.gcore.lib.object.ObjectUtils;
 
 /**
- * Uses a ReentrantReadWriteLock (allows multiple readers and prioritizes the only writer if any)
- * Subsets methods will throw an UnsupportedOperationException when called and forEach() or iterate() should be used instead.
+ * Uses a ReentrantReadWriteLock (allows multiple readers and prioritizes the only writer if any) Subsets methods will
+ * throw an UnsupportedOperationException when called and forEach() or iterate() should be used instead.
+ * 
  * @author GuillaumeVDN
  */
 public class RWLowerCaseLinkedHashMap<V> extends RWLinkedHashMap<String, V> {

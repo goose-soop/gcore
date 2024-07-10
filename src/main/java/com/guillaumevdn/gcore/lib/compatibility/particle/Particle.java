@@ -38,7 +38,7 @@ public class Particle extends Variant<ParticleData> {
 	public void send(Player player, Location location, int count, float speed) {
 		send(player, location, null, null, count, speed);
 	}
-	
+
 	public void send(Player player, Location location, float offx, float offy, float offz) {
 		send(CollectionUtils.asList(player), location, null, 1f, null, 1, 0f, offx, offy, offz);
 	}
@@ -71,7 +71,8 @@ public class Particle extends Variant<ParticleData> {
 		send(players, location, color, redstoneColorScale, noteColor, count, speed, 0f, 0f, 0f);
 	}
 
-	public void send(Collection<Player> players, Location location, Color color, Float redstoneColorScale, Integer noteColor, int count, float speed, float offx, float offy, float offz) {
+	public void send(Collection<Player> players, Location location, Color color, Float redstoneColorScale, Integer noteColor, int count, float speed,
+			float offx, float offy, float offz) {
 		ParticleCompat.sendParticle(players, location, this, color, redstoneColorScale, noteColor, count, speed, offx, offy, offz);
 	}
 

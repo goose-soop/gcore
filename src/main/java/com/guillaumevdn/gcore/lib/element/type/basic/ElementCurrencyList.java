@@ -21,7 +21,8 @@ public class ElementCurrencyList extends ElementFakeEnumList<Currency> {
 
 	@Override
 	protected List<Currency> cacheOrBuild() {
-		return cachedOrBuild(ElementCurrency.cache, () -> Currency.values().stream().filter(curr -> curr.isEnabled()).sorted(Comparator.comparing(e -> e.getId())));
+		return cachedOrBuild(ElementCurrency.cache,
+				() -> Currency.values().stream().filter(curr -> curr.isEnabled()).sorted(Comparator.comparing(e -> e.getId())));
 	}
 
 	@Override

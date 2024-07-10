@@ -24,6 +24,7 @@ public abstract class TimeIn {
 	}
 
 	public abstract ZonedDateTime getCurrent();
+
 	public abstract ZonedDateTime getDelta(int delta);
 
 }

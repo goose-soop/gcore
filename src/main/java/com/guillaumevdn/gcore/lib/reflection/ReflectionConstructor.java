@@ -18,12 +18,14 @@ public class ReflectionConstructor {
 		// direct
 		try {
 			constructor = clazz.getDeclaredConstructor(params);
-		} catch (NoSuchMethodException exception) {}
+		} catch (NoSuchMethodException exception) {
+		}
 		// indirect
 		if (constructor == null) {
 			exploreConstructors: for (Constructor meth : clazz.getDeclaredConstructors()) {
 				Parameter[] methParams = meth.getParameters();
-				if (methParams.length != params.length) continue;
+				if (methParams.length != params.length)
+					continue;
 				for (int i = 0; i < params.length; ++i) {
 					if (params[i] != null && !ObjectUtils.instanceOf(params[i], methParams[i].getType())) {
 						continue exploreConstructors;
@@ -36,10 +38,9 @@ public class ReflectionConstructor {
 		}
 		if (constructor == null) {
 			Reflection.logAndRethrowError(new NoSuchMethodException(),
-					"Class " + clazz
-					+ "\nParameters '" + StringUtils.toTextString(", ", (Object[]) params) + "'"
-					);
-		};
+					"Class " + clazz + "\nParameters '" + StringUtils.toTextString(", ", (Object[]) params) + "'");
+		}
+		;
 	}
 
 	// ----- get
@@ -50,15 +51,14 @@ public class ReflectionConstructor {
 	// ----- methods
 	public ReflectionObject newInstance(Object... params) throws Throwable {
 		try {
-			if (!constructor.isAccessible()) constructor.setAccessible(true);
+			if (!constructor.isAccessible())
+				constructor.setAccessible(true);
 			Object result = constructor.newInstance(params);
 			return result == null ? null : ReflectionObject.of(result);
 		} catch (Throwable exception) {
 			Reflection.logAndRethrowError(exception,
-					"Class " + constructor.getDeclaringClass()
-					+ "\nParameters '" + StringUtils.toTextString(", ", (Object[]) params) + "'"
-					+ "\nConstructor parameters '" + StringUtils.toTextString(", ", (Object[]) constructor.getParameters())
-					);
+					"Class " + constructor.getDeclaringClass() + "\nParameters '" + StringUtils.toTextString(", ", (Object[]) params) + "'"
+							+ "\nConstructor parameters '" + StringUtils.toTextString(", ", (Object[]) constructor.getParameters()));
 			return null;
 		}
 	}
@@ -69,7 +69,8 @@ public class ReflectionConstructor {
 	public static ReflectionConstructor of(Class<?> clazz, Class<?>... params) throws Throwable {
 		// hash by class name
 		int hash = clazz.getName().hashCode();
-		for (Class<?> param : params) hash = 31 * hash + (param == null ? 0 : param.getName().hashCode());
+		for (Class<?> param : params)
+			hash = 31 * hash + (param == null ? 0 : param.getName().hashCode());
 		// construct
 		ReflectionConstructor method = cache.get(hash);
 		if (method == null) {

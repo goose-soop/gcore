@@ -32,8 +32,8 @@ public class PreJava9DateFormatProvider {
   }
 
   /**
-   * Returns the same DateFormat as {@code DateFormat.getDateTimeInstance(dateStyle, timeStyle, Locale.US)}
-   * in Java 8 or below.
+   * Returns the same DateFormat as {@code DateFormat.getDateTimeInstance(dateStyle, timeStyle, Locale.US)} in Java 8 or
+   * below.
    */
   public static DateFormat getUSDateTimeFormat(int dateStyle, int timeStyle) {
     String pattern = getDatePartOfDateTimePattern(dateStyle) + " " + getTimePartOfDateTimePattern(timeStyle);
@@ -83,4 +83,5 @@ public class PreJava9DateFormatProvider {
       throw new IllegalArgumentException("Unknown DateFormat style: " + timeStyle);
     }
   }
+
 }

@@ -67,14 +67,16 @@ public abstract class ListElement<T extends Element> extends MapElement<String, 
 
 	@Override
 	protected void doWrite() throws Throwable {
-		final boolean existed = readContains(); //getSuperElement().getConfiguration().getBackingYML().getSectionNode(getConfigurationPath()) != null;  // do not override existing section types ; make it a compact nested map only if it wasn't written before
+		final boolean existed = readContains(); // getSuperElement().getConfiguration().getBackingYML().getSectionNode(getConfigurationPath()) != null; // do
+												// not override existing section types ; make it a compact nested map only if it wasn't written before
 
 		getSuperElement().getConfiguration().write(getConfigurationPath(), null);
 		if (!isEmpty()) {
 			SectionNode node = null;
-			if (!existed && allowCompactNestedWrite) {  
+			if (!existed && allowCompactNestedWrite) {
 				node = getSuperElement().getConfiguration().getBackingYML().mkdirs(getConfigurationPath(), SectionNodeType.COMPACT_NESTED_MAP);
-				node.setSingleValue("_____TO_BE_REMOVED_____", "value", null);  // when we call element.write() below, it sets the path to null ; thus, it clears the parent section, anihilating our hopes that it'll be a compact nested map
+				node.setSingleValue("_____TO_BE_REMOVED_____", "value", null); // when we call element.write() below, it sets the path to null ; thus, it clears
+																				// the parent section, anihilating our hopes that it'll be a compact nested map
 			}
 			for (T element : values()) {
 				element.write();
@@ -90,6 +92,7 @@ public abstract class ListElement<T extends Element> extends MapElement<String, 
 	@Override
 	public EditorGUI editorGUI(ClickCall fromCall) {
 		EditorGUI editor = new EditorGUI(this, fromCall) {
+
 			@Override
 			protected boolean doFill() {
 				// values
@@ -118,26 +121,28 @@ public abstract class ListElement<T extends Element> extends MapElement<String, 
 					}));
 				}
 				// create item
-				setPersistentItem(new GUIItem("new_element", 50, ItemUtils.createItem(CommonMats.BLAZE_ROD, TextEditorGeneric.controlAddElementName.parseLine(), TextEditorGeneric.controlAddElementWithQuick.parseLines()), call -> {
-					// left-click : quickly create with a generated id
-					if (call.getType().equals(ClickType.LEFT)) {
-						T element = createAndAddElement();
-						getSuperElement().onEditorChange(element);
-						// reopen GUI (that refreshes it since it's an editor GUI)
-						call.reopenGUI();
-					}
-					// right-click : manually enter id
-					else if (call.getType().equals(ClickType.RIGHT)) {
-						editorAskKeyAndCreateAndAddElement(call, (elementId, element) -> {
-							getSuperElement().onEditorChange(element);
-							// reopen GUI (that refreshes it since it's an editor GUI)
-							call.reopenGUI();
-						}, () -> call.reopenGUI());
-					}
-				}));
+				setPersistentItem(new GUIItem("new_element", 50, ItemUtils.createItem(CommonMats.BLAZE_ROD, TextEditorGeneric.controlAddElementName.parseLine(),
+						TextEditorGeneric.controlAddElementWithQuick.parseLines()), call -> {
+							// left-click : quickly create with a generated id
+							if (call.getType().equals(ClickType.LEFT)) {
+								T element = createAndAddElement();
+								getSuperElement().onEditorChange(element);
+								// reopen GUI (that refreshes it since it's an editor GUI)
+								call.reopenGUI();
+							}
+							// right-click : manually enter id
+							else if (call.getType().equals(ClickType.RIGHT)) {
+								editorAskKeyAndCreateAndAddElement(call, (elementId, element) -> {
+									getSuperElement().onEditorChange(element);
+									// reopen GUI (that refreshes it since it's an editor GUI)
+									call.reopenGUI();
+								}, () -> call.reopenGUI());
+							}
+						}));
 				// done
 				return super.doFill();
 			}
+
 		};
 		return editor;
 	}

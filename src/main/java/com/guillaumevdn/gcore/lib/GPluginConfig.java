@@ -80,9 +80,12 @@ public abstract class GPluginConfig {
 				logDataFile = new ArrayList<>();
 				logDataSQL = new ArrayList<>();
 				for (String boardId : config.readKeysForSection("log.data")) {
-					if (config.readBoolean("log.data." + boardId + ".console", true)) logDataConsole.add(boardId.toLowerCase());
-					if (config.readBoolean("log.data." + boardId + ".file", true)) logDataFile.add(boardId.toLowerCase());
-					if (config.readBoolean("log.data." + boardId + ".sql", true)) logDataSQL.add(boardId.toLowerCase());
+					if (config.readBoolean("log.data." + boardId + ".console", true))
+						logDataConsole.add(boardId.toLowerCase());
+					if (config.readBoolean("log.data." + boardId + ".file", true))
+						logDataFile.add(boardId.toLowerCase());
+					if (config.readBoolean("log.data." + boardId + ".sql", true))
+						logDataSQL.add(boardId.toLowerCase());
 				}
 				for (String boardId : config.readKeysForSection("data_backend")) {
 					dataBackEnds.put(boardId.toLowerCase(), config.readEnum("data_backend." + boardId, DataBackEnd.JSON, DataBackEnd.class));
@@ -94,7 +97,8 @@ public abstract class GPluginConfig {
 			}
 		} catch (Throwable exception) {
 			ConfigError configError = ObjectUtils.findCauseOrNull(exception, ConfigError.class);
-			if (configError != null) throw configError;
+			if (configError != null)
+				throw configError;
 			YMLError ymlError = ObjectUtils.findCauseOrNull(exception, YMLError.class);
 			throw ymlError != null ? ymlError : exception;
 		}

@@ -143,8 +143,7 @@ public interface Text {
 
 	// ----- type
 	public static enum TextType {
-		NORMAL,
-		RANDOM_LINE
+		NORMAL, RANDOM_LINE
 	}
 
 	// ----- fast creation

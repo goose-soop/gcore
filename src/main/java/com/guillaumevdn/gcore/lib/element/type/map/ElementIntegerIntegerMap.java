@@ -31,7 +31,7 @@ public class ElementIntegerIntegerMap extends MapElement<Integer, ElementInteger
 	@Override
 	public ElementInteger createElement(String elementId) {
 		ElementInteger element = new ElementInteger(this, elementId, Need.optional(), null);
-		element.setValue(CollectionUtils.asList("1"));  // don't use the default value otherwise it won't be saved
+		element.setValue(CollectionUtils.asList("1")); // don't use the default value otherwise it won't be saved
 		return element;
 	}
 

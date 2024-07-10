@@ -27,7 +27,7 @@ public abstract class Variant<D extends VariantData> implements Comparable<Varia
 	public final D getData() {
 		return data;
 	}
-	
+
 	public final boolean isNoCheck() {
 		return nocheck;
 	}

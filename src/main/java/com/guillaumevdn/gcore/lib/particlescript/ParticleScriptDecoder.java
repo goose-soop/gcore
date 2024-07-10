@@ -67,7 +67,8 @@ public class ParticleScriptDecoder {
 	protected void consume(List<String> lines, int index, int indent, int indentLevel, Map<String, Double> localVars) {
 		// no matching indent
 		if (StringUtils.countLeadingChar(lines.get(index), ' ') != indent) {
-			plugin.getMainLogger().error("On decode of script " + file.getName() + ", an error occured : invalid indent level at line '" + lines.get(index) + "', expected " + StringUtils.pluralizeAmountDesc("space", indent));
+			plugin.getMainLogger().error("On decode of script " + file.getName() + ", an error occured : invalid indent level at line '" + lines.get(index)
+					+ "', expected " + StringUtils.pluralizeAmountDesc("space", indent));
 			return;
 		}
 		// build line (with local variables)
@@ -82,7 +83,8 @@ public class ParticleScriptDecoder {
 		String trimmedLower = trimmed.toLowerCase();
 		int paramsIndex = trimmedLower.indexOf('(');
 		if (paramsIndex == -1 || trimmedLower.charAt(trimmedLower.length() - 1) != ')') {
-			plugin.getMainLogger().error("On decode of script " + file.getName() + ", an error occured : invalid function/parenthesis at line '" + trimmed + "'");
+			plugin.getMainLogger()
+					.error("On decode of script " + file.getName() + ", an error occured : invalid function/parenthesis at line '" + trimmed + "'");
 			return;
 		}
 		String function = trimmedLower.substring(0, paramsIndex).trim();
@@ -132,7 +134,8 @@ public class ParticleScriptDecoder {
 			try {
 				effect = Particle.firstFromIdOrDataName(params[0].trim()).orNull();
 				if (effect == null) {
-					plugin.getMainLogger().error("On decode of script " + file.getName() + ", an error occured while parsing params of line '" + trimmed + "' : unknown particle effect '" + params[0] + "'");
+					plugin.getMainLogger().error("On decode of script " + file.getName() + ", an error occured while parsing params of line '" + trimmed
+							+ "' : unknown particle effect '" + params[0] + "'");
 				}
 				x = params[1].trim();
 				y = params[2].trim();

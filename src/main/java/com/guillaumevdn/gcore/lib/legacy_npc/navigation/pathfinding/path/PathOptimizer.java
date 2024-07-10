@@ -14,7 +14,8 @@ import com.guillaumevdn.gcore.lib.legacy_npc.navigation.pathfinding.movement.Mov
 public final class PathOptimizer {
 
 	public static List<OptimizedPathPoint> optimize(Path path, Pathfinding finder) {
-		MovementFinder optimizer = MovementFinder.ofProperties(0, finder.getMovementFinder().getMinBottomVertical(), finder.getMovementFinder().canStickToWall(), false);
+		MovementFinder optimizer = MovementFinder.ofProperties(0, finder.getMovementFinder().getMinBottomVertical(),
+				finder.getMovementFinder().canStickToWall(), false);
 		List<OptimizedPathPoint> points = new ArrayList<>();
 		path.iteratePoints((next, it) -> points.add(new OptimizedPathPoint(next.getMovementToPoint(), next.getPoint())));
 		// connect points that could be connected (close, only use gap 0)

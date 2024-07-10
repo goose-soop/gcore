@@ -37,7 +37,7 @@ import com.guillaumevdn.gcore.lib.tuple.Pair;
  */
 public final class DataIO {
 
-	private LinkedHashMap<String, Object> objects = new LinkedHashMap<>();  // not a lowercase one because we're encoding stuff in camelcase
+	private LinkedHashMap<String, Object> objects = new LinkedHashMap<>(); // not a lowercase one because we're encoding stuff in camelcase
 
 	// ----- get
 	public Set<String> getKeys() {
@@ -205,11 +205,14 @@ public final class DataIO {
 		}
 		if (obj instanceof String) {
 			Byte nbb = NumberUtils.byteOrNull(obj);
-			if (nbb != null) return nbb;
+			if (nbb != null)
+				return nbb;
 			Integer nbi = NumberUtils.integerOrNull(obj);
-			if (nbi != null) return nbi;
+			if (nbi != null)
+				return nbi;
 			Double nbl = NumberUtils.doubleOrNull(obj);
-			if (nbl != null) return nbl;
+			if (nbl != null)
+				return nbl;
 			String str = (String) obj;
 			if (str.startsWith("__intarray__")) {
 				return Serializer.PRIMITIVE_INT_ARRAY.deserialize(str.substring("__intarray__".length()));
@@ -230,7 +233,8 @@ public final class DataIO {
 				try {
 					t = Serializer.find(typeClass).deserialize(value.toString());
 				} catch (Throwable exception) {
-					throw new IllegalStateException("expected " + typeClass + " but found " + value.getClass() + " for " + key + ", and couldn't deserialize it", exception);
+					throw new IllegalStateException(
+							"expected " + typeClass + " but found " + value.getClass() + " for " + key + ", and couldn't deserialize it", exception);
 				}
 				if (t == null) {
 					throw new NullPointerException("deserializing '" + value.toString() + "' created a null value");
@@ -328,19 +332,20 @@ public final class DataIO {
 	}
 
 	@Nonnull
-	public<K, V, M extends Map<K, V>> M readObjectMap(String key, Class<K> keyClass, M map, TriFunction<String, K, DataIO, V> valueDeserializer) {
+	public <K, V, M extends Map<K, V>> M readObjectMap(String key, Class<K> keyClass, M map, TriFunction<String, K, DataIO, V> valueDeserializer) {
 		readNullableObjectMap(key, keyClass, map, valueDeserializer);
 		return map;
 	}
 
 	@Nonnull
-	public <K, V, M extends Map<K, V>> M readObjectMapOrThrow(String key, Class<K> keyClass, M map, ThrowableTriFunction<String, K, DataIO, V> valueDeserializer) throws Throwable {
+	public <K, V, M extends Map<K, V>> M readObjectMapOrThrow(String key, Class<K> keyClass, M map,
+			ThrowableTriFunction<String, K, DataIO, V> valueDeserializer) throws Throwable {
 		readNullableObjectMapOrThrow(key, keyClass, map, valueDeserializer);
 		return map;
 	}
 
 	@Nullable
-	public<K, V, M extends Map<K, V>> M readNullableObjectMap(String key, Class<K> keyClass, M map, TriFunction<String, K, DataIO, V> valueDeserializer) {
+	public <K, V, M extends Map<K, V>> M readNullableObjectMap(String key, Class<K> keyClass, M map, TriFunction<String, K, DataIO, V> valueDeserializer) {
 		try {
 			return readNullableObjectMapOrThrow(key, keyClass, map, (subKeyRaw, subKey, subReader) -> valueDeserializer.apply(subKeyRaw, subKey, subReader));
 		} catch (Throwable exception) {
@@ -349,7 +354,8 @@ public final class DataIO {
 	}
 
 	@Nullable
-	public <K, V, M extends Map<K, V>> M readNullableObjectMapOrThrow(String key, Class<K> keyClass, M map, ThrowableTriFunction<String, K, DataIO, V> valueDeserializer) throws Throwable {
+	public <K, V, M extends Map<K, V>> M readNullableObjectMapOrThrow(String key, Class<K> keyClass, M map,
+			ThrowableTriFunction<String, K, DataIO, V> valueDeserializer) throws Throwable {
 		readObjectOrThrow(key, mapReader -> {
 			Serializer<K> keySerializer = Serializer.find(keyClass);
 			for (String elementKey : mapReader.getKeys()) {
@@ -374,13 +380,14 @@ public final class DataIO {
 	}
 
 	@Nonnull
-	public <K, V, M extends Map<K, V>> M readSimpleMapOrThrow(String key, Class<K> keyClass, M map, ThrowableTriFunction<String, K, DataIO, V> valueDeserializer) throws Throwable {
+	public <K, V, M extends Map<K, V>> M readSimpleMapOrThrow(String key, Class<K> keyClass, M map,
+			ThrowableTriFunction<String, K, DataIO, V> valueDeserializer) throws Throwable {
 		readNullableSimpleMapOrThrow(key, keyClass, map, valueDeserializer);
 		return map;
 	}
 
 	@Nullable
-	public<K, V, M extends Map<K, V>> M readNullableSimpleMap(String key, Class<K> keyClass, M map, TriFunction<String, K, DataIO, V> valueDeserializer) {
+	public <K, V, M extends Map<K, V>> M readNullableSimpleMap(String key, Class<K> keyClass, M map, TriFunction<String, K, DataIO, V> valueDeserializer) {
 		try {
 			return readNullableSimpleMapOrThrow(key, keyClass, map, (subKeyRaw, subKey, mapReader) -> valueDeserializer.apply(subKeyRaw, subKey, mapReader));
 		} catch (Throwable exception) {
@@ -389,7 +396,8 @@ public final class DataIO {
 	}
 
 	@Nullable
-	public <K, V, M extends Map<K, V>> M readNullableSimpleMapOrThrow(String key, Class<K> keyClass, M map, ThrowableTriFunction<String, K, DataIO, V> valueDeserializer) throws Throwable {
+	public <K, V, M extends Map<K, V>> M readNullableSimpleMapOrThrow(String key, Class<K> keyClass, M map,
+			ThrowableTriFunction<String, K, DataIO, V> valueDeserializer) throws Throwable {
 		readObjectOrThrow(key, mapReader -> {
 			Serializer<K> keySerializer = Serializer.find(keyClass);
 			for (String elementKey : mapReader.getKeys()) {

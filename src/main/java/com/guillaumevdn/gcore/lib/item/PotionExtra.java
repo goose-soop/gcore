@@ -5,8 +5,6 @@ package com.guillaumevdn.gcore.lib.item;
  */
 public enum PotionExtra {
 
-	EXTENDED,
-	UPGRADED,
-	NONE;
+	EXTENDED, UPGRADED, NONE;
 
 }

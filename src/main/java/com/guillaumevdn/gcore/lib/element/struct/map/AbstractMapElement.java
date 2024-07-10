@@ -50,15 +50,15 @@ public abstract class AbstractMapElement<K, V extends IElement> extends Element 
 	}
 
 	public final List<K> keys() {
-		return elements.keySet();  // map already returns an unmodifiable collection
+		return elements.keySet(); // map already returns an unmodifiable collection
 	}
 
 	public final List<V> values() {
-		return elements.values();  // map already returns an unmodifiable collection
+		return elements.values(); // map already returns an unmodifiable collection
 	}
 
-	public List<Pair<K, V>> getElements() {	
-		return elements.getElements();  // map already returns an unmodifiable collection
+	public List<Pair<K, V>> getElements() {
+		return elements.getElements(); // map already returns an unmodifiable collection
 	}
 
 	public Optional<V> getElement(K key) {
@@ -87,7 +87,8 @@ public abstract class AbstractMapElement<K, V extends IElement> extends Element 
 	// ----- add/remove
 	/** @eturn the value parameter */
 	protected V add(K key, V value) {
-		if (value instanceof Element && !equals(((Element) value).getParent())) throw new IllegalStateException("added elements must be children of this element");
+		if (value instanceof Element && !equals(((Element) value).getParent()))
+			throw new IllegalStateException("added elements must be children of this element");
 		elements.put(key, value);
 		return value;
 	}
@@ -109,7 +110,9 @@ public abstract class AbstractMapElement<K, V extends IElement> extends Element 
 	// ----- editor
 	@Override
 	public List<String> editorCurrentValue() {
-		return size() == 0 ? null : (size() <= 1 ? TextEditorGeneric.elementElementCountSingle.parseLines() : TextEditorGeneric.elementElementCountPlural.replace("{count}", () -> size()).parseLines());
+		return size() == 0 ? null
+				: (size() <= 1 ? TextEditorGeneric.elementElementCountSingle.parseLines()
+						: TextEditorGeneric.elementElementCountPlural.replace("{count}", () -> size()).parseLines());
 	}
 
 }

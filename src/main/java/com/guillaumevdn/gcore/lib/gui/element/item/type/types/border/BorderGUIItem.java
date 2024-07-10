@@ -37,7 +37,8 @@ public class BorderGUIItem extends GUIItem {
 		super(id, preferredSlot, item, clickPerformer);
 	}
 
-	public BorderGUIItem(String id, int preferredSlot, ItemStack item, Sound clickSound, Map<ClickType, Consumer<ClickCall>> overrideClicks, Consumer<ClickCall> clickPerformer) {
+	public BorderGUIItem(String id, int preferredSlot, ItemStack item, Sound clickSound, Map<ClickType, Consumer<ClickCall>> overrideClicks,
+			Consumer<ClickCall> clickPerformer) {
 		super(id, preferredSlot, item, clickSound, overrideClicks, clickPerformer);
 	}
 
@@ -49,7 +50,8 @@ public class BorderGUIItem extends GUIItem {
 		super(id, preferredLocations, item, clickPerformer);
 	}
 
-	public BorderGUIItem(String id, List<IntegerPair> preferredLocations, ItemStack item, Sound clickSound, Map<ClickType, Consumer<ClickCall>> overrideClicks, Consumer<ClickCall> clickPerformer) {
+	public BorderGUIItem(String id, List<IntegerPair> preferredLocations, ItemStack item, Sound clickSound, Map<ClickType, Consumer<ClickCall>> overrideClicks,
+			Consumer<ClickCall> clickPerformer) {
 		super(id, preferredLocations, item, clickSound, overrideClicks, clickPerformer);
 	}
 

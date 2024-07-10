@@ -38,9 +38,11 @@ public class IntegrationInstancePlaceholderAPI extends IntegrationInstance {
 				try {
 					expansion.unregister();
 				} catch (Throwable ignored) {
-					PlaceholderAPIPlugin.getInstance().getLocalExpansionManager().unregister(expansion);  // it seems to bug sometimes for some reason if we use expansion.unregister() directly
+					PlaceholderAPIPlugin.getInstance().getLocalExpansionManager().unregister(expansion); // it seems to bug sometimes for some reason if we use
+																											// expansion.unregister() directly
 				}
-			} catch (Throwable ignored) {}  // come on man
+			} catch (Throwable ignored) {
+			} // come on man
 			expansion = null;
 		});
 	}

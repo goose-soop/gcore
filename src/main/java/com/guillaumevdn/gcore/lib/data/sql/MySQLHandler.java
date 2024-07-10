@@ -20,18 +20,12 @@ public final class MySQLHandler implements SQLHandler {
 		return connector;
 	}
 
-	/*public void setConnector(SQLConnector mysql) {
-		this.connector = mysql;
-		canConnect = false;
-	}
-
-	public void updateCanConnect() throws SQLException {
-		canConnect = false;
-		if (connector != null) {
-			connector.ensureConnection();
-			canConnect = true;
-		}
-	}*/
+	/*
+	 * public void setConnector(SQLConnector mysql) { this.connector = mysql; canConnect = false; }
+	 * 
+	 * public void updateCanConnect() throws SQLException { canConnect = false; if (connector != null) {
+	 * connector.ensureConnection(); canConnect = true; } }
+	 */
 
 	@Override
 	public void shutdown() {

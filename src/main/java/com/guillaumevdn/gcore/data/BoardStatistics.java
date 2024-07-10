@@ -30,7 +30,10 @@ import com.guillaumevdn.gcore.lib.statistic.Statistic;
 public class BoardStatistics extends BiKeyedBoardRemote<Statistic, UUID, Double> {
 
 	private static BoardStatistics instance = null;
-	public static BoardStatistics inst() { return instance; }
+
+	public static BoardStatistics inst() {
+		return instance;
+	}
 
 	public BoardStatistics() {
 		super(GCore.inst(), "gcore_statistics_v8", Double.class, 20 * 60);
@@ -62,6 +65,7 @@ public class BoardStatistics extends BiKeyedBoardRemote<Statistic, UUID, Double>
 	@Override
 	protected ConnectorBiKeyedJson<Statistic, UUID, Double> createConnectorJson() {
 		return new ConnectorBiKeyedJson<Statistic, UUID, Double>(this) {
+
 			@Override
 			public File getRoot() {
 				return GCore.inst().getDataFile("data_v8/statistics/");
@@ -81,7 +85,7 @@ public class BoardStatistics extends BiKeyedBoardRemote<Statistic, UUID, Double>
 			protected Map<UUID, Double> secondaryAndValuesFromJson(FileReader reader) {
 				Map<UUID, Double> fixed = new HashMap<>();
 				Map map = getPlugin().getPrettyGson().fromJson(reader, Map.class);
-				if (map != null) {  // there's a null issue somewhere around here #1339
+				if (map != null) { // there's a null issue somewhere around here #1339
 					map.forEach((key, value) -> {
 						Double dbl = NumberUtils.doubleOrNull(value.toString());
 						if (dbl != null) {
@@ -96,6 +100,7 @@ public class BoardStatistics extends BiKeyedBoardRemote<Statistic, UUID, Double>
 			protected void secondaryAndValuesToJson(Map<UUID, Double> values, FileWriter writer) {
 				board.getPluginGson().toJson(values, values.getClass(), writer);
 			}
+
 		};
 	}
 
@@ -105,6 +110,7 @@ public class BoardStatistics extends BiKeyedBoardRemote<Statistic, UUID, Double>
 
 	private ConnectorBiKeyedSQL<Statistic, UUID, Double> createConnectorSQL(SQLHandler handler) {
 		return new ConnectorBiKeyedSQL<Statistic, UUID, Double>(this, handler) {
+
 			@Override
 			public String keyName() {
 				return "statistic";
@@ -122,13 +128,14 @@ public class BoardStatistics extends BiKeyedBoardRemote<Statistic, UUID, Double>
 
 			@Override
 			protected UUID decodeKey2(String raw) {
-				return UUID.fromString(raw);  // row can't contain an invalid UUID, since the query was built from a valid UUID object
+				return UUID.fromString(raw); // row can't contain an invalid UUID, since the query was built from a valid UUID object
 			}
 
 			@Override
 			protected Double getValue(ResultSet set) throws SQLException {
 				return set.getDouble(valueName());
 			}
+
 		};
 	}
 

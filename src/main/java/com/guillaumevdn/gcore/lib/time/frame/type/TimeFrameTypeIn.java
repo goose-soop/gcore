@@ -27,8 +27,11 @@ public abstract class TimeFrameTypeIn<T extends TimeIn> extends TimeFrameType {
 
 	@Override
 	public Pair<ZonedDateTime, ZonedDateTime> getBounds(ElementTimeFrame frame, Replacer replacer, int offset) {
-		ZonedDateTime start = (frame.getElement("start").orNull().readContains() ? ((ElementTimeIn<T>) frame.getElementAs("start")).parse(replacer).orElse(defaultStart) : defaultStart).getCurrent();
-		ZonedDateTime end = (frame.getElement("end").orNull().readContains() ? ((ElementTimeIn<T>) frame.getElementAs("end")).parse(replacer).orElse(defaultEnd) : defaultEnd).getCurrent();
+		ZonedDateTime start = (frame.getElement("start").orNull().readContains()
+				? ((ElementTimeIn<T>) frame.getElementAs("start")).parse(replacer).orElse(defaultStart)
+				: defaultStart).getCurrent();
+		ZonedDateTime end = (frame.getElement("end").orNull().readContains() ? ((ElementTimeIn<T>) frame.getElementAs("end")).parse(replacer).orElse(defaultEnd)
+				: defaultEnd).getCurrent();
 
 		// start is before end : regular start/end times
 		if (start.isBefore(end)) {
@@ -36,9 +39,9 @@ public abstract class TimeFrameTypeIn<T extends TimeIn> extends TimeFrameType {
 		// start is after end : check which part of the week we're in, and adjust start/end times
 		else {
 			ZonedDateTime now = ConfigGCore.timeNow();
-			if (now.isBefore(end)) {  // we're before end time ; set start time to last period
+			if (now.isBefore(end)) { // we're before end time ; set start time to last period
 				start = deltaPeriod(start, -1);
-			} else {  // we're after end time ; set end time to new period
+			} else { // we're after end time ; set end time to new period
 				end = deltaPeriod(end, 1);
 			}
 		}

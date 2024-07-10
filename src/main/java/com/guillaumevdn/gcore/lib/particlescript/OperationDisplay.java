@@ -82,7 +82,9 @@ public class OperationDisplay implements Operation {
 		final Integer noteColor = execution.parseAndCalculateInteger(this.noteColor);
 		final int count = execution.parseAndCalculateInteger(this.count);
 		if (x != null && y != null && z != null) {
-			Color color = NumberUtils.isInRange(red, 0, 255) && NumberUtils.isInRange(red, 0, 255) && NumberUtils.isInRange(red, 0, 255) ? Color.fromRGB(red, green, blue) : null;
+			Color color = NumberUtils.isInRange(red, 0, 255) && NumberUtils.isInRange(red, 0, 255) && NumberUtils.isInRange(red, 0, 255)
+					? Color.fromRGB(red, green, blue)
+					: null;
 			BukkitThread.regular(isAsync).operate(execution.getPlugin(), () -> {
 				Location loc = new Location(execution.getBaseLocation().getWorld(), x, y, z);
 				effect.send(players != null ? players : loc.getWorld().getPlayers(), loc, color, noteColor, count, 0f);

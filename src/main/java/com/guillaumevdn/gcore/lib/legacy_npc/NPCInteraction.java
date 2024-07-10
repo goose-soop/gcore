@@ -6,8 +6,7 @@ import com.guillaumevdn.gcore.lib.player.PhysicalClickType;
 
 public enum NPCInteraction {
 
-	ATTACK(PhysicalClickType.LEFT_CLICK),
-	INTERACT(PhysicalClickType.RIGHT_CLICK);
+	ATTACK(PhysicalClickType.LEFT_CLICK), INTERACT(PhysicalClickType.RIGHT_CLICK);
 
 	private PhysicalClickType click;
 

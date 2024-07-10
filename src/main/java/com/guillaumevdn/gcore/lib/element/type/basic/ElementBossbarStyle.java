@@ -11,7 +11,7 @@ import com.guillaumevdn.gcore.lib.string.Text;
  * @author GuillaumeVDN
  */
 public class ElementBossbarStyle extends ElementEnum<BossbarStyle> {
-	
+
 	public ElementBossbarStyle(Element parent, String id, Need need, Text editorDescription) {
 		super(BossbarStyle.class, parent, id, need, editorDescription);
 	}

@@ -39,8 +39,13 @@ public final class UserNPCs {
 		return uuid;
 	}
 
-	public final void iterateNPCs(TriConsumer<Integer, UserNPC, IteratorControls> consumer) { npcs.iterateAndModify(consumer); }
-	public final void iterateNPCsOrThrow(ThrowableTriConsumer<Integer, UserNPC, IteratorControls> consumer) throws Throwable { npcs.iterateAndModifyOrThrow(consumer); }
+	public final void iterateNPCs(TriConsumer<Integer, UserNPC, IteratorControls> consumer) {
+		npcs.iterateAndModify(consumer);
+	}
+
+	public final void iterateNPCsOrThrow(ThrowableTriConsumer<Integer, UserNPC, IteratorControls> consumer) throws Throwable {
+		npcs.iterateAndModifyOrThrow(consumer);
+	}
 
 	public UserNPC getNPC(int id) {
 		return npcs.get(id);
@@ -75,7 +80,7 @@ public final class UserNPCs {
 		writer.writeObjectOrThrow("npcs", npcsWriter -> {
 			npcs.iterateAndModifyOrThrow((id, npc, iter) -> {
 				npcsWriter.writeObjectOrThrow("" + id, w -> {
-					w.write("id", npc.getId());  // write id so the object is still written even if there's no modified data
+					w.write("id", npc.getId()); // write id so the object is still written even if there's no modified data
 					w.write("shown", npc.getModifiedShown());
 					w.write("name", npc.getModifiedName());
 					w.write("skinData", npc.getModifiedSkinData());
@@ -103,7 +108,9 @@ public final class UserNPCs {
 		return BoardUsersNPCs.inst().getCachedValue(playerUUID);
 	}
 
-	public static final RWHashMap<UUID, RWArrayList<Consumer<Runnable>>> offlineActionsQueue = new RWHashMap<>(5, 1f);  // this avoids data being overwritten by multiples commands ran simultaneously on the same player
+	public static final RWHashMap<UUID, RWArrayList<Consumer<Runnable>>> offlineActionsQueue = new RWHashMap<>(5, 1f); // this avoids data being overwritten by
+																														// multiples commands ran simultaneously
+																														// on the same player
 
 	public static void process(UUID key, Consumer<UserNPCs> processor) {
 		// already loaded if online

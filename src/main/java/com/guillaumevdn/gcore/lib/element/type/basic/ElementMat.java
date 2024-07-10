@@ -20,6 +20,7 @@ public class ElementMat extends ElementFakeEnum<Mat> {
 	}
 
 	static RWWeakHashMap<Object, List<Mat>> cache = new RWWeakHashMap<>(1, 1f);
+
 	@Override
 	protected List<Mat> cacheOrBuild() {
 		return cachedOrBuild(cache, () -> Mat.values().stream().sorted(Comparator.comparing(e -> e.getId())));

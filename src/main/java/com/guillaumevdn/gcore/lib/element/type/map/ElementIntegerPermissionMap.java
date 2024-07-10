@@ -32,7 +32,7 @@ public class ElementIntegerPermissionMap extends MapElement<Integer, ElementPerm
 	@Override
 	public ElementPermission createElement(String elementId) {
 		ElementPermission element = new ElementPermission(this, elementId, Need.optional(), null);
-		element.setValue(CollectionUtils.asList("1"));  // don't use the default value otherwise it won't be saved
+		element.setValue(CollectionUtils.asList("1")); // don't use the default value otherwise it won't be saved
 		return element;
 	}
 

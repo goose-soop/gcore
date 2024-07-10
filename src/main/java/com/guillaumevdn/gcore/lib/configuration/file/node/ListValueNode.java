@@ -44,7 +44,8 @@ public class ListValueNode extends ConfigNode {
 
 	// ----- set
 	public void setValue(List<String> value) {
-		if (value == null) throw new IllegalArgumentException("value can't be null");
+		if (value == null)
+			throw new IllegalArgumentException("value can't be null");
 		this.value = CollectionUtils.asList(value);
 		if (value.stream().anyMatch(line -> line.contains("\n"))) {
 			ez = false;
@@ -56,13 +57,19 @@ public class ListValueNode extends ConfigNode {
 	public void write(Appendable writer, WriteType type) throws Throwable {
 		String prefix = getPrefix();
 
-		if (type.writePrefix()) writer.append(prefix);
-		if (type.writeId()) writer.append(YMLReader.wrapIdToWrite(getId()) + ": ");
+		if (type.writePrefix())
+			writer.append(prefix);
+		if (type.writeId())
+			writer.append(YMLReader.wrapIdToWrite(getId()) + ": ");
 
 		if (value.isEmpty()) {
 			writer.append("[]" + (trailingComment != null ? "  #" + trailingComment : "") + "\n");
 		} else if (shouldWriteCompact()) {
-			writer.append("[" + StringUtils.toTextString(", ", StringUtils.retranslateColorCodesCopy(value.stream().map(line -> YMLReader.wrapValueToWrite(line.replace('\n', ' '))).collect(Collectors.toList()))) + "]" + (trailingComment != null ? "  #" + trailingComment : "") + "\n");
+			writer.append("["
+					+ StringUtils.toTextString(", ",
+							StringUtils.retranslateColorCodesCopy(
+									value.stream().map(line -> YMLReader.wrapValueToWrite(line.replace('\n', ' '))).collect(Collectors.toList())))
+					+ "]" + (trailingComment != null ? "  #" + trailingComment : "") + "\n");
 		} else if (ez) {
 			writer.append("|" + (trailingComment != null ? "  #" + trailingComment : "") + "\n");
 			String linePrefix = prefix + "  ";
@@ -102,15 +109,25 @@ public class ListValueNode extends ConfigNode {
 		if (value.isEmpty()) {
 			writer.append(YMLReader.wrapIdToWrite(getId()) + ": []");
 		} else {
-			writer.append(YMLReader.wrapIdToWrite(getId()) + ": [" + StringUtils.toTextString(", ", StringUtils.retranslateColorCodesCopy(value.stream().map(line -> YMLReader.wrapValueToWrite(line.replace('\n', ' '))).collect(Collectors.toList()))) + "]");
+			writer.append(
+					YMLReader.wrapIdToWrite(getId()) + ": ["
+							+ StringUtils.toTextString(", ",
+									StringUtils.retranslateColorCodesCopy(
+											value.stream().map(line -> YMLReader.wrapValueToWrite(line.replace('\n', ' '))).collect(Collectors.toList())))
+							+ "]");
 		}
 	}
 
 	private boolean shouldWriteCompact() {
-		if (compact) return true;
-		if (ez) return false;
-		if (value.stream().allMatch(elem -> NumberUtils.longOrNull(elem) != null || NumberUtils.doubleOrNull(elem) != null)) return true;
-		if (value.size() == 1 && !value.get(0).contains(",") && value.get(0).length() < 25 && StringUtils.unformat(value.get(0)).length() == value.get(0).length()) return true;
+		if (compact)
+			return true;
+		if (ez)
+			return false;
+		if (value.stream().allMatch(elem -> NumberUtils.longOrNull(elem) != null || NumberUtils.doubleOrNull(elem) != null))
+			return true;
+		if (value.size() == 1 && !value.get(0).contains(",") && value.get(0).length() < 25
+				&& StringUtils.unformat(value.get(0)).length() == value.get(0).length())
+			return true;
 		return false;
 	}
 

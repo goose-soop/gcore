@@ -9,7 +9,10 @@ import com.guillaumevdn.gcore.lib.permission.PermissionContainer;
 public class PermissionGCore extends PermissionContainer {
 
 	private static PermissionGCore instance = null;
-	public static PermissionGCore inst() { return instance; }
+
+	public static PermissionGCore inst() {
+		return instance;
+	}
 
 	public PermissionGCore() {
 		super(GCore.inst());

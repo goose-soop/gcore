@@ -48,12 +48,12 @@ public abstract class VariantData<E extends Enum<E>> implements Cloneable {
 	// ----- object
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) return true;
-		if (obj == null) return false;
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
 		VariantData<E> other = ObjectUtils.castOrNull(obj, getClass());
-		return other != null
-				&& Objects.deepEquals(dataName, other.dataName)
-				&& CollectionUtils.contentEquals(extra, other.extra, false);
+		return other != null && Objects.deepEquals(dataName, other.dataName) && CollectionUtils.contentEquals(extra, other.extra, false);
 	}
 
 	@Override

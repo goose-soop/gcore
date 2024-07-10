@@ -34,7 +34,8 @@ public class ArgumentPairEnumInfinite<E extends Enum<E>> extends Argument<Pair<E
 			return null;
 		}
 		for (int i = 0; i < call.getArguments().size(); ++i) {
-			if (i + 1 >= call.getArguments().size()) break;
+			if (i + 1 >= call.getArguments().size())
+				break;
 			E e = ObjectUtils.safeValueOf(call.getArguments().get(i), enumClass);
 			if (e != null) {
 				call.getArguments().remove(i);

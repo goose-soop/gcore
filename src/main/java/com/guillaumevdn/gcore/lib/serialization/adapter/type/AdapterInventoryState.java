@@ -38,5 +38,5 @@ public final class AdapterInventoryState extends DataAdapter<InventoryState> {
 		}
 		throw new IllegalArgumentException("unknown adapter version " + version);
 	}
-	
+
 }

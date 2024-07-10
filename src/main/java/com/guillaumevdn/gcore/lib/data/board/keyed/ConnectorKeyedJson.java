@@ -21,7 +21,9 @@ public abstract class ConnectorKeyedJson<K, V> extends ConnectorKeyed<K, V> {
 
 	// ----- wrapper and file
 	public abstract File getRoot();
+
 	public abstract File getFile(K key);
+
 	public abstract K getKey(File file);
 
 	// ----- init
@@ -63,7 +65,8 @@ public abstract class ConnectorKeyedJson<K, V> extends ConnectorKeyed<K, V> {
 		}
 	}
 
-	protected V valueFromJson(FileReader reader) {  // this can be overriden because for complex values such as maps gson seems to be drunk and puts keys/values as raw string in the map
+	protected V valueFromJson(FileReader reader) { // this can be overriden because for complex values such as maps gson seems to be drunk and puts keys/values
+													// as raw string in the map
 		return board.getPluginGson().fromJson(reader, board.getValueClass());
 	}
 
@@ -85,7 +88,8 @@ public abstract class ConnectorKeyedJson<K, V> extends ConnectorKeyed<K, V> {
 		}
 	}
 
-	protected void valueToJson(V value, FileWriter writer) {  // this can be overriden because for complex values such as maps gson seems to be drunk and puts keys/values as raw string in the map
+	protected void valueToJson(V value, FileWriter writer) { // this can be overriden because for complex values such as maps gson seems to be drunk and puts
+																// keys/values as raw string in the map
 		board.getPluginGson().toJson(value, board.getValueClass(), writer);
 	}
 

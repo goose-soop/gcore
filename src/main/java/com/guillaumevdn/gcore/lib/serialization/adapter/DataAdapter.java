@@ -36,6 +36,7 @@ public abstract class DataAdapter<T> {
 
 	// ----- set
 	public abstract void write(T object, DataIO writer) throws Throwable;
+
 	public abstract T read(int version, DataIO reader) throws Throwable;
 
 	public final T read(DataIO reader) throws Throwable {

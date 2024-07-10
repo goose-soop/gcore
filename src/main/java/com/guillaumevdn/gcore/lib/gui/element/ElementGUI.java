@@ -47,7 +47,8 @@ public class ElementGUI extends ContainerElement implements SuperElement {
 	protected ElementGUI(Element parent, File file, String id, boolean defContents, Text editorDescription) {
 		super(parent, id, Need.optional(), editorDescription);
 		this.file = file;
-		if (defContents) defaultContents = add(new ElementGUIItemList(this, "contents", Need.optional(), TextEditorGeneric.descriptionGuiContents));
+		if (defContents)
+			defaultContents = add(new ElementGUIItemList(this, "contents", Need.optional(), TextEditorGeneric.descriptionGuiContents));
 	}
 
 	public ElementString getName() {
@@ -59,11 +60,8 @@ public class ElementGUI extends ContainerElement implements SuperElement {
 	}
 
 	public List<ActiveElementGUI> getActiveGUIs() {
-		return PluginUtils.getGPlugins().stream()
-				.flatMap(pl -> (Stream<GUI>) pl.getGUIs().stream())
-				.filter(gui -> ActiveElementGUI.isActiveElementGUI(gui, this))
-				.map(gui -> (ActiveElementGUI) gui)
-				.collect(Collectors.toList());
+		return PluginUtils.getGPlugins().stream().flatMap(pl -> (Stream<GUI>) pl.getGUIs().stream())
+				.filter(gui -> ActiveElementGUI.isActiveElementGUI(gui, this)).map(gui -> (ActiveElementGUI) gui).collect(Collectors.toList());
 	}
 
 	// ----- default implementation
@@ -90,12 +88,42 @@ public class ElementGUI extends ContainerElement implements SuperElement {
 	private List<String> loadErrors = new ArrayList<>();
 	protected YMLConfiguration config = null;
 
-	@Override public GPlugin getPlugin() { return GCore.inst(); }
-	@Override public File getOwnFile() { return file; }
-	@Override public List<String> getLoadErrors() { return Collections.unmodifiableList(loadErrors); }
-	@Override public YMLConfiguration getConfiguration() { if (config == null) { reloadConfiguration(); } return config; }
-	@Override public String getConfigurationPath() { return ""; }
-	@Override public void addLoadError(String error) { loadErrors.add(error); }
-	@Override public void reloadConfiguration() { this.config = new YMLConfiguration(getPlugin(), file); }
+	@Override
+	public GPlugin getPlugin() {
+		return GCore.inst();
+	}
+
+	@Override
+	public File getOwnFile() {
+		return file;
+	}
+
+	@Override
+	public List<String> getLoadErrors() {
+		return Collections.unmodifiableList(loadErrors);
+	}
+
+	@Override
+	public YMLConfiguration getConfiguration() {
+		if (config == null) {
+			reloadConfiguration();
+		}
+		return config;
+	}
+
+	@Override
+	public String getConfigurationPath() {
+		return "";
+	}
+
+	@Override
+	public void addLoadError(String error) {
+		loadErrors.add(error);
+	}
+
+	@Override
+	public void reloadConfiguration() {
+		this.config = new YMLConfiguration(getPlugin(), file);
+	}
 
 }

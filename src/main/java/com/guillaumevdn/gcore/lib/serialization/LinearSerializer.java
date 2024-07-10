@@ -35,7 +35,8 @@ public abstract class LinearSerializer<T extends LinearObjectType, L extends Lin
 		if (value == null) {
 			return "null";
 		}
-		return (value.getType() == null ? null : value.getType().name()) + (value.getArguments() == null || value.getArguments().isEmpty() ? "" : " " + StringUtils.toTextString(" ", value.getArguments()));
+		return (value.getType() == null ? null : value.getType().name())
+				+ (value.getArguments() == null || value.getArguments().isEmpty() ? "" : " " + StringUtils.toTextString(" ", value.getArguments()));
 	}
 
 	@Override
@@ -45,10 +46,7 @@ public abstract class LinearSerializer<T extends LinearObjectType, L extends Lin
 		}
 		List<String> split = StringUtils.split(string, " ", 1);
 		T type = split.get(0).equalsIgnoreCase("null") ? null : typeSerializer.deserialize(split.get(0));
-		return type == null ? null : deserialize(
-				type,
-				(split.size() == 1 ? new ArrayList<>() : StringUtils.split(split.get(1), " ", -1))
-				);
+		return type == null ? null : deserialize(type, (split.size() == 1 ? new ArrayList<>() : StringUtils.split(split.get(1), " ", -1)));
 	}
 
 	protected abstract L deserialize(T type, List<String> params);

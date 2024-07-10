@@ -34,7 +34,7 @@ public class MultipleBasedParticleScriptExecution<K> {
 	public GPlugin getPlugin() {
 		return plugin;
 	}
-	
+
 	public final ParticleScript getScript() {
 		return script;
 	}
@@ -51,10 +51,13 @@ public class MultipleBasedParticleScriptExecution<K> {
 			locations.put(key, location);
 			// maybe init execution
 			ParticleScriptExecution exec = executions.computeIfAbsent(key, __ -> new ParticleScriptExecution(plugin, script, autoLoop) {
+
 				@Override
 				public Location getBaseLocation() {
-					return locations.get(key); // will be reset every time this class' update() is called so we get it from the map (only one execution instance will be created)
+					return locations.get(key); // will be reset every time this class' update() is called so we get it from the map (only one execution instance
+												// will be created)
 				}
+
 			});
 			// maybe update script if it changed
 			if (!exec.getScript().equals(script)) {

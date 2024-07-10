@@ -33,8 +33,10 @@ public class PositionTypeCitizensNPCRelativeAreaInside extends PositionTypeCitiz
 	// ----- parse
 	@Override
 	protected Position doParse(ElementPosition position, NPC npc, Replacer replacer) throws ParsingError {
-		Location a = position.getElementAs("bound1", ElementRelativeLocation.class).parseNoCatchOrThrowParsingNull(replacer.cloneReplacer().with(npc.getEntity().getLocation()));
-		Location b = position.getElementAs("bound2", ElementRelativeLocation.class).parseNoCatchOrThrowParsingNull(replacer.cloneReplacer().with(npc.getEntity().getLocation()));
+		Location a = position.getElementAs("bound1", ElementRelativeLocation.class)
+				.parseNoCatchOrThrowParsingNull(replacer.cloneReplacer().with(npc.getEntity().getLocation()));
+		Location b = position.getElementAs("bound2", ElementRelativeLocation.class)
+				.parseNoCatchOrThrowParsingNull(replacer.cloneReplacer().with(npc.getEntity().getLocation()));
 		return new PositionAreaInside(a, b);
 	}
 

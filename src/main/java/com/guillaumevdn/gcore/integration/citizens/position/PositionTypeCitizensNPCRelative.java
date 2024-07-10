@@ -47,17 +47,21 @@ public abstract class PositionTypeCitizensNPCRelative extends PositionType {
 		NPC npc;
 		try {
 			npc = position.getElementAs("npc", ElementCitizensNPC.class).parseNoCatchOrThrowParsingNull(replacer);
-			if (!npc.isSpawned()) return null;
+			if (!npc.isSpawned())
+				return null;
 		} catch (ParsingError error) {
 			List<String> names = position.directParseOrNull("npc_names", replacer);
-			if (names == null || names.isEmpty()) throw error;
-			Stream<NPC> stream = CollectionUtils.asList(CitizensAPI.getNPCRegistry()).stream().filter(n -> CollectionUtils.containsIgnoreCase(names, n.getName())).filter(NPC::isSpawned);
+			if (names == null || names.isEmpty())
+				throw error;
+			Stream<NPC> stream = CollectionUtils.asList(CitizensAPI.getNPCRegistry()).stream()
+					.filter(n -> CollectionUtils.containsIgnoreCase(names, n.getName())).filter(NPC::isSpawned);
 			Location loc = replacer.getReplacerData().getLocationOrPlayer();
 			if (loc != null) {
 				stream = stream.sorted((a, b) -> Double.compare(a.getEntity().getLocation().distance(loc), b.getEntity().getLocation().distance(loc)));
 			}
 			npc = stream.findFirst().orElse(null);
-			if (npc == null) return null;
+			if (npc == null)
+				return null;
 		}
 		return doParse(position, npc, replacer);
 	}

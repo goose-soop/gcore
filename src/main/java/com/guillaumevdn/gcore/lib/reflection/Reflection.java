@@ -1,17 +1,5 @@
 package com.guillaumevdn.gcore.lib.reflection;
 
-import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
-import com.guillaumevdn.gcore.lib.compatibility.Version;
-import com.guillaumevdn.gcore.lib.concurrency.RWHashMap;
-import com.guillaumevdn.gcore.lib.concurrency.RWHashSet;
-import com.guillaumevdn.gcore.lib.function.ThrowableConsumer;
-import com.guillaumevdn.gcore.lib.logic.ComparisonType;
-import com.guillaumevdn.gcore.lib.object.ObjectUtils;
-import com.guillaumevdn.gcore.lib.string.StringUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -23,11 +11,23 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.bukkit.Bukkit;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
+
+import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
+import com.guillaumevdn.gcore.lib.compatibility.Version;
+import com.guillaumevdn.gcore.lib.concurrency.RWHashMap;
+import com.guillaumevdn.gcore.lib.concurrency.RWHashSet;
+import com.guillaumevdn.gcore.lib.function.ThrowableConsumer;
+import com.guillaumevdn.gcore.lib.logic.ComparisonType;
+import com.guillaumevdn.gcore.lib.object.ObjectUtils;
+import com.guillaumevdn.gcore.lib.string.StringUtils;
+
 /**
  * @author GuillaumeVDN
  */
-public final class Reflection
-{
+public final class Reflection {
 
     // ----- class
     private static RWHashMap<Integer, Class> cache = new RWHashMap<>(10, 1f);
@@ -152,7 +152,8 @@ public final class Reflection
     }
 
     public static ReflectionObject invokeMethod(Class clazz, String name, Object object, Collection<?> params) throws Throwable {
-        return getMethod(clazz, name, params.stream().map(param -> param == null ? null : param.getClass()).collect(Collectors.toList())).invoke(object, params);
+        return getMethod(clazz, name, params.stream().map(param -> param == null ? null : param.getClass()).collect(Collectors.toList())).invoke(object,
+                params);
     }
 
     public static ReflectionMethod getMethodForParams(Class clazz, String name, Object... params) throws Throwable {
@@ -223,7 +224,8 @@ public final class Reflection
     }
 
     public static void sendNmsPacket(Player player, Object packet) throws Throwable {
-        getPlayerConnection(player).invokeMethod(Version.ATLEAST_1_20_2 ? "b" : (Version.ATLEAST_1_20 ? "a" : (Version.ATLEAST_1_19 ? "sendPacket" : (Version.ATLEAST_1_18 ? "a" : "sendPacket"))), packet);
+        getPlayerConnection(player).invokeMethod(Version.ATLEAST_1_20_2 ? "b"
+                : (Version.ATLEAST_1_20 ? "a" : (Version.ATLEAST_1_19 ? "sendPacket" : (Version.ATLEAST_1_18 ? "a" : "sendPacket"))), packet);
     }
 
     public static void sendNmsPacket(Collection<Player> players, String path, Object... params) throws Throwable {

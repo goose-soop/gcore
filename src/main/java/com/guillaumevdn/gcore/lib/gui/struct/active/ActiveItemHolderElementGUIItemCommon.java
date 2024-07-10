@@ -28,12 +28,15 @@ public abstract class ActiveItemHolderElementGUIItemCommon extends ActiveItemHol
 	}
 
 	@Override
-	protected final void buildItems(List<IntegerPair> locations, ItemStack itemIcon, Sound clickSound, Map<ClickType, Consumer<ClickCall>> overrideClicks, TriConsumer<Collection<? extends GUIItem>, Set<String>, Integer> callback) throws ParsingError {
+	protected final void buildItems(List<IntegerPair> locations, ItemStack itemIcon, Sound clickSound, Map<ClickType, Consumer<ClickCall>> overrideClicks,
+			TriConsumer<Collection<? extends GUIItem>, Set<String>, Integer> callback) throws ParsingError {
 		build(itemIcon, (icon, placeholders, forcedDelay, performer) -> {
 			GUIItem item = new GUIItem(getHolder().getId(), locations, icon, clickSound, overrideClicks, performer);
 			callback.accept(CollectionUtils.asList(item), placeholders, forcedDelay);
 		});
 	}
 
-	protected abstract void build(@Nullable ItemStack itemIcon, QuadriConsumer<ItemStack, Set<String>, Integer, Consumer<ClickCall>> callback) throws ParsingError;
+	protected abstract void build(@Nullable ItemStack itemIcon, QuadriConsumer<ItemStack, Set<String>, Integer, Consumer<ClickCall>> callback)
+			throws ParsingError;
+
 }

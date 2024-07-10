@@ -5,8 +5,6 @@ package com.guillaumevdn.gcore.lib.object;
  */
 public enum NeedType {
 
-	REQUIRED,
-	OPTIONAL
-	;
+	REQUIRED, OPTIONAL;
 
 }

@@ -49,7 +49,8 @@ public abstract class ElementTypableElementType<T extends TypableElementType> ex
 						TypableContainerElement<T> parent = (TypableContainerElement<T>) getParent();
 						parent.changeType(value);
 					}
-				} catch (ClassCastException ignored) {}
+				} catch (ClassCastException ignored) {
+				}
 
 				// reopen GUI (that refreshes it since it's an editor GUI)
 				call.reopenGUI();

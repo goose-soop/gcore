@@ -55,7 +55,8 @@ public class SortedLowerCaseHashMap<V> implements Cloneable {
 
 	/**
 	 * @param key the key
-	 * @return the value associated with this key (a null value might mean that it's mapped with a null value, or that there's no mapping as well)
+	 * @return the value associated with this key (a null value might mean that it's mapped with a null value, or that
+	 *         there's no mapping as well)
 	 */
 	public V get(String key) {
 		return map.get(lower(key));
@@ -93,9 +94,11 @@ public class SortedLowerCaseHashMap<V> implements Cloneable {
 
 	/**
 	 * Map a value to a key
-	 * @param key the key
+	 * 
+	 * @param key   the key
 	 * @param value the value
-	 * @return the value previously associated with this key (a null value might mean that it was mapped with a null value, or that there was no mapping as well)
+	 * @return the value previously associated with this key (a null value might mean that it was mapped with a null value,
+	 *         or that there was no mapping as well)
 	 */
 	public V put(String key, V value) {
 		return map.put(lower(key), value);
@@ -107,8 +110,10 @@ public class SortedLowerCaseHashMap<V> implements Cloneable {
 
 	/**
 	 * Remove a key from the map
+	 * 
 	 * @param key the key
-	 * @return the value previously associated with this key (a null value might mean that it was mapped with a null value, or that there was no mapping as well)
+	 * @return the value previously associated with this key (a null value might mean that it was mapped with a null value,
+	 *         or that there was no mapping as well)
 	 */
 	public V remove(String key) {
 		return map.remove(lower(key));
@@ -188,7 +193,8 @@ public class SortedLowerCaseHashMap<V> implements Cloneable {
 
 	// ----- static methods
 	public static <TV> SortedLowerCaseHashMap<TV> asMap(Type type, Order order, Object... objects) {
-		if (objects.length != 0 && objects.length % 2 != 0) throw new IllegalArgumentException("size isn't a multiple of 2");
+		if (objects.length != 0 && objects.length % 2 != 0)
+			throw new IllegalArgumentException("size isn't a multiple of 2");
 		SortedLowerCaseHashMap<TV> map = new SortedLowerCaseHashMap<>(type, order);
 		for (int i = 0; i < objects.length; i += 2) {
 			map.put((String) objects[i], (TV) objects[i + 1]);

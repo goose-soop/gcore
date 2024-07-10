@@ -25,12 +25,15 @@ import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
 public final class MetaLeatherArmor {
 
 	public static boolean match(ItemMeta itemMeta, ItemReference reference, ItemCheck check) {
-		if (!reference.hasMeta(LeatherArmorMeta.class)) return true;
-		LeatherArmorMeta meta = ObjectUtils.castOrNull(itemMeta, LeatherArmorMeta.class);  // might be null if exact match is false
+		if (!reference.hasMeta(LeatherArmorMeta.class))
+			return true;
+		LeatherArmorMeta meta = ObjectUtils.castOrNull(itemMeta, LeatherArmorMeta.class); // might be null if exact match is false
 
 		// color
-		if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getColor(), reference.getArmorColor()))) return false;
-		else if (!check.isExact() && reference.getArmorColor() != null && (meta == null || reference.getArmorColor().equals(meta.getColor()))) return false;
+		if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getColor(), reference.getArmorColor())))
+			return false;
+		else if (!check.isExact() && reference.getArmorColor() != null && (meta == null || reference.getArmorColor().equals(meta.getColor())))
+			return false;
 
 		// seems good
 		return true;
@@ -72,7 +75,8 @@ public final class MetaLeatherArmor {
 	public static void importElements(ElementItem item, ItemMeta itemMeta) {
 		LeatherArmorMeta meta = ObjectUtils.castOrNull(itemMeta, LeatherArmorMeta.class);
 		if (meta != null) {
-			item.getElementAs("color", ElementColor.class).setValue(meta.getColor() != null ? CollectionUtils.asList(Serializer.COLOR.serialize(meta.getColor())) : null);
+			item.getElementAs("color", ElementColor.class)
+					.setValue(meta.getColor() != null ? CollectionUtils.asList(Serializer.COLOR.serialize(meta.getColor())) : null);
 		}
 	}
 

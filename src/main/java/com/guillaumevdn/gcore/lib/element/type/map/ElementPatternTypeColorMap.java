@@ -18,7 +18,8 @@ import com.guillaumevdn.gcore.lib.string.Text;
 /**
  * @author GuillaumeVDN
  */
-public class ElementPatternTypeColorMap extends ElementAbstractEnumMap<PatternType, ElementDyeColor> implements ParseableMapElement<PatternType, DyeColor, ElementDyeColor> {
+public class ElementPatternTypeColorMap extends ElementAbstractEnumMap<PatternType, ElementDyeColor>
+		implements ParseableMapElement<PatternType, DyeColor, ElementDyeColor> {
 
 	public ElementPatternTypeColorMap(Element parent, String id, Need need, Text editorDescription) {
 		super(PatternType.class, parent, id, need, editorDescription, CollectionUtils.asList(PatternType.values()));
@@ -28,7 +29,7 @@ public class ElementPatternTypeColorMap extends ElementAbstractEnumMap<PatternTy
 	@Override
 	public ElementDyeColor createElement(String elementId) {
 		ElementDyeColor elem = new ElementDyeColor(this, elementId, Need.optional(), null);
-		elem.setValue(CollectionUtils.asList(DyeColor.PURPLE.name()));  // set a value to force it to save
+		elem.setValue(CollectionUtils.asList(DyeColor.PURPLE.name())); // set a value to force it to save
 		return elem;
 	}
 

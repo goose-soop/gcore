@@ -30,19 +30,21 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 /**
- * A map of comparable keys to values. Unlike {@code TreeMap}, this class uses
- * insertion order for iteration order. Comparison order is only used as an
- * optimization for efficient insertion and removal.
+ * A map of comparable keys to values. Unlike {@code TreeMap}, this class uses insertion order for iteration order.
+ * Comparison order is only used as an optimization for efficient insertion and removal.
  *
- * <p>This implementation was derived from Android 4.1's TreeMap and
- * LinkedHashMap classes.
+ * <p>
+ * This implementation was derived from Android 4.1's TreeMap and LinkedHashMap classes.
  */
 public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements Serializable {
-   // to avoid Comparable<Comparable<Comparable<...>>>
+
+  // to avoid Comparable<Comparable<Comparable<...>>>
   private static final Comparator<Comparable> NATURAL_ORDER = new Comparator<Comparable>() {
+
     public int compare(Comparable a, Comparable b) {
       return a.compareTo(b);
     }
+
   };
 
   Comparator<? super K> comparator;
@@ -53,45 +55,44 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
   int threshold;
 
   /**
-   * Create a natural order, empty tree map whose keys must be mutually
-   * comparable and non-null.
+   * Create a natural order, empty tree map whose keys must be mutually comparable and non-null.
    */
-   // unsafe! this assumes K is comparable
+  // unsafe! this assumes K is comparable
   public LinkedHashTreeMap() {
     this((Comparator<? super K>) NATURAL_ORDER);
   }
 
   /**
-   * Create a tree map ordered by {@code comparator}. This map's keys may only
-   * be null if {@code comparator} permits.
+   * Create a tree map ordered by {@code comparator}. This map's keys may only be null if {@code comparator} permits.
    *
-   * @param comparator the comparator to order elements with, or {@code null} to
-   *     use the natural ordering.
+   * @param comparator the comparator to order elements with, or {@code null} to use the natural ordering.
    */
-   // unsafe! if comparator is null, this assumes K is comparable
+  // unsafe! if comparator is null, this assumes K is comparable
   public LinkedHashTreeMap(Comparator<? super K> comparator) {
-    this.comparator = comparator != null
-        ? comparator
-        : (Comparator) NATURAL_ORDER;
+    this.comparator = comparator != null ? comparator : (Comparator) NATURAL_ORDER;
     this.header = new Node<K, V>();
-    this.table = new Node[16]; // 
+    this.table = new Node[16]; //
     this.threshold = (table.length / 2) + (table.length / 4); // 3/4 capacity
   }
 
-  @Override public int size() {
+  @Override
+  public int size() {
     return size;
   }
 
-  @Override public V get(Object key) {
+  @Override
+  public V get(Object key) {
     Node<K, V> node = findByObject(key);
     return node != null ? node.value : null;
   }
 
-  @Override public boolean containsKey(Object key) {
+  @Override
+  public boolean containsKey(Object key) {
     return findByObject(key) != null;
   }
 
-  @Override public V put(K key, V value) {
+  @Override
+  public V put(K key, V value) {
     if (key == null) {
       throw new NullPointerException("key == null");
     }
@@ -101,14 +102,15 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
     return result;
   }
 
-  @Override public void clear() {
+  @Override
+  public void clear() {
     Arrays.fill(table, null);
     size = 0;
     modCount++;
 
     // Clear all links to help GC
     Node<K, V> header = this.header;
-    for (Node<K, V> e = header.next; e != header; ) {
+    for (Node<K, V> e = header.next; e != header;) {
       Node<K, V> next = e.next;
       e.next = e.prev = null;
       e = next;
@@ -117,7 +119,8 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
     header.next = header.prev = header;
   }
 
-  @Override public V remove(Object key) {
+  @Override
+  public V remove(Object key) {
     Node<K, V> node = removeInternalByKey(key);
     return node != null ? node.value : null;
   }
@@ -125,8 +128,7 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
   /**
    * Returns the node at or adjacent to the given key, creating it if requested.
    *
-   * @throws ClassCastException if {@code key} and the tree's keys aren't
-   *     mutually comparable.
+   * @throws ClassCastException if {@code key} and the tree's keys aren't mutually comparable.
    */
   Node<K, V> find(K key, boolean create) {
     Comparator<? super K> comparator = this.comparator;
@@ -138,15 +140,11 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
 
     if (nearest != null) {
       // Micro-optimization: avoid polymorphic calls to Comparator.compare().
-       // Throws a ClassCastException below if there's trouble.
-      Comparable<Object> comparableKey = (comparator == NATURAL_ORDER)
-          ? (Comparable<Object>) key
-          : null;
+      // Throws a ClassCastException below if there's trouble.
+      Comparable<Object> comparableKey = (comparator == NATURAL_ORDER) ? (Comparable<Object>) key : null;
 
       while (true) {
-        comparison = (comparableKey != null)
-            ? comparableKey.compareTo(nearest.key)
-            : comparator.compare(key, nearest.key);
+        comparison = (comparableKey != null) ? comparableKey.compareTo(nearest.key) : comparator.compare(key, nearest.key);
 
         // We found the requested key.
         if (comparison == 0) {
@@ -196,7 +194,6 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
     return created;
   }
 
-  
   Node<K, V> findByObject(Object key) {
     try {
       return key != null ? find((K) key, false) : null;
@@ -209,9 +206,10 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
    * Returns this map's entry that has the same key and value as {@code
    * entry}, or null if this map has no such entry.
    *
-   * <p>This method uses the comparator for key equality rather than {@code
-   * equals}. If this map's comparator isn't consistent with equals (such as
-   * {@code String.CASE_INSENSITIVE_ORDER}), then {@code remove()} and {@code
+   * <p>
+   * This method uses the comparator for key equality rather than {@code
+   * equals}. If this map's comparator isn't consistent with equals (such as {@code String.CASE_INSENSITIVE_ORDER}), then
+   * {@code remove()} and {@code
    * contains()} will violate the collections API.
    */
   Node<K, V> findByEntry(Entry<?, ?> entry) {
@@ -225,10 +223,9 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
   }
 
   /**
-   * Applies a supplemental hash function to a given hashCode, which defends
-   * against poor quality hash functions. This is critical because HashMap
-   * uses power-of-two length hash tables, that otherwise encounter collisions
-   * for hashCodes that do not differ in lower or upper bits.
+   * Applies a supplemental hash function to a given hashCode, which defends against poor quality hash functions. This is
+   * critical because HashMap uses power-of-two length hash tables, that otherwise encounter collisions for hashCodes that
+   * do not differ in lower or upper bits.
    */
   private static int secondaryHash(int h) {
     // Doug Lea's supplemental hash function
@@ -237,8 +234,7 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
   }
 
   /**
-   * Removes {@code node} from this tree, rearranging the tree's structure as
-   * necessary.
+   * Removes {@code node} from this tree, rearranging the tree's structure as necessary.
    *
    * @param unlink true to also unlink this node from the iteration linked list.
    */
@@ -255,12 +251,11 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
     if (left != null && right != null) {
 
       /*
-       * To remove a node with both left and right subtrees, move an
-       * adjacent node from one of those subtrees into this node's place.
+       * To remove a node with both left and right subtrees, move an adjacent node from one of those subtrees into this node's
+       * place.
        *
-       * Removing the adjacent node may change this node's subtrees. This
-       * node may no longer have two subtrees once the adjacent node is
-       * gone!
+       * Removing the adjacent node may change this node's subtrees. This node may no longer have two subtrees once the
+       * adjacent node is gone!
        */
 
       Node<K, V> adjacent = (left.height > right.height) ? left.last() : right.first();
@@ -329,11 +324,9 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
   }
 
   /**
-   * Rebalances the tree by making any AVL rotations necessary between the
-   * newly-unbalanced node and the tree's root.
+   * Rebalances the tree by making any AVL rotations necessary between the newly-unbalanced node and the tree's root.
    *
-   * @param insert true if the node was unbalanced by an insert; false if it
-   *     was by a removal.
+   * @param insert true if the node was unbalanced by an insert; false if it was by a removal.
    */
   private void rebalance(Node<K, V> unbalanced, boolean insert) {
     for (Node<K, V> node = unbalanced; node != null; node = node.parent) {
@@ -417,10 +410,8 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
     root.parent = pivot;
 
     // fix heights
-    root.height = Math.max(left != null ? left.height : 0,
-        pivotLeft != null ? pivotLeft.height : 0) + 1;
-    pivot.height = Math.max(root.height,
-        pivotRight != null ? pivotRight.height : 0) + 1;
+    root.height = Math.max(left != null ? left.height : 0, pivotLeft != null ? pivotLeft.height : 0) + 1;
+    pivot.height = Math.max(root.height, pivotRight != null ? pivotRight.height : 0) + 1;
   }
 
   /**
@@ -445,26 +436,27 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
     root.parent = pivot;
 
     // fixup heights
-    root.height = Math.max(right != null ? right.height : 0,
-        pivotRight != null ? pivotRight.height : 0) + 1;
-    pivot.height = Math.max(root.height,
-        pivotLeft != null ? pivotLeft.height : 0) + 1;
+    root.height = Math.max(right != null ? right.height : 0, pivotRight != null ? pivotRight.height : 0) + 1;
+    pivot.height = Math.max(root.height, pivotLeft != null ? pivotLeft.height : 0) + 1;
   }
 
   private EntrySet entrySet;
   private KeySet keySet;
 
-  @Override public Set<Entry<K, V>> entrySet() {
+  @Override
+  public Set<Entry<K, V>> entrySet() {
     EntrySet result = entrySet;
     return result != null ? result : (entrySet = new EntrySet());
   }
 
-  @Override public Set<K> keySet() {
+  @Override
+  public Set<K> keySet() {
     KeySet result = keySet;
     return result != null ? result : (keySet = new KeySet());
   }
 
   static final class Node<K, V> implements Entry<K, V> {
+
     Node<K, V> parent;
     Node<K, V> left;
     Node<K, V> right;
@@ -508,8 +500,8 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
       return oldValue;
     }
 
-    
-    @Override public boolean equals(Object o) {
+    @Override
+    public boolean equals(Object o) {
       if (o instanceof Entry) {
         Entry other = (Entry) o;
         return (key == null ? other.getKey() == null : key.equals(other.getKey()))
@@ -518,12 +510,13 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
       return false;
     }
 
-    @Override public int hashCode() {
-      return (key == null ? 0 : key.hashCode())
-          ^ (value == null ? 0 : value.hashCode());
+    @Override
+    public int hashCode() {
+      return (key == null ? 0 : key.hashCode()) ^ (value == null ? 0 : value.hashCode());
     }
 
-    @Override public String toString() {
+    @Override
+    public String toString() {
       return key + "=" + value;
     }
 
@@ -552,6 +545,7 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
       }
       return node;
     }
+
   }
 
   private void doubleCapacity() {
@@ -560,13 +554,13 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
   }
 
   /**
-   * Returns a new array containing the same nodes as {@code oldTable}, but with
-   * twice as many trees, each of (approximately) half the previous size.
+   * Returns a new array containing the same nodes as {@code oldTable}, but with twice as many trees, each of
+   * (approximately) half the previous size.
    */
   static <K, V> Node<K, V>[] doubleCapacity(Node<K, V>[] oldTable) {
-    // 
+    //
     int oldCapacity = oldTable.length;
-     // Arrays and generics don't get along.
+    // Arrays and generics don't get along.
     Node<K, V>[] newTable = new Node[oldCapacity * 2];
     AvlIterator<K, V> iterator = new AvlIterator<K, V>();
     AvlBuilder<K, V> leftBuilder = new AvlBuilder<K, V>();
@@ -583,7 +577,7 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
       iterator.reset(root);
       int leftSize = 0;
       int rightSize = 0;
-      for (Node<K, V> node; (node = iterator.next()) != null; ) {
+      for (Node<K, V> node; (node = iterator.next()) != null;) {
         if ((node.hash & oldCapacity) == 0) {
           leftSize++;
         } else {
@@ -595,7 +589,7 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
       leftBuilder.reset(leftSize);
       rightBuilder.reset(rightSize);
       iterator.reset(root);
-      for (Node<K, V> node; (node = iterator.next()) != null; ) {
+      for (Node<K, V> node; (node = iterator.next()) != null;) {
         if ((node.hash & oldCapacity) == 0) {
           leftBuilder.add(node);
         } else {
@@ -611,15 +605,15 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
   }
 
   /**
-   * Walks an AVL tree in iteration order. Once a node has been returned, its
-   * left, right and parent links are <strong>no longer used</strong>. For this
-   * reason it is safe to transform these links as you walk a tree.
+   * Walks an AVL tree in iteration order. Once a node has been returned, its left, right and parent links are <strong>no
+   * longer used</strong>. For this reason it is safe to transform these links as you walk a tree.
    *
-   * <p><strong>Warning:</strong> this iterator is destructive. It clears the
-   * parent node of all nodes in the tree. It is an error to make a partial
-   * iteration of a tree.
+   * <p>
+   * <strong>Warning:</strong> this iterator is destructive. It clears the parent node of all nodes in the tree. It is an
+   * error to make a partial iteration of a tree.
    */
   static class AvlIterator<K, V> {
+
     /** This stack is a singly linked list, linked by the 'parent' field. */
     private Node<K, V> stackTop;
 
@@ -647,27 +641,28 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
       this.stackTop = stackTop;
       return result;
     }
+
   }
 
   /**
-   * Builds AVL trees of a predetermined size by accepting nodes of increasing
-   * value. To use:
+   * Builds AVL trees of a predetermined size by accepting nodes of increasing value. To use:
    * <ol>
-   *   <li>Call {@link #reset} to initialize the target size <i>size</i>.
-   *   <li>Call {@link #add} <i>size</i> times with increasing values.
-   *   <li>Call {@link #root} to get the root of the balanced tree.
+   * <li>Call {@link #reset} to initialize the target size <i>size</i>.
+   * <li>Call {@link #add} <i>size</i> times with increasing values.
+   * <li>Call {@link #root} to get the root of the balanced tree.
    * </ol>
    *
-   * <p>The returned tree will satisfy the AVL constraint: for every node
-   * <i>N</i>, the height of <i>N.left</i> and <i>N.right</i> is different by at
-   * most 1. It accomplishes this by omitting deepest-level leaf nodes when
-   * building trees whose size isn't a power of 2 minus 1.
+   * <p>
+   * The returned tree will satisfy the AVL constraint: for every node <i>N</i>, the height of <i>N.left</i> and
+   * <i>N.right</i> is different by at most 1. It accomplishes this by omitting deepest-level leaf nodes when building
+   * trees whose size isn't a power of 2 minus 1.
    *
-   * <p>Unlike rebuilding a tree from scratch, this approach requires no value
-   * comparisons. Using this class to create a tree of size <i>S</i> is
-   * {@code O(S)}.
+   * <p>
+   * Unlike rebuilding a tree from scratch, this approach requires no value comparisons. Using this class to create a tree
+   * of size <i>S</i> is {@code O(S)}.
    */
   final static class AvlBuilder<K, V> {
+
     /** This stack is a singly linked list, linked by the 'parent' field. */
     private Node<K, V> stack;
     private int leavesToSkip;
@@ -706,17 +701,14 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
       }
 
       /*
-       * Combine 3 nodes into subtrees whenever the size is one less than a
-       * multiple of 4. For example we combine the nodes A, B, C into a
-       * 3-element tree with B as the root.
+       * Combine 3 nodes into subtrees whenever the size is one less than a multiple of 4. For example we combine the nodes A,
+       * B, C into a 3-element tree with B as the root.
        *
-       * Combine two subtrees and a spare single value whenever the size is one
-       * less than a multiple of 8. For example at 8 we may combine subtrees
-       * (A B C) and (E F G) with D as the root to form ((A B C) D (E F G)).
+       * Combine two subtrees and a spare single value whenever the size is one less than a multiple of 8. For example at 8 we
+       * may combine subtrees (A B C) and (E F G) with D as the root to form ((A B C) D (E F G)).
        *
-       * Just as we combine single nodes when size nears a multiple of 4, and
-       * 3-element trees when size nears a multiple of 8, we combine subtrees of
-       * size (N-1) whenever the total size is 2N-1 whenever N is a power of 2.
+       * Just as we combine single nodes when size nears a multiple of 4, and 3-element trees when size nears a multiple of 8,
+       * we combine subtrees of size (N-1) whenever the total size is 2N-1 whenever N is a power of 2.
        */
       for (int scale = 4; (size & scale - 1) == scale - 1; scale *= 2) {
         if (leavesSkipped == 0) {
@@ -755,9 +747,11 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
       }
       return stackTop;
     }
+
   }
 
   private abstract class LinkedTreeMapIterator<T> implements Iterator<T> {
+
     Node<K, V> next = header.next;
     Node<K, V> lastReturned = null;
     int expectedModCount = modCount;
@@ -789,26 +783,34 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
       lastReturned = null;
       expectedModCount = modCount;
     }
+
   }
 
   final class EntrySet extends AbstractSet<Entry<K, V>> {
-    @Override public int size() {
+
+    @Override
+    public int size() {
       return size;
     }
 
-    @Override public Iterator<Entry<K, V>> iterator() {
+    @Override
+    public Iterator<Entry<K, V>> iterator() {
       return new LinkedTreeMapIterator<Entry<K, V>>() {
+
         public Entry<K, V> next() {
           return nextNode();
         }
+
       };
     }
 
-    @Override public boolean contains(Object o) {
+    @Override
+    public boolean contains(Object o) {
       return o instanceof Entry && findByEntry((Entry<?, ?>) o) != null;
     }
 
-    @Override public boolean remove(Object o) {
+    @Override
+    public boolean remove(Object o) {
       if (!(o instanceof Entry)) {
         return false;
       }
@@ -821,44 +823,55 @@ public final class LinkedHashTreeMap<K, V> extends AbstractMap<K, V> implements 
       return true;
     }
 
-    @Override public void clear() {
+    @Override
+    public void clear() {
       LinkedHashTreeMap.this.clear();
     }
+
   }
 
   final class KeySet extends AbstractSet<K> {
-    @Override public int size() {
+
+    @Override
+    public int size() {
       return size;
     }
 
-    @Override public Iterator<K> iterator() {
+    @Override
+    public Iterator<K> iterator() {
       return new LinkedTreeMapIterator<K>() {
+
         public K next() {
           return nextNode().key;
         }
+
       };
     }
 
-    @Override public boolean contains(Object o) {
+    @Override
+    public boolean contains(Object o) {
       return containsKey(o);
     }
 
-    @Override public boolean remove(Object key) {
+    @Override
+    public boolean remove(Object key) {
       return removeInternalByKey(key) != null;
     }
 
-    @Override public void clear() {
+    @Override
+    public void clear() {
       LinkedHashTreeMap.this.clear();
     }
+
   }
 
   /**
-   * If somebody is unlucky enough to have to serialize one of these, serialize
-   * it as a LinkedHashMap so that they won't need Gson on the other side to
-   * deserialize it. Using serialization defeats our DoS defence, so most apps
-   * shouldn't use it.
+   * If somebody is unlucky enough to have to serialize one of these, serialize it as a LinkedHashMap so that they won't
+   * need Gson on the other side to deserialize it. Using serialization defeats our DoS defence, so most apps shouldn't
+   * use it.
    */
   private Object writeReplace() throws ObjectStreamException {
     return new LinkedHashMap<K, V>(this);
   }
+
 }

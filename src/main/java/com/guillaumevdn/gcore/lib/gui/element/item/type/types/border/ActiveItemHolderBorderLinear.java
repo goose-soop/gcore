@@ -59,9 +59,9 @@ public final class ActiveItemHolderBorderLinear extends ActiveItemHolder {
 
 			// parse settings
 			try {
-				locations = element.parseLocations(getInstance().getReplacer());  // new list
+				locations = element.parseLocations(getInstance().getReplacer()); // new list
 
-				if (locations.isEmpty()) {  // no point in going any further
+				if (locations.isEmpty()) { // no point in going any further
 					itemIconOn = null;
 					return;
 				}
@@ -89,7 +89,7 @@ public final class ActiveItemHolderBorderLinear extends ActiveItemHolder {
 		// already initialized
 		else if (itemIconOn != null /* null if parsing error */) {
 			if (locations.isEmpty()) {
-				return;  // happens very rarily, no idea why
+				return; // happens very rarily, no idea why
 			}
 
 			// increase step
@@ -105,7 +105,8 @@ public final class ActiveItemHolderBorderLinear extends ActiveItemHolder {
 
 			// only update slots that changed to avoid heavy refreshes
 			// we'll send page items directly using the handler
-			// -> the GUI will think that it's just always off everywhere, we don't care, it's only display (as long as it knows there's something to avoid conflicts, we're good)
+			// -> the GUI will think that it's just always off everywhere, we don't care, it's only display (as long as it knows
+			// there's something to avoid conflicts, we're good)
 			previousOn.addAll(locOn);
 			previousOn.forEach(pair -> {
 				ActiveItemHolder present = getInstance().getNonBorderHolder(pair.getA(), pair.getB());

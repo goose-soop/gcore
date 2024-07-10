@@ -101,7 +101,8 @@ public final class ResourceExtractor {
 						file = new File(targetFolder, path.replaceFirst(resourcePath, ""));
 					} else {
 						int index = path.indexOf(File.separatorChar);
-						if (index == -1) index = path.indexOf('/');
+						if (index == -1)
+							index = path.indexOf('/');
 						file = new File(targetFolder, path.substring(index, path.length()));
 					}
 
@@ -121,19 +122,16 @@ public final class ResourceExtractor {
 						FileOutputStream out = new FileOutputStream(file);
 
 						byte[] buffer = new byte[1024];
-						for (int n; (n = in.read(buffer)) != -1; out.write(buffer, 0, n));
+						for (int n; (n = in.read(buffer)) != -1; out.write(buffer, 0, n))
+							;
 
 						in.close();
 						out.close();
 
-						/* // original code, which tends to be slower
-						InputStream is = jar.getInputStream(entry);
-						FileOutputStream fos = new FileOutputStream(file);
-						while (is.available() > 0) {
-							fos.write(is.read());
-						}
-						fos.close();
-						is.close();*/
+						/*
+						 * // original code, which tends to be slower InputStream is = jar.getInputStream(entry); FileOutputStream fos = new
+						 * FileOutputStream(file); while (is.available() > 0) { fos.write(is.read()); } fos.close(); is.close();
+						 */
 
 						done.alter(1);
 					}

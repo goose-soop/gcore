@@ -14,7 +14,6 @@ import com.guillaumevdn.gcore.lib.string.Text;
  */
 public class ElementFloatList extends ElementValueList<Float> {
 
-	
 	private final float min, max;
 
 	public ElementFloatList(Element parent, String id, Need need, Text editorDescription) {

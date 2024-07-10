@@ -9,71 +9,27 @@ import com.guillaumevdn.gcore.lib.string.TextEnumElement;
 public enum TextGeneric implements TextEnumElement {
 
 	// ----- miscellaneous
-	messageNoPermission,
-	messageInvalidPlayer,
-	messageInvalidOfflinePlayer,
-	messageInvalidNumber,
-	messageInvalidNumberRangeMin,
-	messageInvalidNumberRangeMax,
-	messageInvalidEnum,
-	messageInvalidEnumNoList,
-	messageCC,
-	messageSilentCC,
-	textCancel,
+	messageNoPermission, messageInvalidPlayer, messageInvalidOfflinePlayer, messageInvalidNumber, messageInvalidNumberRangeMin, messageInvalidNumberRangeMax,
+	messageInvalidEnum, messageInvalidEnumNoList, messageCC, messageSilentCC, textCancel,
 
 	// ----- command
-	commandParameterUsageTarget,
-	commandParameterUsageReset,
-	commandParameterUsageOperation,
-	commandParameterUsageAmount,
-	commandParameterUsageSpecificEditor,
-	commandParameterUsageDate,
-	commandDescriptionGenericReload,
-	commandDescriptionGenericPluginState,
-	commandDescriptionGenericMigrate,
-	messageCommandNotPlayer,
-	messageCommandMissingArgument,
-	messageCommandMissingArgumentFound,
-	messageCommandUnnecessaryArguments,
-	messageCommandIncompatibleArguments,
-	messageCommandDependentArguments,
-	messageCommandUnknown,
-	messageCommandHelpElementPrefix,
-	messageCommandHelpElement,
-	messageCommandHelpColorArgumentOptional,
-	messageCommandHelpColorArgumentRequired,
-	messageCommandHelpPageOutsideBounds,
-	messageCommandHelpHeader,
+	commandParameterUsageTarget, commandParameterUsageReset, commandParameterUsageOperation, commandParameterUsageAmount, commandParameterUsageSpecificEditor,
+	commandParameterUsageDate, commandDescriptionGenericReload, commandDescriptionGenericPluginState, commandDescriptionGenericMigrate, messageCommandNotPlayer,
+	messageCommandMissingArgument, messageCommandMissingArgumentFound, messageCommandUnnecessaryArguments, messageCommandIncompatibleArguments,
+	messageCommandDependentArguments, messageCommandUnknown, messageCommandHelpElementPrefix, messageCommandHelpElement,
+	messageCommandHelpColorArgumentOptional, messageCommandHelpColorArgumentRequired, messageCommandHelpPageOutsideBounds, messageCommandHelpHeader,
 
 	// ----- numbers
-	numberMillion,
-	numberBillion,
-	numberTrillion,
-	durationFormatS,
-	durationFormatMS,
-	durationFormatHMS,
-	durationFormatDHMS,
-	durationFormatDays,
+	numberMillion, numberBillion, numberTrillion, durationFormatS, durationFormatMS, durationFormatHMS, durationFormatDHMS, durationFormatDays,
 
 	// ----- cost
-	messageMustHaveCurrency,
-	messageMustHaveMoreItem,
-	messageMustHaveItem,
-	messageMustHaveItemNoDetail,
+	messageMustHaveCurrency, messageMustHaveMoreItem, messageMustHaveItem, messageMustHaveItemNoDetail,
 
 	// ----- item
-	textDescribeItem,
-	textDescribeItemNameIfHas,
-	textDescribeItemLoreIfHas,
-	textDescribeItemEnchantmentsIfHas,
-	textDescribeItemEnchantmentsLine,
+	textDescribeItem, textDescribeItemNameIfHas, textDescribeItemLoreIfHas, textDescribeItemEnchantmentsIfHas, textDescribeItemEnchantmentsLine,
 
-	textDescribeItemSingleLine,
-	textDescribeItemSingleLineNameIfHas,
-	textDescribeItemSingleLineLoreIfHas,
-	textDescribeItemSingleLineEnchantmentsIfHas,
-	textDescribeItemSingleLineEnchantmentsLine,
-	textDescribeItemSingleLineSeparator,
+	textDescribeItemSingleLine, textDescribeItemSingleLineNameIfHas, textDescribeItemSingleLineLoreIfHas, textDescribeItemSingleLineEnchantmentsIfHas,
+	textDescribeItemSingleLineEnchantmentsLine, textDescribeItemSingleLineSeparator,
 
 	// ----- format
 	dateTimeFormat

@@ -10,7 +10,7 @@ import com.guillaumevdn.gcore.lib.function.ThrowableRunnable;
  */
 public class RWLock {
 
-	private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock(true);  // fair lock
+	private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock(true); // fair lock
 
 	// ----- lock manipulation
 
@@ -23,7 +23,8 @@ public class RWLock {
 	}
 
 	public void unlockRead() {
-		lock.readLock().unlock();  // unlock only once ; there might be multiple operations during the same "parent read lock", and always unlocking all held in this method would make it so parent operations could end up being made while not locked at all
+		lock.readLock().unlock(); // unlock only once ; there might be multiple operations during the same "parent read lock", and always unlocking all
+									// held in this method would make it so parent operations could end up being made while not locked at all
 	}
 
 	public void lockWrite() {
@@ -31,7 +32,8 @@ public class RWLock {
 	}
 
 	public void unlockWrite() {
-		lock.writeLock().unlock();  // unlock only once ; there might be multiple operations during the same "parent write lock", and always unlocking all held in this method would make it so parent operations could end up being made while not locked at all
+		lock.writeLock().unlock(); // unlock only once ; there might be multiple operations during the same "parent write lock", and always unlocking all
+									// held in this method would make it so parent operations could end up being made while not locked at all
 	}
 
 	// ----- shortcuts to read/write
@@ -44,7 +46,8 @@ public class RWLock {
 		} catch (Throwable error) {
 			unlockRead();
 			throw error;
-			// throw new RuntimeException("ERROR WHILE LOCKED ON READ/no result, current read " + lock.getReadHoldCount() + " write " + lock.getWriteHoldCount() + ", thread " + Thread.currentThread().toString(), error);
+			// throw new RuntimeException("ERROR WHILE LOCKED ON READ/no result, current read " + lock.getReadHoldCount() + " write
+			// " + lock.getWriteHoldCount() + ", thread " + Thread.currentThread().toString(), error);
 		}
 	}
 
@@ -56,7 +59,8 @@ public class RWLock {
 		} catch (Throwable error) {
 			unlockRead();
 			throw error;
-			// throw new RuntimeException("ERROR WHILE LOCKED ON READ/no result, current read " + lock.getReadHoldCount() + " write " + lock.getWriteHoldCount() + ", thread " + Thread.currentThread().toString(), error);
+			// throw new RuntimeException("ERROR WHILE LOCKED ON READ/no result, current read " + lock.getReadHoldCount() + " write
+			// " + lock.getWriteHoldCount() + ", thread " + Thread.currentThread().toString(), error);
 		}
 	}
 
@@ -69,7 +73,8 @@ public class RWLock {
 		} catch (Throwable error) {
 			unlockRead();
 			throw error;
-			// throw new RuntimeException("ERROR WHILE LOCKED ON READ/result, current read " + lock.getReadHoldCount() + " write " + lock.getWriteHoldCount() + ", thread " + Thread.currentThread().toString(), error);
+			// throw new RuntimeException("ERROR WHILE LOCKED ON READ/result, current read " + lock.getReadHoldCount() + " write " +
+			// lock.getWriteHoldCount() + ", thread " + Thread.currentThread().toString(), error);
 		}
 	}
 
@@ -81,7 +86,8 @@ public class RWLock {
 		} catch (Throwable error) {
 			unlockWrite();
 			throw error;
-			// throw new RuntimeException("ERROR WHILE LOCKED ON WRITE/no result, current read " + lock.getReadHoldCount() + " write " + lock.getWriteHoldCount() + ", thread " + Thread.currentThread().toString(), error);
+			// throw new RuntimeException("ERROR WHILE LOCKED ON WRITE/no result, current read " + lock.getReadHoldCount() + " write
+			// " + lock.getWriteHoldCount() + ", thread " + Thread.currentThread().toString(), error);
 		}
 	}
 
@@ -93,7 +99,8 @@ public class RWLock {
 		} catch (Throwable error) {
 			unlockWrite();
 			throw error;
-			// throw new RuntimeException("ERROR WHILE LOCKED ON WRITE/no result, current read " + lock.getReadHoldCount() + " write " + lock.getWriteHoldCount() + ", thread " + Thread.currentThread().toString(), error);
+			// throw new RuntimeException("ERROR WHILE LOCKED ON WRITE/no result, current read " + lock.getReadHoldCount() + " write
+			// " + lock.getWriteHoldCount() + ", thread " + Thread.currentThread().toString(), error);
 		}
 	}
 
@@ -106,7 +113,8 @@ public class RWLock {
 		} catch (Throwable error) {
 			unlockWrite();
 			throw error;
-			// throw new RuntimeException("ERROR WHILE LOCKED ON WRITE/result, current read " + lock.getReadHoldCount() + " write " + lock.getWriteHoldCount() + ", thread " + Thread.currentThread().toString(), error);
+			// throw new RuntimeException("ERROR WHILE LOCKED ON WRITE/result, current read " + lock.getReadHoldCount() + " write "
+			// + lock.getWriteHoldCount() + ", thread " + Thread.currentThread().toString(), error);
 		}
 	}
 

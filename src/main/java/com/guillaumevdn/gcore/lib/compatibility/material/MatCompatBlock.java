@@ -37,8 +37,7 @@ final class MatCompatBlock {
 				}
 				// set block whatsoever
 				block.setType(material);
-			})
-			.orElse((block, mat) -> {
+			}).orElse((block, mat) -> {
 				int typeId = ReflectionObject.of(mat.getData().getDataInstance()).invokeMethod("getId").get(int.class);
 				// door
 				if (mat.getData().isDoor()) {
@@ -61,7 +60,8 @@ final class MatCompatBlock {
 
 	private static final ReflectionProcedureTriConsumer<Mat, Block, Player> SET_BLOCK_CHANGE = new ReflectionProcedureTriConsumer<Mat, Block, Player>()
 			.setIf(Version.ATLEAST_1_13, (mat, block, player) -> {
-				// legacy data is not loaded in 1.13+ Mat class, so, create a block somewhere and then send the packet using its block data
+				// legacy data is not loaded in 1.13+ Mat class, so, create a block somewhere and then send the packet using its block
+				// data
 
 				// has a cached block data, use that
 				final BlockData data = BLOCK_DATA_CACHE.get(mat);
@@ -101,8 +101,7 @@ final class MatCompatBlock {
 						});
 					}
 				}
-			})
-			.orElse((mat, block, player) -> {
+			}).orElse((mat, block, player) -> {
 				player.sendBlockChange(block.getLocation(), mat.getData().getDataInstance(), (byte) mat.getData().getLegacyDataOrZero());
 			});
 
@@ -113,7 +112,8 @@ final class MatCompatBlock {
 	// ----- match
 	private static final ReflectionProcedureBiFunction<Block, Mat, Boolean> MATCH = new ReflectionProcedureBiFunction<Block, Mat, Boolean>()
 			.orElse((block, mat) -> {
-				return block.getType().equals(mat.getData().getDataInstance()) && (Version.ATLEAST_1_13 || mat.getData().acceptsLegacyData(Compat.getLegacyData(block)));
+				return block.getType().equals(mat.getData().getDataInstance())
+						&& (Version.ATLEAST_1_13 || mat.getData().acceptsLegacyData(Compat.getLegacyData(block)));
 			});
 
 	static boolean match(Block block, Mat mat) {

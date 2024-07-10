@@ -12,13 +12,14 @@ import java.util.stream.Stream;
 import javax.annotation.Nullable;
 
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
-import com.guillaumevdn.gcore.lib.number.NumberUtils;
 import com.guillaumevdn.gcore.lib.legacy_npc.navigation.pathfinding.Pathfinding;
 import com.guillaumevdn.gcore.lib.legacy_npc.navigation.pathfinding.Point;
 import com.guillaumevdn.gcore.lib.legacy_npc.navigation.pathfinding.path.ExploringPathPoint;
+import com.guillaumevdn.gcore.lib.number.NumberUtils;
 
 /**
  * A movement finder with some properties ; this class caches finder with the same properties
+ * 
  * @author GuillaumeVDN
  */
 public final class MovementFinder {
@@ -26,11 +27,12 @@ public final class MovementFinder {
 	private static Map<Integer, MovementFinder> cache = new HashMap<>();
 
 	public static MovementFinder ofProperties(int maxGap, int minBottomVertical, boolean canStickToWall, boolean canSwim) {
-		return cache.computeIfAbsent(Objects.hash(maxGap, minBottomVertical, canStickToWall, canSwim), __ -> new MovementFinder(maxGap, minBottomVertical, canStickToWall, canSwim));
+		return cache.computeIfAbsent(Objects.hash(maxGap, minBottomVertical, canStickToWall, canSwim),
+				__ -> new MovementFinder(maxGap, minBottomVertical, canStickToWall, canSwim));
 	}
 
 	// ----------------------------------------------------------------------------------------------------
-	//		BUILD RELATIVE
+	// BUILD RELATIVE
 	// ----------------------------------------------------------------------------------------------------
 
 	private List<Offset> offsets = new ArrayList<>();
@@ -40,42 +42,45 @@ public final class MovementFinder {
 	private final boolean canSwim;
 
 	private MovementFinder(int maxGap, int minBottomVertical, boolean canStickToWall, boolean canSwim) {
-		if (!NumberUtils.isInRange(maxGap, 0, 2)) throw new IllegalArgumentException("invalid max gap " + maxGap + ", should have 0 <= maxGap <= 2");
-		if (!NumberUtils.isInRange(minBottomVertical, -3, -1)) throw new IllegalArgumentException("invalid min. bottom vertical " + minBottomVertical + ", should have -3 <= minBottomVertical <= -1");
+		if (!NumberUtils.isInRange(maxGap, 0, 2))
+			throw new IllegalArgumentException("invalid max gap " + maxGap + ", should have 0 <= maxGap <= 2");
+		if (!NumberUtils.isInRange(minBottomVertical, -3, -1))
+			throw new IllegalArgumentException("invalid min. bottom vertical " + minBottomVertical + ", should have -3 <= minBottomVertical <= -1");
 		List<Integer> vertical = CollectionUtils.asList(0, 1);
-		for (int i = -1; i >= minBottomVertical; --i) vertical.add(i);
+		for (int i = -1; i >= minBottomVertical; --i)
+			vertical.add(i);
 		// initialize gaps offsets (from 2 to 0 so the list is kind of pre-sorted for findFrom)
-		if (maxGap == 2) {  // gap 2
+		if (maxGap == 2) { // gap 2
 			// FIXME do :CringeHarold:
 		}
-		if (maxGap == 1 || maxGap == 2) {  // gap 1
+		if (maxGap == 1 || maxGap == 2) { // gap 1
 			for (int y : vertical) {
-				withOffset(1, 0, y, -2, b(0, -1));  // north
+				withOffset(1, 0, y, -2, b(0, -1)); // north
 				withOffset(1, 1, y, -2, b(0, -1), b(0, -2), b(1, -1));
-				withOffset(1, 2, y, -2, b(0, -1), b(1, -1), b(1, 0), b(1, -2), b(2, -1));  // north-east
+				withOffset(1, 2, y, -2, b(0, -1), b(1, -1), b(1, 0), b(1, -2), b(2, -1)); // north-east
 				withOffset(1, 2, y, -1, b(1, 0), b(2, 0), b(1, -1));
-				withOffset(1, 2, y, 0, b(1, 0));  // east
+				withOffset(1, 2, y, 0, b(1, 0)); // east
 				withOffset(1, 2, y, 1, b(1, 0), b(2, 0), b(1, 1));
-				withOffset(1, 2, y, 2, b(1, 0), b(1, 1), b(0, 1), b(2, 1), b(1, 2));  // south-east corner
+				withOffset(1, 2, y, 2, b(1, 0), b(1, 1), b(0, 1), b(2, 1), b(1, 2)); // south-east corner
 				withOffset(1, 1, y, 2, b(0, 1), b(0, 2), b(1, 1));
-				withOffset(1, 0, y, 2, b(0, 1));  // south
+				withOffset(1, 0, y, 2, b(0, 1)); // south
 				withOffset(1, -1, y, 2, b(0, 1), b(0, 2), b(-1, 1));
-				withOffset(1, -2, y, 2, b(0, 1), b(-1, 0), b(-1, 1), b(-1, 2), b(-2, 1));  // south-west corner
+				withOffset(1, -2, y, 2, b(0, 1), b(-1, 0), b(-1, 1), b(-1, 2), b(-2, 1)); // south-west corner
 				withOffset(1, -2, y, 1, b(-1, 0), b(-2, 0), b(-1, 1));
-				withOffset(1, -2, y, 0, b(-1, 0));  // west
+				withOffset(1, -2, y, 0, b(-1, 0)); // west
 				withOffset(1, -2, y, -1, b(-1, 0), b(-2, 0), b(-1, -1));
-				withOffset(1, -2, y, -2, b(-1, 0), b(-1, -1), b(0, -1), b(-2, -1), b(-1, -2));  // north-west corner
+				withOffset(1, -2, y, -2, b(-1, 0), b(-1, -1), b(0, -1), b(-2, -1), b(-1, -2)); // north-west corner
 				withOffset(1, -1, y, -2, b(0, -1), b(0, -2), b(-1, -1));
 			}
 		}
-		for (int y : vertical) {  // gap 0
-			withOffset(0, 0, y, -1);  // north
+		for (int y : vertical) { // gap 0
+			withOffset(0, 0, y, -1); // north
 			withOffset(0, 1, y, -1, y >= 0 || !canStickToWall ? b(0, -1) : b(0, -1, 1, 0), y >= 0 || !canStickToWall ? b(1, 0) : b(1, 0, 0, -1));
-			withOffset(0, 1, y, 0);  // east
+			withOffset(0, 1, y, 0); // east
 			withOffset(0, 1, y, 1, y >= 0 || !canStickToWall ? b(1, 0) : b(1, 0, 0, 1), y >= 0 || !canStickToWall ? b(0, 1) : b(0, 1, 1, 0));
-			withOffset(0, 0, y, 1);  // south
+			withOffset(0, 0, y, 1); // south
 			withOffset(0, -1, y, 1, y >= 0 || !canStickToWall ? b(0, 1) : b(0, 1, -1, 0), y >= 0 || !canStickToWall ? b(-1, 0) : b(-1, 0));
-			withOffset(0, -1, y, 0);  // west
+			withOffset(0, -1, y, 0); // west
 			withOffset(0, -1, y, -1, y >= 0 || !canStickToWall ? b(-1, 0, 0, -1) : b(-1, 0), y >= 0 || !canStickToWall ? b(0, -1) : b(0, -1, -1, 0));
 		}
 		// fields
@@ -86,8 +91,13 @@ public final class MovementFinder {
 		this.canSwim = canSwim;
 	}
 
-	private static OffsetBlocking b(int x, int z) { return new OffsetBlocking(x, z); }
-	private static OffsetBlocking b(int x, int z, int backupX, int backupZ) { return new OffsetBlocking(x, z, backupX, backupZ); }
+	private static OffsetBlocking b(int x, int z) {
+		return new OffsetBlocking(x, z);
+	}
+
+	private static OffsetBlocking b(int x, int z, int backupX, int backupZ) {
+		return new OffsetBlocking(x, z, backupX, backupZ);
+	}
 
 	// ----- get
 	public List<Offset> getOffsets() {
@@ -111,18 +121,20 @@ public final class MovementFinder {
 	}
 
 	// ----- set
-	private void withOffset(int gap, int x, int y, int z, OffsetBlocking... blocking) {  // FIXME : in offsets, add 'MovementType' for particular movements
+	private void withOffset(int gap, int x, int y, int z, OffsetBlocking... blocking) { // FIXME : in offsets, add 'MovementType' for particular movements
 		offsets.add(new Offset(gap, x, y, z, CollectionUtils.asUnmodifiableList(blocking)));
 	}
 
 	// ----------------------------------------------------------------------------------------------------
-	//  		FIND MOVEMENT
+	// FIND MOVEMENT
 	// ----------------------------------------------------------------------------------------------------
 
 	/**
 	 * Find a new movement, assuming the origin is a solid block and is free above
+	 * 
 	 * @param origin the starting block BELOW the entity's feet
-	 * @return a new movement from the origin to a relative point that's as close to the target as possible, or null if not found
+	 * @return a new movement from the origin to a relative point that's as close to the target as possible, or null if not
+	 *         found
 	 */
 
 	@Nullable
@@ -136,7 +148,7 @@ public final class MovementFinder {
 		if (previous != null) {
 			// when coming from a ladder, we can only go forward to get out of the ladder
 			if (previous.getType().equals(MovementType.LADDER)) {
-				offsets = offsets.filter(offset -> offset.getY() == 0 && offset.getGap() == 0);  // FIXME ladder ; + up/down the ladder
+				offsets = offsets.filter(offset -> offset.getY() == 0 && offset.getGap() == 0); // FIXME ladder ; + up/down the ladder
 			}
 			// when coming from swimming, we can only go forward to get out of the water
 			if (previous.getType().equals(MovementType.SWIMMING) || previous.getType().equals(MovementType.GET_IN_WATER)) {
@@ -148,14 +160,33 @@ public final class MovementFinder {
 		offsets = offsets.filter(offset -> !pathPoint.getOffsetsToIgnore().contains(offset));
 
 		// sort offsets by distance to target
-		offsets = offsets.sorted((a, b) -> Double.compare(a.distanceToTargetIfApplied(origin, finder.getTarget()), b.distanceToTargetIfApplied(origin, finder.getTarget())));  // TODO : see how long this takes ; and eventually try to improve with distance caching for instance
+		offsets = offsets.sorted(
+				(a, b) -> Double.compare(a.distanceToTargetIfApplied(origin, finder.getTarget()), b.distanceToTargetIfApplied(origin, finder.getTarget()))); // TODO
+																																								// :
+																																								// see
+																																								// how
+																																								// long
+																																								// this
+																																								// takes
+																																								// ;
+																																								// and
+																																								// eventually
+																																								// try
+																																								// to
+																																								// improve
+																																								// with
+																																								// distance
+																																								// caching
+																																								// for
+																																								// instance
 
 		// check offsets
 		List<Offset> offs = offsets.collect(Collectors.toList());
 
 		for (Offset offset : offs) {
 			// mark offset to ignore whatsoever
-			// - no matter the result, we don't want this offset to be re-checked again later (because invalid, or discontinued dead end, or whatever)
+			// - no matter the result, we don't want this offset to be re-checked again later (because invalid, or discontinued dead
+			// end, or whatever)
 			pathPoint.ignoreOffset(offset);
 
 			// target must be ignored
@@ -177,8 +208,10 @@ public final class MovementFinder {
 
 	/**
 	 * Find a movement of this type from a point to another, assuming the origin is a solid block and is free above
+	 * 
 	 * @param origin the starting block BELOW the entity's feet
-	 * @return a new movement from the origin to a relative point that's as close to the target as possible, or null if not found
+	 * @return a new movement from the origin to a relative point that's as close to the target as possible, or null if not
+	 *         found
 	 */
 
 	@Nullable
@@ -216,10 +249,13 @@ public final class MovementFinder {
 		// AND, if gap is not zero, that there's actually a hole below corridor (otherwise we'll want to use a closer offset)
 		for (OffsetBlocking blocking : offset.getBlocking()) {
 			Point check = origin.relative(blocking.getX(), offset.getY(), blocking.getZ());
-			if (offset.getGap() == 0 && offset.getY() == 0 ? !finder.isFreeAbove(check, origin, extraHeight) : !finder.isTraversableOrWaterAndFreeAbove(check, origin, extraHeight)) {
-				if (blocking.hasBackup() && !finder.getBlockType(target).isWater()) {  // only allow stick to wall towards non-water block
-					if (finder.isTraversableOrWaterAndFreeAbove(origin.relative(blocking.getBackupX(), offset.getY(), blocking.getBackupX()), origin, extraHeight)) {  // allow stick to wall above water/traversable
-						return new Movement(origin, target, MovementType.OFFSET_STICK_TO_WALL, new Offset(0, blocking.getBackupX(), 0, blocking.getBackupZ(), null));
+			if (offset.getGap() == 0 && offset.getY() == 0 ? !finder.isFreeAbove(check, origin, extraHeight)
+					: !finder.isTraversableOrWaterAndFreeAbove(check, origin, extraHeight)) {
+				if (blocking.hasBackup() && !finder.getBlockType(target).isWater()) { // only allow stick to wall towards non-water block
+					if (finder.isTraversableOrWaterAndFreeAbove(origin.relative(blocking.getBackupX(), offset.getY(), blocking.getBackupX()), origin,
+							extraHeight)) { // allow stick to wall above water/traversable
+						return new Movement(origin, target, MovementType.OFFSET_STICK_TO_WALL,
+								new Offset(0, blocking.getBackupX(), 0, blocking.getBackupZ(), null));
 					}
 				}
 				return null;
@@ -238,6 +274,7 @@ public final class MovementFinder {
 		return new Movement(origin, target, type, offset);
 	}
 
-	// ----- FIXME : when navigating, when about to do a movement, make sure it's actually still possible ; otherwise, recalculate path
+	// ----- FIXME : when navigating, when about to do a movement, make sure it's actually still possible ; otherwise,
+	// recalculate path
 
 }

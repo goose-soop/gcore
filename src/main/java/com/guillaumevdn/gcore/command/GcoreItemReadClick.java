@@ -48,7 +48,7 @@ public final class GcoreItemReadClick extends Subcommand {
 			config.write("item", item);
 			config.save();
 			try (BufferedReader reader = new BufferedReader(new FileReader(config.getFile()))) {
-				for (String line = null; (line = reader.readLine()) != null; ) {
+				for (String line = null; (line = reader.readLine()) != null;) {
 					player.sendMessage(line);
 				}
 			} catch (IOException exception) {

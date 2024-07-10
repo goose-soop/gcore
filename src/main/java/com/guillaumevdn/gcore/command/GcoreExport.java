@@ -67,9 +67,10 @@ public final class GcoreExport extends Subcommand {
 		File logRoot = new File(Bukkit.getWorldContainer() + "/logs");
 		int logCount = 0;
 		File[] arr = logRoot.listFiles();
-		if (arr != null) {  // happens
+		if (arr != null) { // happens
 			for (File logFile : Stream.of(arr).sorted((a, b) -> -a.compareTo(b)).collect(Collectors.toList())) {
-				if (++logCount > 3) break;
+				if (++logCount > 3)
+					break;
 				File f = new File(temp + "/log_" + logFile.getName());
 				try {
 					FileUtils.copy(logFile, f);
@@ -81,8 +82,16 @@ public final class GcoreExport extends Subcommand {
 		}
 		// create server info file
 		String implementation = "unknown";
-		try { Class.forName("com.destroystokyo.paper.PaperConfig"); implementation = "paper"; } catch (Throwable ignored) {}
-		try { Class.forName("org.spigotmc.SpigotConfig"); implementation = "spigot"; } catch (Throwable ignored) {}
+		try {
+			Class.forName("com.destroystokyo.paper.PaperConfig");
+			implementation = "paper";
+		} catch (Throwable ignored) {
+		}
+		try {
+			Class.forName("org.spigotmc.SpigotConfig");
+			implementation = "spigot";
+		} catch (Throwable ignored) {
+		}
 		List<GPlugin<?, ?>> gplugins = PluginUtils.getGPlugins();
 		List<Plugin> plugins = CollectionUtils.asList(Bukkit.getPluginManager().getPlugins());
 		plugins.removeAll(gplugins);
@@ -110,7 +119,8 @@ public final class GcoreExport extends Subcommand {
 		FileUtils.zip(temp, target);
 		FileUtils.delete(temp);
 		// done
-		TextGCore.messageGcoreExportFile.replace("{plugins}", () -> StringUtils.toTextString(", ", gplugins)).replace("{file}", () -> target).send(call.getSender());
+		TextGCore.messageGcoreExportFile.replace("{plugins}", () -> StringUtils.toTextString(", ", gplugins)).replace("{file}", () -> target)
+				.send(call.getSender());
 	}
 
 }

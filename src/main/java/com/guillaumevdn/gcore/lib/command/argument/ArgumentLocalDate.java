@@ -34,7 +34,8 @@ public class ArgumentLocalDate extends Argument<LocalDate> {
 					call.getArguments().remove(i);
 					return date;
 				}
-			} catch (Throwable ignored) {}
+			} catch (Throwable ignored) {
+			}
 		}
 		return null;
 	}

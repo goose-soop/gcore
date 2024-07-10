@@ -136,8 +136,10 @@ import com.guillaumevdn.gcore.lib.time.in.ElementTimeInYear;
  */
 public abstract class ContainerElement extends AbstractMapElement<String, Element> {
 
-	private final LowerCaseArrayList startRowSlots = new LowerCaseArrayList(0);  // since elements are stored in a linked map, just save which elements trigger a new line
-	private final LowerCaseArrayList skipSlots = new LowerCaseArrayList(0);  // since elements are stored in a linked map, just save which elements trigger a slot skip
+	private final LowerCaseArrayList startRowSlots = new LowerCaseArrayList(0); // since elements are stored in a linked map, just save which elements trigger a
+																				// new line
+	private final LowerCaseArrayList skipSlots = new LowerCaseArrayList(0); // since elements are stored in a linked map, just save which elements trigger a
+																			// slot skip
 
 	public ContainerElement(Element parent, String id, Need need, Text editorDescription) {
 		super(String.class, parent, id, need, editorDescription);
@@ -278,7 +280,8 @@ public abstract class ContainerElement extends AbstractMapElement<String, Elemen
 		});
 	}
 
-	public final <A, B, C, D> void directParseAndIfPresentDo(String idA, String idB, String idC, String idD, Replacer replacer, QuadriConsumer<A, B, C, D> consumer) {
+	public final <A, B, C, D> void directParseAndIfPresentDo(String idA, String idB, String idC, String idD, Replacer replacer,
+			QuadriConsumer<A, B, C, D> consumer) {
 		Optional<A> A = parseElementAs(idA, replacer);
 		A.ifPresentDo(a -> {
 			Optional<B> B = parseElementAs(idB, replacer);
@@ -294,7 +297,8 @@ public abstract class ContainerElement extends AbstractMapElement<String, Elemen
 		});
 	}
 
-	public final <A, B, C, D, E> void directParseAndIfPresentDo(String idA, String idB, String idC, String idD, String idE, Replacer replacer, QuintConsumer<A, B, C, D, E> consumer) {
+	public final <A, B, C, D, E> void directParseAndIfPresentDo(String idA, String idB, String idC, String idD, String idE, Replacer replacer,
+			QuintConsumer<A, B, C, D, E> consumer) {
 		Optional<A> A = parseElementAs(idA, replacer);
 		A.ifPresentDo(a -> {
 			Optional<B> B = parseElementAs(idB, replacer);
@@ -342,18 +346,16 @@ public abstract class ContainerElement extends AbstractMapElement<String, Elemen
 	}
 
 	@Override
-	protected final void clearBeforeRead() {  // obviously don't
+	protected final void clearBeforeRead() { // obviously don't
 	}
 
-	//private static final Set<String> IGNORE_OPTIONS = CollectionUtils.asSet();
+	// private static final Set<String> IGNORE_OPTIONS = CollectionUtils.asSet();
 
 	@Override
 	protected void doRead() throws Throwable {
 		// read elements
-		final List<String> keys = getSuperElement().getConfiguration().readKeysForSectionCopyIfEmpty(getConfigurationPath())  // this creates a new list
-				.stream()
-				.map(str -> str.toLowerCase())
-				.collect(Collectors.toList());
+		final List<String> keys = getSuperElement().getConfiguration().readKeysForSectionCopyIfEmpty(getConfigurationPath()) // this creates a new list
+				.stream().map(str -> str.toLowerCase()).collect(Collectors.toList());
 
 		for (Element element : values()) {
 			element.read();
@@ -361,9 +363,10 @@ public abstract class ContainerElement extends AbstractMapElement<String, Elemen
 		}
 
 		// look for unknown options and log them
-		//keys.removeAll(IGNORE_OPTIONS);
+		// keys.removeAll(IGNORE_OPTIONS);
 		for (String key : keys) {
-			getSuperElement().addLoadError("found unknown option '" + key + "' at path '" + (getConfigurationPath().isEmpty() ? key : getConfigurationPath() + "." + key) + "'");
+			getSuperElement().addLoadError(
+					"found unknown option '" + key + "' at path '" + (getConfigurationPath().isEmpty() ? key : getConfigurationPath() + "." + key) + "'");
 		}
 	}
 
@@ -373,7 +376,8 @@ public abstract class ContainerElement extends AbstractMapElement<String, Elemen
 		for (Element element : values()) {
 			element.write();
 		}
-		// if nothing was written (all default values) AND the DIRECT parent is a map element (which is not a container element), then write an empty value
+		// if nothing was written (all default values) AND the DIRECT parent is a map element (which is not a container
+		// element), then write an empty value
 		if (!getSuperElement().getConfiguration().contains(getConfigurationPath())) {
 			AbstractMapElement parent = ObjectUtils.castOrNull(getParent(), AbstractMapElement.class);
 			if (parent != null && !(parent instanceof ContainerElement)) {
@@ -386,14 +390,18 @@ public abstract class ContainerElement extends AbstractMapElement<String, Elemen
 	@Override
 	public EditorGUI editorGUI(ClickCall fromCall) {
 		EditorGUI editor = new EditorGUI(this, fromCall) {
+
 			@Override
 			protected boolean doFill() {
 				int page = 0;
 				int slot = -1;
 				for (Element element : values()) {
 					++slot;
-					if (startRowSlots.contains(element.getId())) while (slot % 9 != 0) ++slot;
-					else if (skipSlots.contains(element.getId()) && slot % 9 != 0) ++slot;
+					if (startRowSlots.contains(element.getId()))
+						while (slot % 9 != 0)
+							++slot;
+					else if (skipSlots.contains(element.getId()) && slot % 9 != 0)
+						++slot;
 
 					if (slot > GUIType.CHEST_6_ROW.getRegularItemSlotsEnd()) {
 						slot = 0;
@@ -406,6 +414,7 @@ public abstract class ContainerElement extends AbstractMapElement<String, Elemen
 				}
 				return super.doFill();
 			}
+
 		};
 		return editor;
 	}
@@ -421,237 +430,1049 @@ public abstract class ContainerElement extends AbstractMapElement<String, Elemen
 		}
 	}
 
-	public final ElementBlockStateList addBlockStateList(String id, Need need, Text editorDescription) { return add(new ElementBlockStateList(this, id, need, editorDescription)); }
-	public final ElementBlockStateList addBlockStateList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementBlockStateList(this, id, need, editorDescription)); }
-	public final ElementBiome addBiome(String id, Need need, Text editorDescription) { return add(new ElementBiome(this, id, need, editorDescription)); }
-	public final ElementBiome addBiome(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementBiome(this, id, need, editorDescription)); }
-	public final ElementBiomeList addBiomeList(String id, Need need, Text editorDescription) { return add(new ElementBiomeList(this, id, need, editorDescription)); }
-	public final ElementBiomeList addBiomeList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementBiomeList(this, id, need, editorDescription)); }
-	public final ElementBoolean addBoolean(String id, Need need, Text editorDescription) { return add(new ElementBoolean(this, id, need, editorDescription)); }
-	public final ElementBoolean addBoolean(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementBoolean(this, id, need, editorDescription)); }
-	public final ElementBossbarColor addBossbarColor(String id, Need need, Text editorDescription) { return add(new ElementBossbarColor(this, id, need, editorDescription)); }
-	public final ElementBossbarColor addBossbarColor(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementBossbarColor(this, id, need, editorDescription)); }
-	public final ElementBossbarStyle addBossbarStyle(String id, Need need, Text editorDescription) { return add(new ElementBossbarStyle(this, id, need, editorDescription)); }
-	public final ElementBossbarStyle addBossbarStyle(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementBossbarStyle(this, id, need, editorDescription)); }
-	public final ElementBossbarFlag addBossbarFlag(String id, Need need, Text editorDescription) { return add(new ElementBossbarFlag(this, id, need, editorDescription)); }
-	public final ElementBossbarFlag addBossbarFlag(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementBossbarFlag(this, id, need, editorDescription)); }
-	public final ElementBossbarFlagList addBossbarFlagList(String id, Need need, Text editorDescription) { return add(new ElementBossbarFlagList(this, id, need, editorDescription)); }
-	public final ElementBossbarFlagList addBossbarFlagList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementBossbarFlagList(this, id, need, editorDescription)); }
-	public final ElementBucketType addBucketType(String id, Need need, Text editorDescription) { return add(new ElementBucketType(this, id, need, editorDescription)); }
-	public final ElementBucketType addBucketType(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementBucketType(this, id, need, editorDescription)); }
-	public final ElementChancePercentage addChancePercentage(String id, Need need, Text editorDescription) { return add(new ElementChancePercentage(this, id, need, editorDescription)); }
-	public final ElementChancePercentage addChancePercentage(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementChancePercentage(this, id, need, editorDescription)); }
-	public final ElementClickType addClickType(String id, Need need, Text editorDescription) { return add(new ElementClickType(this, id, need, editorDescription)); }
-	public final ElementClickType addClickType(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementClickType(this, id, need, editorDescription)); }
-	public final ElementColor addColor(String id, Need need, Text editorDescription) { return add(new ElementColor(this, id, need, editorDescription)); }
-	public final ElementColor addColor(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementColor(this, id, need, editorDescription)); }
-	public final ElementColorList addColorList(String id, Need need, Text editorDescription) { return add(new ElementColorList(this, id, need, editorDescription)); }
-	public final ElementColorList addColorList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementColorList(this, id, need, editorDescription)); }
-	public final ElementCommandList addCommandList(String id, Need need, Text editorDescription) { return add(new ElementCommandList(this, id, need, editorDescription)); }
-	public final ElementCommandList addCommandList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementCommandList(this, id, need, editorDescription)); }
-	public final ElementCommandRestriction addCommandRestriction(String id, Need need, Text editorDescription) { return add(new ElementCommandRestriction(this, id, need, editorDescription)); }
-	public final ElementCommandRestriction addCommandRestriction(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementCommandRestriction(this, id, need, editorDescription)); }
-	public final ElementComparisonType addComparisonType(String id, Need need, Text editorDescription) { return add(new ElementComparisonType(this, id, need, editorDescription)); }
-	public final ElementComparisonType addComparisonType(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementComparisonType(this, id, need, editorDescription)); }
-	public final ElementConfigSection addConfigSection(String id, Need need, Text editorDescription) { return add(new ElementConfigSection(this, id, need, editorDescription)); }
-	public final ElementConfigSection addConfigSection(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementConfigSection(this, id, need, editorDescription)); }
-	public final ElementCurrency addCurrency(String id, Need need, Text editorDescription) { return add(new ElementCurrency(this, id, need, editorDescription)); }
-	public final ElementCurrency addCurrency(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementCurrency(this, id, need, editorDescription)); }
-	public final ElementCurrencyList addCurrencyList(String id, Need need, Text editorDescription) { return add(new ElementCurrencyList(this, id, need, editorDescription)); }
-	public final ElementCurrencyList addCurrencyList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementCurrencyList(this, id, need, editorDescription)); }
-	public final ElementCurrencyDoubleMap addCurrencyDoubleMap(String id, Need need, Text editorDescription) { return add(new ElementCurrencyDoubleMap(this, id, need, editorDescription)); }
-	public final ElementCurrencyDoubleMap addCurrencyDoubleMap(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementCurrencyDoubleMap(this, id, need, editorDescription)); }
-	public final ElementDayOfWeek addDayOfWeek(String id, Need need, Text editorDescription) { return add(new ElementDayOfWeek(this, id, need, editorDescription)); }
-	public final ElementDayOfWeek addDayOfWeek(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementDayOfWeek(this, id, need, editorDescription)); }
-	public final ElementDamageCauseList addDamageCauseList(String id, Need need, Text editorDescription) { return add(new ElementDamageCauseList(this, id, need, editorDescription)); }
-	public final ElementDamageCauseList addDamageCauseList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementDamageCauseList(this, id, need, editorDescription)); }
-	public final ElementDouble addDouble(String id, Need need, Text editorDescription) { return add(new ElementDouble(this, id, need, editorDescription)); }
-	public final ElementDouble addDouble(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementDouble(this, id, need, editorDescription)); }
-	public final ElementDouble addDouble(String id, Need need, double min, Text editorDescription) { return add(new ElementDouble(this, id, need, min, editorDescription)); }
-	public final ElementDouble addDouble(String id, Need need, double min, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementDouble(this, id, need, min, editorDescription)); }
-	public final ElementDouble addDouble(String id, Need need, double min, double max, Text editorDescription) { return add(new ElementDouble(this, id, need, min, max, editorDescription)); }
-	public final ElementDouble addDouble(String id, Need need, double min, double max, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementDouble(this, id, need, min, max, editorDescription)); }
-	public final ElementDoubleList addDoubleList(String id, Need need, Text editorDescription) { return add(new ElementDoubleList(this, id, need, editorDescription)); }
-	public final ElementDoubleList addDoubleList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementDoubleList(this, id, need, editorDescription)); }
-	public final ElementDoubleList addDoubleList(String id, Need need, double min, Text editorDescription) { return add(new ElementDoubleList(this, id, need, min, editorDescription)); }
-	public final ElementDoubleList addDoubleList(String id, Need need, double min, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementDoubleList(this, id, need, min, editorDescription)); }
-	public final ElementDoubleList addDoubleList(String id, Need need, double min, double max, Text editorDescription) { return add(new ElementDoubleList(this, id, need, min, max, editorDescription)); }
-	public final ElementDoubleList addDoubleList(String id, Need need, double min, double max, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementDoubleList(this, id, need, min, max, editorDescription)); }
-	public final ElementDyeColor addDyeColor(String id, Need need, Text editorDescription) { return add(new ElementDyeColor(this, id, need, editorDescription)); }
-	public final ElementDyeColor addDyeColor(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementDyeColor(this, id, need, editorDescription)); }
-	public final ElementDyeColorList addDyeColorList(String id, Need need, Text editorDescription) { return add(new ElementDyeColorList(this, id, need, editorDescription)); }
-	public final ElementDyeColorList addDyeColorList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementDyeColorList(this, id, need, editorDescription)); }
-	public final ElementDynmapMarker addDynmapMarker(String id, Need need, Text editorDescription) { return add(new ElementDynmapMarker(this, id, need, editorDescription)); }
-	public final ElementDynmapMarker addDynmapMarker(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementDynmapMarker(this, id, need, editorDescription)); }
-	public final ElementDuration addDuration(String id, Need need, Integer defaultTime, TimeUnit defaultUnit, Text editorDescription) { return add(new ElementDuration(this, id, need, defaultTime, defaultUnit, editorDescription)); }
-	public final ElementDuration addDuration(String id, Need need, Integer defaultTime, TimeUnit defaultUnit, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementDuration(this, id, need, defaultTime, defaultUnit, editorDescription)); }
-	public final ElementEnchantment addEnchantment(String id, Need need, Text editorDescription) { return add(new ElementEnchantment(this, id, need, editorDescription)); }
-	public final ElementEnchantment addEnchantment(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementEnchantment(this, id, need, editorDescription)); }
-	public final ElementEnchantmentList addEnchantmentList(String id, Need need, Text editorDescription) { return add(new ElementEnchantmentList(this, id, need, editorDescription)); }
-	public final ElementEnchantmentList addEnchantmentList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementEnchantmentList(this, id, need, editorDescription)); }
-	public final ElementEnchantmentLevelMap addEnchantmentLevelMap(String id, Need need, Text editorDescription) { return add(new ElementEnchantmentLevelMap(this, id, need, editorDescription)); }
-	public final ElementEnchantmentLevelMap addEnchantmentLevelMap(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementEnchantmentLevelMap(this, id, need, editorDescription)); }
-	public final ElementEntityType addEntityType(String id, Need need, Text editorDescription) { return add(new ElementEntityType(this, id, need, editorDescription)); }
-	public final ElementEntityType addEntityType(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementEntityType(this, id, need, editorDescription)); }
-	public final ElementEntityTypeDoubleMap addEntityTypeDoubleMap(String id, Need need, Text editorDescription) { return add(new ElementEntityTypeDoubleMap(this, id, need, editorDescription)); }
-	public final ElementEntityTypeDoubleMap addEntityTypeDoubleMap(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementEntityTypeDoubleMap(this, id, need, editorDescription)); }
-	public final ElementEntityTypeList addEntityTypeList(String id, Need need, Text editorDescription) { return add(new ElementEntityTypeList(this, id, need, editorDescription)); }
-	public final ElementEntityTypeList addEntityTypeList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementEntityTypeList(this, id, need, editorDescription)); }
-	public final ElementFireworkEffect addFireworkEffect(String id, Need need, Text editorDescription) { return add(new ElementFireworkEffect(this, id, need, editorDescription)); }
-	public final ElementFireworkEffect addFireworkEffect(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementFireworkEffect(this, id, need, editorDescription)); }
-	public final ElementFireworkEffectList addFireworkEffectList(String id, Need need, Text editorDescription) { return add(new ElementFireworkEffectList(this, id, need, editorDescription)); }
-	public final ElementFireworkEffectList addFireworkEffectList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementFireworkEffectList(this, id, need, editorDescription)); }
-	public final ElementFireworkEffectType addFireworkEffectType(String id, Need need, Text editorDescription) { return add(new ElementFireworkEffectType(this, id, need, editorDescription)); }
-	public final ElementFireworkEffectType addFireworkEffectType(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementFireworkEffectType(this, id, need, editorDescription)); }
-	public final ElementFloat addFloat(String id, Need need, Text editorDescription) { return add(new ElementFloat(this, id, need, editorDescription)); }
-	public final ElementFloat addFloat(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementFloat(this, id, need, editorDescription)); }
-	public final ElementFloat addFloat(String id, Need need, float min, Text editorDescription) { return add(new ElementFloat(this, id, need, min, editorDescription)); }
-	public final ElementFloat addFloat(String id, Need need, float min, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementFloat(this, id, need, min, editorDescription)); }
-	public final ElementFloat addFloat(String id, Need need, float min, float max, Text editorDescription) { return add(new ElementFloat(this, id, need, min, max, editorDescription)); }
-	public final ElementFloat addFloat(String id, Need need, float min, float max, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementFloat(this, id, need, min, max, editorDescription)); }
-	public final ElementFloatList addFloatList(String id, Need need, Text editorDescription) { return add(new ElementFloatList(this, id, need, editorDescription)); }
-	public final ElementFloatList addFloatList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementFloatList(this, id, need, editorDescription)); }
-	public final ElementFloatList addFloatList(String id, Need need, float min, Text editorDescription) { return add(new ElementFloatList(this, id, need, min, editorDescription)); }
-	public final ElementFloatList addFloatList(String id, Need need, float min, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementFloatList(this, id, need, min, editorDescription)); }
-	public final ElementFloatList addFloatList(String id, Need need, float min, float max, Text editorDescription) { return add(new ElementFloatList(this, id, need, min, max, editorDescription)); }
-	public final ElementFloatList addFloatList(String id, Need need, float min, float max, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementFloatList(this, id, need, min, max, editorDescription)); }
-	public final ElementGameMode addGameMode(String id, Need need, Text editorDescription) { return add(new ElementGameMode(this, id, need, editorDescription)); }
-	public final ElementGameMode addGameMode(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementGameMode(this, id, need, editorDescription)); }
-	public final ElementHorseColorList addHorseColorList(String id, Need need, Text editorDescription) { return add(new ElementHorseColorList(this, id, need, editorDescription)); }
-	public final ElementHorseColorList addHorseColorList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementHorseColorList(this, id, need, editorDescription)); }
-	public final ElementHorseStyleList addHorseStyleList(String id, Need need, Text editorDescription) { return add(new ElementHorseStyleList(this, id, need, editorDescription)); }
-	public final ElementHorseStyleList addHorseStyleList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementHorseStyleList(this, id, need, editorDescription)); }
-	public final ElementInteger addInteger(String id, Need need, Text editorDescription) { return add(new ElementInteger(this, id, need, editorDescription)); }
-	public final ElementInteger addInteger(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementInteger(this, id, need, editorDescription)); }
-	public final ElementInteger addInteger(String id, Need need, int min, Text editorDescription) { return add(new ElementInteger(this, id, need, min, editorDescription)); }
-	public final ElementInteger addInteger(String id, Need need, int min, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementInteger(this, id, need, min, editorDescription)); }
-	public final ElementInteger addInteger(String id, Need need, int min, int max, Text editorDescription) { return add(new ElementInteger(this, id, need, min, max, editorDescription)); }
-	public final ElementInteger addInteger(String id, Need need, int min, int max, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementInteger(this, id, need, min, max, editorDescription)); }
-	public final ElementIntegerList addIntegerList(String id, Need need, Text editorDescription) { return add(new ElementIntegerList(this, id, need, editorDescription)); }
-	public final ElementIntegerList addIntegerList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementIntegerList(this, id, need, editorDescription)); }
-	public final ElementIntegerList addIntegerList(String id, Need need, int min, Text editorDescription) { return add(new ElementIntegerList(this, id, need, min, editorDescription)); }
-	public final ElementIntegerList addIntegerList(String id, Need need, int min, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementIntegerList(this, id, need, min, editorDescription)); }
-	public final ElementIntegerList addIntegerList(String id, Need need, int min, int max, Text editorDescription) { return add(new ElementIntegerList(this, id, need, min, max, editorDescription)); }
-	public final ElementIntegerList addIntegerList(String id, Need need, int min, int max, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementIntegerList(this, id, need, min, max, editorDescription)); }
-	public final ElementInventoryTypeList addInventoryTypeList(String id, Need need, Text editorDescription) { return add(new ElementInventoryTypeList(this, id, need, editorDescription)); }
-	public final ElementInventoryTypeList addInventoryTypeList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementInventoryTypeList(this, id, need, editorDescription)); }
-	public final ElementItem addItem(String id, Need need, ElementItemMode mode, Text editorDescription) { return add(new ElementItem(this, id, need, mode, editorDescription)); }
-	public final ElementItem addItem(String id, Need need, ElementItemMode mode, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementItem(this, id, need, mode, editorDescription)); }
-	public final ElementItemCheck addItemCheck(String id, Need need, Text editorDescription) { return add(new ElementItemCheck(this, id, need, editorDescription)); }
-	public final ElementItemCheck addItemCheck(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementItemCheck(this, id, need, editorDescription)); }
-	public final ElementItemMatchList addItemMatchList(String id, Need need, boolean allowCustomCheck, Text editorDescription) { return add(new ElementItemMatchList(this, id, need, allowCustomCheck, editorDescription)); }
-	public final ElementItemMatchList addItemMatchList(String id, Need need, boolean allowCustomCheck, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementItemMatchList(this, id, need, allowCustomCheck, editorDescription)); }
-	public final ElementItemFlagList addItemFlagList(String id, Need need, Text editorDescription) { return add(new ElementItemFlagList(this, id, need, editorDescription)); }
-	public final ElementItemFlagList addItemFlagList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementItemFlagList(this, id, need, editorDescription)); }
-	public final ElementItemList addItemList(String id, Need need, ElementItemMode mode, Text editorDescription) { return add(new ElementItemList(this, id, need, mode, editorDescription)); }
-	public final ElementItemList addItemList(String id, Need need, ElementItemMode mode, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementItemList(this, id, need, mode, editorDescription)); }
-	public final ElementItemsNeeded addItemsNeeded(String id, Need need, Text editorDescription) { return add(new ElementItemsNeeded(this, id, need, editorDescription)); }
-	public final ElementItemsNeeded addItemsNeeded(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementItemsNeeded(this, id, need, editorDescription)); }
-	public final ElementLocation addLocation(String id, Need need, Text editorDescription) { return add(new ElementLocation(this, id, need, editorDescription)); }
-	public final ElementLocation addLocation(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementLocation(this, id, need, editorDescription)); }
-	public final ElementLocationList addLocationList(String id, Need need, Text editorDescription) { return add(new ElementLocationList(this, id, need, editorDescription)); }
-	public final ElementLocationList addLocationList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementLocationList(this, id, need, editorDescription)); }
-	public final ElementLong addLong(String id, Need need, Text editorDescription) { return add(new ElementLong(this, id, need, editorDescription)); }
-	public final ElementLong addLong(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementLong(this, id, need, editorDescription)); }
-	public final ElementLong addLong(String id, Need need, long min, Text editorDescription) { return add(new ElementLong(this, id, need, min, editorDescription)); }
-	public final ElementLong addLong(String id, Need need, long min, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementLong(this, id, need, min, editorDescription)); }
-	public final ElementLong addLong(String id, Need need, long min, long max, Text editorDescription) { return add(new ElementLong(this, id, need, min, max, editorDescription)); }
-	public final ElementLong addLong(String id, Need need, long min, long max, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementLong(this, id, need, min, max, editorDescription)); }
-	public final ElementLongList addLongList(String id, Need need, Text editorDescription) { return add(new ElementLongList(this, id, need, editorDescription)); }
-	public final ElementLongList addLongList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementLongList(this, id, need, editorDescription)); }
-	public final ElementLongList addLongList(String id, Need need, long min, Text editorDescription) { return add(new ElementLongList(this, id, need, min, editorDescription)); }
-	public final ElementLongList addLongList(String id, Need need, long min, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementLongList(this, id, need, min, editorDescription)); }
-	public final ElementLongList addLongList(String id, Need need, long min, long max, Text editorDescription) { return add(new ElementLongList(this, id, need, min, max, editorDescription)); }
-	public final ElementLongList addLongList(String id, Need need, long min, long max, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementLongList(this, id, need, min, max, editorDescription)); }
-	public final ElementNotify addNotify(String id, Need need, Text editorDescription) { return add(new ElementNotify(this, id, need, editorDescription)); }
-	public final ElementNotify addNotify(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementNotify(this, id, need, editorDescription)); }
-	public final ElementMat addMat(String id, Need need, Text editorDescription) { return add(new ElementMat(this, id, need, editorDescription)); }
-	public final ElementMat addMat(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementMat(this, id, need, editorDescription)); }
-	public final ElementMatDoubleMap addMatDoubleMap(String id, Need need, Text editorDescription) { return add(new ElementMatDoubleMap(this, id, need, editorDescription)); }
-	public final ElementMatDoubleMap addMatDoubleMap(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementMatDoubleMap(this, id, need, editorDescription)); }
-	public final ElementMatList addMatList(String id, Need need, Text editorDescription) { return add(new ElementMatList(this, id, need, editorDescription)); }
-	public final ElementMatList addMatList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementMatList(this, id, need, editorDescription)); }
-	public final ElementMatRestriction addMatRestriction(String id, Need need, Text editorDescription) { return add(new ElementMatRestriction(this, id, need, editorDescription)); }
-	public final ElementMatRestriction addMatRestriction(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementMatRestriction(this, id, need, editorDescription)); }
-	public final ElementMonth addMonth(String id, Need need, Text editorDescription) { return add(new ElementMonth(this, id, need, editorDescription)); }
-	public final ElementMonth addMonth(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementMonth(this, id, need, editorDescription)); }
-	public final ElementParticle addParticle(String id, Need need, Text editorDescription) { return add(new ElementParticle(this, id, need, editorDescription)); }
-	public final ElementParticle addParticle(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementParticle(this, id, need, editorDescription)); }
-	public final ElementParticleList addParticleList(String id, Need need, Text editorDescription) { return add(new ElementParticleList(this, id, need, editorDescription)); }
-	public final ElementParticleList addParticleList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementParticleList(this, id, need, editorDescription)); }
-	public final com.guillaumevdn.gcore.lib.element.type.map.ElementPatternTypeColorMap addPatternTypeColorMap(String id, Need need, Text editorDescription) { return add(new com.guillaumevdn.gcore.lib.element.type.map.ElementPatternTypeColorMap(this, id, need, editorDescription)); }
-	public final com.guillaumevdn.gcore.lib.element.type.map.ElementPatternTypeColorMap addPatternTypeColorMap(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new com.guillaumevdn.gcore.lib.element.type.map.ElementPatternTypeColorMap(this, id, need, editorDescription)); }
-	public final ElementPermission addPermission(String id, Need need, Text editorDescription) { return add(new ElementPermission(this, id, need, editorDescription)); }
-	public final ElementPermission addPermission(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementPermission(this, id, need, editorDescription)); }
-	public final ElementPhysicalClickType addPhysicalClickType(String id, Need need, Text editorDescription) { return add(new ElementPhysicalClickType(this, id, need, editorDescription)); }
-	public final ElementPhysicalClickType addPhysicalClickType(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementPhysicalClickType(this, id, need, editorDescription)); }
-	public final ElementPhysicalClickTypeList addPhysicalClickTypeList(String id, Need need, Text editorDescription) { return add(new ElementPhysicalClickTypeList(this, id, need, editorDescription)); }
-	public final ElementPhysicalClickTypeList addPhysicalClickTypeList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementPhysicalClickTypeList(this, id, need, editorDescription)); }
-	public final ElementPointTolerance addPointTolerance(String id, Need need, Text editorDescription) { return add(new ElementPointTolerance(this, id, need, editorDescription)); }
-	public final ElementPointTolerance addPointTolerance(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementPointTolerance(this, id, need, editorDescription)); }
-	public final ElementPosition addPosition(String id, Need need, Text editorDescription) { return add(new ElementPosition(this, id, need, editorDescription)); }
-	public final ElementPosition addPosition(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementPosition(this, id, need, editorDescription)); }
-	public final ElementPositionList addPositionList(String id, Need need, Text editorDescription) { return add(new ElementPositionList(this, id, need, editorDescription)); }
-	public final ElementPositionList addPositionList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementPositionList(this, id, need, editorDescription)); }
-	public final ElementPotionEffect addPotionEffect(String id, Need need, Text editorDescription) { return add(new ElementPotionEffect(this, id, need, editorDescription)); }
-	public final ElementPotionEffect addPotionEffect(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementPotionEffect(this, id, need, editorDescription)); }
-	public final ElementPotionEffectList addPotionEffectList(String id, Need need, Text editorDescription) { return add(new ElementPotionEffectList(this, id, need, editorDescription)); }
-	public final ElementPotionEffectList addPotionEffectList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementPotionEffectList(this, id, need, editorDescription)); }
-	public final ElementPotionEffectType addPotionEffectType(String id, Need need, Text editorDescription) { return add(new ElementPotionEffectType(this, id, need, editorDescription)); }
-	public final ElementPotionEffectType addPotionEffectType(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementPotionEffectType(this, id, need, editorDescription)); }
-	public final ElementPotionEffectTypeList addPotionEffectTypeList(String id, Need need, Text editorDescription) { return add(new ElementPotionEffectTypeList(this, id, need, editorDescription)); }
-	public final ElementPotionEffectTypeList addPotionEffectTypeList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementPotionEffectTypeList(this, id, need, editorDescription)); }
-	public final ElementPotionExtra addPotionExtra(String id, Need need, Text editorDescription) { return add(new ElementPotionExtra(this, id, need, editorDescription)); }
-	public final ElementPotionExtra addPotionExtra(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementPotionExtra(this, id, need, editorDescription)); }
-	public final ElementPotionType addPotionType(String id, Need need, Text editorDescription) { return add(new ElementPotionType(this, id, need, editorDescription)); }
-	public final ElementPotionType addPotionType(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementPotionType(this, id, need, editorDescription)); }
-	public final ElementProjectileType addProjectileType(String id, Need need, Text editorDescription) { return add(new ElementProjectileType(this, id, need, editorDescription)); }
-	public final ElementProjectileType addProjectileType(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementProjectileType(this, id, need, editorDescription)); }
-	public final ElementProjectileTypeList addProjectileTypeList(String id, Need need, Text editorDescription) { return add(new ElementProjectileTypeList(this, id, need, editorDescription)); }
-	public final ElementProjectileTypeList addProjectileTypeList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementProjectileTypeList(this, id, need, editorDescription)); }
-	public final ElementRegainReasonList addRegainReasonList(String id, Need need, Text editorDescription) { return add(new ElementRegainReasonList(this, id, need, editorDescription)); }
-	public final ElementRegainReasonList addRegainReasonList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementRegainReasonList(this, id, need, editorDescription)); }
-	public final ElementRelativeLocation addRelativeLocation(String id, Need need, Text editorDescription) { return add(new ElementRelativeLocation(this, id, need, editorDescription)); }
-	public final ElementRelativeLocation addRelativeLocation(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementRelativeLocation(this, id, need, editorDescription)); }
-	public final ElementSound addSound(String id, Need need, Text editorDescription) { return add(new ElementSound(this, id, need, editorDescription)); }
-	public final ElementSound addSound(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementSound(this, id, need, editorDescription)); }
-	public final ElementString addString(String id, Need need, Text editorDescription) { return add(new ElementString(this, id, need, editorDescription)); }
-	public final ElementString addString(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementString(this, id, need, editorDescription)); }
-	public final ElementStringList addStringList(String id, Need need, Text editorDescription) { return add(new ElementStringList(this, id, need, editorDescription)); }
-	public final ElementStringList addStringList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementStringList(this, id, need, editorDescription)); }
-	public final ElementStringMap addStringMap(String id, Need need, Text editorDescription) { return add(new ElementStringMap(this, id, need, editorDescription)); }
-	public final ElementStringMap addStringMap(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementStringMap(this, id, need, editorDescription)); }
-	public final ElementText addText(String id, Need need, Text editorDescription) { return add(new ElementText(this, id, need, editorDescription)); }
-	public final ElementText addText(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementText(this, id, need, editorDescription)); }
-	public final ElementTimeFrame addTimeFrame(String id, Need need, Text editorDescription) { return add(new ElementTimeFrame(this, id, need, editorDescription)); }
-	public final ElementTimeFrame addTimeFrame(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementTimeFrame(this, id, need, editorDescription)); }
-	public final ElementTimeInDay addTimeInDay(String id, Need need, Text editorDescription) { return add(new ElementTimeInDay(this, id, need, editorDescription)); }
-	public final ElementTimeInDay addTimeInDay(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementTimeInDay(this, id, need, editorDescription)); }
-	public final ElementTimeInWeek addTimeInWeek(String id, Need need, Text editorDescription) { return add(new ElementTimeInWeek(this, id, need, editorDescription)); }
-	public final ElementTimeInWeek addTimeInWeek(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementTimeInWeek(this, id, need, editorDescription)); }
-	public final ElementTimeInMonth addTimeInMonth(String id, Need need, Text editorDescription) { return add(new ElementTimeInMonth(this, id, need, editorDescription)); }
-	public final ElementTimeInMonth addTimeInMonth(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementTimeInMonth(this, id, need, editorDescription)); }
-	public final ElementTimeInYear addTimeInYear(String id, Need need, Text editorDescription) { return add(new ElementTimeInYear(this, id, need, editorDescription)); }
-	public final ElementTimeInYear addTimeInYear(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementTimeInYear(this, id, need, editorDescription)); }
-	public final ElementTimeLimit addTimeLimit(String id, Need need, Text editorDescription) { return add(new ElementTimeLimit(this, id, need, editorDescription)); }
-	public final ElementTimeLimit addTimeLimit(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementTimeLimit(this, id, need, editorDescription)); }
-	public final ElementTimeUnit addTimeUnit(String id, Need need, Text editorDescription) { return add(new ElementTimeUnit(this, id, need, editorDescription)); }
-	public final ElementTimeUnit addTimeUnit(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementTimeUnit(this, id, need, editorDescription)); }
-	public final ElementTreeType addTreeType(String id, Need need, Text editorDescription) { return add(new ElementTreeType(this, id, need, editorDescription)); }
-	public final ElementTreeType addTreeType(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementTreeType(this, id, need, editorDescription)); }
-	public final ElementUUID addUUID(String id, Need need, Text editorDescription) { return add(new ElementUUID(this, id, need, editorDescription)); }
-	public final ElementUUID addUUID(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementUUID(this, id, need, editorDescription)); }
-	public final ElementUUIDList addUUIDList(String id, Need need, Text editorDescription) { return add(new ElementUUIDList(this, id, need, editorDescription)); }
-	public final ElementUUIDList addUUIDList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementUUIDList(this, id, need, editorDescription)); }
-	public final ElementVehicleType addVehicleType(String id, Need need, Text editorDescription) { return add(new ElementVehicleType(this, id, need, editorDescription)); }
-	public final ElementVehicleType addVehicleType(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementVehicleType(this, id, need, editorDescription)); }
-	public final ElementWorld addWorld(String id, Need need, Text editorDescription) { return add(new ElementWorld(this, id, need, editorDescription)); }
-	public final ElementWorld addWorld(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementWorld(this, id, need, editorDescription)); }
-	public final ElementWorldList addWorldList(String id, Need need, Text editorDescription) { return add(new ElementWorldList(this, id, need, editorDescription)); }
-	public final ElementWorldList addWorldList(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementWorldList(this, id, need, editorDescription)); }
-	public final ElementWorldRestriction addWorldRestriction(String id, Need need, Text editorDescription) { return add(new ElementWorldRestriction(this, id, need, editorDescription)); }
-	public final ElementWorldRestriction addWorldRestriction(String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementWorldRestriction(this, id, need, editorDescription)); }
-	public final ElementWorldguardRegion addWorldguardRegion(ElementWorld world, String id, Need need, Text editorDescription) { return add(new ElementWorldguardRegion(this, world, id, need, editorDescription)); }
-	public final ElementWorldguardRegion addWorldguardRegion(ElementWorld world, String id, Need need, SlotPlacement slot, Text editorDescription) { slot(id, slot); return add(new ElementWorldguardRegion(this, world, id, need, editorDescription)); }
+	public final ElementBlockStateList addBlockStateList(String id, Need need, Text editorDescription) {
+		return add(new ElementBlockStateList(this, id, need, editorDescription));
+	}
+
+	public final ElementBlockStateList addBlockStateList(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementBlockStateList(this, id, need, editorDescription));
+	}
+
+	public final ElementBiome addBiome(String id, Need need, Text editorDescription) {
+		return add(new ElementBiome(this, id, need, editorDescription));
+	}
+
+	public final ElementBiome addBiome(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementBiome(this, id, need, editorDescription));
+	}
+
+	public final ElementBiomeList addBiomeList(String id, Need need, Text editorDescription) {
+		return add(new ElementBiomeList(this, id, need, editorDescription));
+	}
+
+	public final ElementBiomeList addBiomeList(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementBiomeList(this, id, need, editorDescription));
+	}
+
+	public final ElementBoolean addBoolean(String id, Need need, Text editorDescription) {
+		return add(new ElementBoolean(this, id, need, editorDescription));
+	}
+
+	public final ElementBoolean addBoolean(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementBoolean(this, id, need, editorDescription));
+	}
+
+	public final ElementBossbarColor addBossbarColor(String id, Need need, Text editorDescription) {
+		return add(new ElementBossbarColor(this, id, need, editorDescription));
+	}
+
+	public final ElementBossbarColor addBossbarColor(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementBossbarColor(this, id, need, editorDescription));
+	}
+
+	public final ElementBossbarStyle addBossbarStyle(String id, Need need, Text editorDescription) {
+		return add(new ElementBossbarStyle(this, id, need, editorDescription));
+	}
+
+	public final ElementBossbarStyle addBossbarStyle(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementBossbarStyle(this, id, need, editorDescription));
+	}
+
+	public final ElementBossbarFlag addBossbarFlag(String id, Need need, Text editorDescription) {
+		return add(new ElementBossbarFlag(this, id, need, editorDescription));
+	}
+
+	public final ElementBossbarFlag addBossbarFlag(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementBossbarFlag(this, id, need, editorDescription));
+	}
+
+	public final ElementBossbarFlagList addBossbarFlagList(String id, Need need, Text editorDescription) {
+		return add(new ElementBossbarFlagList(this, id, need, editorDescription));
+	}
+
+	public final ElementBossbarFlagList addBossbarFlagList(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementBossbarFlagList(this, id, need, editorDescription));
+	}
+
+	public final ElementBucketType addBucketType(String id, Need need, Text editorDescription) {
+		return add(new ElementBucketType(this, id, need, editorDescription));
+	}
+
+	public final ElementBucketType addBucketType(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementBucketType(this, id, need, editorDescription));
+	}
+
+	public final ElementChancePercentage addChancePercentage(String id, Need need, Text editorDescription) {
+		return add(new ElementChancePercentage(this, id, need, editorDescription));
+	}
+
+	public final ElementChancePercentage addChancePercentage(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementChancePercentage(this, id, need, editorDescription));
+	}
+
+	public final ElementClickType addClickType(String id, Need need, Text editorDescription) {
+		return add(new ElementClickType(this, id, need, editorDescription));
+	}
+
+	public final ElementClickType addClickType(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementClickType(this, id, need, editorDescription));
+	}
+
+	public final ElementColor addColor(String id, Need need, Text editorDescription) {
+		return add(new ElementColor(this, id, need, editorDescription));
+	}
+
+	public final ElementColor addColor(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementColor(this, id, need, editorDescription));
+	}
+
+	public final ElementColorList addColorList(String id, Need need, Text editorDescription) {
+		return add(new ElementColorList(this, id, need, editorDescription));
+	}
+
+	public final ElementColorList addColorList(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementColorList(this, id, need, editorDescription));
+	}
+
+	public final ElementCommandList addCommandList(String id, Need need, Text editorDescription) {
+		return add(new ElementCommandList(this, id, need, editorDescription));
+	}
+
+	public final ElementCommandList addCommandList(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementCommandList(this, id, need, editorDescription));
+	}
+
+	public final ElementCommandRestriction addCommandRestriction(String id, Need need, Text editorDescription) {
+		return add(new ElementCommandRestriction(this, id, need, editorDescription));
+	}
+
+	public final ElementCommandRestriction addCommandRestriction(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementCommandRestriction(this, id, need, editorDescription));
+	}
+
+	public final ElementComparisonType addComparisonType(String id, Need need, Text editorDescription) {
+		return add(new ElementComparisonType(this, id, need, editorDescription));
+	}
+
+	public final ElementComparisonType addComparisonType(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementComparisonType(this, id, need, editorDescription));
+	}
+
+	public final ElementConfigSection addConfigSection(String id, Need need, Text editorDescription) {
+		return add(new ElementConfigSection(this, id, need, editorDescription));
+	}
+
+	public final ElementConfigSection addConfigSection(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementConfigSection(this, id, need, editorDescription));
+	}
+
+	public final ElementCurrency addCurrency(String id, Need need, Text editorDescription) {
+		return add(new ElementCurrency(this, id, need, editorDescription));
+	}
+
+	public final ElementCurrency addCurrency(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementCurrency(this, id, need, editorDescription));
+	}
+
+	public final ElementCurrencyList addCurrencyList(String id, Need need, Text editorDescription) {
+		return add(new ElementCurrencyList(this, id, need, editorDescription));
+	}
+
+	public final ElementCurrencyList addCurrencyList(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementCurrencyList(this, id, need, editorDescription));
+	}
+
+	public final ElementCurrencyDoubleMap addCurrencyDoubleMap(String id, Need need, Text editorDescription) {
+		return add(new ElementCurrencyDoubleMap(this, id, need, editorDescription));
+	}
+
+	public final ElementCurrencyDoubleMap addCurrencyDoubleMap(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementCurrencyDoubleMap(this, id, need, editorDescription));
+	}
+
+	public final ElementDayOfWeek addDayOfWeek(String id, Need need, Text editorDescription) {
+		return add(new ElementDayOfWeek(this, id, need, editorDescription));
+	}
+
+	public final ElementDayOfWeek addDayOfWeek(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementDayOfWeek(this, id, need, editorDescription));
+	}
+
+	public final ElementDamageCauseList addDamageCauseList(String id, Need need, Text editorDescription) {
+		return add(new ElementDamageCauseList(this, id, need, editorDescription));
+	}
+
+	public final ElementDamageCauseList addDamageCauseList(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementDamageCauseList(this, id, need, editorDescription));
+	}
+
+	public final ElementDouble addDouble(String id, Need need, Text editorDescription) {
+		return add(new ElementDouble(this, id, need, editorDescription));
+	}
+
+	public final ElementDouble addDouble(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementDouble(this, id, need, editorDescription));
+	}
+
+	public final ElementDouble addDouble(String id, Need need, double min, Text editorDescription) {
+		return add(new ElementDouble(this, id, need, min, editorDescription));
+	}
+
+	public final ElementDouble addDouble(String id, Need need, double min, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementDouble(this, id, need, min, editorDescription));
+	}
+
+	public final ElementDouble addDouble(String id, Need need, double min, double max, Text editorDescription) {
+		return add(new ElementDouble(this, id, need, min, max, editorDescription));
+	}
+
+	public final ElementDouble addDouble(String id, Need need, double min, double max, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementDouble(this, id, need, min, max, editorDescription));
+	}
+
+	public final ElementDoubleList addDoubleList(String id, Need need, Text editorDescription) {
+		return add(new ElementDoubleList(this, id, need, editorDescription));
+	}
+
+	public final ElementDoubleList addDoubleList(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementDoubleList(this, id, need, editorDescription));
+	}
+
+	public final ElementDoubleList addDoubleList(String id, Need need, double min, Text editorDescription) {
+		return add(new ElementDoubleList(this, id, need, min, editorDescription));
+	}
+
+	public final ElementDoubleList addDoubleList(String id, Need need, double min, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementDoubleList(this, id, need, min, editorDescription));
+	}
+
+	public final ElementDoubleList addDoubleList(String id, Need need, double min, double max, Text editorDescription) {
+		return add(new ElementDoubleList(this, id, need, min, max, editorDescription));
+	}
+
+	public final ElementDoubleList addDoubleList(String id, Need need, double min, double max, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementDoubleList(this, id, need, min, max, editorDescription));
+	}
+
+	public final ElementDyeColor addDyeColor(String id, Need need, Text editorDescription) {
+		return add(new ElementDyeColor(this, id, need, editorDescription));
+	}
+
+	public final ElementDyeColor addDyeColor(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementDyeColor(this, id, need, editorDescription));
+	}
+
+	public final ElementDyeColorList addDyeColorList(String id, Need need, Text editorDescription) {
+		return add(new ElementDyeColorList(this, id, need, editorDescription));
+	}
+
+	public final ElementDyeColorList addDyeColorList(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementDyeColorList(this, id, need, editorDescription));
+	}
+
+	public final ElementDynmapMarker addDynmapMarker(String id, Need need, Text editorDescription) {
+		return add(new ElementDynmapMarker(this, id, need, editorDescription));
+	}
+
+	public final ElementDynmapMarker addDynmapMarker(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementDynmapMarker(this, id, need, editorDescription));
+	}
+
+	public final ElementDuration addDuration(String id, Need need, Integer defaultTime, TimeUnit defaultUnit, Text editorDescription) {
+		return add(new ElementDuration(this, id, need, defaultTime, defaultUnit, editorDescription));
+	}
+
+	public final ElementDuration addDuration(String id, Need need, Integer defaultTime, TimeUnit defaultUnit, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementDuration(this, id, need, defaultTime, defaultUnit, editorDescription));
+	}
+
+	public final ElementEnchantment addEnchantment(String id, Need need, Text editorDescription) {
+		return add(new ElementEnchantment(this, id, need, editorDescription));
+	}
+
+	public final ElementEnchantment addEnchantment(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementEnchantment(this, id, need, editorDescription));
+	}
+
+	public final ElementEnchantmentList addEnchantmentList(String id, Need need, Text editorDescription) {
+		return add(new ElementEnchantmentList(this, id, need, editorDescription));
+	}
+
+	public final ElementEnchantmentList addEnchantmentList(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementEnchantmentList(this, id, need, editorDescription));
+	}
+
+	public final ElementEnchantmentLevelMap addEnchantmentLevelMap(String id, Need need, Text editorDescription) {
+		return add(new ElementEnchantmentLevelMap(this, id, need, editorDescription));
+	}
+
+	public final ElementEnchantmentLevelMap addEnchantmentLevelMap(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementEnchantmentLevelMap(this, id, need, editorDescription));
+	}
+
+	public final ElementEntityType addEntityType(String id, Need need, Text editorDescription) {
+		return add(new ElementEntityType(this, id, need, editorDescription));
+	}
+
+	public final ElementEntityType addEntityType(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementEntityType(this, id, need, editorDescription));
+	}
+
+	public final ElementEntityTypeDoubleMap addEntityTypeDoubleMap(String id, Need need, Text editorDescription) {
+		return add(new ElementEntityTypeDoubleMap(this, id, need, editorDescription));
+	}
+
+	public final ElementEntityTypeDoubleMap addEntityTypeDoubleMap(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementEntityTypeDoubleMap(this, id, need, editorDescription));
+	}
+
+	public final ElementEntityTypeList addEntityTypeList(String id, Need need, Text editorDescription) {
+		return add(new ElementEntityTypeList(this, id, need, editorDescription));
+	}
+
+	public final ElementEntityTypeList addEntityTypeList(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementEntityTypeList(this, id, need, editorDescription));
+	}
+
+	public final ElementFireworkEffect addFireworkEffect(String id, Need need, Text editorDescription) {
+		return add(new ElementFireworkEffect(this, id, need, editorDescription));
+	}
+
+	public final ElementFireworkEffect addFireworkEffect(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementFireworkEffect(this, id, need, editorDescription));
+	}
+
+	public final ElementFireworkEffectList addFireworkEffectList(String id, Need need, Text editorDescription) {
+		return add(new ElementFireworkEffectList(this, id, need, editorDescription));
+	}
+
+	public final ElementFireworkEffectList addFireworkEffectList(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementFireworkEffectList(this, id, need, editorDescription));
+	}
+
+	public final ElementFireworkEffectType addFireworkEffectType(String id, Need need, Text editorDescription) {
+		return add(new ElementFireworkEffectType(this, id, need, editorDescription));
+	}
+
+	public final ElementFireworkEffectType addFireworkEffectType(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementFireworkEffectType(this, id, need, editorDescription));
+	}
+
+	public final ElementFloat addFloat(String id, Need need, Text editorDescription) {
+		return add(new ElementFloat(this, id, need, editorDescription));
+	}
+
+	public final ElementFloat addFloat(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementFloat(this, id, need, editorDescription));
+	}
+
+	public final ElementFloat addFloat(String id, Need need, float min, Text editorDescription) {
+		return add(new ElementFloat(this, id, need, min, editorDescription));
+	}
+
+	public final ElementFloat addFloat(String id, Need need, float min, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementFloat(this, id, need, min, editorDescription));
+	}
+
+	public final ElementFloat addFloat(String id, Need need, float min, float max, Text editorDescription) {
+		return add(new ElementFloat(this, id, need, min, max, editorDescription));
+	}
+
+	public final ElementFloat addFloat(String id, Need need, float min, float max, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementFloat(this, id, need, min, max, editorDescription));
+	}
+
+	public final ElementFloatList addFloatList(String id, Need need, Text editorDescription) {
+		return add(new ElementFloatList(this, id, need, editorDescription));
+	}
+
+	public final ElementFloatList addFloatList(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementFloatList(this, id, need, editorDescription));
+	}
+
+	public final ElementFloatList addFloatList(String id, Need need, float min, Text editorDescription) {
+		return add(new ElementFloatList(this, id, need, min, editorDescription));
+	}
+
+	public final ElementFloatList addFloatList(String id, Need need, float min, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementFloatList(this, id, need, min, editorDescription));
+	}
+
+	public final ElementFloatList addFloatList(String id, Need need, float min, float max, Text editorDescription) {
+		return add(new ElementFloatList(this, id, need, min, max, editorDescription));
+	}
+
+	public final ElementFloatList addFloatList(String id, Need need, float min, float max, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementFloatList(this, id, need, min, max, editorDescription));
+	}
+
+	public final ElementGameMode addGameMode(String id, Need need, Text editorDescription) {
+		return add(new ElementGameMode(this, id, need, editorDescription));
+	}
+
+	public final ElementGameMode addGameMode(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementGameMode(this, id, need, editorDescription));
+	}
+
+	public final ElementHorseColorList addHorseColorList(String id, Need need, Text editorDescription) {
+		return add(new ElementHorseColorList(this, id, need, editorDescription));
+	}
+
+	public final ElementHorseColorList addHorseColorList(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementHorseColorList(this, id, need, editorDescription));
+	}
+
+	public final ElementHorseStyleList addHorseStyleList(String id, Need need, Text editorDescription) {
+		return add(new ElementHorseStyleList(this, id, need, editorDescription));
+	}
+
+	public final ElementHorseStyleList addHorseStyleList(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementHorseStyleList(this, id, need, editorDescription));
+	}
+
+	public final ElementInteger addInteger(String id, Need need, Text editorDescription) {
+		return add(new ElementInteger(this, id, need, editorDescription));
+	}
+
+	public final ElementInteger addInteger(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementInteger(this, id, need, editorDescription));
+	}
+
+	public final ElementInteger addInteger(String id, Need need, int min, Text editorDescription) {
+		return add(new ElementInteger(this, id, need, min, editorDescription));
+	}
+
+	public final ElementInteger addInteger(String id, Need need, int min, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementInteger(this, id, need, min, editorDescription));
+	}
+
+	public final ElementInteger addInteger(String id, Need need, int min, int max, Text editorDescription) {
+		return add(new ElementInteger(this, id, need, min, max, editorDescription));
+	}
+
+	public final ElementInteger addInteger(String id, Need need, int min, int max, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementInteger(this, id, need, min, max, editorDescription));
+	}
+
+	public final ElementIntegerList addIntegerList(String id, Need need, Text editorDescription) {
+		return add(new ElementIntegerList(this, id, need, editorDescription));
+	}
+
+	public final ElementIntegerList addIntegerList(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementIntegerList(this, id, need, editorDescription));
+	}
+
+	public final ElementIntegerList addIntegerList(String id, Need need, int min, Text editorDescription) {
+		return add(new ElementIntegerList(this, id, need, min, editorDescription));
+	}
+
+	public final ElementIntegerList addIntegerList(String id, Need need, int min, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementIntegerList(this, id, need, min, editorDescription));
+	}
+
+	public final ElementIntegerList addIntegerList(String id, Need need, int min, int max, Text editorDescription) {
+		return add(new ElementIntegerList(this, id, need, min, max, editorDescription));
+	}
+
+	public final ElementIntegerList addIntegerList(String id, Need need, int min, int max, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementIntegerList(this, id, need, min, max, editorDescription));
+	}
+
+	public final ElementInventoryTypeList addInventoryTypeList(String id, Need need, Text editorDescription) {
+		return add(new ElementInventoryTypeList(this, id, need, editorDescription));
+	}
+
+	public final ElementInventoryTypeList addInventoryTypeList(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementInventoryTypeList(this, id, need, editorDescription));
+	}
+
+	public final ElementItem addItem(String id, Need need, ElementItemMode mode, Text editorDescription) {
+		return add(new ElementItem(this, id, need, mode, editorDescription));
+	}
+
+	public final ElementItem addItem(String id, Need need, ElementItemMode mode, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementItem(this, id, need, mode, editorDescription));
+	}
+
+	public final ElementItemCheck addItemCheck(String id, Need need, Text editorDescription) {
+		return add(new ElementItemCheck(this, id, need, editorDescription));
+	}
+
+	public final ElementItemCheck addItemCheck(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementItemCheck(this, id, need, editorDescription));
+	}
+
+	public final ElementItemMatchList addItemMatchList(String id, Need need, boolean allowCustomCheck, Text editorDescription) {
+		return add(new ElementItemMatchList(this, id, need, allowCustomCheck, editorDescription));
+	}
+
+	public final ElementItemMatchList addItemMatchList(String id, Need need, boolean allowCustomCheck, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementItemMatchList(this, id, need, allowCustomCheck, editorDescription));
+	}
+
+	public final ElementItemFlagList addItemFlagList(String id, Need need, Text editorDescription) {
+		return add(new ElementItemFlagList(this, id, need, editorDescription));
+	}
+
+	public final ElementItemFlagList addItemFlagList(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementItemFlagList(this, id, need, editorDescription));
+	}
+
+	public final ElementItemList addItemList(String id, Need need, ElementItemMode mode, Text editorDescription) {
+		return add(new ElementItemList(this, id, need, mode, editorDescription));
+	}
+
+	public final ElementItemList addItemList(String id, Need need, ElementItemMode mode, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementItemList(this, id, need, mode, editorDescription));
+	}
+
+	public final ElementItemsNeeded addItemsNeeded(String id, Need need, Text editorDescription) {
+		return add(new ElementItemsNeeded(this, id, need, editorDescription));
+	}
+
+	public final ElementItemsNeeded addItemsNeeded(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementItemsNeeded(this, id, need, editorDescription));
+	}
+
+	public final ElementLocation addLocation(String id, Need need, Text editorDescription) {
+		return add(new ElementLocation(this, id, need, editorDescription));
+	}
+
+	public final ElementLocation addLocation(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementLocation(this, id, need, editorDescription));
+	}
+
+	public final ElementLocationList addLocationList(String id, Need need, Text editorDescription) {
+		return add(new ElementLocationList(this, id, need, editorDescription));
+	}
+
+	public final ElementLocationList addLocationList(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementLocationList(this, id, need, editorDescription));
+	}
+
+	public final ElementLong addLong(String id, Need need, Text editorDescription) {
+		return add(new ElementLong(this, id, need, editorDescription));
+	}
+
+	public final ElementLong addLong(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementLong(this, id, need, editorDescription));
+	}
+
+	public final ElementLong addLong(String id, Need need, long min, Text editorDescription) {
+		return add(new ElementLong(this, id, need, min, editorDescription));
+	}
+
+	public final ElementLong addLong(String id, Need need, long min, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementLong(this, id, need, min, editorDescription));
+	}
+
+	public final ElementLong addLong(String id, Need need, long min, long max, Text editorDescription) {
+		return add(new ElementLong(this, id, need, min, max, editorDescription));
+	}
+
+	public final ElementLong addLong(String id, Need need, long min, long max, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementLong(this, id, need, min, max, editorDescription));
+	}
+
+	public final ElementLongList addLongList(String id, Need need, Text editorDescription) {
+		return add(new ElementLongList(this, id, need, editorDescription));
+	}
+
+	public final ElementLongList addLongList(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementLongList(this, id, need, editorDescription));
+	}
+
+	public final ElementLongList addLongList(String id, Need need, long min, Text editorDescription) {
+		return add(new ElementLongList(this, id, need, min, editorDescription));
+	}
+
+	public final ElementLongList addLongList(String id, Need need, long min, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementLongList(this, id, need, min, editorDescription));
+	}
+
+	public final ElementLongList addLongList(String id, Need need, long min, long max, Text editorDescription) {
+		return add(new ElementLongList(this, id, need, min, max, editorDescription));
+	}
+
+	public final ElementLongList addLongList(String id, Need need, long min, long max, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementLongList(this, id, need, min, max, editorDescription));
+	}
+
+	public final ElementNotify addNotify(String id, Need need, Text editorDescription) {
+		return add(new ElementNotify(this, id, need, editorDescription));
+	}
+
+	public final ElementNotify addNotify(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementNotify(this, id, need, editorDescription));
+	}
+
+	public final ElementMat addMat(String id, Need need, Text editorDescription) {
+		return add(new ElementMat(this, id, need, editorDescription));
+	}
+
+	public final ElementMat addMat(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementMat(this, id, need, editorDescription));
+	}
+
+	public final ElementMatDoubleMap addMatDoubleMap(String id, Need need, Text editorDescription) {
+		return add(new ElementMatDoubleMap(this, id, need, editorDescription));
+	}
+
+	public final ElementMatDoubleMap addMatDoubleMap(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementMatDoubleMap(this, id, need, editorDescription));
+	}
+
+	public final ElementMatList addMatList(String id, Need need, Text editorDescription) {
+		return add(new ElementMatList(this, id, need, editorDescription));
+	}
+
+	public final ElementMatList addMatList(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementMatList(this, id, need, editorDescription));
+	}
+
+	public final ElementMatRestriction addMatRestriction(String id, Need need, Text editorDescription) {
+		return add(new ElementMatRestriction(this, id, need, editorDescription));
+	}
+
+	public final ElementMatRestriction addMatRestriction(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementMatRestriction(this, id, need, editorDescription));
+	}
+
+	public final ElementMonth addMonth(String id, Need need, Text editorDescription) {
+		return add(new ElementMonth(this, id, need, editorDescription));
+	}
+
+	public final ElementMonth addMonth(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementMonth(this, id, need, editorDescription));
+	}
+
+	public final ElementParticle addParticle(String id, Need need, Text editorDescription) {
+		return add(new ElementParticle(this, id, need, editorDescription));
+	}
+
+	public final ElementParticle addParticle(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementParticle(this, id, need, editorDescription));
+	}
+
+	public final ElementParticleList addParticleList(String id, Need need, Text editorDescription) {
+		return add(new ElementParticleList(this, id, need, editorDescription));
+	}
+
+	public final ElementParticleList addParticleList(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementParticleList(this, id, need, editorDescription));
+	}
+
+	public final com.guillaumevdn.gcore.lib.element.type.map.ElementPatternTypeColorMap addPatternTypeColorMap(String id, Need need, Text editorDescription) {
+		return add(new com.guillaumevdn.gcore.lib.element.type.map.ElementPatternTypeColorMap(this, id, need, editorDescription));
+	}
+
+	public final com.guillaumevdn.gcore.lib.element.type.map.ElementPatternTypeColorMap addPatternTypeColorMap(String id, Need need, SlotPlacement slot,
+			Text editorDescription) {
+		slot(id, slot);
+		return add(new com.guillaumevdn.gcore.lib.element.type.map.ElementPatternTypeColorMap(this, id, need, editorDescription));
+	}
+
+	public final ElementPermission addPermission(String id, Need need, Text editorDescription) {
+		return add(new ElementPermission(this, id, need, editorDescription));
+	}
+
+	public final ElementPermission addPermission(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementPermission(this, id, need, editorDescription));
+	}
+
+	public final ElementPhysicalClickType addPhysicalClickType(String id, Need need, Text editorDescription) {
+		return add(new ElementPhysicalClickType(this, id, need, editorDescription));
+	}
+
+	public final ElementPhysicalClickType addPhysicalClickType(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementPhysicalClickType(this, id, need, editorDescription));
+	}
+
+	public final ElementPhysicalClickTypeList addPhysicalClickTypeList(String id, Need need, Text editorDescription) {
+		return add(new ElementPhysicalClickTypeList(this, id, need, editorDescription));
+	}
+
+	public final ElementPhysicalClickTypeList addPhysicalClickTypeList(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementPhysicalClickTypeList(this, id, need, editorDescription));
+	}
+
+	public final ElementPointTolerance addPointTolerance(String id, Need need, Text editorDescription) {
+		return add(new ElementPointTolerance(this, id, need, editorDescription));
+	}
+
+	public final ElementPointTolerance addPointTolerance(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementPointTolerance(this, id, need, editorDescription));
+	}
+
+	public final ElementPosition addPosition(String id, Need need, Text editorDescription) {
+		return add(new ElementPosition(this, id, need, editorDescription));
+	}
+
+	public final ElementPosition addPosition(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementPosition(this, id, need, editorDescription));
+	}
+
+	public final ElementPositionList addPositionList(String id, Need need, Text editorDescription) {
+		return add(new ElementPositionList(this, id, need, editorDescription));
+	}
+
+	public final ElementPositionList addPositionList(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementPositionList(this, id, need, editorDescription));
+	}
+
+	public final ElementPotionEffect addPotionEffect(String id, Need need, Text editorDescription) {
+		return add(new ElementPotionEffect(this, id, need, editorDescription));
+	}
+
+	public final ElementPotionEffect addPotionEffect(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementPotionEffect(this, id, need, editorDescription));
+	}
+
+	public final ElementPotionEffectList addPotionEffectList(String id, Need need, Text editorDescription) {
+		return add(new ElementPotionEffectList(this, id, need, editorDescription));
+	}
+
+	public final ElementPotionEffectList addPotionEffectList(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementPotionEffectList(this, id, need, editorDescription));
+	}
+
+	public final ElementPotionEffectType addPotionEffectType(String id, Need need, Text editorDescription) {
+		return add(new ElementPotionEffectType(this, id, need, editorDescription));
+	}
+
+	public final ElementPotionEffectType addPotionEffectType(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementPotionEffectType(this, id, need, editorDescription));
+	}
+
+	public final ElementPotionEffectTypeList addPotionEffectTypeList(String id, Need need, Text editorDescription) {
+		return add(new ElementPotionEffectTypeList(this, id, need, editorDescription));
+	}
+
+	public final ElementPotionEffectTypeList addPotionEffectTypeList(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementPotionEffectTypeList(this, id, need, editorDescription));
+	}
+
+	public final ElementPotionExtra addPotionExtra(String id, Need need, Text editorDescription) {
+		return add(new ElementPotionExtra(this, id, need, editorDescription));
+	}
+
+	public final ElementPotionExtra addPotionExtra(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementPotionExtra(this, id, need, editorDescription));
+	}
+
+	public final ElementPotionType addPotionType(String id, Need need, Text editorDescription) {
+		return add(new ElementPotionType(this, id, need, editorDescription));
+	}
+
+	public final ElementPotionType addPotionType(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementPotionType(this, id, need, editorDescription));
+	}
+
+	public final ElementProjectileType addProjectileType(String id, Need need, Text editorDescription) {
+		return add(new ElementProjectileType(this, id, need, editorDescription));
+	}
+
+	public final ElementProjectileType addProjectileType(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementProjectileType(this, id, need, editorDescription));
+	}
+
+	public final ElementProjectileTypeList addProjectileTypeList(String id, Need need, Text editorDescription) {
+		return add(new ElementProjectileTypeList(this, id, need, editorDescription));
+	}
+
+	public final ElementProjectileTypeList addProjectileTypeList(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementProjectileTypeList(this, id, need, editorDescription));
+	}
+
+	public final ElementRegainReasonList addRegainReasonList(String id, Need need, Text editorDescription) {
+		return add(new ElementRegainReasonList(this, id, need, editorDescription));
+	}
+
+	public final ElementRegainReasonList addRegainReasonList(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementRegainReasonList(this, id, need, editorDescription));
+	}
+
+	public final ElementRelativeLocation addRelativeLocation(String id, Need need, Text editorDescription) {
+		return add(new ElementRelativeLocation(this, id, need, editorDescription));
+	}
+
+	public final ElementRelativeLocation addRelativeLocation(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementRelativeLocation(this, id, need, editorDescription));
+	}
+
+	public final ElementSound addSound(String id, Need need, Text editorDescription) {
+		return add(new ElementSound(this, id, need, editorDescription));
+	}
+
+	public final ElementSound addSound(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementSound(this, id, need, editorDescription));
+	}
+
+	public final ElementString addString(String id, Need need, Text editorDescription) {
+		return add(new ElementString(this, id, need, editorDescription));
+	}
+
+	public final ElementString addString(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementString(this, id, need, editorDescription));
+	}
+
+	public final ElementStringList addStringList(String id, Need need, Text editorDescription) {
+		return add(new ElementStringList(this, id, need, editorDescription));
+	}
+
+	public final ElementStringList addStringList(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementStringList(this, id, need, editorDescription));
+	}
+
+	public final ElementStringMap addStringMap(String id, Need need, Text editorDescription) {
+		return add(new ElementStringMap(this, id, need, editorDescription));
+	}
+
+	public final ElementStringMap addStringMap(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementStringMap(this, id, need, editorDescription));
+	}
+
+	public final ElementText addText(String id, Need need, Text editorDescription) {
+		return add(new ElementText(this, id, need, editorDescription));
+	}
+
+	public final ElementText addText(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementText(this, id, need, editorDescription));
+	}
+
+	public final ElementTimeFrame addTimeFrame(String id, Need need, Text editorDescription) {
+		return add(new ElementTimeFrame(this, id, need, editorDescription));
+	}
+
+	public final ElementTimeFrame addTimeFrame(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementTimeFrame(this, id, need, editorDescription));
+	}
+
+	public final ElementTimeInDay addTimeInDay(String id, Need need, Text editorDescription) {
+		return add(new ElementTimeInDay(this, id, need, editorDescription));
+	}
+
+	public final ElementTimeInDay addTimeInDay(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementTimeInDay(this, id, need, editorDescription));
+	}
+
+	public final ElementTimeInWeek addTimeInWeek(String id, Need need, Text editorDescription) {
+		return add(new ElementTimeInWeek(this, id, need, editorDescription));
+	}
+
+	public final ElementTimeInWeek addTimeInWeek(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementTimeInWeek(this, id, need, editorDescription));
+	}
+
+	public final ElementTimeInMonth addTimeInMonth(String id, Need need, Text editorDescription) {
+		return add(new ElementTimeInMonth(this, id, need, editorDescription));
+	}
+
+	public final ElementTimeInMonth addTimeInMonth(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementTimeInMonth(this, id, need, editorDescription));
+	}
+
+	public final ElementTimeInYear addTimeInYear(String id, Need need, Text editorDescription) {
+		return add(new ElementTimeInYear(this, id, need, editorDescription));
+	}
+
+	public final ElementTimeInYear addTimeInYear(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementTimeInYear(this, id, need, editorDescription));
+	}
+
+	public final ElementTimeLimit addTimeLimit(String id, Need need, Text editorDescription) {
+		return add(new ElementTimeLimit(this, id, need, editorDescription));
+	}
+
+	public final ElementTimeLimit addTimeLimit(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementTimeLimit(this, id, need, editorDescription));
+	}
+
+	public final ElementTimeUnit addTimeUnit(String id, Need need, Text editorDescription) {
+		return add(new ElementTimeUnit(this, id, need, editorDescription));
+	}
+
+	public final ElementTimeUnit addTimeUnit(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementTimeUnit(this, id, need, editorDescription));
+	}
+
+	public final ElementTreeType addTreeType(String id, Need need, Text editorDescription) {
+		return add(new ElementTreeType(this, id, need, editorDescription));
+	}
+
+	public final ElementTreeType addTreeType(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementTreeType(this, id, need, editorDescription));
+	}
+
+	public final ElementUUID addUUID(String id, Need need, Text editorDescription) {
+		return add(new ElementUUID(this, id, need, editorDescription));
+	}
+
+	public final ElementUUID addUUID(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementUUID(this, id, need, editorDescription));
+	}
+
+	public final ElementUUIDList addUUIDList(String id, Need need, Text editorDescription) {
+		return add(new ElementUUIDList(this, id, need, editorDescription));
+	}
+
+	public final ElementUUIDList addUUIDList(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementUUIDList(this, id, need, editorDescription));
+	}
+
+	public final ElementVehicleType addVehicleType(String id, Need need, Text editorDescription) {
+		return add(new ElementVehicleType(this, id, need, editorDescription));
+	}
+
+	public final ElementVehicleType addVehicleType(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementVehicleType(this, id, need, editorDescription));
+	}
+
+	public final ElementWorld addWorld(String id, Need need, Text editorDescription) {
+		return add(new ElementWorld(this, id, need, editorDescription));
+	}
+
+	public final ElementWorld addWorld(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementWorld(this, id, need, editorDescription));
+	}
+
+	public final ElementWorldList addWorldList(String id, Need need, Text editorDescription) {
+		return add(new ElementWorldList(this, id, need, editorDescription));
+	}
+
+	public final ElementWorldList addWorldList(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementWorldList(this, id, need, editorDescription));
+	}
+
+	public final ElementWorldRestriction addWorldRestriction(String id, Need need, Text editorDescription) {
+		return add(new ElementWorldRestriction(this, id, need, editorDescription));
+	}
+
+	public final ElementWorldRestriction addWorldRestriction(String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementWorldRestriction(this, id, need, editorDescription));
+	}
+
+	public final ElementWorldguardRegion addWorldguardRegion(ElementWorld world, String id, Need need, Text editorDescription) {
+		return add(new ElementWorldguardRegion(this, world, id, need, editorDescription));
+	}
+
+	public final ElementWorldguardRegion addWorldguardRegion(ElementWorld world, String id, Need need, SlotPlacement slot, Text editorDescription) {
+		slot(id, slot);
+		return add(new ElementWorldguardRegion(this, world, id, need, editorDescription));
+	}
 
 }

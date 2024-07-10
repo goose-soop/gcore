@@ -77,8 +77,10 @@ public abstract class MapElement<K, V extends Element> extends AbstractMapElemen
 			try {
 				key = getKeySerializer().deserialize(elementId);
 			} catch (Throwable ignored) {
-				/*ignored.printStackTrace();
-				Bukkit.getLogger().info("element id " + elementId + ", type serializer " + getKeySerializer());*/
+				/*
+				 * ignored.printStackTrace(); Bukkit.getLogger().info("element id " + elementId + ", type serializer " +
+				 * getKeySerializer());
+				 */
 			}
 			if (key == null) {
 				getSuperElement().addLoadError("key " + elementId + " at path " + path + " isn't a valid " + getKeySerializer().getTypeName());
@@ -109,6 +111,7 @@ public abstract class MapElement<K, V extends Element> extends AbstractMapElemen
 	@Override
 	public EditorGUI editorGUI(ClickCall fromCall) {
 		EditorGUI editor = new EditorGUI(this, fromCall) {
+
 			@Override
 			protected boolean doFill() {
 				// values
@@ -137,19 +140,21 @@ public abstract class MapElement<K, V extends Element> extends AbstractMapElemen
 					}));
 				}
 				// create item
-				setPersistentItem(new GUIItem("new_element", 50, ItemUtils.createItem(CommonMats.BLAZE_ROD, TextEditorGeneric.controlAddElementName.parseLine(), null), call -> {
-					// left-click : create
-					if (call.getType().equals(ClickType.LEFT)) {
-						editorAskKeyAndCreateAndAddElement(call, (key, value) -> {
-							getSuperElement().onEditorChange(MapElement.this);
-							// reopen GUI (that refreshes it since it's an editor GUI)
-							call.reopenGUI();
-						}, () -> call.reopenGUI());
-					}
-				}));
+				setPersistentItem(new GUIItem("new_element", 50,
+						ItemUtils.createItem(CommonMats.BLAZE_ROD, TextEditorGeneric.controlAddElementName.parseLine(), null), call -> {
+							// left-click : create
+							if (call.getType().equals(ClickType.LEFT)) {
+								editorAskKeyAndCreateAndAddElement(call, (key, value) -> {
+									getSuperElement().onEditorChange(MapElement.this);
+									// reopen GUI (that refreshes it since it's an editor GUI)
+									call.reopenGUI();
+								}, () -> call.reopenGUI());
+							}
+						}));
 				// done
 				return super.doFill();
 			}
+
 		};
 		return editor;
 	}

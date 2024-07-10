@@ -94,7 +94,8 @@ public final class TextElement implements Text {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) return true;
+		if (this == obj)
+			return true;
 		Text other = ObjectUtils.castOrNull(obj, Text.class);
 		return other != null && CollectionUtils.contentEquals(lines, other.getCurrentLines());
 	}

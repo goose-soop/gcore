@@ -40,6 +40,7 @@ public class PositionTypeWorlds extends PositionType {
 	public Position doParse(ElementPosition position, Replacer replacer) throws ParsingError {
 		List<World> worlds = position.getElementAs("worlds", ElementWorldList.class).parseNoCatchOrThrowParsingNull(replacer);
 		return new Position() {
+
 			@Override
 			public boolean match(Location loc) {
 				if (loc == null) {
@@ -47,26 +48,32 @@ public class PositionTypeWorlds extends PositionType {
 				}
 				return worlds.contains(loc.getWorld());
 			}
+
 			@Override
 			public World getWorld() {
 				return CollectionUtils.random(worlds);
 			}
+
 			@Override
 			public boolean canFindRandom() {
 				return false;
 			}
+
 			@Override
 			public Location findRandom() {
 				return null;
 			}
+
 			@Override
 			public int findSafeRandomMaxY() {
 				return 0;
 			}
+
 			@Override
 			public MinMaxDouble getRandomSolidAndFreeAboveYBounds() {
 				return null;
 			}
+
 			@Override
 			public Location findClosestTo(Location loc) {
 				if (!worlds.contains(loc.getWorld())) {
@@ -74,17 +81,21 @@ public class PositionTypeWorlds extends PositionType {
 				}
 				return loc;
 			}
+
 			@Override
 			public Location findGPSFor(Player player) {
 				return null;
 			}
+
 			@Override
 			public boolean canFill() {
 				return false;
 			}
+
 			@Override
 			public void fill(Mat blockType, List<BlockState> blockStates) {
 			}
+
 		};
 	}
 

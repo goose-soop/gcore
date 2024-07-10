@@ -14,18 +14,15 @@ import com.guillaumevdn.gcore.lib.gui.struct.ClickCall;
  */
 public enum OverrideClickType implements LinearObjectType {
 
-	NONE(false, null, action -> null),
-	COMMANDS_AS_SERVER(false, null, action -> call -> {
+	NONE(false, null, action -> null), COMMANDS_AS_SERVER(false, null, action -> call -> {
 		for (String command : action.getValidArguments(0).split(",")) {
 			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("{player}", call.getClicker().getName()));
 		}
-	}),
-	COMMANDS_AS_PLAYER(false, null, action -> call -> {
+	}), COMMANDS_AS_PLAYER(false, null, action -> call -> {
 		for (String command : action.getValidArguments(0).split(",")) {
 			Bukkit.dispatchCommand(call.getClicker(), command.replace("{player}", call.getClicker().getName()));
 		}
-	})
-	;
+	});
 
 	private boolean requiredParam;
 	private Mat icon;

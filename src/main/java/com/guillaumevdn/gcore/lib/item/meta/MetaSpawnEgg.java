@@ -24,12 +24,15 @@ import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
 public final class MetaSpawnEgg {
 
 	public static boolean match(ItemMeta itemMeta, ItemReference reference, ItemCheck check) {
-		if (!reference.hasMeta(SpawnEggMeta.class)) return true;
+		if (!reference.hasMeta(SpawnEggMeta.class))
+			return true;
 		SpawnEggMeta meta = ObjectUtils.castOrNull(itemMeta, SpawnEggMeta.class); // might be null if exact match is false
 
 		// author
-		if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getSpawnedType(), reference.getSpawnedType()))) return false;
-		else if (!check.isExact() && reference.getSpawnedType() != null && (meta == null || !reference.getSpawnedType().equals(meta.getSpawnedType()))) return false;
+		if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getSpawnedType(), reference.getSpawnedType())))
+			return false;
+		else if (!check.isExact() && reference.getSpawnedType() != null && (meta == null || !reference.getSpawnedType().equals(meta.getSpawnedType())))
+			return false;
 
 		// seems good
 		return true;
@@ -69,7 +72,8 @@ public final class MetaSpawnEgg {
 	public static void importElements(ElementItem item, ItemMeta itemMeta) {
 		SpawnEggMeta meta = ObjectUtils.castOrNull(itemMeta, SpawnEggMeta.class);
 		if (meta != null) {
-			item.getElementAs("spawned_type", ElementEntityType.class).setValue(meta.getSpawnedType() != null ? CollectionUtils.asList(meta.getSpawnedType().name()) : null);
+			item.getElementAs("spawned_type", ElementEntityType.class)
+					.setValue(meta.getSpawnedType() != null ? CollectionUtils.asList(meta.getSpawnedType().name()) : null);
 		}
 	}
 

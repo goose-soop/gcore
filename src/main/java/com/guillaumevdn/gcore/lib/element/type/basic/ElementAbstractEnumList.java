@@ -49,7 +49,8 @@ public abstract class ElementAbstractEnumList<E> extends ElementValueList<E> {
 		if (call.getType().equals(ClickType.RIGHT)) {
 			List<E> v = getValues();
 			if (getRawValue() != null) {
-				v = v.stream().filter(value -> !CollectionUtils.containsIgnoreCase(getRawValue(), getSerializer().serialize(value))).collect(Collectors.toList());
+				v = v.stream().filter(value -> !CollectionUtils.containsIgnoreCase(getRawValue(), getSerializer().serialize(value)))
+						.collect(Collectors.toList());
 			}
 			List<E> values = v; // pepega
 			// select with element icons
@@ -115,7 +116,8 @@ public abstract class ElementAbstractEnumList<E> extends ElementValueList<E> {
 	protected String editorNewLine() {
 		List<E> values = getValues();
 		if (getRawValue() != null) {
-			values = values.stream().filter(value -> !CollectionUtils.containsIgnoreCase(getRawValue(), getSerializer().serialize(value))).collect(Collectors.toList());
+			values = values.stream().filter(value -> !CollectionUtils.containsIgnoreCase(getRawValue(), getSerializer().serialize(value)))
+					.collect(Collectors.toList());
 		}
 		return getSerializer().serialize(CollectionUtils.random(!values.isEmpty() ? values : getValues()));
 	}

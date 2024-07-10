@@ -7,13 +7,8 @@ import java.util.function.Function;
  */
 public enum TimeUnit {
 
-	MILLISECOND(millis -> millis),
-	TICK(ticks -> ticks * 50L),
-	SECOND(seconds -> seconds * 1000L),
-	MINUTE(minutes -> SECOND.toMillis(minutes * 60L)),
-	HOUR(hours -> MINUTE.toMillis(hours * 60L)),
-	DAY(days -> HOUR.toMillis(days * 24L)),
-	WEEK(weeks -> DAY.toMillis(weeks * 7L)),
+	MILLISECOND(millis -> millis), TICK(ticks -> ticks * 50L), SECOND(seconds -> seconds * 1000L), MINUTE(minutes -> SECOND.toMillis(minutes * 60L)),
+	HOUR(hours -> MINUTE.toMillis(hours * 60L)), DAY(days -> HOUR.toMillis(days * 24L)), WEEK(weeks -> DAY.toMillis(weeks * 7L)),
 	MONTH(months -> WEEK.toMillis(months * 31L));
 
 	// ----- base

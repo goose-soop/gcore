@@ -20,6 +20,7 @@ public final class ElementPositionType extends ElementTypableElementType<Positio
 	}
 
 	public static RWWeakHashMap<Object, List<PositionType>> valuesCache = new RWWeakHashMap<>(1, 1f);
+
 	@Override
 	protected List<PositionType> cacheOrBuild() {
 		return cachedOrBuild(valuesCache, () -> PositionTypes.inst().values().stream().sorted(Comparator.comparing(e -> e.getId())));

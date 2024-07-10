@@ -25,11 +25,14 @@ public interface Position {
 	default boolean match(Player player) {
 		return match(player.getLocation());
 	}
+
 	boolean match(Location loc);
 
 	// ----- random
 	boolean canFindRandom();
+
 	Location findRandom();
+
 	int findSafeRandomMaxY();
 
 	default Location findMaybeSafeRandom(int entityHeight, int maxTries) {
@@ -90,6 +93,7 @@ public interface Position {
 	default Location findClosestTo(Player player) {
 		return findClosestTo(player.getLocation());
 	}
+
 	Location findClosestTo(Location loc);
 
 	// ----- gps
@@ -97,6 +101,7 @@ public interface Position {
 
 	// ----- fill
 	boolean canFill();
+
 	default void fill(Mat blockType, List<BlockState> blockStates) {
 		throw new UnsupportedOperationException();
 	}

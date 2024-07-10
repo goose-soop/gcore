@@ -37,9 +37,7 @@ public class GUI {
 
 	// ----- options
 	public static enum Option {
-		DONT_UNREGISTER_ON_CLOSE,
-		AUTO_BACK_ITEM,
-		RAW_NAME
+		DONT_UNREGISTER_ON_CLOSE, AUTO_BACK_ITEM, RAW_NAME
 	}
 
 	private static final int MAX_LENGTH = 25;
@@ -54,11 +52,11 @@ public class GUI {
 	private final Set<Option> options;
 	private final List<Integer> regularItemSlots;
 	private final RWLowerCaseHashMap<GUIItem> regularItems = new RWLowerCaseHashMap<>(5, 1f);
-	private final RWLowerCaseHashMap<GUIItem> persistentItems = new RWLowerCaseHashMap<>(1, 1f);  // expecting more regulars than persistents
+	private final RWLowerCaseHashMap<GUIItem> persistentItems = new RWLowerCaseHashMap<>(1, 1f); // expecting more regulars than persistents
 	private final Handler handler;
 	private long lastFilled = 0L;
 	private boolean active = false;
-	private RWWeakHashMap<Player, ClickCall> fromCall = new RWWeakHashMap<>(1, 1f);  // usually expecting one player per GUI
+	private RWWeakHashMap<Player, ClickCall> fromCall = new RWWeakHashMap<>(1, 1f); // usually expecting one player per GUI
 
 	public GUI(GPlugin plugin, String id, String name, GUIType type, Option... options) {
 		this(plugin, id, name, type, NumberUtils.range(0, type.getRegularItemSlotsEnd()), options);
@@ -77,30 +75,22 @@ public class GUI {
 		String n = StringUtils.unformat(name);
 		if (!this.options.contains(Option.RAW_NAME) && n.length() > MAX_LENGTH) {
 			/*
-			 * Faut compter les couleurs nécessaires pour arriver au cut pour que le nom qu'on a cut, unformatté, ait la même taille que le cut normal
-			 * Perso j'ai la flemme
-
-			int cutAt = n.length() - (MAX_LENGTH - APPEND_CUT.length()) + (name.length() - n.length());
-
-			int cutAt = n.length() - (MAX_LENGTH - APPEND_CUT.length()) + (name.length() - n.length());
-			int cutAtNormal = n.length() - (MAX_LENGTH - APPEND_CUT.length());
-
-			Bukkit.getLogger().info("name " + name);
-			Bukkit.getLogger().info("n    " + n);
-			Bukkit.getLogger().info("n    " + name.replace('§', '&'));
-			Bukkit.getLogger().info("= diff " + (name.length() - n.length()));
-			Bukkit.getLogger().info("- cutAt " + cutAt);
-			Bukkit.getLogger().info("- cutAtNormal " + cutAtNormal);
-			Bukkit.getLogger().info("- subst " + name.substring(cutAt, name.length()) + ", length " + (name.substring(cutAt, name.length()).length()));
-
-			if (cutAt > 0 && name.charAt(cutAt - 1) == '§') {
-				if (cutAt + 1 >= n.length()) {
-					--cutAt;
-				} else {
-					++cutAt;
-				}
-			}
-			this.name = StringUtils.getLastColors(name.substring(0, cutAt)) + APPEND_CUT + name.substring(cutAt, name.length());
+			 * Faut compter les couleurs nécessaires pour arriver au cut pour que le nom qu'on a cut, unformatté, ait la même taille
+			 * que le cut normal Perso j'ai la flemme
+			 * 
+			 * int cutAt = n.length() - (MAX_LENGTH - APPEND_CUT.length()) + (name.length() - n.length());
+			 * 
+			 * int cutAt = n.length() - (MAX_LENGTH - APPEND_CUT.length()) + (name.length() - n.length()); int cutAtNormal =
+			 * n.length() - (MAX_LENGTH - APPEND_CUT.length());
+			 * 
+			 * Bukkit.getLogger().info("name " + name); Bukkit.getLogger().info("n    " + n); Bukkit.getLogger().info("n    " +
+			 * name.replace('§', '&')); Bukkit.getLogger().info("= diff " + (name.length() - n.length()));
+			 * Bukkit.getLogger().info("- cutAt " + cutAt); Bukkit.getLogger().info("- cutAtNormal " + cutAtNormal);
+			 * Bukkit.getLogger().info("- subst " + name.substring(cutAt, name.length()) + ", length " + (name.substring(cutAt,
+			 * name.length()).length()));
+			 * 
+			 * if (cutAt > 0 && name.charAt(cutAt - 1) == '§') { if (cutAt + 1 >= n.length()) { --cutAt; } else { ++cutAt; } }
+			 * this.name = StringUtils.getLastColors(name.substring(0, cutAt)) + APPEND_CUT + name.substring(cutAt, name.length());
 			 */
 
 			int extra = n.length() - MAX_LENGTH;
@@ -111,7 +101,8 @@ public class GUI {
 		}
 		this.type = type;
 		this.regularItemSlots = regularItemSlots;
-		if (this.options.contains(Option.AUTO_BACK_ITEM) && type.getBackItemSlot() != -1) regularItemSlots.remove((Integer) (this.backItemSlot = type.getBackItemSlot()));
+		if (this.options.contains(Option.AUTO_BACK_ITEM) && type.getBackItemSlot() != -1)
+			regularItemSlots.remove((Integer) (this.backItemSlot = type.getBackItemSlot()));
 		this.handler = ConfigGCore.allowProtocolGUIs && PluginUtils.isPluginEnabled("ProtocolLib") ? new ProtocolHandler(this) : new VanillaHandler(this);
 	}
 
@@ -189,7 +180,7 @@ public class GUI {
 
 	// ----- set
 
-	protected void setPlugin(GPlugin plugin) {  // this can be useful, for the confirm GUI for instance
+	protected void setPlugin(GPlugin plugin) { // this can be useful, for the confirm GUI for instance
 		this.plugin = plugin;
 	}
 
@@ -208,9 +199,11 @@ public class GUI {
 				.orElseGet(() -> regularItems.streamResultValues(str -> str.filter(it -> it.isInLocation(page, slot)).findFirst().orElse(null)));
 	}
 
-	public GUIItem getItemWithPerformer(int page, int slot, ClickType type) {  // some items allow to override them, but they however can still be detected at their slot (for instance, dynamic borders)
+	public GUIItem getItemWithPerformer(int page, int slot, ClickType type) { // some items allow to override them, but they however can still be detected at
+																				// their slot (for instance, dynamic borders)
 		return persistentItems.streamResultValues(str -> str.filter(it -> it.isInSlot(slot) && it.getClickPerformer(type) != null).findFirst())
-				.orElseGet(() -> regularItems.streamResultValues(str -> str.filter(it -> it.isInLocation(page, slot) && it.getClickPerformer(type) != null).findFirst().orElse(null)));
+				.orElseGet(() -> regularItems.streamResultValues(
+						str -> str.filter(it -> it.isInLocation(page, slot) && it.getClickPerformer(type) != null).findFirst().orElse(null)));
 	}
 
 	public GUIItem getRegularItem(int pageIndex, int slot) {
@@ -238,7 +231,8 @@ public class GUI {
 		// invalid slot
 		for (IntegerPair preferredLocation : item.getLocations()) {
 			if (preferredLocation.getB() < -1 || preferredLocation.getB() >= type.getSize()) {
-				throw new IllegalArgumentException("can't set regular item " + item.getId() + " in GUI " + getId() + ", preferred slot " + preferredLocation.getB() + " is outside bounds (-1 to " + (type.getSize() - 1) + ")");
+				throw new IllegalArgumentException("can't set regular item " + item.getId() + " in GUI " + getId() + ", preferred slot "
+						+ preferredLocation.getB() + " is outside bounds (-1 to " + (type.getSize() - 1) + ")");
 			}
 		}
 
@@ -247,9 +241,9 @@ public class GUI {
 
 		// get locations
 		List<IntegerPair> locations;
-		if (previous != null && !previous.getLocations().isEmpty()) {  // get from previous
+		if (previous != null && !previous.getLocations().isEmpty()) { // get from previous
 			locations = previous.getLocations();
-		} else {  // recalculate them
+		} else { // recalculate them
 			locations = new ArrayList<>();
 			if (item.getPreferredLocations().isEmpty()) {
 				IntegerPair location = findOrCreateFreeForRegular(-1, -1);
@@ -262,7 +256,8 @@ public class GUI {
 				for (IntegerPair preferredLocation : item.getPreferredLocations()) {
 					IntegerPair location = findOrCreateFreeForRegular(preferredLocation.getA(), preferredLocation.getB());
 					if (location == null) {
-						GCore.inst().getMainLogger().error("can't set regular item " + item.getId() + " in GUI " + getId() + ", no location found for preferred " + preferredLocation.toString());
+						GCore.inst().getMainLogger().error("can't set regular item " + item.getId() + " in GUI " + getId()
+								+ ", no location found for preferred " + preferredLocation.toString());
 					} else {
 						locations.add(location);
 					}
@@ -299,14 +294,18 @@ public class GUI {
 			if (preferredLocation.getA() > 0) {
 				throw new IllegalArgumentException("can't set persistent item " + item.getId() + " in GUI " + getId() + ", no preferred page can be specified");
 			} else if (preferredLocation.getB() < 0 /* no -1 for persistent items */ || preferredLocation.getB() >= type.getSize()) {
-				throw new IllegalArgumentException("can't set persistent item " + item.getId() + " in GUI " + getId() + ", preferred slot " + preferredLocation.getB() + " is outside bounds (-1 to " + (type.getSize() - 1) + ")");
+				throw new IllegalArgumentException("can't set persistent item " + item.getId() + " in GUI " + getId() + ", preferred slot "
+						+ preferredLocation.getB() + " is outside bounds (-1 to " + (type.getSize() - 1) + ")");
 			} else if (preferredLocation.getB() == backItemSlot) {
-				throw new IllegalArgumentException("can't set persistent item " + item.getId() + " in GUI " + getId() + ", preferred slot " + preferredLocation.getB() + " is the back item slot");
+				throw new IllegalArgumentException("can't set persistent item " + item.getId() + " in GUI " + getId() + ", preferred slot "
+						+ preferredLocation.getB() + " is the back item slot");
 			}
 			if (!(item instanceof BorderGUIItem /* border items will simply be skipped on these slots */)) {
 				GUIItem existing = getPersistentItem(preferredLocation.getB());
-				if (existing != null && !existing.getId().equals(item.getId()) && !(existing instanceof BorderGUIItem) /* existing border items will simply be overriden */) {
-					throw new IllegalArgumentException("can't set persistent item " + item.getId() + " in GUI " + getId() + ", preferred slot " + preferredLocation.getB() + " already has persistent item " + existing.getId());
+				if (existing != null && !existing.getId().equals(item.getId())
+						&& !(existing instanceof BorderGUIItem) /* existing border items will simply be overriden */) {
+					throw new IllegalArgumentException("can't set persistent item " + item.getId() + " in GUI " + getId() + ", preferred slot "
+							+ preferredLocation.getB() + " already has persistent item " + existing.getId());
 				}
 			}
 		}
@@ -318,7 +317,8 @@ public class GUI {
 		persistentItems.put(item.getId(), item);
 
 		// ensure there's at least one page
-		// when we call refill() manually, we sometimes end up adding a persistent dynamic border at first, and it's added nowhere because there are no pages
+		// when we call refill() manually, we sometimes end up adding a persistent dynamic border at first, and it's added
+		// nowhere because there are no pages
 		if (getPageCount() == 0) {
 			createPage();
 		}
@@ -335,7 +335,9 @@ public class GUI {
 			// set item
 			for (int pageIndex = 0; pageIndex < handler.getPageCount(); ++pageIndex) {
 				// control item
-				if ((pageIndex > 0 && preferredLocation.getB() == type.getPreviousPageItemSlot()) || (pageIndex + 1 < handler.getPageCount() && preferredLocation.getB() == type.getNextPageItemSlot()) || preferredLocation.getB() == backItemSlot) {
+				if ((pageIndex > 0 && preferredLocation.getB() == type.getPreviousPageItemSlot())
+						|| (pageIndex + 1 < handler.getPageCount() && preferredLocation.getB() == type.getNextPageItemSlot())
+						|| preferredLocation.getB() == backItemSlot) {
 					continue;
 				}
 				// remove existing regular item if any
@@ -555,7 +557,8 @@ public class GUI {
 		boolean open = doFill();
 		lastFilled = System.currentTimeMillis();
 
-		// open new pages for viewers ; old pages are cleared, but kept open, so the cursor doesn't recenter when we reopen new pages
+		// open new pages for viewers ; old pages are cleared, but kept open, so the cursor doesn't recenter when we reopen new
+		// pages
 		if (open) {
 			if (handler.getPageCount() == 0) {
 				createPage();
@@ -598,7 +601,7 @@ public class GUI {
 	private final boolean doOpenFor(Player player, int pageIndex, ClickCall fromCall) {
 
 		final ClickCall previousFromCall = getFromCall(player);
-		setFromCall(player, fromCall);  // some GUIs will use this as early as the items building step, so do it first
+		setFromCall(player, fromCall); // some GUIs will use this as early as the items building step, so do it first
 
 		// create a page if has none
 		if (handler.getPageCount() == 0) {
@@ -610,7 +613,7 @@ public class GUI {
 			activate();
 			lastFilled = System.currentTimeMillis();
 			if (!doFill()) {
-				setFromCall(player, previousFromCall);  // revert from call, since we didn't open it
+				setFromCall(player, previousFromCall); // revert from call, since we didn't open it
 				return false;
 			}
 		}
@@ -620,27 +623,30 @@ public class GUI {
 			if (lastFilled == 0L) {
 				lastFilled = System.currentTimeMillis();
 				if (!doFill()) {
-					setFromCall(player, previousFromCall);  // revert from call, since we didn't open it
+					setFromCall(player, previousFromCall); // revert from call, since we didn't open it
 					return false;
 				}
 			}
 		}
 
 		// invalid page
-		/*if (pageIndex >= handler.getPageCount()) {
-			throw new IllegalArgumentException("can't open GUI " + getId() + ", page index " + pageIndex + " is outside bounds");
-		}*/
+		/*
+		 * if (pageIndex >= handler.getPageCount()) { throw new IllegalArgumentException("can't open GUI " + getId() +
+		 * ", page index " + pageIndex + " is outside bounds"); }
+		 */
 		if (pageIndex >= handler.getPageCount()) {
 			pageIndex = handler.getPageCount() - 1;
 		}
 
-		// remove player from all other GUIs if ProtocolLib ; because the window close packet isn't sent when opening a window while another is already opened, and this creates messy issues (player is considered to be on multiple pages at the same time)
+		// remove player from all other GUIs if ProtocolLib ; because the window close packet isn't sent when opening a window
+		// while another is already opened, and this creates messy issues (player is considered to be on multiple pages at the
+		// same time)
 		if (PluginUtils.isPluginEnabled("ProtocolLib")) {
 			PluginUtils.getGPlugins().forEach(plugin -> plugin.getGUIs().forEach(gui -> {
 				ProtocolHandler handler = ObjectUtils.castOrNull(((GUI) gui).handler, ProtocolHandler.class);
 				if (handler != null) {
 					handler.removeViewer(player);
-					if (gui.equals(this)) {  // same GUI ? ignore it, we're reopening a page so he'll be added to the new viewers list
+					if (gui.equals(this)) { // same GUI ? ignore it, we're reopening a page so he'll be added to the new viewers list
 					} else {
 						// otherwise, call remove on other handler
 						handler.onClose(player);
@@ -727,17 +733,19 @@ public class GUI {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) return true;
+		if (this == obj)
+			return true;
 		return ObjectUtils.ifCanBeCastedDo(obj, getClass(), other -> other.getId().equals(getId())).orElse(false);
 	}
 
 	// ----- static
 	public static GUI getOpenGUI(Player player) {
-		return PluginUtils.getGPlugins().stream().flatMap(pl -> (Stream<GUI>) pl.getGUIs().stream()).filter(gui -> gui.handler.isViewer(player)).findFirst().orElse(null);
+		return PluginUtils.getGPlugins().stream().flatMap(pl -> (Stream<GUI>) pl.getGUIs().stream()).filter(gui -> gui.handler.isViewer(player)).findFirst()
+				.orElse(null);
 	}
 
 	public static boolean hasOpenGUI(Player player) {
-		if (!player.getOpenInventory().getTopInventory().getType().equals(InventoryType.CRAFTING))  // default opened view is the player's crafting inventory
+		if (!player.getOpenInventory().getTopInventory().getType().equals(InventoryType.CRAFTING)) // default opened view is the player's crafting inventory
 			return true;
 		if (getOpenGUI(player) != null)
 			return true;

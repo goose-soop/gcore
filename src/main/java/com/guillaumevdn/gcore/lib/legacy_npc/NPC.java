@@ -27,7 +27,8 @@ public class NPC {
 	private ItemStack[] items = new ItemStack[6];
 	private boolean spawned = false;
 
-	public NPC(final Player player, final int id, String name, String skinData, String skinSignature, Location location, double targetDistance, List<NPCStatus> status, ItemStack[] items) {
+	public NPC(final Player player, final int id, String name, String skinData, String skinSignature, Location location, double targetDistance,
+			List<NPCStatus> status, ItemStack[] items) {
 		this.player = player;
 		this.id = id;
 		this.name = name;
@@ -35,7 +36,8 @@ public class NPC {
 		this.skinSignature = skinSignature;
 		this.location = location;
 		this.targetDistance = targetDistance;
-		if (status != null) this.status.addAll(status);
+		if (status != null)
+			this.status.addAll(status);
 		if (items != null) {
 			for (int i = 0; i < 6; ++i) {
 				if (items.length >= i) {
@@ -145,7 +147,8 @@ public class NPC {
 			// success
 			return true;
 		} catch (Throwable exception) {
-			if (!(exception instanceof IllegalArgumentException)) { // java.lang.IllegalArgumentException: No serializer found for class java.lang.Byte :confusedwat:
+			if (!(exception instanceof IllegalArgumentException)) { // java.lang.IllegalArgumentException: No serializer found for class java.lang.Byte
+																	// :confusedwat:
 				exception.printStackTrace();
 			}
 			return false;
@@ -180,7 +183,8 @@ public class NPC {
 		double dz = z - z0;
 		double r = Math.sqrt(dx * dx + dy * dy + dz * dz);
 		double yaw = -Math.atan2(dx, dz) / Math.PI * 180d;
-		if (yaw < 0) yaw = 360d + yaw;
+		if (yaw < 0)
+			yaw = 360d + yaw;
 		double pitch = -Math.asin(dy / r) / Math.PI * 180d;
 		return Pair.of((float) yaw, (float) pitch);
 	}
@@ -330,8 +334,10 @@ public class NPC {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) return true;
-		if (!(obj instanceof NPC)) return false;
+		if (this == obj)
+			return true;
+		if (!(obj instanceof NPC))
+			return false;
 		NPC other = (NPC) obj;
 		return other.id == id && other.player.getUniqueId().equals(player.getUniqueId());
 	}

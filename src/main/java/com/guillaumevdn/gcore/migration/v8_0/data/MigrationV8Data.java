@@ -37,7 +37,7 @@ public final class MigrationV8Data extends Migration {
 
 	@Override
 	public boolean mustMigrate() {
-		return true;  // if not made yet
+		return true; // if not made yet
 	}
 
 	private final Gson gson = getPlugin().createGsonBuilder().create();
@@ -77,18 +77,13 @@ public final class MigrationV8Data extends Migration {
 			});
 			// create tables
 			attemptOperation("creating SQLConnector tables", BackupBehavior.NONE, () -> {
-				mysql.performUpdateQuery(getPlugin(), new Query("DROP TABLE IF EXISTS gcore_users_npcs_v8;"
-						+ "CREATE TABLE gcore_users_npcs_v8("
-						+ "user_uuid CHAR(36) NOT NULL,"
-						+ "data LONGTEXT NOT NULL,"
-						+ "PRIMARY KEY(user_uuid)"
-						+ ") ENGINE=InnoDB DEFAULT CHARSET = 'utf8';"));
+				mysql.performUpdateQuery(getPlugin(), new Query("DROP TABLE IF EXISTS gcore_users_npcs_v8;" + "CREATE TABLE gcore_users_npcs_v8("
+						+ "user_uuid CHAR(36) NOT NULL," + "data LONGTEXT NOT NULL," + "PRIMARY KEY(user_uuid)" + ") ENGINE=InnoDB DEFAULT CHARSET = 'utf8';"));
 			});
 			// statistics
 			attemptOperation("copying SQLConnector statistics", BackupBehavior.NONE, () -> {
 				mysql.performUpdateQuery(getPlugin(), new Query("DROP TABLE IF EXISTS gcore_statistics_v8;"
-						+ "CREATE TABLE gcore_statistics_v8 LIKE gcore_statistics;"
-						+ "INSERT INTO gcore_statistics_v8 SELECT * FROM gcore_statistics;"));
+						+ "CREATE TABLE gcore_statistics_v8 LIKE gcore_statistics;" + "INSERT INTO gcore_statistics_v8 SELECT * FROM gcore_statistics;"));
 			});
 			// statistics
 			attemptOperation("converting SQLConnector users NPCs board", BackupBehavior.NONE, () -> {
@@ -100,7 +95,8 @@ public final class MigrationV8Data extends Migration {
 						uuid = migrateUserInfo(set.getString("id"));
 						UserNPCs user = migrateUserData(uuid, set.getString("data"), null, npcsConfig);
 						// write
-						mysql.performUpdateQuery(getPlugin(), new Query("INSERT INTO gcore_users_npcs_v8(user_uuid,data) VALUES (" + Query.escapeValue(uuid.toString()) + ", " + Query.escapeValue(gson.toJson(user)) + ");"));
+						mysql.performUpdateQuery(getPlugin(), new Query("INSERT INTO gcore_users_npcs_v8(user_uuid,data) VALUES ("
+								+ Query.escapeValue(uuid.toString()) + ", " + Query.escapeValue(gson.toJson(user)) + ");"));
 						countMod();
 					} catch (Throwable exception) {
 						error("Couldn't convert saved user NPCs for " + uuid + ", skipping", exception);
@@ -194,7 +190,8 @@ public final class MigrationV8Data extends Migration {
 				}
 				// save npc if there's non-default data
 				UserNPC userNPC = new UserNPC(npcId);
-				userNPC.saveNonDefault(npcConfig, Replacer.GENERIC, npc.shown, npc.name, npc.skinData, npc.skinSignature, npc.location, npc.targetDistance, npc.status, heldItem, heldItemOff, boots, leggings, chestplate, helmet);
+				userNPC.saveNonDefault(npcConfig, Replacer.GENERIC, npc.shown, npc.name, npc.skinData, npc.skinSignature, npc.location, npc.targetDistance,
+						npc.status, heldItem, heldItemOff, boots, leggings, chestplate, helmet);
 				if (!userNPC.isEmpty()) {
 					npcs.put(npcId, userNPC);
 				}
@@ -205,7 +202,7 @@ public final class MigrationV8Data extends Migration {
 	}
 
 	private UUID migrateUserInfo(String userInfo) {
-		if (userInfo == null) {  // might happen
+		if (userInfo == null) { // might happen
 			return null;
 		}
 		int index = userInfo.indexOf('_');

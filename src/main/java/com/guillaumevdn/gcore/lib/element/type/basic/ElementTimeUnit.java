@@ -22,9 +22,11 @@ public class ElementTimeUnit extends ElementFakeEnum<TimeUnit> {
 	}
 
 	private static RWWeakHashMap<Object, List<TimeUnit>> cache = new RWWeakHashMap<>(1, 1f);
+
 	@Override
 	protected List<TimeUnit> cacheOrBuild() {
-		return cachedOrBuild(cache, () -> Stream.of(TimeUnit.TICK, TimeUnit.SECOND, TimeUnit.MINUTE, TimeUnit.HOUR, TimeUnit.DAY, TimeUnit.WEEK, TimeUnit.MONTH).sorted(Comparator.comparing(e -> e.name())));
+		return cachedOrBuild(cache, () -> Stream.of(TimeUnit.TICK, TimeUnit.SECOND, TimeUnit.MINUTE, TimeUnit.HOUR, TimeUnit.DAY, TimeUnit.WEEK, TimeUnit.MONTH)
+				.sorted(Comparator.comparing(e -> e.name())));
 	}
 
 	@Override

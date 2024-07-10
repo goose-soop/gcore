@@ -46,7 +46,8 @@ public class SingleValueNode extends ConfigNode {
 
 	// ----- set
 	public void setValueString(String value) {
-		if (value == null) throw new IllegalArgumentException("value can't be null");
+		if (value == null)
+			throw new IllegalArgumentException("value can't be null");
 		// find line length limit
 		int lengthLimit;
 		if (valueWithLineBreaks != null && valueWithLineBreaks.size() > 1) {
@@ -68,7 +69,8 @@ public class SingleValueNode extends ConfigNode {
 	}
 
 	public void setValueWithLineBreaks(List<String> value) {
-		if (value == null || value.isEmpty()) throw new IllegalArgumentException("value can't be null");
+		if (value == null || value.isEmpty())
+			throw new IllegalArgumentException("value can't be null");
 		this.valueWithLineBreaks = value;
 	}
 
@@ -76,7 +78,10 @@ public class SingleValueNode extends ConfigNode {
 	public void print() {
 		String prefix = getPrefix();
 		if (valueWithLineBreaks.size() == 1) {
-			Bukkit.getLogger().info(getDepthLevel() + " " + prefix + getId() + ": " + YMLReader.wrapValueToWrite(StringUtils.retranslateColorCodes(valueWithLineBreaks.get(0))) + (trailingComment != null ? " #" + trailingComment : ""));
+			Bukkit.getLogger()
+					.info(getDepthLevel() + " " + prefix + getId() + ": "
+							+ YMLReader.wrapValueToWrite(StringUtils.retranslateColorCodes(valueWithLineBreaks.get(0)))
+							+ (trailingComment != null ? " #" + trailingComment : ""));
 		} else {
 			Bukkit.getLogger().info(getDepthLevel() + " " + prefix + getId() + ": >" + (trailingComment != null ? " #" + trailingComment : ""));
 			for (String line : StringUtils.retranslateColorCodes(valueWithLineBreaks)) {
@@ -90,11 +95,14 @@ public class SingleValueNode extends ConfigNode {
 	public void write(Appendable writer, WriteType type) throws Throwable {
 		String prefix = getPrefix();
 
-		if (type.writePrefix()) writer.append(prefix);
-		if (type.writeId()) writer.append(YMLReader.wrapIdToWrite(getId()) + ": ");
+		if (type.writePrefix())
+			writer.append(prefix);
+		if (type.writeId())
+			writer.append(YMLReader.wrapIdToWrite(getId()) + ": ");
 
 		if (valueWithLineBreaks.size() == 1) {
-			writer.append(YMLReader.wrapValueToWrite(StringUtils.retranslateColorCodes(valueWithLineBreaks.get(0))) + (trailingComment != null ? " #" + trailingComment : "") + "\n");
+			writer.append(YMLReader.wrapValueToWrite(StringUtils.retranslateColorCodes(valueWithLineBreaks.get(0)))
+					+ (trailingComment != null ? " #" + trailingComment : "") + "\n");
 		} else {
 			writer.append(">" + (trailingComment != null ? " #" + trailingComment : "") + "\n");
 			for (String line : StringUtils.retranslateColorCodes(valueWithLineBreaks)) {

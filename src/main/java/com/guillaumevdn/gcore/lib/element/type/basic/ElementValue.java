@@ -51,17 +51,18 @@ public abstract class ElementValue<T> extends BasicElement<T> {
 			if (line != null) {
 				return serializer.deserialize(line);
 			}
-		} catch (Throwable ignored) {}
+		} catch (Throwable ignored) {
+		}
 		return null;
 	}
 
 	// ----- parse
 	@Override
 	protected T doParseString(String raw) throws ParsingError {
-		T value = serializer.deserialize(raw);  // if any exception is thrown here, it'll be catched and displayed correctly
+		T value = serializer.deserialize(raw); // if any exception is thrown here, it'll be catched and displayed correctly
 		if (value == null) {
 			if (ConfigGCore.ignoreInvalidElementValues) {
-				return null;  // and here goes my consistency :PepeHands:
+				return null; // and here goes my consistency :PepeHands:
 			}
 			throw new ParsingError(this, "invalid value '" + raw + "'");
 		}
@@ -77,23 +78,24 @@ public abstract class ElementValue<T> extends BasicElement<T> {
 	public void onEditorClick(ClickCall call) {
 		// left-click : enter value
 		if (call.getType().equals(ClickType.LEFT)) {
-			WorkerGCore.inst().awaitChatWithSuggestedValue(call.getClicker(), TextEditorGeneric.messageElementBasicEditSuggestCurrent, getRawValueLineOrDefault(0), value -> {
-				if (StringUtils.hasPlaceholders(value)) {
-					setValue(CollectionUtils.asList(value));
-					getSuperElement().onEditorChange(this);
-				} else {
-					try {
-						T parsed = doParseString(value);
-						setValue(parsed == null ? null : CollectionUtils.asList(value));
-						call.getGUI().setRegularItem(buildEditorItem(call.getPageIndex(), call.getSlot()));
+			WorkerGCore.inst().awaitChatWithSuggestedValue(call.getClicker(), TextEditorGeneric.messageElementBasicEditSuggestCurrent,
+					getRawValueLineOrDefault(0), value -> {
+						if (StringUtils.hasPlaceholders(value)) {
+							setValue(CollectionUtils.asList(value));
+							getSuperElement().onEditorChange(this);
+						} else {
+							try {
+								T parsed = doParseString(value);
+								setValue(parsed == null ? null : CollectionUtils.asList(value));
+								call.getGUI().setRegularItem(buildEditorItem(call.getPageIndex(), call.getSlot()));
+								call.reopenGUI();
+								getSuperElement().onEditorChange(this);
+							} catch (ParsingError error) {
+								error.send(call.getClicker());
+							}
+						}
 						call.reopenGUI();
-						getSuperElement().onEditorChange(this);
-					} catch (ParsingError error) {
-						error.send(call.getClicker());
-					}
-				}
-				call.reopenGUI();
-			}, () -> call.reopenGUI());
+					}, () -> call.reopenGUI());
 		}
 		// other
 		else {

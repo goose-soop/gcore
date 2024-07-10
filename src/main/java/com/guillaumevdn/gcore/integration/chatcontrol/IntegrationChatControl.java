@@ -22,7 +22,7 @@ public class IntegrationChatControl extends IntegrationInstance {
 		listenerCount += attemptRegister(() -> Bukkit.getPluginManager().registerEvents(new ListenerChatChannelEvent(), getIntegration().getPlugin()));
 		listenerCount += attemptRegister(() -> Bukkit.getPluginManager().registerEvents(new ListenerPreMessagePrivateEvent(), getIntegration().getPlugin()));
 		// ChatControl free
-		listenerCount += attemptRegister(() ->Bukkit.getPluginManager().registerEvents(new ListenerCompatPlayerChatEvent(), getIntegration().getPlugin()));
+		listenerCount += attemptRegister(() -> Bukkit.getPluginManager().registerEvents(new ListenerCompatPlayerChatEvent(), getIntegration().getPlugin()));
 		// done
 		return listenerCount != 0;
 	}

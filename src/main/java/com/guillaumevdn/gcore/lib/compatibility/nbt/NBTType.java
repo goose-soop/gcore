@@ -17,9 +17,7 @@ import com.guillaumevdn.gcore.lib.serialization.data.DataIO;
  */
 public enum NBTType {
 
-	UNKNOWN(null, null, 0),
-	ANY(null, null, 0),
-	BYTE("NBTTagByte", byte.class, 1, CollectionUtils.asMap(Version.MC_1_17_R1, "x")),
+	UNKNOWN(null, null, 0), ANY(null, null, 0), BYTE("NBTTagByte", byte.class, 1, CollectionUtils.asMap(Version.MC_1_17_R1, "x")),
 	SHORT("NBTTagShort", short.class, 1, CollectionUtils.asMap(Version.MC_1_17_R1, "c")),
 	INT("NBTTagInt", int.class, 3, CollectionUtils.asMap(Version.MC_1_17_R1, "c")),
 	LONG("NBTTagLong", long.class, 4, CollectionUtils.asMap(Version.MC_1_17_R1, "c")),
@@ -89,7 +87,7 @@ public enum NBTType {
 	public static NBTType getByWrappedClass(Object wrapper) throws Throwable {
 		if (wrapper != null) {
 			String simpleName = wrapper.getClass().getSimpleName();
-			//ConfigGCore.logspamItemNbt(null, () -> "-- Type by wrapper : " + simpleName, false);
+			// ConfigGCore.logspamItemNbt(null, () -> "-- Type by wrapper : " + simpleName, false);
 			for (NBTType type : NBTType.values()) {
 				if (simpleName.equals(type.nmsClass)) {
 					return type;
@@ -101,7 +99,7 @@ public enum NBTType {
 
 	public static NBTType getByValueClass(Object object) throws Throwable {
 		if (object != null) {
-			//ConfigGCore.logspamItemNbt(null, () -> "-- Type by value : " + object.getClass(), false);
+			// ConfigGCore.logspamItemNbt(null, () -> "-- Type by value : " + object.getClass(), false);
 			if (object instanceof DataIO) {
 				return NBTType.COMPOUND;
 			}

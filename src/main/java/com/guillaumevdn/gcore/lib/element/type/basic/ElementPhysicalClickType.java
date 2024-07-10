@@ -1,6 +1,5 @@
 package com.guillaumevdn.gcore.lib.element.type.basic;
 
-
 import com.guillaumevdn.gcore.lib.compatibility.material.CommonMats;
 import com.guillaumevdn.gcore.lib.compatibility.material.Mat;
 import com.guillaumevdn.gcore.lib.element.struct.Element;

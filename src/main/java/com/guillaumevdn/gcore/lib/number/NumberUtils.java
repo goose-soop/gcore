@@ -1,8 +1,5 @@
 package com.guillaumevdn.gcore.lib.number;
 
-import com.guillaumevdn.gcore.lib.exception.CalculationError;
-import com.guillaumevdn.gcore.lib.string.StringUtils;
-
 import java.text.DecimalFormat;
 import java.util.Collection;
 import java.util.HashMap;
@@ -12,11 +9,13 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.guillaumevdn.gcore.lib.exception.CalculationError;
+import com.guillaumevdn.gcore.lib.string.StringUtils;
+
 /**
  * @author GuillaumeVDN
  */
-public final class NumberUtils
-{
+public final class NumberUtils {
 
     // ----- integer
     public static Integer integerOrNull(Object raw) {
@@ -104,7 +103,7 @@ public final class NumberUtils
             return "" + (int) value;
         }
         DecimalFormat format = roundFormatCache.computeIfAbsent(places, __ -> new DecimalFormat("#." + StringUtils.repeatString("#", places)));
-        return format.format(value).replace(',', '.');  // happens sometimes for some reason, wrong locale maybe
+        return format.format(value).replace(',', '.'); // happens sometimes for some reason, wrong locale maybe
     }
 
     public static String roundStringFillZerosRight(double value, int places) {
@@ -192,11 +191,12 @@ public final class NumberUtils
     }
 
     // ----- calculation
-    // ----- https://stackoverflow.com/questions/3422673/how-to-evaluate-a-math-expression-given-in-string-form, that guy is a real programmer, Pog
+    // ----- https://stackoverflow.com/questions/3422673/how-to-evaluate-a-math-expression-given-in-string-form, that guy is
+    // a real programmer, Pog
     public static double calculateExpression(String expression) throws CalculationError {
         final String str = expression.trim().toLowerCase();
-        return new Object()
-        {
+        return new Object() {
+
             int pos = -1, ch;
 
             void nextChar() {
@@ -204,7 +204,8 @@ public final class NumberUtils
             }
 
             boolean eat(int charToEat) {
-                while (ch == ' ') nextChar();
+                while (ch == ' ')
+                    nextChar();
                 if (ch == charToEat) {
                     nextChar();
                     return true;
@@ -215,7 +216,9 @@ public final class NumberUtils
             double parse() {
                 nextChar();
                 double x = parseExpression();
-                if (pos < str.length()) throw new CalculationError("when parsing expression '" + expression + "', unexpected character '" + Character.valueOf((char) ch).toString() + "'");
+                if (pos < str.length())
+                    throw new CalculationError(
+                            "when parsing expression '" + expression + "', unexpected character '" + Character.valueOf((char) ch).toString() + "'");
                 return x;
             }
 
@@ -223,29 +226,37 @@ public final class NumberUtils
             // expression = term | expression `+` term | expression `-` term
             // term = factor | term `*` factor | term `/` factor
             // factor = `+` factor | `-` factor | `(` expression `)`
-            //        | number | functionName factor | factor `^` factor
+            // | number | functionName factor | factor `^` factor
 
             double parseExpression() {
                 double x = parseTerm();
-                for (; ; ) {
-                    if (eat('+')) x += parseTerm(); // addition
-                    else if (eat('-')) x -= parseTerm(); // subtraction
-                    else return x;
+                for (;;) {
+                    if (eat('+'))
+                        x += parseTerm(); // addition
+                    else if (eat('-'))
+                        x -= parseTerm(); // subtraction
+                    else
+                        return x;
                 }
             }
 
             double parseTerm() {
                 double x = parseFactor();
-                for (; ; ) {
-                    if (eat('*')) x *= parseFactor(); // multiplication
-                    else if (eat('/')) x /= parseFactor(); // division
-                    else return x;
+                for (;;) {
+                    if (eat('*'))
+                        x *= parseFactor(); // multiplication
+                    else if (eat('/'))
+                        x /= parseFactor(); // division
+                    else
+                        return x;
                 }
             }
 
             double parseFactor() {
-                if (eat('+')) return parseFactor(); // unary plus
-                if (eat('-')) return -parseFactor(); // unary minus
+                if (eat('+'))
+                    return parseFactor(); // unary plus
+                if (eat('-'))
+                    return -parseFactor(); // unary minus
 
                 double x;
                 int startPos = this.pos;
@@ -253,35 +264,54 @@ public final class NumberUtils
                     x = parseExpression();
                     eat(')');
                 } else if ((ch >= '0' && ch <= '9') || ch == '.') { // numbers
-                    while ((ch >= '0' && ch <= '9') || ch == '.') nextChar();
+                    while ((ch >= '0' && ch <= '9') || ch == '.')
+                        nextChar();
                     x = Double.parseDouble(str.substring(startPos, this.pos));
                 } else if (ch >= 'a' && ch <= 'z') { // functions
-                    while (ch >= 'a' && ch <= 'z') nextChar();
+                    while (ch >= 'a' && ch <= 'z')
+                        nextChar();
                     String func = str.substring(startPos, this.pos);
                     x = parseFactor();
-                    if (func.equals("sqrt")) x = Math.sqrt(x);
-                    else if (func.equals("sin")) x = Math.sin(Math.toRadians(x));
-                    else if (func.equals("cos")) x = Math.cos(Math.toRadians(x));
-                    else if (func.equals("tan")) x = Math.tan(Math.toRadians(x));
-                    else if (func.equals("ln")) x = Math.log(x);
-                    else if (func.equals("log")) x = Math.log10(x);
-                    else if (func.equals("ceil")) x = Math.ceil(x);
-                    else if (func.equals("floor")) x = Math.floor(x);
-                    else if (func.equals("round")) x = Math.round(x);
-                    else if (func.equals("rand")) x = random(0d, x);
-                    else if (func.equals("randint")) x = random(0, (int) x);
-                    else if (func.equals("abs")) x = Math.abs(x);
-                    else if (func.equals("posorzero")) x = x >= 0d ? x : 0d;
-                    else if (func.equals("posorone")) x = x >= 0d ? x : 1d;
-                    else throw new CalculationError("when parsing expression '" + expression + "', unknown function '" + func + "'");
+                    if (func.equals("sqrt"))
+                        x = Math.sqrt(x);
+                    else if (func.equals("sin"))
+                        x = Math.sin(Math.toRadians(x));
+                    else if (func.equals("cos"))
+                        x = Math.cos(Math.toRadians(x));
+                    else if (func.equals("tan"))
+                        x = Math.tan(Math.toRadians(x));
+                    else if (func.equals("ln"))
+                        x = Math.log(x);
+                    else if (func.equals("log"))
+                        x = Math.log10(x);
+                    else if (func.equals("ceil"))
+                        x = Math.ceil(x);
+                    else if (func.equals("floor"))
+                        x = Math.floor(x);
+                    else if (func.equals("round"))
+                        x = Math.round(x);
+                    else if (func.equals("rand"))
+                        x = random(0d, x);
+                    else if (func.equals("randint"))
+                        x = random(0, (int) x);
+                    else if (func.equals("abs"))
+                        x = Math.abs(x);
+                    else if (func.equals("posorzero"))
+                        x = x >= 0d ? x : 0d;
+                    else if (func.equals("posorone"))
+                        x = x >= 0d ? x : 1d;
+                    else
+                        throw new CalculationError("when parsing expression '" + expression + "', unknown function '" + func + "'");
                 } else {
                     throw new CalculationError("when parsing expression '" + expression + "', unexpected character : '" + (char) ch + "'");
                 }
 
-                if (eat('^')) x = Math.pow(x, parseFactor()); // exponentiation
+                if (eat('^'))
+                    x = Math.pow(x, parseFactor()); // exponentiation
 
                 return x;
             }
+
         }.parse();
     }
 

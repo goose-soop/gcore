@@ -7,9 +7,10 @@ import java.lang.annotation.Target;
 
 /**
  * Indicates that a collection is not sorted in a particular order
+ * 
  * @author GuillaumeVDN
  */
 @Retention(RetentionPolicy.CLASS)
-@Target({ElementType.FIELD, ElementType.METHOD})
+@Target({ ElementType.FIELD, ElementType.METHOD })
 public @interface NotSorted {
 }

@@ -24,12 +24,15 @@ import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
 public final class MetaFireworkEffect {
 
 	public static boolean match(ItemMeta itemMeta, ItemReference reference, ItemCheck check) {
-		if (!reference.hasMeta(FireworkEffectMeta.class)) return true;
-		FireworkEffectMeta meta = ObjectUtils.castOrNull(itemMeta, FireworkEffectMeta.class);  // might be null if exact match is false
+		if (!reference.hasMeta(FireworkEffectMeta.class))
+			return true;
+		FireworkEffectMeta meta = ObjectUtils.castOrNull(itemMeta, FireworkEffectMeta.class); // might be null if exact match is false
 
 		// effect
-		if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getEffect(), reference.getEffect()))) return false;
-		else if (!check.isExact() && reference.hasEffect() && (meta == null || !Objects.deepEquals(meta.getEffect(), reference.getEffect()))) return false;
+		if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getEffect(), reference.getEffect())))
+			return false;
+		else if (!check.isExact() && reference.hasEffect() && (meta == null || !Objects.deepEquals(meta.getEffect(), reference.getEffect())))
+			return false;
 
 		// seems good
 		return true;
@@ -48,8 +51,10 @@ public final class MetaFireworkEffect {
 		writer.write("type", effect.getType());
 		writer.writeSerializedList("colors", effect.getColors());
 		writer.writeSerializedList("fadeColors", effect.getFadeColors());
-		if (effect.hasFlicker()) writer.write("flicker", true);
-		if (effect.hasTrail()) writer.write("trail", true);
+		if (effect.hasFlicker())
+			writer.write("flicker", true);
+		if (effect.hasTrail())
+			writer.write("trail", true);
 	}
 
 	public static void read(ItemMeta itemMeta, DataIO reader) throws Throwable {
@@ -71,7 +76,9 @@ public final class MetaFireworkEffect {
 		List<Color> fadeColors = reader.readSerializedList("fadeColors", Color.class);
 		Boolean flicker = reader.readBoolean("flicker");
 		Boolean trail = reader.readBoolean("trail");
-		return type == null ? null : FireworkEffect.builder().with(type).withColor(colors).withFade(fadeColors).flicker(flicker != null && flicker).trail(trail != null && trail).build();
+		return type == null ? null
+				: FireworkEffect.builder().with(type).withColor(colors).withFade(fadeColors).flicker(flicker != null && flicker).trail(trail != null && trail)
+						.build();
 	}
 
 	public static void fillElements(ItemMeta sampleMeta, ElementItem item) {

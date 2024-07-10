@@ -70,7 +70,8 @@ public class ElementWorldRestriction extends ParseableContainerElement<List<Worl
 	// ----- editor
 	@Override
 	public Mat editorIconType() {
-		if (!parseGeneric().isPresent()) return CommonMats.MINECART;
+		if (!parseGeneric().isPresent())
+			return CommonMats.MINECART;
 		return CommonMats.FURNACE_MINECART;
 	}
 

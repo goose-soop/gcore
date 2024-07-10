@@ -36,7 +36,8 @@ public class WGRegion {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) return true;
+		if (this == obj)
+			return true;
 		WGRegion other = ObjectUtils.castOrNull(obj, WGRegion.class);
 		return other != null && other.world.equals(world) && other.regionId.equalsIgnoreCase(regionId);
 	}

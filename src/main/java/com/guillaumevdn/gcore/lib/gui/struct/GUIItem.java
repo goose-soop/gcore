@@ -22,7 +22,7 @@ public class GUIItem {
 	private final String id;
 	private ItemStack item;
 	private List<IntegerPair> preferredLocations;
-	private List<IntegerPair> locations = new ArrayList<>();  // <page, slot>
+	private List<IntegerPair> locations = new ArrayList<>(); // <page, slot>
 	private Consumer<ClickCall> clickPerformer;
 	private Sound clickSound;
 	private Map<ClickType, Consumer<ClickCall>> overrideClicks;
@@ -47,7 +47,8 @@ public class GUIItem {
 		this(id, CollectionUtils.asList(IntegerPair.of(-1, preferredSlot)), item, null, null, clickPerformer);
 	}
 
-	public GUIItem(String id, int preferredSlot, ItemStack item, Sound clickSound, Map<ClickType, Consumer<ClickCall>> overrideClicks, Consumer<ClickCall> clickPerformer) {
+	public GUIItem(String id, int preferredSlot, ItemStack item, Sound clickSound, Map<ClickType, Consumer<ClickCall>> overrideClicks,
+			Consumer<ClickCall> clickPerformer) {
 		this(id, CollectionUtils.asList(IntegerPair.of(-1, preferredSlot)), item, clickSound, overrideClicks, clickPerformer);
 	}
 
@@ -59,7 +60,8 @@ public class GUIItem {
 		this(id, preferredLocations, item, null, null, clickPerformer);
 	}
 
-	public GUIItem(String id, List<IntegerPair> preferredLocations, ItemStack item, Sound clickSound, Map<ClickType, Consumer<ClickCall>> overrideClicks, Consumer<ClickCall> clickPerformer) {
+	public GUIItem(String id, List<IntegerPair> preferredLocations, ItemStack item, Sound clickSound, Map<ClickType, Consumer<ClickCall>> overrideClicks,
+			Consumer<ClickCall> clickPerformer) {
 		this.id = id;
 		this.item = item;
 		this.preferredLocations = preferredLocations == null ? new ArrayList<>() : preferredLocations.stream().distinct().collect(Collectors.toList());

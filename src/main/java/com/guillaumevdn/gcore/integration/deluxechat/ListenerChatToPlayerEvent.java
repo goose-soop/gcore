@@ -17,7 +17,7 @@ public final class ListenerChatToPlayerEvent {
 			if (og.getPlayer() != null) {
 				PlayerChatEvent event = PlayerChatEvent.call(og.getPlayer(), og.getChatMessage(), CollectionUtils.asSet(og.getRecipient()));
 				og.setChatMessage(event.isCancelled() ? "" : event.getMessage());
-				//Bukkit.getLogger().info("ChatToPlayerEvent, message '" + og.getChatMessage());
+				// Bukkit.getLogger().info("ChatToPlayerEvent, message '" + og.getChatMessage());
 			}
 		});
 	}

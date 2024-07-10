@@ -31,7 +31,8 @@ public abstract class GUIItemType extends TypableElementType<ElementGUIItem> {
 	protected @Override void doFillTypeSpecificElements(ElementGUIItem item) {
 		super.doFillTypeSpecificElements(item);
 		if (!iconNeed.equals(IconNeed.USELESS)) {
-			item.addItem("icon", iconNeed.equals(IconNeed.REQUIRED) ? Need.required() : Need.optional(), ElementItemMode.BUILDABLE, TextEditorGeneric.descriptionGuiItemIcon);
+			item.addItem("icon", iconNeed.equals(IconNeed.REQUIRED) ? Need.required() : Need.optional(), ElementItemMode.BUILDABLE,
+					TextEditorGeneric.descriptionGuiItemIcon);
 		}
 	}
 

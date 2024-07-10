@@ -72,7 +72,10 @@ public class V7ItemData {
 		if (customNbt != null) {
 			try {
 				DataIO nbtWriter = new DataIO();
-				AdapterNBTCompound.INSTANCE.write(new NBTCompound(null, "root", 0, (customNbt.toLowerCase().startsWith("custom:") ? MigrationV8Config.PARSE_MOJANGSON : MigrationV8Config.UNSERIALIZE_NBT).process(customNbt)), nbtWriter);
+				AdapterNBTCompound.INSTANCE.write(new NBTCompound(null, "root", 0,
+						(customNbt.toLowerCase().startsWith("custom:") ? MigrationV8Config.PARSE_MOJANGSON : MigrationV8Config.UNSERIALIZE_NBT)
+								.process(customNbt)),
+						nbtWriter);
 			} catch (Throwable exception) {
 				GCore.inst().getMainLogger().error("Couldn't migrate item nbt '" + customNbt + "', skipping", exception);
 			}
@@ -194,28 +197,46 @@ public class V7ItemData {
 		private Boolean hideFlags = null;
 
 		private OldDataWrapper(V7ItemData item) {
-			if (item.type != null) this.type = item.type;
-			if (item.amount != 1) this.amount = item.amount;
-			if (item.effects != null && !item.effects.isEmpty()) this.effects = item.effects;
-			if (item.enchants != null && !item.enchants.isEmpty()) this.enchants = item.enchants;
-			if (item.name != null) this.name = item.name;
-			if (item.lore != null && !item.lore.isEmpty()) this.lore = item.lore;
-			if (item.customNbt != null) this.customNbt = item.customNbt;
-			if (item.unbreakable) this.unbreakable = true;
-			if (item.hideFlags) this.hideFlags = true;
+			if (item.type != null)
+				this.type = item.type;
+			if (item.amount != 1)
+				this.amount = item.amount;
+			if (item.effects != null && !item.effects.isEmpty())
+				this.effects = item.effects;
+			if (item.enchants != null && !item.enchants.isEmpty())
+				this.enchants = item.enchants;
+			if (item.name != null)
+				this.name = item.name;
+			if (item.lore != null && !item.lore.isEmpty())
+				this.lore = item.lore;
+			if (item.customNbt != null)
+				this.customNbt = item.customNbt;
+			if (item.unbreakable)
+				this.unbreakable = true;
+			if (item.hideFlags)
+				this.hideFlags = true;
 		}
 
 		private V7ItemData toItemData() {
 			V7ItemData item = new V7ItemData();
-			if (this.type != null) item.type = this.type;
-			if (this.amount != null && this.amount != 1) item.amount = this.amount;
-			if (this.effects != null && !this.effects.isEmpty()) item.effects = this.effects;
-			if (this.enchants != null && !this.enchants.isEmpty()) item.enchants = this.enchants;
-			if (this.name != null) item.name = this.name;
-			if (this.lore != null && !this.lore.isEmpty()) item.lore = this.lore;
-			if (this.customNbt != null) item.customNbt = this.customNbt;
-			if (this.unbreakable != null && this.unbreakable) item.unbreakable = true;
-			if (this.hideFlags != null && this.hideFlags) item.hideFlags = true;
+			if (this.type != null)
+				item.type = this.type;
+			if (this.amount != null && this.amount != 1)
+				item.amount = this.amount;
+			if (this.effects != null && !this.effects.isEmpty())
+				item.effects = this.effects;
+			if (this.enchants != null && !this.enchants.isEmpty())
+				item.enchants = this.enchants;
+			if (this.name != null)
+				item.name = this.name;
+			if (this.lore != null && !this.lore.isEmpty())
+				item.lore = this.lore;
+			if (this.customNbt != null)
+				item.customNbt = this.customNbt;
+			if (this.unbreakable != null && this.unbreakable)
+				item.unbreakable = true;
+			if (this.hideFlags != null && this.hideFlags)
+				item.hideFlags = true;
 			return item;
 		}
 

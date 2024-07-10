@@ -27,9 +27,10 @@ public final class WorldGuardCompat {
 	private static final ReflectionProcedureBiFunction<World, String, Object> GET_REGION = new ReflectionProcedureBiFunction<World, String, Object>()
 			.setIf(Version.ATLEAST_1_13, (world, regionId) -> {
 				Object bukkitWorld = Reflection.newInstance("com.sk89q.worldedit.bukkit.BukkitWorld", world).justGet();
-				return Reflection.invokeMethod("com.sk89q.worldguard.WorldGuard", "getInstance", null).invokeMethod("getPlatform").invokeMethod("getRegionContainer").invokeMethod("get", bukkitWorld).invokeMethod("getRegion", regionId);
-			})
-			.orElse((world, regionId) -> ReflectionObject.ofPlugin("WorldGuard").invokeMethod("getRegionContainer").invokeMethod("get", world).invokeMethod("getRegion", regionId).orNull());
+				return Reflection.invokeMethod("com.sk89q.worldguard.WorldGuard", "getInstance", null).invokeMethod("getPlatform")
+						.invokeMethod("getRegionContainer").invokeMethod("get", bukkitWorld).invokeMethod("getRegion", regionId);
+			}).orElse((world, regionId) -> ReflectionObject.ofPlugin("WorldGuard").invokeMethod("getRegionContainer").invokeMethod("get", world)
+					.invokeMethod("getRegion", regionId).orNull());
 
 	public static Object getRegion(World world, String regionId) {
 		if (!PluginUtils.isPluginEnabled("WorldGuard")) {
@@ -42,11 +43,12 @@ public final class WorldGuardCompat {
 	private static final ReflectionProcedureFunction<World, Collection<String>> GET_REGIONS = new ReflectionProcedureFunction<World, Collection<String>>()
 			.setIf(Version.ATLEAST_1_13, (world) -> {
 				Object bukkitWorld = Reflection.newInstance("com.sk89q.worldedit.bukkit.BukkitWorld", world).justGet();
-				Map<String, ?> map = Reflection.invokeMethod("com.sk89q.worldguard.WorldGuard", "getInstance", null).invokeMethod("getPlatform").invokeMethod("getRegionContainer").invokeMethod("get", bukkitWorld).invokeMethod("getRegions").get();
+				Map<String, ?> map = Reflection.invokeMethod("com.sk89q.worldguard.WorldGuard", "getInstance", null).invokeMethod("getPlatform")
+						.invokeMethod("getRegionContainer").invokeMethod("get", bukkitWorld).invokeMethod("getRegions").get();
 				return map == null ? null : CollectionUtils.asList(map.keySet());
-			})
-			.orElse((world) -> {
-				Map map = ReflectionObject.ofPlugin("WorldGuard").invokeMethod("getRegionContainer").invokeMethod("get", world).invokeMethod("getRegions").get();
+			}).orElse((world) -> {
+				Map map = ReflectionObject.ofPlugin("WorldGuard").invokeMethod("getRegionContainer").invokeMethod("get", world).invokeMethod("getRegions")
+						.get();
 				return map == null ? null : CollectionUtils.asList(map.keySet());
 			});
 
@@ -61,7 +63,8 @@ public final class WorldGuardCompat {
 	private static final ReflectionProcedureBiFunction<World, String, Pair<Point, Point>> GET_REGION_BOUNDS = new ReflectionProcedureBiFunction<World, String, Pair<Point, Point>>()
 			.orElse((world, regionId) -> {
 				ReflectionObject region = ReflectionObject.ofOrNull(getRegion(world, regionId));
-				if (region.justGet() == null) return null;
+				if (region.justGet() == null)
+					return null;
 				ReflectionObject regionMin = region.invokeMethod("getMinimumPoint");
 				ReflectionObject regionMax = region.invokeMethod("getMaximumPoint");
 

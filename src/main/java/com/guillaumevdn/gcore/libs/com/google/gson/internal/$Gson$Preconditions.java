@@ -20,6 +20,7 @@ package com.guillaumevdn.gcore.libs.com.google.gson.internal;
  * A simple utility class used to check method Preconditions.
  *
  * <pre>
+ * 
  * public long divideBy(long value) {
  *   Preconditions.checkArgument(value != 0);
  *   return this.value / value;
@@ -30,6 +31,7 @@ package com.guillaumevdn.gcore.libs.com.google.gson.internal;
  * @author Joel Leitch
  */
 public final class $Gson$Preconditions {
+
   private $Gson$Preconditions() {
     throw new UnsupportedOperationException();
   }
@@ -46,4 +48,5 @@ public final class $Gson$Preconditions {
       throw new IllegalArgumentException();
     }
   }
+
 }

@@ -20,6 +20,7 @@ import com.guillaumevdn.gcore.lib.string.Text;
 
 /**
  * Represents an element that can't be edited in-game and has no particular parsing
+ * 
  * @author GuillaumeVDN
  */
 public class ElementConfigSection<T> extends Element {

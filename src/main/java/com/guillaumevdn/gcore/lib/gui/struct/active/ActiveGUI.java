@@ -27,12 +27,14 @@ import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
 public abstract class ActiveGUI extends GUI {
 
 	private final Replacer replacer;
-	private final RWLowerCaseHashMap<ActiveItemHolder> activeHolders = new RWLowerCaseHashMap<>(5, 1f);  // otherwise sometimes concurrent modification exception #1143
-	private final RWLowerCaseHashMap<Object> lifecycleData = new RWLowerCaseHashMap<>(1, 1f);  // this allows to store temporary values, such as interactions with player inventory slots
-	private boolean asyncInit = false;  // when building GUIs with a great amount of players heads to fetch, this avoids creating too many async threads
+	private final RWLowerCaseHashMap<ActiveItemHolder> activeHolders = new RWLowerCaseHashMap<>(5, 1f); // otherwise sometimes concurrent modification exception
+																										// #1143
+	private final RWLowerCaseHashMap<Object> lifecycleData = new RWLowerCaseHashMap<>(1, 1f); // this allows to store temporary values, such as interactions
+																								// with player inventory slots
+	private boolean asyncInit = false; // when building GUIs with a great amount of players heads to fetch, this avoids creating too many async threads
 
 	public ActiveGUI(GPlugin plugin, String id, String name, GUIType type, Replacer replacer, Option... options) {
-		super(plugin, id, name, type, NumberUtils.range(0, type.getSize() -1), options);
+		super(plugin, id, name, type, NumberUtils.range(0, type.getSize() - 1), options);
 		this.replacer = replacer;
 	}
 
@@ -61,7 +63,9 @@ public abstract class ActiveGUI extends GUI {
 	}
 
 	public ActiveItemHolder getNonBorderHolder(int page, int slot) {
-		return activeHolders.streamResultValues(str -> str.filter(active -> active.getLastItems() != null && active.getLastItems().stream().anyMatch(it -> it.isInLocation(page, slot))).findAny().orElse(null));
+		return activeHolders.streamResultValues(
+				str -> str.filter(active -> active.getLastItems() != null && active.getLastItems().stream().anyMatch(it -> it.isInLocation(page, slot)))
+						.findAny().orElse(null));
 	}
 
 	protected void setAsyncInit() {
@@ -92,17 +96,20 @@ public abstract class ActiveGUI extends GUI {
 		return true;
 	}
 
-	public final void directAdd(ItemHolder holder) {  // called in some GUIs, such as GUIs that add elements dynamically when the player does actions ; to avoid refreshing the whole thing
+	public final void directAdd(ItemHolder holder) { // called in some GUIs, such as GUIs that add elements dynamically when the player does actions ; to avoid
+														// refreshing the whole thing
 		ActiveItemHolder active = holder.newActive(this);
 		active.init();
 		activeHolders.put(holder.getId(), active);
 	}
 
-	public final void directRemove(ItemHolder holder) {  // called in some GUIs, such as GUIs that remove elements dynamically when the player does actions ; to avoid refreshing the whole thing
+	public final void directRemove(ItemHolder holder) { // called in some GUIs, such as GUIs that remove elements dynamically when the player does actions ; to
+														// avoid refreshing the whole thing
 		directRemove(holder.getId());
 	}
 
-	public final void directRemove(String holderId) {  // called in some GUIs, such as GUIs that remove elements dynamically when the player does actions ; to avoid refreshing the whole thing
+	public final void directRemove(String holderId) { // called in some GUIs, such as GUIs that remove elements dynamically when the player does actions ; to
+														// avoid refreshing the whole thing
 		final ActiveItemHolder active = activeHolders.remove(holderId);
 		if (active != null) {
 			final Collection<? extends GUIItem> last = active.getLastItems();
@@ -113,18 +120,12 @@ public abstract class ActiveGUI extends GUI {
 		}
 	}
 
-	/*@Override
-	public boolean openFor(Player player, int pageIndex, ClickCall fromCall) {
-		int viewers = getViewers().size();
-		boolean opened = super.openFor(player, pageIndex, fromCall);
-		if (opened && viewers == 0) {
-			// if just opened for a viewer, start task
-			getPlugin().registerTask("gui_tick_" + getId(), true, 1, () -> {
-				tick();
-			});
-		}
-		return opened;
-	}*/
+	/*
+	 * @Override public boolean openFor(Player player, int pageIndex, ClickCall fromCall) { int viewers =
+	 * getViewers().size(); boolean opened = super.openFor(player, pageIndex, fromCall); if (opened && viewers == 0) { // if
+	 * just opened for a viewer, start task getPlugin().registerTask("gui_tick_" + getId(), true, 1, () -> { tick(); }); }
+	 * return opened; }
+	 */
 
 	@Override
 	public void onActivate() {
@@ -161,7 +162,8 @@ public abstract class ActiveGUI extends GUI {
 	}
 
 	public void refreshWithPlaceholders(String... placeholders) {
-		refreshIf(active -> active.getLastPlaceholders() != null && (placeholders == null || placeholders.length == 0 || Stream.of(placeholders).anyMatch(pl -> active.getLastPlaceholders().contains(pl))));
+		refreshIf(active -> active.getLastPlaceholders() != null
+				&& (placeholders == null || placeholders.length == 0 || Stream.of(placeholders).anyMatch(pl -> active.getLastPlaceholders().contains(pl))));
 	}
 
 	public void refreshIf(Predicate<ActiveItemHolder> filter) {

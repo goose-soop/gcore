@@ -33,10 +33,11 @@ public abstract class BasicElement<T> extends Element implements ParseableElemen
 
 	private final SizeTolerance sizeTolerance;
 	private final List<String> defaultValue;
-	private List<BiConsumer<T, T>> watchers = null;  // lazy ; almost no elements need watchers
+	private List<BiConsumer<T, T>> watchers = null; // lazy ; almost no elements need watchers
 
 	private boolean hasParseableLocations = false;
-	private List<String> rawValue = null;  // IF NO PLACEHOLDERS : this is lazy ; it'll be loaded on-demand (-> when using the editor, or in some particular cases) ; while the parse result (cache) will always be present
+	private List<String> rawValue = null; // IF NO PLACEHOLDERS : this is lazy ; it'll be loaded on-demand (-> when using the editor, or in some particular
+											// cases) ; while the parse result (cache) will always be present
 
 	public BasicElement(SizeTolerance sizeTolerance, Element parent, String id, NeedType need, List<String> def, Text editorDescription) {
 		super(parent, id, need, editorDescription);
@@ -49,14 +50,16 @@ public abstract class BasicElement<T> extends Element implements ParseableElemen
 	// ----- cache and raw value management
 
 	private ParsedCache<T> parsedCache = new ParsedCache<T>() {
+
 		@Override
 		protected void beforeSet(Optional<T> value) {
-			if (value != null && value.isPresent()) {  // we successfully parsed it ; so we no longer need the raw value
+			if (value != null && value.isPresent()) { // we successfully parsed it ; so we no longer need the raw value
 				rawValue = null;
-			} else {  // we're setting a null value, maybe we failed to parse it ; re-load it from cached value
+			} else { // we're setting a null value, maybe we failed to parse it ; re-load it from cached value
 				loadRawValue();
 			}
 		}
+
 	};
 
 	@Override
@@ -138,7 +141,8 @@ public abstract class BasicElement<T> extends Element implements ParseableElemen
 
 	public final String getRawValueLineOrDefault(int index) {
 		loadRawValue();
-		return rawValue != null && index < rawValue.size() ? rawValue.get(index) : (defaultValue != null && index < defaultValue.size() ? defaultValue.get(index) : null);
+		return rawValue != null && index < rawValue.size() ? rawValue.get(index)
+				: (defaultValue != null && index < defaultValue.size() ? defaultValue.get(index) : null);
 	}
 
 	public final void ifRawValueOrDefaultIsPresent(Consumer<List<String>> ifPresent) {
@@ -169,8 +173,14 @@ public abstract class BasicElement<T> extends Element implements ParseableElemen
 
 		// attempt to parse previous and new value for watchers
 		T previous = null, next = null;
-		try { previous = this.rawValue.size() == 1 ? doParseString(this.rawValue.get(0)) : doParseList(this.rawValue); } catch (Throwable ignored) {}
-		try { next = newValue.size() == 1 ? doParseString(newValue.get(0)) : doParseList(newValue); } catch (Throwable ignored) {}
+		try {
+			previous = this.rawValue.size() == 1 ? doParseString(this.rawValue.get(0)) : doParseList(this.rawValue);
+		} catch (Throwable ignored) {
+		}
+		try {
+			next = newValue.size() == 1 ? doParseString(newValue.get(0)) : doParseList(newValue);
+		} catch (Throwable ignored) {
+		}
 
 		// reset valuesCache
 		resetCache();
@@ -185,7 +195,7 @@ public abstract class BasicElement<T> extends Element implements ParseableElemen
 		} else {
 			List<String> v = new ArrayList<>(newValue.size());
 			for (String l : newValue) {
-				v.add(StringUtils.format(l).trim());  // reformat since color parsing is made on read
+				v.add(StringUtils.format(l).trim()); // reformat since color parsing is made on read
 			}
 			this.rawValue = Collections.unmodifiableList(v);
 			this.hasParseableLocations = StringUtils.hasPlaceholders(v);
@@ -232,9 +242,11 @@ public abstract class BasicElement<T> extends Element implements ParseableElemen
 		} catch (Throwable exception) {
 			ConfigError configError = ObjectUtils.findCauseOrNull(exception, ConfigError.class);
 			if (configError != null) {
-				getSuperElement().addLoadError(StringUtils.capitalize(configError.getMessage().replace(config.buildMistakeErrorHeader(), "").replace(config.buildFormatErrorHeader(), "")));
+				getSuperElement().addLoadError(StringUtils
+						.capitalize(configError.getMessage().replace(config.buildMistakeErrorHeader(), "").replace(config.buildFormatErrorHeader(), "")));
 			} else {
-				getSuperElement().getPlugin().getMainLogger().error("Couldn't read element " + getClass().getSimpleName() + " at path " + path + " in file " + config.getLogFilePath(), exception);
+				getSuperElement().getPlugin().getMainLogger()
+						.error("Couldn't read element " + getClass().getSimpleName() + " at path " + path + " in file " + config.getLogFilePath(), exception);
 			}
 		}
 	}

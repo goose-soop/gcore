@@ -11,7 +11,7 @@ import com.guillaumevdn.gcore.lib.string.Text;
  * @author GuillaumeVDN
  */
 public abstract class ElementEnumMap<E extends Enum<E>, V extends Element> extends ElementAbstractEnumMap<E, V> {
-	
+
 	public ElementEnumMap(Class<E> enumClass, Element parent, String id, Need need, Text editorDescription) {
 		super(enumClass, parent, id, need, editorDescription, CollectionUtils.asList(enumClass.getEnumConstants()));
 	}

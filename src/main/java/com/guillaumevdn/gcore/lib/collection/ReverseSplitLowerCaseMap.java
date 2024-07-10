@@ -15,8 +15,9 @@ import com.guillaumevdn.gcore.lib.string.StringUtils;
 import com.guillaumevdn.gcore.lib.tuple.Pair;
 
 /**
- * This (very specific) map implementation split the keys (reversed) with the said separator to separate values into submaps
- * For instance, if the character is <code>_</code>, here's how this object could be structured :
+ * This (very specific) map implementation split the keys (reversed) with the said separator to separate values into
+ * submaps For instance, if the character is <code>_</code>, here's how this object could be structured :
+ * 
  * <pre>
  * {@code
  * BLOCK:
@@ -28,14 +29,16 @@ import com.guillaumevdn.gcore.lib.tuple.Pair;
  *   DIAMOND: value for final key "DIAMOND_SWORD"
  * }
  * </pre>
+ * 
  * Additionally, an extra map is created for values that don't contain the separator character.
+ * 
  * @author GuillaumeVDN
  */
 public class ReverseSplitLowerCaseMap<V> {
 
 	private final char separator;
-	private final Map<Integer, Object> base = new HashMap<>(1, 1f);  // we directly use the part hashcode as a key
-	private final Map<Integer, V> standalone = new HashMap<>(1, 1f);  // for keys with no separator
+	private final Map<Integer, Object> base = new HashMap<>(1, 1f); // we directly use the part hashcode as a key
+	private final Map<Integer, V> standalone = new HashMap<>(1, 1f); // for keys with no separator
 
 	public ReverseSplitLowerCaseMap(char separator) {
 		this.separator = separator;

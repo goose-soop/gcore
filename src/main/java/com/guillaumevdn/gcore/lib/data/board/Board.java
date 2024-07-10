@@ -34,11 +34,8 @@ public abstract class Board<C extends BoardConnector> {
 		Integer ticks = plugin.getConfiguration().dataSaveTicks(this);
 		this.saveDelayTicks = ticks != null ? ticks : saveDelayTicks;
 		String loggerId = "data-" + id;
-		plugin.registerLogger(logger = new Logger(plugin, plugin.getName() + "-" + loggerId,
-				plugin.getConfiguration().logDataConsole(this),
-				plugin.getConfiguration().logDataFile(this),
-				plugin.getConfiguration().logDataSQL(this)
-				));
+		plugin.registerLogger(logger = new Logger(plugin, plugin.getName() + "-" + loggerId, plugin.getConfiguration().logDataConsole(this),
+				plugin.getConfiguration().logDataFile(this), plugin.getConfiguration().logDataSQL(this)));
 	}
 
 	// ----- connector
@@ -66,7 +63,9 @@ public abstract class Board<C extends BoardConnector> {
 	}
 
 	protected abstract C createConnectorJson();
+
 	protected abstract C createConnectorMySQL();
+
 	protected abstract C createConnectorSQLite();
 
 	// ----- get
@@ -99,9 +98,10 @@ public abstract class Board<C extends BoardConnector> {
 	}
 
 	private DataBackEnd lastKnownBackEnd = null;
+
 	public final DataBackEnd getBackEnd() {
 		DataBackEnd result = plugin.getConfiguration() == null ? null : plugin.getConfiguration().dataBackEnd(this);
-		return result != null ? (lastKnownBackEnd = result) : lastKnownBackEnd;  // useful on reload
+		return result != null ? (lastKnownBackEnd = result) : lastKnownBackEnd; // useful on reload
 	}
 
 	public final boolean isInitialized() {
@@ -113,32 +113,35 @@ public abstract class Board<C extends BoardConnector> {
 	}
 
 	// ----------------------------------------------------------------------------------------------------
-	// 		 saving
+	// saving
 	// ----------------------------------------------------------------------------------------------------
 
 	public final void startSaving() {
-		if (getSaveDelayTicks() <= 0) return;
+		if (getSaveDelayTicks() <= 0)
+			return;
 		getPlugin().registerTask("board_saving_" + getId(), true, getSaveDelayTicks(), () -> {
 			saveNeeded(BukkitThread.ASYNC);
 		});
 	}
 
 	public final void stopSaving() {
-		if (getSaveDelayTicks() <= 0) return;
+		if (getSaveDelayTicks() <= 0)
+			return;
 		getPlugin().stopTask("board_saving_" + getId());
 	}
 
 	public void saveNeeded(BukkitThread thread) {
 		saveNeeded(thread, null);
 	}
+
 	public void saveNeeded(BukkitThread thread, ThrowableRunnable callback) {
-		saveNeeded(thread);  // by default, use saveNeeded to avoid breaking API change
+		saveNeeded(thread); // by default, use saveNeeded to avoid breaking API change
 	}
 
 	public abstract boolean mustSaveSomething();
 
 	// ----------------------------------------------------------------------------------------------------
-	// 		 data
+	// data
 	// ----------------------------------------------------------------------------------------------------
 
 	public final void initialize(BukkitThread thread, ThrowableRunnable callback) {
@@ -152,10 +155,12 @@ public abstract class Board<C extends BoardConnector> {
 			if (boardType.equals(BoardType.LOCAL)) {
 				pullAll(thread, () -> {
 					localPulledAll = true;
-					if (callback != null) callback.run();
+					if (callback != null)
+						callback.run();
 				});
 			} else {
-				if (callback != null) callback.run();
+				if (callback != null)
+					callback.run();
 			}
 		}, () -> {
 			operateOnConnector(BoardConnector::remoteInit);
@@ -191,7 +196,7 @@ public abstract class Board<C extends BoardConnector> {
 	}
 
 	// ----------------------------------------------------------------------------------------------------
-	// 		 remote
+	// remote
 	// ----------------------------------------------------------------------------------------------------
 
 	protected final void operate(BukkitThread thread, final String operationName, final ThrowableRunnable callback, final ThrowableRunnable runner) {

@@ -4,7 +4,7 @@ package com.guillaumevdn.gcore.lib.validator;
  * @author GuillaumeVDN
  */
 public abstract class Validator<T> {
-	
+
 	private String mustBeDescription;
 
 	public Validator(String mustBeDescription) {

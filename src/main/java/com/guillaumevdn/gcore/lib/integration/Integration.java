@@ -68,7 +68,7 @@ public class Integration<T extends IntegrationInstance> {
 	}
 
 	public void deactivate() {
-		if  (instance != null) {
+		if (instance != null) {
 			instance.getEvents().forEach(IntegrationEvent::unregisterListener);
 			instance.deactivate();
 			instance.getSerializers().forEach(IntegrationSerializer::unregister);

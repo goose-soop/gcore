@@ -11,9 +11,10 @@ public interface Operation {
 
 	/**
 	 * @param execution the execution instance
-	 * @param players the players to perform the action to, or null if none (all actions might not be affected by this parameter)
+	 * @param players   the players to perform the action to, or null if none (all actions might not be affected by this
+	 *                  parameter)
 	 * @return the amount of ticks to wait before executing the next operation
 	 */
-    int perform(ParticleScriptExecution execution, Collection<Player> players, boolean isAsync);
+	int perform(ParticleScriptExecution execution, Collection<Player> players, boolean isAsync);
 
 }

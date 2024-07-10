@@ -30,13 +30,14 @@ public final class Pathfinding {
 	private final MovementFinder movementFinder;
 
 	// ----- callbacks
-	private final BiConsumer<PathfindingResult, List<OptimizedPathPoint>> onDone;  // B will either be the successful path, either the closest path
+	private final BiConsumer<PathfindingResult, List<OptimizedPathPoint>> onDone; // B will either be the successful path, either the closest path
 
 	// ----- active
 	private final PathfindingTask runnable;
 	private BukkitTask task = null;
-	private PositionCache<Mat> typeCache;  // valuesCache block types since we'll more than likely check the same blocks multiple times
-	private PositionCache<Object> toIgnore;  Object __VALUE = new Object();
+	private PositionCache<Mat> typeCache; // valuesCache block types since we'll more than likely check the same blocks multiple times
+	private PositionCache<Object> toIgnore;
+	Object __VALUE = new Object();
 	private Path path;
 
 	// ----- construct
@@ -44,7 +45,8 @@ public final class Pathfinding {
 	 * @param origin is the origin block BELOW the entity's feet
 	 * @param target is the target block BELOW the entity's feet
 	 */
-	public Pathfinding(World world, Point origin, Point target, PointTolerance tolerance, int entityHeight, MovementFinder movementFinder, BiConsumer<PathfindingResult, List<OptimizedPathPoint>> onDone) {
+	public Pathfinding(World world, Point origin, Point target, PointTolerance tolerance, int entityHeight, MovementFinder movementFinder,
+			BiConsumer<PathfindingResult, List<OptimizedPathPoint>> onDone) {
 		this.world = world;
 		this.origin = origin;
 		this.tolerance = tolerance;
@@ -98,7 +100,8 @@ public final class Pathfinding {
 	}
 
 	public Mat getBlockType(Point point) {
-		return typeCache.computeIfAbsent(point.getX(), point.getY(), point.getZ(), () -> Mat.fromBlock(world.getBlockAt(point.getX(), point.getY(), point.getZ())).orElse(CommonMats.AIR));
+		return typeCache.computeIfAbsent(point.getX(), point.getY(), point.getZ(),
+				() -> Mat.fromBlock(world.getBlockAt(point.getX(), point.getY(), point.getZ())).orElse(CommonMats.AIR));
 	}
 
 	public boolean isTraversableOrWaterAndFreeAbove(Point point, Point comingFrom, int extraHeight) {
@@ -116,7 +119,7 @@ public final class Pathfinding {
 		int nextY = 1;
 		// maybe there's a door, check if it's open
 		Mat bottomType = getBlockType(point.relative(0, 1, 0));
-		if (bottomType.getData().isDoor()) {  // FIXME : see if door is open from 'comingFrom'
+		if (bottomType.getData().isDoor()) { // FIXME : see if door is open from 'comingFrom'
 		}
 		// check remaining height
 		for (int y = nextY; y <= maxY; ++y) {

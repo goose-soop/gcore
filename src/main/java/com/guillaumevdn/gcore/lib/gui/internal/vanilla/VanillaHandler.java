@@ -31,7 +31,7 @@ public class VanillaHandler extends Handler {
 
 	@Override
 	public void activate() {
-		Bukkit.getPluginManager().registerEvents(events, getGUI().getPlugin());	
+		Bukkit.getPluginManager().registerEvents(events, getGUI().getPlugin());
 	}
 
 	@Override
@@ -44,7 +44,7 @@ public class VanillaHandler extends Handler {
 	@Override
 	public RWHashMap<Player, Integer> getViewers() {
 		RWHashMap<Player, Integer> viewers = new RWHashMap<>(10, 1f);
-		for (int i = 0; i < pages.size(); ++i) {  // ConcurrentModificationException ?
+		for (int i = 0; i < pages.size(); ++i) { // ConcurrentModificationException ?
 			for (HumanEntity pl : pages.get(i).getViewers()) {
 				Player player = ObjectUtils.castOrNull(pl, Player.class);
 				if (player != null) {
@@ -145,7 +145,7 @@ public class VanillaHandler extends Handler {
 
 	@Override
 	public void onClose(Player player) {
-		if (switchingPage) {  // when switching pages, we close the old one ; don't trigger 'onClose'
+		if (switchingPage) { // when switching pages, we close the old one ; don't trigger 'onClose'
 			switchingPage = false;
 			return;
 		}

@@ -19,7 +19,7 @@ import com.guillaumevdn.gcore.lib.wrapper.WrapperBoolean;
  */
 public class ProtocolHandler extends Handler {
 
-	public static final int WINDOW_ID = 72;  // signed byte ; don't go above 128
+	public static final int WINDOW_ID = 72; // signed byte ; don't go above 128
 	private RWArrayList<Window> pages = new RWArrayList<>(5);
 	private ProtocolEvents events = new ProtocolEvents(this);
 

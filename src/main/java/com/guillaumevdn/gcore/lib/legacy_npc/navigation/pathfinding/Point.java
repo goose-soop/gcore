@@ -7,8 +7,8 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
-import com.guillaumevdn.gcore.lib.number.NumberUtils;
 import com.guillaumevdn.gcore.lib.legacy_npc.navigation.pathfinding.movement.Offset;
+import com.guillaumevdn.gcore.lib.number.NumberUtils;
 
 /**
  * @author GuillaumeVDN

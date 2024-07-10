@@ -33,7 +33,8 @@ public class ElementGUIItem extends TypableContainerElement<GUIItemType> {
 	private ElementStringList locations = addStringList("locations", Need.optional(), null, TextEditorGeneric.descriptionGuiItemLocations);
 	private ElementBoolean persistent = addBoolean("persistent", Need.optional(false), TextEditorGeneric.descriptionGuiItemPersistent);
 	private ElementSound clickSound = addSound("click_sound", Need.optional(), TextEditorGeneric.descriptionGuiItemClickSound);
-	private ElementClickTypeOverrideClickMap overrideClicks = add(new ElementClickTypeOverrideClickMap(this, "override_clicks", Need.optional(), TextEditorGeneric.descriptionGuiItemOverrideClicks));
+	private ElementClickTypeOverrideClickMap overrideClicks = add(
+			new ElementClickTypeOverrideClickMap(this, "override_clicks", Need.optional(), TextEditorGeneric.descriptionGuiItemOverrideClicks));
 
 	public ElementGUIItem(Element parent, String id, Need need, Text editorDescription) {
 		super(GUIItemTypes.inst(), parent, id, need, editorDescription);
@@ -72,7 +73,8 @@ public class ElementGUIItem extends TypableContainerElement<GUIItemType> {
 
 		// add override clicks
 		Map<ClickType, Consumer<ClickCall>> result = new HashMap<>();
-		getOverrideClicks().parse(replacer).orEmptyMap().forEach((click, action) -> {  // don't ignore NONE type, even for the default element ; the dude choose to set it that way, maybe he wants to cancel the effects of the TYPE
+		getOverrideClicks().parse(replacer).orEmptyMap().forEach((click, action) -> { // don't ignore NONE type, even for the default element ; the dude choose
+																						// to set it that way, maybe he wants to cancel the effects of the TYPE
 			Consumer<ClickCall> handler = action.getType().buildHandler(action);
 			if (handler != null) {
 				result.put(click, handler);
@@ -83,7 +85,8 @@ public class ElementGUIItem extends TypableContainerElement<GUIItemType> {
 		ElementOverrideClick def = getOverrideClicks().getDefaultElement().orNull();
 		OverrideClick parsedDef = def == null ? null : def.parse(replacer).orNull();
 		Consumer<ClickCall> defHandler = parsedDef == null ? null : parsedDef.getType().buildHandler(parsedDef);
-		if (defHandler != null) {  // don't ignore NONE type, even for the default element ; the dude choose to set it that way, maybe he wants to cancel the effects of the TYPE
+		if (defHandler != null) { // don't ignore NONE type, even for the default element ; the dude choose to set it that way, maybe he wants to cancel
+									// the effects of the TYPE
 			for (ClickType click : ClickType.values()) {
 				result.computeIfAbsent(click, __ -> defHandler);
 			}
@@ -113,13 +116,15 @@ public class ElementGUIItem extends TypableContainerElement<GUIItemType> {
 					} else if (split.length == 2) {
 						result.add(IntegerPair.of(Integer.parseInt(split[0]), Integer.parseInt(split[1])));
 					}
-				} catch (Throwable ignored) {}
+				} catch (Throwable ignored) {
+				}
 			}
 		}
 		return result;
 	}
 
-	private transient ElementGUIItemHolder holderCache = null;  // valuesCache holder since it's only calling methods and equals check is with ID
+	private transient ElementGUIItemHolder holderCache = null; // valuesCache holder since it's only calling methods and equals check is with ID
+
 	public ElementGUIItemHolder getHolder() {
 		return holderCache != null ? holderCache : (holderCache = new ElementGUIItemHolder(this));
 	}

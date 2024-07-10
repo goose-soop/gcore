@@ -51,13 +51,16 @@ public class Sound extends Variant<SoundData> {
 			}
 		} else if (target instanceof OfflinePlayer) {
 			final Player player = PlayerUtils.getOnline((OfflinePlayer) target);
-			if (player != null) player.playSound(forceLocation != null ? forceLocation : player.getLocation(), getData().getDataInstance(), volume, pitch);
+			if (player != null)
+				player.playSound(forceLocation != null ? forceLocation : player.getLocation(), getData().getDataInstance(), volume, pitch);
 		} else if (target instanceof CommandSender) {
 			final Player player = ObjectUtils.castOrNull(target, Player.class);
-			if (player != null) player.playSound(forceLocation != null ? forceLocation : player.getLocation(), getData().getDataInstance(), volume, pitch);
+			if (player != null)
+				player.playSound(forceLocation != null ? forceLocation : player.getLocation(), getData().getDataInstance(), volume, pitch);
 		} else if (target instanceof UUID) {
 			final Player player = Bukkit.getPlayer((UUID) target);
-			if (player != null) player.playSound(forceLocation != null ? forceLocation : player.getLocation(), getData().getDataInstance(), volume, pitch);
+			if (player != null)
+				player.playSound(forceLocation != null ? forceLocation : player.getLocation(), getData().getDataInstance(), volume, pitch);
 		} else if (target instanceof Location) {
 			final Location loc = (Location) target;
 			play(loc.getWorld().getPlayers(), volume, pitch, loc);

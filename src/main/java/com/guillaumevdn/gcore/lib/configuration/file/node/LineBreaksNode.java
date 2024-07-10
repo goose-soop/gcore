@@ -23,9 +23,9 @@ public class LineBreaksNode extends Node {
 	@Override
 	public void write(Appendable writer, WriteType type) throws Throwable {
 		writer.append("\n"); // ignore count actually
-		/*for (int i = 0; i < count; ++i) {
-			writer.append("\n");
-		}*/
+		/*
+		 * for (int i = 0; i < count; ++i) { writer.append("\n"); }
+		 */
 	}
 
 	@Override

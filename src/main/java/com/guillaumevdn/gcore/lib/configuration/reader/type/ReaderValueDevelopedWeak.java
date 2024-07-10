@@ -50,9 +50,10 @@ public class ReaderValueDevelopedWeak implements ThrowableFunction<ReaderContext
 			}
 			if (!s.isEmpty() && s.charAt(0) == ' ') {
 				if (wrapping != null) { // if started with wrapping, we must have a weak value
-					/*  actually ignore extra indentation for this, lines are trimmed anyway
-					context.throwIndentError(peek, valueIndent.length(), false);
-					*/
+					/*
+					 * actually ignore extra indentation for this, lines are trimmed anyway context.throwIndentError(peek,
+					 * valueIndent.length(), false);
+					 */
 				} else { // if didn't start with wrapping, maybe it's not a weak value then
 					return false;
 				}
@@ -76,7 +77,8 @@ public class ReaderValueDevelopedWeak implements ThrowableFunction<ReaderContext
 				List<String> notEmpty = value.stream().filter(line -> !line.isEmpty()).collect(Collectors.toList());
 				String last = notEmpty.isEmpty() /* LMAO GOT IT ??? */ ? null : notEmpty.get(notEmpty.size() - 1);
 				if (last == null || last.charAt(last.length() - 1) != wrapping) {
-					context.throwError("didn't find closing " + wrapping + " for weak-developed value at line " + (context.getIdentifiableLine().getNumber() + value.size()));
+					context.throwError("didn't find closing " + wrapping + " for weak-developed value at line "
+							+ (context.getIdentifiableLine().getNumber() + value.size()));
 				}
 			}
 			// seems good :monkaGIGA:

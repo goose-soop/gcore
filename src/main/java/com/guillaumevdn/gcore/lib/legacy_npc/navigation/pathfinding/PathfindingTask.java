@@ -44,7 +44,8 @@ final class PathfindingTask extends BukkitRunnable {
 				// mark the new point to be ignored ; we don't want a path to re-check it later (this avoids loops)
 				finder.ignore(movement.getTarget());
 				// FIXME : setting for pathfinding
-				//Particle.fromId("VILLAGER_ANGRY").orNull().send(PlayerUtils.getOnline(), movement.getTarget().toLocation(finder.getWorld()));  // FIXME : remove
+				// Particle.fromId("VILLAGER_ANGRY").orNull().send(PlayerUtils.getOnline(),
+				// movement.getTarget().toLocation(finder.getWorld())); // FIXME : remove
 				// maybe we're done ?
 				if (finder.getTolerance().match(movement.getTarget().toLocation(finder.getWorld()), targetLocation)) {
 					finder.end(PathfindingResult.SUCCESS);
@@ -53,7 +54,7 @@ final class PathfindingTask extends BukkitRunnable {
 			}
 			// ... no movement found
 			else {
-				path.removeLast();  // remove last ; it will already has been marked as ignored, so it won't be re-checked
+				path.removeLast(); // remove last ; it will already has been marked as ignored, so it won't be re-checked
 			}
 			// stop for this task iteration
 			if (System.currentTimeMillis() - started >= NPCConfig.pathfindingMaxMillisPerTick) {

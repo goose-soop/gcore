@@ -43,12 +43,13 @@ public class MojangsterAPI {
 		try {
 			final InputStream inputStream = makeConnection(new URL("http://status.mojang.com/check")).getInputStream();
 			try {
-				final JSONArray jsonArray = (JSONArray)new JSONParser().parse(readAll(new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))));
+				final JSONArray jsonArray = (JSONArray) new JSONParser()
+						.parse(readAll(new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))));
 				for (int i = 0; i < jsonArray.size(); ++i) {
-					final JSONObject jsonObject = (JSONObject)jsonArray.get(i);
+					final JSONObject jsonObject = (JSONObject) jsonArray.get(i);
 					final String s = (String) jsonObject.keySet().iterator().next();
 					boolean b = false;
-					final String s2 = (String)jsonObject.get(s);
+					final String s2 = (String) jsonObject.get(s);
 					switch (s2) {
 					case "green": {
 						b = true;
@@ -65,8 +66,7 @@ public class MojangsterAPI {
 					}
 					hashMap.put(s, b);
 				}
-			}
-			finally {
+			} finally {
 				inputStream.close();
 			}
 		} catch (ParseException | IOException exception) {
@@ -79,25 +79,26 @@ public class MojangsterAPI {
 		Object[] array = new Object[2];
 		LinkedHashMultimap create = LinkedHashMultimap.create();
 		try {
-			InputStream inputStream = (makeConnection(new URL("http://api.mcplayerindex.com/raw/<uuid>/signed".replaceAll("<uuid>", uuid.toString().replaceAll("-", ""))))).getInputStream();
+			InputStream inputStream = (makeConnection(
+					new URL("http://api.mcplayerindex.com/raw/<uuid>/signed".replaceAll("<uuid>", uuid.toString().replaceAll("-", ""))))).getInputStream();
 			try {
-				JSONObject jsonObject = (JSONObject) new JSONParser().parse(readAll(new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))));
+				JSONObject jsonObject = (JSONObject) new JSONParser()
+						.parse(readAll(new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))));
 				array[0] = jsonObject.get("name");
-				JSONArray jsonArray = (JSONArray)jsonObject.get("properties");
+				JSONArray jsonArray = (JSONArray) jsonObject.get("properties");
 				for (int i = 0; i < jsonArray.size(); ++i) {
-					JSONObject jsonObject2 = (JSONObject)jsonArray.get(i);
+					JSONObject jsonObject2 = (JSONObject) jsonArray.get(i);
 					if (jsonObject2.containsKey("name") && jsonObject2.get("name").equals("textures")) {
-						create.put("textures", new WrappedSignedProperty((String)jsonObject2.get("name"), (String)jsonObject2.get("value"), (String)jsonObject2.get("signature")));
+						create.put("textures", new WrappedSignedProperty((String) jsonObject2.get("name"), (String) jsonObject2.get("value"),
+								(String) jsonObject2.get("signature")));
 						array[1] = create;
 						break;
 					}
 				}
-			}
-			finally {
+			} finally {
 				inputStream.close();
 			}
-		}
-		catch (ParseException | IOException ex) {
+		} catch (ParseException | IOException ex) {
 			return null;
 		}
 		return array;
@@ -122,7 +123,8 @@ public class MojangsterAPI {
 			return null;
 		}
 		Object[] arr = WrappedGameProfile.fromHandle(handle).getProperties().get("textures").toArray();
-		if (arr.length == 0) return null;
+		if (arr.length == 0)
+			return null;
 		create.put("textures", arr[0]);
 		array[1] = create;
 		return array;
@@ -130,15 +132,16 @@ public class MojangsterAPI {
 
 	public static String getName(UUID uuid) {
 		try {
-			HttpURLConnection httpURLConnection = (HttpURLConnection)makeConnection(new URL(" https://api.mojang.com/user/profiles/<uuid>/names".replaceAll("<uuid>", uuid.toString().replaceAll("-", ""))));
+			HttpURLConnection httpURLConnection = (HttpURLConnection) makeConnection(
+					new URL(" https://api.mojang.com/user/profiles/<uuid>/names".replaceAll("<uuid>", uuid.toString().replaceAll("-", ""))));
 			if (httpURLConnection.getResponseCode() == 204 || httpURLConnection.getResponseCode() == 404) {
 				throw new Error(uuid + " is not an existing player UUID");
 			}
 			InputStream inputStream = httpURLConnection.getInputStream();
 			try {
-				return (String)((JSONObject)((JSONArray)new JSONParser().parse(readAll(new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))))).get(0)).get("name");
-			}
-			finally {
+				return (String) ((JSONObject) ((JSONArray) new JSONParser()
+						.parse(readAll(new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))))).get(0)).get("name");
+			} finally {
 				inputStream.close();
 			}
 		} catch (ParseException | IOException exception) {
@@ -152,7 +155,7 @@ public class MojangsterAPI {
 		StringBuilder sb = new StringBuilder();
 		int read;
 		while ((read = reader.read()) != -1) {
-			sb.append((char)read);
+			sb.append((char) read);
 		}
 		return sb.toString();
 	}
@@ -182,8 +185,7 @@ public class MojangsterAPI {
 					return method.invoke(invoke);
 				}
 			}
-		}
-		catch (Exception ex) {
+		} catch (Exception ex) {
 			throw new IllegalStateException("An error occurred while trying to get the session service", ex);
 		}
 		throw new IllegalStateException("No session service found :o");

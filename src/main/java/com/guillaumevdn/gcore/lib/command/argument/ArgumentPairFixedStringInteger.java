@@ -31,7 +31,8 @@ public class ArgumentPairFixedStringInteger extends Argument<Integer> {
 			return null;
 		}
 		for (int i = 0; i < call.getArguments().size(); ++i) {
-			if (i + 1 >= call.getArguments().size()) break;
+			if (i + 1 >= call.getArguments().size())
+				break;
 			String string = call.getArguments().get(i);
 			if (fixedStrings.contains(string.toLowerCase())) {
 				Integer nb = NumberUtils.integerOrNull(call.getArguments().get(i + 1));

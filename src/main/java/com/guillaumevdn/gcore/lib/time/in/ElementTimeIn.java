@@ -43,7 +43,8 @@ public abstract class ElementTimeIn<T extends TimeIn> extends ParseableContainer
 
 	@Override
 	public List<String> editorCurrentValue() {
-		Stream<String> stream = values().stream().flatMap(elem -> ((BasicElement) elem).getRawValueOrDefault() == null ? Stream.empty() : ((BasicElement) elem).getRawValueOrDefault().stream());
+		Stream<String> stream = values().stream()
+				.flatMap(elem -> ((BasicElement) elem).getRawValueOrDefault() == null ? Stream.empty() : ((BasicElement) elem).getRawValueOrDefault().stream());
 		List<String> all = stream.filter(value -> value != null).collect(Collectors.toList());
 		return all.isEmpty() ? null : all;
 	}

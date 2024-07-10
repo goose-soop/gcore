@@ -48,7 +48,9 @@ public final class Mats extends Variants<Mat, MatExtra, MatData> {
 	private Optional<Mat> from(Material type, int legacyData) {
 		String typeName = type.name();
 		String queryId = typeName + "-" + legacyData;
-		// <1.13 ; check legacy data even if it's 0, because otherwise it'll take the first matching name (even if data is not 0 in config) ; example ACACIA_WOOD which is LOG_2:0 would be detected as any LOG_2, for instance DARK_OAK_WOOD even if it's LOG_2:1
+		// <1.13 ; check legacy data even if it's 0, because otherwise it'll take the first matching name (even if data is not 0
+		// in config) ; example ACACIA_WOOD which is LOG_2:0 would be detected as any LOG_2, for instance DARK_OAK_WOOD even if
+		// it's LOG_2:1
 		if (!Version.ATLEAST_1_13) {
 			Optional<Mat> result = byIdAndDataQueryCache.get(queryId);
 			if (result == null) {
@@ -66,7 +68,7 @@ public final class Mats extends Variants<Mat, MatExtra, MatData> {
 		}
 		// >=1.13
 		else {
-			Optional<Mat> mat = fromIdOrDataName(typeName);  // this will valuesCache an empty optional if none found
+			Optional<Mat> mat = fromIdOrDataName(typeName); // this will valuesCache an empty optional if none found
 			if (mat.isPresent() || !isLenient()) {
 				return mat;
 			}
@@ -95,7 +97,8 @@ public final class Mats extends Variants<Mat, MatExtra, MatData> {
 				legacyDatas = loadPositiveNumberList(matSplit, 1, matSplit.length, "data");
 			}
 			Material material = ObjectUtils.safeValueOf(name, Material.class);
-			if (material == null && Version.ATLEAST_1_13) material = ObjectUtils.safeValueOf("LEGACY_" + name, Material.class);
+			if (material == null && Version.ATLEAST_1_13)
+				material = ObjectUtils.safeValueOf("LEGACY_" + name, Material.class);
 			return new MatData(version, comparison, name, material, legacyData, legacyDatas, extra);
 		} catch (Throwable exception) {
 			throw new ConfigError("invalid " + getTypeName() + " config " + rawData, exception);
@@ -108,7 +111,8 @@ public final class Mats extends Variants<Mat, MatExtra, MatData> {
 	}
 
 	Mat createIfLenient(Material material, int legacyData) {
-		if (!isLenient()) return null;
+		if (!isLenient())
+			return null;
 
 		// lenient already exists
 		String id = material.name() + (legacyData == 0 ? "" : "_DATA" + legacyData);
@@ -125,7 +129,8 @@ public final class Mats extends Variants<Mat, MatExtra, MatData> {
 			GCore.inst().getMainLogger().warning("Creating lenient mat " + material.name() + ":" + legacyData);
 		}
 		try {
-			return registerIfHasCurrentVersion(id, CollectionUtils.asList(new MatData(Version.CURRENT, ComparisonType.EQUALS, material.name(), material, 0, null, null)));
+			return registerIfHasCurrentVersion(id,
+					CollectionUtils.asList(new MatData(Version.CURRENT, ComparisonType.EQUALS, material.name(), material, 0, null, null)));
 		} catch (Throwable exception) {
 			GCore.inst().getMainLogger().error("Couldn't create custom mat " + id, exception);
 			return null;

@@ -21,6 +21,7 @@ public class ElementCurrency extends ElementFakeEnum<Currency> {
 	}
 
 	static RWWeakHashMap<Object, List<Currency>> cache = new RWWeakHashMap<>(1, 1f);
+
 	@Override
 	protected List<Currency> cacheOrBuild() {
 		return cachedOrBuild(cache, () -> Currency.values().stream().sorted(Comparator.comparing(e -> e.getId())));

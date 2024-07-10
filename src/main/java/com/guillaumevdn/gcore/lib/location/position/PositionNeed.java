@@ -5,8 +5,6 @@ package com.guillaumevdn.gcore.lib.location.position;
  */
 public enum PositionNeed {
 
-	REQUIRED,
-	OPTIONAL,
-	FORBIDDEN;
+	REQUIRED, OPTIONAL, FORBIDDEN;
 
 }

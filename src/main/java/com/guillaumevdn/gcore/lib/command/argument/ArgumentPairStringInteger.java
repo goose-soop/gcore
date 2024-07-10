@@ -25,7 +25,8 @@ public class ArgumentPairStringInteger extends Argument<Pair<String, Integer>> {
 			return null;
 		}
 		for (int i = 0; i < call.getArguments().size(); ++i) {
-			if (i + 1 >= call.getArguments().size()) break;
+			if (i + 1 >= call.getArguments().size())
+				break;
 			String string = call.getArguments().get(i);
 			Integer nb = NumberUtils.integerOrNull(call.getArguments().get(i + 1));
 			if (nb != null) {

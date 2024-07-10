@@ -1,24 +1,28 @@
 package com.guillaumevdn.gcore.lib.scoreboard;
 
-import com.guillaumevdn.gcore.lib.GPlugin;
-import com.guillaumevdn.gcore.lib.string.StringUtils;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Team;
 
-import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import com.guillaumevdn.gcore.lib.GPlugin;
+import com.guillaumevdn.gcore.lib.string.StringUtils;
 
 /**
  * @author GuillaumeVDN
  */
-public final class Scoreboard
-{
+public final class Scoreboard {
 
     private final String id = StringUtils.generateRandomAlphanumericString(10);
     private GPlugin plugin;
@@ -60,7 +64,8 @@ public final class Scoreboard
 
     // ----- start/stop
     public void start() {
-        if (active) return;
+        if (active)
+            return;
         active = true;
 
         getPlugin().operateSync(() -> {
@@ -76,7 +81,8 @@ public final class Scoreboard
     }
 
     public void stop() {
-        if (!active) return;
+        if (!active)
+            return;
         active = false;
 
         // stop updating
@@ -118,7 +124,7 @@ public final class Scoreboard
         getPlugin().operateSync(() -> {
             // maybe the scoreboard was unregistered for some reason : restart it
             try {
-                objective.getDisplayName();  // this throws an IllegalStateException if the component is unregistered
+                objective.getDisplayName(); // this throws an IllegalStateException if the component is unregistered
             } catch (Throwable ignored) {
                 stop();
                 start();
@@ -138,7 +144,7 @@ public final class Scoreboard
             List<ScoreboardEntry> builtEntries = builder.entries().map(entry -> buildEntry(entry, offsets)).collect(Collectors.toList());
             Set<ScoreboardEntry> newEntries = new HashSet<>();
 
-            //Bukkit.getLogger().info("---------------------------------------------");
+            // Bukkit.getLogger().info("---------------------------------------------");
 
             // process entries
             int score = builtEntries.size();
@@ -152,41 +158,43 @@ public final class Scoreboard
                     team = teams.get(teamId);
                     if (team == null) {
                         String teamName = "" + teamId;
-                        team = bukkit.getTeam(teamName);  // sometimes it apparently already exists (#1664 ; synchronization issue ?)
+                        team = bukkit.getTeam(teamName); // sometimes it apparently already exists (#1664 ; synchronization issue ?)
                         if (team == null) {
                             team = bukkit.registerNewTeam(teamName);
                         }
                         team.setPrefix(entry.getPrefix());
                         team.setSuffix(entry.getSuffix());
                         teams.put(teamId, team);
-                        //Bukkit.getLogger().info("--created team, " + teamId);
+                        // Bukkit.getLogger().info("--created team, " + teamId);
                     } else {
-                        //Bukkit.getLogger().info("--team exists, " + teamId);
+                        // Bukkit.getLogger().info("--team exists, " + teamId);
                     }
                 }
 
                 // set score and team
-                //Bukkit.getLogger().info("--set score to " + score + " for " + entry);
+                // Bukkit.getLogger().info("--set score to " + score + " for " + entry);
                 entry.setScore(score);
                 entry.setTeam(team);
                 newEntries.add(entry);
-                //entries.put(entry.hashCode(), entry);
+                // entries.put(entry.hashCode(), entry);
             }
 
             // reset scores of entries that are still present on the bukkit scoreboard but should be removed
-			/*bukkit.getEntries().stream().filter(oldEntry -> !newEntries.stream().anyMatch(newEntry -> newEntry.getName().equals(oldEntry))).forEach(entry -> {
-			});*/
+            /*
+             * bukkit.getEntries().stream().filter(oldEntry -> !newEntries.stream().anyMatch(newEntry ->
+             * newEntry.getName().equals(oldEntry))).forEach(entry -> { });
+             */
             currentEntries.stream().filter(entry -> !newEntries.contains(entry)).forEach(entry -> {
-                //Bukkit.getLogger().info(">>>>> reset entry " + entry);
+                // Bukkit.getLogger().info(">>>>> reset entry " + entry);
                 entry.reset(bukkit);
             });
 
-            //Bukkit.getLogger().info("-- scores remaining : " + bukkit.getEntries());
+            // Bukkit.getLogger().info("-- scores remaining : " + bukkit.getEntries());
 
             // set new scores
-            currentEntries = newEntries;  // we do be collecting garbage
+            currentEntries = newEntries; // we do be collecting garbage
             newEntries.forEach(entry -> {
-                //Bukkit.getLogger().info(">>>>> set entry " + entry + " to score " + entry.getScore());
+                // Bukkit.getLogger().info(">>>>> set entry " + entry + " to score " + entry.getScore());
                 entry.apply(objective);
             });
         });

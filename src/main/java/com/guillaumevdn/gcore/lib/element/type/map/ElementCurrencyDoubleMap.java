@@ -26,7 +26,7 @@ public class ElementCurrencyDoubleMap extends ElementAbstractEnumMap<Currency, E
 	@Override
 	public ElementDouble createElement(String elementId) {
 		ElementDouble element = new ElementDouble(this, elementId, Need.optional(), 1, null);
-		element.setValue(CollectionUtils.asList("1"));  // don't use the default value otherwise it won't be saved
+		element.setValue(CollectionUtils.asList("1")); // don't use the default value otherwise it won't be saved
 		return element;
 	}
 

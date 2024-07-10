@@ -26,7 +26,7 @@ public class ElementCitizensNPCList extends ElementAbstractEnumList<NPC> {
 	public List<NPC> getValues() {
 		return CollectionUtils.asList(CitizensAPI.getNPCRegistry().sorted());
 	}
-	
+
 	// ----- TODO : import npc here too
 
 	// ----- editor

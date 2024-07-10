@@ -9,8 +9,7 @@ public enum Operation {
 
 	ADD((value, param) -> value + param, (value, param) -> value + param),
 	TAKE((value, param) -> value - param, (value, param) -> value.contains(param) ? value.replace(param, "") : value),
-	SET((value, param) -> param, (value, param) -> param)
-	;
+	SET((value, param) -> param, (value, param) -> param);
 
 	private BiFunction<Double, Double, Double> applierDouble;
 	private BiFunction<String, String, String> applierString;

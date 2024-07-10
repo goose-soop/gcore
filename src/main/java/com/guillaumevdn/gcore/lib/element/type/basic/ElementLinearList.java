@@ -83,23 +83,24 @@ public abstract class ElementLinearList<T extends LinearObjectType, L extends Li
 		// right-click : edit parameters
 		else if (call.getType().equals(ClickType.RIGHT)) {
 			Pair<T, List<String>> current = getCurrentPair(lineIndex);
-			WorkerGCore.inst().awaitChatWithSuggestedValue(call.getClicker(), TextEditorGeneric.messageElementBasicEditSuggestCurrent, StringUtils.toTextString(" ", current.getB()), value -> {
-				if (StringUtils.hasPlaceholders(value)) {
-					setNewValueLine(lineIndex, current.getA() == null ? null : current.getA().name() + " " + value);
-					call.getGUI().setRegularItem(buildEditorItem(call.getPageIndex(), call.getSlot()));
-					getSuperElement().onEditorChange(this);
-				} else {
-					try {
-						L parsed = current.getA() == null ? null : doParseLine(current.getA().name() + " " + value);
-						setNewValueLine(lineIndex, parsed == null ? null : getSerializer().serialize(parsed));
-						call.getGUI().setRegularItem(buildEditorItem(call.getPageIndex(), call.getSlot()));
-						getSuperElement().onEditorChange(this);
-					} catch (ParsingError error) {
-						error.send(call.getClicker());
-					}
-				}
-				call.reopenGUI();
-			}, () -> call.reopenGUI());
+			WorkerGCore.inst().awaitChatWithSuggestedValue(call.getClicker(), TextEditorGeneric.messageElementBasicEditSuggestCurrent,
+					StringUtils.toTextString(" ", current.getB()), value -> {
+						if (StringUtils.hasPlaceholders(value)) {
+							setNewValueLine(lineIndex, current.getA() == null ? null : current.getA().name() + " " + value);
+							call.getGUI().setRegularItem(buildEditorItem(call.getPageIndex(), call.getSlot()));
+							getSuperElement().onEditorChange(this);
+						} else {
+							try {
+								L parsed = current.getA() == null ? null : doParseLine(current.getA().name() + " " + value);
+								setNewValueLine(lineIndex, parsed == null ? null : getSerializer().serialize(parsed));
+								call.getGUI().setRegularItem(buildEditorItem(call.getPageIndex(), call.getSlot()));
+								getSuperElement().onEditorChange(this);
+							} catch (ParsingError error) {
+								error.send(call.getClicker());
+							}
+						}
+						call.reopenGUI();
+					}, () -> call.reopenGUI());
 		}
 	}
 

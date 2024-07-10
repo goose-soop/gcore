@@ -26,26 +26,37 @@ import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
 public final class MetaBook {
 
 	public static boolean match(ItemMeta itemMeta, ItemReference reference, ItemCheck check) {
-		if (!reference.hasMeta(BookMeta.class)) return true;
-		BookMeta meta = ObjectUtils.castOrNull(itemMeta, BookMeta.class);  // might be null if exact match is false
+		if (!reference.hasMeta(BookMeta.class))
+			return true;
+		BookMeta meta = ObjectUtils.castOrNull(itemMeta, BookMeta.class); // might be null if exact match is false
 
 		// author
-		if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getAuthor(), reference.getAuthor()))) return false;
-		else if (!check.isExact() && reference.hasAuthor() && (meta == null || !Objects.deepEquals(meta.getAuthor(), reference.getAuthor()))) return false;
+		if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getAuthor(), reference.getAuthor())))
+			return false;
+		else if (!check.isExact() && reference.hasAuthor() && (meta == null || !Objects.deepEquals(meta.getAuthor(), reference.getAuthor())))
+			return false;
 
 		// title
-		if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getTitle(), reference.getTitle()))) return false;
-		else if (!check.isExact() && reference.hasTitle() && (meta == null || !Objects.deepEquals(meta.getTitle(), reference.getTitle()))) return false;
+		if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getTitle(), reference.getTitle())))
+			return false;
+		else if (!check.isExact() && reference.hasTitle() && (meta == null || !Objects.deepEquals(meta.getTitle(), reference.getTitle())))
+			return false;
 
 		// author
 		if (Version.ATLEAST_1_9) {
-			if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getGeneration(), reference.getGeneration()))) return false;
-			else if (!check.isExact() && reference.hasGeneration() && (meta == null || !Objects.deepEquals(meta.getGeneration(), reference.getGeneration()))) return false;
+			if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getGeneration(), reference.getGeneration())))
+				return false;
+			else if (!check.isExact() && reference.hasGeneration() && (meta == null || !Objects.deepEquals(meta.getGeneration(), reference.getGeneration())))
+				return false;
 		}
 
 		// pages
-		if (check.isExact() && (meta == null || meta.hasPages() != reference.hasPages() || !CollectionUtils.contentEquals(meta.getPages(), reference.getPages()))) return false;
-		else if (!check.isExact() && reference.hasPages() && (meta == null || !meta.hasPages() || !CollectionUtils.contentEquals(meta.getPages(), reference.getPages()))) return false;
+		if (check.isExact()
+				&& (meta == null || meta.hasPages() != reference.hasPages() || !CollectionUtils.contentEquals(meta.getPages(), reference.getPages())))
+			return false;
+		else if (!check.isExact() && reference.hasPages()
+				&& (meta == null || !meta.hasPages() || !CollectionUtils.contentEquals(meta.getPages(), reference.getPages())))
+			return false;
 
 		// seems good
 		return true;
@@ -104,7 +115,8 @@ public final class MetaBook {
 			item.addString("author", Need.optional(), SlotPlacement.START_ROW, TextEditorGeneric.descriptionItemBookAuthor);
 			item.addString("title", Need.optional(), TextEditorGeneric.descriptionItemBookTitle);
 			if (Version.ATLEAST_1_9) {
-				item.add(new com.guillaumevdn.gcore.lib.element.type.basic.ElementBookGeneration(item, "generation", Need.optional(), TextEditorGeneric.descriptionItemBookGeneration));
+				item.add(new com.guillaumevdn.gcore.lib.element.type.basic.ElementBookGeneration(item, "generation", Need.optional(),
+						TextEditorGeneric.descriptionItemBookGeneration));
 			}
 			item.addStringList("pages", Need.optional(), TextEditorGeneric.descriptionItemBookPages);
 		}
@@ -121,7 +133,8 @@ public final class MetaBook {
 		item.parseElementAs("author", replacer).ifPresentDo(v -> writer.write("author", v));
 		item.parseElementAs("title", replacer).ifPresentDo(v -> writer.write("title", v));
 		if (Version.ATLEAST_1_9) {
-			item.parseElementAs("generation", replacer).ifPresentDo(v -> writer.write("generation", v));  // if not null, this will generate a new serializer for book generation
+			item.parseElementAs("generation", replacer).ifPresentDo(v -> writer.write("generation", v)); // if not null, this will generate a new serializer for
+																											// book generation
 		}
 		item.parseElementAs("pages", replacer).ifPresentDo(v -> writer.writeSerializedList("pages", (List<String>) v));
 	}
@@ -132,7 +145,8 @@ public final class MetaBook {
 			item.getElementAs("author", ElementString.class).setValue(meta.hasAuthor() ? CollectionUtils.asList(meta.getAuthor()) : null);
 			item.getElementAs("title", ElementString.class).setValue(meta.hasTitle() ? CollectionUtils.asList(meta.getTitle()) : null);
 			if (Version.ATLEAST_1_9) {
-				item.getElementAs("generation", com.guillaumevdn.gcore.lib.element.type.basic.ElementBookGeneration.class).setValue(meta.hasGeneration() ? CollectionUtils.asList(meta.getGeneration().name()) : null);
+				item.getElementAs("generation", com.guillaumevdn.gcore.lib.element.type.basic.ElementBookGeneration.class)
+						.setValue(meta.hasGeneration() ? CollectionUtils.asList(meta.getGeneration().name()) : null);
 			}
 			item.getElementAs("pages", ElementStringList.class).setValue(meta.hasPages() ? meta.getPages() : null);
 		}

@@ -18,11 +18,11 @@ public final class GUIItemTypes extends TypableElementTypes<GUIItemType> {
 	}
 
 	// ----- types
-	public final TypeNone 					NONE 					= register(new TypeNone("NONE"));
-	public final TypeBack 					BACK					= register(new TypeBack("BACK"));
-	public final TypeClose 					CLOSE					= register(new TypeClose("CLOSE"));
-	public final TypeStaticBorder 			STATIC_BORDER			= register(new TypeStaticBorder("STATIC_BORDER"));
-	public final TypeDynamicBorderLinear 	DYNAMIC_BORDER_LINEAR	= register(new TypeDynamicBorderLinear("DYNAMIC_BORDER_LINEAR"));
+	public final TypeNone NONE = register(new TypeNone("NONE"));
+	public final TypeBack BACK = register(new TypeBack("BACK"));
+	public final TypeClose CLOSE = register(new TypeClose("CLOSE"));
+	public final TypeStaticBorder STATIC_BORDER = register(new TypeStaticBorder("STATIC_BORDER"));
+	public final TypeDynamicBorderLinear DYNAMIC_BORDER_LINEAR = register(new TypeDynamicBorderLinear("DYNAMIC_BORDER_LINEAR"));
 
 	// ----- values
 	public static GUIItemTypes inst() {

@@ -58,7 +58,10 @@ public class ReflectionObject {
 	// ----- methods
 	public ReflectionObject invokeMethod(String name, Object... params) throws Throwable {
 		if (object == null) {
-			throw new IllegalStateException("can't invoke method " + name + "(" + StringUtils.toTextString(", ", CollectionUtils.asList(params).stream().map(param -> param == null ? "null" : param.getClass().getSimpleName())) + ") on a null object");
+			throw new IllegalStateException("can't invoke method " + name + "("
+					+ StringUtils.toTextString(", ",
+							CollectionUtils.asList(params).stream().map(param -> param == null ? "null" : param.getClass().getSimpleName()))
+					+ ") on a null object");
 		}
 		return Reflection.invokeMethod(object.getClass(), name, object, params);
 	}
@@ -75,7 +78,10 @@ public class ReflectionObject {
 	/** @return this object, for chaining convenience because it's cool */
 	public ReflectionObject invokeVoidMethod(String name, Object... params) throws Throwable {
 		if (object == null) {
-			throw new IllegalStateException("can't invoke void method " + name + "(" + StringUtils.toTextString(", ", CollectionUtils.asList(params).stream().map(param -> param == null ? "null" : param.getClass().getSimpleName())) + ") on a null object");
+			throw new IllegalStateException("can't invoke void method " + name + "("
+					+ StringUtils.toTextString(", ",
+							CollectionUtils.asList(params).stream().map(param -> param == null ? "null" : param.getClass().getSimpleName()))
+					+ ") on a null object");
 		}
 		invokeMethod(name, params);
 		return this;
@@ -108,7 +114,8 @@ public class ReflectionObject {
 					r += " " + f.getType().getName();
 					r += " " + f.getName();
 					if (withValues) {
-						if (!f.isAccessible()) f.setAccessible(true);
+						if (!f.isAccessible())
+							f.setAccessible(true);
 						r += " = ";
 						try {
 							r += f.get(object);

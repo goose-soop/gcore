@@ -91,7 +91,8 @@ public final class CollectionUtils {
 
 	public static LowerCaseHashSet asLowercaseSet(String... elements) {
 		LowerCaseHashSet list = new LowerCaseHashSet(elements.length);
-		for (String element : elements) list.add(element);
+		for (String element : elements)
+			list.add(element);
 		return list;
 	}
 
@@ -121,7 +122,8 @@ public final class CollectionUtils {
 				collection.add(null);
 			} else {
 				T casted = ObjectUtils.castOrNull(object, typeClass);
-				if (casted == null) throw new ClassCastException("couldn't cast to " + typeClass + " object " + object);
+				if (casted == null)
+					throw new ClassCastException("couldn't cast to " + typeClass + " object " + object);
 				collection.add(casted);
 			}
 		}
@@ -211,7 +213,8 @@ public final class CollectionUtils {
 	// ----- map
 	private static <K, V, M extends Map<K, V>> M doAsMap(M map, Object... objects) {
 		for (int i = 0; i < objects.length; ++i) {
-			if (i + 1 >= objects.length) break;
+			if (i + 1 >= objects.length)
+				break;
 			map.put((K) objects[i], (V) objects[++i]);
 		}
 		return map;
@@ -257,7 +260,8 @@ public final class CollectionUtils {
 
 	@Nullable
 	public static <K, K2, V> Map<K2, V> remapKeys(@Nullable Map<K, V> map, Function<K, K2> mapper) {
-		if (map == null) return null;
+		if (map == null)
+			return null;
 		return asMap(r -> map.forEach((k, v) -> r.put(mapper.apply(k), v)));
 	}
 
@@ -300,22 +304,26 @@ public final class CollectionUtils {
 		IteratorControls iter = new IteratorControls();
 		while (iterator.hasNext()) {
 			consumer.accept(iterator.next(), iter);
-			if (iter.mustRemove()) iterator.remove();
-			if (iter.mustStop()) return;
+			if (iter.mustRemove())
+				iterator.remove();
+			if (iter.mustStop())
+				return;
 			iter.reset();
 		}
 	}
 
 	public static <T> void iterateCatching(Collection<T> collection, ThrowableBiConsumer<T, IteratorControls> consumer) {
 		IteratorControls iter = new IteratorControls();
-		for (Iterator<T> iterator = collection.iterator(); iterator.hasNext(); ) {
+		for (Iterator<T> iterator = collection.iterator(); iterator.hasNext();) {
 			try {
 				consumer.accept(iterator.next(), iter);
 			} catch (Throwable exception) {
 				exception.printStackTrace();
 			}
-			if (iter.mustRemove()) iterator.remove();
-			if (iter.mustStop()) return;
+			if (iter.mustRemove())
+				iterator.remove();
+			if (iter.mustStop())
+				return;
 			iter.reset();
 		}
 	}
@@ -323,12 +331,14 @@ public final class CollectionUtils {
 	public static <T> void iterateNonNull(Collection<T> collection, BiConsumer<T, IteratorControls> consumer) {
 		if (collection != null) {
 			IteratorControls iter = new IteratorControls();
-			for (Iterator<T> iterator = collection.iterator(); iterator.hasNext(); ) {
+			for (Iterator<T> iterator = collection.iterator(); iterator.hasNext();) {
 				T next = iterator.next();
 				if (next != null) {
 					consumer.accept(next, iter);
-					if (iter.mustRemove()) iterator.remove();
-					if (iter.mustStop()) return;
+					if (iter.mustRemove())
+						iterator.remove();
+					if (iter.mustStop())
+						return;
 					iter.reset();
 				}
 			}
@@ -338,12 +348,14 @@ public final class CollectionUtils {
 	public static <T> void iterateNonNullValues(Map<?, T> collection, BiConsumer<T, IteratorControls> consumer) {
 		if (collection != null) {
 			IteratorControls iter = new IteratorControls();
-			for (Iterator<T> iterator = collection.values().iterator(); iterator.hasNext(); ) {
+			for (Iterator<T> iterator = collection.values().iterator(); iterator.hasNext();) {
 				T next = iterator.next();
 				if (next != null) {
 					consumer.accept(next, iter);
-					if (iter.mustRemove()) iterator.remove();
-					if (iter.mustStop()) return;
+					if (iter.mustRemove())
+						iterator.remove();
+					if (iter.mustStop())
+						return;
 					iter.reset();
 				}
 			}
@@ -405,7 +417,8 @@ public final class CollectionUtils {
 	}
 
 	public static boolean containsIgnoreCase(Collection<String> coll, String string) {
-		if (string == null) return coll.contains(null);
+		if (string == null)
+			return coll.contains(null);
 		for (String str : coll) {
 			if (str != null && str.equalsIgnoreCase(string)) {
 				return true;
@@ -486,15 +499,18 @@ public final class CollectionUtils {
 		}
 	}
 
-	/* @return a singleton list containing the same collection if less than split size, or multiple new collections otherwise */
+	/*
+	 * @return a singleton list containing the same collection if less than split size, or multiple new collections
+	 * otherwise
+	 */
 	public static <T> List<Collection<T>> splitCollection(Collection<T> collection, int splitSize) {
 		if (splitSize < 1) {
 			throw new Error("split size must be at least 1");
 		}
 		List<Collection<T>> result = new ArrayList<>();
-		if (collection.size() <= splitSize) {  // only one
+		if (collection.size() <= splitSize) { // only one
 			result.add(collection);
-		} else {  // must split
+		} else { // must split
 			List<T> current = new ArrayList<>();
 			result.add(current);
 			Iterator<? extends T> iterator = collection.iterator();

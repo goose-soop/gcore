@@ -39,13 +39,12 @@ public abstract class Node {
 
 	// ----- write
 	public abstract void write(Appendable writer, WriteType type) throws Throwable;
+
 	public abstract void writeInCompact(Appendable writer, boolean isCompactParent) throws Throwable;
 
 	public static enum WriteType {
 
-		PREFIX_ID_VALUE,
-		ID_VALUE,
-		VALUE;
+		PREFIX_ID_VALUE, ID_VALUE, VALUE;
 
 		public boolean writePrefix() {
 			return ordinal() == 0;

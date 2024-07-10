@@ -29,7 +29,7 @@ public class ReaderSection implements ThrowableFunction<ReaderContext, Boolean> 
 			List<ReaderLine> subsectionLines = new ArrayList<>();
 			ReaderLine firstNonEmptySectionLine = null;
 			String sectionIndent = context.getCurrentIndent() + context.getIndentLevel();
-			for (ReaderLine peek; (peek = context.peekLine()) != null; ) {
+			for (ReaderLine peek; (peek = context.peekLine()) != null;) {
 				// remove comment from line to process id
 				String maybeEmptyPeek = peek.getLine().trim();
 				int c = YMLReader.indexOfComment(maybeEmptyPeek);
@@ -61,7 +61,9 @@ public class ReaderSection implements ThrowableFunction<ReaderContext, Boolean> 
 			// no lines
 			if (firstNonEmptySectionLine == null) {
 				// maybe this is just a fucked up value such as "element:" and nothing behind, skip it
-				context.getFile().getConfiguration().getPlugin().getMainLogger().warning("Found empty value for key '" + context.getId() + "' at line " + context.getIdentifiableLine().getNumber() + " in file " + context.getFile().getConfiguration().getLogFilePath() + ", it's most likely a configuration mistake");
+				context.getFile().getConfiguration().getPlugin().getMainLogger()
+						.warning("Found empty value for key '" + context.getId() + "' at line " + context.getIdentifiableLine().getNumber() + " in file "
+								+ context.getFile().getConfiguration().getLogFilePath() + ", it's most likely a configuration mistake");
 				return true;
 			}
 

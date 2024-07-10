@@ -21,6 +21,7 @@ public class ElementParticleList extends ElementFakeEnumList<Particle> {
 	}
 
 	private static RWWeakHashMap<Object, List<Particle>> cache = new RWWeakHashMap<>(1, 1f);
+
 	@Override
 	protected List<Particle> cacheOrBuild() {
 		return cachedOrBuild(cache, () -> Particle.values().stream().sorted(Comparator.comparing(e -> e.getId())));

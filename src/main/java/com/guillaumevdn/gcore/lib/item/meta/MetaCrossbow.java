@@ -28,17 +28,23 @@ import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
 public final class MetaCrossbow {
 
 	public static boolean match(ItemMeta itemMeta, ItemReference reference, ItemCheck check) {
-		if (!reference.hasMeta(CrossbowMeta.class)) return true;
-		CrossbowMeta meta = ObjectUtils.castOrNull(itemMeta, CrossbowMeta.class);  // might be null if exact match is false
-		
+		if (!reference.hasMeta(CrossbowMeta.class))
+			return true;
+		CrossbowMeta meta = ObjectUtils.castOrNull(itemMeta, CrossbowMeta.class); // might be null if exact match is false
+
 		// charged projectiles
 		if (check.isExact()) {
-			if (meta.hasChargedProjectiles() != meta.hasChargedProjectiles()) return false;  // parce qu'on rappelle que .getChargedProjectiles est @NotNull mais qu'il est null quand même :CringeHarold: #956
-			if (!reference.hasChargedProjectiles()) return true;
-			if (meta.getChargedProjectiles().size() != reference.getChargedProjectiles().size()) return false;
+			if (meta.hasChargedProjectiles() != meta.hasChargedProjectiles())
+				return false; // parce qu'on rappelle que .getChargedProjectiles est @NotNull mais qu'il est null quand même :CringeHarold: #956
+			if (!reference.hasChargedProjectiles())
+				return true;
+			if (meta.getChargedProjectiles().size() != reference.getChargedProjectiles().size())
+				return false;
 		} else {
-			if (reference.hasChargedProjectiles() && (meta == null || !meta.hasChargedProjectiles())) return false;
-			if (!reference.hasChargedProjectiles()) return true;
+			if (reference.hasChargedProjectiles() && (meta == null || !meta.hasChargedProjectiles()))
+				return false;
+			if (!reference.hasChargedProjectiles())
+				return true;
 		}
 		main: for (ItemStack refProjectile : reference.getChargedProjectiles()) {
 			for (ItemStack projectile : meta.getChargedProjectiles()) {
@@ -48,7 +54,7 @@ public final class MetaCrossbow {
 			}
 			return false;
 		}
-		
+
 		// seems good
 		return true;
 	}
@@ -72,12 +78,13 @@ public final class MetaCrossbow {
 		CrossbowMeta meta = ObjectUtils.castOrNull(itemMeta, CrossbowMeta.class);
 		if (meta != null) {
 			List<DataIO> chargedProjectiles = reader.readDirectList("chargedProjectiles");
-			if (chargedProjectiles != null) for (DataIO d : chargedProjectiles) {
-				ItemStack proj = AdapterItemStack.INSTANCE.read(d);
-				if (proj != null) {
-					meta.addChargedProjectile(proj);
+			if (chargedProjectiles != null)
+				for (DataIO d : chargedProjectiles) {
+					ItemStack proj = AdapterItemStack.INSTANCE.read(d);
+					if (proj != null) {
+						meta.addChargedProjectile(proj);
+					}
 				}
-			}
 		}
 	}
 

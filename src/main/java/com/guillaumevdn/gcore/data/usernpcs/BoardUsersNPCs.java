@@ -34,7 +34,10 @@ import com.guillaumevdn.gcore.lib.plugin.PluginUtils;
 public class BoardUsersNPCs extends KeyedBoardRemote<UUID, UserNPCs> {
 
 	private static BoardUsersNPCs instance = null;
-	public static BoardUsersNPCs inst() { return instance; }
+
+	public static BoardUsersNPCs inst() {
+		return instance;
+	}
 
 	public BoardUsersNPCs() {
 		super(GCore.inst(), "gcore_users_npcs_v8", UserNPCs.class, 20 * 60);
@@ -63,7 +66,8 @@ public class BoardUsersNPCs extends KeyedBoardRemote<UUID, UserNPCs> {
 	public void createAndSpawnDefault(Player player, UserNPCs user, ElementNPC npcConfig) {
 		// get npc id
 		Integer npcId = NumberUtils.integerOrNull(npcConfig.getId());
-		if (npcId == null) return;
+		if (npcId == null)
+			return;
 		// add data if hasn't
 		UserNPC userNpc = user.getNPC(npcId);
 		if (userNpc == null) {
@@ -115,6 +119,7 @@ public class BoardUsersNPCs extends KeyedBoardRemote<UUID, UserNPCs> {
 	@Override
 	protected ConnectorKeyed<UUID, UserNPCs> createConnectorJson() {
 		return new ConnectorKeyedJson<UUID, UserNPCs>(this) {
+
 			@Override
 			public File getRoot() {
 				return GCore.inst().getDataFile("data_v8/users_npcs/");
@@ -129,6 +134,7 @@ public class BoardUsersNPCs extends KeyedBoardRemote<UUID, UserNPCs> {
 			public UUID getKey(File file) {
 				return ObjectUtils.uuidOrNull(FileUtils.getSimpleName(file));
 			}
+
 		};
 	}
 
@@ -138,6 +144,7 @@ public class BoardUsersNPCs extends KeyedBoardRemote<UUID, UserNPCs> {
 
 	private ConnectorKeyedSQL<UUID, UserNPCs> createConnectorSQL(SQLHandler handler) {
 		return new ConnectorKeyedSQL<UUID, UserNPCs>(this, handler) {
+
 			@Override
 			public String keyName() {
 				return "user_uuid";
@@ -145,7 +152,7 @@ public class BoardUsersNPCs extends KeyedBoardRemote<UUID, UserNPCs> {
 
 			@Override
 			protected UUID decodeKey(String raw) {
-				return UUID.fromString(raw);  // row can't contain an invalid UUID, since the query was built from a valid UUID object
+				return UUID.fromString(raw); // row can't contain an invalid UUID, since the query was built from a valid UUID object
 			}
 
 			@Override
@@ -157,6 +164,7 @@ public class BoardUsersNPCs extends KeyedBoardRemote<UUID, UserNPCs> {
 			protected String encodeValue(UserNPCs value) {
 				return GCore.inst().getGson().toJson(value);
 			}
+
 		};
 	}
 

@@ -4,7 +4,7 @@ package com.guillaumevdn.gcore.lib.tuple;
  * @author GuillaumeVDN
  */
 public class BooleanPair extends Pair<Boolean, Boolean> {
-	
+
 	protected BooleanPair() {
 		super();
 	}

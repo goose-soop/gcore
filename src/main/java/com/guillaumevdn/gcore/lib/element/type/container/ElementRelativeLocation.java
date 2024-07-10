@@ -24,10 +24,12 @@ import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
  */
 public class ElementRelativeLocation extends ParseableContainerElement<Location> {
 
-	private ElementDouble horizontalAngle = addDouble("horizontal_angle", Need.optional(0d), 0d, 360d, TextEditorGeneric.descriptionRelativeLocationHorizontalAngle);
+	private ElementDouble horizontalAngle = addDouble("horizontal_angle", Need.optional(0d), 0d, 360d,
+			TextEditorGeneric.descriptionRelativeLocationHorizontalAngle);
 	private ElementDouble distance = addDouble("distance", Need.optional(0d), TextEditorGeneric.descriptionRelativeLocationDistance);
 	private ElementDouble verticalOffset = addDouble("vertical_offset", Need.optional(0d), TextEditorGeneric.descriptionRelativeLocationVerticalOffset);
-	private ElementBoolean baseRotationAware = addBoolean("base_rotation_aware", Need.optional(true), TextEditorGeneric.descriptionRelativeLocationBaseRotationAware);
+	private ElementBoolean baseRotationAware = addBoolean("base_rotation_aware", Need.optional(true),
+			TextEditorGeneric.descriptionRelativeLocationBaseRotationAware);
 	private ElementFloat addYaw = addFloat("add_yaw", Need.optional(0f), 0f, 360f, TextEditorGeneric.descriptionRelativeLocationAddYaw);
 	private ElementFloat addPitch = addFloat("add_pitch", Need.optional(0f), -90f, 90f, TextEditorGeneric.descriptionRelativeLocationAddPitch);
 
@@ -61,7 +63,7 @@ public class ElementRelativeLocation extends ParseableContainerElement<Location>
 
 	@Override
 	public ParsedCache<Location> getCache() {
-		return null;  // don't valuesCache obviously since this relies on volatile data
+		return null; // don't valuesCache obviously since this relies on volatile data
 	}
 
 	@Override

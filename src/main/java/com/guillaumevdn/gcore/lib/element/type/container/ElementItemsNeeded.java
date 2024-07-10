@@ -69,7 +69,12 @@ public class ElementItemsNeeded extends ContainerElement {
 	}
 
 	// ----- ref
-	private RWWeakHashMap<Object, RWWeakHashMap<Player, RWHashMap<ItemMatch, Integer>>> matchingItems = new RWWeakHashMap<>(1, 1f);  // kind of dirty, but this avoid re-checking for matches/locations when taking items later OR when willing to check which items match
+	private RWWeakHashMap<Object, RWWeakHashMap<Player, RWHashMap<ItemMatch, Integer>>> matchingItems = new RWWeakHashMap<>(1, 1f); // kind of dirty, but this
+																																	// avoid re-checking for
+																																	// matches/locations when
+																																	// taking items later OR
+																																	// when willing to check
+																																	// which items match
 
 	@Nullable
 	public RWWeakHashMap<Player, RWHashMap<ItemMatch, Integer>> lastMatches(Object ref) {
@@ -97,7 +102,8 @@ public class ElementItemsNeeded extends ContainerElement {
 			return true;
 		}
 		int neededCount = getCount().parse(replacer).orElse(999);
-		if (neededCount > items.size()) neededCount = items.size();
+		if (neededCount > items.size())
+			neededCount = items.size();
 		// needed count is zero : the player musn't have any of the items
 		if (neededCount <= 0) {
 			for (Player player : playersOnline) {
@@ -161,7 +167,8 @@ public class ElementItemsNeeded extends ContainerElement {
 	}
 
 	private void setMatch(Object ref, Player player, ItemMatch item, int count) {
-		matchingItems.computeIfAbsent(ref, __ -> new RWWeakHashMap<>(5, 1f)).computeIfAbsent(player, __ -> new RWHashMap<>(10, 1f)).put(item, count > item.getGoal() ? item.getGoal() : count);
+		matchingItems.computeIfAbsent(ref, __ -> new RWWeakHashMap<>(5, 1f)).computeIfAbsent(player, __ -> new RWHashMap<>(10, 1f)).put(item,
+				count > item.getGoal() ? item.getGoal() : count);
 	}
 
 	public void takeIfNeeded(Object ref, Replacer replacer, List<Player> players) {
@@ -225,7 +232,8 @@ public class ElementItemsNeeded extends ContainerElement {
 				desc.add("must have " + count);
 			}
 		}
-		items.values().stream().map(item -> item.editorCurrentValue().stream().map(line -> line.contains("check") ? "- " : "  ")).forEach(d -> d.forEach(l -> desc.add(l)));
+		items.values().stream().map(item -> item.editorCurrentValue().stream().map(line -> line.contains("check") ? "- " : "  "))
+				.forEach(d -> d.forEach(l -> desc.add(l)));
 		return desc;
 	}
 

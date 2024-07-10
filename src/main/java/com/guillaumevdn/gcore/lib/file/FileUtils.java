@@ -47,19 +47,13 @@ import com.guillaumevdn.gcore.libs.com.google.gson.GsonBuilder;
 public final class FileUtils {
 
 	public static GsonBuilder createGsonBuilder() {
-		GsonBuilder builder = new GsonBuilder()
-				.addDeserializationExclusionStrategy(new DuplicateFieldsExclusionStrategy())
-				.addSerializationExclusionStrategy(new DuplicateFieldsExclusionStrategy())
-				.enableComplexMapKeySerialization()
-				.disableInnerClassSerialization()
-				.serializeSpecialFloatingPointValues()
-				.registerTypeAdapterFactory(new GsonAdapterClassFactory())
-				.registerTypeAdapter(Text.class, new GsonAdapterText())
-				.registerTypeAdapter(ItemStack.class, AdapterItemStack.INSTANCE.getGsonAdapter())
+		GsonBuilder builder = new GsonBuilder().addDeserializationExclusionStrategy(new DuplicateFieldsExclusionStrategy())
+				.addSerializationExclusionStrategy(new DuplicateFieldsExclusionStrategy()).enableComplexMapKeySerialization().disableInnerClassSerialization()
+				.serializeSpecialFloatingPointValues().registerTypeAdapterFactory(new GsonAdapterClassFactory())
+				.registerTypeAdapter(Text.class, new GsonAdapterText()).registerTypeAdapter(ItemStack.class, AdapterItemStack.INSTANCE.getGsonAdapter())
 				.registerTypeAdapter(NBTCompound.class, AdapterNBTCompound.INSTANCE.getGsonAdapter())
 				.registerTypeAdapter(InventoryState.class, AdapterInventoryState.INSTANCE.getGsonAdapter())
-				.registerTypeAdapter(PotionEffect.class, AdapterPotionEffect.INSTANCE.getGsonAdapter())
-				;
+				.registerTypeAdapter(PotionEffect.class, AdapterPotionEffect.INSTANCE.getGsonAdapter());
 		for (Serializer serializer : Serializer.values()) {
 			builder.registerTypeAdapter(serializer.getTypeClass(), serializer.getGsonAdapter());
 		}
@@ -97,7 +91,8 @@ public final class FileUtils {
 	}
 
 	public static boolean delete(File file) {
-		if (!file.exists()) return true;
+		if (!file.exists())
+			return true;
 		if (file.isDirectory()) {
 			for (File sub : file.listFiles()) {
 				delete(sub);
@@ -122,7 +117,8 @@ public final class FileUtils {
 	}
 
 	public static boolean reset(File file) {
-		if (!delete(file)) return false;
+		if (!delete(file))
+			return false;
 		try {
 			if (!file.getParentFile().exists()) {
 				file.getParentFile().mkdirs();
@@ -145,12 +141,15 @@ public final class FileUtils {
 	}
 
 	public static void copy(File src, File target, Set<String> ignorePathsContaining) throws IOException {
-		if (!src.exists()) throw new IOException("source file don't exist");
-		if (target.exists()) throw new IOException("target file already exists");
+		if (!src.exists())
+			throw new IOException("source file don't exist");
+		if (target.exists())
+			throw new IOException("target file already exists");
 		doCopy(src, target, ignorePathsContaining);
 	}
 
 	private static final long FILE_COPY_BUFFER_SIZE = 1024 * 1024 * 30;
+
 	private static void doCopy(File src, File dest, Set<String> ignorePathsContaining) throws IOException {
 		String path = src.getPath().toLowerCase();
 		if (ignorePathsContaining.stream().anyMatch(ignore -> path.contains(ignore.toLowerCase()))) {
@@ -198,6 +197,7 @@ public final class FileUtils {
 			}
 			ZipOutputStream outputStream = new ZipOutputStream(new FileOutputStream(zipFileName));
 			Files.walkFileTree(sourceDir, new SimpleFileVisitor<Path>() {
+
 				@Override
 				public FileVisitResult visitFile(Path file, BasicFileAttributes attributes) {
 					try {
@@ -211,6 +211,7 @@ public final class FileUtils {
 					}
 					return FileVisitResult.CONTINUE;
 				}
+
 			});
 			outputStream.close();
 		} catch (IOException exception) {
@@ -220,13 +221,10 @@ public final class FileUtils {
 
 	public static List<String> readLines(File file) throws Throwable {
 		return Files.readAllLines(file.toPath(), StandardCharsets.UTF_8);
-		/*List<String> lines = new ArrayList<>();
-		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-			for (String line; (line = reader.readLine()) != null;) {
-				lines.add(line);
-			}
-		}
-		return lines;*/
+		/*
+		 * List<String> lines = new ArrayList<>(); try (BufferedReader reader = new BufferedReader(new FileReader(file))) { for
+		 * (String line; (line = reader.readLine()) != null;) { lines.add(line); } } return lines;
+		 */
 	}
 
 	/** @return the file name (without extension if not a directory) */
@@ -262,7 +260,7 @@ public final class FileUtils {
 			}
 			// count remaining characters
 			while (readChars != -1) {
-				for (int i=0; i<readChars; ++i) {
+				for (int i = 0; i < readChars; ++i) {
 					if (c[i] == '\n') {
 						++count;
 					}

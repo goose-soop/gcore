@@ -61,7 +61,8 @@ public final class Query {
 	public String logToString() {
 		String out = "";
 		for (int i = 0; i < parts.size(); ++i) {
-			if (i != 0) out += "\n-----";
+			if (i != 0)
+				out += "\n-----";
 			out += "\n" + parts.get(i);
 		}
 		return out;
@@ -72,7 +73,8 @@ public final class Query {
 		for (int i = 0; i < parts.size(); ++i) {
 			String part = parts.get(i);
 			if (part.contains(partMustContains)) {
-				if (i != 0) out += "\n-----";
+				if (i != 0)
+					out += "\n-----";
 				out += "\n" + part;
 			}
 		}
@@ -91,7 +93,8 @@ public final class Query {
 		String query = "WHERE " + keyRowName + " IN (";
 		int i = -1;
 		for (T key : keysToString) {
-			if (++i != 0) query += ",";
+			if (++i != 0)
+				query += ",";
 			final Serializer<T> serializer = Serializer.find((Class<T>) key.getClass());
 			query += escapeValue(serializer.serialize(key));
 		}
@@ -117,13 +120,15 @@ public final class Query {
 		return new Query("DELETE FROM " + tableName + " " + buildWhereKeysInString(tableName, keyRowName, keysToString) + ";");
 	}
 
-	public static <T> Query buildInsertOrUpdatePair(String tableName, String keyRowName, String dataName, Collection<T> keysToString, Function<T, String> getData, boolean sqlite) {
+	public static <T> Query buildInsertOrUpdatePair(String tableName, String keyRowName, String dataName, Collection<T> keysToString,
+			Function<T, String> getData, boolean sqlite) {
 		// build query
 		Query query = new Query("INSERT INTO " + tableName + " (" + keyRowName + ", " + dataName + ") VALUES ");
 		int i = -1;
 		for (T key : keysToString) {
 			String data = getData.apply(key);
-			if (data != null && !data.equals("null")) {  // happens to WarnD sometimes, this writes a null value directly into the database, causing quests to reset ; this avoids it, although further investigation is needed to find the cause
+			if (data != null && !data.equals("null")) { // happens to WarnD sometimes, this writes a null value directly into the database, causing quests to
+														// reset ; this avoids it, although further investigation is needed to find the cause
 				String q = ++i != 0 ? "," : "";
 				final Serializer<T> serializer = Serializer.find((Class<T>) key.getClass());
 				q += "(" + Query.escapeValue(serializer.serialize(key)) + "," + Query.escapeValue(data) + ")";
@@ -131,7 +136,7 @@ public final class Query {
 			}
 		}
 
-		if (query.getParts().size() == 1) {  // if data is null
+		if (query.getParts().size() == 1) { // if data is null
 			return new Query();
 		}
 

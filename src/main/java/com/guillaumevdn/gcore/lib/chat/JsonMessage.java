@@ -1,22 +1,28 @@
 package com.guillaumevdn.gcore.lib.chat;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+
 import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.compatibility.Compat;
 import com.guillaumevdn.gcore.lib.compatibility.nbt.NBTItem;
 import com.guillaumevdn.gcore.lib.player.PlayerUtils;
 import com.guillaumevdn.gcore.lib.string.StringUtils;
-import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.*;
 
 /**
  * @author JustisR and GuillaumeVDN
  */
-public class JsonMessage
-{
+public class JsonMessage {
+
     private String msg = "[{\"text\":\"\",\"extra\":[{\"text\": \"\"}";
 
     public JsonStringBuilder append(String text) {
@@ -39,16 +45,10 @@ public class JsonMessage
         send(PlayerUtils.getOnline());
     }
 
-    public static class JsonStringBuilder
-    {
+    public static class JsonStringBuilder {
 
-        private static final Map<ChatColor, String> FORMAT_CODES = CollectionUtils.asMap(
-            ChatColor.MAGIC, "obfuscated",
-            ChatColor.BOLD, "bold",
-            ChatColor.STRIKETHROUGH, "strikethrough",
-            ChatColor.UNDERLINE, "underlined",
-            ChatColor.ITALIC, "italic"
-        );
+        private static final Map<ChatColor, String> FORMAT_CODES = CollectionUtils.asMap(ChatColor.MAGIC, "obfuscated", ChatColor.BOLD, "bold",
+                ChatColor.STRIKETHROUGH, "strikethrough", ChatColor.UNDERLINE, "underlined", ChatColor.ITALIC, "italic");
 
         private final JsonMessage message;
         private final String string = ",{\"text\":\"\",\"extra\":[";
@@ -88,13 +88,13 @@ public class JsonMessage
                                 code += split[j];
                             }
                             String last = j < split.length ? split[j] : null;
-                            if (last != null && !last.isEmpty()) {  // valid hex code
+                            if (last != null && !last.isEmpty()) { // valid hex code
                                 textColor = "#" + (code + last.charAt(0)).toUpperCase();
                                 textFormat.clear();
 
                                 text = last.substring(1);
                                 i = j;
-                            } else {  // invalid hex code
+                            } else { // invalid hex code
                                 textColor = "white";
                                 textFormat.clear();
                             }
@@ -112,7 +112,7 @@ public class JsonMessage
                                     textFormat.clear();
                                     textColor = color.name().toLowerCase();
                                 }
-                            } else {  // unknown color code
+                            } else { // unknown color code
                                 textFormat.clear();
                                 textColor = "white";
                             }
@@ -141,7 +141,8 @@ public class JsonMessage
         }
 
         /**
-         * Adapted from https://github.com/dadus33-plugins/ChatItem/blob/v2/src/main/java/me/dadus33/chatitem/chatmanager/v1/json/JSONManipulator.java
+         * Adapted from
+         * https://github.com/dadus33-plugins/ChatItem/blob/v2/src/main/java/me/dadus33/chatitem/chatmanager/v1/json/JSONManipulator.java
          */
         public JsonStringBuilder setHover(ItemStack item) {
             try {
@@ -176,15 +177,16 @@ public class JsonMessage
         }
 
         /**
-         * Adapted from https://github.com/dadus33-plugins/ChatItem/blob/v2/src/main/java/me/dadus33/chatitem/chatmanager/v1/json/JSONManipulator.java
+         * Adapted from
+         * https://github.com/dadus33-plugins/ChatItem/blob/v2/src/main/java/me/dadus33/chatitem/chatmanager/v1/json/JSONManipulator.java
          */
         private static final String itemJson(ItemStack item) throws Throwable {
             final NBTItem nbt = new NBTItem(item);
             final String id = nbt.hasKey("id") ? nbt.getString("id").replace("\"", "") : item.getType().name().toLowerCase();
 
             final StringBuilder builder = new StringBuilder("{id:\"" + id + "\",Count:" + item.getAmount() + "b");
-            if (!nbt.hasKey("Damage"))  // for new versions
-                builder.append(",Damage:").append(item.getDurability()).append("s");  // append the durability data
+            if (!nbt.hasKey("Damage")) // for new versions
+                builder.append(",Damage:").append(item.getDurability()).append("s"); // append the durability data
 
             if (nbt.getKeys().isEmpty()) {
                 builder.append("}");
@@ -196,4 +198,5 @@ public class JsonMessage
         }
 
     }
+
 }

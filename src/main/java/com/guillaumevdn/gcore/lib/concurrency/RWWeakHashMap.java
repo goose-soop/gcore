@@ -23,8 +23,9 @@ import com.guillaumevdn.gcore.lib.object.ObjectUtils;
 import com.guillaumevdn.gcore.lib.string.StringUtils;
 
 /**
- * Since this can remove things when reading, we need standard synchronization
- * Subsets methods will throw an UnsupportedOperationException when called and forEach() or iterate() should be used instead.
+ * Since this can remove things when reading, we need standard synchronization Subsets methods will throw an
+ * UnsupportedOperationException when called and forEach() or iterate() should be used instead.
+ * 
  * @author GuillaumeVDN
  */
 public class RWWeakHashMap<K, V> extends WeakHashMap<K, V> {
@@ -37,7 +38,7 @@ public class RWWeakHashMap<K, V> extends WeakHashMap<K, V> {
 
 	// -------------------- utils --------------------
 
-	protected K keyModifier(Object key) {  // key modifiers for subclasses
+	protected K keyModifier(Object key) { // key modifiers for subclasses
 		return (K) key;
 	}
 
@@ -139,7 +140,8 @@ public class RWWeakHashMap<K, V> extends WeakHashMap<K, V> {
 	public final void iterateAndModifyOrThrow(ThrowableTriConsumer<K, V, IteratorControls> consumer) throws Throwable {
 		// always lock on write here
 		// if the method is called, it means we want to modify the map
-		// if this is called simultaneously and elements are removed, it would throw errors with the usual "read > write > read" process since the iterator would no longer be valid (ConcurrentModificationException)
+		// if this is called simultaneously and elements are removed, it would throw errors with the usual "read > write > read"
+		// process since the iterator would no longer be valid (ConcurrentModificationException)
 
 		lockThrowable(() -> {
 			Iterator<Entry<K, V>> it = super.entrySet().iterator();
@@ -209,17 +211,25 @@ public class RWWeakHashMap<K, V> extends WeakHashMap<K, V> {
 
 	// -------------------- object --------------------
 
-	private int unsafeSize() { return super.size(); }
-	private V getUnsafe(Object key) { return super.get(keyModifier(key)); }
-	private boolean containsKeyUnsafe(Object key) { return super.containsKey(keyModifier(key)); }
+	private int unsafeSize() {
+		return super.size();
+	}
+
+	private V getUnsafe(Object key) {
+		return super.get(keyModifier(key));
+	}
+
+	private boolean containsKeyUnsafe(Object key) {
+		return super.containsKey(keyModifier(key));
+	}
 
 	@Override
-	public final boolean equals(Object o) {  // adapted code from HashMap
+	public final boolean equals(Object o) { // adapted code from HashMap
 		if (o == this)
 			return true;
 		if (!(o instanceof Map))
 			return false;
-		Map<?,?> other = (Map<?,?>) o;
+		Map<?, ?> other = (Map<?, ?>) o;
 
 		return lock(() -> {
 			// other is also a RW map ; lock once and use unsafe methods to avoid locking/unlocking every 3 nanoseconds
@@ -230,9 +240,9 @@ public class RWWeakHashMap<K, V> extends WeakHashMap<K, V> {
 						return false;
 
 					try {
-						Iterator<Entry<K,V>> i = super.entrySet().iterator();
+						Iterator<Entry<K, V>> i = super.entrySet().iterator();
 						while (i.hasNext()) {
-							Entry<K,V> e = i.next();
+							Entry<K, V> e = i.next();
 							K key = e.getKey();
 							V value = e.getValue();
 							if (value == null) {
@@ -258,9 +268,9 @@ public class RWWeakHashMap<K, V> extends WeakHashMap<K, V> {
 					return false;
 
 				try {
-					Iterator<Entry<K,V>> i = super.entrySet().iterator();
+					Iterator<Entry<K, V>> i = super.entrySet().iterator();
 					while (i.hasNext()) {
-						Entry<K,V> e = i.next();
+						Entry<K, V> e = i.next();
 						K key = e.getKey();
 						V value = e.getValue();
 						if (value == null) {
@@ -283,10 +293,10 @@ public class RWWeakHashMap<K, V> extends WeakHashMap<K, V> {
 	}
 
 	@Override
-	public final int hashCode() {  // adapted code from HashMap
+	public final int hashCode() { // adapted code from HashMap
 		return lock(() -> {
 			int h = 0;
-			Iterator<Entry<K,V>> i = super.entrySet().iterator();
+			Iterator<Entry<K, V>> i = super.entrySet().iterator();
 			while (i.hasNext())
 				h += i.next().hashCode();
 			return h;
@@ -398,10 +408,11 @@ public class RWWeakHashMap<K, V> extends WeakHashMap<K, V> {
 		});
 	}
 
-	/* -------------------- (potential) write methods with loss of performance --------------------
-		due to (a) pre-check that would be made during iteration in the original method
-		       (b) using a write lock without being sure that modifications will be made
-		... I'm too lazy to completely rewrite a HashSet implementation with "low-level" direct operations on the table :Kappa:
+	/*
+	 * -------------------- (potential) write methods with loss of performance -------------------- due to (a) pre-check
+	 * that would be made during iteration in the original method (b) using a write lock without being sure that
+	 * modifications will be made ... I'm too lazy to completely rewrite a HashSet implementation with "low-level" direct
+	 * operations on the table :Kappa:
 	 */
 
 	@Override
@@ -427,6 +438,7 @@ public class RWWeakHashMap<K, V> extends WeakHashMap<K, V> {
 
 	/**
 	 * Replaces the entry for the specified key only if it is currently not mapped to some value.
+	 * 
 	 * @return true if the value was modified
 	 */
 	public final boolean replaceIfNot(K key, V value) {

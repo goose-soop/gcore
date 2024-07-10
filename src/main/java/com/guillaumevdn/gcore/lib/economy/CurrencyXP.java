@@ -37,7 +37,7 @@ public class CurrencyXP extends Currency {
 		if (online == null) {
 			return false;
 		}
-		online.giveExp(- (int) amount);
+		online.giveExp(-(int) amount);
 		return true;
 	}
 

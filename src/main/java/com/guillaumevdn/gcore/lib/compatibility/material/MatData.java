@@ -18,13 +18,15 @@ import com.guillaumevdn.gcore.lib.string.StringUtils;
  */
 public final class MatData extends SimpleExistingVariantData<Material, MatExtra> {
 
-	private int legacyData;  // if there's only one
-	private List<Integer> legacyDatas;  // if multiple are allowed (for instance, multiple facings of the same block, such as wood)
+	private int legacyData; // if there's only one
+	private List<Integer> legacyDatas; // if multiple are allowed (for instance, multiple facings of the same block, such as wood)
 	private boolean door, traversable, damageable;
 
-	public MatData(Version version, ComparisonType versionComparison, String dataName, Material dataInstance, int legacyData, List<Integer> legacyDatas, List<MatExtra> extra) {
+	public MatData(Version version, ComparisonType versionComparison, String dataName, Material dataInstance, int legacyData, List<Integer> legacyDatas,
+			List<MatExtra> extra) {
 		super(version, versionComparison, dataName, dataInstance, extra);
-		if (legacyData >= 0 && legacyDatas != null) throw new IllegalArgumentException("got both legacyData and legacyDatas");
+		if (legacyData >= 0 && legacyDatas != null)
+			throw new IllegalArgumentException("got both legacyData and legacyDatas");
 		this.legacyData = legacyData;
 		this.legacyDatas = legacyDatas;
 		this.door = extra != null && extra.contains(MatExtra.DOOR);
@@ -69,7 +71,8 @@ public final class MatData extends SimpleExistingVariantData<Material, MatExtra>
 	// ----- object
 	@Override
 	public boolean equals(Object obj) {
-		if (!super.equals(obj)) return false;
+		if (!super.equals(obj))
+			return false;
 		MatData other = ObjectUtils.castOrNull(obj, MatData.class);
 		return other != null && CollectionUtils.contentEquals(legacyDatas, other.legacyDatas);
 	}
@@ -81,23 +84,20 @@ public final class MatData extends SimpleExistingVariantData<Material, MatExtra>
 
 	@Override
 	public MatData clone() {
-		return new MatData(getVersion(), getVersionComparison(), getDataName(), getDataInstance(), legacyData, legacyDatas != null ? CollectionUtils.asList(legacyDatas) : null, getExtra().isEmpty() ? null : CollectionUtils.asList(getExtra()));
+		return new MatData(getVersion(), getVersionComparison(), getDataName(), getDataInstance(), legacyData,
+				legacyDatas != null ? CollectionUtils.asList(legacyDatas) : null, getExtra().isEmpty() ? null : CollectionUtils.asList(getExtra()));
 	}
 
 	@Override
 	public String toString() {
-		return "("
-				+ getVersionComparison().getSymbol() + getVersion() + ","
-				+ getDataName() + (legacyDatas == null && legacyData == 0 ? "" : ":" + (legacyDatas == null ? legacyData : legacyDatas))
-				+ (getExtra().isEmpty() ? "" : "," + StringUtils.toTextString("-", getExtra()))
-				+ ")";
+		return "(" + getVersionComparison().getSymbol() + getVersion() + "," + getDataName()
+				+ (legacyDatas == null && legacyData == 0 ? "" : ":" + (legacyDatas == null ? legacyData : legacyDatas))
+				+ (getExtra().isEmpty() ? "" : "," + StringUtils.toTextString("-", getExtra())) + ")";
 	}
 
 	// ----- extra
 	public static enum MatExtra {
-		DOOR,
-		TRAVERSABLE,
-		DAMAGEABLE,
+		DOOR, TRAVERSABLE, DAMAGEABLE,
 	}
 
 }

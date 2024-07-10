@@ -16,25 +16,26 @@
 
 package com.guillaumevdn.gcore.libs.com.google.gson;
 
-import com.guillaumevdn.gcore.libs.com.google.gson.internal.LinkedTreeMap;
-
 import java.util.Map;
 import java.util.Set;
 
+import com.guillaumevdn.gcore.libs.com.google.gson.internal.LinkedTreeMap;
+
 /**
- * A class representing an object type in Json. An object consists of name-value pairs where names
- * are strings, and values are any other type of {@link JsonElement}. This allows for a creating a
- * tree of JsonElements. The member elements of this object are maintained in order they were added.
+ * A class representing an object type in Json. An object consists of name-value pairs where names are strings, and
+ * values are any other type of {@link JsonElement}. This allows for a creating a tree of JsonElements. The member
+ * elements of this object are maintained in order they were added.
  *
  * @author Inderjeet Singh
  * @author Joel Leitch
  */
 public final class JsonObject extends JsonElement {
-  private final LinkedTreeMap<String, JsonElement> members =
-      new LinkedTreeMap<String, JsonElement>();
+
+  private final LinkedTreeMap<String, JsonElement> members = new LinkedTreeMap<String, JsonElement>();
 
   /**
    * Creates a deep copy of this element and all its children
+   * 
    * @since 2.8.2
    */
   @Override
@@ -47,12 +48,11 @@ public final class JsonObject extends JsonElement {
   }
 
   /**
-   * Adds a member, which is a name-value pair, to self. The name must be a String, but the value
-   * can be an arbitrary JsonElement, thereby allowing you to build a full tree of JsonElements
-   * rooted at this node.
+   * Adds a member, which is a name-value pair, to self. The name must be a String, but the value can be an arbitrary
+   * JsonElement, thereby allowing you to build a full tree of JsonElements rooted at this node.
    *
    * @param property name of the member.
-   * @param value the member object.
+   * @param value    the member object.
    */
   public void add(String property, JsonElement value) {
     members.put(property, value == null ? JsonNull.INSTANCE : value);
@@ -70,52 +70,47 @@ public final class JsonObject extends JsonElement {
   }
 
   /**
-   * Convenience method to add a primitive member. The specified value is converted to a
-   * JsonPrimitive of String.
+   * Convenience method to add a primitive member. The specified value is converted to a JsonPrimitive of String.
    *
    * @param property name of the member.
-   * @param value the string value associated with the member.
+   * @param value    the string value associated with the member.
    */
   public void addProperty(String property, String value) {
     add(property, value == null ? JsonNull.INSTANCE : new JsonPrimitive(value));
   }
 
   /**
-   * Convenience method to add a primitive member. The specified value is converted to a
-   * JsonPrimitive of Number.
+   * Convenience method to add a primitive member. The specified value is converted to a JsonPrimitive of Number.
    *
    * @param property name of the member.
-   * @param value the number value associated with the member.
+   * @param value    the number value associated with the member.
    */
   public void addProperty(String property, Number value) {
     add(property, value == null ? JsonNull.INSTANCE : new JsonPrimitive(value));
   }
 
   /**
-   * Convenience method to add a boolean member. The specified value is converted to a
-   * JsonPrimitive of Boolean.
+   * Convenience method to add a boolean member. The specified value is converted to a JsonPrimitive of Boolean.
    *
    * @param property name of the member.
-   * @param value the number value associated with the member.
+   * @param value    the number value associated with the member.
    */
   public void addProperty(String property, Boolean value) {
     add(property, value == null ? JsonNull.INSTANCE : new JsonPrimitive(value));
   }
 
   /**
-   * Convenience method to add a char member. The specified value is converted to a
-   * JsonPrimitive of Character.
+   * Convenience method to add a char member. The specified value is converted to a JsonPrimitive of Character.
    *
    * @param property name of the member.
-   * @param value the number value associated with the member.
+   * @param value    the number value associated with the member.
    */
   public void addProperty(String property, Character value) {
     add(property, value == null ? JsonNull.INSTANCE : new JsonPrimitive(value));
   }
 
   /**
-   * Returns a set of members of this object. The set is ordered, and the order is in which the
-   * elements were added.
+   * Returns a set of members of this object. The set is ordered, and the order is in which the elements were added.
    *
    * @return a set of members of this object.
    */
@@ -194,12 +189,12 @@ public final class JsonObject extends JsonElement {
 
   @Override
   public boolean equals(Object o) {
-    return (o == this) || (o instanceof JsonObject
-        && ((JsonObject) o).members.equals(members));
+    return (o == this) || (o instanceof JsonObject && ((JsonObject) o).members.equals(members));
   }
 
   @Override
   public int hashCode() {
     return members.hashCode();
   }
+
 }

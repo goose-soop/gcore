@@ -60,11 +60,9 @@ public abstract class PositionTypeClosestMythicMob extends PositionType {
 			stream = stream.filter(mob -> mobs.stream().anyMatch(type -> type.equals(mob.getType())));
 		}
 		// sort and find first
-		return stream
-				.map(mob -> mob.getEntity() == null || mob.getEntity().getBukkitEntity() == null ? null : mob.getEntity().getBukkitEntity().getLocation())
+		return stream.map(mob -> mob.getEntity() == null || mob.getEntity().getBukkitEntity() == null ? null : mob.getEntity().getBukkitEntity().getLocation())
 				.filter(loc -> loc != null && loc.getWorld().equals(parsingLocation.getWorld()))
-				.sorted((a, b) -> Double.compare(a.distance(parsingLocation), b.distance(parsingLocation)))
-				.findFirst().orElse(null);
+				.sorted((a, b) -> Double.compare(a.distance(parsingLocation), b.distance(parsingLocation))).findFirst().orElse(null);
 	}
 
 }

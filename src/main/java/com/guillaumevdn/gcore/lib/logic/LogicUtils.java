@@ -27,7 +27,8 @@ public final class LogicUtils {
 		// read base groups
 		Merger merger = null;
 		int mergerCount = 0;
-		List<String> baseGroups = new ArrayList<>();  // groups found with mergers parenthesis, such as [...] AND/OR [...] or simply [...], or implicit groups (<elem1> AND <elem2> with no parenthesis [...])
+		List<String> baseGroups = new ArrayList<>(); // groups found with mergers parenthesis, such as [...] AND/OR [...] or simply [...], or implicit groups
+														// (<elem1> AND <elem2> with no parenthesis [...])
 		int depth = 0;
 		int beginGroup = 0;
 		char[] chars = logicString.toCharArray();
@@ -48,7 +49,7 @@ public final class LogicUtils {
 				--depth;
 				if (depth == 0) { // base group, so add
 					baseGroups.add(logicString.substring(beginGroup + 1, i).trim());
-					beginGroup = i + 1;  // mark beginning of potential new implicit group
+					beginGroup = i + 1; // mark beginning of potential new implicit group
 				} else if (depth < 0) { // invalid group end, too much
 					throw new LogicError("invalid ] found at index " + i + " in '" + logicString + "'");
 				}
@@ -65,7 +66,8 @@ public final class LogicUtils {
 					++i;
 					Merger newMerger = ch == '&' ? Merger.AND : Merger.OR;
 					if (merger != null && !merger.equals(newMerger)) {
-						throw new LogicError("merger was '" + merger + "' but found " + (ch == '&' ? "AND" : "OR") + " for the same group at index " + i + " in '" + logicString + "' ; use [] to enclose different mergers");
+						throw new LogicError("merger was '" + merger + "' but found " + (ch == '&' ? "AND" : "OR") + " for the same group at index " + i
+								+ " in '" + logicString + "' ; use [] to enclose different mergers");
 					}
 					merger = newMerger;
 					++mergerCount;
@@ -74,10 +76,10 @@ public final class LogicUtils {
 					if (depth == 0) {
 						String implicitGroup = logicString.substring(beginGroup, i - 1).trim();
 
-						if (!implicitGroup.isEmpty()) {  // might be the case with strings such as [merged conditions] && <implicit group>
+						if (!implicitGroup.isEmpty()) { // might be the case with strings such as [merged conditions] && <implicit group>
 							baseGroups.add(implicitGroup);
 						}
-						beginGroup = i + 1;  // mark beginning of new potential implicit group
+						beginGroup = i + 1; // mark beginning of new potential implicit group
 					}
 				}
 
@@ -152,11 +154,16 @@ public final class LogicUtils {
 		main: for (int index = 0; index < logicString.length() - 1; ++index) {
 			for (ComparisonType comp : ComparisonType.values()) {
 				if (!comp.equals(ComparisonType.IN_RANGE)) {
-					if (index + comp.getSymbol().length() + 1 < logicString.length()
-							&& logicString.charAt(index + comp.getSymbol().length()) == ' '  // to avoid interpreting '<=' as '<' for instance
+					if (index + comp.getSymbol().length() + 1 < logicString.length() && logicString.charAt(index + comp.getSymbol().length()) == ' ' // to avoid
+																																						// interpreting
+																																						// '<='
+																																						// as
+																																						// '<'
+																																						// for
+																																						// instance
 							&& logicString.substring(index, index + comp.getSymbol().length()).equals(comp.getSymbol())) {
 						comparisons.add(Pair.of(index, comp));
-						index += comp.getSymbol().length() - 1;  // -1 because ++index
+						index += comp.getSymbol().length() - 1; // -1 because ++index
 						continue main;
 					}
 				}
@@ -211,10 +218,13 @@ public final class LogicUtils {
 	}
 
 	public static class LogicError extends Error {
+
 		private static final long serialVersionUID = -8958202336274552915L;
+
 		public LogicError(String message) {
 			super(message);
 		}
+
 	}
 
 }

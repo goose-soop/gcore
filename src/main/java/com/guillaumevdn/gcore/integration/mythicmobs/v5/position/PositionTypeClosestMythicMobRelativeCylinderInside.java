@@ -32,7 +32,8 @@ public class PositionTypeClosestMythicMobRelativeCylinderInside extends Position
 	// ----- parse
 	@Override
 	public Position doParseMob(ElementPosition position, Location mobLocation, Replacer replacer) throws ParsingError {
-		Location center = position.getElementAs("center", ElementRelativeLocation.class).parseNoCatchOrThrowParsingNull(replacer.cloneReplacer().with(mobLocation));
+		Location center = position.getElementAs("center", ElementRelativeLocation.class)
+				.parseNoCatchOrThrowParsingNull(replacer.cloneReplacer().with(mobLocation));
 		double radius = position.getElementAs("radius", ElementDouble.class).parseNoCatchOrThrowParsingNull(replacer);
 		return new PositionCylinderInside(center, radius);
 	}

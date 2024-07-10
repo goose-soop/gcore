@@ -113,7 +113,8 @@ public class Logger {
 		log(LogLevel.DEBUG, line, true, false, null);
 	}
 
-	//private transient RWHashMap<String, Long> lastLogged = new RWHashMap<>(10, 1f);  // #925, concurrent mod exception ; // UPDATE : this simply takes too much memory
+	// private transient RWHashMap<String, Long> lastLogged = new RWHashMap<>(10, 1f); // #925, concurrent mod exception ;
+	// // UPDATE : this simply takes too much memory
 
 	public void log(LogLevel level, String line, boolean printIdInConsole, Throwable trace) {
 		log(level, line, printIdInConsole, false, trace);
@@ -122,15 +123,14 @@ public class Logger {
 	public void log(LogLevel level, String line, boolean printIdInConsole, boolean ignoreAntiSpam, Throwable trace) {
 		try {
 			// already logged recently
-			/*if (antiSpam && !ignoreAntiSpam) {
-				if (System.currentTimeMillis() - lastLogged.computeIfAbsent(line, __ -> 0L) < 1000L) {
-					return;
-				}
-				lastLogged.put(line, System.currentTimeMillis());
-			}*/
+			/*
+			 * if (antiSpam && !ignoreAntiSpam) { if (System.currentTimeMillis() - lastLogged.computeIfAbsent(line, __ -> 0L) <
+			 * 1000L) { return; } lastLogged.put(line, System.currentTimeMillis()); }
+			 */
 			// log to console
 			if (isLogConsole() || level.equals(LogLevel.ERROR)) {
-				Bukkit.getConsoleSender().sendMessage(level.getConsoleColor() + (printIdInConsole ? "[" + id + "] " : "") + (trace != null && trace instanceof ConfigError ? line + ", " + trace.getMessage() : line));
+				Bukkit.getConsoleSender().sendMessage(level.getConsoleColor() + (printIdInConsole ? "[" + id + "] " : "")
+						+ (trace != null && trace instanceof ConfigError ? line + ", " + trace.getMessage() : line));
 				if (trace != null && !(trace instanceof ConfigError)) {
 					trace.printStackTrace();
 				}
@@ -152,14 +152,14 @@ public class Logger {
 
 	// ----- saving
 	public final void startSaving() {
-		/*stopSaving();
-		if (logFile) {
-			plugin.registerTask("logger_filesave_" + id.toLowerCase(), true, 20, () -> saveFileIfPersistent());
-		}*/
+		/*
+		 * stopSaving(); if (logFile) { plugin.registerTask("logger_filesave_" + id.toLowerCase(), true, 20, () ->
+		 * saveFileIfPersistent()); }
+		 */
 	}
 
 	public final void stopSaving() {
-		//plugin.stopTask("logger_filesave_" + id.toLowerCase());
+		// plugin.stopTask("logger_filesave_" + id.toLowerCase());
 		if (writer != null) {
 			try {
 				writer.close();

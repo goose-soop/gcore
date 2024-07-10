@@ -91,7 +91,8 @@ public final class Node<V extends Element> implements IElement {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) return true;
+		if (this == obj)
+			return true;
 		Node<V> other = ObjectUtils.castOrNull(obj, getClass());
 		return other != null && key.equals(other.key);
 	}

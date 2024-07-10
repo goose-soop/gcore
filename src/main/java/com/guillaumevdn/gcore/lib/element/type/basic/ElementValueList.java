@@ -42,7 +42,7 @@ public abstract class ElementValueList<T> extends BasicElement<List<T>> {
 		super(SizeTolerance.ALLOW_EMPTY_AND_LIST, parent, id, need.getType(), need.serializeDef(serializer), editorDescription);
 		this.serializer = serializer;
 	}
-	
+
 	@Override
 	protected List<String> loadRawValueFrom(@Nonnull List<T> value) {
 		return serializer.serialize(value);
@@ -56,7 +56,8 @@ public abstract class ElementValueList<T> extends BasicElement<List<T>> {
 	public final List<T> getParsedDefaultValue() {
 		List<String> def = getDefaultValue();
 		List<T> result = new ArrayList<>();
-		if (def.isEmpty()) return result;
+		if (def.isEmpty())
+			return result;
 		for (String d : def) {
 			T deserialized = serializer.deserialize(d);
 			if (deserialized != null) {
@@ -79,10 +80,10 @@ public abstract class ElementValueList<T> extends BasicElement<List<T>> {
 	}
 
 	protected T doParseStringSingle(String raw) throws ParsingError {
-		T value = serializer.deserialize(raw);  // if any exception is thrown here, it'll be catched and displayed correctly
+		T value = serializer.deserialize(raw); // if any exception is thrown here, it'll be catched and displayed correctly
 		if (value == null) {
 			if (ConfigGCore.ignoreInvalidElementValues) {
-				return null;  // and here goes my consistency :PepeHands:
+				return null; // and here goes my consistency :PepeHands:
 			}
 			throw new ParsingError(this, "invalid value '" + raw + "'");
 		}
@@ -94,8 +95,8 @@ public abstract class ElementValueList<T> extends BasicElement<List<T>> {
 	protected List<T> doParseList(List<String> raw) throws ParsingError {
 		List<T> value = new ArrayList<>();
 		for (String r : raw) {
-			T elem = doParseStringSingle(r);  // if any exception is thrown here, it'll be catched and displayed correctly
-			if (elem != null) {  // if ConfigGCore.ignoreInvalidElementValues
+			T elem = doParseStringSingle(r); // if any exception is thrown here, it'll be catched and displayed correctly
+			if (elem != null) { // if ConfigGCore.ignoreInvalidElementValues
 				value.add(elem);
 			}
 		}
@@ -178,19 +179,21 @@ public abstract class ElementValueList<T> extends BasicElement<List<T>> {
 				}
 
 				// new line item
-				setPersistentItem(new GUIItem("newline", 50, ItemUtils.createItem(CommonMats.BLAZE_ROD, TextEditorGeneric.controlAddElementName.parseLine(), null), call -> {
-					if (getRawValue() == null) {
-						setValue(CollectionUtils.asList(editorNewLine()));
-					} else {
-						setValue(CollectionUtils.asListMultiple(String.class, getRawValue(), editorNewLine()));
-					}
-					call.getGUI().refill();
-					getSuperElement().onEditorChange(ElementValueList.this);
-				}));
+				setPersistentItem(new GUIItem("newline", 50,
+						ItemUtils.createItem(CommonMats.BLAZE_ROD, TextEditorGeneric.controlAddElementName.parseLine(), null), call -> {
+							if (getRawValue() == null) {
+								setValue(CollectionUtils.asList(editorNewLine()));
+							} else {
+								setValue(CollectionUtils.asListMultiple(String.class, getRawValue(), editorNewLine()));
+							}
+							call.getGUI().refill();
+							getSuperElement().onEditorChange(ElementValueList.this);
+						}));
 
 				// done
 				return super.doFill();
 			}
+
 		};
 	}
 
@@ -213,29 +216,30 @@ public abstract class ElementValueList<T> extends BasicElement<List<T>> {
 
 	public final void onEditorClickEdit(int lineIndex, ClickCall call) {
 		call.getClicker().closeInventory();
-		WorkerGCore.inst().awaitChatWithSuggestedValue(call.getClicker(), TextEditorGeneric.messageElementBasicListLineEdit, getRawValueLine(lineIndex), value -> {
-			if (StringUtils.hasPlaceholders(value)) {
-				List<String> v = getRawValueCopyOrNewList();
-				v.set(lineIndex, value);
-				setValue(v);
-				getSuperElement().onEditorChange(ElementValueList.this);
-			} else {
-				try {
-					T parsed = doParseStringSingle(value);
-					List<String> v = getRawValueCopyOrNewList();
-					if (parsed != null) {
+		WorkerGCore.inst().awaitChatWithSuggestedValue(call.getClicker(), TextEditorGeneric.messageElementBasicListLineEdit, getRawValueLine(lineIndex),
+				value -> {
+					if (StringUtils.hasPlaceholders(value)) {
+						List<String> v = getRawValueCopyOrNewList();
 						v.set(lineIndex, value);
+						setValue(v);
+						getSuperElement().onEditorChange(ElementValueList.this);
 					} else {
-						v.remove(lineIndex);
+						try {
+							T parsed = doParseStringSingle(value);
+							List<String> v = getRawValueCopyOrNewList();
+							if (parsed != null) {
+								v.set(lineIndex, value);
+							} else {
+								v.remove(lineIndex);
+							}
+							setValue(v);
+							getSuperElement().onEditorChange(ElementValueList.this);
+						} catch (ParsingError error) {
+							error.send(call.getClicker());
+						}
 					}
-					setValue(v);
-					getSuperElement().onEditorChange(ElementValueList.this);
-				} catch (ParsingError error) {
-					error.send(call.getClicker());
-				}
-			}
-			call.reopenGUI();
-		}, () -> call.reopenGUI());
+					call.reopenGUI();
+				}, () -> call.reopenGUI());
 	}
 
 	public void onEditorOtherClickEdit(int lineIndex, ClickCall call) {

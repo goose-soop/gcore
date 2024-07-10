@@ -54,6 +54,7 @@ public class Task {
 	public void start() {
 		stop();
 		BukkitRunnable runnable = new BukkitRunnable() {
+
 			@Override
 			public void run() {
 				if (plugin.isReloading()) {
@@ -62,9 +63,11 @@ public class Task {
 				try {
 					runner.run();
 				} catch (Throwable exception) {
-					new Error("an error occured while executing task " + id + " for " + plugin.getName() + " v" + plugin.getDescription().getVersion(), exception).printStackTrace();
+					new Error("an error occured while executing task " + id + " for " + plugin.getName() + " v" + plugin.getDescription().getVersion(),
+							exception).printStackTrace();
 				}
 			}
+
 		};
 		long period = (long) ticksPeriod;
 		task = async ? runnable.runTaskTimerAsynchronously(plugin, period, period) : runnable.runTaskTimer(plugin, period, period);

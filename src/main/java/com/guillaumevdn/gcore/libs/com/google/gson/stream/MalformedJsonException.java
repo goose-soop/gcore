@@ -19,10 +19,11 @@ package com.guillaumevdn.gcore.libs.com.google.gson.stream;
 import java.io.IOException;
 
 /**
- * Thrown when a reader encounters malformed JSON. Some syntax errors can be
- * ignored by calling {@link JsonReader#setLenient(boolean)}.
+ * Thrown when a reader encounters malformed JSON. Some syntax errors can be ignored by calling
+ * {@link JsonReader#setLenient(boolean)}.
  */
 public final class MalformedJsonException extends IOException {
+
   private static final long serialVersionUID = 1L;
 
   public MalformedJsonException(String msg) {
@@ -41,4 +42,5 @@ public final class MalformedJsonException extends IOException {
     // with a constructor with Throwable. This was done in Java 1.6
     initCause(throwable);
   }
+
 }

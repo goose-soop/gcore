@@ -42,8 +42,10 @@ import com.guillaumevdn.gcore.lib.tuple.LongIntegerPair;
 public final class StringUtils {
 
 	// ----- color formatting
-	public static final List<Character> FORMAT_CODES = CollectionUtils.asUnmodifiableList('1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'a', 'b', 'c', 'd', 'e', 'f', 'k', 'l', 'm', 'n', 'o', 'r', 'x');
-	public static final List<Character> FORMAT_CODES_HEX = CollectionUtils.asUnmodifiableList('1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z');
+	public static final List<Character> FORMAT_CODES = CollectionUtils.asUnmodifiableList('1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'a', 'b', 'c', 'd',
+			'e', 'f', 'k', 'l', 'm', 'n', 'o', 'r', 'x');
+	public static final List<Character> FORMAT_CODES_HEX = CollectionUtils.asUnmodifiableList('1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'a', 'b', 'c',
+			'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z');
 
 	public static String format(String string) {
 		if (string == null) {
@@ -66,7 +68,7 @@ public final class StringUtils {
 								code.append(chars[i + j]);
 								hex.append('§').append(chars[i + j]);
 							}
-							Integer.parseInt(code.toString(), 16);  // make sure it's actually a correct code
+							Integer.parseInt(code.toString(), 16); // make sure it's actually a correct code
 							builder.append("§x").append(hex);
 							i += 7;
 						} catch (NumberFormatException ignored) {
@@ -125,14 +127,16 @@ public final class StringUtils {
 		char[] chars = string.replace('§', '&').toCharArray();
 		StringBuilder result = new StringBuilder(chars.length);
 		for (int i = 0; i < chars.length; ++i) {
-			//if (string.startsWith("Regular string")) Bukkit.getLogger().info("-- " + chars[i]);
+			// if (string.startsWith("Regular string")) Bukkit.getLogger().info("-- " + chars[i]);
 
 			result.append(chars[i]);
 			if (chars[i] == '&') {
 				char format = Character.toLowerCase(chars[i + 1]);
 				if (format == 'x') {
-					//if (string.startsWith("Regular string")) Bukkit.getLogger().info("-- found x ; remaining is '" + string.replace('§', '&').substring(i) + "'");
-					if (i + 13 < chars.length && chars[i + 2] == '&' && chars[i + 4] == '&' && chars[i + 6] == '&' && chars[i + 8] == '&' && chars[i + 10] == '&' && chars[i + 12] == '&') {
+					// if (string.startsWith("Regular string")) Bukkit.getLogger().info("-- found x ; remaining is '" + string.replace('§',
+					// '&').substring(i) + "'");
+					if (i + 13 < chars.length && chars[i + 2] == '&' && chars[i + 4] == '&' && chars[i + 6] == '&' && chars[i + 8] == '&'
+							&& chars[i + 10] == '&' && chars[i + 12] == '&') {
 						result.append('#');
 						result.append(chars[i + 3]);
 						result.append(chars[i + 5]);
@@ -140,16 +144,16 @@ public final class StringUtils {
 						result.append(chars[i + 9]);
 						result.append(chars[i + 11]);
 						result.append(chars[i + 13]);
-						i += 13;  // loop does ++i too
+						i += 13; // loop does ++i too
 					}
 				} else if (FORMAT_CODES_HEX.contains(format)) {
-					result.append(format);  // to lower case
-					++i;  // loop does ++i too
+					result.append(format); // to lower case
+					++i; // loop does ++i too
 				}
 
 			}
 
-			//if (string.startsWith("Regular string")) Bukkit.getLogger().info(">> " + result.toString());
+			// if (string.startsWith("Regular string")) Bukkit.getLogger().info(">> " + result.toString());
 		}
 		return result.toString();
 	}
@@ -253,7 +257,9 @@ public final class StringUtils {
 
 	public static String formatNumber(double number, @Nullable Integer forceFormattingDecimals) {
 		try {
-			String[] split = new BigDecimal(Math.abs(number)).setScale(forceFormattingDecimals != null ? forceFormattingDecimals : ConfigGCore.numberFormattingDecimals, RoundingMode.HALF_DOWN).toPlainString().split("\\.");
+			String[] split = new BigDecimal(Math.abs(number))
+					.setScale(forceFormattingDecimals != null ? forceFormattingDecimals : ConfigGCore.numberFormattingDecimals, RoundingMode.HALF_DOWN)
+					.toPlainString().split("\\.");
 			BigDecimal integer = new BigDecimal(split[0]);
 
 			// big numbers
@@ -286,7 +292,7 @@ public final class StringUtils {
 			// done
 			Integer decimals = split.length == 2 ? NumberUtils.integerOrNull(split[1]) : null;
 			return (number < 0d ? "-" : "") + integerFormat + (decimals != null && decimals != 0 ? "." + split[1] : "") + suffix;
-		} catch (NumberFormatException ignored) {  // #1110
+		} catch (NumberFormatException ignored) { // #1110
 			return "" + number;
 		}
 	}
@@ -295,19 +301,11 @@ public final class StringUtils {
 		if (number < 1000) {
 			return "" + number;
 		}
-		/*int rem = number % 1000;
-		String result = "" + ((int) Math.ceil(number / 1000));
-		if (rem != 0) {
-			if (rem < 10) {
-				result += ".00" + rem;
-			} else if (rem < 100) {
-				result += ".0" + rem;
-			} else {
-				result += "." + rem;
-			}
-		}
-		result += "k";
-		return result;*/
+		/*
+		 * int rem = number % 1000; String result = "" + ((int) Math.ceil(number / 1000)); if (rem != 0) { if (rem < 10) {
+		 * result += ".00" + rem; } else if (rem < 100) { result += ".0" + rem; } else { result += "." + rem; } } result += "k";
+		 * return result;
+		 */
 
 		return toTextString(((double) number) / 1000d, 2) + "k";
 	}
@@ -315,14 +313,17 @@ public final class StringUtils {
 	public static String makeProgressBar(double percentage, int barLength, String barChar, String barColor, String barEmpty) {
 		int ok = (int) Math.floor(percentage / 100d * barLength);
 		String bar = barColor;
-		for (int i = 0; i < ok; ++i) bar += barChar;
+		for (int i = 0; i < ok; ++i)
+			bar += barChar;
 		bar += barEmpty;
-		for (int i = 0; i < (barLength - ok); ++i) bar += barChar;
+		for (int i = 0; i < (barLength - ok); ++i)
+			bar += barChar;
 		return bar;
 	}
 
 	// https://stackoverflow.com/questions/11089399/count-with-a-b-c-d-instead-of-0-1-2-3-with-javascript
 	private static final char[] ALPHABETIC = "abcdefghijklmnopqrstuvwxyz".toCharArray();
+
 	public static String alphabeticCountFor(int i) {
 		int mod = i % 26;
 		int pow = i / 26 | 0;
@@ -373,23 +374,17 @@ public final class StringUtils {
 			return ConfigGCore.unknownPlaceholderResult;
 		} else if (seconds < 60) {
 			return TextGeneric.durationFormatS
-					.replace("{seconds}", () -> (seconds % 60) + (secondsDecimals > 0f ? toTextStringDecimals(secondsDecimals, 2) : ""))
-					.parseLine();
+					.replace("{seconds}", () -> (seconds % 60) + (secondsDecimals > 0f ? toTextStringDecimals(secondsDecimals, 2) : "")).parseLine();
 		} else if (seconds < 3600) {
-			return TextGeneric.durationFormatMS
-					.replace("{minutes}", () -> ((seconds % 3600) / 60))
+			return TextGeneric.durationFormatMS.replace("{minutes}", () -> ((seconds % 3600) / 60))
 					.replace("{seconds}", () -> twoDigitString(seconds % 60) + (secondsDecimals > 0f ? toTextStringDecimals(secondsDecimals, 2) : ""))
 					.parseLine();
 		} else if (seconds < 86400) {
-			return TextGeneric.durationFormatHMS
-					.replace("{hours}", () -> (seconds / 3600))
-					.replace("{minutes}", () -> twoDigitString((seconds % 3600) / 60))
+			return TextGeneric.durationFormatHMS.replace("{hours}", () -> (seconds / 3600)).replace("{minutes}", () -> twoDigitString((seconds % 3600) / 60))
 					.replace("{seconds}", () -> twoDigitString(seconds % 60) + (secondsDecimals > 0f ? toTextStringDecimals(secondsDecimals, 2) : ""))
 					.parseLine();
 		} else {
-			return TextGeneric.durationFormatDHMS
-					.replace("{days}", () -> (seconds / 86400))
-					.replace("{hours}", () -> twoDigitString((seconds % 86400) / 3600))
+			return TextGeneric.durationFormatDHMS.replace("{days}", () -> (seconds / 86400)).replace("{hours}", () -> twoDigitString((seconds % 86400) / 3600))
 					.replace("{minutes}", () -> twoDigitString((seconds % 3600) / 60))
 					.replace("{seconds}", () -> twoDigitString(seconds % 60) + (secondsDecimals > 0f ? toTextStringDecimals(secondsDecimals, 2) : ""))
 					.parseLine();
@@ -435,7 +430,8 @@ public final class StringUtils {
 	}
 
 	public static boolean isAlphanumeric(String string) {
-		if (string == null) return false;
+		if (string == null)
+			return false;
 		for (char ch : string.toLowerCase().toCharArray()) {
 			if (!isAlphanumeric(ch)) {
 				return false;
@@ -445,7 +441,8 @@ public final class StringUtils {
 	}
 
 	public static boolean isAlphabetic(String string) {
-		if (string == null) return false;
+		if (string == null)
+			return false;
 		for (char ch : string.toCharArray()) {
 			if (!isAlphabetic(ch)) {
 				return false;
@@ -473,14 +470,15 @@ public final class StringUtils {
 		if (version.contains("-")) {
 			version = version.split("-")[0];
 		}
-		String result = "1";  // add 1 to consider the eventual 0 before
-		String[] temp = new String[3];  // up to 3 entries maximum, example : 1.0.0 will be converted to 1 100 000 000
+		String result = "1"; // add 1 to consider the eventual 0 before
+		String[] temp = new String[3]; // up to 3 entries maximum, example : 1.0.0 will be converted to 1 100 000 000
 		int i = 0;
 		for (String str : version.split("\\.")) {
 			temp[i++] = repeatString("0", partLength - str.length()) + str;
 		}
 		for (i = 0; i < temp.length; i++) {
-			if (temp[i] == null) temp[i] = repeatString("0", partLength);
+			if (temp[i] == null)
+				temp[i] = repeatString("0", partLength);
 			result += temp[i];
 		}
 		return NumberUtils.integerOrNull(result);
@@ -512,7 +510,7 @@ public final class StringUtils {
 	public static String separateAtUnderscore(String string) {
 		final StringBuilder builder = new StringBuilder(string.length());
 		for (char ch : string.toCharArray()) {
-			if (ch == '_') {  // monkaX
+			if (ch == '_') { // monkaX
 				builder.append(' ');
 			} else {
 				builder.append(Character.toLowerCase(ch));
@@ -636,7 +634,7 @@ public final class StringUtils {
 	}
 
 	public static String snakeCaseToCamelCase(String string) {
-		final StringBuilder builder = new StringBuilder(string.length() * 2);  // worst case
+		final StringBuilder builder = new StringBuilder(string.length() * 2); // worst case
 		boolean upNext = false;
 		for (char ch : string.toCharArray()) {
 			if (ch == '_') {
@@ -652,7 +650,7 @@ public final class StringUtils {
 	}
 
 	public static String camelCaseToSnakeCase(String string) {
-		StringBuilder builder = new StringBuilder(string.length() * 2);  // worst case
+		StringBuilder builder = new StringBuilder(string.length() * 2); // worst case
 		for (char ch : string.toCharArray()) {
 			if (Character.isUpperCase(ch)) {
 				builder.append('_');
@@ -774,8 +772,10 @@ public final class StringUtils {
 	}
 
 	public static List<String> split(String string, String separator, int limit) {
-		if (string == null) return new ArrayList<>();
-		if (limit <= 0) limit = Integer.MAX_VALUE;
+		if (string == null)
+			return new ArrayList<>();
+		if (limit <= 0)
+			limit = Integer.MAX_VALUE;
 		List<String> result = new ArrayList<>();
 		int index = -1;
 		while ((index = string.indexOf(separator)) != -1 && --limit >= 0) {
@@ -789,8 +789,10 @@ public final class StringUtils {
 	}
 
 	public static List<String> splitFromEnd(String string, String separator, int limit) {
-		if (string == null) return new ArrayList<>();
-		if (limit <= 0) limit = Integer.MAX_VALUE;
+		if (string == null)
+			return new ArrayList<>();
+		if (limit <= 0)
+			limit = Integer.MAX_VALUE;
 		List<String> result = new ArrayList<>();
 		int index = -1;
 		while ((index = string.lastIndexOf(separator)) != -1 && --limit >= 0) {
@@ -849,7 +851,8 @@ public final class StringUtils {
 		while (string.length() > startSplittingLength) {
 			String unformat = unformat(string);
 			int index = unformat.indexOf(' ', startSplittingLength);
-			if (index != -1) index = string.lastIndexOf(' ', index);
+			if (index != -1)
+				index = string.lastIndexOf(' ', index);
 			if (index != -1) {
 				string = splitLongTextPart(string, result, index, true, operateSplitted);
 			} else {
@@ -874,7 +877,7 @@ public final class StringUtils {
 		// string has remaining, add it
 		if (!string.trim().isEmpty()) {
 			String colors = result.isEmpty() ? "" : StringUtils.getLastColors(result.get(result.size() - 1));
-			string = colors + string;  // so operateSplitted operates with colors at the beginning of the string, like other parts before
+			string = colors + string; // so operateSplitted operates with colors at the beginning of the string, like other parts before
 			result.add(result.isEmpty() || operateSplitted == null ? string : operateSplitted.apply(string));
 		}
 		// done
@@ -904,7 +907,8 @@ public final class StringUtils {
 		String left = text;
 		while (left.length() > maxLength) {
 			int index = left.lastIndexOf(" ", maxLength);
-			if (index == -1) index = maxLength;
+			if (index == -1)
+				index = maxLength;
 			result.add((result.isEmpty() ? "" : operateSplitted.apply(getLastColors(result.get(result.size() - 1)))) + left.substring(0, index));
 			left = left.substring(index + 1);
 		}
@@ -914,19 +918,22 @@ public final class StringUtils {
 
 	// ----- string
 	public static String nonEmptyOrNull(String string) {
-		if (string == null || string.isEmpty()) return null;
+		if (string == null || string.isEmpty())
+			return null;
 		string = string.trim();
 		return string.isEmpty() ? null : string;
 	}
 
 	public static String nonEmptyOr(String string, String def) {
-		if (string == null || string.isEmpty()) return def;
+		if (string == null || string.isEmpty())
+			return def;
 		string = string.trim();
 		return string.isEmpty() ? def : string;
 	}
 
 	public static String nonEmptyAlphanumericOrNull(String string) {
-		if (string == null || string.isEmpty()) return null;
+		if (string == null || string.isEmpty())
+			return null;
 		string = string.trim();
 		return string.isEmpty() || !isAlphanumeric(string) ? null : string;
 	}
@@ -952,7 +959,8 @@ public final class StringUtils {
 		StringBuilder builder = new StringBuilder(string.length());
 		for (int i = 0; i < repetitions; ++i) {
 			builder.append(string);
-			if (i + 1 < repetitions) builder.append(separator);
+			if (i + 1 < repetitions)
+				builder.append(separator);
 		}
 		return builder.toString();
 	}
@@ -999,7 +1007,7 @@ public final class StringUtils {
 	 */
 	public static LongIntegerPair findNumberFrom(char[] val, int index) {
 		StringBuilder builder = new StringBuilder();
-		int len = 0;  // because we skip leading zeros
+		int len = 0; // because we skip leading zeros
 		--index;
 		while (++index < val.length) {
 			char ch = val[index];
@@ -1013,13 +1021,13 @@ public final class StringUtils {
 				break;
 			}
 		}
-		if (builder.length() == 0) {  // maybe no number at all, or only zeros
+		if (builder.length() == 0) { // maybe no number at all, or only zeros
 			return len != 0 ? LongIntegerPair.of(0L, len) : null;
 		}
 		try {
 			return LongIntegerPair.of(Long.parseLong(builder.toString()), len);
 		} catch (NumberFormatException ignored) {
-			return null;  // just compare chars if too big
+			return null; // just compare chars if too big
 		}
 	}
 
@@ -1031,7 +1039,8 @@ public final class StringUtils {
 	public static final Comparator<String> STRING_WITHNUMBERS = (a, b) -> compareAlphabeticallyWithNumbers(a, b);
 	public static final Comparator<String> STRING_WITHNUMBERS_IGNORECASE = (a, b) -> compareAlphabeticallyWithNumbersIgnoreCase(a, b);
 	public static final Comparator<Object> OBJECTSTRING_WITHNUMBERS = (a, b) -> STRING_WITHNUMBERS.compare(String.valueOf(a), String.valueOf(b));
-	public static final Comparator<Object> OBJECTSTRING_WITHNUMBERS_IGNORECASE = (a, b) -> STRING_WITHNUMBERS_IGNORECASE.compare(String.valueOf(a), String.valueOf(b));
+	public static final Comparator<Object> OBJECTSTRING_WITHNUMBERS_IGNORECASE = (a, b) -> STRING_WITHNUMBERS_IGNORECASE.compare(String.valueOf(a),
+			String.valueOf(b));
 
 	public static int compareAlphabeticallyWithNumbers(String a, String b) {
 		return compareAlphabeticallyWithNumbers(a, b, false);
@@ -1042,8 +1051,10 @@ public final class StringUtils {
 	}
 
 	private static int compareAlphabeticallyWithNumbers(String a, String b, boolean ignoreCase) {
-		if (a == null) return b == null ? 0 : 1;
-		if (b == null) return a == null ? 0 : -1;
+		if (a == null)
+			return b == null ? 0 : 1;
+		if (b == null)
+			return a == null ? 0 : -1;
 
 		char[] val1 = a.toCharArray();
 		char[] val2 = b.toCharArray();
@@ -1052,8 +1063,10 @@ public final class StringUtils {
 
 		while (++index1 < maxLength && ++index2 < maxLength) {
 			// too short
-			if (index1 >= val1.length) return -1;
-			if (index2 >= val2.length) return 1;
+			if (index1 >= val1.length)
+				return -1;
+			if (index2 >= val2.length)
+				return 1;
 
 			// same characters
 			char c1 = ignoreCase ? Character.toLowerCase(val1[index1]) : val1[index1];
@@ -1062,18 +1075,19 @@ public final class StringUtils {
 			// compare numbers
 			LongIntegerPair nb1 = findNumberFrom(val1, index1), nb2 = findNumberFrom(val2, index2);
 			if (nb1 != null) {
-				if (nb2 == null) return c1 - c2;  // second isn't a number, compare chars
-				if (nb1.getA() != nb2.getA()) {  // not the same numbers, compare them
+				if (nb2 == null)
+					return c1 - c2; // second isn't a number, compare chars
+				if (nb1.getA() != nb2.getA()) { // not the same numbers, compare them
 					long diff = nb1.getA() - nb2.getA();
-					if (diff >= Integer.MAX_VALUE)  {  // if diff is too big to be converted to int, compare characters directly
+					if (diff >= Integer.MAX_VALUE) { // if diff is too big to be converted to int, compare characters directly
 						String aa = a.substring(index1, index1 + nb1.getB());
 						String bb = b.substring(index2, index2 + nb2.getB());
 						return ignoreCase ? aa.compareToIgnoreCase(bb) : aa.compareTo(bb);
 					}
 					return (int) diff;
 				}
-				index1 += nb1.getB() - 1;  // - 1 because the loop already increments index
-				index2 += nb2.getB() - 1;  // - 1 because the loop already increments index
+				index1 += nb1.getB() - 1; // - 1 because the loop already increments index
+				index2 += nb2.getB() - 1; // - 1 because the loop already increments index
 			}
 			// compare characters
 			else if (c1 != c2) {

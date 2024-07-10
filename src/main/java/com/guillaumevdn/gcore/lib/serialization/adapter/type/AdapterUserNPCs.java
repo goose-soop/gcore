@@ -48,7 +48,8 @@ public final class AdapterUserNPCs extends DataAdapter<UserNPCs> {
 				ItemStack chestplate = npcReader.readItem("chestplate");
 				ItemStack helmet = npcReader.readItem("helmet");
 				UserNPC npc = new UserNPC(npcId);
-				npc.saveNonDefault(null, null, shown, name, skinData, skinSignature, location, targetDistance, status, heldItem, heldItemOff, boots, leggings, chestplate, helmet);
+				npc.saveNonDefault(null, null, shown, name, skinData, skinSignature, location, targetDistance, status, heldItem, heldItemOff, boots, leggings,
+						chestplate, helmet);
 				return npc;
 			});
 			return new UserNPCs(uuid, npcs);

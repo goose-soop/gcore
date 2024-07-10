@@ -5,7 +5,6 @@ package com.guillaumevdn.gcore.lib.legacy_npc.navigation.pathfinding;
  */
 public enum SpeedType {
 
-	WALK,
-	SPRINT;
+	WALK, SPRINT;
 
 }

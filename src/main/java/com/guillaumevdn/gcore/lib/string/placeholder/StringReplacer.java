@@ -18,7 +18,8 @@ import com.guillaumevdn.gcore.lib.tuple.IntegerPair;
  */
 public final class StringReplacer {
 
-	//private static final Pattern PATTERN = Pattern.compile("\\{(.*?)\\}");  // scuffed ; it detects {math:{expression} as a placeholder inside {math:{expression}} and doesn't detect {expression} itself
+	// private static final Pattern PATTERN = Pattern.compile("\\{(.*?)\\}"); // scuffed ; it detects {math:{expression} as
+	// a placeholder inside {math:{expression}} and doesn't detect {expression} itself
 
 	private LowerCaseHashMap<Supplier<Object>> exactMatch = new LowerCaseHashMap<>(1, 1f);
 	private CustomMatcher customMatcher = null;
@@ -92,7 +93,7 @@ public final class StringReplacer {
 		List<IntegerPair> mustIgnore = new ArrayList<>(0);
 		String result = og;
 
-		for (IntegerPair pair; (pair = findNextPlaceholder(result, mustIgnore)) != null; ) {
+		for (IntegerPair pair; (pair = findNextPlaceholder(result, mustIgnore)) != null;) {
 			String placeholder = result.substring(pair.getA(), pair.getB() + 1);
 
 			// find match
@@ -100,42 +101,35 @@ public final class StringReplacer {
 			Supplier<Object> exactMatcher = exactMatch.get(placeholder);
 			if (exactMatcher != null) {
 				match = exactMatcher.get();
-				if (match == null) throw new NullPointerException("exact match returned null for '" + placeholder + "'");
+				if (match == null)
+					throw new NullPointerException("exact match returned null for '" + placeholder + "'");
 			} else if (customMatcher != null) {
 				match = customMatcher.applyCheckOverflow(placeholder);
 			}
 
 			// replace in string
 			if (match != null) {
-				String replacement = StringUtils.replacementToString(match, formatNumbers); //.replace("$", "\\$");
+				String replacement = StringUtils.replacementToString(match, formatNumbers); // .replace("$", "\\$");
 				result = result.substring(0, pair.getA()) + replacement + result.substring(pair.getB() + 1);
-				mustIgnore.clear();  // we changed things to the string ; retry everything else
+				mustIgnore.clear(); // we changed things to the string ; retry everything else
 			} else {
-				mustIgnore.add(pair);  // couldn't parse this placeholder ; ignore this match until we find something new
+				mustIgnore.add(pair); // couldn't parse this placeholder ; ignore this match until we find something new
 			}
 		}
 
 		return result;
 
-		/*Matcher matcher = PATTERN.matcher(og);
-		StringBuffer result = new StringBuffer(og.length());
-		while (matcher.find()) {
-			String placeholder = matcher.group();
-			// find match
-			Object match = null;
-			Supplier<Object> exactMatcher = exactMatch.get(placeholder);
-			if (exactMatcher != null) {
-				match = exactMatcher.get();
-				if (match == null) throw new NullPointerException("exact match returned null for '" + placeholder + "'");
-			} else if (customMatcher != null) {
-				match = customMatcher.applyCheckOverflow(placeholder);
-			}
-			// replace in string
-			String replacement = match == null ? placeholder : StringUtils.replacementToString(match, formatNumbers).replace("$", "\\$");
-			matcher.appendReplacement(result, replacement);
-		}*/
+		/*
+		 * Matcher matcher = PATTERN.matcher(og); StringBuffer result = new StringBuffer(og.length()); while (matcher.find()) {
+		 * String placeholder = matcher.group(); // find match Object match = null; Supplier<Object> exactMatcher =
+		 * exactMatch.get(placeholder); if (exactMatcher != null) { match = exactMatcher.get(); if (match == null) throw new
+		 * NullPointerException("exact match returned null for '" + placeholder + "'"); } else if (customMatcher != null) {
+		 * match = customMatcher.applyCheckOverflow(placeholder); } // replace in string String replacement = match == null ?
+		 * placeholder : StringUtils.replacementToString(match, formatNumbers).replace("$", "\\$");
+		 * matcher.appendReplacement(result, replacement); }
+		 */
 
-		//return matcher.appendTail(result).toString();
+		// return matcher.appendTail(result).toString();
 	}
 
 	public List<String> apply(List<String> og) {
@@ -158,87 +152,45 @@ public final class StringReplacer {
 			}
 
 			// find matches
-			/*Matcher matcher = PATTERN.matcher(ogLine);
-			int offset = 0;
-			String resultLine = ogLine;
-			while (matcher.find()) {
-				int start = matcher.start() + offset;
-				int end = matcher.end() + offset;
-				String prefix = resultLine.substring(0, start);
-				String suffix = resultLine.substring(end);
-				String placeholder = resultLine.substring(start, end);
-
-				// find match
-				Supplier<Object> exactMatcher = exactMatch.get(placeholder);
-				Object match = null;
-				if (exactMatcher != null) {
-					match = exactMatcher.get();
-					if (match == null) throw new NullPointerException("exact match returned null for '" + placeholder + "'");
-				} else if (customMatcher != null) {
-					match = customMatcher.applyCheckOverflow(placeholder);
-				}
-
-				// match is a collection
-				Collection<?> collectionMatch = null;
-				if (match instanceof Collection<?>) {
-					collectionMatch = (Collection<?>) match;
-				} else if (match instanceof Object[]) {
-					collectionMatch = CollectionUtils.asList((Object[]) match);
-				}
-				if (collectionMatch != null) {
-					// if collection match is empty or single, skip it and eventually process is later ; this avoids suffix being put on the next line even though the replacing value is only one line
-					if (collectionMatch.isEmpty() || (collectionMatch.size() == 1 && collectionMatch.iterator().next().equals(""))) {
-						match = "";
-						collectionMatch = null;
-					} else if (collectionMatch.size() == 1) {
-						match = collectionMatch.iterator().next();
-						collectionMatch = null;
-					}
-					// process collection match if size is at least 2
-					else {
-						String colors = StringUtils.getLastColors(prefix);
-						// process collection
-						List<String> collectionReplacement = new ArrayList<>();
-						for (Object obj : collectionMatch) {
-							String str = obj instanceof Double ? "" + NumberUtils.round((Double) obj, 3) : obj.toString();
-							if (collectionReplacement.isEmpty()) {
-								str = prefix + str;
-							} else if (collectionReplacement.size() == collectionMatch.size() - 1) {
-								str = colors + str + suffix;
-							} else {
-								str = colors + str;
-							}
-							//if (!str.trim().isEmpty()) {  // fuck it
-							collectionReplacement.add(str);
-							//}
-						}
-						// delete current line and insert result ; result will contain prefix and suffix so no need to re-add it
-						result.remove(i);
-						result.addAll(i, collectionReplacement);
-						// decrement i to reprocess this line (might be more placeholders in suffix or even in replacement), and continue
-						--i;
-						continue main;
-					}
-				}
-
-				// match isn't a collection, process it
-				String replacement = match == null ? placeholder : StringUtils.replacementToString(match, formatNumbers);
-
-				// replace in string
-				resultLine = prefix + replacement + suffix;
-				offset += replacement.length() - placeholder.length();
-
-				// however, if no prefix, no suffix and empty replacement, skip line
-				if (resultLine.isEmpty()) {
-					result.remove(i);  // remove from list and decrement index to reprocess
-					--i;
-					continue main;
-				}
-			}*/
+			/*
+			 * Matcher matcher = PATTERN.matcher(ogLine); int offset = 0; String resultLine = ogLine; while (matcher.find()) { int
+			 * start = matcher.start() + offset; int end = matcher.end() + offset; String prefix = resultLine.substring(0, start);
+			 * String suffix = resultLine.substring(end); String placeholder = resultLine.substring(start, end);
+			 * 
+			 * // find match Supplier<Object> exactMatcher = exactMatch.get(placeholder); Object match = null; if (exactMatcher !=
+			 * null) { match = exactMatcher.get(); if (match == null) throw new
+			 * NullPointerException("exact match returned null for '" + placeholder + "'"); } else if (customMatcher != null) {
+			 * match = customMatcher.applyCheckOverflow(placeholder); }
+			 * 
+			 * // match is a collection Collection<?> collectionMatch = null; if (match instanceof Collection<?>) { collectionMatch
+			 * = (Collection<?>) match; } else if (match instanceof Object[]) { collectionMatch = CollectionUtils.asList((Object[])
+			 * match); } if (collectionMatch != null) { // if collection match is empty or single, skip it and eventually process is
+			 * later ; this avoids suffix being put on the next line even though the replacing value is only one line if
+			 * (collectionMatch.isEmpty() || (collectionMatch.size() == 1 && collectionMatch.iterator().next().equals(""))) { match
+			 * = ""; collectionMatch = null; } else if (collectionMatch.size() == 1) { match = collectionMatch.iterator().next();
+			 * collectionMatch = null; } // process collection match if size is at least 2 else { String colors =
+			 * StringUtils.getLastColors(prefix); // process collection List<String> collectionReplacement = new ArrayList<>(); for
+			 * (Object obj : collectionMatch) { String str = obj instanceof Double ? "" + NumberUtils.round((Double) obj, 3) :
+			 * obj.toString(); if (collectionReplacement.isEmpty()) { str = prefix + str; } else if (collectionReplacement.size() ==
+			 * collectionMatch.size() - 1) { str = colors + str + suffix; } else { str = colors + str; } //if
+			 * (!str.trim().isEmpty()) { // fuck it collectionReplacement.add(str); //} } // delete current line and insert result ;
+			 * result will contain prefix and suffix so no need to re-add it result.remove(i); result.addAll(i,
+			 * collectionReplacement); // decrement i to reprocess this line (might be more placeholders in suffix or even in
+			 * replacement), and continue --i; continue main; } }
+			 * 
+			 * // match isn't a collection, process it String replacement = match == null ? placeholder :
+			 * StringUtils.replacementToString(match, formatNumbers);
+			 * 
+			 * // replace in string resultLine = prefix + replacement + suffix; offset += replacement.length() -
+			 * placeholder.length();
+			 * 
+			 * // however, if no prefix, no suffix and empty replacement, skip line if (resultLine.isEmpty()) { result.remove(i); //
+			 * remove from list and decrement index to reprocess --i; continue main; } }
+			 */
 
 			List<IntegerPair> mustIgnore = new ArrayList<>(0);
 			String resultLine = ogLine;
-			for (IntegerPair pair; (pair = findNextPlaceholder(resultLine, mustIgnore)) != null; ) {
+			for (IntegerPair pair; (pair = findNextPlaceholder(resultLine, mustIgnore)) != null;) {
 
 				String prefix = resultLine.substring(0, pair.getA());
 				String suffix = resultLine.substring(pair.getB() + 1);
@@ -249,13 +201,14 @@ public final class StringReplacer {
 				Object match = null;
 				if (exactMatcher != null) {
 					match = exactMatcher.get();
-					if (match == null) throw new NullPointerException("exact match returned null for '" + placeholder + "'");
+					if (match == null)
+						throw new NullPointerException("exact match returned null for '" + placeholder + "'");
 				} else if (customMatcher != null) {
 					match = customMatcher.applyCheckOverflow(placeholder);
 				}
 
 				if (match == null) {
-					mustIgnore.add(pair);  // couldn't parse this placeholder ; ignore this match until we find something new
+					mustIgnore.add(pair); // couldn't parse this placeholder ; ignore this match until we find something new
 					continue;
 				}
 
@@ -267,7 +220,8 @@ public final class StringReplacer {
 					collectionMatch = CollectionUtils.asList((Object[]) match);
 				}
 				if (collectionMatch != null) {
-					// if collection match is empty or single, skip it and eventually process is later ; this avoids suffix being put on the next line even though the replacing value is only one line
+					// if collection match is empty or single, skip it and eventually process is later ; this avoids suffix being put on the
+					// next line even though the replacing value is only one line
 					if (collectionMatch.isEmpty() || (collectionMatch.size() == 1 && collectionMatch.iterator().next().equals(""))) {
 						match = "";
 						collectionMatch = null;
@@ -290,9 +244,9 @@ public final class StringReplacer {
 							} else {
 								str = colors + str;
 							}
-							//if (!str.trim().isEmpty()) {  // fuck it
+							// if (!str.trim().isEmpty()) { // fuck it
 							collectionReplacement.add(str);
-							//}
+							// }
 						}
 
 						// delete current line and insert result ; result will contain prefix and suffix so no need to re-add it
@@ -311,12 +265,12 @@ public final class StringReplacer {
 
 					// replace in string
 					resultLine = prefix + replacement + suffix;
-					mustIgnore.clear();  // we changed things to the string ; retry everything else
+					mustIgnore.clear(); // we changed things to the string ; retry everything else
 				}
 
 				// however, if no prefix, no suffix and empty replacement, skip line
 				if (resultLine.isEmpty()) {
-					result.remove(i);  // remove from list and decrement index to reprocess
+					result.remove(i); // remove from list and decrement index to reprocess
 					--i;
 					continue main;
 				}
@@ -354,9 +308,7 @@ public final class StringReplacer {
 	// ----- object
 	@Override
 	public String toString() {
-		return "(" + StringUtils.toTextString(", ", exactMatch.keySet())
-		+ (customMatcher == null ? "" : " -- custom : " + customMatcherDesc)
-		+ ")";
+		return "(" + StringUtils.toTextString(", ", exactMatch.keySet()) + (customMatcher == null ? "" : " -- custom : " + customMatcherDesc) + ")";
 	}
 
 	// ----- maker

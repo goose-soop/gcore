@@ -27,7 +27,8 @@ public class TypeDynamicBorderLinear extends GUIItemType {
 		item.addInteger("on_count", Need.optional(2), TextEditorGeneric.descriptionGuiItemDynamicBorderLinearOnCount);
 		item.addItem("icon_on", Need.optional(), ElementItemMode.BUILDABLE, TextEditorGeneric.descriptionGuiItemDynamicBorderLinearIconOn);
 		item.addItem("icon_off", Need.optional(), ElementItemMode.BUILDABLE, TextEditorGeneric.descriptionGuiItemDynamicBorderLinearIconOff);
-		item.addInteger("refresh_ticks", Need.optional(ConfigGCore.dynamicBorderRefreshTicks), 1, TextEditorGeneric.descriptionGuiItemDynamicBorderLinearRefreshTicks);
+		item.addInteger("refresh_ticks", Need.optional(ConfigGCore.dynamicBorderRefreshTicks), 1,
+				TextEditorGeneric.descriptionGuiItemDynamicBorderLinearRefreshTicks);
 	}
 
 	@Override

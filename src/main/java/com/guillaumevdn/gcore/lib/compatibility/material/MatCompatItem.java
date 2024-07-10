@@ -17,12 +17,11 @@ public final class MatCompatItem {
 	private static final ReflectionProcedureFunction<Mat, ItemStack> CREATE_STACK = new ReflectionProcedureFunction<Mat, ItemStack>()
 			.setIf(Version.ATLEAST_1_13, mat -> {
 				return new ItemStack(mat.getData().getDataInstance());
-			})
-			.orElse(mat -> {
-				ItemStack item = Reflection.newInstance("org.bukkit.inventory.ItemStack", Reflection
-						.params(!mat.getData().hasLegacyData(), mat.getData().getDataInstance(), 1)
-						.orElse(mat.getData().getDataInstance(), 1, (short) 0, (byte) mat.getData().getLegacyDataOrZero())
-						.get())
+			}).orElse(mat -> {
+				ItemStack item = Reflection
+						.newInstance("org.bukkit.inventory.ItemStack",
+								Reflection.params(!mat.getData().hasLegacyData(), mat.getData().getDataInstance(), 1)
+										.orElse(mat.getData().getDataInstance(), 1, (short) 0, (byte) mat.getData().getLegacyDataOrZero()).get())
 						.get(ItemStack.class);
 				return item;
 			});
@@ -34,7 +33,8 @@ public final class MatCompatItem {
 	// ----- match
 	private static final ReflectionProcedureBiFunction<ItemStack, Mat, Boolean> MATCH = new ReflectionProcedureBiFunction<ItemStack, Mat, Boolean>()
 			.setIf(Version.ATLEAST_1_13, (item, mat) -> item.getType().equals(mat.getData().getDataInstance()))
-			.orElse((item, mat) -> item.getType().equals(mat.getData().getDataInstance()) && (Version.ATLEAST_1_13 || mat.getData().acceptsLegacyData(Compat.getLegacyData(item))));
+			.orElse((item, mat) -> item.getType().equals(mat.getData().getDataInstance())
+					&& (Version.ATLEAST_1_13 || mat.getData().acceptsLegacyData(Compat.getLegacyData(item))));
 
 	public static boolean match(ItemStack item, Mat mat) {
 		return mat.isNoCheck() || MATCH.process(item, mat);

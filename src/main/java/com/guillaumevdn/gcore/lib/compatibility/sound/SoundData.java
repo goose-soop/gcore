@@ -12,7 +12,7 @@ import com.guillaumevdn.gcore.lib.logic.ComparisonType;
  * @author GuillaumeVDN
  */
 public class SoundData extends SimpleExistingVariantData<org.bukkit.Sound, SoundExtra> {
-	
+
 	public SoundData(Version version, ComparisonType versionComparison, String dataName, org.bukkit.Sound dataInstance, List<SoundExtra> extra) {
 		super(version, versionComparison, dataName, dataInstance, extra);
 	}
@@ -20,7 +20,8 @@ public class SoundData extends SimpleExistingVariantData<org.bukkit.Sound, Sound
 	// ----- object
 	@Override
 	public SoundData clone() {
-		return new SoundData(getVersion(), getVersionComparison(), getDataName(), getDataInstance(), getExtra().isEmpty() ? null : CollectionUtils.asList(getExtra()));
+		return new SoundData(getVersion(), getVersionComparison(), getDataName(), getDataInstance(),
+				getExtra().isEmpty() ? null : CollectionUtils.asList(getExtra()));
 	}
 
 	// ----- extra

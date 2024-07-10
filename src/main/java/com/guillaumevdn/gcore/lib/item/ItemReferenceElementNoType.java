@@ -88,7 +88,7 @@ final class ItemReferenceElementNoType implements ItemReference {
 	@Override
 	public NBTItem getNBTItem() throws Throwable {
 		if (nbt == null) {
-			DataIO data = new DataIO();  // dummy item with just NBT
+			DataIO data = new DataIO(); // dummy item with just NBT
 			data.write("type", "STONE");
 			if (element.getNbt().getValue() != null) {
 				data.writeObject("nbt", element.getNbt().getValue().toIO(false, replacer));
@@ -101,7 +101,7 @@ final class ItemReferenceElementNoType implements ItemReference {
 
 	@Override
 	public boolean hasMeta(Class<? extends ItemMeta> metaClass) {
-		return false;  // no type, we can't know the meta and don't have the elements
+		return false; // no type, we can't know the meta and don't have the elements
 	}
 
 	// ----- BookMeta

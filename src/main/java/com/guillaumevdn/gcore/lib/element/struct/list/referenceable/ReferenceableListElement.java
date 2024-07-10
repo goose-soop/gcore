@@ -37,7 +37,8 @@ public abstract class ReferenceableListElement<T extends Element> extends Abstra
 	private final ElementsContainer<? extends T> ref;
 	private final boolean allowCompactNestedWrite;
 
-	protected ReferenceableListElement(ElementsContainer<? extends T> ref, boolean allowCompactNestedWrite, Element parent, String id, Need need, Text editorDescription) {
+	protected ReferenceableListElement(ElementsContainer<? extends T> ref, boolean allowCompactNestedWrite, Element parent, String id, Need need,
+			Text editorDescription) {
 		super(String.class, parent, id, need, editorDescription);
 		this.ref = ref;
 		this.allowCompactNestedWrite = allowCompactNestedWrite;
@@ -112,14 +113,16 @@ public abstract class ReferenceableListElement<T extends Element> extends Abstra
 
 	@Override
 	protected void doWrite() throws Throwable {
-		final boolean existed = readContains(); //getSuperElement().getConfiguration().getBackingYML().getSectionNode(getConfigurationPath()) != null;  // do not override existing section types ; make it a compact nested map only if it wasn't written before
+		final boolean existed = readContains(); // getSuperElement().getConfiguration().getBackingYML().getSectionNode(getConfigurationPath()) != null; // do
+												// not override existing section types ; make it a compact nested map only if it wasn't written before
 
 		getSuperElement().getConfiguration().write(getConfigurationPath(), null);
 		if (!isEmpty()) {
 			SectionNode node = null;
-			if (!existed && allowCompactNestedWrite) {  
+			if (!existed && allowCompactNestedWrite) {
 				node = getSuperElement().getConfiguration().getBackingYML().mkdirs(getConfigurationPath(), SectionNodeType.COMPACT_NESTED_MAP);
-				node.setSingleValue("_____TO_BE_REMOVED_____", "value", null);  // when we call element.write() below, it sets the path to null ; thus, it clears the parent section, anihilating our hopes that it'll be a compact nested map
+				node.setSingleValue("_____TO_BE_REMOVED_____", "value", null); // when we call element.write() below, it sets the path to null ; thus, it clears
+																				// the parent section, anihilating our hopes that it'll be a compact nested map
 			}
 			for (Node<T> element : values()) {
 				element.getValue().write();
@@ -143,6 +146,7 @@ public abstract class ReferenceableListElement<T extends Element> extends Abstra
 	@Override
 	public EditorGUI editorGUI(ClickCall fromCall) {
 		EditorGUI editor = new EditorGUI(this, fromCall) {
+
 			@Override
 			protected boolean doFill() {
 				// values
@@ -172,50 +176,53 @@ public abstract class ReferenceableListElement<T extends Element> extends Abstra
 					}));
 				}
 				// create items
-				setPersistentItem(new GUIItem("new_element", 50, ItemUtils.createItem(CommonMats.BLAZE_ROD, TextEditorGeneric.controlAddElementName.parseLine(), TextEditorGeneric.controlAddElementWithQuick.parseLines()), call -> {
-					// left-click : quickly create with a generated id
-					if (call.getType().equals(ClickType.LEFT)) {
-						// generate id
-						int i = 0;
-						String key;
-						do {
-							key = StringUtils.alphabeticCountFor(++i);
-						} while (getElement(key).isPresent());
-						// create element
-						createAndAddLocalElement(key);
-						getSuperElement().onEditorChange(ReferenceableListElement.this);
-						// reopen GUI (that refreshes it since it's an editor GUI)
-						call.reopenGUI();
-					}
-					// right-click : manually enter id
-					else if (call.getType().equals(ClickType.RIGHT)) {
-						editorAskKeyAndCreateAndAddLocalElement(call, (elementId, element) -> {
-							getSuperElement().onEditorChange(ReferenceableListElement.this);
-							// reopen GUI (that refreshes it since it's an editor GUI)
-							call.reopenGUI();
-						}, () -> call.reopenGUI());
-					}
-				}));
-				setPersistentItem(new GUIItem("new_global_element", 51, ItemUtils.createItem(CommonMats.BLAZE_ROD, TextEditorGeneric.controlAddGlobalElementName.parseLine(), null), call -> {
-					// left-click : create
-					if (call.getType().equals(ClickType.LEFT)) {
-						LinkedHashMap<String, Mat> remaining = new LinkedHashMap<>();
-						getRef().getIcons().entrySet().stream().sorted((a, b) -> a.getValue().compareTo(b.getValue())).forEach(entry -> {
-							if (!keys().contains(entry.getKey())) {
-								remaining.put(entry.getKey(), entry.getValue());
+				setPersistentItem(new GUIItem("new_element", 50, ItemUtils.createItem(CommonMats.BLAZE_ROD, TextEditorGeneric.controlAddElementName.parseLine(),
+						TextEditorGeneric.controlAddElementWithQuick.parseLines()), call -> {
+							// left-click : quickly create with a generated id
+							if (call.getType().equals(ClickType.LEFT)) {
+								// generate id
+								int i = 0;
+								String key;
+								do {
+									key = StringUtils.alphabeticCountFor(++i);
+								} while (getElement(key).isPresent());
+								// create element
+								createAndAddLocalElement(key);
+								getSuperElement().onEditorChange(ReferenceableListElement.this);
+								// reopen GUI (that refreshes it since it's an editor GUI)
+								call.reopenGUI();
 							}
-						});
-						EnumSelectorGUI.openSelector(call.getClicker(), false, getKeySerializer(), () -> remaining, key -> {
-							add(key, key);
-							getSuperElement().onEditorChange(ReferenceableListElement.this);
-							// reopen GUI (that refreshes it since it's an editor GUI)
-							call.reopenGUI();
-						}, () -> call.reopenGUI());
-					}
-				}));
+							// right-click : manually enter id
+							else if (call.getType().equals(ClickType.RIGHT)) {
+								editorAskKeyAndCreateAndAddLocalElement(call, (elementId, element) -> {
+									getSuperElement().onEditorChange(ReferenceableListElement.this);
+									// reopen GUI (that refreshes it since it's an editor GUI)
+									call.reopenGUI();
+								}, () -> call.reopenGUI());
+							}
+						}));
+				setPersistentItem(new GUIItem("new_global_element", 51,
+						ItemUtils.createItem(CommonMats.BLAZE_ROD, TextEditorGeneric.controlAddGlobalElementName.parseLine(), null), call -> {
+							// left-click : create
+							if (call.getType().equals(ClickType.LEFT)) {
+								LinkedHashMap<String, Mat> remaining = new LinkedHashMap<>();
+								getRef().getIcons().entrySet().stream().sorted((a, b) -> a.getValue().compareTo(b.getValue())).forEach(entry -> {
+									if (!keys().contains(entry.getKey())) {
+										remaining.put(entry.getKey(), entry.getValue());
+									}
+								});
+								EnumSelectorGUI.openSelector(call.getClicker(), false, getKeySerializer(), () -> remaining, key -> {
+									add(key, key);
+									getSuperElement().onEditorChange(ReferenceableListElement.this);
+									// reopen GUI (that refreshes it since it's an editor GUI)
+									call.reopenGUI();
+								}, () -> call.reopenGUI());
+							}
+						}));
 				// done
 				return super.doFill();
 			}
+
 		};
 		return editor;
 	}

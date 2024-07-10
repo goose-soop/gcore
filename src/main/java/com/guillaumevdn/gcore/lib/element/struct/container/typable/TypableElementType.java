@@ -41,7 +41,7 @@ public abstract class TypableElementType<T extends TypableContainerElement> impl
 		doFillTypeSpecificElements(value);
 		lastFilled = CollectionUtils.findNew(previousIds, CollectionUtils.asLowercaseList(value.keys()));
 		if (!lastFilled.isEmpty()) {
-			if (!value.getTypeName().contains("quest object")) {  // otherwise it dépasses :saperlipopette:
+			if (!value.getTypeName().contains("quest object")) { // otherwise it dépasses :saperlipopette:
 				value.getStartRowSlots().add(lastFilled.get(0));
 			}
 		}

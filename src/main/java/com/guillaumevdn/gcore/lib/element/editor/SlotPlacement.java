@@ -5,8 +5,6 @@ package com.guillaumevdn.gcore.lib.element.editor;
  */
 public enum SlotPlacement {
 
-	ANY,
-	SKIP_ONE,
-	START_ROW;
+	ANY, SKIP_ONE, START_ROW;
 
 }

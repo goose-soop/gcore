@@ -57,16 +57,12 @@ public class IntegrationInstanceCitizens extends IntegrationInstance implements 
 	}
 
 	// ----- activation
-	private Map<String, Class<? extends PositionType>> types = CollectionUtils.asMap(
-			"CITIZENS_NPC_RELATIVE_AREA_INSIDE", PositionTypeCitizensNPCRelativeAreaInside.class,
-			"CITIZENS_NPC_RELATIVE_AREA_OUTSIDE", PositionTypeCitizensNPCRelativeAreaOutside.class,
-			"CITIZENS_NPC_RELATIVE_CYLINDER_INSIDE", PositionTypeCitizensNPCRelativeCylinderInside.class,
-			"CITIZENS_NPC_RELATIVE_CYLINDER_OUTSIDE", PositionTypeCitizensNPCRelativeCylinderOutside.class,
-			"CITIZENS_NPC_RELATIVE_SPHERE_INSIDE", PositionTypeCitizensNPCRelativeSphereInside.class,
-			"CITIZENS_NPC_RELATIVE_SPHERE_OUTSIDE", PositionTypeCitizensNPCRelativeSphereOutside.class,
-			"CITIZENS_NPC_RELATIVE_SINGLE", PositionTypeCitizensNPCRelativeSingle.class,
-			"CITIZENS_NPC_RELATIVE_WORLD", PositionTypeCitizensNPCRelativeWorld.class
-			);
+	private Map<String, Class<? extends PositionType>> types = CollectionUtils.asMap("CITIZENS_NPC_RELATIVE_AREA_INSIDE",
+			PositionTypeCitizensNPCRelativeAreaInside.class, "CITIZENS_NPC_RELATIVE_AREA_OUTSIDE", PositionTypeCitizensNPCRelativeAreaOutside.class,
+			"CITIZENS_NPC_RELATIVE_CYLINDER_INSIDE", PositionTypeCitizensNPCRelativeCylinderInside.class, "CITIZENS_NPC_RELATIVE_CYLINDER_OUTSIDE",
+			PositionTypeCitizensNPCRelativeCylinderOutside.class, "CITIZENS_NPC_RELATIVE_SPHERE_INSIDE", PositionTypeCitizensNPCRelativeSphereInside.class,
+			"CITIZENS_NPC_RELATIVE_SPHERE_OUTSIDE", PositionTypeCitizensNPCRelativeSphereOutside.class, "CITIZENS_NPC_RELATIVE_SINGLE",
+			PositionTypeCitizensNPCRelativeSingle.class, "CITIZENS_NPC_RELATIVE_WORLD", PositionTypeCitizensNPCRelativeWorld.class);
 
 	@Override
 	public boolean activate() {
@@ -94,7 +90,7 @@ public class IntegrationInstanceCitizens extends IntegrationInstance implements 
 		}
 		if (npc.getEntity() == null) {
 			if (PluginUtils.isPluginEnabled("Citizens")) {
-				return null;  // #1886, citizens is sometimes disabled and "getStoredLocation" needs it to be enabled to work
+				return null; // #1886, citizens is sometimes disabled and "getStoredLocation" needs it to be enabled to work
 			}
 			return npc.getStoredLocation();
 		}
@@ -109,8 +105,10 @@ public class IntegrationInstanceCitizens extends IntegrationInstance implements 
 		// cancel current
 		Pair<Consumer<String>, Runnable> currentChat = WorkerGCore.inst().consumeAwaitingChat(player);
 		Pair<Consumer<NPC>, Runnable> currentNPC = awaitingNPCs.remove(player.getUniqueId());
-		if (currentChat != null && currentChat.getB() != null) currentChat.getB().run();
-		if (currentNPC != null && currentNPC.getB() != null) currentNPC.getB().run();
+		if (currentChat != null && currentChat.getB() != null)
+			currentChat.getB().run();
+		if (currentNPC != null && currentNPC.getB() != null)
+			currentNPC.getB().run();
 		// ask
 		if (message != null) {
 			message.replace("{cancel}", () -> TextGeneric.textCancel.parseLine()).send(player);

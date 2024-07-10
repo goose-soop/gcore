@@ -27,8 +27,9 @@ import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
 public final class MetaTropicalFishBucket {
 
 	public static boolean match(ItemMeta itemMeta, ItemReference reference, ItemCheck check) {
-		if (!reference.hasMeta(TropicalFishBucketMeta.class)) return true;
-		TropicalFishBucketMeta meta = ObjectUtils.castOrNull(itemMeta, TropicalFishBucketMeta.class);  // might be null if exact match is false
+		if (!reference.hasMeta(TropicalFishBucketMeta.class))
+			return true;
+		TropicalFishBucketMeta meta = ObjectUtils.castOrNull(itemMeta, TropicalFishBucketMeta.class); // might be null if exact match is false
 
 		// variant
 		if (check.isExact() && meta.hasVariant() != reference.hasVariant()) {
@@ -41,28 +42,34 @@ public final class MetaTropicalFishBucket {
 
 		// body color
 		if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getBodyColor(), reference.getBodyColor()))) {
-			ConfigGCore.logspamItemNbt(null, () -> "Item match ; -> body color don't match, " + (meta == null ? "null meta" : meta.getBodyColor()) + "/" + reference.getBodyColor());
+			ConfigGCore.logspamItemNbt(null,
+					() -> "Item match ; -> body color don't match, " + (meta == null ? "null meta" : meta.getBodyColor()) + "/" + reference.getBodyColor());
 			return false;
 		} else if (!check.isExact() && reference.getBodyColor() != null && (meta == null || !reference.getBodyColor().equals(meta.getBodyColor()))) {
-			ConfigGCore.logspamItemNbt(null, () -> "Item match ; -> body color don't match, " + (meta == null ? "null meta" : meta.getBodyColor()) + "/" + reference.getBodyColor());
+			ConfigGCore.logspamItemNbt(null,
+					() -> "Item match ; -> body color don't match, " + (meta == null ? "null meta" : meta.getBodyColor()) + "/" + reference.getBodyColor());
 			return false;
 		}
 
 		// pattern color
 		if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getPatternColor(), reference.getPatternColor()))) {
-			ConfigGCore.logspamItemNbt(null, () -> "Item match ; -> pattern color don't match, " + (meta == null ? "null meta" : meta.getPatternColor()) + "/" + reference.getPatternColor());
+			ConfigGCore.logspamItemNbt(null, () -> "Item match ; -> pattern color don't match, " + (meta == null ? "null meta" : meta.getPatternColor()) + "/"
+					+ reference.getPatternColor());
 			return false;
 		} else if (!check.isExact() && reference.getPatternColor() != null && (meta == null || !reference.getPatternColor().equals(meta.getPatternColor()))) {
-			ConfigGCore.logspamItemNbt(null, () -> "Item match ; -> pattern color don't match, " + (meta == null ? "null meta" : meta.getPatternColor()) + "/" + reference.getPatternColor());
+			ConfigGCore.logspamItemNbt(null, () -> "Item match ; -> pattern color don't match, " + (meta == null ? "null meta" : meta.getPatternColor()) + "/"
+					+ reference.getPatternColor());
 			return false;
 		}
 
 		// pattern
 		if (check.isExact() && (meta == null || !Objects.deepEquals(meta.getPattern(), reference.getPattern()))) {
-			ConfigGCore.logspamItemNbt(null, () -> "Item match ; -> pattern don't match, " + (meta == null ? "null meta" : meta.getPattern()) + "/" + reference.getPattern());
+			ConfigGCore.logspamItemNbt(null,
+					() -> "Item match ; -> pattern don't match, " + (meta == null ? "null meta" : meta.getPattern()) + "/" + reference.getPattern());
 			return false;
 		} else if (!check.isExact() && reference.getPattern() != null && (meta == null || !reference.getPattern().equals(meta.getPattern()))) {
-			ConfigGCore.logspamItemNbt(null, () -> "Item match ; -> pattern don't match, " + (meta == null ? "null meta" : meta.getPattern()) + "/" + reference.getPattern());
+			ConfigGCore.logspamItemNbt(null,
+					() -> "Item match ; -> pattern don't match, " + (meta == null ? "null meta" : meta.getPattern()) + "/" + reference.getPattern());
 			return false;
 		}
 

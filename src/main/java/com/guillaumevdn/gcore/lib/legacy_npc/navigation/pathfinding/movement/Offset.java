@@ -3,8 +3,8 @@ package com.guillaumevdn.gcore.lib.legacy_npc.navigation.pathfinding.movement;
 import java.util.List;
 import java.util.Objects;
 
-import com.guillaumevdn.gcore.lib.number.NumberUtils;
 import com.guillaumevdn.gcore.lib.legacy_npc.navigation.pathfinding.Point;
+import com.guillaumevdn.gcore.lib.number.NumberUtils;
 
 /**
  * @author GuillaumeVDN

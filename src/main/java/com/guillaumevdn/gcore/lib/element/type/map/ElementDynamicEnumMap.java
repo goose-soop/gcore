@@ -26,10 +26,13 @@ public abstract class ElementDynamicEnumMap<E, V extends Element> extends MapEle
 	// ----- editor
 	@Override
 	protected void editorAskKeyAndCreateAndAddElement(ClickCall call, BiConsumer<E, V> onCreate, Runnable onCancel) {
-		EnumSelectorGUI.openSelector(call.getClicker(), false, getKeySerializer(), () -> getValues().stream().sorted((a, b) -> getKeySerializer().serialize(a).compareTo(getKeySerializer().serialize(b))).filter(key -> !keys().contains(key)).collect(Collectors.toList()), editorIconType(), key -> {
-			V value = createAndAddElement(key);
-			onCreate.accept(key, value);
-		}, onCancel);
+		EnumSelectorGUI.openSelector(call.getClicker(), false, getKeySerializer(),
+				() -> getValues().stream().sorted((a, b) -> getKeySerializer().serialize(a).compareTo(getKeySerializer().serialize(b)))
+						.filter(key -> !keys().contains(key)).collect(Collectors.toList()),
+				editorIconType(), key -> {
+					V value = createAndAddElement(key);
+					onCreate.accept(key, value);
+				}, onCancel);
 	}
 
 }

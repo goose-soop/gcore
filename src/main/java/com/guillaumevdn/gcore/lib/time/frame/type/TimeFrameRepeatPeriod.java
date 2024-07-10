@@ -30,7 +30,11 @@ public class TimeFrameRepeatPeriod extends TimeFrameType {
 	}
 
 	// ----- get
-	private static final ZonedDateTime START_REFERENCE = ZonedDateTime.of(2021, 5, 15, 0, 0, 0, 0, ConfigGCore.timeZone());  // we set a fixed start, so that the period will not reset infinitely every time getBounds() is called, and it will be consistent no matter the period duration
+	private static final ZonedDateTime START_REFERENCE = ZonedDateTime.of(2021, 5, 15, 0, 0, 0, 0, ConfigGCore.timeZone()); // we set a fixed start, so that the
+																															// period will not reset infinitely
+																															// every time getBounds() is called,
+																															// and it will be consistent no
+																															// matter the period duration
 
 	@Override
 	public Pair<ZonedDateTime, ZonedDateTime> getBounds(ElementTimeFrame frame, Replacer replacer, int offset) {

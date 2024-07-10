@@ -48,7 +48,7 @@ public final class Optional<T> {
 	public <TT> TT orElseAs(Supplier<T> def) {
 		return (TT) orElse(def);
 	}
-	
+
 	public Optional<T> orElseOptional(Optional<T> def) {
 		return value != null ? this : def;
 	}
@@ -60,7 +60,7 @@ public final class Optional<T> {
 	public T orNull() {
 		return value;
 	}
-	
+
 	public <TT> TT orNullAs() {
 		return (TT) value;
 	}
@@ -108,12 +108,14 @@ public final class Optional<T> {
 	}
 
 	public OptionalIfPresentFail ifPresentDo(Consumer<T> ifPresent) {
-		if (value != null) ifPresent.accept(value);
+		if (value != null)
+			ifPresent.accept(value);
 		return new OptionalIfPresentFail(value != null);
 	}
 
 	public OptionalIfPresentFail ifPresentDoThrowable(ThrowableConsumer<T> ifPresent) throws Throwable {
-		if (value != null) ifPresent.accept(value);
+		if (value != null)
+			ifPresent.accept(value);
 		return new OptionalIfPresentFail(value != null);
 	}
 
@@ -134,7 +136,8 @@ public final class Optional<T> {
 	}
 
 	public <X extends Throwable> T orThrow(Supplier<X> builder) throws X {
-		if (value != null) return value;
+		if (value != null)
+			return value;
 		throw builder.get();
 	}
 

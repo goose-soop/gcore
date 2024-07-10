@@ -93,5 +93,4 @@ public class PositionAreaOutside implements Position {
 		LocationUtils.getAreaOutlineBlocks(a, b).forEach(block -> LocationUtils.setBlock(block, blockType, blockStates));
 	}
 
-
 }

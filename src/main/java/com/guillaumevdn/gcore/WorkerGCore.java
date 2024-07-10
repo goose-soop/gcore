@@ -1,5 +1,21 @@
 package com.guillaumevdn.gcore;
 
+import java.util.List;
+import java.util.UUID;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
+
+import javax.annotation.Nullable;
+
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.SkullMeta;
+
 import com.guillaumevdn.gcore.lib.chat.JsonMessage;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.collection.LowerCaseHashMap;
@@ -27,26 +43,11 @@ import com.guillaumevdn.gcore.lib.wrapper.Wrapper;
 import com.guillaumevdn.gcore.lib.wrapper.WrapperString;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.SkullMeta;
-
-import javax.annotation.Nullable;
-import java.util.List;
-import java.util.UUID;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.regex.Pattern;
-import java.util.stream.Stream;
 
 /**
  * @author GuillaumeVDN
  */
-public class WorkerGCore
-{
+public class WorkerGCore {
 
     // ----- npc manager
     private NPCManager npcManager = null;
@@ -91,7 +92,7 @@ public class WorkerGCore
     }
 
     public String getOrFetchOfflinePlayerNameAsync(OfflinePlayer player) {
-        final WrapperString wrapper = WrapperString.of("<?>");  // ewww
+        final WrapperString wrapper = WrapperString.of("<?>"); // ewww
         getOrFetchOfflinePlayerName(player, name -> {
             wrapper.set(name);
         });
@@ -116,7 +117,7 @@ public class WorkerGCore
 
     @Nullable
     public UUID getOrFetchOfflinePlayerUUIDAsync(String name) {
-        final Wrapper<UUID> wrapper = Wrapper.of(null);  // ewww
+        final Wrapper<UUID> wrapper = Wrapper.of(null); // ewww
         getOrFetchOfflinePlayerUUID(name, uuid -> {
             wrapper.set(uuid);
         });
@@ -135,7 +136,15 @@ public class WorkerGCore
     // ----- await inputs
     private final RWWeakHashMap<Player, Pair<Consumer<String>, Runnable>> awaitingChats = new RWWeakHashMap<>(1, 1f);
     private final RWWeakHashMap<Player, Object> awaitingLocationsCancelChat = new RWWeakHashMap<>(1, 1f);
-    private final RWWeakHashMap<Player, Triple<Consumer<Location>, Runnable, Long>> awaitingLocations = new RWWeakHashMap<>(1, 1f);  // third is the timestamp when it was asked ; because the editor GUI button to trigger this is often shift + click, the GUI is closed and so the player shifts automatically quickly ; set a 1s delay
+    private final RWWeakHashMap<Player, Triple<Consumer<Location>, Runnable, Long>> awaitingLocations = new RWWeakHashMap<>(1, 1f); // third is the timestamp
+                                                                                                                                    // when it was asked ;
+                                                                                                                                    // because the editor GUI
+                                                                                                                                    // button to trigger this is
+                                                                                                                                    // often shift + click, the
+                                                                                                                                    // GUI is closed and so the
+                                                                                                                                    // player shifts
+                                                                                                                                    // automatically quickly ;
+                                                                                                                                    // set a 1s delay
     private final RWWeakHashMap<Player, Object> awaitingItemsCancelChat = new RWWeakHashMap<>(1, 1f);
     private final RWWeakHashMap<Player, Pair<Consumer<ItemStack>, Runnable>> awaitingItems = new RWWeakHashMap<>(1, 1f);
 
@@ -179,7 +188,8 @@ public class WorkerGCore
     public void awaitChat(Player player, Text message, Consumer<String> onChat, Runnable onCancel) {
         // cancel current
         Pair<Consumer<String>, Runnable> currentChat = awaitingChats.remove(player);
-        if (currentChat != null && currentChat.getB() != null) currentChat.getB().run();
+        if (currentChat != null && currentChat.getB() != null)
+            currentChat.getB().run();
 
         // ask
         GCore.inst().operateSync(() -> {
@@ -194,7 +204,8 @@ public class WorkerGCore
     public void awaitChatWithSuggestedValue(Player player, Text message, String suggestValue, Consumer<String> onChat, Runnable onCancel) {
         // cancel current
         Pair<Consumer<String>, Runnable> currentChat = awaitingChats.remove(player);
-        if (currentChat != null && currentChat.getB() != null) currentChat.getB().run();
+        if (currentChat != null && currentChat.getB() != null)
+            currentChat.getB().run();
 
         // ask
         GCore.inst().operateSync(() -> {
@@ -246,7 +257,8 @@ public class WorkerGCore
         awaitChat(player, message, raw -> {
             final E value = ObjectUtils.safeValueOf(raw, enumClass);
             if (value == null) {
-                TextGeneric.messageInvalidEnum.replace("{value}", () -> raw).replace("{values}", () -> StringUtils.toTextString(", ", CollectionUtils.asList(enumClass.getEnumConstants()))).send(player);
+                TextGeneric.messageInvalidEnum.replace("{value}", () -> raw)
+                        .replace("{values}", () -> StringUtils.toTextString(", ", CollectionUtils.asList(enumClass.getEnumConstants()))).send(player);
                 awaitChatEnum(player, message, enumClass, onChat, onCancel);
                 return;
             }
@@ -258,7 +270,8 @@ public class WorkerGCore
         awaitChat(player, message, raw -> {
             final T value = types.safeValueOf(raw);
             if (value == null) {
-                TextGeneric.messageInvalidEnum.replace("{value}", () -> raw).replace("{values}", () -> StringUtils.toTextString(", ", types.values())).send(player);
+                TextGeneric.messageInvalidEnum.replace("{value}", () -> raw).replace("{values}", () -> StringUtils.toTextString(", ", types.values()))
+                        .send(player);
                 awaitChatType(player, message, types, onChat, onCancel);
                 return;
             }
@@ -286,8 +299,10 @@ public class WorkerGCore
         // cancel current
         Pair<Consumer<String>, Runnable> currentChat = awaitingChats.remove(player);
         Triple<Consumer<Location>, Runnable, Long> currentLocation = awaitingLocations.remove(player);
-        if (currentChat != null && currentChat.getB() != null) currentChat.getB().run();
-        if (currentLocation != null && currentLocation.getB() != null) currentLocation.getB().run();
+        if (currentChat != null && currentChat.getB() != null)
+            currentChat.getB().run();
+        if (currentLocation != null && currentLocation.getB() != null)
+            currentLocation.getB().run();
         // ask
         if (message != null) {
             message.replace(messageReplacer).replace("{cancel}", () -> TextGeneric.textCancel.parseLine()).send(player);
@@ -300,8 +315,10 @@ public class WorkerGCore
         // cancel current
         Pair<Consumer<String>, Runnable> currentChat = awaitingChats.remove(player);
         Pair<Consumer<ItemStack>, Runnable> currentLocation = awaitingItems.remove(player);
-        if (currentChat != null && currentChat.getB() != null) currentChat.getB().run();
-        if (currentLocation != null && currentLocation.getB() != null) currentLocation.getB().run();
+        if (currentChat != null && currentChat.getB() != null)
+            currentChat.getB().run();
+        if (currentLocation != null && currentLocation.getB() != null)
+            currentLocation.getB().run();
         // ask
         if (message != null) {
             message.replace("{cancel}", () -> TextGeneric.textCancel.parseLine()).send(player);
@@ -316,14 +333,17 @@ public class WorkerGCore
     private RWHashMap<UUID, GameProfile> profileCache = new RWHashMap<>(10, 1f);
 
     private static GameProfile defaultProfile(UUID ownerUUID, String ownerName) {
-        return gameProfile(ownerUUID != null ? ownerUUID : UUID.randomUUID(), ownerName != null ? ownerName : "Unknown", "ewogICJ0aW1lc3RhbXAiIDogMTYwODAzMTQ1MTk2MSwKICAicHJvZmlsZUlkIiA6ICJlYzU2MTUzOGYzZmQ0NjFkYWZmNTA4NmIyMjE1NGJjZSIsCiAgInByb2ZpbGVOYW1lIiA6ICJBbGV4IiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzFhNGFmNzE4NDU1ZDRhYWI1MjhlN2E2MWY4NmZhMjVlNmEzNjlkMTc2OGRjYjEzZjdkZjMxOWE3MTNlYjgxMGIiCiAgICB9CiAgfQp9", "J4QNnTc0p9NbhK5zkD5pd+N2lKtH/0y884MOFQyxVGcUYDuSaa5XkkoLBTe/iaOICjarfwd1gLgNNg8XqAW3imb7bsOlN1D+3A3POkjlrdTKgLqFU9ouGwhdhh6rbMa6Sz6Ir6b8bgbeniEKYQxzOjyLbZwaDfJgXycPuQ7dnXiycVrgMYAcSHv3FH/K2Fm4RfjeIWJctWWsgpZdxmX9E0o83LEKlqEH6bT1aMTVnWJDRcak9A/OR6iSwz6ABrsWzARtlwi10mVwZUEQovByOo+UHxGfQErWm6kXbn7U/faDI3Gfq3ovvP/KyhGjB64gYQN0OWFt99N8FM+jWnPuRxVZlH0jx0Sxe2PGPvNy/lwD4gDbJfKScMSsapYZqbTenZ4QakqPVfGYI23JdQMC3IcTjuz4hHlKNjF+AgGZEqz/gDyKUT+95eOJH+8Kr0+KCzmKaL2zKY1/or7zcCsaeAyY/M+trfr6nARfFVBInHVYLHkOPkRSj3xvjNKW1sP4szJvxhQ/V968ipydRTlnQ67H8J8Laz5TDxxB2uQlRkGi6bvk1T7LSNNY/GSTovJVatR9adxTjbndby+DmrfFb666XjZ6kJshwEsudnQs2BU/jG9zi3tvCKoma/d6LbcSr2hfSYCl+ErWCFDSuVB4zJZa5rOLGW2Ea5s1ePFeHiM=");
+        return gameProfile(ownerUUID != null ? ownerUUID : UUID.randomUUID(), ownerName != null ? ownerName : "Unknown",
+                "ewogICJ0aW1lc3RhbXAiIDogMTYwODAzMTQ1MTk2MSwKICAicHJvZmlsZUlkIiA6ICJlYzU2MTUzOGYzZmQ0NjFkYWZmNTA4NmIyMjE1NGJjZSIsCiAgInByb2ZpbGVOYW1lIiA6ICJBbGV4IiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzFhNGFmNzE4NDU1ZDRhYWI1MjhlN2E2MWY4NmZhMjVlNmEzNjlkMTc2OGRjYjEzZjdkZjMxOWE3MTNlYjgxMGIiCiAgICB9CiAgfQp9",
+                "J4QNnTc0p9NbhK5zkD5pd+N2lKtH/0y884MOFQyxVGcUYDuSaa5XkkoLBTe/iaOICjarfwd1gLgNNg8XqAW3imb7bsOlN1D+3A3POkjlrdTKgLqFU9ouGwhdhh6rbMa6Sz6Ir6b8bgbeniEKYQxzOjyLbZwaDfJgXycPuQ7dnXiycVrgMYAcSHv3FH/K2Fm4RfjeIWJctWWsgpZdxmX9E0o83LEKlqEH6bT1aMTVnWJDRcak9A/OR6iSwz6ABrsWzARtlwi10mVwZUEQovByOo+UHxGfQErWm6kXbn7U/faDI3Gfq3ovvP/KyhGjB64gYQN0OWFt99N8FM+jWnPuRxVZlH0jx0Sxe2PGPvNy/lwD4gDbJfKScMSsapYZqbTenZ4QakqPVfGYI23JdQMC3IcTjuz4hHlKNjF+AgGZEqz/gDyKUT+95eOJH+8Kr0+KCzmKaL2zKY1/or7zcCsaeAyY/M+trfr6nARfFVBInHVYLHkOPkRSj3xvjNKW1sP4szJvxhQ/V968ipydRTlnQ67H8J8Laz5TDxxB2uQlRkGi6bvk1T7LSNNY/GSTovJVatR9adxTjbndby+DmrfFb666XjZ6kJshwEsudnQs2BU/jG9zi3tvCKoma/d6LbcSr2hfSYCl+ErWCFDSuVB4zJZa5rOLGW2Ea5s1ePFeHiM=");
     }
 
     public void fetchProfile(@Nullable UUID ownerUUID, @Nullable String ownerName, Consumer<GameProfile> callback) {
         fetchProfile(ownerUUID, ownerName, null, null, callback);
     }
 
-    public void fetchProfile(@Nullable UUID ownerUUID, @Nullable String ownerName, @Nullable String skinData, @Nullable String skinSignature, Consumer<GameProfile> callback) {
+    public void fetchProfile(@Nullable UUID ownerUUID, @Nullable String ownerName, @Nullable String skinData, @Nullable String skinSignature,
+            Consumer<GameProfile> callback) {
         if (ownerName != null && !USERNAME_MATCHER.test(ownerName)) {
             ownerName = null;
         }
@@ -388,7 +408,7 @@ public class WorkerGCore
 
     private void fetchProfileByUUID(UUID correctUUID, @Nullable String originalName, Consumer<GameProfile> callback) {
         GCore.inst().operateAsync(() -> {
-            GameProfile profile = correctUUID == null ? null : MineToolsUtils.fetchProfile(correctUUID);  // nullable
+            GameProfile profile = correctUUID == null ? null : MineToolsUtils.fetchProfile(correctUUID); // nullable
             if (profile == null) {
                 profile = defaultProfile(correctUUID, originalName);
             }
@@ -413,8 +433,10 @@ public class WorkerGCore
                     ItemStack item = CommonMats.PLAYER_HEAD.newStack();
                     SkullMeta meta = (SkullMeta) item.getItemMeta();
                     ReflectionObject.of(meta).setField("profile", profile);
-                    if (name != null) meta.setDisplayName(name);
-                    if (lore != null) meta.setLore(lore);
+                    if (name != null)
+                        meta.setDisplayName(name);
+                    if (lore != null)
+                        meta.setLore(lore);
                     item.setItemMeta(meta);
                     done.accept(item);
                 } catch (Throwable error) {
@@ -422,15 +444,14 @@ public class WorkerGCore
                 }
             });
         };
-        if (!Bukkit.getOnlineMode()) {  // fetch UUID by name if it's an offline server, to get the correct skin
+        if (!Bukkit.getOnlineMode()) { // fetch UUID by name if it's an offline server, to get the correct skin
             GCore.inst().operateAsync(() -> {
-                UUID uuid = /*MojangUtils*/MineToolsUtils.fetchUUID(owner.getName());
+                UUID uuid = /* MojangUtils */MineToolsUtils.fetchUUID(owner.getName());
                 run.accept(uuid != null ? uuid : owner.getUniqueId());
             });
         } else {
             run.accept(owner.getUniqueId());
         }
-
 
     }
 

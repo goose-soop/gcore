@@ -54,7 +54,8 @@ public class SerializerLowerCaseLinkedHashMap<K, V> implements Cloneable {
 
 	/**
 	 * @param key the key
-	 * @return the value associated with this key (a null value might mean that it's mapped with a null value, or that there's no mapping as well)
+	 * @return the value associated with this key (a null value might mean that it's mapped with a null value, or that
+	 *         there's no mapping as well)
 	 */
 	public V get(K key) {
 		return map.get(keySerializer.serialize(key));
@@ -99,14 +100,17 @@ public class SerializerLowerCaseLinkedHashMap<K, V> implements Cloneable {
 	 * @return an immutable list of sorted key/value pairs for this map
 	 */
 	public List<Pair<K, V>> getElements() {
-		return Collections.unmodifiableList(map.keySet().stream().map(string -> Pair.of(keySerializer.deserialize(string), map.get(string))).collect(Collectors.toList()));
+		return Collections.unmodifiableList(
+				map.keySet().stream().map(string -> Pair.of(keySerializer.deserialize(string), map.get(string))).collect(Collectors.toList()));
 	}
 
 	/**
 	 * Map a value to a key
-	 * @param key the key
+	 * 
+	 * @param key   the key
 	 * @param value the value
-	 * @return the value previously associated with this key (a null value might mean that it was mapped with a null value, or that there was no mapping as well)
+	 * @return the value previously associated with this key (a null value might mean that it was mapped with a null value,
+	 *         or that there was no mapping as well)
 	 */
 	public V put(K key, V value) {
 		return map.put(keySerializer.serialize(key), value);
@@ -118,8 +122,10 @@ public class SerializerLowerCaseLinkedHashMap<K, V> implements Cloneable {
 
 	/**
 	 * Remove a key from the map
+	 * 
 	 * @param key the key
-	 * @return the value previously associated with this key (a null value might mean that it was mapped with a null value, or that there was no mapping as well)
+	 * @return the value previously associated with this key (a null value might mean that it was mapped with a null value,
+	 *         or that there was no mapping as well)
 	 */
 	public V remove(K key) {
 		return map.remove(keySerializer.serialize(key));
@@ -186,9 +192,12 @@ public class SerializerLowerCaseLinkedHashMap<K, V> implements Cloneable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) return true;
-		if (obj == null) return false;
-		if (getClass() != obj.getClass()) return false;
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
 		SerializerLowerCaseLinkedHashMap other = (SerializerLowerCaseLinkedHashMap) obj;
 		if (map == null) {
 			if (other.map != null)

@@ -58,12 +58,15 @@ public class VanillaEvents implements Listener {
 			int slot = event.getRawSlot();
 			try {
 				if (player.getInventory().equals(event.getClickedInventory())) {
-					handler.getGUI().onPlayerInventoryClick(new ClickCall(player, ClickType.valueOf(event.getClick().name()), handler.getGUI(), pageIndex, slot), Mat.isVoid(event.getCurrentItem()) ? null : event.getCurrentItem());
+					handler.getGUI().onPlayerInventoryClick(
+							new ClickCall(player, ClickType.valueOf(event.getClick().name()), handler.getGUI(), pageIndex, slot),
+							Mat.isVoid(event.getCurrentItem()) ? null : event.getCurrentItem());
 				} else {
 					handler.onClick(player, ClickType.valueOf(event.getClick().toString()), slot, pageIndex);
 				}
 			} catch (Throwable exception) {
-				handler.getGUI().getPlugin().getMainLogger().error("Couldn't perform click effects in GUI " + handler.getGUI().getId() + " at slot " + slot + " of page " + pageIndex, exception);
+				handler.getGUI().getPlugin().getMainLogger()
+						.error("Couldn't perform click effects in GUI " + handler.getGUI().getId() + " at slot " + slot + " of page " + pageIndex, exception);
 			}
 		}, 1);
 	}
@@ -89,12 +92,14 @@ public class VanillaEvents implements Listener {
 		// unregister on close
 		if (!handler.getGUI().getOptions().contains(Option.DONT_UNREGISTER_ON_CLOSE)) {
 			new BukkitRunnable() {
+
 				@Override
 				public void run() {
 					if (handler.getViewers().isEmpty()) {
 						handler.getGUI().deactivate(true);
 					}
 				}
+
 			}.runTaskLater(handler.getGUI().getPlugin(), 5L);
 		}
 	}

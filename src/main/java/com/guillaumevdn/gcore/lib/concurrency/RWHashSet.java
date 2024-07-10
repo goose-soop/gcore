@@ -23,8 +23,9 @@ import com.guillaumevdn.gcore.lib.object.Optional;
 import com.guillaumevdn.gcore.lib.string.StringUtils;
 
 /**
- * This is to avoid having to/forgetting to synchronize manually on this set.
- * Iteration/stream methods will therefore throw an UnsupportedOperationException when called and forEach() or iterate() should be used instead.
+ * This is to avoid having to/forgetting to synchronize manually on this set. Iteration/stream methods will therefore
+ * throw an UnsupportedOperationException when called and forEach() or iterate() should be used instead.
+ * 
  * @author GuillaumeVDN
  */
 public class RWHashSet<T> extends HashSet<T> {
@@ -98,14 +99,14 @@ public class RWHashSet<T> extends HashSet<T> {
 				consumer.accept(next, iter);
 				if (iter.mustRemove()) {
 					lock.unlockRead();
-					lock.lockWrite();  // wait until this set is good for modification
+					lock.lockWrite(); // wait until this set is good for modification
 					try {
 						it.remove();
-					} catch (Throwable error) {  // if anything happens during write state, unlock write lock and rethrow error
+					} catch (Throwable error) { // if anything happens during write state, unlock write lock and rethrow error
 						lock.unlockWrite();
 						throw error;
 					}
-					lock.lockRead();  // downgrade to read lock (by releasing read lock first) to have priority and continue reading
+					lock.lockRead(); // downgrade to read lock (by releasing read lock first) to have priority and continue reading
 					lock.unlockWrite();
 					iter.reset();
 				}
@@ -164,12 +165,20 @@ public class RWHashSet<T> extends HashSet<T> {
 
 	// -------------------- object --------------------
 
-	private int unsafeSize() { return super.size(); }
-	private Iterator<T> unsafeIterator() { return super.iterator(); }
-	private boolean unsafeContains(Object o) { return super.contains(o); }
+	private int unsafeSize() {
+		return super.size();
+	}
+
+	private Iterator<T> unsafeIterator() {
+		return super.iterator();
+	}
+
+	private boolean unsafeContains(Object o) {
+		return super.contains(o);
+	}
 
 	@Override
-	public final boolean equals(Object o) {  // adapted code from HashSet
+	public final boolean equals(Object o) { // adapted code from HashSet
 		if (o == this)
 			return true;
 		if (!(o instanceof Set))
@@ -191,7 +200,7 @@ public class RWHashSet<T> extends HashSet<T> {
 							}
 						}
 						return true;
-					} catch (ClassCastException unused)   {
+					} catch (ClassCastException unused) {
 						return false;
 					} catch (NullPointerException unused) {
 						return false;
@@ -204,7 +213,7 @@ public class RWHashSet<T> extends HashSet<T> {
 					return false;
 				try {
 					return super.containsAll(other);
-				} catch (ClassCastException unused)   {
+				} catch (ClassCastException unused) {
 					return false;
 				} catch (NullPointerException unused) {
 					return false;
@@ -214,7 +223,7 @@ public class RWHashSet<T> extends HashSet<T> {
 	}
 
 	@Override
-	public final int hashCode() {  // adapted code from HashSet
+	public final int hashCode() { // adapted code from HashSet
 		return lock.read(() -> {
 			int h = 0;
 			Iterator<T> i = super.iterator();
@@ -228,10 +237,10 @@ public class RWHashSet<T> extends HashSet<T> {
 	}
 
 	@Override
-	public final String toString() {  // adapted code from HashSet
+	public final String toString() { // adapted code from HashSet
 		return lock.read(() -> {
 			Iterator<T> it = super.iterator();
-			if (! it.hasNext())
+			if (!it.hasNext())
 				return "[]";
 
 			StringBuilder sb = new StringBuilder();
@@ -321,10 +330,11 @@ public class RWHashSet<T> extends HashSet<T> {
 		});
 	}
 
-	/* -------------------- (potential) write methods with loss of performance --------------------
-		due to (a) pre-check that would be made during iteration in the original method
-		       (b) using a write lock without being sure that modifications will be made
-		... I'm too lazy to completely rewrite a HashSet implementation with "low-level" direct operations on the table :Kappa:
+	/*
+	 * -------------------- (potential) write methods with loss of performance -------------------- due to (a) pre-check
+	 * that would be made during iteration in the original method (b) using a write lock without being sure that
+	 * modifications will be made ... I'm too lazy to completely rewrite a HashSet implementation with "low-level" direct
+	 * operations on the table :Kappa:
 	 */
 
 	@Override
@@ -345,13 +355,13 @@ public class RWHashSet<T> extends HashSet<T> {
 	@Override
 	public final boolean retainAll(Collection<?> c) {
 		Objects.requireNonNull(c);
-		return removeIf(elem -> !c.contains(elem));  // remove if other collection does not contain this element
+		return removeIf(elem -> !c.contains(elem)); // remove if other collection does not contain this element
 	}
 
 	@Override
 	public boolean removeAll(Collection<?> c) {
 		Objects.requireNonNull(c);
-		return removeIf(elem -> c.contains(elem));  // remove if other collection contain this element
+		return removeIf(elem -> c.contains(elem)); // remove if other collection contain this element
 	}
 
 	@Override
@@ -370,7 +380,7 @@ public class RWHashSet<T> extends HashSet<T> {
 		});
 	}
 
-	/* -------------------- extra methods  -------------------- */
+	/* -------------------- extra methods -------------------- */
 
 	public final T random() {
 		return lock.read(() -> {

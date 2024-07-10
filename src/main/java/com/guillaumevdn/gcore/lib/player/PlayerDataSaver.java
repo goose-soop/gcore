@@ -40,7 +40,8 @@ public class PlayerDataSaver {
 		this(true, true, true, true, true, true);
 	}
 
-	public PlayerDataSaver(boolean saveLocation, boolean saveInventory, boolean saveScoreboard, boolean saveEffects, boolean saveSpeeds, boolean saveGameModeAndFly) {
+	public PlayerDataSaver(boolean saveLocation, boolean saveInventory, boolean saveScoreboard, boolean saveEffects, boolean saveSpeeds,
+			boolean saveGameModeAndFly) {
 		this.saveLocation = saveLocation;
 		this.saveInventory = saveInventory;
 		this.saveScoreboard = saveScoreboard;
@@ -62,7 +63,8 @@ public class PlayerDataSaver {
 			lastScoreboard.put(player.getUniqueId(), player.getScoreboard());
 		}
 		if (saveEffects) {
-			lastPotionEffects.put(player.getUniqueId(), (PotionEffect[])player.getActivePotionEffects().toArray(new PotionEffect[player.getActivePotionEffects().size()]));
+			lastPotionEffects.put(player.getUniqueId(),
+					(PotionEffect[]) player.getActivePotionEffects().toArray(new PotionEffect[player.getActivePotionEffects().size()]));
 			resetEffects(player);
 		}
 		if (saveSpeeds) {
@@ -135,7 +137,8 @@ public class PlayerDataSaver {
 		for (PotionEffectType effect : PotionEffectType.values()) {
 			try {
 				player.removePotionEffect(effect);
-			} catch (Throwable ignored) {}
+			} catch (Throwable ignored) {
+			}
 		}
 	}
 

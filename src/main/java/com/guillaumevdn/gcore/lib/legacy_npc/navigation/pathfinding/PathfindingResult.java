@@ -5,9 +5,6 @@ package com.guillaumevdn.gcore.lib.legacy_npc.navigation.pathfinding;
  */
 public enum PathfindingResult {
 
-	SUCCESS,
-	FAILURE_NO_MORE_POINTS,
-	CANCEL
-	;
+	SUCCESS, FAILURE_NO_MORE_POINTS, CANCEL;
 
 }

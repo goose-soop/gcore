@@ -17,17 +17,11 @@ public class YMLMigrationReading extends YMLConfiguration {
 	}
 
 	// ----- read
-	private static final Replacer placeholdersReplacer = Replacer
-			.of("{objective}", () -> "{objective_name}")
-			.with("{objective_progress}", () -> "{objective_progression}")
-			.with("{objective_detail_progress}", () -> "{objective_progression}")
-			.with("{objective_detail_goal}", () -> "{objective_goal}")
-			.with("{objective_detail_percentage}", () -> "{objective_progression_percentage}")
-			;
+	private static final Replacer placeholdersReplacer = Replacer.of("{objective}", () -> "{objective_name}")
+			.with("{objective_progress}", () -> "{objective_progression}").with("{objective_detail_progress}", () -> "{objective_progression}")
+			.with("{objective_detail_goal}", () -> "{objective_goal}").with("{objective_detail_percentage}", () -> "{objective_progression_percentage}");
 
-	private static final Replacer detailedProgressionPlaceholderReplacer = Replacer
-			.of("{detailed_progression}", () -> "{objective}")
-			;
+	private static final Replacer detailedProgressionPlaceholderReplacer = Replacer.of("{detailed_progression}", () -> "{objective}");
 
 	@Override
 	public String readString(String path, String def) {
@@ -57,7 +51,7 @@ public class YMLMigrationReading extends YMLConfiguration {
 		if (value == null || value.isEmpty()) {
 			return null;
 		}
-		if (!path.contains("gui.item_")) {  // don't replace placeholder {detailed_progression} in item descriptions lore
+		if (!path.contains("gui.item_")) { // don't replace placeholder {detailed_progression} in item descriptions lore
 			value = detailedProgressionPlaceholderReplacer.parse(value);
 		}
 		return placeholdersReplacer.parse(value);

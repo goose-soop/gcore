@@ -9,25 +9,14 @@ import com.guillaumevdn.gcore.lib.string.TextEnumElement;
 public enum TextGCore implements TextEnumElement {
 
 	// ----- plugin
-	messagePluginUnknown,
-	messagePluginReloaded,
-	messagePluginManipulateError,
-	messagePluginInternalState,
-	messagePluginList,
-	messageGcoreExportFile,
+	messagePluginUnknown, messagePluginReloaded, messagePluginManipulateError, messagePluginInternalState, messagePluginList, messageGcoreExportFile,
 	messageGcoreExportCouldnt,
 
 	// ----- command
-	commandDescriptionGcore,
-	commandDescriptionGcorePlugins,
-	commandDescriptionGcoreExport,
-	commandDescriptionGcoreItemRead,
-	commandDescriptionGcoreItemReadChat,
-	commandDescriptionGcoreItemReadClick,
-	commandDescriptionGcoreItemSetNBTString,
+	commandDescriptionGcore, commandDescriptionGcorePlugins, commandDescriptionGcoreExport, commandDescriptionGcoreItemRead,
+	commandDescriptionGcoreItemReadChat, commandDescriptionGcoreItemReadClick, commandDescriptionGcoreItemSetNBTString,
 
-	messageItemReadNull,
-	messageItemReadExported,
+	messageItemReadNull, messageItemReadExported,
 
 	;
 

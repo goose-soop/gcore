@@ -36,7 +36,7 @@ public abstract class KeyedBoard<K, V> extends Board<ConnectorKeyed<K, V>> {
 	}
 
 	// ----------------------------------------------------------------------------------------------------
-	// 		 get
+	// get
 	// ----------------------------------------------------------------------------------------------------
 
 	public final Class<V> getValueClass() {
@@ -96,7 +96,7 @@ public abstract class KeyedBoard<K, V> extends Board<ConnectorKeyed<K, V>> {
 	}
 
 	// ----------------------------------------------------------------------------------------------------
-	// 		 save
+	// save
 	// ----------------------------------------------------------------------------------------------------
 
 	private transient RWHashSet<K> toSave = new RWHashSet<>(5);
@@ -126,7 +126,7 @@ public abstract class KeyedBoard<K, V> extends Board<ConnectorKeyed<K, V>> {
 	}
 
 	// ----------------------------------------------------------------------------------------------------
-	// 		 data
+	// data
 	// ----------------------------------------------------------------------------------------------------
 
 	public final void pullElements(BukkitThread thread, Set<K> keys, ThrowableRunnable callback) {
@@ -195,13 +195,15 @@ public abstract class KeyedBoard<K, V> extends Board<ConnectorKeyed<K, V>> {
 		if (keys.isEmpty()) {
 			return;
 		}
-		keys.forEach(key -> beforeDisposeCacheElement(thread, key, getCachedValue(key)));  // this might set some more elements to save
+		keys.forEach(key -> beforeDisposeCacheElement(thread, key, getCachedValue(key))); // this might set some more elements to save
 
-		// disposing means "saving if needed and then remove from valuesCache" ; if elements don't need to be saved, remove directly from valuesCache
+		// disposing means "saving if needed and then remove from valuesCache" ; if elements don't need to be saved, remove
+		// directly from valuesCache
 		Set<K> mustPush = keys.stream().filter(key -> toSave.contains(key)).collect(Collectors.toSet());
 		Set<K> musntPush = keys.stream().filter(key -> !toSave.contains(key)).collect(Collectors.toSet());
 		removeElementsFromCache(musntPush);
-		musntPush.forEach(key -> disposedCacheElement(key));;
+		musntPush.forEach(key -> disposedCacheElement(key));
+		;
 
 		// push needed elements, then remove from valuesCache
 		pushElements(thread, mustPush, () -> {

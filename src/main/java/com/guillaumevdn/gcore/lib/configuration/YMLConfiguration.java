@@ -1,5 +1,18 @@
 package com.guillaumevdn.gcore.lib.configuration;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.function.BiFunction;
+
+import javax.annotation.Nullable;
+
+import org.bukkit.Location;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+
 import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.lib.GPlugin;
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
@@ -25,23 +38,11 @@ import com.guillaumevdn.gcore.lib.validator.type.CollectionIntegerValidator;
 import com.guillaumevdn.gcore.lib.validator.type.DoubleValidator;
 import com.guillaumevdn.gcore.lib.validator.type.IntegerValidator;
 import com.guillaumevdn.gcore.lib.validator.type.ValueValidator;
-import org.bukkit.Location;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-
-import javax.annotation.Nullable;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.function.BiFunction;
 
 /**
  * @author GuillaumeVDN
  */
-public class YMLConfiguration
-{
+public class YMLConfiguration {
 
     private GPlugin plugin;
     private File file;
@@ -52,12 +53,13 @@ public class YMLConfiguration
     public YMLConfiguration(GPlugin plugin, File file) {
         this.plugin = plugin;
         file.getParentFile().mkdirs();
-        this.logFilePath = file.getPath().replace("plugins" + File.separator, "").replace(plugin.getDataFolder().getName() + File.separator, "").replace(File.separator, "/");
+        this.logFilePath = file.getPath().replace("plugins" + File.separator, "").replace(plugin.getDataFolder().getName() + File.separator, "")
+                .replace(File.separator, "/");
         this.file = file;
         load();
     }
 
-    YMLConfiguration(GPlugin plugin) {  // fake one
+    YMLConfiguration(GPlugin plugin) { // fake one
         this.plugin = plugin;
         this.logFilePath = "fake configuration";
         creationStackTrace = new Error();
@@ -133,14 +135,14 @@ public class YMLConfiguration
 
     public List<String> readKeysForSection(String path) {
         if (isConfigurationSection(path)) {
-            return yml.getSectionNode(path).getConfigKeys();  // this creates a new list
+            return yml.getSectionNode(path).getConfigKeys(); // this creates a new list
         }
         return EMPTY_KEYS;
     }
 
     public List<String> readKeysForSectionCopyIfEmpty(String path) {
         if (isConfigurationSection(path)) {
-            return yml.getSectionNode(path).getConfigKeys();  // this creates a new list
+            return yml.getSectionNode(path).getConfigKeys(); // this creates a new list
         }
         return new ArrayList<>();
     }
@@ -495,17 +497,18 @@ public class YMLConfiguration
                     }
                     throwError("element " + obj + " is invalid for " + serializer.getTypeName() + " at path " + path);
                 }
-            } else label:{
-                try {
-                    T valueObject = serializer.deserialize(String.valueOf(object));
-                    if (valueObject != null) {
-                        value.add(valueObject);
-                        break label;
+            } else
+                label: {
+                    try {
+                        T valueObject = serializer.deserialize(String.valueOf(object));
+                        if (valueObject != null) {
+                            value.add(valueObject);
+                            break label;
+                        }
+                    } catch (Throwable ignored) {
                     }
-                } catch (Throwable ignored) {
+                    throwError("element " + object + " is invalid for " + serializer.getTypeName() + " at path " + path);
                 }
-                throwError("element " + object + " is invalid for " + serializer.getTypeName() + " at path " + path);
-            }
         }
         return value;
     }
@@ -588,69 +591,35 @@ public class YMLConfiguration
     }
 
     // ----- get locations item list
-	/*public List<ElementGUIItem> readGUIItemTripleList(String path, List<ElementGUIItem> def) {
-		return contains(path) ? doReadGUIItemTripleList(path) : def;
-	}
-
-	public List<ElementGUIItem> readMandatoryGUIItemTripleList(String path) {
-		if (!contains(path)) {
-			throwMissing(path, "icon/locations list");
-		}
-		return doReadGUIItemTripleList(path);
-	}
-
-	private List<ElementGUIItem> doReadGUIItemTripleList(String path) {
-		validatePath(path);
-		// get items
-		List<ElementGUIItem> value = new ArrayList<>();
-		for (String key : readKeysForSection(path)) {
-			try {
-				GUIItemTriple item = readMandatoryGUIItemTriple(path + "." + key);
-				if (item == null) {
-					throwError("element " + key + " is invalid for icon/locations list at path " + path);
-				}
-				value.add(item);
-			} catch (Throwable ignored) {
-				throwError("element " + key + " is invalid for icon/locations list at path " + path);
-			}
-		}
-		return value;
-	}
-
-	// ----- get locations item
-	public GUIItemTriple readLocationsItem(String path, GUIItemTriple def) throws Throwable {
-		return contains(path) ? doReadGUIItemTriple(path, false) : def;
-	}
-
-	public GUIItemTriple readMandatoryGUIItemTriple(String path) throws Throwable {
-		if (!contains(path)) {
-			throwMissing(path, "icon/locations");
-		}
-		return doReadGUIItemTriple(path, true);
-	}
-
-	private GUIItemTriple doReadGUIItemTriple(String path, boolean mandatory) throws Throwable {
-		validatePath(path);
-		// get item
-		ItemStack item = mandatory ? readMandatoryItemStack(path + ".icon") : doReadItemStack(path + ".icon");
-		boolean persistent = readBoolean(path + ".persistent", false);
-		List<String> rawLocations = mandatory ? readMandatoryStringList(path + ".locations") : doReadStringList(path + ".locations");
-		List<IntegerPair> locations = new ArrayList<>();
-		for (String location : rawLocations) {
-			try {
-				String[] split = location.split(",");
-				if (split.length == 1) {
-					locations.add(IntegerPair.of(-1, Integer.parseInt(split[0])));
-				} else if (split.length == 2) {
-					locations.add(IntegerPair.of(Integer.parseInt(split[0]), Integer.parseInt(split[1])));
-				}
-			} catch (Throwable error) {
-				throwError("couldn't read location " + location + " at path " + path + ".locations");
-			}
-		}
-		GUIItemTriple value = new GUIItemTriple(item, persistent, locations);
-		return value;
-	}*/
+    /*
+     * public List<ElementGUIItem> readGUIItemTripleList(String path, List<ElementGUIItem> def) { return contains(path) ?
+     * doReadGUIItemTripleList(path) : def; }
+     * 
+     * public List<ElementGUIItem> readMandatoryGUIItemTripleList(String path) { if (!contains(path)) { throwMissing(path,
+     * "icon/locations list"); } return doReadGUIItemTripleList(path); }
+     * 
+     * private List<ElementGUIItem> doReadGUIItemTripleList(String path) { validatePath(path); // get items
+     * List<ElementGUIItem> value = new ArrayList<>(); for (String key : readKeysForSection(path)) { try { GUIItemTriple
+     * item = readMandatoryGUIItemTriple(path + "." + key); if (item == null) { throwError("element " + key +
+     * " is invalid for icon/locations list at path " + path); } value.add(item); } catch (Throwable ignored) {
+     * throwError("element " + key + " is invalid for icon/locations list at path " + path); } } return value; }
+     * 
+     * // ----- get locations item public GUIItemTriple readLocationsItem(String path, GUIItemTriple def) throws Throwable {
+     * return contains(path) ? doReadGUIItemTriple(path, false) : def; }
+     * 
+     * public GUIItemTriple readMandatoryGUIItemTriple(String path) throws Throwable { if (!contains(path)) {
+     * throwMissing(path, "icon/locations"); } return doReadGUIItemTriple(path, true); }
+     * 
+     * private GUIItemTriple doReadGUIItemTriple(String path, boolean mandatory) throws Throwable { validatePath(path); //
+     * get item ItemStack item = mandatory ? readMandatoryItemStack(path + ".icon") : doReadItemStack(path + ".icon");
+     * boolean persistent = readBoolean(path + ".persistent", false); List<String> rawLocations = mandatory ?
+     * readMandatoryStringList(path + ".locations") : doReadStringList(path + ".locations"); List<IntegerPair> locations =
+     * new ArrayList<>(); for (String location : rawLocations) { try { String[] split = location.split(","); if
+     * (split.length == 1) { locations.add(IntegerPair.of(-1, Integer.parseInt(split[0]))); } else if (split.length == 2) {
+     * locations.add(IntegerPair.of(Integer.parseInt(split[0]), Integer.parseInt(split[1]))); } } catch (Throwable error) {
+     * throwError("couldn't read location " + location + " at path " + path + ".locations"); } } GUIItemTriple value = new
+     * GUIItemTriple(item, persistent, locations); return value; }
+     */
 
     // ----- get chance item
     public ItemChancePair readChanceItem(String path, ItemChancePair def) throws Throwable {
@@ -697,7 +666,7 @@ public class YMLConfiguration
             throwError("missing item config section at path " + path);
         }
         // read config in DataIO and use the adapter so it's consistent for both config and json
-        DataIO data = readObject(path, true);  // true to convert snake_case to camelCase because we're using that for json
+        DataIO data = readObject(path, true); // true to convert snake_case to camelCase because we're using that for json
         return AdapterItemStack.INSTANCE.readCurrent(data);
     }
 
@@ -709,7 +678,8 @@ public class YMLConfiguration
     }
 
     public long readDurationMillis(String path, long def) {
-        ElementDuration duration = readElement(path, (BiFunction<FakeConfigSuperElement, String, ElementDuration>) (FakeConfigSuperElement parent, String id) -> new ElementDuration(parent, id, Need.optional(), null, null, null));
+        ElementDuration duration = readElement(path, (BiFunction<FakeConfigSuperElement, String, ElementDuration>) (FakeConfigSuperElement parent,
+                String id) -> new ElementDuration(parent, id, Need.optional(), null, null, null));
         if (!duration.readContains()) {
             return def;
         }
@@ -725,7 +695,8 @@ public class YMLConfiguration
     }
 
     public List<PotionEffect> readPotionEffectList(String path) {
-        return readElement(path, (BiFunction<FakeConfigSuperElement, String, ElementPotionEffectList>) (FakeConfigSuperElement parent, String id) -> new ElementPotionEffectList(parent, id, Need.optional(), null)).parse(Replacer.GENERIC).orEmptyList();
+        return readElement(path, (BiFunction<FakeConfigSuperElement, String, ElementPotionEffectList>) (FakeConfigSuperElement parent,
+                String id) -> new ElementPotionEffectList(parent, id, Need.optional(), null)).parse(Replacer.GENERIC).orEmptyList();
     }
 
     public ElementNotify readNotify(String path) {
@@ -743,7 +714,8 @@ public class YMLConfiguration
     public <T extends Element> T readElement(String path, String id, Class<T> elementClass) {
         T element = null;
         try {
-            element = Reflection.newInstance(elementClass, fakeSuperElementParent, id, Need.optional(), null).get();  // classic element constructor ; different ones will need the method below
+            element = Reflection.newInstance(elementClass, fakeSuperElementParent, id, Need.optional(), null).get(); // classic element constructor ; different
+                                                                                                                     // ones will need the method below
         } catch (Throwable exception) {
             throwError("couldn't load initialize of type " + elementClass.getName() + " at path " + path, exception);
         }
@@ -832,17 +804,18 @@ public class YMLConfiguration
                     }
                     throwError("element " + obj + " is invalid for " + serializer.getTypeName() + " at path " + path);
                 }
-            } else label:{
-                try {
-                    T valueObject = serializer.deserialize(String.valueOf(object));
-                    if (valueObject != null) {
-                        value.add(valueObject);
-                        break label;
+            } else
+                label: {
+                    try {
+                        T valueObject = serializer.deserialize(String.valueOf(object));
+                        if (valueObject != null) {
+                            value.add(valueObject);
+                            break label;
+                        }
+                    } catch (Throwable ignored) {
                     }
-                } catch (Throwable ignored) {
+                    throwError("element " + object + " is invalid for " + serializer.getTypeName() + " at path " + path);
                 }
-                throwError("element " + object + " is invalid for " + serializer.getTypeName() + " at path " + path);
-            }
         }
         return value;
     }
@@ -911,18 +884,20 @@ public class YMLConfiguration
             for (String key : readKeysForSection(path)) {
                 copyRec(path + "." + key, target + "." + key, false);
             }
-            if (removeSrc) write(path, null);
+            if (removeSrc)
+                write(path, null);
         }
         // proceed value
         else {
             write(target, read(path, null));
-            if (removeSrc) write(path, null);
+            if (removeSrc)
+                write(path, null);
         }
     }
 
     public void write(String path, @Nullable Object value) {
         if (path.startsWith(".")) {
-            path = path.substring(1);  // just ignore blank, so we don't have to always worry about that (in migrations, for instance)
+            path = path.substring(1); // just ignore blank, so we don't have to always worry about that (in migrations, for instance)
         }
         validatePath(path);
         // remove

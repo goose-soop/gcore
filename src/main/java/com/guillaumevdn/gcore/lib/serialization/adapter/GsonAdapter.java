@@ -61,54 +61,30 @@ public class GsonAdapter<T> extends TypeAdapter<T> {
 	private void writeValue(JsonWriter writer, Object value) throws IOException {
 		if (value == null) {
 			writer.nullValue();
-		}
-		else if (value instanceof DataIO) {
+		} else if (value instanceof DataIO) {
 			writeObject(writer, (DataIO) value);
-		}
-		else if (value instanceof Collection<?>) {
+		} else if (value instanceof Collection<?>) {
 			writeArray(writer, (Collection<?>) value);
-		}
-		else if (value instanceof Long) {
+		} else if (value instanceof Long) {
 			writer.value((Long) value);
-		}
-		else if (value instanceof Integer) {
+		} else if (value instanceof Integer) {
 			writer.value((Integer) value);
-		}
-		else if (value instanceof Double) {
+		} else if (value instanceof Double) {
 			writer.value((Double) value);
-		}
-		else if (value instanceof Boolean) {
+		} else if (value instanceof Boolean) {
 			writer.value((Boolean) value);
-		}
-		else if (value instanceof String) {
+		} else if (value instanceof String) {
 			writer.value((String) value);
-			/* // This is taking too much performance for what it does. There's no point in checking that here
-			String v = (String) value;
-			if ((v.equalsIgnoreCase("true") || v.equalsIgnoreCase("false"))) {
-				writer.value(Boolean.parseBoolean(v));
-			} else {
-				Long l = NumberUtils.longOrNull(value);
-				if (l != null) {
-					writer.value(l);
-				} else {
-					Integer i = NumberUtils.integerOrNull(value);
-					if (i != null) {
-						writer.value(i);
-					} else {
-						Double d = NumberUtils.doubleOrNull(value);
-						if (d != null) {
-							writer.value(d);
-						} else {
-							writer.value(v);
-						}
-					}
-				}
-			}*/
-		}
-		else if (value instanceof UUID) {
+			/*
+			 * // This is taking too much performance for what it does. There's no point in checking that here String v = (String)
+			 * value; if ((v.equalsIgnoreCase("true") || v.equalsIgnoreCase("false"))) { writer.value(Boolean.parseBoolean(v)); }
+			 * else { Long l = NumberUtils.longOrNull(value); if (l != null) { writer.value(l); } else { Integer i =
+			 * NumberUtils.integerOrNull(value); if (i != null) { writer.value(i); } else { Double d =
+			 * NumberUtils.doubleOrNull(value); if (d != null) { writer.value(d); } else { writer.value(v); } } } }
+			 */
+		} else if (value instanceof UUID) {
 			writer.value(((UUID) value).toString());
-		}
-		else {
+		} else {
 			throw new IllegalArgumentException("can't write value of type " + value.getClass());
 		}
 	}
@@ -156,20 +132,29 @@ public class GsonAdapter<T> extends TypeAdapter<T> {
 
 	private Object readValue(JsonReader reader) throws IOException {
 		switch (reader.peek()) {
-		case BEGIN_OBJECT: return readObject(reader);
-		case BEGIN_ARRAY: return readArray(reader);
-		case STRING: return reader.nextString();
-		case NULL: return null;
+		case BEGIN_OBJECT:
+			return readObject(reader);
+		case BEGIN_ARRAY:
+			return readArray(reader);
+		case STRING:
+			return reader.nextString();
+		case NULL:
+			return null;
 		case NUMBER:
 			String raw = reader.nextString();
 			Long l = NumberUtils.longOrNull(raw);
-			if (l != null) return l;
+			if (l != null)
+				return l;
 			Integer i = NumberUtils.integerOrNull(raw);
-			if (i != null) return i;
+			if (i != null)
+				return i;
 			Double d = NumberUtils.doubleOrNull(raw);
-			if (d != null) return d;
-		case BOOLEAN: return reader.nextBoolean();
-		default: throw new IllegalStateException("peeked " + reader.peek());
+			if (d != null)
+				return d;
+		case BOOLEAN:
+			return reader.nextBoolean();
+		default:
+			throw new IllegalStateException("peeked " + reader.peek());
 		}
 	}
 

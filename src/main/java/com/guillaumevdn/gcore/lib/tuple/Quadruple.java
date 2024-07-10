@@ -72,9 +72,11 @@ public class Quadruple<A, B, C, D> {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) return true;
+		if (this == obj)
+			return true;
 		Quadruple<A, B, C, D> other = ObjectUtils.castOrNull(obj, getClass());
-		return other != null && Objects.deepEquals(a, other.a) && Objects.deepEquals(b, other.b) && Objects.deepEquals(c, other.c) && Objects.deepEquals(d, other.d);
+		return other != null && Objects.deepEquals(a, other.a) && Objects.deepEquals(b, other.b) && Objects.deepEquals(c, other.c)
+				&& Objects.deepEquals(d, other.d);
 	}
 
 	// ----- static

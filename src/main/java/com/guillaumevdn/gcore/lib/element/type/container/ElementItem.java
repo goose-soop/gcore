@@ -82,7 +82,8 @@ public final class ElementItem extends ParseableContainerElement<ItemStack> {
 		this.mode = mode;
 
 		type = addMat("type", mode.requireType() ? Need.required() : Need.optional(), TextEditorGeneric.descriptionItemType);
-		typeHDB = !GCore.inst().getIntegration("HeadDatabase").isActivated() ? null : addString("type_hdb", Need.optional(), TextEditorGeneric.descriptionItemTypeHDB);
+		typeHDB = !GCore.inst().getIntegration("HeadDatabase").isActivated() ? null
+				: addString("type_hdb", Need.optional(), TextEditorGeneric.descriptionItemTypeHDB);
 		durability = addInteger("durability", Need.optional(0), TextEditorGeneric.descriptionItemDurability);
 		amount = !mode.allowAmount() ? null : addInteger("amount", Need.optional(1), TextEditorGeneric.descriptionItemAmount);
 
@@ -117,12 +118,18 @@ public final class ElementItem extends ParseableContainerElement<ItemStack> {
 			MetaLeatherArmor.clearElements(item);
 			MetaPotion.clearElements(item);
 			MetaSkull.clearElements(item);
-			if (Version.ATLEAST_1_8) com.guillaumevdn.gcore.lib.item.meta.MetaBanner.clearElements(item);
-			if (Version.ATLEAST_1_11 && !Version.ATLEAST_1_13) com.guillaumevdn.gcore.lib.item.meta.MetaSpawnEgg.clearElements(item);
-			if (Version.ATLEAST_1_12) com.guillaumevdn.gcore.lib.item.meta.MetaKnowledgeBook.clearElements(item);
-			if (Version.ATLEAST_1_13) com.guillaumevdn.gcore.lib.item.meta.MetaTropicalFishBucket.clearElements(item);
-			if (Version.ATLEAST_1_14) com.guillaumevdn.gcore.lib.item.meta.MetaCrossbow.clearElements(item);
-			if (Version.ATLEAST_1_15) com.guillaumevdn.gcore.lib.item.meta.MetaSuspiciousStew.clearElements(item);
+			if (Version.ATLEAST_1_8)
+				com.guillaumevdn.gcore.lib.item.meta.MetaBanner.clearElements(item);
+			if (Version.ATLEAST_1_11 && !Version.ATLEAST_1_13)
+				com.guillaumevdn.gcore.lib.item.meta.MetaSpawnEgg.clearElements(item);
+			if (Version.ATLEAST_1_12)
+				com.guillaumevdn.gcore.lib.item.meta.MetaKnowledgeBook.clearElements(item);
+			if (Version.ATLEAST_1_13)
+				com.guillaumevdn.gcore.lib.item.meta.MetaTropicalFishBucket.clearElements(item);
+			if (Version.ATLEAST_1_14)
+				com.guillaumevdn.gcore.lib.item.meta.MetaCrossbow.clearElements(item);
+			if (Version.ATLEAST_1_15)
+				com.guillaumevdn.gcore.lib.item.meta.MetaSuspiciousStew.clearElements(item);
 		}
 		// fill new
 		ItemStack nxt = next == null ? null : next.newStack();
@@ -135,12 +142,18 @@ public final class ElementItem extends ParseableContainerElement<ItemStack> {
 			MetaLeatherArmor.fillElements(nextMeta, item);
 			MetaPotion.fillElements(nextMeta, item);
 			MetaSkull.fillElements(nextMeta, item);
-			if (Version.ATLEAST_1_8) com.guillaumevdn.gcore.lib.item.meta.MetaBanner.fillElements(nextMeta, item);
-			if (Version.ATLEAST_1_11 && !Version.ATLEAST_1_13) com.guillaumevdn.gcore.lib.item.meta.MetaSpawnEgg.fillElements(nextMeta, item);
-			if (Version.ATLEAST_1_12) com.guillaumevdn.gcore.lib.item.meta.MetaKnowledgeBook.fillElements(nextMeta, item);
-			if (Version.ATLEAST_1_13) com.guillaumevdn.gcore.lib.item.meta.MetaTropicalFishBucket.fillElements(nextMeta, item);
-			if (Version.ATLEAST_1_14) com.guillaumevdn.gcore.lib.item.meta.MetaCrossbow.fillElements(nextMeta, item);
-			if (Version.ATLEAST_1_15) com.guillaumevdn.gcore.lib.item.meta.MetaSuspiciousStew.fillElements(nextMeta, item);
+			if (Version.ATLEAST_1_8)
+				com.guillaumevdn.gcore.lib.item.meta.MetaBanner.fillElements(nextMeta, item);
+			if (Version.ATLEAST_1_11 && !Version.ATLEAST_1_13)
+				com.guillaumevdn.gcore.lib.item.meta.MetaSpawnEgg.fillElements(nextMeta, item);
+			if (Version.ATLEAST_1_12)
+				com.guillaumevdn.gcore.lib.item.meta.MetaKnowledgeBook.fillElements(nextMeta, item);
+			if (Version.ATLEAST_1_13)
+				com.guillaumevdn.gcore.lib.item.meta.MetaTropicalFishBucket.fillElements(nextMeta, item);
+			if (Version.ATLEAST_1_14)
+				com.guillaumevdn.gcore.lib.item.meta.MetaCrossbow.fillElements(nextMeta, item);
+			if (Version.ATLEAST_1_15)
+				com.guillaumevdn.gcore.lib.item.meta.MetaSuspiciousStew.fillElements(nextMeta, item);
 		}
 	}
 
@@ -204,12 +217,10 @@ public final class ElementItem extends ParseableContainerElement<ItemStack> {
 	// ----- read/import
 	@Override
 	protected void doRead() throws Throwable {
-		final List<String> keys = getSuperElement().getConfiguration().readKeysForSectionCopyIfEmpty(getConfigurationPath())  // this creates a new list
-				.stream()
-				.map(str -> str.toLowerCase())
-				.collect(Collectors.toList());
+		final List<String> keys = getSuperElement().getConfiguration().readKeysForSectionCopyIfEmpty(getConfigurationPath()) // this creates a new list
+				.stream().map(str -> str.toLowerCase()).collect(Collectors.toList());
 
-		type.read();  // read type first so it'll trigger watcher that will add elements
+		type.read(); // read type first so it'll trigger watcher that will add elements
 
 		// read elements
 		for (Element element : values()) {
@@ -220,9 +231,10 @@ public final class ElementItem extends ParseableContainerElement<ItemStack> {
 		}
 
 		// look for unknown options and log them
-		//keys.removeAll(IGNORE_OPTIONS);
+		// keys.removeAll(IGNORE_OPTIONS);
 		for (String key : keys) {
-			getSuperElement().addLoadError("found unknown option '" + key + "' at path '" + (getConfigurationPath().isEmpty() ? key : getConfigurationPath() + "." + key) + "'");
+			getSuperElement().addLoadError(
+					"found unknown option '" + key + "' at path '" + (getConfigurationPath().isEmpty() ? key : getConfigurationPath() + "." + key) + "'");
 		}
 	}
 
@@ -259,12 +271,18 @@ public final class ElementItem extends ParseableContainerElement<ItemStack> {
 			MetaLeatherArmor.importElements(this, meta);
 			MetaPotion.importElements(this, meta);
 			MetaSkull.importElements(this, meta);
-			if (Version.ATLEAST_1_8) com.guillaumevdn.gcore.lib.item.meta.MetaBanner.importElements(this, meta);
-			if (Version.ATLEAST_1_11 && !Version.ATLEAST_1_13) com.guillaumevdn.gcore.lib.item.meta.MetaSpawnEgg.importElements(this, meta);
-			if (Version.ATLEAST_1_12) com.guillaumevdn.gcore.lib.item.meta.MetaKnowledgeBook.importElements(this, meta);
-			if (Version.ATLEAST_1_13) com.guillaumevdn.gcore.lib.item.meta.MetaTropicalFishBucket.importElements(this, meta);
-			if (Version.ATLEAST_1_14) com.guillaumevdn.gcore.lib.item.meta.MetaCrossbow.importElements(this, meta, clicker);
-			if (Version.ATLEAST_1_15) com.guillaumevdn.gcore.lib.item.meta.MetaSuspiciousStew.importElements(this, meta);
+			if (Version.ATLEAST_1_8)
+				com.guillaumevdn.gcore.lib.item.meta.MetaBanner.importElements(this, meta);
+			if (Version.ATLEAST_1_11 && !Version.ATLEAST_1_13)
+				com.guillaumevdn.gcore.lib.item.meta.MetaSpawnEgg.importElements(this, meta);
+			if (Version.ATLEAST_1_12)
+				com.guillaumevdn.gcore.lib.item.meta.MetaKnowledgeBook.importElements(this, meta);
+			if (Version.ATLEAST_1_13)
+				com.guillaumevdn.gcore.lib.item.meta.MetaTropicalFishBucket.importElements(this, meta);
+			if (Version.ATLEAST_1_14)
+				com.guillaumevdn.gcore.lib.item.meta.MetaCrossbow.importElements(this, meta, clicker);
+			if (Version.ATLEAST_1_15)
+				com.guillaumevdn.gcore.lib.item.meta.MetaSuspiciousStew.importElements(this, meta);
 		}
 		// nbt
 		try {
@@ -322,12 +340,18 @@ public final class ElementItem extends ParseableContainerElement<ItemStack> {
 			MetaLeatherArmor.writeElements(this, data, replacer);
 			MetaPotion.writeElements(this, data, replacer);
 			MetaSkull.writeElements(this, data, replacer);
-			if (Version.ATLEAST_1_8) com.guillaumevdn.gcore.lib.item.meta.MetaBanner.writeElements(this, data, replacer);
-			if (Version.ATLEAST_1_11 && !Version.ATLEAST_1_13) com.guillaumevdn.gcore.lib.item.meta.MetaSpawnEgg.writeElements(this, data, replacer);
-			if (Version.ATLEAST_1_12) com.guillaumevdn.gcore.lib.item.meta.MetaKnowledgeBook.writeElements(this, data, replacer);
-			if (Version.ATLEAST_1_13) com.guillaumevdn.gcore.lib.item.meta.MetaTropicalFishBucket.writeElements(this, data, replacer);
-			if (Version.ATLEAST_1_14) com.guillaumevdn.gcore.lib.item.meta.MetaCrossbow.writeElements(this, data, replacer);
-			if (Version.ATLEAST_1_15) com.guillaumevdn.gcore.lib.item.meta.MetaSuspiciousStew.writeElements(this, data, replacer);
+			if (Version.ATLEAST_1_8)
+				com.guillaumevdn.gcore.lib.item.meta.MetaBanner.writeElements(this, data, replacer);
+			if (Version.ATLEAST_1_11 && !Version.ATLEAST_1_13)
+				com.guillaumevdn.gcore.lib.item.meta.MetaSpawnEgg.writeElements(this, data, replacer);
+			if (Version.ATLEAST_1_12)
+				com.guillaumevdn.gcore.lib.item.meta.MetaKnowledgeBook.writeElements(this, data, replacer);
+			if (Version.ATLEAST_1_13)
+				com.guillaumevdn.gcore.lib.item.meta.MetaTropicalFishBucket.writeElements(this, data, replacer);
+			if (Version.ATLEAST_1_14)
+				com.guillaumevdn.gcore.lib.item.meta.MetaCrossbow.writeElements(this, data, replacer);
+			if (Version.ATLEAST_1_15)
+				com.guillaumevdn.gcore.lib.item.meta.MetaSuspiciousStew.writeElements(this, data, replacer);
 			if (nbt.getValue() != null) {
 				data.writeObject("nbt", nbt.getValue().toIO(false, replacer));
 			}

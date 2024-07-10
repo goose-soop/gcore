@@ -27,7 +27,7 @@ public class PositionTypeSingleRandom extends PositionType {
 	// ----- elements
 	@Override
 	public boolean mustCache(ElementPosition position) {
-		return false;  // don't cache since random every time
+		return false; // don't cache since random every time
 	}
 
 	@Override

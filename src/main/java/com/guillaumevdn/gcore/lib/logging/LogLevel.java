@@ -7,11 +7,7 @@ import org.bukkit.ChatColor;
  */
 public enum LogLevel {
 
-	INFO("info", "§a"),
-	WARNING("WARNING", "§e"),
-	ERROR("ERROR", "§c"),
-	DEBUG("DEBUG", "§d"),
-	;
+	INFO("info", "§a"), WARNING("WARNING", "§e"), ERROR("ERROR", "§c"), DEBUG("DEBUG", "§d"),;
 
 	private String filePrefix;
 	private String consoleColor;

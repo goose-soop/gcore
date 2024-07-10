@@ -17,7 +17,8 @@ import com.guillaumevdn.gcore.lib.string.Text;
 /**
  * @author GuillaumeVDN
  */
-public class ElementEntityTypeDoubleMap extends ElementAbstractEnumMap<EntityType, ElementDouble> implements ParseableMapElement<EntityType, Double, ElementDouble> {
+public class ElementEntityTypeDoubleMap extends ElementAbstractEnumMap<EntityType, ElementDouble>
+		implements ParseableMapElement<EntityType, Double, ElementDouble> {
 
 	public ElementEntityTypeDoubleMap(Element parent, String id, Need need, Text editorDescription) {
 		super(EntityType.class, parent, id, need, editorDescription, CollectionUtils.asList(EntityType.values()));
@@ -27,7 +28,7 @@ public class ElementEntityTypeDoubleMap extends ElementAbstractEnumMap<EntityTyp
 	@Override
 	public ElementDouble createElement(String elementId) {
 		ElementDouble element = new ElementDouble(this, elementId, Need.optional(), 1, null);
-		element.setValue(CollectionUtils.asList("1"));  // don't use the default value otherwise it won't be saved
+		element.setValue(CollectionUtils.asList("1")); // don't use the default value otherwise it won't be saved
 		return element;
 	}
 

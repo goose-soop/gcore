@@ -42,7 +42,8 @@ public class PositionTypeClosestEntityRelativeAreaOutside extends PositionType {
 	@Override
 	public Position doParse(ElementPosition position, Replacer replacer) throws ParsingError {
 		Entity entity = PositionTypeClosestEntityRelativeSingle.findMatching(position, replacer);
-		if (entity == null) return null;
+		if (entity == null)
+			return null;
 		Location a = position.getElementAs("bound1", ElementRelativeLocation.class).parseNoCatchOrThrowParsingNull(replacer);
 		Location b = position.getElementAs("bound2", ElementRelativeLocation.class).parseNoCatchOrThrowParsingNull(replacer);
 		return new PositionAreaOutside(a, b);

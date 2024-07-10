@@ -38,7 +38,7 @@ public class ParsingError extends Exception {
 				if (pe.element != null) {
 					element = pe.element;
 				}
-				if (error.getCause() != null) {  // sometimes we create a dummy ParsingError with a cause when we're forced to catch something
+				if (error.getCause() != null) { // sometimes we create a dummy ParsingError with a cause when we're forced to catch something
 					error = error.getCause();
 				}
 			}
@@ -49,10 +49,11 @@ public class ParsingError extends Exception {
 				}
 				element.getSuperElement().getPlugin().getMainLogger().error(ParsingError.buildErrorAtPathInFile(error.getMessage(), element));
 			} else {
-				element.getSuperElement().getPlugin().getMainLogger().error(ParsingError.buildUnexpectedHeaderErrorAtPathInFile(error.getMessage(), element), error);
+				element.getSuperElement().getPlugin().getMainLogger().error(ParsingError.buildUnexpectedHeaderErrorAtPathInFile(error.getMessage(), element),
+						error);
 			}
 		} catch (Throwable ignored) {
-			error.printStackTrace();  // just print the error if anything happens (element has no super element, or whatever)  #1095
+			error.printStackTrace(); // just print the error if anything happens (element has no super element, or whatever) #1095
 		}
 	}
 
@@ -79,7 +80,8 @@ public class ParsingError extends Exception {
 
 	private static String atPathInFile(IElement element) {
 		if (element.getSuperElement().getConfiguration().getCreationStackTrace() != null) {
-			GCore.inst().getMainLogger().error("Found a mistake in a fake configuration file, created at :", element.getSuperElement().getConfiguration().getCreationStackTrace());
+			GCore.inst().getMainLogger().error("Found a mistake in a fake configuration file, created at :",
+					element.getSuperElement().getConfiguration().getCreationStackTrace());
 		}
 		return "in file §4" + element.getSuperElement().getConfiguration().getLogFilePath() + "§r§c at path §4" + element.getConfigurationPath() + "§r§c";
 	}

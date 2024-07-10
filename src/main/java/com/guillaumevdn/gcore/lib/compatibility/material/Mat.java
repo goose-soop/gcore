@@ -129,7 +129,8 @@ public final class Mat extends Variant<MatData> {
 
 		public Mat get() {
 			if (mat == null) {
-				throw new ConfigError("Couldn't find material with id or data type " + id);  // config error because this is used on load in CommonMats ; also it's actually a config error so we good
+				throw new ConfigError("Couldn't find material with id or data type " + id); // config error because this is used on load in CommonMats ; also
+																							// it's actually a config error so we good
 			}
 			return mat;
 		}
@@ -149,7 +150,7 @@ public final class Mat extends Variant<MatData> {
 		public static OptionalMat empty() {
 			return new OptionalMat("null", null);
 		}
-		
+
 		@Override
 		public String toString() {
 			return "" + mat;
@@ -157,7 +158,8 @@ public final class Mat extends Variant<MatData> {
 
 		@Override
 		public boolean equals(Object obj) {
-			if (obj == null) return false;
+			if (obj == null)
+				return false;
 			OptionalMat other = ObjectUtils.castOrNull(obj, OptionalMat.class);
 			return mat == null ? other.mat == null : mat.equals(other.mat);
 		}

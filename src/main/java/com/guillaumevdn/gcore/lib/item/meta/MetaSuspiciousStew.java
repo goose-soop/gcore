@@ -25,14 +25,18 @@ import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
 public final class MetaSuspiciousStew {
 
 	public static boolean match(ItemMeta itemMeta, ItemReference reference, ItemCheck check) {
-		if (!reference.hasMeta(SuspiciousStewMeta.class)) return true;
+		if (!reference.hasMeta(SuspiciousStewMeta.class))
+			return true;
 		SuspiciousStewMeta meta = ObjectUtils.castOrNull(itemMeta, SuspiciousStewMeta.class); // might be null if exact match is false
 
 		// effects
 		if (check.isExact()) {
-			if (meta.hasCustomEffects() != reference.hasSuspiciousCustomEffects() || meta.getCustomEffects().size() != reference.getSuspiciousCustomEffects().size()) return false;
+			if (meta.hasCustomEffects() != reference.hasSuspiciousCustomEffects()
+					|| meta.getCustomEffects().size() != reference.getSuspiciousCustomEffects().size())
+				return false;
 		} else {
-			if (reference.hasSuspiciousCustomEffects() && (meta == null || meta.hasCustomEffects())) return false;
+			if (reference.hasSuspiciousCustomEffects() && (meta == null || meta.hasCustomEffects()))
+				return false;
 		}
 		main: for (PotionEffect refEffect : reference.getSuspiciousCustomEffects()) {
 			for (PotionEffect effect : meta.getCustomEffects()) {
@@ -69,12 +73,13 @@ public final class MetaSuspiciousStew {
 		if (meta != null) {
 			// custom effects
 			List<DataIO> customEffects = reader.readDirectList("customEffects");
-			if (customEffects != null) for (DataIO d : customEffects) {
-				PotionEffect effect = AdapterPotionEffect.INSTANCE.read(d);
-				if (effect != null) {
-					meta.addCustomEffect(effect, true); // true to overwrite existing effect with the same type
+			if (customEffects != null)
+				for (DataIO d : customEffects) {
+					PotionEffect effect = AdapterPotionEffect.INSTANCE.read(d);
+					if (effect != null) {
+						meta.addCustomEffect(effect, true); // true to overwrite existing effect with the same type
+					}
 				}
-			}
 		}
 	}
 

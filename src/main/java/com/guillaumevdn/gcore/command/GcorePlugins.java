@@ -34,7 +34,8 @@ public final class GcorePlugins extends Subcommand {
 			}
 		}
 		final int inactiveF = inactive;
-		TextGCore.messagePluginList.replace("{count}", () -> plugins.size()).replace("{active}", () -> plugins.size() - inactiveF).replace("{inactive}", () -> inactiveF).replace("{plugins}", () -> StringUtils.toTextString(", ", plugins)).send(call);
+		TextGCore.messagePluginList.replace("{count}", () -> plugins.size()).replace("{active}", () -> plugins.size() - inactiveF)
+				.replace("{inactive}", () -> inactiveF).replace("{plugins}", () -> StringUtils.toTextString(", ", plugins)).send(call);
 	}
 
 }

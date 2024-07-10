@@ -22,7 +22,8 @@ public final class Params {
 
 	public <T> T getMandatory(Class<T> paramClass, int skipCount) throws IllegalStateException {
 		T found = getOrDefault(paramClass, null, skipCount);
-		if (found != null) return found;
+		if (found != null)
+			return found;
 		throw new IllegalStateException("there's no param of type " + paramClass);
 	}
 

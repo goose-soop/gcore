@@ -6,7 +6,9 @@ package com.guillaumevdn.gcore.lib.data.board;
 public interface BoardConnector {
 
 	void remoteInit() throws Throwable;
+
 	void remotePullAll() throws Throwable;
+
 	void remotePushCached() throws Throwable;
 
 	void forcePushAllCached() throws Throwable;

@@ -33,6 +33,7 @@ public class AwaitingChatListeners implements Listener {
 		if (awaitingChat != null) {
 			event.setCancelled(true);
 			new BukkitRunnable() {
+
 				@Override
 				public void run() {
 					String msg = event.getMessage();
@@ -44,6 +45,7 @@ public class AwaitingChatListeners implements Listener {
 						awaitingChat.getA().accept(msg);
 					}
 				}
+
 			}.runTask(GCore.inst());
 		}
 	}

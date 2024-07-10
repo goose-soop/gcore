@@ -19,7 +19,7 @@ import com.guillaumevdn.gcore.lib.string.Text;
  * @author GuillaumeVDN
  */
 public class ElementItemList extends ListElement<ElementItem> implements ParseableListElement<ItemStack, ElementItem> {
-	
+
 	private final ElementItemMode mode;
 
 	public ElementItemList(Element parent, String id, Need need, ElementItemMode mode, Text editorDescription) {

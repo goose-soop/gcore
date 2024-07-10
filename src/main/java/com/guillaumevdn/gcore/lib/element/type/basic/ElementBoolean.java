@@ -28,7 +28,8 @@ public class ElementBoolean extends ElementValue<Boolean> {
 	@Override
 	public Mat editorIconType() {
 		Optional<Boolean> parsed = parseGeneric();
-		if (!parsed.isPresent()) return CommonMats.WHITE_WOOL;
+		if (!parsed.isPresent())
+			return CommonMats.WHITE_WOOL;
 		return parsed.orNull() ? CommonMats.GREEN_WOOL : CommonMats.RED_WOOL;
 	}
 
@@ -46,21 +47,22 @@ public class ElementBoolean extends ElementValue<Boolean> {
 	public void onEditorClick(ClickCall call) {
 		// left-click : enter value
 		if (call.getType().equals(ClickType.LEFT)) {
-			WorkerGCore.inst().awaitChatWithSuggestedValue(call.getClicker(), TextEditorGeneric.messageElementBasicEditSuggestCurrent, getRawValueLineOrDefault(0), value -> {
-				String trim = StringUtils.unformat(value.toLowerCase()).trim();
-				if (StringUtils.hasPlaceholders(value)) {
-					setValue(CollectionUtils.asList(value));
-				} else if (BOOLEAN_TRUE.contains(trim)) {
-					setValue(CollectionUtils.asList("true"));
-				} else if (BOOLEAN_FALSE.contains(trim)) {
-					setValue(CollectionUtils.asList("false"));
-				} else {
-					setValue(null);
-				}
-				getSuperElement().onEditorChange(ElementBoolean.this);
-				call.reopenGUI();
-				getSuperElement().onEditorChange(this);
-			}, () -> call.reopenGUI());
+			WorkerGCore.inst().awaitChatWithSuggestedValue(call.getClicker(), TextEditorGeneric.messageElementBasicEditSuggestCurrent,
+					getRawValueLineOrDefault(0), value -> {
+						String trim = StringUtils.unformat(value.toLowerCase()).trim();
+						if (StringUtils.hasPlaceholders(value)) {
+							setValue(CollectionUtils.asList(value));
+						} else if (BOOLEAN_TRUE.contains(trim)) {
+							setValue(CollectionUtils.asList("true"));
+						} else if (BOOLEAN_FALSE.contains(trim)) {
+							setValue(CollectionUtils.asList("false"));
+						} else {
+							setValue(null);
+						}
+						getSuperElement().onEditorChange(ElementBoolean.this);
+						call.reopenGUI();
+						getSuperElement().onEditorChange(this);
+					}, () -> call.reopenGUI());
 		}
 		// right-click : toggle
 		else if (call.getType().equals(ClickType.RIGHT)) {

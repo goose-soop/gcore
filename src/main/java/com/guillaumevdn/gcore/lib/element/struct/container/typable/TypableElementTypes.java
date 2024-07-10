@@ -39,7 +39,8 @@ public abstract class TypableElementTypes<T extends TypableElementType> {
 
 	public final T valueOf(String id) throws IllegalArgumentException {
 		T value = safeValueOf(id);
-		if (value == null) throw new IllegalArgumentException("there's no type with id " + id);
+		if (value == null)
+			throw new IllegalArgumentException("there's no type with id " + id);
 		return value;
 	}
 

@@ -23,6 +23,7 @@ public class ElementPotionEffectType extends ElementFakeEnum<PotionEffectType> {
 	}
 
 	static RWWeakHashMap<Object, List<PotionEffectType>> cache = new RWWeakHashMap<>(1, 1f);
+
 	@Override
 	protected List<PotionEffectType> cacheOrBuild() {
 		return cachedOrBuild(cache, () -> Arrays.stream(PotionEffectType.values()).sorted(Comparator.comparing(e -> e.getId())));

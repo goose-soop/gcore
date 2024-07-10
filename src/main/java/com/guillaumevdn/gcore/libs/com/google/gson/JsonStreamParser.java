@@ -28,18 +28,17 @@ import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonToken;
 import com.guillaumevdn.gcore.libs.com.google.gson.stream.MalformedJsonException;
 
 /**
- * A streaming parser that allows reading of multiple {@link JsonElement}s from the specified reader
- * asynchronously. The JSON data is parsed in lenient mode, see also
- * {@link JsonReader#setLenient(boolean)}.
+ * A streaming parser that allows reading of multiple {@link JsonElement}s from the specified reader asynchronously. The
+ * JSON data is parsed in lenient mode, see also {@link JsonReader#setLenient(boolean)}.
  *
- * <p>This class is conditionally thread-safe (see Item 70, Effective Java second edition). To
- * properly use this class across multiple threads, you will need to add some external
- * synchronization. For example:
+ * <p>
+ * This class is conditionally thread-safe (see Item 70, Effective Java second edition). To properly use this class
+ * across multiple threads, you will need to add some external synchronization. For example:
  * 
  * <pre>
  * JsonStreamParser parser = new JsonStreamParser("['first'] {'second':10} 'third'");
  * JsonElement element;
- * synchronized (parser) {  // synchronize on an object shared by threads
+ * synchronized (parser) { // synchronize on an object shared by threads
  *   if (parser.hasNext()) {
  *     element = parser.next();
  *   }
@@ -51,6 +50,7 @@ import com.guillaumevdn.gcore.libs.com.google.gson.stream.MalformedJsonException
  * @since 1.4
  */
 public final class JsonStreamParser implements Iterator<JsonElement> {
+
   private final JsonReader parser;
   private final Object lock;
 
@@ -59,9 +59,9 @@ public final class JsonStreamParser implements Iterator<JsonElement> {
    * @since 1.4
    */
   public JsonStreamParser(String json) {
-    this(new StringReader(json));      
+    this(new StringReader(json));
   }
-  
+
   /**
    * @param reader The data stream containing JSON elements concatenated to each other.
    * @since 1.4
@@ -71,13 +71,13 @@ public final class JsonStreamParser implements Iterator<JsonElement> {
     parser.setLenient(true);
     lock = new Object();
   }
-  
+
   /**
-   * Returns the next available {@link JsonElement} on the reader. Throws a
-   * {@link NoSuchElementException} if no element is available.
+   * Returns the next available {@link JsonElement} on the reader. Throws a {@link NoSuchElementException} if no element
+   * is available.
    *
    * @return the next available {@code JsonElement} on the reader.
-   * @throws JsonSyntaxException if the incoming stream is malformed JSON.
+   * @throws JsonSyntaxException    if the incoming stream is malformed JSON.
    * @throws NoSuchElementException if no {@code JsonElement} is available.
    * @since 1.4
    */
@@ -85,7 +85,7 @@ public final class JsonStreamParser implements Iterator<JsonElement> {
     if (!hasNext()) {
       throw new NoSuchElementException();
     }
-    
+
     try {
       return Streams.parse(parser);
     } catch (StackOverflowError e) {
@@ -99,6 +99,7 @@ public final class JsonStreamParser implements Iterator<JsonElement> {
 
   /**
    * Returns true if a {@link JsonElement} is available on the input for consumption
+   * 
    * @return true if a {@link JsonElement} is available on the input, false otherwise
    * @throws JsonSyntaxException if the incoming stream is malformed JSON.
    * @since 1.4
@@ -116,11 +117,12 @@ public final class JsonStreamParser implements Iterator<JsonElement> {
   }
 
   /**
-   * This optional {@link Iterator} method is not relevant for stream parsing and hence is not
-   * implemented.
+   * This optional {@link Iterator} method is not relevant for stream parsing and hence is not implemented.
+   * 
    * @since 1.4
    */
   public void remove() {
     throw new UnsupportedOperationException();
   }
+
 }

@@ -20,7 +20,8 @@ public class NPCBothClickEvent extends Event implements Cancellable {
 
 	public NPCBothClickEvent(NPCClickEvent event, PhysicalClickType click) {
 		super(!Bukkit.isPrimaryThread());
-		this.event = event;;
+		this.event = event;
+		;
 		this.click = click;
 	}
 
@@ -57,11 +58,13 @@ public class NPCBothClickEvent extends Event implements Cancellable {
 
 	// ----- call
 	public static void callFrom(NPCRightClickEvent event) {
-		Bukkit.getPluginManager().callEvent(new NPCBothClickEvent(event, event.getClicker().isSneaking() ? PhysicalClickType.RIGHT_CLICK_SNEAK : PhysicalClickType.RIGHT_CLICK));
+		Bukkit.getPluginManager()
+				.callEvent(new NPCBothClickEvent(event, event.getClicker().isSneaking() ? PhysicalClickType.RIGHT_CLICK_SNEAK : PhysicalClickType.RIGHT_CLICK));
 	}
 
 	public static void callFrom(NPCLeftClickEvent event) {
-		Bukkit.getPluginManager().callEvent(new NPCBothClickEvent(event, event.getClicker().isSneaking() ? PhysicalClickType.LEFT_CLICK_SNEAK : PhysicalClickType.LEFT_CLICK));
+		Bukkit.getPluginManager()
+				.callEvent(new NPCBothClickEvent(event, event.getClicker().isSneaking() ? PhysicalClickType.LEFT_CLICK_SNEAK : PhysicalClickType.LEFT_CLICK));
 	}
 
 }

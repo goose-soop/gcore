@@ -34,7 +34,8 @@ public abstract class DefaultMapElement<K, V extends Element> extends MapElement
 	@Override
 	public Optional<V> getElement(K key) {
 		Optional<V> val = super.getElement(key);
-		if (!val.isPresent()) val = getDefaultElement();
+		if (!val.isPresent())
+			val = getDefaultElement();
 		return val;
 	}
 
@@ -62,7 +63,8 @@ public abstract class DefaultMapElement<K, V extends Element> extends MapElement
 				K key = null;
 				try {
 					key = getKeySerializer().deserialize(elementId);
-				} catch (Throwable ignored) {}
+				} catch (Throwable ignored) {
+				}
 				if (key == null) {
 					getSuperElement().addLoadError("key " + elementId + " at path " + path + " isn't a valid " + getKeySerializer().getTypeName());
 				}
@@ -76,6 +78,7 @@ public abstract class DefaultMapElement<K, V extends Element> extends MapElement
 
 	@Override
 	public abstract V createElement(String elementId);
+
 	public abstract V createDefaultElement(String elementId);
 
 	@Override
@@ -93,6 +96,7 @@ public abstract class DefaultMapElement<K, V extends Element> extends MapElement
 	@Override
 	public EditorGUI editorGUI(ClickCall fromCall) {
 		EditorGUI editor = new EditorGUI(this, fromCall) {
+
 			@Override
 			protected boolean doFill() {
 				// default value
@@ -145,26 +149,28 @@ public abstract class DefaultMapElement<K, V extends Element> extends MapElement
 					}));
 				}
 				// create item
-				setPersistentItem(new GUIItem("new_element", 50, ItemUtils.createItem(CommonMats.BLAZE_ROD, TextEditorGeneric.controlAddElementName.parseLine(), TextEditorGeneric.controlAddElementWithDefault.parseLines()), call -> {
-					// left-click : create
-					if (call.getType().equals(ClickType.LEFT)) {
-						editorAskKeyAndCreateAndAddElement(call, (key, value) -> {
-							getSuperElement().onEditorChange(DefaultMapElement.this);
-							// reopen GUI (that refreshes it since it's an editor GUI)
-							call.reopenGUI();
-						}, () -> call.reopenGUI());
-					}
-					// right-click : create default
-					else if (call.getType().equals(ClickType.RIGHT)) {
-						defaultElement = createDefaultElement("DEFAULT");
-						getSuperElement().onEditorChange(DefaultMapElement.this);
-						// reopen GUI (that refreshes it since it's an editor GUI)
-						call.reopenGUI();
-					}
-				}));
+				setPersistentItem(new GUIItem("new_element", 50, ItemUtils.createItem(CommonMats.BLAZE_ROD, TextEditorGeneric.controlAddElementName.parseLine(),
+						TextEditorGeneric.controlAddElementWithDefault.parseLines()), call -> {
+							// left-click : create
+							if (call.getType().equals(ClickType.LEFT)) {
+								editorAskKeyAndCreateAndAddElement(call, (key, value) -> {
+									getSuperElement().onEditorChange(DefaultMapElement.this);
+									// reopen GUI (that refreshes it since it's an editor GUI)
+									call.reopenGUI();
+								}, () -> call.reopenGUI());
+							}
+							// right-click : create default
+							else if (call.getType().equals(ClickType.RIGHT)) {
+								defaultElement = createDefaultElement("DEFAULT");
+								getSuperElement().onEditorChange(DefaultMapElement.this);
+								// reopen GUI (that refreshes it since it's an editor GUI)
+								call.reopenGUI();
+							}
+						}));
 				// done
 				return super.doFill();
 			}
+
 		};
 		return editor;
 	}

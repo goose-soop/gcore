@@ -20,14 +20,15 @@ public final class MigrationV8_9 extends MigrationNextMinor {
 	@Override
 	protected void doMigrate() throws Throwable {
 		// make sure that control items in SYSTEM GUIs are persistent
-		attemptDirectYMLFilesOperation("making sure that control items in SYSTEM GUIs are persistent", "gui", BackupBehavior.RESTORE, getPluginFile("guis"), config -> {
-			for (String contentId : config.readKeysForSection("contents")) {
-				if (ids.contains(contentId) && !config.readBoolean("contents." + contentId + ".persistent", false)) {
-					config.write("contents." + contentId + ".persistent", true);
-					countMod();
-				}
-			}
-		});
+		attemptDirectYMLFilesOperation("making sure that control items in SYSTEM GUIs are persistent", "gui", BackupBehavior.RESTORE, getPluginFile("guis"),
+				config -> {
+					for (String contentId : config.readKeysForSection("contents")) {
+						if (ids.contains(contentId) && !config.readBoolean("contents." + contentId + ".persistent", false)) {
+							config.write("contents." + contentId + ".persistent", true);
+							countMod();
+						}
+					}
+				});
 	}
 
 }

@@ -5,8 +5,6 @@ package com.guillaumevdn.gcore.lib.migration;
  */
 public enum BackupBehavior {
 
-	NONE,
-	RESTORE,
-	DELETE;
+	NONE, RESTORE, DELETE;
 
 }

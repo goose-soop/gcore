@@ -5,7 +5,8 @@ import com.guillaumevdn.gcore.lib.function.ThrowableSexaFunction;
 /**
  * @author GuillaumeVDN
  */
-public class ReflectionProcedureSexaFunction<A, B, C, D, E, F, R> extends ReflectionProcedure<ThrowableSexaFunction<A, B, C, D, E, F, R>, ReflectionProcedureSexaFunction<A, B, C, D, E, F, R>> {
+public class ReflectionProcedureSexaFunction<A, B, C, D, E, F, R>
+		extends ReflectionProcedure<ThrowableSexaFunction<A, B, C, D, E, F, R>, ReflectionProcedureSexaFunction<A, B, C, D, E, F, R>> {
 
 	// ----- methods
 	public R process(A a, B b, C c, D d, E e, F f) {

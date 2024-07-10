@@ -34,7 +34,8 @@ public class PositionTypeCitizensNPCRelativeCylinderInside extends PositionTypeC
 	// ----- parse
 	@Override
 	protected Position doParse(ElementPosition position, NPC npc, Replacer replacer) throws ParsingError {
-		Location center = position.getElementAs("center", ElementRelativeLocation.class).parseNoCatchOrThrowParsingNull(replacer.cloneReplacer().with(npc.getEntity().getLocation()));
+		Location center = position.getElementAs("center", ElementRelativeLocation.class)
+				.parseNoCatchOrThrowParsingNull(replacer.cloneReplacer().with(npc.getEntity().getLocation()));
 		double radius = position.getElementAs("radius", ElementDouble.class).parseNoCatchOrThrowParsingNull(replacer);
 		return new PositionCylinderInside(center, radius);
 	}

@@ -100,10 +100,11 @@ public abstract class ElementsContainer<V extends SuperElement> {
 
 	// ----- set
 	public final void load() throws Throwable {
-		elements = new SortedLowerCaseHashMap<>(Type.KEY_SORTED, Order.NATURAL/*, countCandidates(baseFolder), 1f*/);
+		elements = new SortedLowerCaseHashMap<>(Type.KEY_SORTED, Order.NATURAL/* , countCandidates(baseFolder), 1f */);
 		doLoad(baseFolder);
 		if (!elements.isEmpty()) {
-			plugin.getMainLogger().info("Successfully loaded " + StringUtils.pluralizeAmountDesc(typeName, elements.size()) + (ConfigGCore.dontLogLoadedElementsNames ? "" : " : " + StringUtils.toTextString(", ", elements.keySet())));
+			plugin.getMainLogger().info("Successfully loaded " + StringUtils.pluralizeAmountDesc(typeName, elements.size())
+					+ (ConfigGCore.dontLogLoadedElementsNames ? "" : " : " + StringUtils.toTextString(", ", elements.keySet())));
 		}
 	}
 
@@ -111,23 +112,14 @@ public abstract class ElementsContainer<V extends SuperElement> {
 		return !file.getName().toLowerCase().endsWith(".yml") || file.getName().startsWith("SYSTEM_") || skipFiles.contains(FileUtils.getSimpleName(file));
 	}
 
-	/*private int countCandidates(File file) {
-		if (!file.exists()) {  // might happen if the folder wasn't created yet
-			return 0;
-		}
-		if (file.isDirectory()) {
-			int count = 0;
-			for (File f : file.listFiles()) {
-				count += countCandidates(f);
-			}
-			return count;
-		} else {
-			return shouldSkipFile(file) ? 0 : 1;
-		}
-	}*/
+	/*
+	 * private int countCandidates(File file) { if (!file.exists()) { // might happen if the folder wasn't created yet
+	 * return 0; } if (file.isDirectory()) { int count = 0; for (File f : file.listFiles()) { count += countCandidates(f); }
+	 * return count; } else { return shouldSkipFile(file) ? 0 : 1; } }
+	 */
 
 	private void doLoad(File file) throws Throwable {
-		if (!file.exists()) {  // might happen if the folder wasn't created yet
+		if (!file.exists()) { // might happen if the folder wasn't created yet
 			return;
 		}
 		if (file.isDirectory()) {
@@ -155,7 +147,8 @@ public abstract class ElementsContainer<V extends SuperElement> {
 		V elem = createElement(file, id);
 		V existing = getElement(id).orNull();
 		if (existing != null) {
-			throw new ConfigError("Found duplicate " + typeName + " id '" + id + "', first in " + existing.getConfiguration().getLogFilePath() + ", second in " + elem.getConfiguration().getLogFilePath());
+			throw new ConfigError("Found duplicate " + typeName + " id '" + id + "', first in " + existing.getConfiguration().getLogFilePath() + ", second in "
+					+ elem.getConfiguration().getLogFilePath());
 		}
 
 		// load element
@@ -163,11 +156,11 @@ public abstract class ElementsContainer<V extends SuperElement> {
 		elem.read();
 
 		// notify loading errors
-		/* now done in all elements
-		if (!elem.getLoadErrors().isEmpty()) {
-			getPlugin().getMainLogger().error("Errors were found when loading " + getTypeName() + " " + id + " :", true);
-			elem.getLoadErrors().forEach(error -> getPlugin().getMainLogger().error("- " + error, true));
-		}*/
+		/*
+		 * now done in all elements if (!elem.getLoadErrors().isEmpty()) {
+		 * getPlugin().getMainLogger().error("Errors were found when loading " + getTypeName() + " " + id + " :", true);
+		 * elem.getLoadErrors().forEach(error -> getPlugin().getMainLogger().error("- " + error, true)); }
+		 */
 	}
 
 	protected void ensureCanLoad(File file, String id) throws ConfigError {
@@ -193,7 +186,8 @@ public abstract class ElementsContainer<V extends SuperElement> {
 		if (ownFile != null) {
 			if (ownFile.exists()) {
 				if (moveToDeleted) {
-					File newFile = new File(baseFolder + "/deleted/" + DELETE_FILE_LOCALDATETIME_FORMAT.format(ConfigGCore.timeNow()) + "_" + element.getId() + ".ymlr");
+					File newFile = new File(
+							baseFolder + "/deleted/" + DELETE_FILE_LOCALDATETIME_FORMAT.format(ConfigGCore.timeNow()) + "_" + element.getId() + ".ymlr");
 					newFile.getParentFile().mkdirs();
 					if (!ownFile.renameTo(newFile)) {
 						FileUtils.delete(ownFile);
@@ -214,6 +208,7 @@ public abstract class ElementsContainer<V extends SuperElement> {
 	// ----- editor
 	public EditorGUI editorGUI(GPlugin plugin, String title, ClickCall fromCall) {
 		EditorGUI editor = new EditorGUI(plugin, title, fromCall) {
+
 			@Override
 			protected boolean doFill() {
 				// values
@@ -247,40 +242,42 @@ public abstract class ElementsContainer<V extends SuperElement> {
 					}));
 				}
 				// create item
-				setPersistentItem(new GUIItem("new_element", 50, ItemUtils.createItem(CommonMats.BLAZE_ROD, TextEditorGeneric.controlAddElementName.parseLine(), null), call -> {
-					// left-click : create
-					if (call.getType().equals(ClickType.LEFT)) {
-						WorkerGCore.inst().awaitChat(call.getClicker(), TextEditorGeneric.messageElementCreateEnterId, raw -> {
-							// invalid id, or already exists
-							final String id = raw.toLowerCase().trim();
-							final File file = new File(baseFolder + "/" + id + ".yml");
-							if (!StringUtils.isAlphanumeric(id.replace("_", ""))) {
-								TextEditorGeneric.messageElementCreateInvalidId.replace("{value}", () -> id).send(call.getClicker());
-								call.reopenGUI();
-							} else if (getElement(id).isPresent() || file.exists()) {
-								TextEditorGeneric.messageElementCreateAlreadyExists.replace("{value}", () -> id).send(call.getClicker());
-								call.reopenGUI();
-							}
-							// create element
-							else {
-								V value = createElement(file, id);
-								try {
-									value.write();
-									value.getConfiguration().save();
-									elements.put(id, value);
-								} catch (Throwable exception) {
-									exception.printStackTrace();
-								}
+				setPersistentItem(new GUIItem("new_element", 50,
+						ItemUtils.createItem(CommonMats.BLAZE_ROD, TextEditorGeneric.controlAddElementName.parseLine(), null), call -> {
+							// left-click : create
+							if (call.getType().equals(ClickType.LEFT)) {
+								WorkerGCore.inst().awaitChat(call.getClicker(), TextEditorGeneric.messageElementCreateEnterId, raw -> {
+									// invalid id, or already exists
+									final String id = raw.toLowerCase().trim();
+									final File file = new File(baseFolder + "/" + id + ".yml");
+									if (!StringUtils.isAlphanumeric(id.replace("_", ""))) {
+										TextEditorGeneric.messageElementCreateInvalidId.replace("{value}", () -> id).send(call.getClicker());
+										call.reopenGUI();
+									} else if (getElement(id).isPresent() || file.exists()) {
+										TextEditorGeneric.messageElementCreateAlreadyExists.replace("{value}", () -> id).send(call.getClicker());
+										call.reopenGUI();
+									}
+									// create element
+									else {
+										V value = createElement(file, id);
+										try {
+											value.write();
+											value.getConfiguration().save();
+											elements.put(id, value);
+										} catch (Throwable exception) {
+											exception.printStackTrace();
+										}
 
-								// reopen GUI (that refreshes it since it's an editor GUI)
-								call.reopenGUI();
+										// reopen GUI (that refreshes it since it's an editor GUI)
+										call.reopenGUI();
+									}
+								}, () -> call.reopenGUI());
 							}
-						}, () -> call.reopenGUI());
-					}
-				}));
+						}));
 				// done
 				return super.doFill();
 			}
+
 		};
 		return editor;
 	}

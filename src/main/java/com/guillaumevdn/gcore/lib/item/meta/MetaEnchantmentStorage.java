@@ -21,15 +21,19 @@ import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
 public final class MetaEnchantmentStorage {
 
 	public static boolean match(ItemMeta itemMeta, ItemReference reference, ItemCheck check) {
-		if (!reference.hasMeta(EnchantmentStorageMeta.class)) return true;
-		EnchantmentStorageMeta meta = ObjectUtils.castOrNull(itemMeta, EnchantmentStorageMeta.class);  // might be null if exact match is false
+		if (!reference.hasMeta(EnchantmentStorageMeta.class))
+			return true;
+		EnchantmentStorageMeta meta = ObjectUtils.castOrNull(itemMeta, EnchantmentStorageMeta.class); // might be null if exact match is false
 
 		// enchantments
 		if (check.isExact()) {
-			if ((meta != null && meta.hasStoredEnchants()) != reference.hasStoredEnchants()) return false;
-			if (reference.hasStoredEnchants() && !CollectionUtils.contentEquals(meta.getStoredEnchants(), reference.getStoredEnchants())) return false;
+			if ((meta != null && meta.hasStoredEnchants()) != reference.hasStoredEnchants())
+				return false;
+			if (reference.hasStoredEnchants() && !CollectionUtils.contentEquals(meta.getStoredEnchants(), reference.getStoredEnchants()))
+				return false;
 		} else {
-			if (reference.hasStoredEnchants() && (meta == null || !meta.hasStoredEnchants())) return false;
+			if (reference.hasStoredEnchants() && (meta == null || !meta.hasStoredEnchants()))
+				return false;
 			for (Enchantment enchantment : reference.getStoredEnchants().keySet()) {
 				if (meta.getStoredEnchants().get(enchantment) != reference.getStoredEnchants().get(enchantment)) {
 					return false;

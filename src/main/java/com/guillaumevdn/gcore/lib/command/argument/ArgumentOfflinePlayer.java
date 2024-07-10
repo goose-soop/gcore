@@ -95,7 +95,8 @@ public class ArgumentOfflinePlayer extends Argument<OfflinePlayer> implements Pl
 
 	@Override
 	public List<String> tabComplete(CommandCall call) {
-		return Stream.concat(PlayerUtils.getOnlineStream().map(pl -> pl.getName()), WorkerGCore.inst().getOfflinePlayersNames()).filter(n -> n != null).sorted(StringUtils.STRING_WITHNUMBERS_IGNORECASE).collect(Collectors.toList());
+		return Stream.concat(PlayerUtils.getOnlineStream().map(pl -> pl.getName()), WorkerGCore.inst().getOfflinePlayersNames()).filter(n -> n != null)
+				.sorted(StringUtils.STRING_WITHNUMBERS_IGNORECASE).collect(Collectors.toList());
 	}
 
 }

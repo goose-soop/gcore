@@ -110,7 +110,7 @@ public class YMLReader {
 			}
 			if (string.charAt(string.length() - 1) == wrapping) {
 				String wrappingStr = String.valueOf(wrapping);
-				string = string.substring(1, string.length() - 1).replace(wrappingStr + wrappingStr, wrappingStr);  // if value is wrapped, don't trim
+				string = string.substring(1, string.length() - 1).replace(wrappingStr + wrappingStr, wrappingStr); // if value is wrapped, don't trim
 			}
 		}
 		// equals to null ? consider it as a mistake ; if they really want the 'null' string, they can wrap it with &r
@@ -131,7 +131,8 @@ public class YMLReader {
 		if (dbl != null) {
 			return StringUtils.getDoubleFormat(3).format(dbl);
 		}
-		if (NumberUtils.doubleOrNull(value) != null || NumberUtils.integerOrNull(value) != null || NumberUtils.longOrNull(value) != null || value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false")) {
+		if (NumberUtils.doubleOrNull(value) != null || NumberUtils.integerOrNull(value) != null || NumberUtils.longOrNull(value) != null
+				|| value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false")) {
 			return value;
 		}
 		// contains : or ,
@@ -171,10 +172,11 @@ public class YMLReader {
 				}
 			} else if (ch == '#') {
 				if (wrappingCount % 2 == 0) {
-					return -1;  // found comment after wrapping ; if we're here, then we didn't find a colon before comment, so invalid
+					return -1; // found comment after wrapping ; if we're here, then we didn't find a colon before comment, so invalid
 				}
 			} else if (ch == ':') {
-				if (i + 1 >= chars.length || chars[i + 1] == ' ') {  // no longer tolerate 'key:value', we require a space (except at the end of lines, such as section keys)
+				if (i + 1 >= chars.length || chars[i + 1] == ' ') { // no longer tolerate 'key:value', we require a space (except at the end of lines, such as
+																	// section keys)
 					if (wrappingCount % 2 == 0) {
 						return i;
 					}
@@ -207,8 +209,9 @@ public class YMLReader {
 		return -1;
 	}
 
-	public static String requireValidIndentLevelPotentiallyLenient(ReaderContext context, ReaderLine peek) {  // for lists whose "-" don't have extra spaces and are at the same level as their keys
-		String indent = context.getCurrentIndent();  // don't add context.getIndentLevel() here, the list might be formatted without extra leading indent level
+	public static String requireValidIndentLevelPotentiallyLenient(ReaderContext context, ReaderLine peek) { // for lists whose "-" don't have extra spaces and
+																												// are at the same level as their keys
+		String indent = context.getCurrentIndent(); // don't add context.getIndentLevel() here, the list might be formatted without extra leading indent level
 		if (!peek.getLine().startsWith(indent)) {
 			context.throwIndentError(peek, indent.length(), true);
 		}

@@ -30,6 +30,7 @@ public class TypeNone extends GUIItemType {
 	@Override
 	public ActiveItemHolder newActive(ActiveGUI instance, ItemHolder holder, ElementGUIItem element) {
 		return new ActiveItemHolderElementGUIItemCommon(instance, holder, element) {
+
 			@Override
 			protected void build(ItemStack itemIcon, QuadriConsumer<ItemStack, Set<String>, Integer, Consumer<ClickCall>> callback) throws ParsingError {
 
@@ -38,6 +39,7 @@ public class TypeNone extends GUIItemType {
 
 				callback.accept(itemIcon, placeholders, -1, null);
 			}
+
 		};
 	}
 

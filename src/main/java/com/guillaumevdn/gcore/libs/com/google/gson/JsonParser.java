@@ -32,9 +32,11 @@ import com.guillaumevdn.gcore.libs.com.google.gson.stream.MalformedJsonException
  * @since 1.3
  */
 public final class JsonParser {
+
   /** @deprecated No need to instantiate this class, use the static methods instead. */
   @Deprecated
-  public JsonParser() {}
+  public JsonParser() {
+  }
 
   /**
    * Parses the specified JSON string into a parse tree
@@ -74,11 +76,9 @@ public final class JsonParser {
   /**
    * Returns the next value from the JSON stream as a parse tree.
    *
-   * @throws JsonParseException if there is an IOException or if the specified
-   *     text is not valid JSON
+   * @throws JsonParseException if there is an IOException or if the specified text is not valid JSON
    */
-  public static JsonElement parseReader(JsonReader reader)
-      throws JsonIOException, JsonSyntaxException {
+  public static JsonElement parseReader(JsonReader reader) throws JsonIOException, JsonSyntaxException {
     boolean lenient = reader.isLenient();
     reader.setLenient(true);
     try {
@@ -109,4 +109,5 @@ public final class JsonParser {
   public JsonElement parse(JsonReader json) throws JsonIOException, JsonSyntaxException {
     return parseReader(json);
   }
+
 }

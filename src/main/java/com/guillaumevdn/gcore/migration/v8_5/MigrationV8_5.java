@@ -39,18 +39,21 @@ public final class MigrationV8_5 extends MigrationNextMinor {
 		// migrate new GUIs files
 		if (!getPlugin().getDataFile("guis").exists()) {
 			new ResourceExtractor(getPlugin(), getPlugin().getDataFile("guis"), "guis").extract(false, true);
-			migrateGUIToOwnFile(this, getPlugin().loadConfigurationFile("config.yml"), "confirm_gui", "guis/SYSTEM_confirm.yml", CollectionUtils.asMap("item_yes", "confirm", "item_no", "cancel"), "&dConfirm action", (src, target) -> {
-				List<String> lore = src.readStringList("confirm_gui.item_yes.lore", new ArrayList<>());
-				target.write("contents.confirm.lore", lore);
-			});
+			migrateGUIToOwnFile(this, getPlugin().loadConfigurationFile("config.yml"), "confirm_gui", "guis/SYSTEM_confirm.yml",
+					CollectionUtils.asMap("item_yes", "confirm", "item_no", "cancel"), "&dConfirm action", (src, target) -> {
+						List<String> lore = src.readStringList("confirm_gui.item_yes.lore", new ArrayList<>());
+						target.write("contents.confirm.lore", lore);
+					});
 		}
 	}
 
-	public static void migrateGUIToOwnFile(Migration migration, YMLConfiguration src, String srcPath, String targetFile, Map<String, String> customItems, String defaultName) throws Throwable {
+	public static void migrateGUIToOwnFile(Migration migration, YMLConfiguration src, String srcPath, String targetFile, Map<String, String> customItems,
+			String defaultName) throws Throwable {
 		migrateGUIToOwnFile(migration, src, srcPath, targetFile, customItems, defaultName, null);
 	}
 
-	public static void migrateGUIToOwnFile(Migration migration, YMLConfiguration src, String srcPath, String targetFile, Map<String, String> customItems, String defaultName, BiConsumer<YMLConfiguration, YMLConfiguration> custom) throws Throwable {
+	public static void migrateGUIToOwnFile(Migration migration, YMLConfiguration src, String srcPath, String targetFile, Map<String, String> customItems,
+			String defaultName, BiConsumer<YMLConfiguration, YMLConfiguration> custom) throws Throwable {
 		if (src.contains(srcPath)) {
 			migration.attemptOperation("convert GUI to file " + targetFile, BackupBehavior.RESTORE, () -> {
 				// type and name

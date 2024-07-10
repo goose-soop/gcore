@@ -12,7 +12,7 @@ public class ReaderLineBreak implements ThrowableFunction<ReaderContext, Boolean
 	@Override
 	public Boolean apply(ReaderContext context) throws Throwable {
 		int count = 0;
-		for (ReaderLine line; (line = context.peekLine()) != null && line.getLine().trim().isEmpty(); ) {
+		for (ReaderLine line; (line = context.peekLine()) != null && line.getLine().trim().isEmpty();) {
 			context.getLines().remove(0);
 			++count;
 		}

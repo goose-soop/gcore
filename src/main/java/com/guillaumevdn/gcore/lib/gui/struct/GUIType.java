@@ -26,14 +26,14 @@ public enum GUIType {
 	ENCHANTMENT("minecraft:enchanting_table", "ENCHANTMENT", "m", 2, 0, 1, title -> Bukkit.createInventory(null, InventoryType.ENCHANTING, title)),
 	FURNACE("minecraft:furnace", "FURNACE", "n", 3, 3, 2, title -> Bukkit.createInventory(null, InventoryType.FURNACE, title)),
 	GRINDSTONE(null, "GRINDSTONE", "o", 3, 3, 2, title -> Bukkit.createInventory(null, InventoryType.GRINDSTONE, title)),
-	HOPPER(null, "HOPPER", "p", 5, 5, 4, title -> Bukkit.createInventory(null, InventoryType.HOPPER, title))
-	;
+	HOPPER(null, "HOPPER", "p", 5, 5, 4, title -> Bukkit.createInventory(null, InventoryType.HOPPER, title));
 
 	private String containerIdPre114, containerId117, containerId;
 	private int size, regularItemSlotsEnd, pre114PacketSlots, previousPageItemSlot = -1, nextPageItemSlot = -1, backItemSlot = -1;
 	private Function<String, Inventory> createVanilla;
 
-	GUIType(String containerIdPre114, String containerId, String containerId117, int size, int pre114PacketSlots, int regularItemSlotsEnd, Function<String, Inventory> createVanilla) {
+	GUIType(String containerIdPre114, String containerId, String containerId117, int size, int pre114PacketSlots, int regularItemSlotsEnd,
+			Function<String, Inventory> createVanilla) {
 		this.containerIdPre114 = containerIdPre114;
 		this.containerId = containerId;
 		this.containerId117 = containerId117;

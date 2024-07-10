@@ -85,8 +85,10 @@ public class YMLFile {
 	}
 
 	public ConfigNode getConfigNode(String path) {
-		if (path.isEmpty()) return base;
-		if (path.charAt(0) == '.') path = path.substring(1);
+		if (path.isEmpty())
+			return base;
+		if (path.charAt(0) == '.')
+			path = path.substring(1);
 		List<String> split = StringUtils.split(path, ".", -1);
 		SectionNode node = base;
 		String id = null;
@@ -137,7 +139,7 @@ public class YMLFile {
 				} else if (split.isEmpty()) {
 					subType = type;
 				} else {
-					subType = SectionNodeType.REGULAR;  // do not automatically create compact nested maps for intermediate parents
+					subType = SectionNodeType.REGULAR; // do not automatically create compact nested maps for intermediate parents
 				}
 
 				sub = new SectionNode(node, id, subType, null);

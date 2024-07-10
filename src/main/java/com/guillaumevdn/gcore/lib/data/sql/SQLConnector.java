@@ -27,11 +27,11 @@ public final class SQLConnector {
 	}
 
 	// ----- methods
-	//private final Object LOCK = new Object();
+	// private final Object LOCK = new Object();
 	private Connection connection;
 
 	public void ensureConnection() throws SQLException {
-		//synchronized (LOCK) {
+		// synchronized (LOCK) {
 		try {
 			if (connection != null && !connection.isClosed() && connection.isValid(1)) {
 				return;
@@ -40,11 +40,11 @@ public final class SQLConnector {
 			plugin.getMainLogger().error("Couldn't ensure connection to database " + url, error);
 		}
 		connection = DriverManager.getConnection(url, usr, pwd);
-		//}
+		// }
 	}
 
 	public void closeConnection() {
-		//synchronized (LOCK) {
+		// synchronized (LOCK) {
 		try {
 			if (connection != null && !connection.isClosed()) {
 				connection.close();
@@ -54,22 +54,19 @@ public final class SQLConnector {
 		} finally {
 			connection = null;
 		}
-		//}
+		// }
 	}
 
-	/*private static final DateTimeFormatter ISLANDPASS_DEBUG_LOCALDATETIME_FORMAT = DateTimeFormatter.ofPattern("uuuu'-'MM'-'dd' 'HH'h'mm'm'ss's'SSS'ms'");
-	public void islandpassLog(String line, boolean logTime) {
-		if (url.contains("islands.sqlite.db")) {
-			final File logFile = plugin.getDataFile("debug_island_data/sql_requests_log.txt");
-			FileUtils.ensureExistence(logFile);
-
-			try (final BufferedWriter writer = new BufferedWriter(new FileWriter(logFile, true))) {
-				writer.write((logTime ? "[" + ISLANDPASS_DEBUG_LOCALDATETIME_FORMAT.format(ConfigGCore.timeNow()) + "] " : "") + line + "\n");
-			} catch (IOException error) {
-				plugin.getMainLogger().error("Couldn't log SQL : " + line, error);
-			}
-		}
-	}*/
+	/*
+	 * private static final DateTimeFormatter ISLANDPASS_DEBUG_LOCALDATETIME_FORMAT =
+	 * DateTimeFormatter.ofPattern("uuuu'-'MM'-'dd' 'HH'h'mm'm'ss's'SSS'ms'"); public void islandpassLog(String line,
+	 * boolean logTime) { if (url.contains("islands.sqlite.db")) { final File logFile =
+	 * plugin.getDataFile("debug_island_data/sql_requests_log.txt"); FileUtils.ensureExistence(logFile);
+	 * 
+	 * try (final BufferedWriter writer = new BufferedWriter(new FileWriter(logFile, true))) { writer.write((logTime ? "[" +
+	 * ISLANDPASS_DEBUG_LOCALDATETIME_FORMAT.format(ConfigGCore.timeNow()) + "] " : "") + line + "\n"); } catch (IOException
+	 * error) { plugin.getMainLogger().error("Couldn't log SQL : " + line, error); } } }
+	 */
 
 	public boolean performUpdateQuery(Query query) {
 		return doPerformUpdateQuery(query, false);
@@ -77,8 +74,8 @@ public final class SQLConnector {
 
 	private boolean doPerformUpdateQuery(Query query, boolean retrying) {
 		if (!query.isEmpty()) {
-			//synchronized (LOCK) {
-			//String islandPassDebugOutput = query.combineParts() + "\n";
+			// synchronized (LOCK) {
+			// String islandPassDebugOutput = query.combineParts() + "\n";
 			try {
 				ensureConnection();
 				final PreparedStatement statement = connection.prepareStatement(query.combineParts());
@@ -87,21 +84,21 @@ public final class SQLConnector {
 				} finally {
 					statement.close();
 				}
-				//islandPassDebugOutput += "... success, " + count + " updated\n";
-				//islandpassLog(islandPassDebugOutput, true);
+				// islandPassDebugOutput += "... success, " + count + " updated\n";
+				// islandpassLog(islandPassDebugOutput, true);
 			} catch (Throwable exception) {
 				if (exception.getMessage() != null && exception.getMessage().contains("Connection timed out") && !retrying) {
-					//islandPassDebugOutput += "... failed";
-					//islandpassLog(islandPassDebugOutput, false);
+					// islandPassDebugOutput += "... failed";
+					// islandpassLog(islandPassDebugOutput, false);
 					closeConnection();
 					return doPerformUpdateQuery(query, true);
 				}
-				//islandPassDebugOutput += "... failed\n";
-				//islandpassLog(islandPassDebugOutput, false);
+				// islandPassDebugOutput += "... failed\n";
+				// islandpassLog(islandPassDebugOutput, false);
 				printQueryError(query, exception, retrying);
 				return false;
 			}
-			//}
+			// }
 		}
 		return true;
 	}
@@ -112,8 +109,8 @@ public final class SQLConnector {
 
 	private boolean doPerformGetQuery(Query query, ThrowableConsumer<ResultSet> syncProcessor, boolean retrying) {
 		if (!query.isEmpty()) {
-			//synchronized (LOCK) {
-			//String islandPassDebugOutput = query.combineParts() + "\n";
+			// synchronized (LOCK) {
+			// String islandPassDebugOutput = query.combineParts() + "\n";
 			try {
 				ensureConnection();
 				final PreparedStatement statement = connection.prepareStatement(query.combineParts());
@@ -124,27 +121,28 @@ public final class SQLConnector {
 					statement.close();
 					set.close();
 				}
-				//islandPassDebugOutput += "... success, got " + set.getRow() + " row(s)\n";
-				//islandpassLog(islandPassDebugOutput, true);
+				// islandPassDebugOutput += "... success, got " + set.getRow() + " row(s)\n";
+				// islandpassLog(islandPassDebugOutput, true);
 			} catch (Throwable exception) {
 				if (exception.getMessage() != null && exception.getMessage().contains("Connection timed out") && !retrying) {
-					//islandPassDebugOutput += "... failed";
-					//islandpassLog(islandPassDebugOutput, false);
+					// islandPassDebugOutput += "... failed";
+					// islandpassLog(islandPassDebugOutput, false);
 					closeConnection();
 					return doPerformGetQuery(query, syncProcessor, true);
 				}
-				//islandPassDebugOutput += "... failed\n";
-				//islandpassLog(islandPassDebugOutput, false);
+				// islandPassDebugOutput += "... failed\n";
+				// islandpassLog(islandPassDebugOutput, false);
 				printQueryError(query, exception, retrying);
 				return false;
 			}
-			//}
+			// }
 		}
 		return true;
 	}
 
 	private void printQueryError(Query query, Throwable exception, boolean retried) {
-		plugin.getMainLogger().error("Couldn't perform SQLConnector query (retried " + retried + ")\n---------- PARTS ----------" + query.logToString() + "\n---------------------------------", exception);
+		plugin.getMainLogger().error("Couldn't perform SQLConnector query (retried " + retried + ")\n---------- PARTS ----------" + query.logToString()
+				+ "\n---------------------------------", exception);
 	}
 
 }

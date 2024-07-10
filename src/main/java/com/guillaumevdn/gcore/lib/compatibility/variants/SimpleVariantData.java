@@ -10,7 +10,7 @@ import com.guillaumevdn.gcore.lib.string.StringUtils;
  * @author GuillaumeVDN
  */
 public abstract class SimpleVariantData<E extends Enum<E>> extends VariantData<E> {
-	
+
 	public SimpleVariantData(Version version, ComparisonType versionComparison, String dataName, List<E> extra) {
 		super(version, versionComparison, dataName, extra);
 	}
@@ -18,11 +18,8 @@ public abstract class SimpleVariantData<E extends Enum<E>> extends VariantData<E
 	// ----- get
 	@Override
 	public String toString() {
-		return "("
-				+ getVersionComparison().getSymbol() + getVersion() + ","
-				+ getDataName()
-				+ (getExtra().isEmpty() ? "" : "," + StringUtils.toTextString("-", getExtra()))
-				+ ")";
+		return "(" + getVersionComparison().getSymbol() + getVersion() + "," + getDataName()
+				+ (getExtra().isEmpty() ? "" : "," + StringUtils.toTextString("-", getExtra())) + ")";
 	}
 
 }

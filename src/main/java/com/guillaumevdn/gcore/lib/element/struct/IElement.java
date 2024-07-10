@@ -6,9 +6,13 @@ package com.guillaumevdn.gcore.lib.element.struct;
 public interface IElement {
 
 	String getId();
+
 	String getTypeName();
+
 	String getConfigurationPath();
+
 	SuperElement getSuperElement();
+
 	boolean hasParseableLocations();
 
 }

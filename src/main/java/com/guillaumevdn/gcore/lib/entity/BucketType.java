@@ -14,8 +14,10 @@ public enum BucketType {
 	public static BucketType fromBlock(Block block) {
 		Mat mat = Mat.fromBlock(block).orElse(null);
 		if (mat != null) {
-			if (mat.getData().getDataName().toUpperCase().contains("LAVA")) return LAVA;
-			if (mat.getData().getDataName().toUpperCase().contains("WATER")) return WATER;
+			if (mat.getData().getDataName().toUpperCase().contains("LAVA"))
+				return LAVA;
+			if (mat.getData().getDataName().toUpperCase().contains("WATER"))
+				return WATER;
 		}
 		return null;
 	}

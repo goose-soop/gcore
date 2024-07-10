@@ -30,15 +30,13 @@ public class IntegrationInstanceMythicMobsV5 extends IntegrationInstance {
 	}
 
 	// ----- activation
-	private Map<String, Class<? extends PositionType>> types = CollectionUtils.asMap(
-			"CLOSEST_MYTHICMOB_RELATIVE_AREA_INSIDE", PositionTypeClosestMythicMobRelativeAreaInside.class,
-			"CLOSEST_MYTHICMOB_RELATIVE_AREA_OUTSIDE", PositionTypeClosestMythicMobRelativeAreaOutside.class,
-			"CLOSEST_MYTHICMOB_RELATIVE_CYLINDER_INSIDE", PositionTypeClosestMythicMobRelativeCylinderInside.class,
-			"CLOSEST_MYTHICMOB_RELATIVE_CYLINDER_OUTSIDE", PositionTypeClosestMythicMobRelativeCylinderOutside.class,
-			"CLOSEST_MYTHICMOB_RELATIVE_SPHERE_INSIDE", PositionTypeClosestMythicMobRelativeSphereInside.class,
-			"CLOSEST_MYTHICMOB_RELATIVE_SPHERE_OUTSIDE", PositionTypeClosestMythicMobRelativeSphereOutside.class,
-			"CLOSEST_MYTHICMOB_RELATIVE_SINGLE", PositionTypeClosestMythicMobRelativeSingle.class
-			);
+	private Map<String, Class<? extends PositionType>> types = CollectionUtils.asMap("CLOSEST_MYTHICMOB_RELATIVE_AREA_INSIDE",
+			PositionTypeClosestMythicMobRelativeAreaInside.class, "CLOSEST_MYTHICMOB_RELATIVE_AREA_OUTSIDE",
+			PositionTypeClosestMythicMobRelativeAreaOutside.class, "CLOSEST_MYTHICMOB_RELATIVE_CYLINDER_INSIDE",
+			PositionTypeClosestMythicMobRelativeCylinderInside.class, "CLOSEST_MYTHICMOB_RELATIVE_CYLINDER_OUTSIDE",
+			PositionTypeClosestMythicMobRelativeCylinderOutside.class, "CLOSEST_MYTHICMOB_RELATIVE_SPHERE_INSIDE",
+			PositionTypeClosestMythicMobRelativeSphereInside.class, "CLOSEST_MYTHICMOB_RELATIVE_SPHERE_OUTSIDE",
+			PositionTypeClosestMythicMobRelativeSphereOutside.class, "CLOSEST_MYTHICMOB_RELATIVE_SINGLE", PositionTypeClosestMythicMobRelativeSingle.class);
 
 	@Override
 	public boolean activate() {

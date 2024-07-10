@@ -9,264 +9,141 @@ import com.guillaumevdn.gcore.lib.string.TextEnumElement;
 public enum TextEditorGeneric implements TextEnumElement {
 
 	// ----- element
-	guiSelectTitle,
-	guiSearchName,
+	guiSelectTitle, guiSearchName,
 
-	elementTypeMandatory,
-	elementTypeOptional,
+	elementTypeMandatory, elementTypeOptional,
 
-	elementCurrentValueNone,
-	elementCurrentValueNoneDefault,
-	elementCurrentValueSingle,
-	elementCurrentValueSingleDefault,
-	elementCurrentValueList,
-	elementCurrentValueListDefault,
-	elementCurrentValueListLine,
+	elementCurrentValueNone, elementCurrentValueNoneDefault, elementCurrentValueSingle, elementCurrentValueSingleDefault, elementCurrentValueList,
+	elementCurrentValueListDefault, elementCurrentValueListLine,
 
-	elementDescription,
-	elementElementCountSingle,
-	elementElementCountPlural,
-	elementListElement,
+	elementDescription, elementElementCountSingle, elementElementCountPlural, elementListElement,
 
 	// ----- controls
-	controlEdit,
-	controlClear,
-	controlToggle,
-	controlSelect,
-	controlImport,
-	controlDelete,
-	controlLinearSelectType,
-	controlLinearEditParameters,
+	controlEdit, controlClear, controlToggle, controlSelect, controlImport, controlDelete, controlLinearSelectType, controlLinearEditParameters,
 
-	controlListInsert,
-	controlListSwap,
+	controlListInsert, controlListSwap,
 
-	controlAddElementName,
-	controlAddGlobalElementName,
-	controlAddElementWithQuick,
-	controlAddElementWithDefault,
-	controlTextSetRandom,
+	controlAddElementName, controlAddGlobalElementName, controlAddElementWithQuick, controlAddElementWithDefault, controlTextSetRandom,
 
 	// ----- item
-	descriptionItemType,
-	descriptionItemTypeHDB,
-	descriptionItemDurability,
-	descriptionItemAmount,
-	descriptionItemUnbreakable,
-	descriptionItemCustomModelData,
-	descriptionItemFlags,
-	descriptionItemEnchantments,
-	descriptionItemName,
-	descriptionItemLore,
-	descriptionItemNbt,
+	descriptionItemType, descriptionItemTypeHDB, descriptionItemDurability, descriptionItemAmount, descriptionItemUnbreakable, descriptionItemCustomModelData,
+	descriptionItemFlags, descriptionItemEnchantments, descriptionItemName, descriptionItemLore, descriptionItemNbt,
 
-	descriptionItemBannerBaseColor,
-	descriptionItemBannerPatterns,
+	descriptionItemBannerBaseColor, descriptionItemBannerPatterns,
 
-	descriptionItemBookAuthor,
-	descriptionItemBookTitle,
-	descriptionItemBookGeneration,
-	descriptionItemBookPages,
+	descriptionItemBookAuthor, descriptionItemBookTitle, descriptionItemBookGeneration, descriptionItemBookPages,
 
 	descriptionItemCrossbowChargedProjectiles,
 
 	descriptionItemStoredEnchantments,
 
-	descriptionItemFireworkEffect,
-	descriptionItemFireworkEffects,
+	descriptionItemFireworkEffect, descriptionItemFireworkEffects,
 
 	descriptionItemKnowledgeBookRecipes,
 
 	descriptionItemLeatherArmorColor,
 
-	descriptionItemPotionType,
-	descriptionItemPotionExtra,
-	descriptionItemPotionColor,
-	descriptionItemPotionCustomEffects,
+	descriptionItemPotionType, descriptionItemPotionExtra, descriptionItemPotionColor, descriptionItemPotionCustomEffects,
 
-	descriptionItemSkullId,
-	descriptionItemSkullName,
-	descriptionItemSkullData,
-	descriptionItemSkullSignature,
+	descriptionItemSkullId, descriptionItemSkullName, descriptionItemSkullData, descriptionItemSkullSignature,
 
 	descriptionItemSpawnEggType,
 
 	descriptionItemSuspiciousStewCustomEffects,
 
-	descriptionItemTropicalFishBodyColor,
-	descriptionItemTropicalFishPatternColor,
-	descriptionItemTropicalFishPattern,
+	descriptionItemTropicalFishBodyColor, descriptionItemTropicalFishPatternColor, descriptionItemTropicalFishPattern,
 
 	// ----- item condition
-	descriptionItemMatchItem,
-	descriptionItemMatchGoal,
-	descriptionItemMatchCheck,
+	descriptionItemMatchItem, descriptionItemMatchGoal, descriptionItemMatchCheck,
 
-	descriptionItemsNeededItems,
-	descriptionItemsNeededInHand,
-	descriptionItemsNeededInHandSlot,
-	descriptionItemsNeededCount,
-	descriptionItemsNeededTake,
+	descriptionItemsNeededItems, descriptionItemsNeededInHand, descriptionItemsNeededInHandSlot, descriptionItemsNeededCount, descriptionItemsNeededTake,
 	descriptionItemsNeededErrorMessage,
 
 	// ----- gui
-	descriptionGuiName,
-	descriptionGuiType,
-	descriptionGuiContents,
+	descriptionGuiName, descriptionGuiType, descriptionGuiContents,
 
-	descriptionGuiItemType,
-	descriptionGuiItemIcon,
-	descriptionGuiItemLocations,
-	descriptionGuiItemPersistent,
-	descriptionGuiItemClickSound,
+	descriptionGuiItemType, descriptionGuiItemIcon, descriptionGuiItemLocations, descriptionGuiItemPersistent, descriptionGuiItemClickSound,
 	descriptionGuiItemOverrideClicks,
 
-	descriptionGuiItemDynamicBorderLinearOnCount,
-	descriptionGuiItemDynamicBorderLinearIconOn,
-	descriptionGuiItemDynamicBorderLinearIconOff,
+	descriptionGuiItemDynamicBorderLinearOnCount, descriptionGuiItemDynamicBorderLinearIconOn, descriptionGuiItemDynamicBorderLinearIconOff,
 	descriptionGuiItemDynamicBorderLinearRefreshTicks,
 
 	// ----- position
 	descriptionPositionType,
 
-	descriptionPositionTypeClosestEntityTypes,
-	descriptionPositionTypeClosestEntityNames,
-	descriptionPositionTypeClosestEntityColors,
-	descriptionPositionTypeCitizensNPCRelative,
-	descriptionPositionTypeCitizensNPCRelativeNames,
-	descriptionPositionTypeClosestMythicMobMobs,
+	descriptionPositionTypeClosestEntityTypes, descriptionPositionTypeClosestEntityNames, descriptionPositionTypeClosestEntityColors,
+	descriptionPositionTypeCitizensNPCRelative, descriptionPositionTypeCitizensNPCRelativeNames, descriptionPositionTypeClosestMythicMobMobs,
 
-	descriptionPositionTypeWorld,
-	descriptionPositionTypeBiomes,
-	descriptionPositionTypeSingleLocation,
-	descriptionPositionTypeSingleRandomLocations,
-	descriptionPositionTypeRelativeSingleLocation,
-	descriptionPositionTypePointTolerance,
+	descriptionPositionTypeWorld, descriptionPositionTypeBiomes, descriptionPositionTypeSingleLocation, descriptionPositionTypeSingleRandomLocations,
+	descriptionPositionTypeRelativeSingleLocation, descriptionPositionTypePointTolerance,
 
-	descriptionPositionTypeBound1,
-	descriptionPositionTypeBound2,
-	descriptionPositionTypeRelativeBound1,
-	descriptionPositionTypeRelativeBound2,
-	descriptionPositionTypeWorldguardRegionWorld,
-	descriptionPositionTypeWorldguardRegionRegion,
+	descriptionPositionTypeBound1, descriptionPositionTypeBound2, descriptionPositionTypeRelativeBound1, descriptionPositionTypeRelativeBound2,
+	descriptionPositionTypeWorldguardRegionWorld, descriptionPositionTypeWorldguardRegionRegion,
 
-	descriptionPositionTypeSphereCenter,
-	descriptionPositionTypeSphereRadius,
-	descriptionPositionTypeCylinderCenter,
-	descriptionPositionTypeCylinderRadius,
+	descriptionPositionTypeSphereCenter, descriptionPositionTypeSphereRadius, descriptionPositionTypeCylinderCenter, descriptionPositionTypeCylinderRadius,
 
 	// ----- relative location
-	descriptionRelativeLocationHorizontalAngle,
-	descriptionRelativeLocationVerticalOffset,
-	descriptionRelativeLocationDistance,
-	descriptionRelativeLocationBaseRotationAware,
-	descriptionRelativeLocationAddYaw,
-	descriptionRelativeLocationAddPitch,
+	descriptionRelativeLocationHorizontalAngle, descriptionRelativeLocationVerticalOffset, descriptionRelativeLocationDistance,
+	descriptionRelativeLocationBaseRotationAware, descriptionRelativeLocationAddYaw, descriptionRelativeLocationAddPitch,
 
 	// ----- world restriction
-	descriptionWorldRestrictionWhitelist,
-	descriptionWorldRestrictionBlacklist,
+	descriptionWorldRestrictionWhitelist, descriptionWorldRestrictionBlacklist,
 
 	// ----- command restriction
-	descriptionCommandRestrictionWhitelist,
-	descriptionCommandRestrictionBlacklist,
+	descriptionCommandRestrictionWhitelist, descriptionCommandRestrictionBlacklist,
 
 	// ----- mat restriction
-	descriptionMatRestrictionWhitelist,
-	descriptionMatRestrictionBlacklist,
+	descriptionMatRestrictionWhitelist, descriptionMatRestrictionBlacklist,
 
 	// ----- dynmap marker
-	descriptionDynmapMarkerLocation,
-	descriptionDynmapMarkerText,
+	descriptionDynmapMarkerLocation, descriptionDynmapMarkerText,
 
 	// ----- potion effect
-	descriptionPotionEffectType,
-	descriptionPotionEffectDuration,
-	descriptionPotionEffectAmplifier,
-	descriptionPotionEffectAmbient,
-	descriptionPotionEffectParticles,
-	descriptionPotionEffectIcon,
+	descriptionPotionEffectType, descriptionPotionEffectDuration, descriptionPotionEffectAmplifier, descriptionPotionEffectAmbient,
+	descriptionPotionEffectParticles, descriptionPotionEffectIcon,
 
 	// ----- firework effect
-	descriptionFireworkEffectType,
-	descriptionFireworkEffectColors,
-	descriptionFireworkEffectFadeColors,
-	descriptionFireworkEffectFlicker,
+	descriptionFireworkEffectType, descriptionFireworkEffectColors, descriptionFireworkEffectFadeColors, descriptionFireworkEffectFlicker,
 	descriptionFireworkEffectTrail,
 
 	// ----- time
-	descriptionElementTimeMonth,
-	descriptionElementTimeDayOfMonth,
-	descriptionElementTimeDayOfWeek,
-	descriptionElementTimeHour,
-	descriptionElementTimeMinute,
+	descriptionElementTimeMonth, descriptionElementTimeDayOfMonth, descriptionElementTimeDayOfWeek, descriptionElementTimeHour, descriptionElementTimeMinute,
 
 	// ----- time limit
-	descriptionTimeLimitDuration,
-	descriptionTimeLimitReminder,
+	descriptionTimeLimitDuration, descriptionTimeLimitReminder,
 
 	// ----- duration
-	descriptionDurationTime,
-	descriptionDurationUnit,
+	descriptionDurationTime, descriptionDurationUnit,
 
 	// ----- comparison
 	descriptionComparisonType,
 
 	// ----- notify
-	descriptionNotifyMessage,
-	descriptionNotifyActionbar,
-	descriptionNotifyActionbarDuration,
-	descriptionNotifyBossbar,
-	descriptionNotifyBossbarColor,
-	descriptionNotifyBossbarStyle,
-	descriptionNotifyBossbarFlags,
-	descriptionNotifyBossbarDuration,
-	descriptionNotifyTitle,
-	descriptionNotifyTitleSubtitle,
-	descriptionNotifyTitleFadeIn,
-	descriptionNotifyTitleDuration,
-	descriptionNotifyTitleFadeOut,
-	descriptionNotifySound,
-	descriptionNotifySoundVolume,
+	descriptionNotifyMessage, descriptionNotifyActionbar, descriptionNotifyActionbarDuration, descriptionNotifyBossbar, descriptionNotifyBossbarColor,
+	descriptionNotifyBossbarStyle, descriptionNotifyBossbarFlags, descriptionNotifyBossbarDuration, descriptionNotifyTitle, descriptionNotifyTitleSubtitle,
+	descriptionNotifyTitleFadeIn, descriptionNotifyTitleDuration, descriptionNotifyTitleFadeOut, descriptionNotifySound, descriptionNotifySoundVolume,
 	descriptionNotifySoundPitch,
 
 	// ----- time frame
 	descriptionTimeFrameType,
 
-	descriptionTimeFrameInDayStart,
-	descriptionTimeFrameInDayEnd,
+	descriptionTimeFrameInDayStart, descriptionTimeFrameInDayEnd,
 
-	descriptionTimeFrameInWeekStart,
-	descriptionTimeFrameInWeekEnd,
+	descriptionTimeFrameInWeekStart, descriptionTimeFrameInWeekEnd,
 
-	descriptionTimeFrameInMonthStart,
-	descriptionTimeFrameInMonthEnd,
+	descriptionTimeFrameInMonthStart, descriptionTimeFrameInMonthEnd,
 
-	descriptionTimeFrameInYearStart,
-	descriptionTimeFrameInYearEnd,
+	descriptionTimeFrameInYearStart, descriptionTimeFrameInYearEnd,
 
-	descriptionTimeFrameLimitedStart,
-	descriptionTimeFrameLimitedEnd,
+	descriptionTimeFrameLimitedStart, descriptionTimeFrameLimitedEnd,
 
 	descriptionTimeFrameRepeatPeriodDuration,
 
 	// ----- message
-	messageElementBasicEdit,
-	messageElementBasicEditSuggestCurrent,
-	messageElementBasicEditSearch,
-	messageElementBasicEditSearchNoMatch,
-	messageElementBasicEditSearchTooManyMatches,
-	messageElementBasicEditSearchMatch,
-	messageElementBasicListLineEdit,
-	messageElementBasicListSwap,
-	messageElementBasicListSwapped,
-	messageElementBasicImportLocation,
-	messageElementBasicImportNPC,
-	messageElementContainerImportItem,
-	messageElementCreateEnterId,
-	messageElementCreateInvalidId,
-	messageElementCreateAlreadyExists,
-	messageCantImportValue
+	messageElementBasicEdit, messageElementBasicEditSuggestCurrent, messageElementBasicEditSearch, messageElementBasicEditSearchNoMatch,
+	messageElementBasicEditSearchTooManyMatches, messageElementBasicEditSearchMatch, messageElementBasicListLineEdit, messageElementBasicListSwap,
+	messageElementBasicListSwapped, messageElementBasicImportLocation, messageElementBasicImportNPC, messageElementContainerImportItem,
+	messageElementCreateEnterId, messageElementCreateInvalidId, messageElementCreateAlreadyExists, messageCantImportValue
 
 	;
 

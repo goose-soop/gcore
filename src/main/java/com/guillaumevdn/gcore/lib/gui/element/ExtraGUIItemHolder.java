@@ -22,10 +22,12 @@ public abstract class ExtraGUIItemHolder extends ItemHolder {
 	@Override
 	public ActiveItemHolder newActive(ActiveGUI gui) {
 		return new ActiveItemHolder(gui, this) {
+
 			@Override
 			protected void buildItems(TriConsumer<Collection<? extends GUIItem>, Set<String>, Integer> callback) throws ParsingError {
 				ExtraGUIItemHolder.this.build(callback);
 			}
+
 		};
 	}
 

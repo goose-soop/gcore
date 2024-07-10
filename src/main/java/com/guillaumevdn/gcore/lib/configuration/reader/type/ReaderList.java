@@ -22,7 +22,7 @@ public class ReaderList implements ThrowableFunction<ReaderContext, Boolean> {
 				String listIndent = YMLReader.requireValidIndentLevelPotentiallyLenient(context, peek);
 
 				// read list
-				List<String> list = new ArrayList<>(1);  // I'd rather take a little more time when loading than having many collections with a 10% fill ratio
+				List<String> list = new ArrayList<>(1); // I'd rather take a little more time when loading than having many collections with a 10% fill ratio
 				while ((peek = context.peekLine()) != null) {
 					// remove comment from line
 					String maybeEmptyPeek = peek.getLine().trim();
@@ -44,13 +44,15 @@ public class ReaderList implements ThrowableFunction<ReaderContext, Boolean> {
 						context.getLines().remove(0);
 						list.add(YMLReader.unwrapValue(peek.getLine().substring(listIndent.length() + 1), false));
 					}
-					// element continuation (kind of poorly formatted but frequent ; it's also useful in some cases, such as book pages, which can contain \n themselves)
+					// element continuation (kind of poorly formatted but frequent ; it's also useful in some cases, such as book pages,
+					// which can contain \n themselves)
 					else if (peek.getLine().startsWith(listIndent + " ")) {
 						context.getLines().remove(0);
 						if (list.isEmpty()) {
 							list.add(YMLReader.unwrapValue(peek.getLine().substring(listIndent.length() + 1), false));
 						} else {
-							list.set(list.size() - 1, list.get(list.size() - 1) + "\n" + YMLReader.unwrapValue(peek.getLine().substring(listIndent.length() + 1), false));
+							list.set(list.size() - 1,
+									list.get(list.size() - 1) + "\n" + YMLReader.unwrapValue(peek.getLine().substring(listIndent.length() + 1), false));
 						}
 					}
 					// not an element

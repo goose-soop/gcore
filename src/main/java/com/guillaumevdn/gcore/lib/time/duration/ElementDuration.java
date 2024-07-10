@@ -28,24 +28,29 @@ public class ElementDuration extends ParseableContainerElement<Long> {
 
 	protected ElementInteger time;
 	protected ElementTimeUnit unit;
-	private String rawPlaceholderValue = null;  // when the entire value is a placeholder
+	private String rawPlaceholderValue = null; // when the entire value is a placeholder
 
 	public ElementDuration(Element parent, String id, Need need, Integer defaultTime, TimeUnit defaultUnit, Text editorDescription) {
 		super(parent, id, need, editorDescription);
 
-		// we need to overwrite the doWrite methods here, because when editing from the editor, calling superElement.onChange() triggers the write method of this thing and it'll write as section
+		// we need to overwrite the doWrite methods here, because when editing from the editor, calling superElement.onChange()
+		// triggers the write method of this thing and it'll write as section
 
 		time = add(new ElementInteger(this, "time", Need.optional(defaultTime), 0, TextEditorGeneric.descriptionDurationTime) {
+
 			@Override
 			protected void doWrite() throws Throwable {
 				ElementDuration.this.doWrite();
 			};
+
 		});
 		unit = add(new ElementTimeUnit(this, "unit", Need.optional(defaultUnit), TextEditorGeneric.descriptionDurationUnit) {
+
 			@Override
 			protected void doWrite() throws Throwable {
 				ElementDuration.this.doWrite();
 			};
+
 		});
 	}
 
@@ -118,10 +123,12 @@ public class ElementDuration extends ParseableContainerElement<Long> {
 			String unit = this.unit.getRawValueLine(0);
 			String defaultUnit = this.unit.getDefaultValueLine(0);
 
-			if ((time == null && unit == null) || (!getNeed().equals(NeedType.REQUIRED) && StringUtils.equalsIgnoreCaseNullable(time, defaultTime) && StringUtils.equalsIgnoreCaseNullable(unit, defaultUnit))) {
+			if ((time == null && unit == null) || (!getNeed().equals(NeedType.REQUIRED) && StringUtils.equalsIgnoreCaseNullable(time, defaultTime)
+					&& StringUtils.equalsIgnoreCaseNullable(unit, defaultUnit))) {
 				config.write(path, null);
 			} else {
-				config.write(path, (time != null ? time : (defaultTime != null ? defaultTime : 1)) + " " + (unit != null ? unit : (defaultUnit != null ? defaultUnit : TimeUnit.SECOND)));
+				config.write(path, (time != null ? time : (defaultTime != null ? defaultTime : 1)) + " "
+						+ (unit != null ? unit : (defaultUnit != null ? defaultUnit : TimeUnit.SECOND)));
 			}
 		}
 	}

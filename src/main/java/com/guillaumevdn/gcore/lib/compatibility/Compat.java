@@ -37,14 +37,13 @@ public final class Compat {
 	private static final ReflectionProcedureFunction<String, ReflectionObject> CREATE_CHAT_COMPONENT = new ReflectionProcedureFunction<String, ReflectionObject>()
 			.setIf(Version.IS_1_7, string -> {
 				return Reflection.invokeNmsMethod("ChatSerializer", "a", null, "{\"text\": \"" + string.replace("\"", "\\\"") + "\"}");
-			})
-			.orIf(Version.CURRENT == Version.MC_1_20_R2, string -> {
-				return Reflection.invokeNmsMethod((Version.REMAPPED ? "network.chat." : "") + "IChatBaseComponent$ChatSerializer", "b", null, "{\"text\": \"" + string.replace("\"", "\\\"") + "\"}");
-			})
-			.orElse(string -> {
-				return Reflection.invokeNmsMethod((Version.REMAPPED ? "network.chat." : "") + "IChatBaseComponent$ChatSerializer", "a", null, "{\"text\": \"" + string.replace("\"", "\\\"") + "\"}");
-			})
-			;
+			}).orIf(Version.CURRENT == Version.MC_1_20_R2, string -> {
+				return Reflection.invokeNmsMethod((Version.REMAPPED ? "network.chat." : "") + "IChatBaseComponent$ChatSerializer", "b", null,
+						"{\"text\": \"" + string.replace("\"", "\\\"") + "\"}");
+			}).orElse(string -> {
+				return Reflection.invokeNmsMethod((Version.REMAPPED ? "network.chat." : "") + "IChatBaseComponent$ChatSerializer", "a", null,
+						"{\"text\": \"" + string.replace("\"", "\\\"") + "\"}");
+			});
 
 	public static ReflectionObject createChatComponent(String string) {
 		return CREATE_CHAT_COMPONENT.process(string);
@@ -58,12 +57,13 @@ public final class Compat {
 	private static final ReflectionProcedureSexaConsumer<Player, String, String, Integer, Integer, Integer> SEND_TITLE = new ReflectionProcedureSexaConsumer<Player, String, String, Integer, Integer, Integer>()
 			.setIf(Version.ATLEAST_1_17, (player, title, subtitle, fadeIn, duration, fadeOut) -> {
 				player.sendTitle(title, subtitle, fadeIn, duration, fadeOut);
-			})
-			.orIf(Version.ATLEAST_1_8, (player, title, subtitle, fadeIn, duration, fadeOut) -> {
+			}).orIf(Version.ATLEAST_1_8, (player, title, subtitle, fadeIn, duration, fadeOut) -> {
 				ReflectionEnum enumTitleAction = Reflection.getNmsEnum("PacketPlayOutTitle$EnumTitleAction");
 				Reflection.sendNmsPacket(player, "PacketPlayOutTitle", enumTitleAction.valueOf("TIMES").get(), null, fadeIn, duration, fadeOut);
-				if (subtitle != null) Reflection.sendNmsPacket(player, "PacketPlayOutTitle", enumTitleAction.valueOf("SUBTITLE").get(), createChatComponent(subtitle).get());
-				if (title != null) Reflection.sendNmsPacket(player, "PacketPlayOutTitle", enumTitleAction.valueOf("TITLE").get(), createChatComponent(title).get());
+				if (subtitle != null)
+					Reflection.sendNmsPacket(player, "PacketPlayOutTitle", enumTitleAction.valueOf("SUBTITLE").get(), createChatComponent(subtitle).get());
+				if (title != null)
+					Reflection.sendNmsPacket(player, "PacketPlayOutTitle", enumTitleAction.valueOf("TITLE").get(), createChatComponent(title).get());
 			});
 
 	public static void sendTitle(Player player, String title, String subtitle, long fadeIn, long duration, long fadeOut) {
@@ -83,15 +83,13 @@ public final class Compat {
 	private static final ReflectionProcedureBiConsumer<Player, String> SEND_ACTIONBAR = new ReflectionProcedureBiConsumer<Player, String>()
 			.setIf(Version.ATLEAST_1_17, (player, actionbar) -> {
 				player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(actionbar));
-			})
-			.orIf(Version.ATLEAST_1_11, (player, actionbar) -> {
+			}).orIf(Version.ATLEAST_1_11, (player, actionbar) -> {
 				ReflectionEnum enumTitleAction = Reflection.getNmsEnum("PacketPlayOutTitle$EnumTitleAction");
-				Reflection.sendNmsPacket(player, "PacketPlayOutTitle", enumTitleAction.valueOf("ACTIONBAR").justGet(), createChatComponent(actionbar).justGet());
-			})
-			.orIf(Version.ATLEAST_1_8, (player, actionbar) -> {
+				Reflection.sendNmsPacket(player, "PacketPlayOutTitle", enumTitleAction.valueOf("ACTIONBAR").justGet(),
+						createChatComponent(actionbar).justGet());
+			}).orIf(Version.ATLEAST_1_8, (player, actionbar) -> {
 				Reflection.sendNmsPacket(player, "PacketPlayOutChat", createChatComponent(actionbar).get(), (byte) 2);
-			})
-			;
+			});
 
 	public static void sendActionbar(Player player, String actionbar) {
 		SEND_ACTIONBAR.process(player, actionbar);
@@ -106,34 +104,29 @@ public final class Compat {
 			.setIf(Version.IS_1_7, (players, json) -> {
 				Object component = Reflection.invokeNmsMethod("ChatSerializer", "a", null, json).get();
 				Reflection.sendNmsPacket(players, "PacketPlayOutChat", component);
-			})
-			.orIf(Version.ATLEAST_1_19, (players, json) -> {
+			}).orIf(Version.ATLEAST_1_19, (players, json) -> {
 				// TODO : find a cooler packet solution with new encryption system
 				GCore.inst().operateSync(() -> {
 					for (Player pl : players) {
 						Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tellraw " + pl.getName() + " " + json);
 					}
 				});
-			})
-			.orIf(Version.ATLEAST_1_17, (players, json) -> {
+			}).orIf(Version.ATLEAST_1_17, (players, json) -> {
 				ReflectionEnum messageTypeEnum = Reflection.getNmsEnum("network.chat.ChatMessageType");
 				Object component = Reflection.invokeNmsMethod("network.chat.IChatBaseComponent$ChatSerializer", "a", null, json).get();
 				for (Player pl : players) {
 					Reflection.sendNmsPacket(pl, "network.protocol.game.PacketPlayOutChat", component, messageTypeEnum.valueOf("CHAT").get(), pl.getUniqueId());
 				}
-			})
-			.orIf(Version.ATLEAST_1_16, (players, json) -> {
+			}).orIf(Version.ATLEAST_1_16, (players, json) -> {
 				ReflectionEnum messageTypeEnum = Reflection.getNmsEnum("ChatMessageType");
 				Object component = Reflection.invokeNmsMethod("IChatBaseComponent$ChatSerializer", "a", null, json).get();
 				for (Player pl : players) {
 					Reflection.sendNmsPacket(pl, "PacketPlayOutChat", component, messageTypeEnum.valueOf("CHAT").get(), pl.getUniqueId());
 				}
-			})
-			.orElse((players, json) -> {
+			}).orElse((players, json) -> {
 				Object component = Reflection.invokeNmsMethod("IChatBaseComponent$ChatSerializer", "a", null, json).get();
 				Reflection.sendNmsPacket(players, "PacketPlayOutChat", component);
-			})
-			;
+			});
 
 	public static void sendJsonChat(Collection<Player> players, String json) {
 		SEND_JSON_CHAT.process(players, json);
@@ -143,15 +136,12 @@ public final class Compat {
 	private static final ReflectionProcedureTriConsumer<Player, String, String> CHANGE_TAB = new ReflectionProcedureTriConsumer<Player, String, String>()
 			.setIf(Version.ATLEAST_1_17, (player, header, footer) -> {
 				Reflection.sendNmsPacket(player, Reflection.newNmsInstance("network.protocol.game.PacketPlayOutPlayerListHeaderFooter")
-						.setField("a", createChatComponent(header).get())
-						.setField("b", createChatComponent(footer).get())
-						.get());
-			})
-			.orElse((player, header, footer) -> {
-				Reflection.sendNmsPacket(player, Reflection.newNmsInstance("PacketPlayOutPlayerListHeaderFooter")
-						.setField(Version.ATLEAST_1_13 ? "header" : "a", createChatComponent(header).get())
-						.setField(Version.ATLEAST_1_13 ? "footer" : "b", createChatComponent(footer).get())
-						.get());
+						.setField("a", createChatComponent(header).get()).setField("b", createChatComponent(footer).get()).get());
+			}).orElse((player, header, footer) -> {
+				Reflection.sendNmsPacket(player,
+						Reflection.newNmsInstance("PacketPlayOutPlayerListHeaderFooter")
+								.setField(Version.ATLEAST_1_13 ? "header" : "a", createChatComponent(header).get())
+								.setField(Version.ATLEAST_1_13 ? "footer" : "b", createChatComponent(footer).get()).get());
 			});
 
 	public static void changeTab(Player player, String header, String footer) {
@@ -169,8 +159,7 @@ public final class Compat {
 				damageable.setDamage(durability);
 				item.setItemMeta(meta);
 				return item;
-			})
-			.orElse((item, durability) -> {
+			}).orElse((item, durability) -> {
 				ReflectionObject.of(item).invokeMethod("setDurability", durability.shortValue());
 				return item;
 			});
@@ -181,8 +170,7 @@ public final class Compat {
 
 	// ----- set data
 	private static final ReflectionProcedureBiFunction<ItemStack, Integer, ItemStack> SET_LEGACY_DATA = new ReflectionProcedureBiFunction<ItemStack, Integer, ItemStack>()
-			.setIf(Version.ATLEAST_1_13, (item, durability) -> item)
-			.orElse((item, data) -> {
+			.setIf(Version.ATLEAST_1_13, (item, durability) -> item).orElse((item, data) -> {
 				ReflectionObject reflectionItem = ReflectionObject.of(item);
 				reflectionItem.invokeMethod("setData", reflectionItem.invokeMethod("getData").invokeVoidMethod("setData", data.byteValue()));
 				return item;
@@ -198,8 +186,7 @@ public final class Compat {
 				ItemMeta meta = item.getItemMeta();
 				org.bukkit.inventory.meta.Damageable damageable = ObjectUtils.castOrNull(meta, org.bukkit.inventory.meta.Damageable.class);
 				return damageable == null ? 0 : damageable.getDamage();
-			})
-			.orElse((item) -> (int) ReflectionObject.of(item).invokeMethod("getDurability").get(short.class));
+			}).orElse((item) -> (int) ReflectionObject.of(item).invokeMethod("getDurability").get(short.class));
 
 	public static int getDurability(ItemStack item) {
 		return GET_DURABILITY.process(item);
@@ -215,16 +202,14 @@ public final class Compat {
 	}
 
 	private static final ReflectionProcedureFunction<Block, Integer> GET_LEGACY_DATA_BLOCK = new ReflectionProcedureFunction<Block, Integer>()
-			.setIf(Version.ATLEAST_1_13, block -> 0)
-			.orElse(block -> (int) ReflectionObject.of(block).invokeMethod("getData").get(byte.class));
+			.setIf(Version.ATLEAST_1_13, block -> 0).orElse(block -> (int) ReflectionObject.of(block).invokeMethod("getData").get(byte.class));
 
 	public static int getLegacyData(Block block) {
 		return GET_LEGACY_DATA_BLOCK.process(block);
 	}
 
 	private static final ReflectionProcedureFunction<BlockState, Integer> GET_LEGACY_DATA_BLOCK_STATE = new ReflectionProcedureFunction<BlockState, Integer>()
-			.setIf(Version.ATLEAST_1_13, block -> 0)
-			.orElse(block -> (int) ReflectionObject.of(block).invokeMethod("getRawData").get(byte.class));
+			.setIf(Version.ATLEAST_1_13, block -> 0).orElse(block -> (int) ReflectionObject.of(block).invokeMethod("getRawData").get(byte.class));
 
 	public static int getLegacyData(BlockState block) {
 		return GET_LEGACY_DATA_BLOCK_STATE.process(block);
@@ -233,7 +218,8 @@ public final class Compat {
 	// ----- add item flags
 	private static final ReflectionProcedureBiConsumer<ItemMeta, Collection<ItemFlag>> ADD_ITEM_FLAGS = new ReflectionProcedureBiConsumer<ItemMeta, Collection<ItemFlag>>()
 			.setIf(Version.ATLEAST_1_8, (meta, flags) -> {
-				List<org.bukkit.inventory.ItemFlag> list = flags.stream().map(flag -> ObjectUtils.safeValueOf(flag.name(), org.bukkit.inventory.ItemFlag.class)).filter(obj -> obj != null).collect(Collectors.toList());
+				List<org.bukkit.inventory.ItemFlag> list = flags.stream().map(flag -> ObjectUtils.safeValueOf(flag.name(), org.bukkit.inventory.ItemFlag.class))
+						.filter(obj -> obj != null).collect(Collectors.toList());
 				meta.addItemFlags(list.toArray(new org.bukkit.inventory.ItemFlag[list.size()]));
 			});
 
@@ -266,8 +252,7 @@ public final class Compat {
 	private static final ReflectionProcedureBiConsumer<ItemMeta, Boolean> SET_UNBREAKABLE = new ReflectionProcedureBiConsumer<ItemMeta, Boolean>()
 			.setIf(Version.ATLEAST_1_7_10, (meta, unbreakable) -> {
 				ReflectionObject.of(meta).invokeMethod("spigot").invokeMethod("setUnbreakable", unbreakable.booleanValue());
-			})
-			.setIf(Version.ATLEAST_1_11, (meta, unbreakable) -> {
+			}).setIf(Version.ATLEAST_1_11, (meta, unbreakable) -> {
 				ReflectionObject.of(meta).invokeMethod("setUnbreakable", unbreakable);
 			});
 
@@ -279,8 +264,7 @@ public final class Compat {
 	private static final ReflectionProcedureFunction<ItemMeta, Boolean> IS_UNBREAKABLE = new ReflectionProcedureFunction<ItemMeta, Boolean>()
 			.setIf(Version.ATLEAST_1_7_10, (meta) -> {
 				return ReflectionObject.of(meta).invokeMethod("spigot").invokeMethod("isUnbreakable").get();
-			})
-			.setIf(Version.ATLEAST_1_11, (meta) -> {
+			}).setIf(Version.ATLEAST_1_11, (meta) -> {
 				return ReflectionObject.of(meta).invokeMethod("isUnbreakable").get();
 			});
 

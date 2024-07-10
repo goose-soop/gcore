@@ -35,8 +35,7 @@ import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonToken;
 import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonWriter;
 
 /**
- * This type adapter supports three subclasses of date: Date, Timestamp, and
- * java.sql.Date.
+ * This type adapter supports three subclasses of date: Date, Timestamp, and java.sql.Date.
  *
  * @author Inderjeet Singh
  * @author Joel Leitch
@@ -48,8 +47,8 @@ final class DefaultDateTypeAdapter extends TypeAdapter<Date> {
   private final Class<? extends Date> dateType;
 
   /**
-   * List of 1 or more different date formats used for de-serialization attempts.
-   * The first of them is used for serialization as well.
+   * List of 1 or more different date formats used for de-serialization attempts. The first of them is used for
+   * serialization as well.
    */
   private final List<DateFormat> dateFormats = new ArrayList<DateFormat>();
 
@@ -99,8 +98,9 @@ final class DefaultDateTypeAdapter extends TypeAdapter<Date> {
   }
 
   private static Class<? extends Date> verifyDateType(Class<? extends Date> dateType) {
-    if ( dateType != Date.class && dateType != java.sql.Date.class && dateType != Timestamp.class ) {
-      throw new IllegalArgumentException("Date type must be one of " + Date.class + ", " + Timestamp.class + ", or " + java.sql.Date.class + " but was " + dateType);
+    if (dateType != Date.class && dateType != java.sql.Date.class && dateType != Timestamp.class) {
+      throw new IllegalArgumentException(
+          "Date type must be one of " + Date.class + ", " + Timestamp.class + ", or " + java.sql.Date.class + " but was " + dateType);
     }
     return dateType;
   }
@@ -113,7 +113,7 @@ final class DefaultDateTypeAdapter extends TypeAdapter<Date> {
       out.nullValue();
       return;
     }
-    synchronized(dateFormats) {
+    synchronized (dateFormats) {
       String dateFormatAsString = dateFormats.get(0).format(value);
       out.value(dateFormatAsString);
     }
@@ -143,7 +143,8 @@ final class DefaultDateTypeAdapter extends TypeAdapter<Date> {
       for (DateFormat dateFormat : dateFormats) {
         try {
           return dateFormat.parse(s);
-        } catch (ParseException ignored) {}
+        } catch (ParseException ignored) {
+        }
       }
       try {
         return ISO8601Utils.parse(s, new ParsePosition(0));
@@ -162,4 +163,5 @@ final class DefaultDateTypeAdapter extends TypeAdapter<Date> {
       return SIMPLE_NAME + '(' + defaultFormat.getClass().getSimpleName() + ')';
     }
   }
+
 }

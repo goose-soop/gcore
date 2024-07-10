@@ -9,49 +9,21 @@ import com.guillaumevdn.gcore.lib.function.TriFunction;
  */
 public enum ComparisonType {
 
-	LESS_THAN("<",
-			(a, b, comparator) -> comparator.compare(a, b) < 0,
-			(value, reference, extraReference) -> value < reference,
-			(value, reference, extraReference) -> value < reference,
-			null
-			),
-	LESS_OR_EQUALS("<=",
-			(a, b, comparator) -> comparator.compare(a, b) <= 0,
-			(value, reference, extraReference) -> value <= reference,
-			(value, reference, extraReference) -> value <= reference,
-			null
-			),
-	MORE_OR_EQUALS(">=",
-			(a, b, comparator) -> comparator.compare(a, b) >= 0,
-			(value, reference, extraReference) -> value >= reference,
-			(value, reference, extraReference) -> value >= reference,
-			(value, reference, extraReference) -> value - reference
-			),
-	MORE_THAN(">",
-			(a, b, comparator) -> comparator.compare(a, b) > 0,
-			(value, reference, extraReference) -> value > reference,
-			(value, reference, extraReference) -> value > reference,
-			(value, reference, extraReference) -> value - reference
-			),
-	EQUALS("=",
-			(a, b, comparator) -> comparator.compare(a, b) == 0,
-			(value, reference, extraReference) -> value == reference,
-			(value, reference, extraReference) -> value == reference,
-			(value, reference, extraReference) -> 0d
-			),
-	DIFFERENT("!=",
-			(a, b, comparator) -> comparator.compare(a, b) != 0,
-			(value, reference, extraReference) -> value != reference,
-			(value, reference, extraReference) -> value != reference,
-			(value, reference, extraReference) -> value - reference
-			),
-	IN_RANGE(">=<",
-			null,
+	LESS_THAN("<", (a, b, comparator) -> comparator.compare(a, b) < 0, (value, reference, extraReference) -> value < reference,
+			(value, reference, extraReference) -> value < reference, null),
+	LESS_OR_EQUALS("<=", (a, b, comparator) -> comparator.compare(a, b) <= 0, (value, reference, extraReference) -> value <= reference,
+			(value, reference, extraReference) -> value <= reference, null),
+	MORE_OR_EQUALS(">=", (a, b, comparator) -> comparator.compare(a, b) >= 0, (value, reference, extraReference) -> value >= reference,
+			(value, reference, extraReference) -> value >= reference, (value, reference, extraReference) -> value - reference),
+	MORE_THAN(">", (a, b, comparator) -> comparator.compare(a, b) > 0, (value, reference, extraReference) -> value > reference,
+			(value, reference, extraReference) -> value > reference, (value, reference, extraReference) -> value - reference),
+	EQUALS("=", (a, b, comparator) -> comparator.compare(a, b) == 0, (value, reference, extraReference) -> value == reference,
+			(value, reference, extraReference) -> value == reference, (value, reference, extraReference) -> 0d),
+	DIFFERENT("!=", (a, b, comparator) -> comparator.compare(a, b) != 0, (value, reference, extraReference) -> value != reference,
+			(value, reference, extraReference) -> value != reference, (value, reference, extraReference) -> value - reference),
+	IN_RANGE(">=<", null, (value, reference, extraReference) -> extraReference != null && value >= reference && value <= extraReference,
 			(value, reference, extraReference) -> extraReference != null && value >= reference && value <= extraReference,
-			(value, reference, extraReference) -> extraReference != null && value >= reference && value <= extraReference,
-			(value, reference, extraReference) -> value - reference
-			)
-	;
+			(value, reference, extraReference) -> value - reference);
 
 	// ----- base
 	private String symbol;
@@ -60,7 +32,9 @@ public enum ComparisonType {
 	private TriFunction<Long, Long, Long, Boolean> comparatorLong;
 	private TriFunction<Double, Double, Double, Double> taker;
 
-	ComparisonType(String symbol, TriFunction<Comparable, Comparable, Comparator, Boolean> comparableComparator, TriFunction<Double, Double, Double, Boolean> comparatorDouble, TriFunction<Long, Long, Long, Boolean> comparatorLong, TriFunction<Double, Double, Double, Double> taker) {
+	ComparisonType(String symbol, TriFunction<Comparable, Comparable, Comparator, Boolean> comparableComparator,
+			TriFunction<Double, Double, Double, Boolean> comparatorDouble, TriFunction<Long, Long, Long, Boolean> comparatorLong,
+			TriFunction<Double, Double, Double, Double> taker) {
 		this.symbol = symbol;
 		this.comparableComparator = comparableComparator;
 		this.comparatorDouble = comparatorDouble;

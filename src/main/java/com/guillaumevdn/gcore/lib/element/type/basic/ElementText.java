@@ -29,7 +29,8 @@ import com.guillaumevdn.gcore.lib.wrapper.WrapperInteger;
 public class ElementText extends BasicElement<Text> {
 
 	public ElementText(Element parent, String id, Need need, Text editorDescription) {
-		super(SizeTolerance.ALLOW_EMPTY_AND_LIST, parent, id, need.getType(), need.getDef() != null ? ((Text) need.getDef()).getCurrentLines() : null, editorDescription);
+		super(SizeTolerance.ALLOW_EMPTY_AND_LIST, parent, id, need.getType(), need.getDef() != null ? ((Text) need.getDef()).getCurrentLines() : null,
+				editorDescription);
 	}
 
 	@Override
@@ -126,32 +127,35 @@ public class ElementText extends BasicElement<Text> {
 				}
 
 				// new line item
-				setPersistentItem(new GUIItem("newline", 50, ItemUtils.createItem(CommonMats.BLAZE_ROD, TextEditorGeneric.controlAddElementName.parseLine(), null), call -> {
-					if (getRawValue() == null) {
-						setValue(CollectionUtils.asList("new line"));
-					} else {
-						setValue(CollectionUtils.asListMultiple(String.class, getRawValue(), "new line"));
-					}
-					call.getGUI().refill();
-					getSuperElement().onEditorChange(ElementText.this);
-				}));
+				setPersistentItem(new GUIItem("newline", 50,
+						ItemUtils.createItem(CommonMats.BLAZE_ROD, TextEditorGeneric.controlAddElementName.parseLine(), null), call -> {
+							if (getRawValue() == null) {
+								setValue(CollectionUtils.asList("new line"));
+							} else {
+								setValue(CollectionUtils.asListMultiple(String.class, getRawValue(), "new line"));
+							}
+							call.getGUI().refill();
+							getSuperElement().onEditorChange(ElementText.this);
+						}));
 
 				// random item
-				setPersistentItem(new GUIItem("random", 51, ItemUtils.createItem(CommonMats.COMMAND_BLOCK, TextEditorGeneric.controlTextSetRandom.parseLine(), null), call -> {
-					if (getRawValue() == null) {
-						setValue(CollectionUtils.asList("@random"));
-					} else if ("@random".equalsIgnoreCase(getRawValueLine(0))) {
-						return;
-					} else {
-						setValue(CollectionUtils.asListMultiple(String.class, "@random", getRawValue()));
-					}
-					call.getGUI().refill();
-					getSuperElement().onEditorChange(ElementText.this);
-				}));
+				setPersistentItem(new GUIItem("random", 51,
+						ItemUtils.createItem(CommonMats.COMMAND_BLOCK, TextEditorGeneric.controlTextSetRandom.parseLine(), null), call -> {
+							if (getRawValue() == null) {
+								setValue(CollectionUtils.asList("@random"));
+							} else if ("@random".equalsIgnoreCase(getRawValueLine(0))) {
+								return;
+							} else {
+								setValue(CollectionUtils.asListMultiple(String.class, "@random", getRawValue()));
+							}
+							call.getGUI().refill();
+							getSuperElement().onEditorChange(ElementText.this);
+						}));
 
 				// done
 				return super.doFill();
 			}
+
 		};
 	}
 
@@ -172,13 +176,14 @@ public class ElementText extends BasicElement<Text> {
 
 	public void onEditorClickEdit(int lineIndex, ClickCall call) {
 		call.getClicker().closeInventory();
-		WorkerGCore.inst().awaitChatWithSuggestedValue(call.getClicker(), TextEditorGeneric.messageElementBasicListLineEdit, getRawValueLine(lineIndex), value -> {
-			List<String> v = getRawValueCopyOrNewList();
-			v.set(lineIndex, value);
-			setValue(v);
-			getSuperElement().onEditorChange(ElementText.this);
-			call.reopenGUI();
-		}, () -> call.reopenGUI());
+		WorkerGCore.inst().awaitChatWithSuggestedValue(call.getClicker(), TextEditorGeneric.messageElementBasicListLineEdit, getRawValueLine(lineIndex),
+				value -> {
+					List<String> v = getRawValueCopyOrNewList();
+					v.set(lineIndex, value);
+					setValue(v);
+					getSuperElement().onEditorChange(ElementText.this);
+					call.reopenGUI();
+				}, () -> call.reopenGUI());
 	}
 
 }

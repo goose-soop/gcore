@@ -5,8 +5,8 @@ import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.guillaumevdn.gcore.lib.object.ObjectUtils;
 import com.guillaumevdn.gcore.lib.legacy_npc.navigation.pathfinding.Point;
+import com.guillaumevdn.gcore.lib.object.ObjectUtils;
 
 /**
  * @author GuillaumeVDN

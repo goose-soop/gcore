@@ -5,7 +5,8 @@ import com.guillaumevdn.gcore.lib.function.ThrowableOctoConsumer;
 /**
  * @author GuillaumeVDN
  */
-public class ReflectionProcedureOctoConsumer<A, B, C, D, E, F, G, H> extends ReflectionProcedure<ThrowableOctoConsumer<A, B, C, D, E, F, G, H>, ReflectionProcedureOctoConsumer<A, B, C, D, E, F, G, H>> {
+public class ReflectionProcedureOctoConsumer<A, B, C, D, E, F, G, H>
+		extends ReflectionProcedure<ThrowableOctoConsumer<A, B, C, D, E, F, G, H>, ReflectionProcedureOctoConsumer<A, B, C, D, E, F, G, H>> {
 
 	// ----- methods
 	public void process(A a, B b, C c, D d, E e, F f, G g, H h) {

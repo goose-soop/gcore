@@ -37,12 +37,12 @@ public final class JavaVersion {
       version = extractBeginningInt(javaVersion);
     }
     if (version == -1) {
-      return 6;  // Choose minimum supported JDK version as default
+      return 6; // Choose minimum supported JDK version as default
     }
     return version;
   }
 
-  // Parses both legacy 1.8 style and newer 9.0.4 style 
+  // Parses both legacy 1.8 style and newer 9.0.4 style
   private static int parseDotted(String javaVersion) {
     try {
       String[] parts = javaVersion.split("[._]");
@@ -88,5 +88,7 @@ public final class JavaVersion {
     return majorJavaVersion >= 9;
   }
 
-  private JavaVersion() { }
+  private JavaVersion() {
+  }
+
 }

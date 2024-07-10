@@ -8,7 +8,9 @@ import com.guillaumevdn.gcore.lib.compatibility.material.Mat;
 public interface LinearObjectType {
 
 	String name();
+
 	boolean requireParam();
+
 	Mat getIcon();
 
 }

@@ -22,7 +22,12 @@ public abstract class ElementEnum<E extends Enum<E>> extends ElementAbstractEnum
 	public ElementEnum(Class<E> enumClass, Element parent, String id, Need need, Text editorDescription) {
 		super(enumClass, true, parent, id, need, editorDescription);
 
-		RWHashMap<Class<?>, List<?>> cache = valueCache.computeIfAbsent(GCore.inst().getLifecycleReference(), __ -> new RWHashMap<>(10, 1f));  // use GCore lifecycle reference ; those are enums, not dynamic enums
+		RWHashMap<Class<?>, List<?>> cache = valueCache.computeIfAbsent(GCore.inst().getLifecycleReference(), __ -> new RWHashMap<>(10, 1f)); // use GCore
+																																				// lifecycle
+																																				// reference ;
+																																				// those are
+																																				// enums, not
+																																				// dynamic enums
 		values = (List<E>) cache.get(enumClass);
 		if (values == null) {
 			values = CollectionUtils.asList(enumClass.getEnumConstants());

@@ -5,24 +5,15 @@ package com.guillaumevdn.gcore.lib.item;
  */
 public enum ItemCheck {
 
-	ExactSame,
-	ExactSame_ExceptDurability,
+	ExactSame, ExactSame_ExceptDurability,
 
-	SameBase,
-	SameBase_SameDurability,
-	SameBase_NotMoreDamaged,
+	SameBase, SameBase_SameDurability, SameBase_NotMoreDamaged,
 
-	SameBase_NameContains,
-	SameBase_NameContains_SameDurability,
-	SameBase_NameContains_NotMoreDamaged,
+	SameBase_NameContains, SameBase_NameContains_SameDurability, SameBase_NameContains_NotMoreDamaged,
 
-	SameBase_LoreContains,
-	SameBase_LoreContains_SameDurability,
-	SameBase_LoreContains_NotMoreDamaged,
+	SameBase_LoreContains, SameBase_LoreContains_SameDurability, SameBase_LoreContains_NotMoreDamaged,
 
-	SameBase_NameContains_LoreContains,
-	SameBase_NameContains_LoreContains_SameDurability,
-	SameBase_NameContains_LoreContains_NotMoreDamaged,
+	SameBase_NameContains_LoreContains, SameBase_NameContains_LoreContains_SameDurability, SameBase_NameContains_LoreContains_NotMoreDamaged,
 
 	;
 
@@ -37,7 +28,7 @@ public enum ItemCheck {
 
 	// ----- ez methods
 	public boolean isExact() {
-		return equals(ExactSame) || equals(ExactSame_ExceptDurability);  // durability don't use this method, so this is okay
+		return equals(ExactSame) || equals(ExactSame_ExceptDurability); // durability don't use this method, so this is okay
 	}
 
 	public boolean mustHaveSameDurability() {

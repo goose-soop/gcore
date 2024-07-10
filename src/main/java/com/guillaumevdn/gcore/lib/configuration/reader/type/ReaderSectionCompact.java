@@ -16,7 +16,8 @@ public class ReaderSectionCompact implements ThrowableFunction<ReaderContext, Bo
 
 	@Override
 	public Boolean apply(ReaderContext context) throws Throwable {
-		if (context.getIdentifiableLine() != null && context.isRemainingWrappedWith("{ ", " }") /* spaces are important here, to mark a clear difference with placeholders */) {
+		if (context.getIdentifiableLine() != null
+				&& context.isRemainingWrappedWith("{ ", " }") /* spaces are important here, to mark a clear difference with placeholders */) {
 			SectionNode section = context.getParent().addSection(context.getId(), SectionNodeType.COMPACT);
 			readCompactSection(section, context.getRemaining().substring(1, context.getRemaining().length() - 1).trim(), context);
 			return true;
@@ -28,7 +29,7 @@ public class ReaderSectionCompact implements ThrowableFunction<ReaderContext, Bo
 
 		// not enough content
 		remaining = remaining.trim();
-		if (remaining.length() < 4) {  // minimum acceptable value should be something like 'a:[]' or 'a:{}'
+		if (remaining.length() < 4) { // minimum acceptable value should be something like 'a:[]' or 'a:{}'
 			context.throwError(section, "not enough content at line " + context.getIdentifiableLine().getNumber() + " near \"" + remaining + "\"");
 		}
 
@@ -38,7 +39,8 @@ public class ReaderSectionCompact implements ThrowableFunction<ReaderContext, Bo
 
 		while ((commaIndex = indexOfCommaSeparator(remaining)) != -1) {
 			if (commaIndex == -2) {
-				context.throwError(section, "found invalid comma or subsection or list at line " + context.getIdentifiableLine().getNumber() + " near \"" + remaining + "\"");
+				context.throwError(section,
+						"found invalid comma or subsection or list at line " + context.getIdentifiableLine().getNumber() + " near \"" + remaining + "\"");
 			}
 			contents.add(remaining.substring(0, commaIndex).trim());
 			remaining = remaining.substring(commaIndex + 1).trim();
@@ -99,23 +101,28 @@ public class ReaderSectionCompact implements ThrowableFunction<ReaderContext, Bo
 				}
 			} else if (ch == '{') {
 				if (wrapping == null) {
-					if (inList) return -2;
+					if (inList)
+						return -2;
 					++subsectionCount;
 				}
 			} else if (ch == '}') {
 				if (wrapping == null) {
-					if (inList) return -2;
-					if (subsectionCount == 0) return -2;
+					if (inList)
+						return -2;
+					if (subsectionCount == 0)
+						return -2;
 					--subsectionCount;
 				}
 			} else if (ch == '[') {
 				if (wrapping == null) {
-					if (inList) return -2;
+					if (inList)
+						return -2;
 					inList = true;
 				}
 			} else if (ch == ']') {
 				if (wrapping == null) {
-					if (!inList) return -2;
+					if (!inList)
+						return -2;
 					inList = false;
 				}
 			} else if (ch == ',') {

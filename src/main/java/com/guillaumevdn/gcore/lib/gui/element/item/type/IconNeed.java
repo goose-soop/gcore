@@ -5,8 +5,6 @@ package com.guillaumevdn.gcore.lib.gui.element.item.type;
  */
 public enum IconNeed {
 
-	REQUIRED,
-	OPTIONAL,
-	USELESS
+	REQUIRED, OPTIONAL, USELESS
 
 }

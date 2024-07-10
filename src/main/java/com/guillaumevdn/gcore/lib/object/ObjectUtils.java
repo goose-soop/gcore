@@ -35,7 +35,7 @@ public final class ObjectUtils {
 				}
 			}
 		} catch (Throwable ignored) {
-			ignored.printStackTrace();  // because why the heck does it happen sometimes ? :CringeHarold:
+			ignored.printStackTrace(); // because why the heck does it happen sometimes ? :CringeHarold:
 		}
 		return null;
 	}
@@ -85,7 +85,7 @@ public final class ObjectUtils {
 				}
 			}
 		} catch (Throwable ignored) {
-			ignored.printStackTrace();  // because why the heck does it happen sometimes ? :CringeHarold:
+			ignored.printStackTrace(); // because why the heck does it happen sometimes ? :CringeHarold:
 		}
 		return null;
 	}
@@ -105,7 +105,7 @@ public final class ObjectUtils {
 				}
 			}
 		} catch (Throwable ignored) {
-			ignored.printStackTrace();  // because why the heck does it happen sometimes ? :CringeHarold:
+			ignored.printStackTrace(); // because why the heck does it happen sometimes ? :CringeHarold:
 		}
 		return null;
 	}
@@ -125,7 +125,8 @@ public final class ObjectUtils {
 					builder.append(ch[i]);
 				}
 				return UUID.fromString(builder.toString());
-			} catch (Throwable ignored2) {}
+			} catch (Throwable ignored2) {
+			}
 		}
 		return null;
 	}
@@ -134,12 +135,14 @@ public final class ObjectUtils {
 	public static <T> void forCasted(Object object, Class<T> castClass, Consumer<T> ifCasted) {
 		ifCanBeCasted(object, castClass, ifCasted);
 	}
+
 	public static <T> void forCasted(Object a, Object b, Class<T> castClass, BiConsumer<T, T> ifCasted) {
 		final T castedA = castOrNull(a, castClass);
 		final T castedB = castOrNull(b, castClass);
 		if (castedA != null && castedB != null)
 			ifCasted.accept(castedA, castedB);
 	}
+
 	public static <A, B> void forCasted(Object a, Object b, Class<A> castClassA, Class<B> castClassB, BiConsumer<A, B> ifCasted) {
 		final A castedA = castOrNull(a, castClassA);
 		final B castedB = castOrNull(b, castClassB);
@@ -163,7 +166,8 @@ public final class ObjectUtils {
 			if (instanceOf(object, castClass)) {
 				return (T) object;
 			}
-		} catch (ClassCastException | NullPointerException ignored) {}
+		} catch (ClassCastException | NullPointerException ignored) {
+		}
 		return null;
 	}
 
@@ -172,7 +176,8 @@ public final class ObjectUtils {
 			if (instanceOf(object, castClass)) {
 				return (T) object;
 			}
-		} catch (ClassCastException | NullPointerException ignored) {}
+		} catch (ClassCastException | NullPointerException ignored) {
+		}
 		throw new ClassCastException("couldn't cast object of type " + (object == null ? "null" : object.getClass()) + " to " + castClass);
 	}
 
@@ -195,16 +200,8 @@ public final class ObjectUtils {
 	}
 
 	// ----- instanceof
-	private static final Map<Class<?>, Class<?>> primitiveWrappers = CollectionUtils.asMap(
-			int.class, Integer.class,
-			double.class, Double.class,
-			boolean.class, Boolean.class,
-			long.class, Long.class,
-			byte.class, Byte.class,
-			short.class, Short.class,
-			float.class, Float.class,
-			char.class, Character.class
-			);
+	private static final Map<Class<?>, Class<?>> primitiveWrappers = CollectionUtils.asMap(int.class, Integer.class, double.class, Double.class, boolean.class,
+			Boolean.class, long.class, Long.class, byte.class, Byte.class, short.class, Short.class, float.class, Float.class, char.class, Character.class);
 
 	public static <T> boolean instanceOf(T obj, Class<?> typeClass) {
 		return instanceOf(obj == null ? null : obj.getClass(), typeClass);
@@ -257,18 +254,20 @@ public final class ObjectUtils {
 
 	// ----- misc
 	public static <T> Consumer<T> emptyConsumer() {
-		return t -> {};
+		return t -> {
+		};
 	}
 
 	public static <T> ThrowableConsumer<T> emptyThrowableConsumer() {
-		return t -> {};
+		return t -> {
+		};
 	}
 
 	public static <T> Supplier<T> supplier(Class<T> clazz, Supplier<T> supplier) { // wrapping function
 		return supplier;
 	}
 
-	public static <R> R produce(Supplier<R> result) {  // useful in super() calls for instance
+	public static <R> R produce(Supplier<R> result) { // useful in super() calls for instance
 		return result.get();
 	}
 

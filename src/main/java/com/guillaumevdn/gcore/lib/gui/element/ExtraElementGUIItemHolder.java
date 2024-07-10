@@ -29,10 +29,12 @@ public abstract class ExtraElementGUIItemHolder extends ItemHolder {
 	@Override
 	public ActiveItemHolder newActive(ActiveGUI gui) {
 		return new ActiveItemHolderElementGUIItemCommon(gui, this, element) {
+
 			@Override
 			protected void build(ItemStack itemIcon, QuadriConsumer<ItemStack, Set<String>, Integer, Consumer<ClickCall>> callback) throws ParsingError {
 				ExtraElementGUIItemHolder.this.build(itemIcon, callback);
 			}
+
 		};
 	}
 
@@ -42,4 +44,5 @@ public abstract class ExtraElementGUIItemHolder extends ItemHolder {
 	}
 
 	protected abstract void build(ItemStack itemIcon, QuadriConsumer<ItemStack, Set<String>, Integer, Consumer<ClickCall>> callback) throws ParsingError;
+
 }

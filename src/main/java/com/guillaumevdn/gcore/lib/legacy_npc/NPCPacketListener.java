@@ -36,12 +36,8 @@ public class NPCPacketListener implements PacketListener {
 
 	@Override
 	public ListeningWhitelist getReceivingWhitelist() {
-		return ListeningWhitelist.newBuilder()
-				.gamePhase(GamePhase.PLAYING)
-				.types(new PacketType[] { PacketType.Play.Client.USE_ENTITY })
-				.options(new ListenerOptions[0])
-				.priority(ListenerPriority.NORMAL)
-				.build();
+		return ListeningWhitelist.newBuilder().gamePhase(GamePhase.PLAYING).types(new PacketType[] { PacketType.Play.Client.USE_ENTITY })
+				.options(new ListenerOptions[0]).priority(ListenerPriority.NORMAL).build();
 	}
 
 	@Override
@@ -78,7 +74,8 @@ public class NPCPacketListener implements PacketListener {
 					Object value = field.get(packet.getEntityUseActions().getTarget());
 					act = value.toString();
 				}
-				interaction = ObjectUtils.safeValueOf(act, NPCInteraction.class);  // safeValueOf, we're only interested in INTERACT and ATTACK but there are others
+				interaction = ObjectUtils.safeValueOf(act, NPCInteraction.class); // safeValueOf, we're only interested in INTERACT and ATTACK but there are
+																					// others
 			} catch (Throwable exception) {
 				GCore.inst().getMainLogger().error("An error occured while handling GCore NPC interaction packet", exception);
 			}

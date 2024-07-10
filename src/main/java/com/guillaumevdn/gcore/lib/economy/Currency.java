@@ -1,6 +1,5 @@
 package com.guillaumevdn.gcore.lib.economy;
 
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -18,8 +17,7 @@ import com.guillaumevdn.gcore.lib.string.StringUtils;
 /**
  * @author GuillaumeVDN
  */
-public abstract class Currency
-{
+public abstract class Currency {
 
     private final String id;
     private final String requiredPlugin;
@@ -128,7 +126,8 @@ public abstract class Currency
             amount = amount * formatMultiplier;
         }
         return (amount > 1d ? formatMultiple : formatSingle).replace("{amount}", StringUtils.formatNumber(amount, formatDecimalPrecision));
-        //return (amount > 1d ? formatMultiple : formatSingle).replace("{amount}", NumberUtils.roundString(amount, formatDecimalPrecision));
+        // return (amount > 1d ? formatMultiple : formatSingle).replace("{amount}", NumberUtils.roundString(amount,
+        // formatDecimalPrecision));
     }
 
     public double get(OfflinePlayer player) {
@@ -151,10 +150,7 @@ public abstract class Currency
             return true;
         }
         if (notify) {
-            TextGeneric.messageMustHaveCurrency
-                .replace("{balance}", () -> format(balance))
-                .replace("{money}", () -> format(amount))
-                .send(player);
+            TextGeneric.messageMustHaveCurrency.replace("{balance}", () -> format(balance)).replace("{money}", () -> format(amount)).send(player);
         }
         return false;
     }
@@ -230,7 +226,8 @@ public abstract class Currency
 
     public static Currency valueOf(String id) throws IllegalArgumentException {
         Currency value = registered.get(id.toUpperCase());
-        if (value != null) return value;
+        if (value != null)
+            return value;
         throw new IllegalArgumentException("there's no currency with id " + id);
     }
 

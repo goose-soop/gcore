@@ -30,7 +30,8 @@ public class ElementPotionEffect extends ParseableContainerElement<PotionEffect>
 	private ElementDuration duration = addDuration("duration", Need.required(), null, null, TextEditorGeneric.descriptionPotionEffectDuration);
 	private ElementInteger amplifier = addInteger("amplifier", Need.optional(0), 0, TextEditorGeneric.descriptionPotionEffectAmplifier);
 	private ElementBoolean ambient = addBoolean("ambient", Need.optional(true), TextEditorGeneric.descriptionPotionEffectAmbient);
-	private ElementBoolean particles = !Version.ATLEAST_1_8 ? null : addBoolean("particles", Need.optional(true), TextEditorGeneric.descriptionPotionEffectParticles);
+	private ElementBoolean particles = !Version.ATLEAST_1_8 ? null
+			: addBoolean("particles", Need.optional(true), TextEditorGeneric.descriptionPotionEffectParticles);
 	private ElementBoolean icon = !Version.ATLEAST_1_13 ? null : addBoolean("icon", Need.optional(true), TextEditorGeneric.descriptionPotionEffectIcon);
 
 	public ElementPotionEffect(Element parent, String id, Need need, Text editorDescription) {

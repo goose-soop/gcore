@@ -23,6 +23,7 @@ public class ElementEnchantment extends ElementFakeEnum<Enchantment> {
 	}
 
 	static RWWeakHashMap<Object, List<Enchantment>> cache = new RWWeakHashMap<>(1, 1f);
+
 	@Override
 	protected List<Enchantment> cacheOrBuild() {
 		return cachedOrBuild(cache, () -> Arrays.stream(Enchantment.values()).sorted(Comparator.comparing(e -> e.getName())));

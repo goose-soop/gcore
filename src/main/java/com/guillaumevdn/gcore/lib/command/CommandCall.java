@@ -28,7 +28,8 @@ public class CommandCall {
 		this(command, subcommand, sender, original, arguments, parameters, false);
 	}
 
-	public CommandCall(Command command, Subcommand subcommand, CommandSender sender, String[] original, List<String> arguments, List<String> parameters, boolean forTabComplete) {
+	public CommandCall(Command command, Subcommand subcommand, CommandSender sender, String[] original, List<String> arguments, List<String> parameters,
+			boolean forTabComplete) {
 		this.subcommand = subcommand;
 		this.sender = sender;
 		this.senderPlayer = ObjectUtils.castOrNull(sender, Player.class);

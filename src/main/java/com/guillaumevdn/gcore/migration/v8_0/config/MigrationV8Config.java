@@ -54,8 +54,8 @@ public final class MigrationV8Config extends Migration {
 
 		// make sure all .yml files can be loaded with our new parser
 		List<String> errors = new ArrayList<>();
-		attemptFilesOperation("making sure all files can be loaded by the new YAML parser", "file", BackupBehavior.RESTORE, getPluginFolder(), filterYMLIfNotOneOf("texts.yml"),
-				file -> {
+		attemptFilesOperation("making sure all files can be loaded by the new YAML parser", "file", BackupBehavior.RESTORE, getPluginFolder(),
+				filterYMLIfNotOneOf("texts.yml"), file -> {
 					try {
 						new YMLConfiguration(getPlugin(), file);
 					} catch (Throwable cause) {
@@ -80,7 +80,8 @@ public final class MigrationV8Config extends Migration {
 		});
 
 		// copy the old files in the GCoreLegacy directory
-		if (Stream.of("SupremeShops", "BettingGames", "Potatoes", "CustomCommands", "GParticles", "GSlotMachine").anyMatch(pl -> new File(getPluginFolder().getParentFile() + "/" + pl).exists())) {
+		if (Stream.of("SupremeShops", "BettingGames", "Potatoes", "CustomCommands", "GParticles", "GSlotMachine")
+				.anyMatch(pl -> new File(getPluginFolder().getParentFile() + "/" + pl).exists())) {
 			attemptOperation("copying current files to legacy directory for other plugins support", BackupBehavior.RESTORE, () -> {
 				File legacyBase = new File(getPluginFolder().getParentFile() + "/GCoreLegacy");
 				FileUtils.delete(legacyBase);
@@ -108,7 +109,8 @@ public final class MigrationV8Config extends Migration {
 				YMLConfiguration config = new YMLConfiguration(getPlugin(), new File(getPluginFolder() + "/config.yml"));
 				// data
 				if (oldConfig.contains("data.mysql.host")) {
-					config.getBackingYML().getBase().insertBeforeFirstConfigNode(new SectionNode(config.getBackingYML().getBase(), "mysql", SectionNodeType.REGULAR, null));
+					config.getBackingYML().getBase()
+							.insertBeforeFirstConfigNode(new SectionNode(config.getBackingYML().getBase(), "mysql", SectionNodeType.REGULAR, null));
 					config.write("mysql.host", oldConfig.readString("data.mysql.host", null));
 					config.write("mysql.name", oldConfig.readString("data.mysql.name", null));
 					config.write("mysql.user", oldConfig.readString("data.mysql.user", null));
@@ -220,8 +222,7 @@ public final class MigrationV8Config extends Migration {
 		String[] potionSplit = potion == null ? null : potion.split(",");
 		if (potionSplit != null) {
 			target.write(n + ".type", src.readString(o + ".type", Boolean.parseBoolean(potionSplit[3]) ? "SPLASH_POTION" : "POTION"));
-		}
-		else {
+		} else {
 			target.write(n + ".type", src.readString(o + ".type", null));
 			target.write(n + ".durability", src.readString(o + ".durability", null));
 		}
@@ -232,7 +233,8 @@ public final class MigrationV8Config extends Migration {
 		// meta
 		target.write(n + ".unbreakable", src.readString(o + ".unbreakable", null));
 		for (String key : src.readKeysForSection(o + ".enchants")) {
-			target.write(n + ".enchantments." + src.readString(o + ".enchants." + key + ".type", null), src.readString(o + ".enchants." + key + ".level", null));
+			target.write(n + ".enchantments." + src.readString(o + ".enchants." + key + ".type", null),
+					src.readString(o + ".enchants." + key + ".level", null));
 		}
 		target.write(n + ".name", src.readString(o + ".name", null));
 		target.write(n + ".lore", src.readStringList(o + ".lore", null));
@@ -265,7 +267,8 @@ public final class MigrationV8Config extends Migration {
 		if (nbtString != null) {
 			try {
 				DataIO nbtWriter = new DataIO();
-				NBTCompound nbt = new NBTCompound(null, "root", 0, (nbtString.toLowerCase().startsWith("custom:") ? PARSE_MOJANGSON : UNSERIALIZE_NBT).process(nbtString));
+				NBTCompound nbt = new NBTCompound(null, "root", 0,
+						(nbtString.toLowerCase().startsWith("custom:") ? PARSE_MOJANGSON : UNSERIALIZE_NBT).process(nbtString));
 				// skull ?
 				try {
 					if (nbt.hasKey("SkullOwner")) {
@@ -288,7 +291,8 @@ public final class MigrationV8Config extends Migration {
 							}
 						}
 					}
-				} catch (Throwable ignored) {}
+				} catch (Throwable ignored) {
+				}
 				// write nbt
 				AdapterNBTCompound.INSTANCE.write(nbt, nbtWriter);
 				SectionNode parent = target.getBackingYML().mkdirs(n);
@@ -308,7 +312,8 @@ public final class MigrationV8Config extends Migration {
 				if (serialized != null) {
 					byte[] inp;
 					try {
-						inp = Reflection.invokeMethod("org.bukkit.craftbukkit.libs.org.apache.commons.codec.binary.Base64", "decodeBase64", null, serialized).get(new byte[0].getClass());
+						inp = Reflection.invokeMethod("org.bukkit.craftbukkit.libs.org.apache.commons.codec.binary.Base64", "decodeBase64", null, serialized)
+								.get(new byte[0].getClass());
 					} catch (Throwable ignored) {
 						inp = Reflection.invokeMethod("org.apache.commons.codec.binary.Base64", "decodeBase64", null, serialized).get(new byte[0].getClass());
 					}

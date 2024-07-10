@@ -40,24 +40,29 @@ public class TypeStaticBorder extends GUIItemType {
 	@Override
 	public ActiveItemHolder newActive(ActiveGUI instance, ItemHolder holder, ElementGUIItem element) {
 		return new ActiveItemHolder(instance, holder) {
+
 			@Override
 			protected final void buildItems(TriConsumer<Collection<? extends GUIItem>, Set<String>, Integer> callback) throws ParsingError {
 				ItemStack itemIcon = element.directParseNoCatchOrThrowParsingNull("icon", getInstance().getReplacer());
 
-				// we parsed the item using the instance replacer so that item properties are parsed properly (for example meta owner_name and such)
+				// we parsed the item using the instance replacer so that item properties are parsed properly (for example meta
+				// owner_name and such)
 				// take placeholders from initial icons
 				ElementItem itemIconElement = element.getElementAs("icon");
 				String unparsedName = itemIconElement.getName().directParseOrNull(Replacer.GENERIC);
 				List<String> unparsedLore = itemIconElement.getLore().directParseOrNull(Replacer.GENERIC);
 				Set<String> placeholders = new HashSet<>(0);
-				if (unparsedName != null) placeholders.addAll(StringUtils.getPlaceholders(unparsedName));
-				if (unparsedLore != null) placeholders.addAll(StringUtils.getPlaceholders(unparsedLore));
+				if (unparsedName != null)
+					placeholders.addAll(StringUtils.getPlaceholders(unparsedName));
+				if (unparsedLore != null)
+					placeholders.addAll(StringUtils.getPlaceholders(unparsedLore));
 
 				List<IntegerPair> locations = element.parseLocations(getInstance().getReplacer());
 				Sound clickSound = element.getClickSound().parse(getInstance().getReplacer()).orNull();
 				Map<ClickType, Consumer<ClickCall>> overrideClicks = element.parseOverrideClicks(getInstance().getReplacer());
 
-				callback.accept(CollectionUtils.asList(new BorderGUIItem(getHolder().getId(), locations, itemIcon, clickSound, overrideClicks, null)), placeholders, -1);
+				callback.accept(CollectionUtils.asList(new BorderGUIItem(getHolder().getId(), locations, itemIcon, clickSound, overrideClicks, null)),
+						placeholders, -1);
 			}
 
 		};

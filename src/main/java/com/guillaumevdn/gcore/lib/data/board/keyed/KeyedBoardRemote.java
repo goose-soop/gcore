@@ -50,7 +50,7 @@ public abstract class KeyedBoardRemote<K, V> extends KeyedBoard<K, V> {
 						throw exception;
 					} finally {
 						if (!mustCache) {
-							disposeCacheElement(BukkitThread.ASYNC, key, null);  // will be saved if needed
+							disposeCacheElement(BukkitThread.ASYNC, key, null); // will be saved if needed
 						}
 					}
 				};

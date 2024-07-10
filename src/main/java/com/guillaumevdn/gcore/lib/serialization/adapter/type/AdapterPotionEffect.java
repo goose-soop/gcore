@@ -24,7 +24,8 @@ public final class AdapterPotionEffect extends DataAdapter<PotionEffect> {
 		writer.write("type", effect.getType());
 		writer.write("duration", effect.getDuration());
 		writer.write("amplifier", effect.getAmplifier());
-		if (effect.isAmbient()) writer.write("ambient", effect.isAmbient());
+		if (effect.isAmbient())
+			writer.write("ambient", effect.isAmbient());
 		if (Version.ATLEAST_1_8 && effect.hasParticles()) {
 			writer.write("particles", effect.hasParticles());
 		}

@@ -24,7 +24,7 @@ public final class MineToolsUtils {
 	@Nullable
 	public static UUID fetchUUID(String name) throws Throwable {
 		final NameAnswer answer = jsonRequest("https://api.minetools.eu/uuid/" + name, NameAnswer.class);
-		if (answer != null && answer.id != null) {  // content and uuid found
+		if (answer != null && answer.id != null) { // content and uuid found
 			final StringBuilder builder = new StringBuilder(36);
 			char[] ch = answer.id.toCharArray();
 			for (int i = 0; i < ch.length; ++i) {
@@ -35,24 +35,31 @@ public final class MineToolsUtils {
 			}
 			return UUID.fromString(builder.toString());
 		}
-		return null;  // no content or no uuid
+		return null; // no content or no uuid
 	}
 
 	@Nullable
 	public static GameProfile fetchProfile(UUID uuid) throws Throwable {
-		if (uuid == null) return null;  // I am haunted by this
+		if (uuid == null)
+			return null; // I am haunted by this
 		final ProfileAnswer answer = jsonRequest("https://api.minetools.eu/profile/" + uuid.toString().replace("-", ""), ProfileAnswer.class);
-		if (answer == null) return null;
-		if (answer.raw.name == null) return null;
-		if (answer.raw.name == null) return null; // throw new Error("No name found");
+		if (answer == null)
+			return null;
+		if (answer.raw.name == null)
+			return null;
+		if (answer.raw.name == null)
+			return null; // throw new Error("No name found");
 
 		final GameProfile profile = new GameProfile(uuid, answer.raw.name);
 
-		if (answer.raw.properties == null || answer.raw.properties.isEmpty()) return null; // throw new Error("No properties found (" + suuid + ")");
+		if (answer.raw.properties == null || answer.raw.properties.isEmpty())
+			return null; // throw new Error("No properties found (" + suuid + ")");
 		for (ProfileProperty property : answer.raw.properties) {
 			if (property.name.equalsIgnoreCase("textures")) {
-				if (property.value == null) break;  // throw new Error("No value found in textures property (" + suuid + ")");
-				if (property.signature == null) break;  // throw new Error("No signature found in textures property (" + suuid + ")");
+				if (property.value == null)
+					break; // throw new Error("No value found in textures property (" + suuid + ")");
+				if (property.signature == null)
+					break; // throw new Error("No signature found in textures property (" + suuid + ")");
 				profile.getProperties().put("textures", new Property("textures", property.value, property.signature));
 			}
 		}
@@ -70,7 +77,7 @@ public final class MineToolsUtils {
 			// read json
 			String json = "";
 			BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-			for (String line; (line = reader.readLine()) != null; ) {
+			for (String line; (line = reader.readLine()) != null;) {
 				json += line;
 			}
 			// read answer
@@ -88,22 +95,30 @@ public final class MineToolsUtils {
 	}
 
 	private static class NameAnswer {
+
 		private String id;
+
 	}
 
 	private static class ProfileAnswer {
+
 		private ProfileAnswerRaw raw;
+
 	}
 
 	private static class ProfileAnswerRaw {
+
 		private String name;
 		private List<ProfileProperty> properties;
+
 	}
 
 	private static class ProfileProperty {
+
 		private String name;
 		private String value;
 		private String signature;
+
 	}
 
 }

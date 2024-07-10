@@ -34,10 +34,8 @@ public class GcoreBoardUUIDElementPrint extends Subcommand {
 		final String boardPartId = argumentBoardId.get(call);
 		final UUID id = UUID.fromString(argumentId.get(call));
 
-		final KeyedBoard board = (KeyedBoard) PluginUtils.getGPlugins().stream()
-				.flatMap(plugin -> plugin.getData().copyValues().stream())
-				.filter(b -> b instanceof KeyedBoard && ((KeyedBoard) b).getId().contains(boardPartId))
-				.findAny().orElse(null);
+		final KeyedBoard board = (KeyedBoard) PluginUtils.getGPlugins().stream().flatMap(plugin -> plugin.getData().copyValues().stream())
+				.filter(b -> b instanceof KeyedBoard && ((KeyedBoard) b).getId().contains(boardPartId)).findAny().orElse(null);
 
 		if (board == null) {
 			call.getSender().sendMessage("§dNo board found containing id '" + boardPartId + "'.");
@@ -47,7 +45,8 @@ public class GcoreBoardUUIDElementPrint extends Subcommand {
 		call.getSender().sendMessage("§dFrom board " + board.getId() + " :");
 
 		final Consumer<Object> consumer = value -> {
-			if (value == null) return;
+			if (value == null)
+				return;
 			try (StringWriter writer = new StringWriter()) {
 				board.getPlugin().getPrettyGson().toJson(value, board.getValueClass(), new PrintWriter(writer));
 				for (String line : writer.toString().split("\n")) {

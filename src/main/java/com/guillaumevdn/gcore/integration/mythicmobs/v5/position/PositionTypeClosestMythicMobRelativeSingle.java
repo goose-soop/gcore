@@ -33,7 +33,8 @@ public class PositionTypeClosestMythicMobRelativeSingle extends PositionTypeClos
 	// ----- parse
 	@Override
 	public Position doParseMob(ElementPosition position, Location mobLocation, Replacer replacer) throws ParsingError {
-		Location location = position.getElementAs("location", ElementRelativeLocation.class).parseNoCatchOrThrowParsingNull(replacer.cloneReplacer().with(mobLocation));
+		Location location = position.getElementAs("location", ElementRelativeLocation.class)
+				.parseNoCatchOrThrowParsingNull(replacer.cloneReplacer().with(mobLocation));
 		PointTolerance pointTolerance = position.getElementAs("point_tolerance", ElementPointTolerance.class).parseNoCatchOrThrowParsingNull(replacer);
 		return new PositionSingle(location, pointTolerance);
 	}

@@ -24,8 +24,9 @@ import com.guillaumevdn.gcore.lib.object.ObjectUtils;
 import com.guillaumevdn.gcore.lib.string.StringUtils;
 
 /**
- * Uses a ReentrantReadWriteLock (allows multiple readers and prioritizes the only writer if any)
- * Subsets methods will throw an UnsupportedOperationException when called and forEach() or iterate() should be used instead.
+ * Uses a ReentrantReadWriteLock (allows multiple readers and prioritizes the only writer if any) Subsets methods will
+ * throw an UnsupportedOperationException when called and forEach() or iterate() should be used instead.
+ * 
  * @author GuillaumeVDN
  */
 public class RWLinkedHashMap<K, V> extends LinkedHashMap<K, V> {
@@ -97,12 +98,13 @@ public class RWLinkedHashMap<K, V> extends LinkedHashMap<K, V> {
 	public final void iterateAndModifyOrThrow(ThrowableTriConsumer<K, V, IteratorControls> consumer) throws Throwable {
 		// always lock on write here
 		// if the method is called, it means we want to modify the map
-		// if this is called simultaneously and elements are removed, it would throw errors with the usual "read > write > read" process since the iterator would no longer be valid (ConcurrentModificationException)
+		// if this is called simultaneously and elements are removed, it would throw errors with the usual "read > write > read"
+		// process since the iterator would no longer be valid (ConcurrentModificationException)
 
 		lock.writeThrowable(() -> {
 			Iterator<Entry<K, V>> it = super.entrySet().iterator();
 			IteratorControls iter = new IteratorControls();
-			
+
 			while (it.hasNext()) {
 				Entry<K, V> next = it.next();
 				consumer.accept(next.getKey(), next.getValue(), iter);
@@ -173,17 +175,25 @@ public class RWLinkedHashMap<K, V> extends LinkedHashMap<K, V> {
 
 	// -------------------- object --------------------
 
-	private int unsafeSize() { return super.size(); }
-	private V getUnsafe(Object key) { return super.get(keyModifier(key)); }
-	private boolean containsKeyUnsafe(Object key) { return super.containsKey(keyModifier(key)); }
+	private int unsafeSize() {
+		return super.size();
+	}
+
+	private V getUnsafe(Object key) {
+		return super.get(keyModifier(key));
+	}
+
+	private boolean containsKeyUnsafe(Object key) {
+		return super.containsKey(keyModifier(key));
+	}
 
 	@Override
-	public final boolean equals(Object o) {  // adapted code from HashMap
+	public final boolean equals(Object o) { // adapted code from HashMap
 		if (o == this)
 			return true;
 		if (!(o instanceof Map))
 			return false;
-		Map<?,?> other = (Map<?,?>) o;
+		Map<?, ?> other = (Map<?, ?>) o;
 
 		return lock.read(() -> {
 			// other is also a RW map ; lock once and use unsafe methods to avoid locking/unlocking every 3 nanoseconds
@@ -194,9 +204,9 @@ public class RWLinkedHashMap<K, V> extends LinkedHashMap<K, V> {
 						return false;
 
 					try {
-						Iterator<Entry<K,V>> i = super.entrySet().iterator();
+						Iterator<Entry<K, V>> i = super.entrySet().iterator();
 						while (i.hasNext()) {
-							Entry<K,V> e = i.next();
+							Entry<K, V> e = i.next();
 							K key = e.getKey();
 							V value = e.getValue();
 							if (value == null) {
@@ -222,9 +232,9 @@ public class RWLinkedHashMap<K, V> extends LinkedHashMap<K, V> {
 					return false;
 
 				try {
-					Iterator<Entry<K,V>> i = super.entrySet().iterator();
+					Iterator<Entry<K, V>> i = super.entrySet().iterator();
 					while (i.hasNext()) {
-						Entry<K,V> e = i.next();
+						Entry<K, V> e = i.next();
 						K key = e.getKey();
 						V value = e.getValue();
 						if (value == null) {
@@ -247,10 +257,10 @@ public class RWLinkedHashMap<K, V> extends LinkedHashMap<K, V> {
 	}
 
 	@Override
-	public final int hashCode() {  // adapted code from HashMap
+	public final int hashCode() { // adapted code from HashMap
 		return lock.read(() -> {
 			int h = 0;
-			Iterator<Entry<K,V>> i = super.entrySet().iterator();
+			Iterator<Entry<K, V>> i = super.entrySet().iterator();
 			while (i.hasNext())
 				h += i.next().hashCode();
 			return h;
@@ -258,16 +268,16 @@ public class RWLinkedHashMap<K, V> extends LinkedHashMap<K, V> {
 	}
 
 	@Override
-	public final String toString() {  // adapted code from HashMap
+	public final String toString() { // adapted code from HashMap
 		return lock.read(() -> {
-			Iterator<Entry<K,V>> i = super.entrySet().iterator();
+			Iterator<Entry<K, V>> i = super.entrySet().iterator();
 			if (!i.hasNext())
 				return "{}";
 
 			StringBuilder sb = new StringBuilder();
 			sb.append('{');
 			for (;;) {
-				Entry<K,V> e = i.next();
+				Entry<K, V> e = i.next();
 				K key = e.getKey();
 				V value = e.getValue();
 				sb.append(key == this ? "(this Map)" : key);
@@ -380,10 +390,11 @@ public class RWLinkedHashMap<K, V> extends LinkedHashMap<K, V> {
 		});
 	}
 
-	/* -------------------- (potential) write methods with loss of performance --------------------
-		due to (a) pre-check that would be made during iteration in the original method
-		       (b) using a write lock without being sure that modifications will be made
-		... I'm too lazy to completely rewrite a HashMap implementation with "low-level" direct operations on the table :Kappa:
+	/*
+	 * -------------------- (potential) write methods with loss of performance -------------------- due to (a) pre-check
+	 * that would be made during iteration in the original method (b) using a write lock without being sure that
+	 * modifications will be made ... I'm too lazy to completely rewrite a HashMap implementation with "low-level" direct
+	 * operations on the table :Kappa:
 	 */
 
 	@Override
@@ -411,6 +422,7 @@ public class RWLinkedHashMap<K, V> extends LinkedHashMap<K, V> {
 
 	/**
 	 * Replaces the entry for the specified key only if it is currently not mapped to some value.
+	 * 
 	 * @return true if the value was modified
 	 */
 	public final boolean replaceIfNot(K key, V value) {

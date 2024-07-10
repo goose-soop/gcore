@@ -20,6 +20,7 @@ public final class ElementTimeFrameType extends ElementTypableElementType<TimeFr
 	}
 
 	private static RWWeakHashMap<Object, List<TimeFrameType>> cache = new RWWeakHashMap<>(1, 1f);
+
 	@Override
 	protected List<TimeFrameType> cacheOrBuild() {
 		return cachedOrBuild(cache, () -> TimeFrameTypes.inst().values().stream().sorted(Comparator.comparing(e -> e.getId())));

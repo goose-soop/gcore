@@ -82,7 +82,8 @@ public final class PluginUtils {
 			connection.setDoOutput(true);
 			// read
 			String response = null;
-			try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getResponseCode() == 200 ? connection.getInputStream() : connection.getErrorStream()))) {
+			try (BufferedReader reader = new BufferedReader(
+					new InputStreamReader(connection.getResponseCode() == 200 ? connection.getInputStream() : connection.getErrorStream()))) {
 				response = reader.readLine();
 			}
 			return response != null ? response : "unknown_server";

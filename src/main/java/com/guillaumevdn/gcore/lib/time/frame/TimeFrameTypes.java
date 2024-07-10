@@ -20,13 +20,13 @@ public final class TimeFrameTypes extends TypableElementTypes<TimeFrameType> {
 	}
 
 	// ----- types
-	public final TimeFrameTypeInDay			DAILY 			= register(new TimeFrameTypeInDay("DAILY"));
-	public final TimeFrameTypeInWeek 		WEEKLY 			= register(new TimeFrameTypeInWeek("WEEKLY"));
-	public final TimeFrameTypeInMonth		MONTHLY 		= register(new TimeFrameTypeInMonth("MONTHLY"));
-	public final TimeFrameTypeInYear 		YEARLY 			= register(new TimeFrameTypeInYear("YEARLY"));
-	public final TimeFrameRepeatPeriod		REPEAT_PERIOD	= register(new TimeFrameRepeatPeriod("REPEAT_PERIOD"));
-	public final TimeFrameTypeLimited	 	LIMITED			= register(new TimeFrameTypeLimited("LIMITED"));
-	public final TimeFrameTypeNone 			NONE 			= register(new TimeFrameTypeNone("NONE"));
+	public final TimeFrameTypeInDay DAILY = register(new TimeFrameTypeInDay("DAILY"));
+	public final TimeFrameTypeInWeek WEEKLY = register(new TimeFrameTypeInWeek("WEEKLY"));
+	public final TimeFrameTypeInMonth MONTHLY = register(new TimeFrameTypeInMonth("MONTHLY"));
+	public final TimeFrameTypeInYear YEARLY = register(new TimeFrameTypeInYear("YEARLY"));
+	public final TimeFrameRepeatPeriod REPEAT_PERIOD = register(new TimeFrameRepeatPeriod("REPEAT_PERIOD"));
+	public final TimeFrameTypeLimited LIMITED = register(new TimeFrameTypeLimited("LIMITED"));
+	public final TimeFrameTypeNone NONE = register(new TimeFrameTypeNone("NONE"));
 
 	// ----- values
 	public static TimeFrameTypes inst() {

@@ -27,7 +27,8 @@ public interface Replacer {
 		if (StringUtils.hasPlaceholders(string)) {
 			ReplacerData data = getReplacerData();
 
-			// since we don't know in which order placeholders will go (containers that contain placeholders parsed by custom, or the opposite), we parse both twice (as long as there are placeholders)
+			// since we don't know in which order placeholders will go (containers that contain placeholders parsed by custom, or
+			// the opposite), we parse both twice (as long as there are placeholders)
 
 			if (data.getCustom() != null && StringUtils.hasPlaceholders(string)) {
 				string = data.getCustom().apply(string);
@@ -60,7 +61,8 @@ public interface Replacer {
 		}
 		ReplacerData data = getReplacerData();
 
-		// since we don't know in which order placeholders will go (containers that contain placeholders parsed by custom, or the opposite), we parse both twice (as long as there are placeholders)
+		// since we don't know in which order placeholders will go (containers that contain placeholders parsed by custom, or
+		// the opposite), we parse both twice (as long as there are placeholders)
 
 		List<String> parsed;
 		if (data.getCustom() != null) {
@@ -121,10 +123,12 @@ public interface Replacer {
 	default Replacer cloneReplacer() {
 		ReplacerData data = getReplacerData().clone();
 		return new Replacer() {
+
 			@Override
 			public ReplacerData getReplacerData() {
 				return data;
 			}
+
 		};
 	}
 
@@ -193,15 +197,15 @@ public interface Replacer {
 	default String describeReplacer() {
 		ReplacerData data = getReplacerData();
 		Location loc = data.getLocation();
-		return (data.getPlayer() != null ? "player " + data.getPlayer().getName() : "generic")
-				+ (loc != null ? "/location" : "")
-				+ (data.getCustom() != null ? "/custom" : "")
-				;
+		return (data.getPlayer() != null ? "player " + data.getPlayer().getName() : "generic") + (loc != null ? "/location" : "")
+				+ (data.getCustom() != null ? "/custom" : "");
 	}
 
 	// ----- creation
 	static final Replacer GENERIC = empty();
-	static final RWWeakHashMap<Player, Replacer> JUST_PLAYER_REPLACER_CACHE = new RWWeakHashMap<>(10, 1f);  // initializing a Replacer just for the player can be consuming if done often ; this optimizes a few things, especially in recurring tasks
+	static final RWWeakHashMap<Player, Replacer> JUST_PLAYER_REPLACER_CACHE = new RWWeakHashMap<>(10, 1f); // initializing a Replacer just for the player can be
+																											// consuming if done often ; this optimizes a few
+																											// things, especially in recurring tasks
 	// FIXME : ^ remove this cache if still issues
 
 	static Replacer justPlayer(Player player) {
@@ -213,7 +217,8 @@ public interface Replacer {
 	}
 
 	static Replacer of(Player player) {
-		return player == null ? empty() : new SimpleReplacer(new ReplacerData().with(player));  // do not valuesCache players, since this method might be called to create a replacer with other things
+		return player == null ? empty() : new SimpleReplacer(new ReplacerData().with(player)); // do not valuesCache players, since this method might be called
+																								// to create a replacer with other things
 	}
 
 	static Replacer ofPlayer(Supplier<Player> player) {

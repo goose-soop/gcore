@@ -16,17 +16,12 @@ import com.guillaumevdn.gcore.lib.object.ObjectUtils;
  */
 final class VersionUtils {
 
-	/*static Version getCurrent() {
-		String bukkitVersion = Bukkit.getBukkitVersion().split("-")[0];
-		List<Version> versions = CollectionUtils.asList(Version.values());
-		Collections.reverse(versions);
-		for (Version version : versions) {
-			if (version.getNames().stream().anyMatch(v -> bukkitVersion.contains(v))) {
-				return version;
-			}
-		}
-		return Version.UNKNOWN;
-	}*/
+	/*
+	 * static Version getCurrent() { String bukkitVersion = Bukkit.getBukkitVersion().split("-")[0]; List<Version> versions
+	 * = CollectionUtils.asList(Version.values()); Collections.reverse(versions); for (Version version : versions) { if
+	 * (version.getNames().stream().anyMatch(v -> bukkitVersion.contains(v))) { return version; } } return Version.UNKNOWN;
+	 * }
+	 */
 
 	static Version getCurrent() {
 		// forced value from config

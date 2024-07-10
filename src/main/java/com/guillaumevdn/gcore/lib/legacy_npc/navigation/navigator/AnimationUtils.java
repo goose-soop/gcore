@@ -48,14 +48,14 @@ public final class AnimationUtils {
 			OptimizedPathPoint point = path.get(i);
 			Movement movement = point.getMovementToPoint();
 			Offset offset = movement.getOffset();
-			Point origin = movement.getOrigin().relative(0, 1, 0);  // normalize points
-			Point target = movement.getTarget().relative(0, 1, 0);  // normalize points
+			Point origin = movement.getOrigin().relative(0, 1, 0); // normalize points
+			Point target = movement.getTarget().relative(0, 1, 0); // normalize points
 			// find settings to use for this movement
-			final boolean sprinting = false;  // FIXME : find speed
+			final boolean sprinting = false; // FIXME : find speed
 			final double speed = sprinting ? TICK_SPRINTING : TICK_WALKING;
 			List<Movement> movementsToRecheck = CollectionUtils.asList(movement);
 			List<Location> ticks = new ArrayList<>();
-			boolean animated = false;  // FIXME remove this once everything is animated
+			boolean animated = false; // FIXME remove this once everything is animated
 
 			// ---- OFFSET ----------------------------------------------------------------------------------------
 			if (movement.getType().equals(MovementType.OFFSET)) {
@@ -67,11 +67,13 @@ public final class AnimationUtils {
 						boolean straight = offset.isStraight();
 						for (int j = i + 1; j < path.size(); ++j) {
 							Movement next = path.get(j).getMovementToPoint();
-							if (next.getType().equals(MovementType.OFFSET) && next.getOffset().getGap() == 0 && next.getOffset().getY() == 0 && next.getOffset().isStraight() == straight) {
+							if (next.getType().equals(MovementType.OFFSET) && next.getOffset().getGap() == 0 && next.getOffset().getY() == 0
+									&& next.getOffset().isStraight() == straight) {
 								movementsToRecheck.add(next);
-								target = next.getTarget().relative(0, 1, 0);  // normalize points
+								target = next.getTarget().relative(0, 1, 0); // normalize points
 								++i;
-							} else break;
+							} else
+								break;
 						}
 						// add steps
 						Location loc = origin.toLocation(finder.getWorld());
@@ -82,7 +84,7 @@ public final class AnimationUtils {
 							ticks.add(loc = loc.clone().add(step));
 						}
 						// add target
-						//ticks.add(target.toLocation(finder.getWorld()));
+						// ticks.add(target.toLocation(finder.getWorld()));
 						// set look
 						animated = true;
 					}
@@ -136,7 +138,8 @@ public final class AnimationUtils {
 					// FIXME : TO DO LOL
 				}
 			}
-			// FIXME : for "get in water", try to animate a plongeon si on peut directement aller en swimming animation (more than 1 block depth)
+			// FIXME : for "get in water", try to animate a plongeon si on peut directement aller en swimming animation (more than 1
+			// block depth)
 			if (!animated) {
 				ticks.add(target.toLocation(finder.getWorld()));
 			}
@@ -146,10 +149,12 @@ public final class AnimationUtils {
 		return movements;
 	}
 
-	private static void jumpUp(int gap, double forwardMultiplier, double yOffset, double tick, double yExtraUp, Point origin, Point target, double speed, Pathfinding finder, List<Location> ticks) {
+	private static void jumpUp(int gap, double forwardMultiplier, double yOffset, double tick, double yExtraUp, Point origin, Point target, double speed,
+			Pathfinding finder, List<Location> ticks) {
 		// take the vector, add y offset, and make the player follow it until it reaches y + extraUp
 		Vector step = origin.vectorTo(target).multiply(forwardMultiplier).setY(target.getY() - origin.getY() + yOffset).normalize().multiply(tick);
-		if (step.getY() < 0) throw new IllegalStateException("gap 0, offset y 1, but step y is " + step.getY());  // let's avoid infinite loops, just in case
+		if (step.getY() < 0)
+			throw new IllegalStateException("gap 0, offset y 1, but step y is " + step.getY()); // let's avoid infinite loops, just in case
 		Location loc = origin.toLocation(finder.getWorld());
 		while (loc.getY() < target.getY() + yExtraUp) {
 			ticks.add(loc = loc.clone().add(step));
@@ -193,7 +198,7 @@ public final class AnimationUtils {
 		}
 		// and fall
 		double tickFall = TICK_ACCELERATION_DOWN;
-		loc = loc.clone().subtract(step);  // subtract one
+		loc = loc.clone().subtract(step); // subtract one
 		for (int s = 0; s <= steps - 1; ++s) {
 			ticks.add(loc = loc.clone().add(step.clone().setY(-tickFall)));
 			tickFall += TICK_ACCELERATION_DOWN;

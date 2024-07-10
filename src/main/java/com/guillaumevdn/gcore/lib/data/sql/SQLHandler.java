@@ -34,8 +34,11 @@ public interface SQLHandler {
 	}
 
 	boolean performUpdateQuery(Logger logQueryTo, String query);
+
 	boolean performUpdateQuery(Logger logQueryTo, Query query);
+
 	boolean performGetQuery(Logger logQueryTo, String query, ThrowableConsumer<ResultSet> syncProcessor);
+
 	boolean performGetQuery(Logger logQueryTo, Query query, ThrowableConsumer<ResultSet> syncProcessor);
 
 }

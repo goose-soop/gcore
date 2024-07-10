@@ -44,7 +44,7 @@ public class SectionNode extends ConfigNode {
 			return "";
 		}
 		String path = getId();
-		for (SectionNode node = this; (node = node.getParent()) != null && !(node instanceof SuperNode); ) {
+		for (SectionNode node = this; (node = node.getParent()) != null && !(node instanceof SuperNode);) {
 			path = node.getId() + "." + path;
 		}
 		return path;
@@ -59,7 +59,8 @@ public class SectionNode extends ConfigNode {
 	}
 
 	public ConfigNode getConfigNode(String id) {
-		return (ConfigNode) nodes.stream().filter(node -> node instanceof ConfigNode).filter(node -> ((ConfigNode) node).getId().equalsIgnoreCase(id)).findFirst().orElse(null);
+		return (ConfigNode) nodes.stream().filter(node -> node instanceof ConfigNode).filter(node -> ((ConfigNode) node).getId().equalsIgnoreCase(id))
+				.findFirst().orElse(null);
 	}
 
 	public String getTrailingComment() {
@@ -241,14 +242,18 @@ public class SectionNode extends ConfigNode {
 					// attempt to cast value into number, or just write the value as it is
 					String value = replacer.parse(((SingleValueNode) node).getValue());
 					Long nbl = NumberUtils.longOrNull(value);
-					if (nbl != null) data.write(maybeToCamelCase(key, snakeCaseToCamelCase), nbl);
+					if (nbl != null)
+						data.write(maybeToCamelCase(key, snakeCaseToCamelCase), nbl);
 					else {
 						Integer nbi = NumberUtils.integerOrNull(value);
-						if (nbi != null) data.write(maybeToCamelCase(key, snakeCaseToCamelCase), nbi);
+						if (nbi != null)
+							data.write(maybeToCamelCase(key, snakeCaseToCamelCase), nbi);
 						else {
 							Double nbd = NumberUtils.doubleOrNull(value);
-							if (nbd != null) data.write(maybeToCamelCase(key, snakeCaseToCamelCase), nbd);
-							else data.write(maybeToCamelCase(key, snakeCaseToCamelCase), StringUtils.format(value));
+							if (nbd != null)
+								data.write(maybeToCamelCase(key, snakeCaseToCamelCase), nbd);
+							else
+								data.write(maybeToCamelCase(key, snakeCaseToCamelCase), StringUtils.format(value));
 						}
 					}
 				}
@@ -273,8 +278,10 @@ public class SectionNode extends ConfigNode {
 		// regular section or compact nested map
 		else {
 
-			if (type.writePrefix()) writer.append(getPrefix());
-			if (type.writeId()) writer.append(YMLReader.wrapIdToWrite(getId()) + ":");
+			if (type.writePrefix())
+				writer.append(getPrefix());
+			if (type.writeId())
+				writer.append(YMLReader.wrapIdToWrite(getId()) + ":");
 
 			if (nodes.isEmpty()) {
 				writer.append(" {}" + (trailingComment != null ? "  #" + trailingComment : "") + "\n");
@@ -290,7 +297,8 @@ public class SectionNode extends ConfigNode {
 					Node elem = getNodes().get(i);
 					if (isCompactNestedMap()) {
 						if (elem instanceof ConfigNode) {
-							if (type.writeId() || trailingComment != null || (type.equals(WriteType.VALUE) && i > 0) /* for anonymous sections, we still need to write more lines */) {
+							if (type.writeId() || trailingComment != null
+									|| (type.equals(WriteType.VALUE) && i > 0) /* for anonymous sections, we still need to write more lines */) {
 								writer.append(elem.getPrefix());
 							}
 							writer.append("- ");
@@ -299,7 +307,8 @@ public class SectionNode extends ConfigNode {
 					} else {
 						elem.write(writer, getParent() != null && getParent().isCompactNestedMap() && i == 0 ? WriteType.ID_VALUE : WriteType.PREFIX_ID_VALUE);
 					}
-					if (forceLineBreaks && i + 1 < getNodes().size() && !(elem instanceof LineBreaksNode) && !(getNodes().get(i + 1) instanceof LineBreaksNode)) {
+					if (forceLineBreaks && i + 1 < getNodes().size() && !(elem instanceof LineBreaksNode)
+							&& !(getNodes().get(i + 1) instanceof LineBreaksNode)) {
 						writer.append("\n");
 					}
 				}
@@ -344,9 +353,7 @@ public class SectionNode extends ConfigNode {
 	// ----- type
 	public static enum SectionNodeType {
 
-		REGULAR,
-		COMPACT,
-		COMPACT_NESTED_MAP
+		REGULAR, COMPACT, COMPACT_NESTED_MAP
 
 	}
 

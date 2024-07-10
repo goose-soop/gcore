@@ -24,17 +24,20 @@ public class SortedHashMap<K, V> implements Cloneable {
 	private final Type type;
 	private final Order order;
 	private final TreeMap<K, V> map;
-	private final Map<K, V> refMap;  // only for value-sorted maps
+	private final Map<K, V> refMap; // only for value-sorted maps
 	private final Comparator<K> keyComparator;
 
 	public SortedHashMap(final Type type, final Order order) {
-		if (type == null) throw new IllegalArgumentException("type can't be null");
-		if (order == null) throw new IllegalArgumentException("order can't be null");
+		if (type == null)
+			throw new IllegalArgumentException("type can't be null");
+		if (order == null)
+			throw new IllegalArgumentException("order can't be null");
 		this.type = type;
 		this.order = order;
 		// key sorted
 		if (type.equals(Type.KEY_SORTED)) {
 			keyComparator = new Comparator<K>() {
+
 				@Override
 				public int compare(final K k1, final K k2) {
 					// null or not comparable
@@ -51,6 +54,7 @@ public class SortedHashMap<K, V> implements Cloneable {
 					}
 					return order.signum * comp;
 				}
+
 			};
 			refMap = null;
 		}
@@ -58,6 +62,7 @@ public class SortedHashMap<K, V> implements Cloneable {
 		else {
 			refMap = new HashMap<>();
 			keyComparator = new Comparator<K>() {
+
 				@Override
 				public int compare(final K k1, final K k2) {
 					// null or not comparable
@@ -76,6 +81,7 @@ public class SortedHashMap<K, V> implements Cloneable {
 					}
 					return order.signum * comp;
 				}
+
 			};
 		}
 		map = new TreeMap<>(keyComparator);
@@ -118,7 +124,8 @@ public class SortedHashMap<K, V> implements Cloneable {
 
 	/**
 	 * @param key the key
-	 * @return the value associated with this key (a null value might mean that it's mapped with a null value, or that there's no mapping as well)
+	 * @return the value associated with this key (a null value might mean that it's mapped with a null value, or that
+	 *         there's no mapping as well)
 	 */
 	public V get(K key) {
 		return map.get(key);
@@ -156,12 +163,14 @@ public class SortedHashMap<K, V> implements Cloneable {
 
 	/**
 	 * Map a value to a key
-	 * @param key the key
+	 * 
+	 * @param key   the key
 	 * @param value the value
-	 * @return the value previously associated with this key (a null value might mean that it was mapped with a null value, or that there was no mapping as well)
+	 * @return the value previously associated with this key (a null value might mean that it was mapped with a null value,
+	 *         or that there was no mapping as well)
 	 */
 	public V put(K key, V value) {
-		if (refMap != null) {  // bah évidemment ça ça se met avant espèce de giga débile vu qu'on s'en sert pour sort
+		if (refMap != null) { // bah évidemment ça ça se met avant espèce de giga débile vu qu'on s'en sert pour sort
 			refMap.put(key, value);
 		}
 		V v = map.put(key, value);
@@ -185,8 +194,10 @@ public class SortedHashMap<K, V> implements Cloneable {
 
 	/**
 	 * Remove a key from the map
+	 * 
 	 * @param key the key
-	 * @return the value previously associated with this key (a null value might mean that it was mapped with a null value, or that there was no mapping as well)
+	 * @return the value previously associated with this key (a null value might mean that it was mapped with a null value,
+	 *         or that there was no mapping as well)
 	 */
 	public V remove(K key) {
 		V v = map.remove(key);
@@ -273,7 +284,8 @@ public class SortedHashMap<K, V> implements Cloneable {
 	}
 
 	public K getKeyAt(int index) {
-		if (index < 0 || index >= map.size()) throw new IndexOutOfBoundsException("index " + index + ", size " + map.size());
+		if (index < 0 || index >= map.size())
+			throw new IndexOutOfBoundsException("index " + index + ", size " + map.size());
 		Iterator<K> iterator = keySet().iterator();
 		int i = -1;
 		while (iterator.hasNext()) {
@@ -319,8 +331,7 @@ public class SortedHashMap<K, V> implements Cloneable {
 	// ----- order enum
 	public static enum Order {
 
-		NATURAL(1),
-		REVERSE(-1);
+		NATURAL(1), REVERSE(-1);
 
 		private final int signum;
 
@@ -332,7 +343,8 @@ public class SortedHashMap<K, V> implements Cloneable {
 
 	// ----- static methods
 	public static <TK, TV> SortedHashMap<TK, TV> asMap(Type type, Order order, Object... objects) {
-		if (objects.length != 0 && objects.length % 2 != 0) throw new IllegalArgumentException("size isn't a multiple of 2");
+		if (objects.length != 0 && objects.length % 2 != 0)
+			throw new IllegalArgumentException("size isn't a multiple of 2");
 		SortedHashMap<TK, TV> map = new SortedHashMap<>(type, order);
 		for (int i = 0; i < objects.length; i += 2) {
 			map.put((TK) objects[i], (TV) objects[i + 1]);

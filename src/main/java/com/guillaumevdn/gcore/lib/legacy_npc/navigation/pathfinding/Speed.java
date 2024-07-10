@@ -9,10 +9,7 @@ import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
  */
 public enum Speed {
 
-	WALK_ONLY(SpeedType.WALK),
-	WALK_BUT_CAN_SPRINT(SpeedType.WALK, SpeedType.SPRINT),
-	SPRINT_ONLY(SpeedType.SPRINT)
-	;
+	WALK_ONLY(SpeedType.WALK), WALK_BUT_CAN_SPRINT(SpeedType.WALK, SpeedType.SPRINT), SPRINT_ONLY(SpeedType.SPRINT);
 
 	private Set<SpeedType> speeds;
 

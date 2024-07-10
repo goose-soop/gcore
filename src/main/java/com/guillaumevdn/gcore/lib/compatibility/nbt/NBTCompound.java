@@ -20,15 +20,14 @@ public class NBTCompound extends NBTBase {
 	}
 
 	// ----- keys
-	/*private static final String getValueTypeMethod = Reflection.getForThisVersion(Version.MC_1_8_R3, "b", Version.MC_1_9_R2, "d", Version.MC_1_15_R1, "e", Version.MC_1_16_R1, "d");
-
-	public final NBTType getValueType(String key) throws Throwable {
-		Object type = getTag().invokeMethod(getValueTypeMethod).get();
-		if (type == null) {
-			return NBTType.UNKNOWN;
-		}
-		return NBTType.getByInternalId(type instanceof Byte ? ((Byte) type).intValue() : (Integer) type);
-	}*/
+	/*
+	 * private static final String getValueTypeMethod = Reflection.getForThisVersion(Version.MC_1_8_R3, "b",
+	 * Version.MC_1_9_R2, "d", Version.MC_1_15_R1, "e", Version.MC_1_16_R1, "d");
+	 * 
+	 * public final NBTType getValueType(String key) throws Throwable { Object type =
+	 * getTag().invokeMethod(getValueTypeMethod).get(); if (type == null) { return NBTType.UNKNOWN; } return
+	 * NBTType.getByInternalId(type instanceof Byte ? ((Byte) type).intValue() : (Integer) type); }
+	 */
 
 	public final NBTType getValueType(String key) throws Throwable {
 		return NBTType.getByWrappedClass(getTag().invokeMethod(Version.ATLEAST_1_18 ? "c" : "get", key).get());
@@ -183,7 +182,8 @@ public class NBTCompound extends NBTBase {
 		ConfigGCore.logspamItemNbt(this, () -> "thisKeys " + thisKeys);
 		ConfigGCore.logspamItemNbt(this, () -> "ref Keys " + refKeys);
 		if (exactMatch) {
-			if (!CollectionUtils.contentEquals(thisKeys, refKeys, false)) return false;
+			if (!CollectionUtils.contentEquals(thisKeys, refKeys, false))
+				return false;
 		} else {
 			for (String key : refKeys) {
 				if (!thisKeys.contains(key)) {
@@ -247,9 +247,9 @@ public class NBTCompound extends NBTBase {
 			NBTType type = reference.getValueType(key);
 			ConfigGCore.logspamItemNbt(this, () -> " Copying key " + key + " of type " + type);
 			if (type.equals(NBTType.LIST)) {
-				if (!thisKeys.contains(key)) {  // don't replace existing values
+				if (!thisKeys.contains(key)) { // don't replace existing values
 					NBTList list = reference.getList(key);
-					if (list.size() != 0) {  // don't replace empty lists
+					if (list.size() != 0) { // don't replace empty lists
 						NBTType listType = list.getValueType();
 						ConfigGCore.logspamItemNbt(this, () -> "  Copying list " + key);
 						NBTList copy = new NBTList(this, key, getDepth() + 1, NBTType.createListTag(listType));
@@ -262,7 +262,7 @@ public class NBTCompound extends NBTBase {
 			}
 			// object
 			else if (type.equals(NBTType.COMPOUND)) {
-				if (!thisKeys.contains(key)) {  // new compound, add it
+				if (!thisKeys.contains(key)) { // new compound, add it
 					ConfigGCore.logspamItemNbt(this, () -> "  Creating empty compound " + key + " and copying");
 					setCompound(key, new NBTCompound(this, key, getDepth() + 1, NBTType.createCompoundTag()));
 				} else {
@@ -272,7 +272,7 @@ public class NBTCompound extends NBTBase {
 			}
 			// value
 			else if (!type.equals(NBTType.UNKNOWN)) {
-				if (!thisKeys.contains(key)) {  // don't replace existing values
+				if (!thisKeys.contains(key)) { // don't replace existing values
 					ConfigGCore.logspamItemNbt(this, () -> "  Copying value " + key + " : " + reference.get(key));
 					set(key, reference.get(key));
 				}

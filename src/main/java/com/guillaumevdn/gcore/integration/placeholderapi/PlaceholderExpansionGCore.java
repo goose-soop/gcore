@@ -43,7 +43,7 @@ public class PlaceholderExpansionGCore extends PlaceholderExpansion {
 	@Override
 	public String onPlaceholderRequest(Player player, String params) {
 		// other player
-		for (int last = params.length(); (last = params.lastIndexOf('_', last - 1)) != -1; ) {
+		for (int last = params.length(); (last = params.lastIndexOf('_', last - 1)) != -1;) {
 			Player otherPlayer = Bukkit.getPlayer(params.substring(last + 1));
 			if (otherPlayer != null) {
 				return parse(otherPlayer, params.substring(0, last));
@@ -52,7 +52,8 @@ public class PlaceholderExpansionGCore extends PlaceholderExpansion {
 
 		// parsing without a player
 		if (player == null) {
-			return null;  // might happen, for instance, when parsing placeholders temporarily, in GUIs ; it's important to return null so that it will be replaced later
+			return null; // might happen, for instance, when parsing placeholders temporarily, in GUIs ; it's important to return null so that it
+							// will be replaced later
 		}
 
 		// this player

@@ -30,10 +30,10 @@ public class ReaderValueDeveloped implements ThrowableFunction<ReaderContext, Bo
 				valueIndent += context.getIndentLevel();
 				s = s.substring(context.getIndentLevel().length());
 			}
-			/*  actually ignore extra indentation for this, lines are trimmed anyway
-			if (!s.isEmpty() && s.charAt(0) == ' ') {
-				context.throwIndentError(peek, valueIndent.length(), false);
-			}*/
+			/*
+			 * actually ignore extra indentation for this, lines are trimmed anyway if (!s.isEmpty() && s.charAt(0) == ' ') {
+			 * context.throwIndentError(peek, valueIndent.length(), false); }
+			 */
 			// read lines
 			List<String> value = new ArrayList<>();
 			while ((peek = context.peekLine()) != null) {

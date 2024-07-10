@@ -44,7 +44,7 @@ public class AwaitingLocationListeners implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.NORMAL /* normal because sneak cancel GUI delay is LOWEST*/, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.NORMAL /* normal because sneak cancel GUI delay is LOWEST */, ignoreCancelled = true)
 	public void event(PlayerToggleSneakEvent event) {
 		Player player = event.getPlayer();
 		Triple<Consumer<Location>, Runnable, Long> awaitingLocation = WorkerGCore.inst().consumeAwaitingLocations(player);
@@ -55,7 +55,7 @@ public class AwaitingLocationListeners implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.NORMAL /* normal because sneak cancel GUI delay is LOWEST*/, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.NORMAL /* normal because sneak cancel GUI delay is LOWEST */, ignoreCancelled = true)
 	public void event(PlayerInteractEvent event) {
 		if (!event.getAction().toString().contains("CLICK_BLOCK")) {
 			return;

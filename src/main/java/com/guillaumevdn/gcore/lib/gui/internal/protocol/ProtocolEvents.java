@@ -47,32 +47,23 @@ public class ProtocolEvents implements PacketListener, Listener {
 
 	@Override
 	public ListeningWhitelist getReceivingWhitelist() {
-		return ListeningWhitelist.newBuilder().types(PacketType.Play.Client.WINDOW_CLICK, PacketType.Play.Client.CLOSE_WINDOW/*, PacketType.Play.Client.TRANSACTION*/).priority(ListenerPriority.LOWEST).build();
+		return ListeningWhitelist.newBuilder()
+				.types(PacketType.Play.Client.WINDOW_CLICK, PacketType.Play.Client.CLOSE_WINDOW/* , PacketType.Play.Client.TRANSACTION */)
+				.priority(ListenerPriority.LOWEST).build();
 	}
 
 	@Override
 	public ListeningWhitelist getSendingWhitelist() {
-		return ListeningWhitelist.newBuilder()/*.types(PacketType.Play.Client.TRANSACTION)*/.build();
+		return ListeningWhitelist.newBuilder()/* .types(PacketType.Play.Client.TRANSACTION) */.build();
 	}
 
-	/* spigot uses those non-intuitive enum names for modes in 1.9+, because of... reasons :
-			PICKUP -> normal click (0)
-			QUICK_MOVE -> shift click (1)
-			SWAP -> number key (2)
-			CLONE -> middle mouse click, creative (3)
-			THROW -> drop key (4)
-			QUICK_CRAFT -> drag (5) (ignored)
-			PICKUP_ALL -> double click (6)
+	/*
+	 * spigot uses those non-intuitive enum names for modes in 1.9+, because of... reasons : PICKUP -> normal click (0)
+	 * QUICK_MOVE -> shift click (1) SWAP -> number key (2) CLONE -> middle mouse click, creative (3) THROW -> drop key (4)
+	 * QUICK_CRAFT -> drag (5) (ignored) PICKUP_ALL -> double click (6)
 	 */
-	private static final Map<String, Integer> MODES_19 = CollectionUtils.asUnmodifiableMap(
-			"PICKUP", 0,
-			"QUICK_MOVE", 1,
-			"SWAP", 2,
-			"CLONE", 3,
-			"THROW", 4,
-			"QUICK_CRAFT", 5,
-			"PICKUP_ALL", 6
-			);
+	private static final Map<String, Integer> MODES_19 = CollectionUtils.asUnmodifiableMap("PICKUP", 0, "QUICK_MOVE", 1, "SWAP", 2, "CLONE", 3, "THROW", 4,
+			"QUICK_CRAFT", 5, "PICKUP_ALL", 6);
 
 	// ----- receive
 
@@ -113,7 +104,8 @@ public class ProtocolEvents implements PacketListener, Listener {
 				} else {
 					try {
 						Class clickTypeEnum = Reflection.getNmsClass((Version.REMAPPED ? "world.inventory." : "") + "InventoryClickType");
-						String modeEnum = ReflectionObject.of(event.getPacket().getEnumModifier(clickTypeEnum, clickTypeEnum).getValues().get(0)).invokeMethod("name").get();
+						String modeEnum = ReflectionObject.of(event.getPacket().getEnumModifier(clickTypeEnum, clickTypeEnum).getValues().get(0))
+								.invokeMethod("name").get();
 						Integer foundMode = MODES_19.get(modeEnum);
 						if (foundMode != null) {
 							mode = foundMode;
@@ -144,7 +136,8 @@ public class ProtocolEvents implements PacketListener, Listener {
 					// else, only reset some slots
 					else {
 						// reset cursor
-						ProtocolPackets.SET_SLOT.process(set, -1, page.incrementStateId(), -1, null); // -1 and -1 for cursor ; see https://wiki.vg/Protocol#Set_Slot
+						ProtocolPackets.SET_SLOT.process(set, -1, page.incrementStateId(), -1, null); // -1 and -1 for cursor ; see
+																										// https://wiki.vg/Protocol#Set_Slot
 
 						// reset slot in GUI
 						if (slot < page.getGUI().getType().getSize()) {
@@ -154,9 +147,11 @@ public class ProtocolEvents implements PacketListener, Listener {
 						else {
 							int playerInventorySlot = slot - page.getGUI().getType().getSize();
 							if (playerInventorySlot >= 27) {
-								ProtocolPackets.SET_SLOT.process(set, page.getId(), page.incrementStateId(), slot, event.getPlayer().getInventory().getContents()[playerInventorySlot - 27]);
+								ProtocolPackets.SET_SLOT.process(set, page.getId(), page.incrementStateId(), slot,
+										event.getPlayer().getInventory().getContents()[playerInventorySlot - 27]);
 							} else {
-								ProtocolPackets.SET_SLOT.process(set, page.getId(), page.incrementStateId(), slot, event.getPlayer().getInventory().getContents()[playerInventorySlot + 9]);
+								ProtocolPackets.SET_SLOT.process(set, page.getId(), page.incrementStateId(), slot,
+										event.getPlayer().getInventory().getContents()[playerInventorySlot + 9]);
 							}
 						}
 
@@ -168,7 +163,8 @@ public class ProtocolEvents implements PacketListener, Listener {
 						else if (mode == 2) {
 							int buttonSlot = page.getGUI().getType().getSize() + 27 + button;
 							if (buttonSlot != slot) {
-								ProtocolPackets.SET_SLOT.process(set, page.getId(), page.incrementStateId(), buttonSlot, event.getPlayer().getInventory().getContents()[button]);
+								ProtocolPackets.SET_SLOT.process(set, page.getId(), page.incrementStateId(), buttonSlot,
+										event.getPlayer().getInventory().getContents()[button]);
 							}
 						}
 					}
@@ -189,7 +185,7 @@ public class ProtocolEvents implements PacketListener, Listener {
 				lastClick = System.currentTimeMillis();
 
 				// process click
-				final int m = mode;  // turbo pepega
+				final int m = mode; // turbo pepega
 				Runnable processor = () -> {
 					if (m == 0) {
 						click(event.getPlayer(), button == 0 ? ClickType.LEFT : ClickType.RIGHT, page.getIndex(), slot);
@@ -205,8 +201,9 @@ public class ProtocolEvents implements PacketListener, Listener {
 						click(event.getPlayer(), ClickType.DOUBLE_CLICK, page.getIndex(), slot);
 					}
 				};
-				if (ConfigGCore.delayProtocolGUIClicksTicks > 0) {  // maybe delay it, #1206
-					BukkitThread.current().operateLater(handler.getGUI().getPlugin(), ThrowableRunnable.fromSafe(processor), null, ConfigGCore.delayProtocolGUIClicksTicks);
+				if (ConfigGCore.delayProtocolGUIClicksTicks > 0) { // maybe delay it, #1206
+					BukkitThread.current().operateLater(handler.getGUI().getPlugin(), ThrowableRunnable.fromSafe(processor), null,
+							ConfigGCore.delayProtocolGUIClicksTicks);
 				} else {
 					processor.run();
 				}
@@ -248,7 +245,8 @@ public class ProtocolEvents implements PacketListener, Listener {
 		BukkitThread.FORCE_SYNC.operate(handler.getGUI().getPlugin(), () -> {
 			// player inventory
 			if (slot >= handler.getGUI().getType().getSize()) {
-				int s = slot >= handler.getGUI().getType().getSize() + 27 ? slot - handler.getGUI().getType().getSize() - 27 : slot - handler.getGUI().getType().getSize() + 9;
+				int s = slot >= handler.getGUI().getType().getSize() + 27 ? slot - handler.getGUI().getType().getSize() - 27
+						: slot - handler.getGUI().getType().getSize() + 9;
 				handler.getGUI().onPlayerInventoryClick(new ClickCall(player, click, handler.getGUI(), pageIndex, s), player.getInventory().getItem(s));
 
 				if (GcoreItemReadClick.TOGGLED.contains(player)) {
@@ -266,7 +264,8 @@ public class ProtocolEvents implements PacketListener, Listener {
 
 			Bukkit.getPluginManager().callEvent(new ProtocolGUIClickedEvent(handler.getGUI(), player, click, pageIndex, slot));
 		}, error -> {
-			handler.getGUI().getPlugin().getMainLogger().error("couldn't perform click effects in GUI " + handler.getGUI().getId() + " at slot " + slot + " of page " + pageIndex, error);
+			handler.getGUI().getPlugin().getMainLogger()
+					.error("couldn't perform click effects in GUI " + handler.getGUI().getId() + " at slot " + slot + " of page " + pageIndex, error);
 		});
 	}
 

@@ -36,9 +36,7 @@ public class NBTItem extends NBTCompound {
 				return Reflection.newNmsInstance("nbt.NBTTagCompound");
 			}
 		} else if (Version.ATLEAST_1_18) {
-			return nmsCopy
-					.invokeMethod(clone ? "getTagClone" :
-						(Version.ATLEAST_1_20 ? "v" : (Version.ATLEAST_1_19 ? "u" : "t")))
+			return nmsCopy.invokeMethod(clone ? "getTagClone" : (Version.ATLEAST_1_20 ? "v" : (Version.ATLEAST_1_19 ? "u" : "t")))
 					.orElse(Reflection.newNmsInstance("nbt.NBTTagCompound"));
 		} else {
 			ReflectionObject tag = nmsCopy.invokeMethod("getTag");
@@ -61,53 +59,48 @@ public class NBTItem extends NBTCompound {
 	}
 
 	public ItemStack getModifiedItem() throws Throwable {
-		/*ConfigGCore.logspamItemNbt(null, () -> "Applying tag to item");
-		ConfigGCore.logspamItemNbt(null, () -> "Initial keys " + new NBTItem(initialItem).getKeys());
-		ConfigGCore.logspamItemNbt(null, () -> "Modified keys " + getKeys());*/
+		/*
+		 * ConfigGCore.logspamItemNbt(null, () -> "Applying tag to item"); ConfigGCore.logspamItemNbt(null, () ->
+		 * "Initial keys " + new NBTItem(initialItem).getKeys()); ConfigGCore.logspamItemNbt(null, () -> "Modified keys " +
+		 * getKeys());
+		 */
 
 		// save dura and data because apparently it bugs in legacy versions -> if this bug is confirmed, uncomment this part
-		/*int durability = Compat.getDurability(initialItem);
-		int data = Compat.getLegacyData(initialItem);*/
+		/*
+		 * int durability = Compat.getDurability(initialItem); int data = Compat.getLegacyData(initialItem);
+		 */
 		// clone item and set tag
 		ItemStack item = initialItem.clone();
 		ReflectionObject nmsItem = Reflection.invokeCraftbukkitMethod("inventory.CraftItemStack", "asNMSCopy", null, item);
 		nmsItem.invokeMethod(Version.ATLEAST_1_18 ? "c" : "setTag", (Object) getTag().get());
 		ItemStack modified = Reflection.invokeCraftbukkitMethod("inventory.CraftItemStack", "asBukkitCopy", null, (Object) nmsItem.get()).get();
 		// reapply data and dura
-		/*if (durability != 0) modified = Compat.setDurability(modified, durability);
-		if	 (data != 0) modified = Compat.setLegacyData(modified, data);*/
+		/*
+		 * if (durability != 0) modified = Compat.setDurability(modified, durability); if (data != 0) modified =
+		 * Compat.setLegacyData(modified, data);
+		 */
 		// done
-		//ConfigGCore.logspamItemNbt(null, () -> "Final new keys " + new NBTItem(modified).getKeys());
+		// ConfigGCore.logspamItemNbt(null, () -> "Final new keys " + new NBTItem(modified).getKeys());
 		return modified;
 	}
 
 	// ----- static
 	public static final List<String> IGNORE_TAGS = CollectionUtils.asUnmodifiableLowercaseList(
 			// item
-			"unbreakable",
-			"durability",
-			"damage",
-			"data",
-			"HideFlags",
+			"unbreakable", "durability", "damage", "data", "HideFlags",
 			// display
 			"display",
 			// enchantments
-			"enchantments",
-			"StoredEnchantments",
+			"enchantments", "StoredEnchantments",
 			// potions
-			"CustomPotionEffects",
-			"Potion",
+			"CustomPotionEffects", "Potion",
 			// written book
-			"author",
-			"title",
-			"pages",
+			"author", "title", "pages",
 			// custom model data
 			"CustomModelData",
 			// skull profile
-			"SkullProfile",
-			"SkullOwner",
+			"SkullProfile", "SkullOwner",
 			// firework rocket
-			"Fireworks"
-			);
+			"Fireworks");
 
 }

@@ -17,7 +17,8 @@ import com.guillaumevdn.gcore.lib.string.Text;
 /**
  * @author GuillaumeVDN
  */
-public class ElementEnchantmentLevelMap extends ElementAbstractEnumMap<Enchantment, ElementInteger> implements ParseableMapElement<Enchantment, Integer, ElementInteger> {
+public class ElementEnchantmentLevelMap extends ElementAbstractEnumMap<Enchantment, ElementInteger>
+		implements ParseableMapElement<Enchantment, Integer, ElementInteger> {
 
 	public ElementEnchantmentLevelMap(Element parent, String id, Need need, Text editorDescription) {
 		super(Enchantment.class, parent, id, need, editorDescription, CollectionUtils.asList(Enchantment.values()));
@@ -26,8 +27,9 @@ public class ElementEnchantmentLevelMap extends ElementAbstractEnumMap<Enchantme
 	// ----- add
 	@Override
 	public ElementInteger createElement(String elementId) {
-		ElementInteger element = new ElementInteger(this, elementId, Need.optional(), null);  // no min. value allows usage of math placeholders, <1 will mean no enchant
-		element.setValue(CollectionUtils.asList("1"));  // don't use the default value otherwise it won't be saved
+		ElementInteger element = new ElementInteger(this, elementId, Need.optional(), null); // no min. value allows usage of math placeholders, <1 will mean no
+																								// enchant
+		element.setValue(CollectionUtils.asList("1")); // don't use the default value otherwise it won't be saved
 		return element;
 	}
 

@@ -38,16 +38,19 @@ final class NavigatorTask extends BukkitRunnable {
 		// navigating
 		if (navigator.movements != null) {
 			AnimatedMovement movement = navigator.movements.get(navigator.movementIndex);
-			// FIXME : gravity ? the movement finder does not check if the NPC is on a solid block ; so try that before ? or maybe the gravity behavior will pause the navigator ? :o then do that !
+			// FIXME : gravity ? the movement finder does not check if the NPC is on a solid block ; so try that before ? or maybe
+			// the gravity behavior will pause the navigator ? :o then do that !
 			// make sure movements are still possible
 			boolean multipleRechecks = movement.getMovementsToRecheck().size() == 1;
-			boolean recheckNow = navigator.movementLocationsIndex == -1 || (multipleRechecks && System.currentTimeMillis() - lastMovementCheck.computeIfAbsent(navigator.path, __ -> System.currentTimeMillis()) >= NPCConfig.navigationBatchMovementsRecheckMillis);
+			boolean recheckNow = navigator.movementLocationsIndex == -1 || (multipleRechecks && System.currentTimeMillis()
+					- lastMovementCheck.computeIfAbsent(navigator.path, __ -> System.currentTimeMillis()) >= NPCConfig.navigationBatchMovementsRecheckMillis);
 			if (recheckNow) {
 				if (multipleRechecks) {
 					lastMovementCheck.put(navigator.path, System.currentTimeMillis());
 				}
 				for (Movement originalMovement : movement.getMovementsToRecheck()) {
-					Movement newMovement = navigator.movementFinder.findMovement(originalMovement.getOrigin(), originalMovement.getTarget(), navigator.finder, false);
+					Movement newMovement = navigator.movementFinder.findMovement(originalMovement.getOrigin(), originalMovement.getTarget(), navigator.finder,
+							false);
 					// not possible anymore, or different movement ; re-animate, restart pathfinding from new location
 					if (!originalMovement.equals(newMovement)) {
 						navigator.restart();

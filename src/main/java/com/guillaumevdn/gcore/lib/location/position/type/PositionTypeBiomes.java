@@ -37,6 +37,7 @@ public class PositionTypeBiomes extends PositionType {
 	public Position doParse(ElementPosition position, Replacer replacer) throws ParsingError {
 		List<Biome> biomes = position.directParseNoCatchOrThrowParsingNull("biomes", replacer);
 		return new Position() {
+
 			@Override
 			public boolean match(Location loc) {
 				if (loc == null) {
@@ -44,38 +45,47 @@ public class PositionTypeBiomes extends PositionType {
 				}
 				return biomes.contains(loc.getBlock().getBiome());
 			}
+
 			@Override
 			public World getWorld() {
 				return null;
 			}
+
 			@Override
 			public boolean canFindRandom() {
 				return false;
 			}
+
 			@Override
 			public Location findRandom() {
 				return null;
 			}
+
 			@Override
 			public int findSafeRandomMaxY() {
 				return 0;
 			}
+
 			@Override
 			public MinMaxDouble getRandomSolidAndFreeAboveYBounds() {
 				return null;
 			}
+
 			@Override
 			public Location findClosestTo(Location loc) {
 				return null;
 			}
+
 			@Override
 			public Location findGPSFor(Player player) {
 				return null;
 			}
+
 			@Override
 			public boolean canFill() {
 				return false;
 			}
+
 		};
 	}
 

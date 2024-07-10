@@ -104,11 +104,13 @@ public abstract class Subcommand extends UsageRestriction {
 		return addArgument(new ArgumentEnum<E>(need, playerOnly, permission, usage, enumClass));
 	}
 
-	public final <E> ArgumentFakeEnum<E> addArgumentFakeEnum(NeedType need, boolean playerOnly, Permission permission, Text usage, Class<E> valueClass, List<E> values) {
+	public final <E> ArgumentFakeEnum<E> addArgumentFakeEnum(NeedType need, boolean playerOnly, Permission permission, Text usage, Class<E> valueClass,
+			List<E> values) {
 		return addArgument(new ArgumentFakeEnum<E>(need, playerOnly, permission, usage, valueClass, values));
 	}
 
-	public final <E> ArgumentDynamicFakeEnum<E> addArgumentDynamicFakeEnum(NeedType need, boolean playerOnly, Permission permission, Text usage, Class<E> valueClass, Supplier<List<E>> valuesSupplier) {
+	public final <E> ArgumentDynamicFakeEnum<E> addArgumentDynamicFakeEnum(NeedType need, boolean playerOnly, Permission permission, Text usage,
+			Class<E> valueClass, Supplier<List<E>> valuesSupplier) {
 		return addArgument(new ArgumentDynamicFakeEnum<E>(need, playerOnly, permission, usage, valueClass, valuesSupplier));
 	}
 
@@ -149,20 +151,22 @@ public abstract class Subcommand extends UsageRestriction {
 
 	// ----- help/text
 	public void logMissingArgument(Argument argument, CommandCall call) {
-		List<String> found = getArguments().stream()
-				.filter(arg -> arg.getUsage() != null && arg.get(call) != null)
-				.map(arg -> arg.getUsage().parseLine())
+		List<String> found = getArguments().stream().filter(arg -> arg.getUsage() != null && arg.get(call) != null).map(arg -> arg.getUsage().parseLine())
 				.collect(Collectors.toList());
-		(found.isEmpty() ? TextGeneric.messageCommandMissingArgument : TextGeneric.messageCommandMissingArgumentFound).replace("{argument}", () -> argument.getUsage().parseLines()).replace("{found}", () -> StringUtils.toTextString(", ", found)).send(call.getSender());
+		(found.isEmpty() ? TextGeneric.messageCommandMissingArgument : TextGeneric.messageCommandMissingArgumentFound)
+				.replace("{argument}", () -> argument.getUsage().parseLines()).replace("{found}", () -> StringUtils.toTextString(", ", found))
+				.send(call.getSender());
 	}
 
 	public String buildUsage(Command parent, boolean isBase, CommandSender sender) {
 		String colorArgumentOptional = TextGeneric.messageCommandHelpColorArgumentOptional.parseLine();
 		String colorArgumentRequired = TextGeneric.messageCommandHelpColorArgumentRequired.parseLine();
 		List<String> list = CollectionUtils.asList("/" + parent.getHelpName());
-		if (!isBase) list.add(aliases.get(0));
+		if (!isBase)
+			list.add(aliases.get(0));
 		for (Argument argument : arguments) {
-			if (argument.getUsage() != null && argument.canUse(sender) && (!(argument instanceof PlayerArgument) || !((PlayerArgument) argument).canUseBecauseOfSenderIfNone(sender))) {
+			if (argument.getUsage() != null && argument.canUse(sender)
+					&& (!(argument instanceof PlayerArgument) || !((PlayerArgument) argument).canUseBecauseOfSenderIfNone(sender))) {
 				if (argument.getNeed().equals(NeedType.REQUIRED)) {
 					list.add(colorArgumentRequired + "<" + argument.getUsage().parseLine() + ">");
 				} else {
@@ -180,11 +184,8 @@ public abstract class Subcommand extends UsageRestriction {
 
 	public List<String> buildHelp(Command parent, boolean isBase, CommandSender sender) {
 		if (description != null && canUse(sender)) {
-			String line = TextGeneric.messageCommandHelpElementPrefix.parseLine()
-					+ TextGeneric.messageCommandHelpElement
-					.replace("{usage}", () -> buildUsage(parent, isBase, sender))
-					.replace("{description}", () -> description.parseLines())
-					.parseLine();
+			String line = TextGeneric.messageCommandHelpElementPrefix.parseLine() + TextGeneric.messageCommandHelpElement
+					.replace("{usage}", () -> buildUsage(parent, isBase, sender)).replace("{description}", () -> description.parseLines()).parseLine();
 			return StringUtils.splitLongText(line, 68, str -> " " + str);
 		}
 		return null;

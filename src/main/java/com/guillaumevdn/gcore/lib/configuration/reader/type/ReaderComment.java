@@ -15,7 +15,7 @@ public class ReaderComment implements ThrowableFunction<ReaderContext, Boolean> 
 	@Override
 	public Boolean apply(ReaderContext context) throws Throwable {
 		List<String> comment = new ArrayList<>(0);
-		for (ReaderLine line; (line = context.peekLine()) != null && line.getLine().trim().startsWith("#"); ) {
+		for (ReaderLine line; (line = context.peekLine()) != null && line.getLine().trim().startsWith("#");) {
 			comment.add(line.getLine().trim().substring(1));
 			context.getLines().remove(0);
 		}

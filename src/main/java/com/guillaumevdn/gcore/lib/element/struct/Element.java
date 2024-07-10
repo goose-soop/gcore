@@ -40,8 +40,8 @@ public abstract class Element implements IElement, Comparable<Element> {
 	private final NeedType need;
 	private final Text editorDescription;
 
-	private String forcedConfigurationPath = null;  // used in YMLConfiguration, to load elements quickly with no parent
-	private Map<String, String> extra = null;  // to have additionnal data
+	private String forcedConfigurationPath = null; // used in YMLConfiguration, to load elements quickly with no parent
+	private Map<String, String> extra = null; // to have additionnal data
 
 	public Element(Element parent, String id, NeedType need, Text editorDescription) {
 		this.id = id.toLowerCase();
@@ -128,12 +128,13 @@ public abstract class Element implements IElement, Comparable<Element> {
 
 	@Override
 	public abstract boolean hasParseableLocations();
+
 	public abstract boolean isCurrentlyDefault();
 
 	// ----- set
 	public final void setParent(Element parent) {
 		this.parent = parent;
-		getSuperElement();  // throws an error if none found
+		getSuperElement(); // throws an error if none found
 	}
 
 	public final void setForcedConfigurationPath(String forcedConfigurationPath) {
@@ -165,7 +166,8 @@ public abstract class Element implements IElement, Comparable<Element> {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) return true;
+		if (this == obj)
+			return true;
 		Element other = ObjectUtils.castOrNull(obj, getClass());
 		return other != null && other.getId().equals(id);
 	}
@@ -201,9 +203,9 @@ public abstract class Element implements IElement, Comparable<Element> {
 			}
 		} catch (Throwable exception) {
 			ConfigError configError = ObjectUtils.findCauseOrNull(exception, ConfigError.class);
-			if (configError != null) {  // a config error that wasn't catched already ? :think:
+			if (configError != null) { // a config error that wasn't catched already ? :think:
 				getSuperElement().addLoadError(configError.getMessage());
-			} else {  // regular error, re-throw it
+			} else { // regular error, re-throw it
 				throw exception;
 			}
 		}
@@ -225,7 +227,9 @@ public abstract class Element implements IElement, Comparable<Element> {
 	}
 
 	protected abstract void clearBeforeRead();
+
 	protected abstract void doRead() throws Throwable;
+
 	protected abstract void doWrite() throws Throwable;
 
 	// ----- editor
@@ -244,23 +248,25 @@ public abstract class Element implements IElement, Comparable<Element> {
 				return null;
 			}
 			return (isCurrentlyDefault() ? TextEditorGeneric.elementCurrentValueNoneDefault : TextEditorGeneric.elementCurrentValueNone).parseLines();
-		}
-		else if (value.size() == 1) {
-			if (value.get(0).contains("{value}")) {  // the value itself can contain the {value} placeholder... causes an infinite replacer loop #2345
+		} else if (value.size() == 1) {
+			if (value.get(0).contains("{value}")) { // the value itself can contain the {value} placeholder... causes an infinite replacer loop #2345
 				Text text = isCurrentlyDefault() ? TextEditorGeneric.elementCurrentValueSingleDefault : TextEditorGeneric.elementCurrentValueSingle;
-				return Text.of(text.getCurrentLines().stream().map(str -> str.replace("{value}", "{current}")).collect(Collectors.toList())).replace("{current}", () -> value.get(0)).parseLines();
+				return Text.of(text.getCurrentLines().stream().map(str -> str.replace("{value}", "{current}")).collect(Collectors.toList()))
+						.replace("{current}", () -> value.get(0)).parseLines();
 			} else {
-				return (isCurrentlyDefault() ? TextEditorGeneric.elementCurrentValueSingleDefault : TextEditorGeneric.elementCurrentValueSingle).replace("{value}", () -> value.get(0)).parseLines();
+				return (isCurrentlyDefault() ? TextEditorGeneric.elementCurrentValueSingleDefault : TextEditorGeneric.elementCurrentValueSingle)
+						.replace("{value}", () -> value.get(0)).parseLines();
 			}
-		}
-		else {
+		} else {
 			List<String> valueList = new ArrayList<>();
 			value.forEach(line -> valueList.addAll(TextEditorGeneric.elementCurrentValueListLine.replace("{line}", () -> line).parseLines()));
-			if (value.get(0).contains("{value}")) {  // the value itself can contain the {value} placeholder... causes an infinite replacer loop #2345
+			if (value.get(0).contains("{value}")) { // the value itself can contain the {value} placeholder... causes an infinite replacer loop #2345
 				Text text = isCurrentlyDefault() ? TextEditorGeneric.elementCurrentValueListDefault : TextEditorGeneric.elementCurrentValueList;
-				return Text.of(text.getCurrentLines().stream().map(str -> str.replace("{value}", "{current}")).collect(Collectors.toList())).replace("{current}", () -> valueList).parseLines();
+				return Text.of(text.getCurrentLines().stream().map(str -> str.replace("{value}", "{current}")).collect(Collectors.toList()))
+						.replace("{current}", () -> valueList).parseLines();
 			} else {
-				return (isCurrentlyDefault() ? TextEditorGeneric.elementCurrentValueListDefault : TextEditorGeneric.elementCurrentValueList).replace("{value}", () -> valueList).parseLines();
+				return (isCurrentlyDefault() ? TextEditorGeneric.elementCurrentValueListDefault : TextEditorGeneric.elementCurrentValueList)
+						.replace("{value}", () -> valueList).parseLines();
 			}
 		}
 	}
@@ -275,13 +281,16 @@ public abstract class Element implements IElement, Comparable<Element> {
 		}
 		// description
 		if (getEditorDescription() != null) {
-			if (current != null) lore.add("§r");
+			if (current != null)
+				lore.add("§r");
 			lore.addAll(TextEditorGeneric.elementDescription.replace("{description}", () -> getEditorDescription().parseLines()).parseLines());
 		}
 		// type
 		if (!(this instanceof SuperElement)) {
-			if (current != null || getEditorDescription() != null) lore.add("§r");
-			lore.addAll((getNeed().equals(NeedType.REQUIRED) ? TextEditorGeneric.elementTypeMandatory : TextEditorGeneric.elementTypeOptional).replace("{type}", () -> getTypeName()).parseLines());
+			if (current != null || getEditorDescription() != null)
+				lore.add("§r");
+			lore.addAll((getNeed().equals(NeedType.REQUIRED) ? TextEditorGeneric.elementTypeMandatory : TextEditorGeneric.elementTypeOptional)
+					.replace("{type}", () -> getTypeName()).parseLines());
 		}
 		return lore;
 	}
@@ -298,13 +307,13 @@ public abstract class Element implements IElement, Comparable<Element> {
 		List<String> lore = nonControl ? nonControlEditorIconLore() : editorIconLore();
 		lore = lore == null ? null : StringUtils.splitLongText(lore, 50);
 		if (lore != null && lore.size() > 30) {
-			while (lore.size() > 30) lore.remove(lore.size() - 1);
+			while (lore.size() > 30)
+				lore.remove(lore.size() - 1);
 			lore.add("§7...");
 		}
 		ItemStack icon = ItemUtils.addAllFlags(ItemUtils.createItem(editorIconType(), "§6" + getId(), lore));
 		if (!isCurrentlyDefault()) {
-			icon.addUnsafeEnchantment(
-			Enchantment.getByName(Version.ATLEAST_1_20_5 ? "UNBREAKING" : "DURABILITY"), 1);
+			icon.addUnsafeEnchantment(Enchantment.getByName(Version.ATLEAST_1_20_5 ? "UNBREAKING" : "DURABILITY"), 1);
 		}
 		if (this instanceof AbstractMapElement) {
 			int abstraction = getAbstraction(this, 1);
@@ -334,7 +343,8 @@ public abstract class Element implements IElement, Comparable<Element> {
 	}
 
 	public final GUIItem buildEditorItem(int page, int slot) {
-		return new GUIItem("element_" + getId(), CollectionUtils.asList(IntegerPair.of(page, slot)), ItemUtils.addAllFlags(editorIcon()), call -> onEditorClick(call));
+		return new GUIItem("element_" + getId(), CollectionUtils.asList(IntegerPair.of(page, slot)), ItemUtils.addAllFlags(editorIcon()),
+				call -> onEditorClick(call));
 	}
 
 	public EditorGUI editorGUI(ClickCall fromCall) {

@@ -80,7 +80,8 @@ public class RWPair<A, B> {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) return true;
+		if (this == obj)
+			return true;
 		RWPair<A, B> other = ObjectUtils.castOrNull(obj, getClass());
 		return other != null && lock.read(() -> Objects.deepEquals(a, other.a) && Objects.deepEquals(b, other.b));
 	}

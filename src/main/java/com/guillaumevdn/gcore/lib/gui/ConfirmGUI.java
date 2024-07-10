@@ -32,6 +32,7 @@ public class ConfirmGUI extends ActiveExtraElementGUI {
 		setPlugin(owner);
 
 		addItem(new ExtraElementGUIItemHolder(ConfigGCore.guiConfirm.getItemConfirm()) {
+
 			@Override
 			protected void build(ItemStack itemIcon, QuadriConsumer<ItemStack, Set<String>, Integer, Consumer<ClickCall>> callback) throws ParsingError {
 				Set<String> placeholders = StringUtils.getPlaceholders(itemIcon);
@@ -47,18 +48,21 @@ public class ConfirmGUI extends ActiveExtraElementGUI {
 					doConfirm.run();
 				});
 			}
+
 		});
 
 		addItem(new ExtraElementGUIItemHolder(ConfigGCore.guiConfirm.getItemCancel()) {
+
 			@Override
 			protected void build(ItemStack itemIcon, QuadriConsumer<ItemStack, Set<String>, Integer, Consumer<ClickCall>> callback) throws ParsingError {
 				Set<String> placeholders = StringUtils.getPlaceholders(itemIcon);
 				itemIcon = getReplacer().parse(itemIcon);
 
 				callback.accept(itemIcon, placeholders, -1, call -> {
-					deactivate(true);  // this will trigger onDeactivate(), so cancel() too
+					deactivate(true); // this will trigger onDeactivate(), so cancel() too
 				});
 			}
+
 		});
 
 		this.doCancel = doCancel;
@@ -67,8 +71,9 @@ public class ConfirmGUI extends ActiveExtraElementGUI {
 	@Override
 	public void onClose(Player clicker) {
 		getPlugin().operateSyncLater(() -> {
-			deactivate(true);  // this will trigger onDeactivate(), so cancel() too
-		}, ConfigGCore.allowProtocolGUIs && PluginUtils.isPluginEnabled("ProtocolLib") ? 0L : 1L);  // when triggered by the ESC key, it bugs when vanilla handler is used
+			deactivate(true); // this will trigger onDeactivate(), so cancel() too
+		}, ConfigGCore.allowProtocolGUIs && PluginUtils.isPluginEnabled("ProtocolLib") ? 0L : 1L); // when triggered by the ESC key, it bugs when vanilla
+																									// handler is used
 	}
 
 	@Override
@@ -79,13 +84,15 @@ public class ConfirmGUI extends ActiveExtraElementGUI {
 	private void cancel() {
 		if (doCancel != null) {
 			Runnable doCancel = this.doCancel;
-			this.doCancel = null;  // in the cancel runnable might be something like "reopen another GUI" -> and that will trigger "onClose", that will trigger cancel() again, ect ; so prevent that
+			this.doCancel = null; // in the cancel runnable might be something like "reopen another GUI" -> and that will trigger "onClose", that will
+									// trigger cancel() again, ect ; so prevent that
 			doCancel.run();
 		}
 	}
 
 	// ----- static
-	public static void performOrConfirm(GPlugin owner, boolean mustConfirm, Player player, Text confirmLore, Replacer confirmLoreParser, Runnable doConfirm, Runnable doCancel) {
+	public static void performOrConfirm(GPlugin owner, boolean mustConfirm, Player player, Text confirmLore, Replacer confirmLoreParser, Runnable doConfirm,
+			Runnable doCancel) {
 		if (mustConfirm) {
 			new ConfirmGUI(owner, Replacer.justPlayer(player), confirmLore, confirmLoreParser, doConfirm, doCancel).openFor(player, null);
 		} else {

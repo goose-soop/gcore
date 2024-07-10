@@ -78,7 +78,8 @@ public abstract class Serializer<T> {
 	protected Serializer(String typeName, Class<T> typeClass, boolean register) {
 		// register
 		if (register) {
-			if (registration.containsKey(typeClass)) throw new IllegalStateException("there's already a serializer for type " + typeClass);
+			if (registration.containsKey(typeClass))
+				throw new IllegalStateException("there's already a serializer for type " + typeClass);
 			registration.put(typeClass, this);
 		}
 		// init
@@ -88,7 +89,7 @@ public abstract class Serializer<T> {
 		this.registered = register;
 	}
 
-	// 		 get
+	// get
 	public final String getTypeName() {
 		return typeName;
 	}
@@ -105,8 +106,9 @@ public abstract class Serializer<T> {
 		return registered;
 	}
 
-	// 		 serialization
+	// serialization
 	public abstract String serialize(T value);
+
 	public abstract T deserialize(String string);
 
 	public List<String> serialize(Collection<T> value) {
@@ -118,28 +120,25 @@ public abstract class Serializer<T> {
 	}
 
 	// ----------------------------------------------------------------------------------------------------
-	// 		 registration
+	// registration
 	// ----------------------------------------------------------------------------------------------------
 
-	private static final RWHashMap<Class, Serializer> registration = new RWHashMap<>(10, 1f);  // #2284, concurrent modification exception
+	private static final RWHashMap<Class, Serializer> registration = new RWHashMap<>(10, 1f); // #2284, concurrent modification exception
 
 	public static <T> Serializer<T> find(T object) {
-		if (object == null) throw new NullPointerException();
+		if (object == null)
+			throw new NullPointerException();
 		return (Serializer<T>) find(object.getClass());
 	}
 
 	public static <T> Serializer<T> find(Class<T> typeClass) {
 
 		if (String.class.equals(typeClass)) {
-			return (Serializer<T>) STRING;  // so feeeest
+			return (Serializer<T>) STRING; // so feeeest
 		}
 
-		Serializer ser = registration.streamResult(str -> str
-				.filter(e -> ObjectUtils.instanceOf(typeClass, e.getKey()))
-				.findFirst()
-				.map(e -> e.getValue())
-				.orElse(null)
-				);
+		Serializer ser = registration
+				.streamResult(str -> str.filter(e -> ObjectUtils.instanceOf(typeClass, e.getKey())).findFirst().map(e -> e.getValue()).orElse(null));
 		if (ser != null) {
 			return ser;
 		}
@@ -157,11 +156,12 @@ public abstract class Serializer<T> {
 		registration.remove(serializerClass);
 	}
 
-	// 		 init
-	public static void init() {}
+	// init
+	public static void init() {
+	}
 
 	// ----------------------------------------------------------------------------------------------------
-	// 		 creation
+	// creation
 	// ----------------------------------------------------------------------------------------------------
 
 	public static <T> Serializer<T> of(Class<T> typeClass, Function<T, String> serializer, Function<String, T> deserializer) {
@@ -176,7 +176,8 @@ public abstract class Serializer<T> {
 		return of(typeName, typeClass, serializer, deserializer, true);
 	}
 
-	public static <T> Serializer<T> of(String typeName, Class<T> typeClass, Function<T, String> serializer, Function<String, T> deserializer, boolean register) {
+	public static <T> Serializer<T> of(String typeName, Class<T> typeClass, Function<T, String> serializer, Function<String, T> deserializer,
+			boolean register) {
 		if (register) {
 			Serializer<T> existing = registration.get(typeClass);
 			if (existing != null) {
@@ -184,14 +185,17 @@ public abstract class Serializer<T> {
 			}
 		}
 		return new Serializer<T>(typeName, typeClass, register) {
+
 			@Override
 			public String serialize(T value) {
 				return value == null ? "null" : serializer.apply(value);
 			}
+
 			@Override
 			public T deserialize(String string) {
 				return string == null || string.equalsIgnoreCase("null") ? null : deserializer.apply(string);
 			}
+
 		};
 	}
 
@@ -214,7 +218,8 @@ public abstract class Serializer<T> {
 			if (array.length != 0) {
 				for (int i = 0; i < array.length; ++i) {
 					serialized += valueSerializer.serialize(array[i]);
-					if (i + 1 < array.length) serialized += "@@@";
+					if (i + 1 < array.length)
+						serialized += "@@@";
 				}
 			}
 			return serialized;
@@ -234,24 +239,29 @@ public abstract class Serializer<T> {
 	}
 
 	public static <T extends SuperElement> Serializer<T> ofContainer(Class<T> typeClass, Supplier<ElementsContainer<T>> container) {
-		return of(StringUtils.getReadableName(typeClass).toLowerCase(), typeClass, value -> value.getId(), string -> container.get().getElement(string).orNull());
+		return of(StringUtils.getReadableName(typeClass).toLowerCase(), typeClass, value -> value.getId(),
+				string -> container.get().getElement(string).orNull());
 	}
 
-	public static <T extends LinearObjectType, L extends LinearObject<T>> LinearSerializer<T, L> ofLinear(Serializer<T> typeSerializer, Class<L> typeClass, BiFunction<T, List<String>, L> deserializer) {
+	public static <T extends LinearObjectType, L extends LinearObject<T>> LinearSerializer<T, L> ofLinear(Serializer<T> typeSerializer, Class<L> typeClass,
+			BiFunction<T, List<String>, L> deserializer) {
 		return ofLinear(typeSerializer, StringUtils.getReadableName(typeClass).toLowerCase(), typeClass, deserializer);
 	}
 
-	public static <T extends LinearObjectType, L extends LinearObject<T>> LinearSerializer<T, L> ofLinear(Serializer<T> typeSerializer, String typeName, Class<L> typeClass, BiFunction<T, List<String>, L> deserializer) {
+	public static <T extends LinearObjectType, L extends LinearObject<T>> LinearSerializer<T, L> ofLinear(Serializer<T> typeSerializer, String typeName,
+			Class<L> typeClass, BiFunction<T, List<String>, L> deserializer) {
 		return new LinearSerializer<T, L>(typeSerializer, typeName, typeClass, true) {
+
 			@Override
 			protected L deserialize(T type, List<String> params) {
 				return deserializer.apply(type, params);
 			}
+
 		};
 	}
 
 	// ----------------------------------------------------------------------------------------------------
-	// 		 types : java
+	// types : java
 	// ----------------------------------------------------------------------------------------------------
 
 	public static final Serializer<String> STRING = of(String.class, value -> value, string -> string);
@@ -279,7 +289,8 @@ public abstract class Serializer<T> {
 		if (array.length != 0) {
 			for (int i = 0; i < array.length; ++i) {
 				serialized += INTEGER.serialize(array[i]);
-				if (i + 1 < array.length) serialized += "@@@";
+				if (i + 1 < array.length)
+					serialized += "@@@";
 			}
 		}
 		return serialized;
@@ -302,7 +313,8 @@ public abstract class Serializer<T> {
 		if (array.length != 0) {
 			for (int i = 0; i < array.length; ++i) {
 				serialized += BYTE.serialize(array[i]);
-				if (i + 1 < array.length) serialized += "@@@";
+				if (i + 1 < array.length)
+					serialized += "@@@";
 			}
 		}
 		return serialized;
@@ -321,7 +333,7 @@ public abstract class Serializer<T> {
 	});
 
 	// ----------------------------------------------------------------------------------------------------
-	// 		 types : mine
+	// types : mine
 	// ----------------------------------------------------------------------------------------------------
 
 	public static final Serializer<TimeFrameType> TIME_FRAME_TYPE = ofTypable(TimeFrameType.class, () -> TimeFrameTypes.inst());
@@ -331,13 +343,14 @@ public abstract class Serializer<T> {
 		Currency curr = Currency.safeValueOf(string);
 		return curr != null && curr.isEnabled() ? curr : null;
 	});
-	public static final Serializer<ParticleScript> PARTICLE_SCRIPT = of(ParticleScript.class, value -> value.getId(), string -> ConfigGCore.particleScripts.get(string));
+	public static final Serializer<ParticleScript> PARTICLE_SCRIPT = of(ParticleScript.class, value -> value.getId(),
+			string -> ConfigGCore.particleScripts.get(string));
 	public static final Serializer<ItemFlag> ITEM_FLAG = ofEnum(ItemFlag.class);
-	public static final LinearSerializer<OverrideClickType, OverrideClick> OVERRIDE_CLICK = Serializer.ofLinear(Serializer.ofEnum(OverrideClickType.class), OverrideClick.class, (type, params) -> new OverrideClick(type, params));
+	public static final LinearSerializer<OverrideClickType, OverrideClick> OVERRIDE_CLICK = Serializer.ofLinear(Serializer.ofEnum(OverrideClickType.class),
+			OverrideClick.class, (type, params) -> new OverrideClick(type, params));
 	public static final Serializer<Permission> PERMISSION = of(Permission.class, value -> value.getName(), string -> new Permission(string));
 
-	public static final Serializer<Point> POINT = of(Point.class,
-			value -> value.getWorldName() + "," + value.getX() + "," + value.getY() + "," + value.getZ(),
+	public static final Serializer<Point> POINT = of(Point.class, value -> value.getWorldName() + "," + value.getX() + "," + value.getY() + "," + value.getZ(),
 			string -> {
 				// not enough params
 				String[] split = string.split(",");
@@ -352,8 +365,7 @@ public abstract class Serializer<T> {
 				}
 			});
 
-	public static final Serializer<VectorPoint> VECTOR_POINT = of(VectorPoint.class,
-			value -> value.getX() + "," + value.getY() + "," + value.getZ(),
+	public static final Serializer<VectorPoint> VECTOR_POINT = of(VectorPoint.class, value -> value.getX() + "," + value.getY() + "," + value.getZ(),
 			string -> {
 				// not enough params
 				String[] split = string.split(",");
@@ -368,9 +380,7 @@ public abstract class Serializer<T> {
 				}
 			});
 
-
-	public static final Serializer<Region> REGION = of(Region.class,
-			value -> POINT.serialize(value.getMin()) + "@@@" + POINT.serialize(value.getMax()),
+	public static final Serializer<Region> REGION = of(Region.class, value -> POINT.serialize(value.getMin()) + "@@@" + POINT.serialize(value.getMax()),
 			string -> {
 				String[] split = string.split("@@@");
 				if (split.length != 2)
@@ -382,29 +392,30 @@ public abstract class Serializer<T> {
 				}
 			});
 	public static final Serializer<Board> BOARD = of(Board.class, b -> b.getId(), id -> {
-		return PluginUtils.getGPlugins().stream()
-				.flatMap(pl -> pl.getData().streamResult(str -> str.collect(Collectors.toList()).stream()))
-				.filter(b -> b.getKey().equalsIgnoreCase(id))
-				.findFirst().map(e -> e.getValue())
-				.orElse(null);
+		return PluginUtils.getGPlugins().stream().flatMap(pl -> pl.getData().streamResult(str -> str.collect(Collectors.toList()).stream()))
+				.filter(b -> b.getKey().equalsIgnoreCase(id)).findFirst().map(e -> e.getValue()).orElse(null);
 	});
 
 	// ----------------------------------------------------------------------------------------------------
-	// 		 types : bukkit
+	// types : bukkit
 	// ----------------------------------------------------------------------------------------------------
 
-	public static final Serializer NAMESPACED_KEY = !Version.ATLEAST_1_12 ? null : of(org.bukkit.NamespacedKey.class, value -> value.getNamespace() + ":" + value.getKey(), string -> {
-		String[] split = string.split(":");
-		return split.length < 2 ? null : new org.bukkit.NamespacedKey(split[0], split[1]);
-	});
-	public static final Serializer BANNER_PATTERN = !Version.ATLEAST_1_8 ? null : of(org.bukkit.block.banner.Pattern.class, value -> value.getPattern() + "-" + value.getColor(), string -> {
-		String[] split = string.split("-");
-		org.bukkit.block.banner.PatternType ptype = split.length < 1 ? null : ObjectUtils.safeValueOf(split[0], org.bukkit.block.banner.PatternType.class);
-		DyeColor pcolor = split.length < 2 ? null : ObjectUtils.safeValueOf(split[1], DyeColor.class);
-		return ptype != null && pcolor != null ? new org.bukkit.block.banner.Pattern(pcolor, ptype) : null;
-	});
+	public static final Serializer NAMESPACED_KEY = !Version.ATLEAST_1_12 ? null
+			: of(org.bukkit.NamespacedKey.class, value -> value.getNamespace() + ":" + value.getKey(), string -> {
+				String[] split = string.split(":");
+				return split.length < 2 ? null : new org.bukkit.NamespacedKey(split[0], split[1]);
+			});
+	public static final Serializer BANNER_PATTERN = !Version.ATLEAST_1_8 ? null
+			: of(org.bukkit.block.banner.Pattern.class, value -> value.getPattern() + "-" + value.getColor(), string -> {
+				String[] split = string.split("-");
+				org.bukkit.block.banner.PatternType ptype = split.length < 1 ? null
+						: ObjectUtils.safeValueOf(split[0], org.bukkit.block.banner.PatternType.class);
+				DyeColor pcolor = split.length < 2 ? null : ObjectUtils.safeValueOf(split[1], DyeColor.class);
+				return ptype != null && pcolor != null ? new org.bukkit.block.banner.Pattern(pcolor, ptype) : null;
+			});
 	public static final Serializer<EntityType> ENTITY_TYPE = ofEnum(EntityType.class);
-	public static final Serializer<PotionEffectType> POTION_EFFECT_TYPE = of(PotionEffectType.class, value -> value.getName(), string -> ObjectUtils.potionEffectTypeOrNull(string));
+	public static final Serializer<PotionEffectType> POTION_EFFECT_TYPE = of(PotionEffectType.class, value -> value.getName(),
+			string -> ObjectUtils.potionEffectTypeOrNull(string));
 	public static final Serializer<Enchantment> ENCHANTMENT = of(Enchantment.class, value -> value.getName(), string -> ObjectUtils.enchantmentOrNull(string));
 	public static final Serializer<ChatColor> CHAT_COLOR = ofEnum(ChatColor.class);
 	public static final Serializer<Color> COLOR = of(Color.class, value -> {
@@ -417,55 +428,56 @@ public abstract class Serializer<T> {
 					}
 				}
 			}
-		} catch (Throwable ignored) {}
+		} catch (Throwable ignored) {
+		}
 		return value.getRed() + "," + value.getGreen() + "," + value.getBlue();
 	}, string -> {
 		if (!string.contains(",")) {
 			try {
 				return Reflection.getField("org.bukkit.Color", string.toUpperCase()).retrieve(null).get();
-			} catch (Throwable ignored) {}
+			} catch (Throwable ignored) {
+			}
 			return null;
 		}
 		List<Integer> ints = NumberUtils.integersIn(string.split(","));
 		return ints.size() < 3 ? null : Color.fromRGB(ints.get(0), ints.get(1), ints.get(2));
 	});
 	public static final Serializer<World> WORLD = of(World.class, value -> value.getName(), string -> Bukkit.getWorld(string.trim()));
-	public static final Serializer<Location> LOCATION = of(Location.class,
-			value -> {
-				return value.getWorld().getName() + ","
-						+ StringUtils.toTextString(value.getX(), 3) + ","
-						+ StringUtils.toTextString(value.getY(), 3) + ","
-						+ StringUtils.toTextString(value.getZ(), 3) + ","
-						+ StringUtils.toTextString((double) value.getYaw(), 3) + ","
-						+ StringUtils.toTextString((double) value.getPitch(), 3);
-			},
-			string -> {
-				// not enough params
-				String[] split = string.split(",");
-				if (split.length < 4) {
-					return null;
-				}
-				// unknown world (entertainment)
-				World world = Bukkit.getWorld(split[0]);
-				if (world == null) {
-					return null;
-				}
-				// decode
-				try {
-					return split.length >= 6 ? new Location(world, Double.parseDouble(split[1]), Double.parseDouble(split[2]), Double.parseDouble(split[3]), Float.parseFloat(split[4]), Float.parseFloat(split[5])) : new Location(world, Double.parseDouble(split[1]), Double.parseDouble(split[2]), Double.parseDouble(split[3]));
-				} catch (Throwable exception) {
-					throw new Error("couldn't deserialize location " + string, exception);
-				}
-			});
+	public static final Serializer<Location> LOCATION = of(Location.class, value -> {
+		return value.getWorld().getName() + "," + StringUtils.toTextString(value.getX(), 3) + "," + StringUtils.toTextString(value.getY(), 3) + ","
+				+ StringUtils.toTextString(value.getZ(), 3) + "," + StringUtils.toTextString((double) value.getYaw(), 3) + ","
+				+ StringUtils.toTextString((double) value.getPitch(), 3);
+	}, string -> {
+		// not enough params
+		String[] split = string.split(",");
+		if (split.length < 4) {
+			return null;
+		}
+		// unknown world (entertainment)
+		World world = Bukkit.getWorld(split[0]);
+		if (world == null) {
+			return null;
+		}
+		// decode
+		try {
+			return split.length >= 6
+					? new Location(world, Double.parseDouble(split[1]), Double.parseDouble(split[2]), Double.parseDouble(split[3]), Float.parseFloat(split[4]),
+							Float.parseFloat(split[5]))
+					: new Location(world, Double.parseDouble(split[1]), Double.parseDouble(split[2]), Double.parseDouble(split[3]));
+		} catch (Throwable exception) {
+			throw new Error("couldn't deserialize location " + string, exception);
+		}
+	});
 
 	// ----------------------------------------------------------------------------------------------------
-	// 		 types : linear
+	// types : linear
 	// ----------------------------------------------------------------------------------------------------
 
-	public static final LinearSerializer<BlockStateType, BlockState> BLOCK_STATE = Serializer.ofLinear(Serializer.ofEnum(BlockStateType.class), BlockState.class, (type, params) -> new BlockState(type, params));
+	public static final LinearSerializer<BlockStateType, BlockState> BLOCK_STATE = Serializer.ofLinear(Serializer.ofEnum(BlockStateType.class),
+			BlockState.class, (type, params) -> new BlockState(type, params));
 
 	// ----------------------------------------------------------------------------------------------------
-	// 		 types : variants
+	// types : variants
 	// ----------------------------------------------------------------------------------------------------
 
 	public static final Serializer<Sound> SOUND = of(Sound.class, value -> value.getId(), string -> Sound.firstFromIdOrDataName(string).orNull());

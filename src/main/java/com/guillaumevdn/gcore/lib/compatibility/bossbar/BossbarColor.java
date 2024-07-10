@@ -5,12 +5,6 @@ package com.guillaumevdn.gcore.lib.compatibility.bossbar;
  */
 public enum BossbarColor {
 
-	BLUE,
-	GREEN,
-	PINK,
-	PURPLE,
-	RED,
-	WHITE,
-	YELLOW;
+	BLUE, GREEN, PINK, PURPLE, RED, WHITE, YELLOW;
 
 }

@@ -1,9 +1,9 @@
 package com.guillaumevdn.gcore.lib.compatibility;
 
-import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
-
 import java.util.Collections;
 import java.util.List;
+
+import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 
 /**
  * @author GuillaumeVDN
@@ -13,40 +13,30 @@ public enum Version {
 
     UNKNOWN(CollectionUtils.asList("UNKNOWN"), null),
 
-    MC_1_7_R1(CollectionUtils.asList("1.7.2"), "v1_7_R1"),
-    MC_1_7_R3(CollectionUtils.asList("1.7.9"), "v1_7_R3"),
+    MC_1_7_R1(CollectionUtils.asList("1.7.2"), "v1_7_R1"), MC_1_7_R3(CollectionUtils.asList("1.7.9"), "v1_7_R3"),
     MC_1_7_R4(CollectionUtils.asList("1.7.10"), "v1_7_R4"),
 
-    MC_1_8_R3(CollectionUtils.asList("1.8"), "v1_8_R3"),
-    MC_1_9_R2(CollectionUtils.asList("1.9"), "v1_9_R2"),
-    MC_1_10_R1(CollectionUtils.asList("1.10"), "v1_10_R1"),
-    MC_1_11_R1(CollectionUtils.asList("1.11"), "v1_11_R1"),
-    MC_1_12_R1(CollectionUtils.asList("1.12"), "v1_12_R1"),
-    MC_1_13_R2(CollectionUtils.asList("1.13"), "v1_13_R2"),
-    MC_1_14_R1(CollectionUtils.asList("1.14"), "v1_14_R1"),
-    MC_1_15_R1(CollectionUtils.asList("1.15"), "v1_15_R1"),
+    MC_1_8_R3(CollectionUtils.asList("1.8"), "v1_8_R3"), MC_1_9_R2(CollectionUtils.asList("1.9"), "v1_9_R2"),
+    MC_1_10_R1(CollectionUtils.asList("1.10"), "v1_10_R1"), MC_1_11_R1(CollectionUtils.asList("1.11"), "v1_11_R1"),
+    MC_1_12_R1(CollectionUtils.asList("1.12"), "v1_12_R1"), MC_1_13_R2(CollectionUtils.asList("1.13"), "v1_13_R2"),
+    MC_1_14_R1(CollectionUtils.asList("1.14"), "v1_14_R1"), MC_1_15_R1(CollectionUtils.asList("1.15"), "v1_15_R1"),
 
-    MC_1_16_R1(CollectionUtils.asList("1.16"), "v1_16_R1"),
-    MC_1_16_R2(CollectionUtils.asList("1.16.2", "1.16.3"), "v1_16_R2"),
+    MC_1_16_R1(CollectionUtils.asList("1.16"), "v1_16_R1"), MC_1_16_R2(CollectionUtils.asList("1.16.2", "1.16.3"), "v1_16_R2"),
     MC_1_16_R3(CollectionUtils.asList("1.16.4", "1.16.5"), "v1_16_R3"),
 
-    MC_1_17_R1(CollectionUtils.asList("1.17"), "v1_17_R1", true),
-    MC_1_17_R2(CollectionUtils.asList("1.17.1"), "v1_17_R1", true),
+    MC_1_17_R1(CollectionUtils.asList("1.17"), "v1_17_R1", true), MC_1_17_R2(CollectionUtils.asList("1.17.1"), "v1_17_R1", true),
 
-    MC_1_18_R1(CollectionUtils.asList("1.18"), "v1_18_R1", true),
-    MC_1_18_R2(CollectionUtils.asList("1.18.2"), "v1_18_R2", true),
+    MC_1_18_R1(CollectionUtils.asList("1.18"), "v1_18_R1", true), MC_1_18_R2(CollectionUtils.asList("1.18.2"), "v1_18_R2", true),
 
-    MC_1_19_R1(CollectionUtils.asList("1.19"), "v1_19_R1", true),
-    MC_1_19_R2(CollectionUtils.asList("1.19.3"), "v1_19_R2", true),
+    MC_1_19_R1(CollectionUtils.asList("1.19"), "v1_19_R1", true), MC_1_19_R2(CollectionUtils.asList("1.19.3"), "v1_19_R2", true),
     MC_1_19_R3(CollectionUtils.asList("1.19.4"), "v1_19_R3", true),
 
-    MC_1_20_R1(CollectionUtils.asList("1.20", "1.20.1"), "v1_20_R1", true),
-    MC_1_20_R2(CollectionUtils.asList("1.20.2"), "v1_20_R2", true),
-    MC_1_20_R3(CollectionUtils.asList("1.20.4"), "v1_20_R3", true),
-    MC_1_20_R4(CollectionUtils.asList("1.20.5", "1.20.6"), "v1_20_R4", true),
+    MC_1_20_R1(CollectionUtils.asList("1.20", "1.20.1"), "v1_20_R1", true), MC_1_20_R2(CollectionUtils.asList("1.20.2"), "v1_20_R2", true),
+    MC_1_20_R3(CollectionUtils.asList("1.20.4"), "v1_20_R3", true), MC_1_20_R4(CollectionUtils.asList("1.20.5", "1.20.6"), "v1_20_R4", true),
     MC_1_21_R1(CollectionUtils.asList("1.21"), "v1_21_R1", true),
 
-    UNSUPPORTED(CollectionUtils.asList("UNSUPPORTED"), null)  // this will be used if we find a package name that's not listed above (a not yet updated newer version most likely)
+    UNSUPPORTED(CollectionUtils.asList("UNSUPPORTED"), null) // this will be used if we find a package name that's not listed above (a not yet updated newer
+                                                             // version most likely)
     ;
 
     public static final Version CURRENT = VersionUtils.getCurrent();

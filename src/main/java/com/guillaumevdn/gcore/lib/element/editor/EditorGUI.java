@@ -11,12 +11,16 @@ import com.guillaumevdn.gcore.lib.string.StringUtils;
 
 /**
  * Editor GUIs are always refilled on open
+ * 
  * @author GuillaumeVDN
  */
 public class EditorGUI extends GUI {
 
 	public EditorGUI(IElement element, ClickCall fromCall /* used just for title computation */) {
-		super(element.getSuperElement().getPlugin(), "editor_" + StringUtils.generateRandomAlphanumericString(10) + (element == null ? "" : "_" + element.getClass().getSimpleName()), fromCall == null ? element.getId() : fromCall.getGUI().getName() + "/" + element.getId(), GUIType.CHEST_6_ROW, fromCall == null ? new Option[0] : new Option[] { Option.AUTO_BACK_ITEM });
+		super(element.getSuperElement().getPlugin(),
+				"editor_" + StringUtils.generateRandomAlphanumericString(10) + (element == null ? "" : "_" + element.getClass().getSimpleName()),
+				fromCall == null ? element.getId() : fromCall.getGUI().getName() + "/" + element.getId(), GUIType.CHEST_6_ROW,
+				fromCall == null ? new Option[0] : new Option[] { Option.AUTO_BACK_ITEM });
 	}
 
 	public EditorGUI(GPlugin plugin, String title, ClickCall fromCall /* used just for title computation */) {
@@ -24,7 +28,9 @@ public class EditorGUI extends GUI {
 	}
 
 	public EditorGUI(GPlugin plugin, String title, ClickCall fromCall /* used just for title computation */, GUIType type) {
-		super(plugin, "editor_" + StringUtils.generateRandomAlphanumericString(10), fromCall == null || fromCall.getGUI() == null /* can happen due to /qe edit <editor> */ ? title : fromCall.getGUI().getName() + "/" + title, type, fromCall == null ? new Option[0] : new Option[] { Option.AUTO_BACK_ITEM });
+		super(plugin, "editor_" + StringUtils.generateRandomAlphanumericString(10),
+				fromCall == null || fromCall.getGUI() == null /* can happen due to /qe edit <editor> */ ? title : fromCall.getGUI().getName() + "/" + title,
+				type, fromCall == null ? new Option[0] : new Option[] { Option.AUTO_BACK_ITEM });
 	}
 
 	/** @return true if the GUI was opened */

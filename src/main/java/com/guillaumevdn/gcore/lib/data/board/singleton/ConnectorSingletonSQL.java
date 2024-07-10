@@ -12,7 +12,7 @@ public abstract class ConnectorSingletonSQL<W> implements BoardConnector {
 	private Class<W> jsonDataWrapperClass;
 	private SQLHandler handler;
 
-	public ConnectorSingletonSQL(SingletonBoard board,  Class<W> jsonDataWrapperClass, SQLHandler handler) {
+	public ConnectorSingletonSQL(SingletonBoard board, Class<W> jsonDataWrapperClass, SQLHandler handler) {
 		this.board = board;
 		this.jsonDataWrapperClass = jsonDataWrapperClass;
 		this.handler = handler;
@@ -40,19 +40,10 @@ public abstract class ConnectorSingletonSQL<W> implements BoardConnector {
 	public void remoteInit() throws Throwable {
 		if (handler instanceof SQLiteHandler) {
 			handler.performUpdateQuery(board.getLogger(),
-					"CREATE TABLE IF NOT EXISTS " + tableName() + "("
-							+ "version SMALLINT NOT NULL PRIMARY KEY,"
-							+ "data LONGTEXT NOT NULL"
-							+ ");"
-					);
+					"CREATE TABLE IF NOT EXISTS " + tableName() + "(" + "version SMALLINT NOT NULL PRIMARY KEY," + "data LONGTEXT NOT NULL" + ");");
 		} else {
-			handler.performUpdateQuery(board.getLogger(),
-					"CREATE TABLE IF NOT EXISTS " + tableName() + "("
-							+ "version SMALLINT NOT NULL,"
-							+ "data LONGTEXT NOT NULL,"
-							+ "PRIMARY KEY(data_key)"
-							+ ") ENGINE=InnoDB DEFAULT CHARSET = 'utf8';"
-					);
+			handler.performUpdateQuery(board.getLogger(), "CREATE TABLE IF NOT EXISTS " + tableName() + "(" + "version SMALLINT NOT NULL,"
+					+ "data LONGTEXT NOT NULL," + "PRIMARY KEY(data_key)" + ") ENGINE=InnoDB DEFAULT CHARSET = 'utf8';");
 		}
 	}
 
@@ -85,17 +76,11 @@ public abstract class ConnectorSingletonSQL<W> implements BoardConnector {
 		Query insertQuery = new Query("INSERT INTO " + tableName() + " (version,data) VALUES(" + dataVersion() + "," + Query.escapeValue(json) + ")");
 
 		if (handler instanceof SQLiteHandler) {
-			insertQuery.add(" ON CONFLICT(version) DO UPDATE SET "
-					+ "data = excluded.data"
-					+ ";");
+			insertQuery.add(" ON CONFLICT(version) DO UPDATE SET " + "data = excluded.data" + ";");
 		} else if (ConfigGCore.mySQLPre8019) {
-			insertQuery.add(" ON DUPLICATE KEY UPDATE "
-					+ "data = VALUES(data)"
-					+ ";");
+			insertQuery.add(" ON DUPLICATE KEY UPDATE " + "data = VALUES(data)" + ";");
 		} else {
-			insertQuery.add(" AS new ON DUPLICATE KEY UPDATE "
-					+ "data = new.data"
-					+ ";");
+			insertQuery.add(" AS new ON DUPLICATE KEY UPDATE " + "data = new.data" + ";");
 		}
 
 		handler.performUpdateQuery(board.getLogger(), insertQuery);

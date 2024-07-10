@@ -7,12 +7,7 @@ package com.guillaumevdn.gcore.lib.legacy_npc;
 public enum NPCStatus {
 
 	// ----- status
-	ON_FIRE((byte) 1),
-	CROUCHED((byte) 2),
-	SPRINTING((byte) 8),
-	INVISIBLE((byte) 32),
-	GLOWING((byte) 64),
-	ELYTRA((byte) 128);
+	ON_FIRE((byte) 1), CROUCHED((byte) 2), SPRINTING((byte) 8), INVISIBLE((byte) 32), GLOWING((byte) 64), ELYTRA((byte) 128);
 
 	// ----- base
 	private byte b;

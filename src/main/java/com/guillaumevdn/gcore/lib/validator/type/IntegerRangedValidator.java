@@ -4,7 +4,7 @@ package com.guillaumevdn.gcore.lib.validator.type;
  * @author GuillaumeVDN
  */
 public class IntegerRangedValidator extends IntegerValidator {
-	
+
 	private int min, max;
 
 	public IntegerRangedValidator(int min, int max) {

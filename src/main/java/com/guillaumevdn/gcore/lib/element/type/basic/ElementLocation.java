@@ -43,20 +43,22 @@ public class ElementLocation extends ElementValue<Location> {
 		// left-click : enter value
 		if (call.getType().equals(ClickType.LEFT)) {
 			call.getClicker().closeInventory();
-			WorkerGCore.inst().awaitChatWithSuggestedValue(call.getClicker(), TextEditorGeneric.messageElementBasicEditSuggestCurrent, getRawValueLineOrDefault(0), value -> {
-				if (StringUtils.hasPlaceholders(value)) {
-					setValue(CollectionUtils.asList(value));
-				} else {
-					Location loc = null;
-					try {
-						loc = getSerializer().deserialize(value);
-					} catch (Throwable ignored) {}
-					setValue(loc == null ? null : CollectionUtils.asList(value));
-				}
-				call.getGUI().setRegularItem(buildEditorItem(call.getPageIndex(), call.getSlot()));
-				call.reopenGUI();
-				getSuperElement().onEditorChange(this);
-			}, () -> call.reopenGUI());
+			WorkerGCore.inst().awaitChatWithSuggestedValue(call.getClicker(), TextEditorGeneric.messageElementBasicEditSuggestCurrent,
+					getRawValueLineOrDefault(0), value -> {
+						if (StringUtils.hasPlaceholders(value)) {
+							setValue(CollectionUtils.asList(value));
+						} else {
+							Location loc = null;
+							try {
+								loc = getSerializer().deserialize(value);
+							} catch (Throwable ignored) {
+							}
+							setValue(loc == null ? null : CollectionUtils.asList(value));
+						}
+						call.getGUI().setRegularItem(buildEditorItem(call.getPageIndex(), call.getSlot()));
+						call.reopenGUI();
+						getSuperElement().onEditorChange(this);
+					}, () -> call.reopenGUI());
 		}
 		// shift + right-click : import
 		else if (call.getType().equals(ClickType.SHIFT_RIGHT)) {

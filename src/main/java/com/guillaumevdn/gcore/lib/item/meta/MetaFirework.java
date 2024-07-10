@@ -23,14 +23,17 @@ import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
 public final class MetaFirework {
 
 	public static boolean match(ItemMeta itemMeta, ItemReference reference, ItemCheck check) {
-		if (!reference.hasMeta(FireworkMeta.class)) return true;
+		if (!reference.hasMeta(FireworkMeta.class))
+			return true;
 		FireworkMeta meta = ObjectUtils.castOrNull(itemMeta, FireworkMeta.class); // might be null if exact match is false
 
 		// effects
 		if (check.isExact()) {
-			if (meta.hasEffects() != reference.hasEffects() || meta.getEffects().size() != reference.getEffects().size()) return false;
+			if (meta.hasEffects() != reference.hasEffects() || meta.getEffects().size() != reference.getEffects().size())
+				return false;
 		} else {
-			if (reference.hasEffects() && (meta == null || meta.hasEffects())) return false;
+			if (reference.hasEffects() && (meta == null || meta.hasEffects()))
+				return false;
 		}
 		main: for (FireworkEffect refEffect : reference.getEffects()) {
 			for (FireworkEffect effect : meta.getEffects()) {

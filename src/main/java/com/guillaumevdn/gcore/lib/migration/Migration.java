@@ -32,14 +32,9 @@ public abstract class Migration {
 	private int modCount = 0;
 
 	public Migration(GPlugin plugin, String backupName, String migrationName, String successFilePath) {
-		this(plugin,
-				backupName != null,
-				migrationName,
-				plugin.getDataFolder(),
+		this(plugin, backupName != null, migrationName, plugin.getDataFolder(),
 				new File(plugin.getDataFolder().getParentFile() + "/" + plugin.getName() + "_backup_on_" + backupName),
-				new File(plugin.getDataFolder() + "/" + successFilePath),
-				new File(plugin.getDataFolder() + "/hardlock")
-				);
+				new File(plugin.getDataFolder() + "/" + successFilePath), new File(plugin.getDataFolder() + "/hardlock"));
 	}
 
 	public Migration(GPlugin plugin, boolean mustBackup, String migrationName, File pluginFolder, File backupFolder, File successFile, File hardlockFile) {
@@ -143,8 +138,9 @@ public abstract class Migration {
 			logger.error("STACKTRACE :", cause);
 		}
 		if (mustBackup) {
-			logger.error("BACKUP STATE : " + (backupError ?
-					"wanted to " + backup.name().toLowerCase() + ", but couldn't ; " + (hardlock ? "the plugin won't try to migrate again until you fix it manually" : "please do it manually")
+			logger.error("BACKUP STATE : " + (backupError
+					? "wanted to " + backup.name().toLowerCase() + ", but couldn't ; "
+							+ (hardlock ? "the plugin won't try to migrate again until you fix it manually" : "please do it manually")
 					: backup.name().toLowerCase() + "d"));
 			if (backupStackTrace != null) {
 				logger.error("BACKUP STACKTRACE :", backupStackTrace);
@@ -196,7 +192,7 @@ public abstract class Migration {
 		if (mustBackup) {
 			try {
 				FileUtils.delete(backupFolder);
-				FileUtils.copy(pluginFolder, backupFolder, CollectionUtils.asSet("plugin_log.log", "logs"));  // don't copy plugin log and log files
+				FileUtils.copy(pluginFolder, backupFolder, CollectionUtils.asSet("plugin_log.log", "logs")); // don't copy plugin log and log files
 			} catch (Throwable exception) {
 				fail("Couldn't create backup", exception, BackupBehavior.DELETE);
 				return false;
@@ -242,15 +238,15 @@ public abstract class Migration {
 		}
 	}
 
-	protected final void attemptYMLFilesOperation(String elementTypeName, BackupBehavior backupOnFail, String srcFolderPath, String targetFolderPath, ThrowableBiConsumer<YMLMigrationReading, YMLMigrationWriting> processor, String... ignoreElements) throws Throwable {
+	protected final void attemptYMLFilesOperation(String elementTypeName, BackupBehavior backupOnFail, String srcFolderPath, String targetFolderPath,
+			ThrowableBiConsumer<YMLMigrationReading, YMLMigrationWriting> processor, String... ignoreElements) throws Throwable {
 		attemptYMLFilesOperation("converting " + elementTypeName + "s", elementTypeName, backupOnFail, new File(getBackupFolder() + "/" + srcFolderPath),
-				element -> new File(getPluginFolder() + "/" + targetFolderPath + "/" + element.toLowerCase() + ".yml"),
-				processor,
-				ignoreElements
-				);
+				element -> new File(getPluginFolder() + "/" + targetFolderPath + "/" + element.toLowerCase() + ".yml"), processor, ignoreElements);
 	}
 
-	protected final void attemptYMLFilesOperation(String operation, String elementTypeName, BackupBehavior backupOnFail, File src, Function<String, File> targetSupplier, ThrowableBiConsumer<YMLMigrationReading, YMLMigrationWriting> processor, String... ignoreElements) throws Throwable {
+	protected final void attemptYMLFilesOperation(String operation, String elementTypeName, BackupBehavior backupOnFail, File src,
+			Function<String, File> targetSupplier, ThrowableBiConsumer<YMLMigrationReading, YMLMigrationWriting> processor, String... ignoreElements)
+			throws Throwable {
 		attemptOperation(operation, backupOnFail, () -> {
 			doFileOperation(operation, elementTypeName, src, backupOnFail, filterYMLIfNotOneOf(ignoreElements), file -> {
 				YMLMigrationReading elementSrc = new YMLMigrationReading(getPlugin(), file);
@@ -264,7 +260,8 @@ public abstract class Migration {
 		});
 	}
 
-	public final void attemptDirectYMLFilesOperation(String operation, String elementTypeName, BackupBehavior backupOnFail, File src, ThrowableConsumer<YMLConfiguration> processor, String... ignoreElements) throws Throwable {
+	public final void attemptDirectYMLFilesOperation(String operation, String elementTypeName, BackupBehavior backupOnFail, File src,
+			ThrowableConsumer<YMLConfiguration> processor, String... ignoreElements) throws Throwable {
 		attemptOperation(operation, backupOnFail, () -> {
 			doFileOperation(operation, elementTypeName, src, backupOnFail, filterYMLIfNotOneOf(ignoreElements), file -> {
 				YMLConfiguration config = new YMLConfiguration(getPlugin(), file);
@@ -277,13 +274,15 @@ public abstract class Migration {
 		});
 	}
 
-	protected final void attemptFilesOperation(String operation, String elementTypeName, BackupBehavior backupOnFail, File src, Predicate<File> filter, ThrowableConsumer<File> processor) throws Throwable {
+	protected final void attemptFilesOperation(String operation, String elementTypeName, BackupBehavior backupOnFail, File src, Predicate<File> filter,
+			ThrowableConsumer<File> processor) throws Throwable {
 		attemptOperation(operation, backupOnFail, () -> {
 			doFileOperation(operation, elementTypeName, src, backupOnFail, filter, processor);
 		});
 	}
 
-	private final void doFileOperation(String operation, String elementTypeName, File src, BackupBehavior backupOnFail, Predicate<File> filter, ThrowableConsumer<File> processor) throws Throwable {
+	private final void doFileOperation(String operation, String elementTypeName, File src, BackupBehavior backupOnFail, Predicate<File> filter,
+			ThrowableConsumer<File> processor) throws Throwable {
 		if (!src.exists()) {
 			return;
 		}
@@ -309,15 +308,16 @@ public abstract class Migration {
 		}
 	}
 
-	protected final void attemptFromBackupSingleYMLFileToMultiple(String elementTypeName, BackupBehavior backupOnFail, String srcFilePath, String srcPath, String targetFolderPath, ThrowableTriConsumer<YMLMigrationReading, String, YMLMigrationWriting> processor, String... ignoreElements) throws Throwable {
-		attemptSingleYMLFileToMultiple("converting " + elementTypeName + "s", elementTypeName, backupOnFail, new File(getBackupFolder() + "/" + srcFilePath), srcPath,
-				element -> new File(getPluginFolder() + "/" + targetFolderPath + "/" + element.toLowerCase() + ".yml"),
-				processor,
-				ignoreElements
-				);
+	protected final void attemptFromBackupSingleYMLFileToMultiple(String elementTypeName, BackupBehavior backupOnFail, String srcFilePath, String srcPath,
+			String targetFolderPath, ThrowableTriConsumer<YMLMigrationReading, String, YMLMigrationWriting> processor, String... ignoreElements)
+			throws Throwable {
+		attemptSingleYMLFileToMultiple("converting " + elementTypeName + "s", elementTypeName, backupOnFail, new File(getBackupFolder() + "/" + srcFilePath),
+				srcPath, element -> new File(getPluginFolder() + "/" + targetFolderPath + "/" + element.toLowerCase() + ".yml"), processor, ignoreElements);
 	}
 
-	protected final void attemptSingleYMLFileToMultiple(String operation, String elementTypeName, BackupBehavior backupOnFail, File src, String path, Function<String, File> targetSupplier, ThrowableTriConsumer<YMLMigrationReading, String, YMLMigrationWriting> processor, String... ignoreElements) throws Throwable {
+	protected final void attemptSingleYMLFileToMultiple(String operation, String elementTypeName, BackupBehavior backupOnFail, File src, String path,
+			Function<String, File> targetSupplier, ThrowableTriConsumer<YMLMigrationReading, String, YMLMigrationWriting> processor, String... ignoreElements)
+			throws Throwable {
 		attemptOperation(operation, backupOnFail, () -> {
 			if (!src.exists()) {
 				return;
@@ -348,6 +348,7 @@ public abstract class Migration {
 	}
 
 	protected static final Predicate<File> FILTER_YML = file -> file.getName().toLowerCase().endsWith(".yml");
+
 	protected static Predicate<File> filterYMLIfNotOneOf(String... ignore) {
 		return file -> FILTER_YML.test(file) && !Stream.of(ignore).anyMatch(name -> file.getName().equalsIgnoreCase(name));
 	}

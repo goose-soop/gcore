@@ -58,11 +58,10 @@ public class ReflectionMethod {
 			}
 		}
 		if (method == null) {
-			String log = "Class " + original
-					+ "\nName '" + name + "'"
-					+ "\nParameters '" + StringUtils.toTextString(", ", CollectionUtils.asList(params).stream().map(param -> param == null ? "null" : param.getName())) + "'"
+			String log = "Class " + original + "\nName '" + name + "'" + "\nParameters '"
+					+ StringUtils.toTextString(", ", CollectionUtils.asList(params).stream().map(param -> param == null ? "null" : param.getName())) + "'"
 					+ "\n\nAvailable methods:";
-			
+
 			// log every available method
 			classes = CollectionUtils.asList(original);
 			explored = new HashSet<>();
@@ -71,7 +70,8 @@ public class ReflectionMethod {
 				Class<?> clazz = classes.remove(0);
 				log += "\n\n... from class " + clazz + ":";
 				for (Method meth : clazz.getDeclaredMethods()) {
-					log += "\n- " + meth.getName() + "(" + StringUtils.toTextString(", ", CollectionUtils.asList(meth.getParameters()).stream().map(param -> param.getType()) + ")");
+					log += "\n- " + meth.getName() + "("
+							+ StringUtils.toTextString(", ", CollectionUtils.asList(meth.getParameters()).stream().map(param -> param.getType()) + ")");
 				}
 				// set parent class to explore
 				Class<?> parent = clazz.getSuperclass();
@@ -90,7 +90,8 @@ public class ReflectionMethod {
 	}
 
 	private static boolean canCheck(Class<?> clazz) {
-		return clazz != null && !clazz.isPrimitive() && !clazz.equals(Object.class) /*&& !clazz.equals(Enum.class) actually allow enum classes, we want sometimes to get the name() method*/;
+		return clazz != null && !clazz.isPrimitive()
+				&& !clazz.equals(Object.class) /* && !clazz.equals(Enum.class) actually allow enum classes, we want sometimes to get the name() method */;
 	}
 
 	// ----- get
@@ -111,11 +112,9 @@ public class ReflectionMethod {
 			return ReflectionObject.of(method.invoke(object, params));
 		} catch (IllegalArgumentException exception) {
 			Reflection.logAndRethrowError(exception,
-					"Class " + method.getDeclaringClass()
-					+ "\nName " + method.getName()
-					+ "\nParameters '" + StringUtils.toTextString(", ", Stream.of(params))
-					+ "\nMethod parameters '" + StringUtils.toTextString(", ", CollectionUtils.asList(method.getParameters()).stream().map(param -> param.getType())) + "'"
-					);
+					"Class " + method.getDeclaringClass() + "\nName " + method.getName() + "\nParameters '" + StringUtils.toTextString(", ", Stream.of(params))
+							+ "\nMethod parameters '"
+							+ StringUtils.toTextString(", ", CollectionUtils.asList(method.getParameters()).stream().map(param -> param.getType())) + "'");
 			return null;
 		}
 	}
@@ -127,7 +126,8 @@ public class ReflectionMethod {
 		// hash by class name
 		int hash = original.getName().hashCode();
 		hash = hash * 31 + name.hashCode();
-		for (Class<?> param : params) hash = 31 * hash + (param == null ? 0 : param.getName().hashCode());
+		for (Class<?> param : params)
+			hash = 31 * hash + (param == null ? 0 : param.getName().hashCode());
 		// construct
 		ReflectionMethod method = cache.get(hash);
 		if (method == null) {

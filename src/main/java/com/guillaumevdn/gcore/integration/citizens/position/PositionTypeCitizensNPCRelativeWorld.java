@@ -29,6 +29,7 @@ public class PositionTypeCitizensNPCRelativeWorld extends PositionTypeCitizensNP
 	protected Position doParse(ElementPosition position, NPC npc, Replacer replacer) {
 		World world = npc.getEntity().getWorld();
 		return new Position() {
+
 			@Override
 			public boolean match(Location loc) {
 				if (loc == null) {
@@ -36,26 +37,32 @@ public class PositionTypeCitizensNPCRelativeWorld extends PositionTypeCitizensNP
 				}
 				return loc.getWorld().equals(world);
 			}
+
 			@Override
 			public World getWorld() {
 				return world;
 			}
+
 			@Override
 			public boolean canFindRandom() {
 				return false;
 			}
+
 			@Override
 			public Location findRandom() {
 				return null;
 			}
+
 			@Override
 			public int findSafeRandomMaxY() {
 				return 0;
 			}
+
 			@Override
 			public MinMaxDouble getRandomSolidAndFreeAboveYBounds() {
 				return null;
 			}
+
 			@Override
 			public Location findClosestTo(Location loc) {
 				if (!loc.getWorld().equals(world)) {
@@ -63,17 +70,21 @@ public class PositionTypeCitizensNPCRelativeWorld extends PositionTypeCitizensNP
 				}
 				return loc;
 			}
+
 			@Override
 			public Location findGPSFor(Player player) {
 				return null;
 			}
+
 			@Override
 			public boolean canFill() {
 				return false;
 			}
+
 			@Override
 			public void fill(Mat blockType, List<BlockState> blockStates) {
 			}
+
 		};
 	}
 

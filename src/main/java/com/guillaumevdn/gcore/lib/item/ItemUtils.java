@@ -1,22 +1,18 @@
 package com.guillaumevdn.gcore.lib.item;
 
-import com.guillaumevdn.gcore.ConfigGCore;
-import com.guillaumevdn.gcore.TextGeneric;
-import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
-import com.guillaumevdn.gcore.lib.compatibility.Compat;
-import com.guillaumevdn.gcore.lib.compatibility.Version;
-import com.guillaumevdn.gcore.lib.compatibility.material.CommonMats;
-import com.guillaumevdn.gcore.lib.compatibility.material.Mat;
-import com.guillaumevdn.gcore.lib.compatibility.nbt.NBTItem;
-import com.guillaumevdn.gcore.lib.gui.ItemFlag;
-import com.guillaumevdn.gcore.lib.item.meta.*;
-import com.guillaumevdn.gcore.lib.string.StringUtils;
-import com.guillaumevdn.gcore.lib.string.Text;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Stream;
+
+import javax.annotation.Nullable;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.SkullType;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -26,26 +22,41 @@ import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
-import javax.annotation.Nullable;
-import java.util.*;
-import java.util.stream.Stream;
+import com.guillaumevdn.gcore.ConfigGCore;
+import com.guillaumevdn.gcore.TextGeneric;
+import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
+import com.guillaumevdn.gcore.lib.compatibility.Compat;
+import com.guillaumevdn.gcore.lib.compatibility.Version;
+import com.guillaumevdn.gcore.lib.compatibility.material.CommonMats;
+import com.guillaumevdn.gcore.lib.compatibility.material.Mat;
+import com.guillaumevdn.gcore.lib.compatibility.nbt.NBTItem;
+import com.guillaumevdn.gcore.lib.gui.ItemFlag;
+import com.guillaumevdn.gcore.lib.item.meta.MetaBook;
+import com.guillaumevdn.gcore.lib.item.meta.MetaEnchantmentStorage;
+import com.guillaumevdn.gcore.lib.item.meta.MetaFirework;
+import com.guillaumevdn.gcore.lib.item.meta.MetaFireworkEffect;
+import com.guillaumevdn.gcore.lib.item.meta.MetaLeatherArmor;
+import com.guillaumevdn.gcore.lib.item.meta.MetaPotion;
+import com.guillaumevdn.gcore.lib.item.meta.MetaSkull;
+import com.guillaumevdn.gcore.lib.string.StringUtils;
+import com.guillaumevdn.gcore.lib.string.Text;
 
 /**
  * @author GuillaumeVDN
  */
-public final class ItemUtils
-{
-	public static final Enchantment ENCHANTMENT_BANE_OF_ARTHROPODS;
+public final class ItemUtils {
 
-	static {
-		Enchantment rocketType = null;
-		try {
-			rocketType = Enchantment.getByName("DAMAGE_ARTHROPODS");
-		} catch (IllegalArgumentException e) {
-			rocketType = Enchantment.BANE_OF_ARTHROPODS;
-		}
-		ENCHANTMENT_BANE_OF_ARTHROPODS = rocketType;
-	}
+    public static final Enchantment ENCHANTMENT_BANE_OF_ARTHROPODS;
+
+    static {
+        Enchantment rocketType = null;
+        try {
+            rocketType = Enchantment.getByName("DAMAGE_ARTHROPODS");
+        } catch (IllegalArgumentException e) {
+            rocketType = Enchantment.BANE_OF_ARTHROPODS;
+        }
+        ENCHANTMENT_BANE_OF_ARTHROPODS = rocketType;
+    }
 
     // ----- text
     public static String describeSingleLine(ItemStack item) {
@@ -54,9 +65,9 @@ public final class ItemUtils
 
     public static String describeSingleLine(ItemStack item, int amount) {
         String separator = TextGeneric.textDescribeItemSingleLineSeparator.parseLine();
-        Stream<String> desc = describe(item, amount, TextGeneric.textDescribeItemSingleLine, TextGeneric.textDescribeItemSingleLineNameIfHas, TextGeneric.textDescribeItemSingleLineLoreIfHas, TextGeneric.textDescribeItemSingleLineEnchantmentsIfHas, TextGeneric.textDescribeItemSingleLineEnchantmentsLine)
-            .stream()
-            .filter(line -> !line.trim().isEmpty());
+        Stream<String> desc = describe(item, amount, TextGeneric.textDescribeItemSingleLine, TextGeneric.textDescribeItemSingleLineNameIfHas,
+                TextGeneric.textDescribeItemSingleLineLoreIfHas, TextGeneric.textDescribeItemSingleLineEnchantmentsIfHas,
+                TextGeneric.textDescribeItemSingleLineEnchantmentsLine).stream().filter(line -> !line.trim().isEmpty());
         return StringUtils.toTextString(separator, desc);
     }
 
@@ -65,38 +76,40 @@ public final class ItemUtils
     }
 
     public static List<String> describe(ItemStack item, int amount) {
-        return describe(item, amount, TextGeneric.textDescribeItem, TextGeneric.textDescribeItemNameIfHas, TextGeneric.textDescribeItemLoreIfHas, TextGeneric.textDescribeItemEnchantmentsIfHas, TextGeneric.textDescribeItemEnchantmentsLine);
+        return describe(item, amount, TextGeneric.textDescribeItem, TextGeneric.textDescribeItemNameIfHas, TextGeneric.textDescribeItemLoreIfHas,
+                TextGeneric.textDescribeItemEnchantmentsIfHas, TextGeneric.textDescribeItemEnchantmentsLine);
     }
 
-    public static List<String> describe(ItemStack item, int amount, Text text, Text itemNameIfHas, Text itemLoreIfHas, Text itemEnchantmentsIfHas, Text enchantmentLine) {
+    public static List<String> describe(ItemStack item, int amount, Text text, Text itemNameIfHas, Text itemLoreIfHas, Text itemEnchantmentsIfHas,
+            Text enchantmentLine) {
         Mat mat = Mat.fromItem(item).orElse(null);
         ItemMeta meta = item.getItemMeta();
-        return text
-            .replace("{amount}", () -> amount)
-            .replace("{type}", () -> mat == null ? "?" + item.getType().name() : StringUtils.separateAtUnderscore(mat.getId()).toLowerCase())
-            .replace("{durability}", () -> Compat.getDurability(item))
-            .replace("{custom_model_data}", () -> Version.ATLEAST_1_14 ? (item.getItemMeta().hasCustomModelData() ? item.getItemMeta().getCustomModelData() : 0) : null)
-            .replace("{name}", () -> meta == null || !meta.hasDisplayName() ? "" : itemNameIfHas.replace("{name}", () -> meta.getDisplayName()).parseLines())
-            .replace("{lore}", () -> {
-                List<String> lore = meta == null || !meta.hasLore() ? null : meta.getLore();
-                if (lore == null || lore.isEmpty()) {
-                    return "";
-                } else {
-                    List<String> parsed = new ArrayList<>();
-                    lore.forEach(line -> parsed.add(line));
-                    return itemLoreIfHas.replace("{lore}", () -> parsed).parseLines();
-                }
-            })
-            .replace("{enchantments}", () -> {
-                if (item.getEnchantments().isEmpty()) {
-                    return "";
-                } else {
-                    List<String> parsed = new ArrayList<>();
-                    item.getEnchantments().forEach((enchant, level) -> parsed.addAll(enchantmentLine.replace("{enchant}", () -> enchant.getName()).replace("{level}", () -> level).parseLines()));
-                    return itemEnchantmentsIfHas.replace("{enchantments}", () -> parsed).parseLines();
-                }
-            })
-            .parseLines();
+        return text.replace("{amount}", () -> amount)
+                .replace("{type}", () -> mat == null ? "?" + item.getType().name() : StringUtils.separateAtUnderscore(mat.getId()).toLowerCase())
+                .replace("{durability}", () -> Compat.getDurability(item))
+                .replace("{custom_model_data}",
+                        () -> Version.ATLEAST_1_14 ? (item.getItemMeta().hasCustomModelData() ? item.getItemMeta().getCustomModelData() : 0) : null)
+                .replace("{name}",
+                        () -> meta == null || !meta.hasDisplayName() ? "" : itemNameIfHas.replace("{name}", () -> meta.getDisplayName()).parseLines())
+                .replace("{lore}", () -> {
+                    List<String> lore = meta == null || !meta.hasLore() ? null : meta.getLore();
+                    if (lore == null || lore.isEmpty()) {
+                        return "";
+                    } else {
+                        List<String> parsed = new ArrayList<>();
+                        lore.forEach(line -> parsed.add(line));
+                        return itemLoreIfHas.replace("{lore}", () -> parsed).parseLines();
+                    }
+                }).replace("{enchantments}", () -> {
+                    if (item.getEnchantments().isEmpty()) {
+                        return "";
+                    } else {
+                        List<String> parsed = new ArrayList<>();
+                        item.getEnchantments().forEach((enchant, level) -> parsed
+                                .addAll(enchantmentLine.replace("{enchant}", () -> enchant.getName()).replace("{level}", () -> level).parseLines()));
+                        return itemEnchantmentsIfHas.replace("{enchantments}", () -> parsed).parseLines();
+                    }
+                }).parseLines();
     }
 
     // ----- head
@@ -109,7 +122,8 @@ public final class ItemUtils
         SkullMeta meta = (SkullMeta) stack.getItemMeta();
         meta.setOwner(name);
         meta.setDisplayName(nameColor + name);
-        if (lore != null) meta.setLore(lore);
+        if (lore != null)
+            meta.setLore(lore);
         stack.setItemMeta(meta);
         return stack;
     }
@@ -117,28 +131,32 @@ public final class ItemUtils
     // ----- player
 
     /**
-     * @return the dropped item containing the remaining amount if player inventory became full as a result of this call, or null if there was no extra
+     * @return the dropped item containing the remaining amount if player inventory became full as a result of this call, or
+     *         null if there was no extra
      */
     public static Item give(Player player, ItemStack item, boolean updateInv) {
         return give(player, item, updateInv, item.getMaxStackSize());
     }
 
     /**
-     * @return the dropped item containing the remaining amount if player inventory became full as a result of this call, or null if there was no extra
+     * @return the dropped item containing the remaining amount if player inventory became full as a result of this call, or
+     *         null if there was no extra
      */
     public static Item give(Player player, ItemStack item, int amount, boolean updateInv) {
         return give(player, item, amount, updateInv, item.getMaxStackSize());
     }
 
     /**
-     * @return the dropped item containing the remaining amount if player inventory became full as a result of this call, or null if there was no extra
+     * @return the dropped item containing the remaining amount if player inventory became full as a result of this call, or
+     *         null if there was no extra
      */
     public static Item give(Player player, ItemStack item, boolean updateInv, int maxStackSize) {
         return give(player, item, item.getAmount(), updateInv, maxStackSize);
     }
 
     /**
-     * @return the dropped item containing the remaining amount if player inventory became full as a result of this call, or null if there was no extra
+     * @return the dropped item containing the remaining amount if player inventory became full as a result of this call, or
+     *         null if there was no extra
      */
     public static Item give(Player player, ItemStack item, int amount, boolean updateInv, int maxStackSize) {
         // eventually fix max stack size
@@ -308,9 +326,12 @@ public final class ItemUtils
     public static boolean match(ItemStack item, ItemReference reference, ItemCheck check) {
         boolean voidItem = Mat.isVoid(item);
         boolean voidReference = reference.isVoid();
-        if (voidItem != voidReference) return false; // one is void but not the other
-        if (voidItem) return true; // both void
-        if (item == reference) return true;
+        if (voidItem != voidReference)
+            return false; // one is void but not the other
+        if (voidItem)
+            return true; // both void
+        if (item == reference)
+            return true;
 
         // type
         Mat type = Mat.fromItem(item).orElse(null);
@@ -348,17 +369,22 @@ public final class ItemUtils
             ConfigGCore.logspamItemNbt(null, () -> "Item match ; custom model data");
             int itemModelData = itemMeta != null && itemMeta.hasCustomModelData() ? itemMeta.getCustomModelData() : 0;
             int referenceModelData = reference.getCustomModelData();
-            if (check.isExact() && itemModelData != referenceModelData) return false;
-            else if (!check.isExact() && referenceModelData != 0 && itemModelData != referenceModelData) return false;
+            if (check.isExact() && itemModelData != referenceModelData)
+                return false;
+            else if (!check.isExact() && referenceModelData != 0 && itemModelData != referenceModelData)
+                return false;
         }
 
         // unbreakable
         ConfigGCore.logspamItemNbt(null, () -> "Item match ; unbreakable");
         boolean itemUnbreakable = itemMeta != null && Compat.isUnbreakable(itemMeta);
         boolean referenceUnbreakable = reference.isUnbreakable();
-        if (check.isExact() && itemUnbreakable != referenceUnbreakable) return false;
-        else if (!check.isExact() && referenceUnbreakable && (itemMeta == null || !itemUnbreakable)) return false;
-        // if it's not unbreakable, and can be damaged, and we want it to be less damaged, check if the guy is trying to bamboozle us
+        if (check.isExact() && itemUnbreakable != referenceUnbreakable)
+            return false;
+        else if (!check.isExact() && referenceUnbreakable && (itemMeta == null || !itemUnbreakable))
+            return false;
+        // if it's not unbreakable, and can be damaged, and we want it to be less damaged, check if the guy is trying to
+        // bamboozle us
         if (!itemUnbreakable && type.getData().isDamageable() && check.musntBeMoreDamaged() && itemDura > referenceDura) {
             return false;
         }
@@ -368,13 +394,16 @@ public final class ItemUtils
         boolean itemHasEnchants = itemMeta != null && itemMeta.hasEnchants();
         boolean referenceHasEnchants = reference.hasEnchants();
         if (check.isExact()) {
-            if (itemHasEnchants != referenceHasEnchants) return false;
+            if (itemHasEnchants != referenceHasEnchants)
+                return false;
             Map<Enchantment, Integer> itemEnchants = itemMeta == null ? EMPTY_ENCHANTS : itemMeta.getEnchants();
             Map<Enchantment, Integer> referenceEnchants = reference.getEnchants();
-            if (!CollectionUtils.contentEquals(itemEnchants, referenceEnchants)) return false;
+            if (!CollectionUtils.contentEquals(itemEnchants, referenceEnchants))
+                return false;
         } else {
             if (referenceHasEnchants) {
-                if (!itemHasEnchants) return false;
+                if (!itemHasEnchants)
+                    return false;
                 for (Enchantment enchantment : reference.getEnchants().keySet()) {
                     if (itemMeta.getEnchants().get(enchantment) != reference.getEnchants().get(enchantment)) {
                         return false;
@@ -388,9 +417,11 @@ public final class ItemUtils
         List<ItemFlag> referenceFlags = reference.getFlags();
         ConfigGCore.logspamItemNbt(null, () -> "Item match ; flags ; item " + itemFlags + ", ref " + referenceFlags);
         if (check.isExact()) {
-            if (!CollectionUtils.contentEquals(itemFlags, referenceFlags, false)) return false;
+            if (!CollectionUtils.contentEquals(itemFlags, referenceFlags, false))
+                return false;
         } else if (!check.isExact()) {
-            if (!itemFlags.containsAll(referenceFlags)) return false;
+            if (!itemFlags.containsAll(referenceFlags))
+                return false;
         }
 
         // name
@@ -437,50 +468,64 @@ public final class ItemUtils
 
         // specific meta
         ConfigGCore.logspamItemNbt(null, () -> "Item match ; book meta");
-        if (!MetaBook.match(itemMeta, reference, check)) return false;
+        if (!MetaBook.match(itemMeta, reference, check))
+            return false;
 
         ConfigGCore.logspamItemNbt(null, () -> "Item match ; enchantment storage meta");
-        if (!MetaEnchantmentStorage.match(itemMeta, reference, check)) return false;
+        if (!MetaEnchantmentStorage.match(itemMeta, reference, check))
+            return false;
 
         ConfigGCore.logspamItemNbt(null, () -> "Item match ; firework effect meta");
-        if (!MetaFireworkEffect.match(itemMeta, reference, check)) return false;
+        if (!MetaFireworkEffect.match(itemMeta, reference, check))
+            return false;
 
         ConfigGCore.logspamItemNbt(null, () -> "Item match ; firework meta");
-        if (!MetaFirework.match(itemMeta, reference, check)) return false;
+        if (!MetaFirework.match(itemMeta, reference, check))
+            return false;
 
         ConfigGCore.logspamItemNbt(null, () -> "Item match ; leather armor meta");
-        if (!MetaLeatherArmor.match(itemMeta, reference, check)) return false;
+        if (!MetaLeatherArmor.match(itemMeta, reference, check))
+            return false;
 
         ConfigGCore.logspamItemNbt(null, () -> "Item match ; potion meta");
-        if (!MetaPotion.match(itemMeta, reference, check)) return false;
+        if (!MetaPotion.match(itemMeta, reference, check))
+            return false;
 
         ConfigGCore.logspamItemNbt(null, () -> "Item match ; skull meta");
-        if (!MetaSkull.match(itemMeta, reference, check)) return false;
+        if (!MetaSkull.match(itemMeta, reference, check))
+            return false;
 
         ConfigGCore.logspamItemNbt(null, () -> "Item match ; banner meta");
-        if (Version.ATLEAST_1_8 && !com.guillaumevdn.gcore.lib.item.meta.MetaBanner.match(itemMeta, reference, check)) return false;
+        if (Version.ATLEAST_1_8 && !com.guillaumevdn.gcore.lib.item.meta.MetaBanner.match(itemMeta, reference, check))
+            return false;
 
         ConfigGCore.logspamItemNbt(null, () -> "Item match ; spawn egg meta");
-        if (Version.ATLEAST_1_11 && !Version.ATLEAST_1_13 && !com.guillaumevdn.gcore.lib.item.meta.MetaSpawnEgg.match(itemMeta, reference, check)) return false;
+        if (Version.ATLEAST_1_11 && !Version.ATLEAST_1_13 && !com.guillaumevdn.gcore.lib.item.meta.MetaSpawnEgg.match(itemMeta, reference, check))
+            return false;
 
         ConfigGCore.logspamItemNbt(null, () -> "Item match ; knowledge book meta");
-        if (Version.ATLEAST_1_12 && !com.guillaumevdn.gcore.lib.item.meta.MetaKnowledgeBook.match(itemMeta, reference, check)) return false;
+        if (Version.ATLEAST_1_12 && !com.guillaumevdn.gcore.lib.item.meta.MetaKnowledgeBook.match(itemMeta, reference, check))
+            return false;
 
         ConfigGCore.logspamItemNbt(null, () -> "Item match ; tropical fish bucket meta");
-        if (Version.ATLEAST_1_13 && !com.guillaumevdn.gcore.lib.item.meta.MetaTropicalFishBucket.match(itemMeta, reference, check)) return false;
+        if (Version.ATLEAST_1_13 && !com.guillaumevdn.gcore.lib.item.meta.MetaTropicalFishBucket.match(itemMeta, reference, check))
+            return false;
 
         ConfigGCore.logspamItemNbt(null, () -> "Item match ; crossbow meta");
-        if (Version.ATLEAST_1_14 && !com.guillaumevdn.gcore.lib.item.meta.MetaCrossbow.match(itemMeta, reference, check)) return false;
+        if (Version.ATLEAST_1_14 && !com.guillaumevdn.gcore.lib.item.meta.MetaCrossbow.match(itemMeta, reference, check))
+            return false;
 
         ConfigGCore.logspamItemNbt(null, () -> "Item match ; suspicious stew meta");
-        if (Version.ATLEAST_1_15 && !com.guillaumevdn.gcore.lib.item.meta.MetaSuspiciousStew.match(itemMeta, reference, check)) return false;
+        if (Version.ATLEAST_1_15 && !com.guillaumevdn.gcore.lib.item.meta.MetaSuspiciousStew.match(itemMeta, reference, check))
+            return false;
 
         // nbt
         try {
             ConfigGCore.logspamItemNbt(null, () -> "Item match ; nbt");
             NBTItem nbt = new NBTItem(item);
             NBTItem nbtRef = reference.getNBTItem();
-            if (!nbt.match(nbtRef, check.isExact())) return false;
+            if (!nbt.match(nbtRef, check.isExact()))
+                return false;
         } catch (Throwable exception) {
             exception.printStackTrace();
             return false;
@@ -512,8 +557,10 @@ public final class ItemUtils
         item.setAmount(amount);
         if (name != null || lore != null) {
             ItemMeta meta = item.getItemMeta();
-            if (name != null) meta.setDisplayName(StringUtils.format(name));
-            if (lore != null) meta.setLore(StringUtils.formatCopy(lore));
+            if (name != null)
+                meta.setDisplayName(StringUtils.format(name));
+            if (lore != null)
+                meta.setLore(StringUtils.formatCopy(lore));
             item.setItemMeta(meta);
         }
         return item;
@@ -552,7 +599,7 @@ public final class ItemUtils
             item = item.clone();
         }
         final ItemMeta meta = item.getItemMeta();
-        if (meta != null) {  // has happened
+        if (meta != null) { // has happened
             final List<String> lore = meta.getLore() != null ? meta.getLore() : new ArrayList<>();
             lore.addAll(toAdd);
             meta.setLore(lore);

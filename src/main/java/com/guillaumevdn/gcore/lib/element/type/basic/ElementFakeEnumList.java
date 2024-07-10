@@ -20,7 +20,9 @@ public abstract class ElementFakeEnumList<E> extends ElementAbstractEnumList<E> 
 		super(typeClass, true, parent, id, need, editorDescription);
 	}
 
-	protected abstract List<E> cacheOrBuild();  // there will be multiple elements of this type ; to avoid having 783478384 lists that contain the exact same list, this returns a static valuesCache (weak reference to the plugin lifecycle reference)
+	protected abstract List<E> cacheOrBuild(); // there will be multiple elements of this type ; to avoid having 783478384 lists that contain the exact same
+												// list, this returns a static valuesCache (weak reference to the plugin lifecycle reference)
+
 	protected final List<E> cachedOrBuild(WeakHashMap<Object, List<E>> cache, Supplier<Stream<E>> buildSorted) {
 		List<E> values = cache.get(getSuperElement().getPlugin().getLifecycleReference());
 		if (values == null) {

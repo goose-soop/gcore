@@ -110,7 +110,8 @@ public class ReaderContext {
 		return null;
 	}
 
-	public ReaderLine peekComplexLineThatStartsWith(String startsWith) {  // a complex line is something that can be interpreted as something more than a scalar value (see cases below)
+	public ReaderLine peekComplexLineThatStartsWith(String startsWith) { // a complex line is something that can be interpreted as something more than a scalar
+																			// value (see cases below)
 		for (int i = 0; i < lines.size(); ++i) {
 			ReaderLine line = lines.get(i);
 			String l = line.getLine();
@@ -119,13 +120,14 @@ public class ReaderContext {
 				l = l.substring(0, c);
 			}
 			if (l.trim().isEmpty()) {
-				continue;  // skip comments
+				continue; // skip comments
 			}
 			if (!l.startsWith(startsWith)) {
 				return null;
 			}
 			l = l.substring(startsWith.length()).trim();
-			if (YMLReader.indexOfColonSeparator(l) != -1 || l.startsWith("[") || l.startsWith("- ") || l.equals("{}") || l.equals(">") || l.equals("|") || l.equals("%")) {
+			if (YMLReader.indexOfColonSeparator(l) != -1 || l.startsWith("[") || l.startsWith("- ") || l.equals("{}") || l.equals(">") || l.equals("|")
+					|| l.equals("%")) {
 				return line;
 			}
 		}
@@ -194,7 +196,11 @@ public class ReaderContext {
 	}
 
 	public void throwIndentError(SectionNode section, ReaderLine line, Integer expectedSpaces, boolean atLeast) {
-		throwError(parent, "unexpected indent at line " + line.getNumber() + (expectedSpaces == null ? "" : ", expected " + (atLeast ? "at least " : "") + StringUtils.pluralizeAmountDesc("space", expectedSpaces) + " but found " + StringUtils.countLeadingChar(line.getLine(), ' ')));
+		throwError(parent,
+				"unexpected indent at line " + line.getNumber()
+						+ (expectedSpaces == null ? ""
+								: ", expected " + (atLeast ? "at least " : "") + StringUtils.pluralizeAmountDesc("space", expectedSpaces) + " but found "
+										+ StringUtils.countLeadingChar(line.getLine(), ' ')));
 	}
 
 	public void throwError(SectionNode section, String error) {
@@ -202,7 +208,8 @@ public class ReaderContext {
 	}
 
 	private String buildLogHeader(SectionNode section) {
-		return getFile().getConfiguration().buildFormatErrorHeader() + "in " + (section instanceof SuperNode ? "root section" : "section " + section.getPath()) + ", ";
+		return getFile().getConfiguration().buildFormatErrorHeader() + "in " + (section instanceof SuperNode ? "root section" : "section " + section.getPath())
+				+ ", ";
 	}
 
 }

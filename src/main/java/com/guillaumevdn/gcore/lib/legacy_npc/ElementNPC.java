@@ -31,7 +31,8 @@ public final class ElementNPC extends ContainerElement implements SuperElement {
 	private ElementString skinSignature = addString("skin_signature", Need.optional(), Text.of("§7The skin signature for this NPC"));
 	private ElementLocation location = addLocation("location", Need.required(), Text.of("§7The default location of this NPC"));
 	private ElementDouble targetDistance = addDouble("target_distance", Need.optional(5d), Text.of("§7In what range should the NPC look at players"));
-	private ElementEnumList<NPCStatus> status = add(new ElementDirectEnumList<>(NPCStatus.class, this, "status", Need.optional(), Text.of("§7A bunch of status for this NPC")));
+	private ElementEnumList<NPCStatus> status = add(
+			new ElementDirectEnumList<>(NPCStatus.class, this, "status", Need.optional(), Text.of("§7A bunch of status for this NPC")));
 	private ElementItem heldItem = addItem("held_item", Need.optional(), ElementItemMode.BUILDABLE, Text.of("§7An item held in the hand"));
 	private ElementItem heldItemOff = addItem("held_item_off", Need.optional(), ElementItemMode.BUILDABLE, Text.of("§7An item held in the off-hand"));
 	private ElementItem boots = addItem("boots", Need.optional(), ElementItemMode.BUILDABLE, Text.of("§7A boots item"));
@@ -47,13 +48,43 @@ public final class ElementNPC extends ContainerElement implements SuperElement {
 	private List<String> loadErrors = new ArrayList<>();
 	private YMLConfiguration config = null;
 
-	@Override public GPlugin getPlugin() { return GCore.inst(); }
-	@Override public List<String> getLoadErrors() { return Collections.unmodifiableList(loadErrors); }
-	@Override public File getOwnFile() { return null; }
-	@Override public YMLConfiguration getConfiguration() { if (config == null) { reloadConfiguration(); } return config; }
-	@Override public String getConfigurationPath() { return "npcs." + getId(); }
-	@Override public void addLoadError(String error) { loadErrors.add(error); }
-	@Override public void reloadConfiguration() { this.config = GCore.inst().loadConfigurationFile("npcs.yml"); }
+	@Override
+	public GPlugin getPlugin() {
+		return GCore.inst();
+	}
+
+	@Override
+	public List<String> getLoadErrors() {
+		return Collections.unmodifiableList(loadErrors);
+	}
+
+	@Override
+	public File getOwnFile() {
+		return null;
+	}
+
+	@Override
+	public YMLConfiguration getConfiguration() {
+		if (config == null) {
+			reloadConfiguration();
+		}
+		return config;
+	}
+
+	@Override
+	public String getConfigurationPath() {
+		return "npcs." + getId();
+	}
+
+	@Override
+	public void addLoadError(String error) {
+		loadErrors.add(error);
+	}
+
+	@Override
+	public void reloadConfiguration() {
+		this.config = GCore.inst().loadConfigurationFile("npcs.yml");
+	}
 
 	// ----- get
 	public ElementBoolean getShown() {

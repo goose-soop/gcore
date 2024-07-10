@@ -1,5 +1,27 @@
 package com.guillaumevdn.gcore.lib;
 
+import java.io.File;
+import java.lang.reflect.Constructor;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Consumer;
+
+import org.bukkit.Bukkit;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.plugin.java.JavaPlugin;
+
 import com.guillaumevdn.gcore.ConfigGCore;
 import com.guillaumevdn.gcore.GCore;
 import com.guillaumevdn.gcore.TextGCore;
@@ -35,33 +57,11 @@ import com.guillaumevdn.gcore.lib.string.TextFile;
 import com.guillaumevdn.gcore.libs.com.google.gson.Gson;
 import com.guillaumevdn.gcore.libs.com.google.gson.GsonBuilder;
 import com.guillaumevdn.gcore.libs.org.bstats.Metrics;
-import org.bukkit.Bukkit;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.HandlerList;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
-import org.bukkit.plugin.java.JavaPlugin;
-
-import java.io.File;
-import java.lang.reflect.Constructor;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.function.Consumer;
 
 /**
  * @author GuillaumeVDN
  */
-public abstract class GPlugin<C extends GPluginConfig, P extends PermissionContainer> extends JavaPlugin
-{
+public abstract class GPlugin<C extends GPluginConfig, P extends PermissionContainer> extends JavaPlugin {
 
     private final int spigotResourceId;
     private final String mainCommandName;
@@ -87,9 +87,11 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
     private final RWLowerCaseHashMap<Integration> integrations = new RWLowerCaseHashMap<>(5, 1f);
     private Metrics metrics = null;
 
-    private Logger mainLogger = new Logger(this, getName() + "-" + getDescription().getVersion(), true, false);  // define it temporarily for start ; don't log in file at first, it can break migrations on windows
+    private Logger mainLogger = new Logger(this, getName() + "-" + getDescription().getVersion(), true, false); // define it temporarily for start ; don't log
+                                                                                                                // in file at first, it can break migrations on
+                                                                                                                // windows
     private boolean activated = false;
-    private Object lifecycleReference = new Object();  // changed on every reload ; allows to create WeakHashMap caches that reset on reload
+    private Object lifecycleReference = new Object(); // changed on every reload ; allows to create WeakHashMap caches that reset on reload
     private Gson gson = createGsonBuilder().create();
     private Gson prettyGson = createGsonBuilder().setPrettyPrinting().create();
 
@@ -97,7 +99,8 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
         return FileUtils.createGsonBuilder();
     }
 
-    public GPlugin(int spigotResourceId, String mainCommandName, String mainCommandHelpAlias, Class<C> configurationClass, Class<P> permissionContainerClass, String dataContainerFolderName, Class<? extends Migration>... migrations) {
+    public GPlugin(int spigotResourceId, String mainCommandName, String mainCommandHelpAlias, Class<C> configurationClass, Class<P> permissionContainerClass,
+            String dataContainerFolderName, Class<? extends Migration>... migrations) {
         this.spigotResourceId = spigotResourceId;
         this.mainCommandName = mainCommandName;
         this.mainCommandHelpAlias = mainCommandHelpAlias;
@@ -303,7 +306,8 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
             if (GCore.inst().equals(this)) {
                 // log version
                 if (Version.CURRENT.equals(Version.UNSUPPORTED)) {
-                    getMainLogger().warning("Couldn't find registered server version ; using UNSUPPORTED with found package " + Version.CURRENT.getNMSPackage());
+                    getMainLogger()
+                            .warning("Couldn't find registered server version ; using UNSUPPORTED with found package " + Version.CURRENT.getNMSPackage());
                 } else if (Version.CURRENT.equals(Version.UNKNOWN)) {
                     getMainLogger().error("Couldn't find server version");
                 } else {
@@ -315,7 +319,8 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
             registerTypes();
 
             // trigger other plugins
-            // do this before config load, so that integrations from other plugins are registered (integrations are usually type registration and such, so it must be done here, so it loads before)
+            // do this before config load, so that integrations from other plugins are registered (integrations are usually type
+            // registration and such, so it must be done here, so it loads before)
             // integrations from THIS plugin though might still need a loading delay if said plugins are enabled after config load
             triggerEnableInOtherPlugins();
 
@@ -329,8 +334,10 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 
             // save default configs
             try {
-                int savedConfig = new ResourceExtractor(this, new File(getDataFolder() + "/"), "resources/", extractDefaultConfigIgnoreStartingPaths()).extract(false, true);
-                if (savedConfig > 0) mainLogger.info("Saved " + StringUtils.pluralize(savedConfig + " default configuration file", savedConfig));
+                int savedConfig = new ResourceExtractor(this, new File(getDataFolder() + "/"), "resources/", extractDefaultConfigIgnoreStartingPaths())
+                        .extract(false, true);
+                if (savedConfig > 0)
+                    mainLogger.info("Saved " + StringUtils.pluralize(savedConfig + " default configuration file", savedConfig));
             } catch (Throwable exception) {
                 failEnable("Couldn't extract default config file ", exception);
                 return;
@@ -424,7 +431,8 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
             }
 
             // register main logger
-            registerLogger(mainLogger = new Logger(this, getName() + "-" + getDescription().getVersion(), getConfiguration().logMainConsole(), getConfiguration().logMainFile(), getConfiguration().logMainSQL()));
+            registerLogger(mainLogger = new Logger(this, getName() + "-" + getDescription().getVersion(), getConfiguration().logMainConsole(),
+                    getConfiguration().logMainFile(), getConfiguration().logMainSQL()));
 
             // register data
             try {
@@ -446,19 +454,22 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 
             // notify update and notify update listeners
             notifyUpdate(Bukkit.getConsoleSender());
-            registerListener("join_update", new Listener()
-            {
+            registerListener("join_update", new Listener() {
+
                 @EventHandler(priority = EventPriority.LOWEST)
                 public void event(PlayerJoinEvent event) {
                     if (permissionContainer.getAdminPermission().has(event.getPlayer())) {
                         notifyUpdate(event.getPlayer());
                     }
                 }
+
             });
 
-            // bossbar listeners ; centralize them all here because when bossbars are started/stopped, the registration + HandlerList.unregisterAll(listener) things take an unholy amount of time to execute (about half of the time of the whole bossbar sending process) #1734
-            registerListener("bossbar", new Listener()
-            {
+            // bossbar listeners ; centralize them all here because when bossbars are started/stopped, the registration +
+            // HandlerList.unregisterAll(listener) things take an unholy amount of time to execute (about half of the time of the
+            // whole bossbar sending process) #1734
+            registerListener("bossbar", new Listener() {
+
                 @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
                 public void event(PlayerQuitEvent event) {
                     bossbars.iterateAndModify((id, bossbar, iter) -> {
@@ -478,13 +489,18 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
                 public void event(PlayerRespawnEvent event) {
                     bossbars.iterateAndModify((id, bossbar, iter) -> bossbar.handleTeleport(event.getPlayer()));
                 }
+
             });
 
             // start logger tasks
             loggers.forEach((__, logger) -> logger.startSaving());
 
             // initialize data boards
-            data.forEach((__, board) -> board.initializeConnector(board.getBackEnd()));  // initialize connectors for each board now, otherwise if boards are inter-dependant it might cause data deletion (ex. qc users will load from qc quests instantly even though connector is not yet loaded, causing quests references to be removed from qc user because board "can't find them")
+            data.forEach((__, board) -> board.initializeConnector(board.getBackEnd())); // initialize connectors for each board now, otherwise if boards are
+                                                                                        // inter-dependant it might cause data deletion (ex. qc users will load
+                                                                                        // from qc quests instantly even though connector is not yet loaded,
+                                                                                        // causing quests references to be removed from qc user because board
+                                                                                        // "can't find them")
             data.forEach((__, board) -> board.initialize(BukkitThread.ASYNC, () -> board.startSaving()));
 
             // register commands
@@ -531,7 +547,7 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
         for (GPlugin plugin : PluginUtils.getGPlugins()) {
             if (plugin.isActivated() && !plugin.equals(this)) {
                 try {
-                    plugin.onGPluginEnable(this);  // ez, to avoid having to register an integration just for this
+                    plugin.onGPluginEnable(this); // ez, to avoid having to register an integration just for this
                     Integration integ = plugin.getIntegration(getName());
                     if (integ != null) {
                         if (integ.isActivated()) {
@@ -556,8 +572,8 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
             try {
                 mainLogger.error(log, exception);
                 mainLogger.error("Disabling plugin - you can re-try with /" + mainCommandName);
-                getCommand(mainCommandName).setExecutor(new CommandExecutor()
-                {
+                getCommand(mainCommandName).setExecutor(new CommandExecutor() {
+
                     @Override
                     public boolean onCommand(CommandSender sender, org.bukkit.command.Command command, String label, String[] args) {
                         if (retry()) {
@@ -567,14 +583,15 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
                         }
                         return true;
                     }
+
                 });
-                //mainLogger.saveFileIfPersistent();
+                // mainLogger.saveFileIfPersistent();
                 onDisable();
             } catch (Throwable ignored) {
                 ignored.printStackTrace();
             }
         }
-        //setEnabled(false);
+        // setEnabled(false);
     }
 
     public final boolean retry() {
@@ -615,7 +632,7 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
             // cancel tasks
             tasks.forEach((__, task) -> task.stop());
             tasks.clear();
-            Bukkit.getScheduler().cancelTasks(this);  // make sure to cancel all tasks, future as well
+            Bukkit.getScheduler().cancelTasks(this); // make sure to cancel all tasks, future as well
 
             // close and unregister GUIs
             guis.copyValues().forEach(gui -> gui.deactivate(true));
@@ -629,7 +646,7 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
 
             // save and cancel loggers
             loggers.forEachThrowable((__, logger) -> {
-                //logger.saveFileIfPersistent();
+                // logger.saveFileIfPersistent();
                 logger.stopSaving();
             });
             loggers.clear();
@@ -724,7 +741,7 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
         else if (getConfiguration().updateNotification() && spigotResourceId > 0 && !equals(GCore.inst())) {
             operateAsync(() -> {
                 if (Bukkit.isPrimaryThread()) {
-                    return;  // apparently can't be async, maybe the plugin is stopping or something
+                    return; // apparently can't be async, maybe the plugin is stopping or something
                 }
 
                 String response = PluginUtils.getOfficialVersion(this);
@@ -740,11 +757,9 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
                         // spigot is latest
                         if (spigot > local) {
                             if (sender instanceof Player) {
-                                new JsonMessage()
-                                    .append("§dPlease make sure to ").build()
-                                    .append("§l§5update").setURL("https://www.spigotmc.org/resources/" + getSpigotResourceId() + "/updates/").build()
-                                    .append("§d to " + getName() + " v" + response + " :)").build()
-                                    .send((Player) sender);
+                                new JsonMessage().append("§dPlease make sure to ").build().append("§l§5update")
+                                        .setURL("https://www.spigotmc.org/resources/" + getSpigotResourceId() + "/updates/").build()
+                                        .append("§d to " + getName() + " v" + response + " :)").build().send((Player) sender);
                             } else {
                                 sender.sendMessage("§dPlease make sure to §l§5update §dto " + getName() + " v" + response + " :)");
                                 sender.sendMessage("§dhttps://www.spigotmc.org/resources/" + getSpigotResourceId() + "/updates/");
@@ -812,7 +827,9 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
                     });
 
                     // log
-                    mainLogger.warning("Loaded " + StringUtils.pluralizeAmountDesc("missing text", missing.size()) + " from default lang for " + textFile.getFilePath() + (textFile.getFilePath().contains("editor") && ConfigGCore.dontLogMissingEditorTexts ? "" : " : " + StringUtils.toTextString(", ", missingDisplay)));
+                    mainLogger.warning("Loaded " + StringUtils.pluralizeAmountDesc("missing text", missing.size()) + " from default lang for "
+                            + textFile.getFilePath() + (textFile.getFilePath().contains("editor") && ConfigGCore.dontLogMissingEditorTexts ? ""
+                                    : " : " + StringUtils.toTextString(", ", missingDisplay)));
                 }
             });
 
@@ -820,7 +837,10 @@ public abstract class GPlugin<C extends GPluginConfig, P extends PermissionConta
         } catch (Throwable exception) {
             YMLError causeYML = ObjectUtils.findCauseOrNull(exception, YMLError.class);
             ConfigError causeConfig = ObjectUtils.findCauseOrNull(exception, ConfigError.class);
-            failEnable(causeYML != null ? "Couldn't load texts from " + langFolder.getPath() + " : " + causeYML.getMessage() : (causeConfig != null ? causeConfig.getMessage() : "Couldn't load texts from " + langFolder.getPath()), causeYML != null || causeConfig != null ? null : exception);
+            failEnable(
+                    causeYML != null ? "Couldn't load texts from " + langFolder.getPath() + " : " + causeYML.getMessage()
+                            : (causeConfig != null ? causeConfig.getMessage() : "Couldn't load texts from " + langFolder.getPath()),
+                    causeYML != null || causeConfig != null ? null : exception);
             return false;
         }
     }

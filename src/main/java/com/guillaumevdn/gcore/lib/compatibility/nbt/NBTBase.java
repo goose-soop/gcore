@@ -48,5 +48,5 @@ public abstract class NBTBase {
 	public final void setTag(ReflectionObject tag) {
 		this.tag = tag;
 	}
-	
+
 }

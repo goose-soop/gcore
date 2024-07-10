@@ -7,10 +7,7 @@ import org.bukkit.Location;
  */
 public enum PointTolerance {
 
-	COORDS(null),
-	STRICT(0.75d),
-	REGULAR(1.5d),
-	LENIENT(2.25d);
+	COORDS(null), STRICT(0.75d), REGULAR(1.5d), LENIENT(2.25d);
 
 	private Double distance;
 

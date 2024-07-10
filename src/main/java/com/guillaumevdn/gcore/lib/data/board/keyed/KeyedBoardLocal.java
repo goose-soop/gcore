@@ -17,7 +17,7 @@ public abstract class KeyedBoardLocal<K, V> extends KeyedBoard<K, V> {
 	}
 
 	// ----------------------------------------------------------------------------------------------------
-	// 		 get
+	// get
 	// ----------------------------------------------------------------------------------------------------
 
 	public final void forPresentValue(K key, Consumer<V> ifValue) {
@@ -31,14 +31,16 @@ public abstract class KeyedBoardLocal<K, V> extends KeyedBoard<K, V> {
 	public final void forValue(K key, Consumer<V> ifValue, Runnable ifAbsent) {
 		V value = getCachedValue(key);
 		if (value == null) {
-			if (ifAbsent != null) ifAbsent.run();
+			if (ifAbsent != null)
+				ifAbsent.run();
 		} else {
-			if (ifValue != null) ifValue.accept(value);
+			if (ifValue != null)
+				ifValue.accept(value);
 		}
 	}
 
 	// ----------------------------------------------------------------------------------------------------
-	// 		 set
+	// set
 	// ----------------------------------------------------------------------------------------------------
 
 	public final V putValue(K key, V value) {

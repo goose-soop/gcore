@@ -20,12 +20,13 @@ public class ParticleScriptExecution {
 	private final boolean autoLoop;
 	private int operationIndex;
 	private int ticksToWait;
-	private ConcurrentHashMap<String, Double> variables = new ConcurrentHashMap<>(5);  // lowercase keys
+	private ConcurrentHashMap<String, Double> variables = new ConcurrentHashMap<>(5); // lowercase keys
 	private final Location fixedBaseLocation;
 
 	/**
-	 * Initializes a new particle script execution
-	 * Same as calling {@link #ParticleScriptExecution(ParticleScript, Location)} with a null fixedBaseLocation argument
+	 * Initializes a new particle script execution Same as calling
+	 * {@link #ParticleScriptExecution(ParticleScript, Location)} with a null fixedBaseLocation argument
+	 * 
 	 * @param script the particle script
 	 */
 	public ParticleScriptExecution(GPlugin plugin, ParticleScript script, boolean autoLoop) {
@@ -34,8 +35,10 @@ public class ParticleScriptExecution {
 
 	/**
 	 * Initializes a new particle script execution
-	 * @param script the particle script
-	 * @param fixedBaseLocation the fixed base location ; if this is null (because the location is volatile), you'll have to override method {@link #getBaseLocation()}
+	 * 
+	 * @param script            the particle script
+	 * @param fixedBaseLocation the fixed base location ; if this is null (because the location is volatile), you'll have to
+	 *                          override method {@link #getBaseLocation()}
 	 */
 	public ParticleScriptExecution(GPlugin plugin, ParticleScript script, Location fixedBaseLocation, boolean autoLoop) {
 		this.plugin = plugin;
@@ -97,7 +100,8 @@ public class ParticleScriptExecution {
 	}
 
 	/**
-	 * @param players the players to perform the action to, or null if none (all actions might not be affected by this parameter)
+	 * @param players the players to perform the action to, or null if none (all actions might not be affected by this
+	 *                parameter)
 	 * @param isAsync true if the execution of actions should be async
 	 * @return true if this execution is over
 	 */
@@ -127,11 +131,11 @@ public class ParticleScriptExecution {
 				}
 				// perform next operation
 				if ((ticksToWait = script.getOperations().get(operationIndex).perform(this, players, isAsync)) > 0) {
-					return false;  // must wait
+					return false; // must wait
 				}
 			}
 		} catch (Throwable ignored) {
-			return false;  // sometimes an error appears, on startup and such, but it apparently has no impact on players
+			return false; // sometimes an error appears, on startup and such, but it apparently has no impact on players
 		}
 	}
 
@@ -146,7 +150,8 @@ public class ParticleScriptExecution {
 		try {
 			return NumberUtils.calculateExpression(parsed);
 		} catch (Throwable exception) {
-			//script.getPlugin().getMainLogger().error("Couldn't parse mathematical expression '" + parsed + "' (raw '" + raw + "') (" + exception.getMessage() + ")");
+			// script.getPlugin().getMainLogger().error("Couldn't parse mathematical expression '" + parsed + "' (raw '" + raw + "')
+			// (" + exception.getMessage() + ")");
 			// - just don't print this anymore, it shows for invalid stuff
 			return null;
 		}

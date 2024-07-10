@@ -74,7 +74,8 @@ public class ElementFireworkEffect extends ParseableContainerElement<FireworkEff
 		List<Color> fadeColors = this.fadeColors.parseNoCatch(replacer).orEmptyList();
 		Boolean flicker = this.flicker.parseNoCatch(replacer).orElse(false);
 		Boolean trail = this.trail.parseNoCatch(replacer).orElse(false);
-		return FireworkEffect.builder().with(type).withColor(colors).withFade(fadeColors).flicker(flicker != null && flicker).trail(trail != null && trail).build();
+		return FireworkEffect.builder().with(type).withColor(colors).withFade(fadeColors).flicker(flicker != null && flicker).trail(trail != null && trail)
+				.build();
 	}
 
 	// ----- editor

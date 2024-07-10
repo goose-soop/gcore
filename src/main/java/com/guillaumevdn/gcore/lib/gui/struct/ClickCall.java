@@ -57,8 +57,8 @@ public class ClickCall {
 	}
 
 	/**
-	 * Get the click call for the ancestor in this "call stack"
-	 * This avoids infinite loops in GUIs (for types <PLUGIN>_GUI) and finds the actual previous path
+	 * Get the click call for the ancestor in this "call stack" This avoids infinite loops in GUIs (for types <PLUGIN>_GUI)
+	 * and finds the actual previous path
 	 */
 	public ClickCall getAncestorFor(ElementGUI targetGUI) {
 		ClickCall c = this;
@@ -82,33 +82,29 @@ public class ClickCall {
 
 	public static enum ClickType {
 
-		LEFT,
-		SHIFT_LEFT,
-		RIGHT,
-		SHIFT_RIGHT,
-		MIDDLE,
-		NUMBER_KEY,
-		DOUBLE_CLICK,
-		DROP,
-		CONTROL_DROP,
-		SWAP_OFFHAND,
-		UNKNOWN,  // exists in spigot, and has happened before, but I'm not sure what it means ; maybe a custom client or something
+		LEFT, SHIFT_LEFT, RIGHT, SHIFT_RIGHT, MIDDLE, NUMBER_KEY, DOUBLE_CLICK, DROP, CONTROL_DROP, SWAP_OFFHAND, UNKNOWN, // exists in spigot, and has happened
+																															// before, but I'm not sure what it
+																															// means ; maybe a custom client or
+																															// something
 
 		// doesn't work for vanilla handling
-		NUMBER_KEY_1,
-		NUMBER_KEY_2,
-		NUMBER_KEY_3,
-		NUMBER_KEY_4,
-		NUMBER_KEY_5,
-		NUMBER_KEY_6,
-		NUMBER_KEY_7,
-		NUMBER_KEY_8,
-		NUMBER_KEY_9,
-		KEY_OFFHAND,
-		CREATIVE,  // not really used but avoids errors in creative inventory when clicking stuff in bottom inv
+		NUMBER_KEY_1, NUMBER_KEY_2, NUMBER_KEY_3, NUMBER_KEY_4, NUMBER_KEY_5, NUMBER_KEY_6, NUMBER_KEY_7, NUMBER_KEY_8, NUMBER_KEY_9, KEY_OFFHAND, CREATIVE, // not
+																																								// really
+																																								// used
+																																								// but
+																																								// avoids
+																																								// errors
+																																								// in
+																																								// creative
+																																								// inventory
+																																								// when
+																																								// clicking
+																																								// stuff
+																																								// in
+																																								// bottom
+																																								// inv
 
-		NONE,
-		;
+		NONE,;
 
 		public boolean isNumberKey() {
 			return name().contains("NUMBER");

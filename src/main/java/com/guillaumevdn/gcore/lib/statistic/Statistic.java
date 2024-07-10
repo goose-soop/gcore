@@ -16,7 +16,9 @@ import com.guillaumevdn.gcore.lib.object.ObjectUtils;
 public final class Statistic {
 
 	private String id;
-	private RWHashMap<UUID, Object> locks = new RWHashMap<>(1, 1f);  // this is to avoid fetching and manipulating statistics at the same time, in things such as logic objects in QC, causing for instance two formulas being applied at the same time on an original value (and thus overrides / points loss)
+	private RWHashMap<UUID, Object> locks = new RWHashMap<>(1, 1f); // this is to avoid fetching and manipulating statistics at the same time, in things such as
+																	// logic objects in QC, causing for instance two formulas being applied at the same time on
+																	// an original value (and thus overrides / points loss)
 
 	private Statistic(String id) {
 		this.id = id;
@@ -47,7 +49,8 @@ public final class Statistic {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) return true;
+		if (this == obj)
+			return true;
 		Statistic other = ObjectUtils.castOrNull(obj, Statistic.class);
 		return other != null && Objects.deepEquals(id, other.id);
 	}
@@ -65,7 +68,8 @@ public final class Statistic {
 
 	public static Statistic valueOf(String id) throws IllegalArgumentException {
 		Statistic stat = registered.get(id);
-		if (stat == null) throw new IllegalArgumentException("there's no statistic with id " + id);
+		if (stat == null)
+			throw new IllegalArgumentException("there's no statistic with id " + id);
 		return stat;
 	}
 

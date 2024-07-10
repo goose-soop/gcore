@@ -92,12 +92,18 @@ public final class AdapterItemStack extends DataAdapter<ItemStack> {
 			MetaLeatherArmor.write(meta, writer);
 			MetaPotion.write(meta, writer);
 			MetaSkull.write(meta, writer);
-			if (Version.ATLEAST_1_8) com.guillaumevdn.gcore.lib.item.meta.MetaBanner.write(meta, writer);
-			if (Version.ATLEAST_1_11 && !Version.ATLEAST_1_13) com.guillaumevdn.gcore.lib.item.meta.MetaSpawnEgg.write(meta, writer);
-			if (Version.ATLEAST_1_12) com.guillaumevdn.gcore.lib.item.meta.MetaKnowledgeBook.write(meta, writer);
-			if (Version.ATLEAST_1_13) com.guillaumevdn.gcore.lib.item.meta.MetaTropicalFishBucket.write(meta, writer);
-			if (Version.ATLEAST_1_14) com.guillaumevdn.gcore.lib.item.meta.MetaCrossbow.write(meta, writer);
-			if (Version.ATLEAST_1_15) com.guillaumevdn.gcore.lib.item.meta.MetaSuspiciousStew.write(meta, writer);
+			if (Version.ATLEAST_1_8)
+				com.guillaumevdn.gcore.lib.item.meta.MetaBanner.write(meta, writer);
+			if (Version.ATLEAST_1_11 && !Version.ATLEAST_1_13)
+				com.guillaumevdn.gcore.lib.item.meta.MetaSpawnEgg.write(meta, writer);
+			if (Version.ATLEAST_1_12)
+				com.guillaumevdn.gcore.lib.item.meta.MetaKnowledgeBook.write(meta, writer);
+			if (Version.ATLEAST_1_13)
+				com.guillaumevdn.gcore.lib.item.meta.MetaTropicalFishBucket.write(meta, writer);
+			if (Version.ATLEAST_1_14)
+				com.guillaumevdn.gcore.lib.item.meta.MetaCrossbow.write(meta, writer);
+			if (Version.ATLEAST_1_15)
+				com.guillaumevdn.gcore.lib.item.meta.MetaSuspiciousStew.write(meta, writer);
 		}
 		// nbt
 		writer.writeObjectOrThrow("nbt", d -> AdapterNBTCompound.INSTANCE.write(new NBTItem(item), d));
@@ -118,7 +124,8 @@ public final class AdapterItemStack extends DataAdapter<ItemStack> {
 				try {
 					Material material = Reflection.invokeMethod("org.bukkit.material.Material", "getMaterial", null, numericType).get();
 					type = Mat.firstFromIdOrDataName(material.name()).orElse(null);
-				} catch (Throwable ignored) {}
+				} catch (Throwable ignored) {
+				}
 				if (type == null) {
 					throw new IllegalStateException("no material found with numeric type " + numericType);
 				}
@@ -148,9 +155,11 @@ public final class AdapterItemStack extends DataAdapter<ItemStack> {
 			}
 			// durability
 			// only set that if it's not already specified in the type, and it's not an <1.13 item with legacy data
-			// because in legacy versions, data and durability must be the same for the variant to appear correctly, otherwise it displays the weird blank item
+			// because in legacy versions, data and durability must be the same for the variant to appear correctly, otherwise it
+			// displays the weird blank item
 			Integer durability = reader.readInteger("durability");
-			if (durability == null) durability = 0;
+			if (durability == null)
+				durability = 0;
 			if (durability != Compat.getDurability(item) && (Version.ATLEAST_1_13 || !type.getData().hasLegacyData())) {
 				item = Compat.setDurability(item, durability);
 			}
@@ -164,23 +173,27 @@ public final class AdapterItemStack extends DataAdapter<ItemStack> {
 			// unbreakable
 			Boolean unbreakable = reader.readBoolean("unbreakable");
 			if (unbreakable != null && unbreakable) {
-				if (meta == null) meta = item.getItemMeta();
+				if (meta == null)
+					meta = item.getItemMeta();
 				Compat.setUnbreakable(meta, true);
 			}
 			// custom model data
 			if (Version.ATLEAST_1_14) {
 				Integer customModelData = reader.readInteger("customModelData");
 				if (customModelData != null) {
-					if (meta == null) meta = item.getItemMeta();
+					if (meta == null)
+						meta = item.getItemMeta();
 					meta.setCustomModelData(customModelData);
 				}
 			}
 			// enchantments
-			Map<Enchantment, Integer> enchantments = reader.readNullableSimpleMap("enchantments", Enchantment.class, new HashMap<>(), (key, __, mapReader) -> mapReader.readInteger(key));
+			Map<Enchantment, Integer> enchantments = reader.readNullableSimpleMap("enchantments", Enchantment.class, new HashMap<>(),
+					(key, __, mapReader) -> mapReader.readInteger(key));
 			if (enchantments != null) {
-				if (meta == null) meta = item.getItemMeta();
+				if (meta == null)
+					meta = item.getItemMeta();
 				for (Entry<Enchantment, Integer> enchantment : enchantments.entrySet()) {
-					if (enchantment.getValue() != 0) {  // allow negative enchants if needed, but not zero
+					if (enchantment.getValue() != 0) { // allow negative enchants if needed, but not zero
 						meta.addEnchant(enchantment.getKey(), enchantment.getValue(), true);
 					}
 				}
@@ -188,23 +201,27 @@ public final class AdapterItemStack extends DataAdapter<ItemStack> {
 			// flags
 			List<ItemFlag> flags = reader.readSerializedList("flags", ItemFlag.class);
 			if (flags != null) {
-				if (meta == null) meta = item.getItemMeta();
+				if (meta == null)
+					meta = item.getItemMeta();
 				Compat.addItemFlags(meta, flags);
 			}
 			// name
 			String name = reader.readString("name");
 			if (name != null) {
-				if (meta == null) meta = item.getItemMeta();
+				if (meta == null)
+					meta = item.getItemMeta();
 				meta.setDisplayName(StringUtils.format(name));
 			}
 			// lore
 			List<String> lore = reader.readDirectList("lore");
 			if (lore != null) {
-				if (meta == null) meta = item.getItemMeta();
+				if (meta == null)
+					meta = item.getItemMeta();
 				meta.setLore(StringUtils.formatCopy(lore));
 			}
 			// specific meta
-			if (meta == null) meta = item.getItemMeta();
+			if (meta == null)
+				meta = item.getItemMeta();
 			MetaBook.read(meta, reader);
 			MetaEnchantmentStorage.read(meta, reader);
 			MetaFireworkEffect.read(meta, reader);
@@ -212,12 +229,18 @@ public final class AdapterItemStack extends DataAdapter<ItemStack> {
 			MetaLeatherArmor.read(meta, reader);
 			MetaPotion.read(meta, reader);
 			MetaSkull.read(meta, reader);
-			if (Version.ATLEAST_1_8) com.guillaumevdn.gcore.lib.item.meta.MetaBanner.read(meta, reader);
-			if (Version.ATLEAST_1_11 && !Version.ATLEAST_1_13) com.guillaumevdn.gcore.lib.item.meta.MetaSpawnEgg.read(meta, reader);
-			if (Version.ATLEAST_1_12) com.guillaumevdn.gcore.lib.item.meta.MetaKnowledgeBook.read(meta, reader);
-			if (Version.ATLEAST_1_13) com.guillaumevdn.gcore.lib.item.meta.MetaTropicalFishBucket.read(meta, reader);
-			if (Version.ATLEAST_1_14) com.guillaumevdn.gcore.lib.item.meta.MetaCrossbow.read(meta, reader);
-			if (Version.ATLEAST_1_15) com.guillaumevdn.gcore.lib.item.meta.MetaSuspiciousStew.read(meta, reader);
+			if (Version.ATLEAST_1_8)
+				com.guillaumevdn.gcore.lib.item.meta.MetaBanner.read(meta, reader);
+			if (Version.ATLEAST_1_11 && !Version.ATLEAST_1_13)
+				com.guillaumevdn.gcore.lib.item.meta.MetaSpawnEgg.read(meta, reader);
+			if (Version.ATLEAST_1_12)
+				com.guillaumevdn.gcore.lib.item.meta.MetaKnowledgeBook.read(meta, reader);
+			if (Version.ATLEAST_1_13)
+				com.guillaumevdn.gcore.lib.item.meta.MetaTropicalFishBucket.read(meta, reader);
+			if (Version.ATLEAST_1_14)
+				com.guillaumevdn.gcore.lib.item.meta.MetaCrossbow.read(meta, reader);
+			if (Version.ATLEAST_1_15)
+				com.guillaumevdn.gcore.lib.item.meta.MetaSuspiciousStew.read(meta, reader);
 			// apply meta to item
 			if (meta != null) {
 				item.setItemMeta(meta);

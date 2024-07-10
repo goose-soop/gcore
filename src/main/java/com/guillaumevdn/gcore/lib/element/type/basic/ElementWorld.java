@@ -42,20 +42,22 @@ public class ElementWorld extends ElementValue<World> {
 	public void onEditorClick(ClickCall call) {
 		// left-click : enter value
 		if (call.getType().equals(ClickType.LEFT)) {
-			WorkerGCore.inst().awaitChatWithSuggestedValue(call.getClicker(), TextEditorGeneric.messageElementBasicEditSuggestCurrent, getRawValueLineOrDefault(0), value -> {
-				if (StringUtils.hasPlaceholders(value)) {
-					setValue(CollectionUtils.asList(value));
-				} else {
-					World world = null;
-					try {
-						world = getSerializer().deserialize(value);
-					} catch (Throwable ignored) {}
-					setValue(world == null ? null : CollectionUtils.asList(value));
-				}
-				call.getGUI().setRegularItem(buildEditorItem(call.getPageIndex(), call.getSlot()));
-				call.reopenGUI();
-				getSuperElement().onEditorChange(this);
-			}, () -> call.reopenGUI());
+			WorkerGCore.inst().awaitChatWithSuggestedValue(call.getClicker(), TextEditorGeneric.messageElementBasicEditSuggestCurrent,
+					getRawValueLineOrDefault(0), value -> {
+						if (StringUtils.hasPlaceholders(value)) {
+							setValue(CollectionUtils.asList(value));
+						} else {
+							World world = null;
+							try {
+								world = getSerializer().deserialize(value);
+							} catch (Throwable ignored) {
+							}
+							setValue(world == null ? null : CollectionUtils.asList(value));
+						}
+						call.getGUI().setRegularItem(buildEditorItem(call.getPageIndex(), call.getSlot()));
+						call.reopenGUI();
+						getSuperElement().onEditorChange(this);
+					}, () -> call.reopenGUI());
 		}
 		// right-click : import
 		else if (call.getType().equals(ClickType.RIGHT)) {

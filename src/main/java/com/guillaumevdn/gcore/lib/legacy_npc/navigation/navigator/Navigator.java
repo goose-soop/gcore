@@ -85,8 +85,8 @@ public abstract class Navigator {
 			// reset data
 			this.path = null;
 			this.movements = null;
-			this.finder = new Pathfinding(world, new Point(getNpcs().get(0).getLocation().getBlock().getRelative(BlockFace.DOWN)), target, tolerance, 2, movementFinder,
-					(result, path) -> {
+			this.finder = new Pathfinding(world, new Point(getNpcs().get(0).getLocation().getBlock().getRelative(BlockFace.DOWN)), target, tolerance, 2,
+					movementFinder, (result, path) -> {
 						if (result.equals(PathfindingResult.SUCCESS)) {
 							this.path = path;
 							this.movements = AnimationUtils.animate(path, finder);
@@ -107,7 +107,7 @@ public abstract class Navigator {
 	public void end(NavigatorResult result) {
 		if (task != null) {
 			task.cancel();
-			task = null;  // so we won't be called again from pathfinding's onDone
+			task = null; // so we won't be called again from pathfinding's onDone
 			if (result.equals(NavigatorResult.CANCEL) || result.equals(NavigatorResult.FAILURE_TIMEOUT)) {
 				finder.end(PathfindingResult.CANCEL);
 			}

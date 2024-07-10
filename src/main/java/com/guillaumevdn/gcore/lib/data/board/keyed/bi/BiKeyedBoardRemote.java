@@ -30,10 +30,8 @@ public abstract class BiKeyedBoardRemote<K, K2, V> extends BiKeyedBoard<K, K2, V
 			});
 		} else {
 			if (ifFound != null) {
-				Map<K2, V> cachedValue = streamResult(str -> str
-						.filter(e -> e.getKey().getA().equals(key))
-						.collect(Collectors.toMap(e -> e.getKey().getB(), e -> e.getValue()))
-						);
+				Map<K2, V> cachedValue = streamResult(
+						str -> str.filter(e -> e.getKey().getA().equals(key)).collect(Collectors.toMap(e -> e.getKey().getB(), e -> e.getValue())));
 				if (!cachedValue.isEmpty()) {
 					ifFound.accept(cachedValue);
 					return;
@@ -53,20 +51,15 @@ public abstract class BiKeyedBoardRemote<K, K2, V> extends BiKeyedBoard<K, K2, V
 					throw exception;
 				} finally {
 					if (!mustCache) {
-						disposeCacheElements(
-								BukkitThread.ASYNC,
-								values.entrySet().stream().map(e -> Pair.of(key, e.getKey())).collect(Collectors.toSet()),
-								null
-								);  // will be saved if needed
+						disposeCacheElements(BukkitThread.ASYNC, values.entrySet().stream().map(e -> Pair.of(key, e.getKey())).collect(Collectors.toSet()),
+								null); // will be saved if needed
 					}
 				}
 			};
 
 			// absent
-			Map<K2, V> result = streamResult(str -> str
-					.filter(e -> e.getKey().getA().equals(key))
-					.collect(Collectors.toMap(e -> e.getKey().getB(), e -> e.getValue()))
-					);
+			Map<K2, V> result = streamResult(
+					str -> str.filter(e -> e.getKey().getA().equals(key)).collect(Collectors.toMap(e -> e.getKey().getB(), e -> e.getValue())));
 
 			// process
 			if (result != null) {
@@ -119,7 +112,7 @@ public abstract class BiKeyedBoardRemote<K, K2, V> extends BiKeyedBoard<K, K2, V
 	}
 
 	// ----------------------------------------------------------------------------------------------------
-	// 		set
+	// set
 	// ----------------------------------------------------------------------------------------------------
 
 	public final void putValue(K key, K2 key2, V value, Runnable onPush, boolean mustCache) {

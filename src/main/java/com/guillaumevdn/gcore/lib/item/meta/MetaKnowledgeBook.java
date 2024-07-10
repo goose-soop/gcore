@@ -24,12 +24,17 @@ import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
 public final class MetaKnowledgeBook {
 
 	public static boolean match(ItemMeta itemMeta, ItemReference reference, ItemCheck check) {
-		if (!reference.hasMeta(KnowledgeBookMeta.class)) return true;
+		if (!reference.hasMeta(KnowledgeBookMeta.class))
+			return true;
 		KnowledgeBookMeta meta = ObjectUtils.castOrNull(itemMeta, KnowledgeBookMeta.class); // might be null if exact match is false
 
 		// recipes
-		if (check.isExact() && (meta == null || meta.hasRecipes() != reference.hasRecipes() || !CollectionUtils.contentEquals(meta.getRecipes(), reference.getRecipes()))) return false;
-		else if (!check.isExact() && reference.hasRecipes() && (meta == null || !meta.hasRecipes() || !CollectionUtils.contentEquals(meta.getRecipes(), reference.getRecipes()))) return false;
+		if (check.isExact()
+				&& (meta == null || meta.hasRecipes() != reference.hasRecipes() || !CollectionUtils.contentEquals(meta.getRecipes(), reference.getRecipes())))
+			return false;
+		else if (!check.isExact() && reference.hasRecipes()
+				&& (meta == null || !meta.hasRecipes() || !CollectionUtils.contentEquals(meta.getRecipes(), reference.getRecipes())))
+			return false;
 
 		// seems good
 		return true;

@@ -131,7 +131,8 @@ public abstract class Variants<V extends Variant, DE extends Enum<DE>, D extends
 					data.add(loadData(line));
 				} catch (Throwable exception) {
 					ConfigError configError = ObjectUtils.findCauseOrNull(exception, ConfigError.class);
-					throw new ConfigError("for " + typeName + " " + id + ", invalid logic line '" + line + "'" + (configError != null ? " : " + configError.getMessage() : ""), configError != null ? null : exception);
+					throw new ConfigError("for " + typeName + " " + id + ", invalid logic line '" + line + "'"
+							+ (configError != null ? " : " + configError.getMessage() : ""), configError != null ? null : exception);
 				}
 			}
 			// register
@@ -139,7 +140,8 @@ public abstract class Variants<V extends Variant, DE extends Enum<DE>, D extends
 				registerIfHasCurrentVersion(id, data);
 			} catch (Throwable exception) {
 				ConfigError configError = ObjectUtils.findCauseOrNull(exception, ConfigError.class);
-				throw new ConfigError("Couldn't register " + typeName + " " + id + (configError != null ? " : " + configError.getMessage() : ""), configError != null ? null : exception);
+				throw new ConfigError("Couldn't register " + typeName + " " + id + (configError != null ? " : " + configError.getMessage() : ""),
+						configError != null ? null : exception);
 			}
 		}
 	}
@@ -147,7 +149,8 @@ public abstract class Variants<V extends Variant, DE extends Enum<DE>, D extends
 	public D loadData(String string) throws ConfigError {
 		// separate settings correctly
 		string = string.replace("\t", " ").trim().toUpperCase();
-		while (string.contains("  ")) string = string.replace("  ", " ");
+		while (string.contains("  "))
+			string = string.replace("  ", " ");
 		// get extras
 		List<DE> elementExtra = null;
 		if (extraClass != null) {
@@ -221,9 +224,10 @@ public abstract class Variants<V extends Variant, DE extends Enum<DE>, D extends
 				SimpleExistingVariantData existing = ObjectUtils.castOrNull(first, SimpleExistingVariantData.class);
 				if (existing != null && existing.getDataInstance() == null) {
 					if (existing.getDataName().equals("NONE")) {
-						return null;  // we do not want to register this material on this version, it's a choice here
+						return null; // we do not want to register this material on this version, it's a choice here
 					}
-					throw new ConfigError("variant " + typeName + " " + id + " has invalid " + first.getVersionComparison().getSymbol() + first.getVersion() + " data '" + first.getDataName() + "' (don't exist even though we're running this version)");
+					throw new ConfigError("variant " + typeName + " " + id + " has invalid " + first.getVersionComparison().getSymbol() + first.getVersion()
+							+ " data '" + first.getDataName() + "' (don't exist even though we're running this version)");
 				}
 				V value = createElement(id.toUpperCase(), first);
 				register(value);
@@ -240,7 +244,8 @@ public abstract class Variants<V extends Variant, DE extends Enum<DE>, D extends
 		try {
 			if (!string.isEmpty()) {
 				number = Integer.parseInt(string);
-				if (number < 0) throw new NumberFormatException();
+				if (number < 0)
+					throw new NumberFormatException();
 			}
 		} catch (NumberFormatException ignored) {
 			throw new ConfigError("'" + string + "' isn't a valid " + type);

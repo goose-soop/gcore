@@ -23,7 +23,8 @@ public final class NBTList extends NBTBase {
 	public final NBTType getValueType() throws Throwable {
 		for (int i = 0; i < size(); ++i) {
 			NBTType type = NBTType.getByWrappedClass(getTag().invokeMethod(getValueMethod, i).get());
-			//final int ii = i; ConfigGCore.logspamItemNbt(this, () -> "-- List type by value " + getTag().invokeMethod(getValueMethod, ii).get().getClass() + ", type " + type, false);
+			// final int ii = i; ConfigGCore.logspamItemNbt(this, () -> "-- List type by value " +
+			// getTag().invokeMethod(getValueMethod, ii).get().getClass() + ", type " + type, false);
 			if (!type.equals(NBTType.UNKNOWN)) {
 				return type;
 			}
@@ -31,7 +32,8 @@ public final class NBTList extends NBTBase {
 		return NBTType.UNKNOWN;
 	}
 
-	private static final String getValueMethod = Reflection.getForThisVersion(Version.MC_1_7_R4, "g", Version.MC_1_9_R2, "h", Version.MC_1_12_R1, "i", Version.MC_1_13_R2, "get");
+	private static final String getValueMethod = Reflection.getForThisVersion(Version.MC_1_7_R4, "g", Version.MC_1_9_R2, "h", Version.MC_1_12_R1, "i",
+			Version.MC_1_13_R2, "get");
 
 	private final Object doGetObject(int index) throws Throwable {
 		return getTag().invokeMethod(getValueMethod, index).getField(getValueType().getDataFieldName()).get();
@@ -107,9 +109,12 @@ public final class NBTList extends NBTBase {
 	private static final String setIndexMethod = Reflection.getForThisVersion(Version.MC_1_7_R4, "a", Version.MC_1_13_R2, "set");
 
 	private final void doSet(NBTType type, int index, Object value) throws Throwable {
-		if (setIndexMethod == null) throw new UnsupportedOperationException("can't add value in nbt list for version " + Version.CURRENT);
-		if (type.equals(NBTType.UNKNOWN)) throw new UnsupportedOperationException("can't add value in nbt list for type " + type);
-		if (size() != 0 && !type.equals(getValueType())) throw new UnsupportedOperationException("type " + type + " doesn't match list value type " + getValueType());
+		if (setIndexMethod == null)
+			throw new UnsupportedOperationException("can't add value in nbt list for version " + Version.CURRENT);
+		if (type.equals(NBTType.UNKNOWN))
+			throw new UnsupportedOperationException("can't add value in nbt list for type " + type);
+		if (size() != 0 && !type.equals(getValueType()))
+			throw new UnsupportedOperationException("type " + type + " doesn't match list value type " + getValueType());
 		getTag().invokeMethod(setIndexMethod, type.equals(NBTType.COMPOUND) || type.equals(NBTType.LIST) ? value : type.newNmsWrapper(value).get());
 	}
 
@@ -178,9 +183,12 @@ public final class NBTList extends NBTBase {
 	}
 
 	private final void doAdd(NBTType type, Object value) throws Throwable {
-		if (setIndexMethod == null) throw new UnsupportedOperationException("can't add value in nbt list for version " + Version.CURRENT);
-		if (type.equals(NBTType.UNKNOWN)) throw new UnsupportedOperationException("can't add value in nbt list for type " + type);
-		if (size() != 0 && !type.equals(getValueType())) throw new UnsupportedOperationException("type " + type + " doesn't match list value type " + getValueType());
+		if (setIndexMethod == null)
+			throw new UnsupportedOperationException("can't add value in nbt list for version " + Version.CURRENT);
+		if (type.equals(NBTType.UNKNOWN))
+			throw new UnsupportedOperationException("can't add value in nbt list for type " + type);
+		if (size() != 0 && !type.equals(getValueType()))
+			throw new UnsupportedOperationException("type " + type + " doesn't match list value type " + getValueType());
 		if (Version.ATLEAST_1_14) { // add method with no index was removed in 1.14
 			getTag().invokeMethod("b", size(), type.equals(NBTType.COMPOUND) || type.equals(NBTType.LIST) ? value : type.newNmsWrapper(value).get());
 		} else {
@@ -254,27 +262,33 @@ public final class NBTList extends NBTBase {
 
 	// ----- match
 	public boolean match(NBTList reference, boolean exactMatch) throws Throwable {
-		if (exactMatch && size() != reference.size()) return false;
-		else if (!exactMatch && size() < reference.size()) return false;
+		if (exactMatch && size() != reference.size())
+			return false;
+		else if (!exactMatch && size() < reference.size())
+			return false;
 		// invalid type
 		NBTType type = getValueType();
-		if (size() != 0 && !type.equals(reference.getValueType())) return false;
+		if (size() != 0 && !type.equals(reference.getValueType()))
+			return false;
 		// list of list
 		if (type.equals(NBTType.LIST)) {
 			for (int index = 0; index < size(); ++index) {
-				if (!getList(index).match(reference.getList(index), exactMatch)) return false;
+				if (!getList(index).match(reference.getList(index), exactMatch))
+					return false;
 			}
 		}
 		// list of objects
 		else if (type.equals(NBTType.COMPOUND)) {
 			for (int index = 0; index < size(); ++index) {
-				if (!getCompound(index).match(reference.getCompound(index), exactMatch)) return false;
+				if (!getCompound(index).match(reference.getCompound(index), exactMatch))
+					return false;
 			}
 		}
 		// list of values
 		else if (!type.equals(NBTType.UNKNOWN)) {
 			for (int index = 0; index < size(); ++index) {
-				if (!Objects.deepEquals(get(index, type), reference.get(index, type))) return false;
+				if (!Objects.deepEquals(get(index, type), reference.get(index, type)))
+					return false;
 			}
 		}
 		// seems good

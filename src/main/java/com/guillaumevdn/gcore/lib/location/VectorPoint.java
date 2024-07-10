@@ -85,7 +85,8 @@ public class VectorPoint {
 	}
 
 	public double distance(Location location) {
-		return Math.sqrt(Math.pow(location.getX() - this.getX(), 2d) + Math.pow(location.getZ() - this.getZ(), 2d) + Math.pow(location.getZ() - this.getZ(), 2d));
+		return Math
+				.sqrt(Math.pow(location.getX() - this.getX(), 2d) + Math.pow(location.getZ() - this.getZ(), 2d) + Math.pow(location.getZ() - this.getZ(), 2d));
 	}
 
 	// ----- transform

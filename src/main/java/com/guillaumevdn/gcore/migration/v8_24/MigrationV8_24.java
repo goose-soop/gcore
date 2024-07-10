@@ -20,7 +20,8 @@ public final class MigrationV8_24 extends MigrationNextMinor {
 
 	@Override
 	protected void doMigrate() throws Throwable {
-		migrateRequiredContentItems(this, "guis/SYSTEM_confirm.yml", CollectionUtils.asMap("contents.confirm", "item_confirm", "contents.cancel", "item_cancel"));
+		migrateRequiredContentItems(this, "guis/SYSTEM_confirm.yml",
+				CollectionUtils.asMap("contents.confirm", "item_confirm", "contents.cancel", "item_cancel"));
 	}
 
 	public static void migrateRequiredContentItems(Migration migration, String filePath, Map<String, String> paths) throws Throwable {

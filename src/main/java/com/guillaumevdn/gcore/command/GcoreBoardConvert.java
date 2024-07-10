@@ -28,14 +28,17 @@ import com.guillaumevdn.gcore.lib.string.Text;
  */
 public class GcoreBoardConvert extends Subcommand {
 
-	private final ArgumentDynamicFakeEnum<String> argumentBoardId = addArgumentDynamicFakeEnum(NeedType.REQUIRED, false, null, Text.of("board id"), String.class, () -> {
-		return PluginUtils.getGPlugins().stream().flatMap(plugin -> plugin.getData().copyKeys().stream()).collect(Collectors.toList());
-	});
-	private final ArgumentFakeEnum<DataBackEnd> argumentBackEnd = addArgumentFakeEnum(NeedType.REQUIRED, false, null, Text.of("target data"), DataBackEnd.class, CollectionUtils.asList(DataBackEnd.JSON, DataBackEnd.SQLITE, DataBackEnd.MYSQL));
+	private final ArgumentDynamicFakeEnum<String> argumentBoardId = addArgumentDynamicFakeEnum(NeedType.REQUIRED, false, null, Text.of("board id"),
+			String.class, () -> {
+				return PluginUtils.getGPlugins().stream().flatMap(plugin -> plugin.getData().copyKeys().stream()).collect(Collectors.toList());
+			});
+	private final ArgumentFakeEnum<DataBackEnd> argumentBackEnd = addArgumentFakeEnum(NeedType.REQUIRED, false, null, Text.of("target data"), DataBackEnd.class,
+			CollectionUtils.asList(DataBackEnd.JSON, DataBackEnd.SQLITE, DataBackEnd.MYSQL));
 	private final Set<CommandSender> mustConfirm = new HashSet<>();
 
 	public GcoreBoardConvert() {
-		super(false, PermissionGCore.inst().gcoreAdmin, Text.of("copy data from a board to another back-end type"), CollectionUtils.asList("convertboard", "convert"));
+		super(false, PermissionGCore.inst().gcoreAdmin, Text.of("copy data from a board to another back-end type"),
+				CollectionUtils.asList("convertboard", "convert"));
 	}
 
 	@Override
@@ -43,9 +46,7 @@ public class GcoreBoardConvert extends Subcommand {
 		String boardPartId = argumentBoardId.get(call);
 		DataBackEnd toBackEnd = argumentBackEnd.get(call);
 
-		Board board = PluginUtils.getGPlugins().stream()
-				.flatMap(plugin -> plugin.getData().copyValues().stream())
-				.filter(b -> b.getId().contains(boardPartId))
+		Board board = PluginUtils.getGPlugins().stream().flatMap(plugin -> plugin.getData().copyValues().stream()).filter(b -> b.getId().contains(boardPartId))
 				.findAny().orElse(null);
 
 		if (board == null) {
@@ -66,10 +67,11 @@ public class GcoreBoardConvert extends Subcommand {
 			return;
 		}
 
-		/*if (toBackEnd.equals(DataBackEnd.MYSQL) && !GCore.inst().getMySQLHandler().canConnect()) {
-			call.getSender().sendMessage("§7Could not connect to MySQL. Make sure the identifiers are correctly configured in §cGCore/config.yml§7.");
-			return;
-		}*/
+		/*
+		 * if (toBackEnd.equals(DataBackEnd.MYSQL) && !GCore.inst().getMySQLHandler().canConnect()) { call.getSender().
+		 * sendMessage("§7Could not connect to MySQL. Make sure the identifiers are correctly configured in §cGCore/config.yml§7."
+		 * ); return; }
+		 */
 
 		GPlugin<?, ?> plugin = board.getPlugin();
 		if (mustConfirm.add(call.getSender())) {

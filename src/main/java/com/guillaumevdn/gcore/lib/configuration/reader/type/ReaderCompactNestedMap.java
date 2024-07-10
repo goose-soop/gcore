@@ -28,10 +28,12 @@ public class ReaderCompactNestedMap implements ThrowableFunction<ReaderContext, 
 				return false;
 			}
 
-			String mainSectionIndent = YMLReader.requireValidIndentLevelPotentiallyLenient(context, first);  // this throws an error if invalid indent ; it's the same as the list reader though so it would be thrown anyways at some point if invalid
+			String mainSectionIndent = YMLReader.requireValidIndentLevelPotentiallyLenient(context, first); // this throws an error if invalid indent ; it's the
+																											// same as the list reader though so it would be
+																											// thrown anyways at some point if invalid
 
-			if (context.getRemaining().equals("%")) {  // forces the compact nested map
-			} else if (first.getLine().startsWith(mainSectionIndent + "- ")) {  // automatically detect compact nested map if we find a complex line
+			if (context.getRemaining().equals("%")) { // forces the compact nested map
+			} else if (first.getLine().startsWith(mainSectionIndent + "- ")) { // automatically detect compact nested map if we find a complex line
 				ReaderLine firstLineOfMap = context.peekComplexLineThatStartsWith(mainSectionIndent + "- ");
 				if (firstLineOfMap == null) {
 					return false;
@@ -46,7 +48,7 @@ public class ReaderCompactNestedMap implements ThrowableFunction<ReaderContext, 
 			List<ReaderLine> mainLines = new ArrayList<>();
 			int currentElementId = 0;
 
-			for (ReaderLine peek; (peek = context.peekLine()) != null; ) {
+			for (ReaderLine peek; (peek = context.peekLine()) != null;) {
 				// remove comment from line to process it
 				String maybeEmptyPeek = peek.getLine().trim();
 				int c = YMLReader.indexOfComment(maybeEmptyPeek);
@@ -57,7 +59,7 @@ public class ReaderCompactNestedMap implements ThrowableFunction<ReaderContext, 
 				// ignore empty/comment lines (we allow spacing between sections because it's clearier to read)
 				if (maybeEmptyPeek.isEmpty()) {
 					context.getLines().remove(0);
-					if (c != -1) {  // ... still add comment though
+					if (c != -1) { // ... still add comment though
 						mainLines.add(peek);
 					}
 					continue;
@@ -68,7 +70,8 @@ public class ReaderCompactNestedMap implements ThrowableFunction<ReaderContext, 
 
 					String currentIdAlphabetic = StringUtils.alphabeticCountFor(++currentElementId);
 					String firstLine = peek.getLine().substring((mainSectionIndent + "- ").length());
-					if (YMLReader.indexOfColonSeparator(firstLine) != -1 || firstLine.trim().startsWith("- ")) {  // more than likely a subsection, or a list (or something they need to wrap)
+					if (YMLReader.indexOfColonSeparator(firstLine) != -1 || firstLine.trim().startsWith("- ")) { // more than likely a subsection, or a list (or
+																													// something they need to wrap)
 						mainLines.add(new ReaderLine(peek.getNumber(), mainSectionIndent + currentIdAlphabetic + ":"));
 						mainLines.add(new ReaderLine(peek.getNumber(), subsectionIndent + firstLine));
 					} else {

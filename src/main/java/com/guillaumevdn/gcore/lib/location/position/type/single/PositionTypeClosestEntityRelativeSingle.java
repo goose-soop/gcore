@@ -58,9 +58,11 @@ public class PositionTypeClosestEntityRelativeSingle extends PositionType {
 			return null;
 		}
 		// find entities by types (or all entities if no type)
-		List<Class<? extends Entity>> typesClassesList = element.parseElementAsList("entity_types", EntityType.class, replacer).orEmptyList().stream().map(EntityType::getEntityClass).collect(Collectors.toList());
+		List<Class<? extends Entity>> typesClassesList = element.parseElementAsList("entity_types", EntityType.class, replacer).orEmptyList().stream()
+				.map(EntityType::getEntityClass).collect(Collectors.toList());
 		Class[] typesClasses = typesClassesList.toArray(new Class[typesClassesList.size()]);
-		Stream<Entity> stream = (typesClasses.length == 0 ? parsingLocation.getWorld().getEntities() : parsingLocation.getWorld().getEntitiesByClasses(typesClasses)).stream();
+		Stream<Entity> stream = (typesClasses.length == 0 ? parsingLocation.getWorld().getEntities()
+				: parsingLocation.getWorld().getEntitiesByClasses(typesClasses)).stream();
 		// filter by name
 		List<String> names = element.parseElementAsList("entity_names", String.class, replacer).orNull();
 		if (names != null) {
@@ -105,7 +107,8 @@ public class PositionTypeClosestEntityRelativeSingle extends PositionType {
 	@Override
 	public Position doParse(ElementPosition position, Replacer replacer) throws ParsingError {
 		Entity entity = findMatching(position, replacer);
-		if (entity == null) return null;
+		if (entity == null)
+			return null;
 		Location location = position.getElementAs("location", ElementRelativeLocation.class).parseNoCatchOrThrowParsingNull(replacer);
 		PointTolerance pointTolerance = position.getElementAs("point_tolerance", ElementPointTolerance.class).parseNoCatchOrThrowParsingNull(replacer);
 		return new PositionSingle(location, pointTolerance);

@@ -13,8 +13,8 @@ import org.bukkit.event.HandlerList;
 import com.guillaumevdn.gcore.lib.string.StringUtils;
 
 /**
- * Represents a chat event, compatible with vanilla and other integrated chat plugins
- * TODO : integrate more chat plugins
+ * Represents a chat event, compatible with vanilla and other integrated chat plugins TODO : integrate more chat plugins
+ * 
  * @author GuillaumeVDN
  */
 public class PlayerChatEvent extends Event implements Cancellable {
@@ -68,7 +68,8 @@ public class PlayerChatEvent extends Event implements Cancellable {
 	}
 
 	public boolean match(String configString, boolean startsWith) {
-		if (configString == null) return false;
+		if (configString == null)
+			return false;
 		int configSlashCount = StringUtils.countLeadingChar(configString, '/');
 		if (configSlashCount != commandSlashCount) {
 			return false;

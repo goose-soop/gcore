@@ -1,21 +1,20 @@
 package com.guillaumevdn.gcore.lib.compatibility.bossbar;
 
+import java.util.List;
+
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
+
 import com.guillaumevdn.gcore.lib.collection.CollectionUtils;
 import com.guillaumevdn.gcore.lib.compatibility.Version;
 import com.guillaumevdn.gcore.lib.reflection.Reflection;
 import com.guillaumevdn.gcore.lib.reflection.ReflectionMethod;
 import com.guillaumevdn.gcore.lib.reflection.ReflectionObject;
-import org.bukkit.Location;
-import org.bukkit.entity.Player;
-
-import java.util.List;
 
 /**
- * @author GuillaumeVDN
- * Original code : https://github.com/confuser/BarAPI
+ * @author GuillaumeVDN Original code : https://github.com/confuser/BarAPI
  */
-public final class FakeDragon
-{
+public final class FakeDragon {
 
     private Bossbar bossbar;
     private Player player;
@@ -45,7 +44,7 @@ public final class FakeDragon
     public void sendSpawn() throws Throwable {
         Location loc = getLocation();
         ReflectionObject world = ReflectionObject.of(getPlayer().getWorld()).invokeMethod("getHandle");
-        dragon = Reflection.newNmsInstance("EntityEnderDragon", new Object[]{world.get()});
+        dragon = Reflection.newNmsInstance("EntityEnderDragon", new Object[] { world.get() });
         dragon.invokeMethod("setLocation", loc.getX(), loc.getY(), loc.getZ(), loc.getPitch(), loc.getYaw());
         dragon.invokeMethod("setInvisible", true);
         dragon.invokeMethod("setCustomName", getBossbar().getTitle());
@@ -56,7 +55,7 @@ public final class FakeDragon
     }
 
     public void sendDestroy() throws Throwable {
-        Reflection.sendNmsPacket(getPlayer(), "PacketPlayOutEntityDestroy", new int[]{id});
+        Reflection.sendNmsPacket(getPlayer(), "PacketPlayOutEntityDestroy", new int[] { id });
     }
 
     void sendDestroySafe() {
@@ -67,13 +66,8 @@ public final class FakeDragon
     }
 
     public void sendTeleport(Location location) throws Throwable {
-        List<Object> params = CollectionUtils.asList(id,
-            location.getBlockX() * 32,
-            location.getBlockY() * 32,
-            location.getBlockZ() * 32,
-            (byte) ((int) location.getYaw() * 256 / 360),
-            (byte) ((int) location.getPitch() * 256 / 360)
-        );
+        List<Object> params = CollectionUtils.asList(id, location.getBlockX() * 32, location.getBlockY() * 32, location.getBlockZ() * 32,
+                (byte) ((int) location.getYaw() * 256 / 360), (byte) ((int) location.getPitch() * 256 / 360));
         if (Version.ATLEAST_1_8) {
             params.add(false);
         }

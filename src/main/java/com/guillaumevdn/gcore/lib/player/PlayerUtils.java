@@ -35,7 +35,7 @@ public final class PlayerUtils {
 
 	public static List<Player> getOnline() {
 		Object online = Bukkit.getOnlinePlayers();
-		if (online instanceof Collection) {  // on some servers (forge servers, #2462) it's actually a collection even in 1.7
+		if (online instanceof Collection) { // on some servers (forge servers, #2462) it's actually a collection even in 1.7
 			return new ArrayList<>((Collection<? extends Player>) online);
 		} else {
 			Player[] array = (Player[]) online;
@@ -49,7 +49,7 @@ public final class PlayerUtils {
 
 	public static Stream<? extends Player> getOnlineStream() {
 		Object online = Bukkit.getOnlinePlayers();
-		if (online instanceof Collection) {  // on some servers (forge servers, #2462) it's actually a collection even in 1.7
+		if (online instanceof Collection) { // on some servers (forge servers, #2462) it's actually a collection even in 1.7
 			return ((Collection<? extends Player>) online).stream();
 		} else {
 			Player[] array = (Player[]) online;
@@ -74,8 +74,10 @@ public final class PlayerUtils {
 	}
 
 	public static boolean hasPermission(Object target, String permission) {
-		if (target == null) return false;
-		if ((permission = StringUtils.nonEmptyOrNull(permission)) == null) return true;
+		if (target == null)
+			return false;
+		if ((permission = StringUtils.nonEmptyOrNull(permission)) == null)
+			return true;
 		return hasPermission0(target, permission);
 	}
 
@@ -121,15 +123,18 @@ public final class PlayerUtils {
 			return;
 		}
 		if (message.trim().isEmpty()) {
-			return;  // ignore strings that are completely empty (no format code &r)
+			return; // ignore strings that are completely empty (no format code &r)
 		}
 		if (target instanceof CommandSender) {
 			CommandSender targetSender = (CommandSender) target;
-			if (!onlyCC) targetSender.sendMessage(message);
-			if (cc != null && (onlyCC || !cc.equals(target))) cc.sendMessage(message + (onlyCC ? TextGeneric.messageSilentCC : TextGeneric.messageCC).replace("{og}", () -> targetSender.getName()).parseLine());
+			if (!onlyCC)
+				targetSender.sendMessage(message);
+			if (cc != null && (onlyCC || !cc.equals(target)))
+				cc.sendMessage(
+						message + (onlyCC ? TextGeneric.messageSilentCC : TextGeneric.messageCC).replace("{og}", () -> targetSender.getName()).parseLine());
 		} else if (target instanceof RWArrayList<?>) {
 			((RWArrayList<?>) target).forEach(sub -> sendMessage(sub, message, cc, onlyCC));
-		}  else if (target instanceof RWHashSet<?>) {
+		} else if (target instanceof RWHashSet<?>) {
 			((RWHashSet<?>) target).forEach(sub -> sendMessage(sub, message, cc, onlyCC));
 		} else if (target instanceof Collection<?>) {
 			for (Object sub : ((Collection<?>) target)) {
@@ -141,7 +146,9 @@ public final class PlayerUtils {
 			if (online != null) {
 				sendMessage(online, message, cc, onlyCC);
 			} else {
-				if (cc != null) cc.sendMessage(message + (onlyCC ? TextGeneric.messageSilentCC : TextGeneric.messageCC).replace("{og}", () -> offline.getName()).parseLine());
+				if (cc != null)
+					cc.sendMessage(
+							message + (onlyCC ? TextGeneric.messageSilentCC : TextGeneric.messageCC).replace("{og}", () -> offline.getName()).parseLine());
 			}
 		} else if (target instanceof CommandCall) {
 			sendMessage(((CommandCall) target).getSender(), message, cc, onlyCC);
@@ -164,7 +171,8 @@ public final class PlayerUtils {
 	}
 
 	public static Player getOnline(OfflinePlayer player) {
-		if (player.isOnline()) {  // if player is an old instance of a Player who disconnected, isOnline will be false but getPlayer() will return this, aka the old instance
+		if (player.isOnline()) { // if player is an old instance of a Player who disconnected, isOnline will be false but getPlayer() will return this,
+									// aka the old instance
 			return player.getPlayer();
 		}
 		return null;

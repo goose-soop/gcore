@@ -64,18 +64,16 @@ import com.guillaumevdn.gcore.task.OfflineUserNPCsActionsProcessor;
 public final class GCore extends GPlugin<ConfigGCore, PermissionGCore> {
 
 	private static GCore instance;
-	public static GCore inst() { return instance; }
+
+	public static GCore inst() {
+		return instance;
+	}
 
 	public GCore() {
-		super(24180, "gcore", "gcore", ConfigGCore.class, PermissionGCore.class, "data_v8",
-				MigrationV8Config.class, MigrationV8Data.class,
-				MigrationV8_5.class,
-				MigrationV8_9.class,
-				MigrationV8_24.class,
-				MigrationV8_25.class,
-				MigrationV8_30.class
-				// __MigrationV8_36.class
-				);
+		super(24180, "gcore", "gcore", ConfigGCore.class, PermissionGCore.class, "data_v8", MigrationV8Config.class, MigrationV8Data.class, MigrationV8_5.class,
+				MigrationV8_9.class, MigrationV8_24.class, MigrationV8_25.class, MigrationV8_30.class
+		// __MigrationV8_36.class
+		);
 		instance = this;
 	}
 
@@ -99,7 +97,7 @@ public final class GCore extends GPlugin<ConfigGCore, PermissionGCore> {
 	PositionTypes positionTypes = null;
 	GUIItemTypes guiItemTypes = null;
 
-	//private MySQLHandler mysqlHandler = new MySQLHandler();
+	// private MySQLHandler mysqlHandler = new MySQLHandler();
 	private WorkerGCore worker;
 
 	public TimeFrameTypes getTimeFrameTypes() {
@@ -114,9 +112,9 @@ public final class GCore extends GPlugin<ConfigGCore, PermissionGCore> {
 		return guiItemTypes;
 	}
 
-	/*public MySQLHandler getMySQLHandler() {
-		return mysqlHandler;
-	}*/
+	/*
+	 * public MySQLHandler getMySQLHandler() { return mysqlHandler; }
+	 */
 	@Deprecated
 	public MySQLHandler getMySQLHandler() {
 		return new MySQLHandler(ConfigGCore.createMySQLConnector(this));
@@ -175,22 +173,22 @@ public final class GCore extends GPlugin<ConfigGCore, PermissionGCore> {
 		getClassLoader().loadClass("com.guillaumevdn.gcore.lib.data.sql.Query");
 		getClassLoader().loadClass("com.guillaumevdn.gcore.lib.function.ThrowableConsumer");
 
-		try {  // those occur with GCoreLegacy for some reason
+		try { // those occur with GCoreLegacy for some reason
 			getClassLoader().loadClass("com.comphenix.protocol.wrappers.WrappedSignedProperty");
-		} catch (ClassNotFoundException ignored) {}
+		} catch (ClassNotFoundException ignored) {
+		}
 		try {
 			com.guillaumevdn.gcore.lib.legacy_npc.NpcProtocols.inst().getDefaultHumanEntityMetadata();
-		} catch (Throwable ignored) {}
+		} catch (Throwable ignored) {
+		}
 
 		// try to connect to mysql
-		/*try {
-			mysqlHandler.updateCanConnect();
-			if (mysqlHandler.canConnect()) {
-				getMainLogger().info("Connected to MySQL");
-			}
-		} catch (Throwable exception) {
-			getMainLogger().error("couldn't initialize mysql connection, no data will be saved on database during this session", exception);
-		}*/
+		/*
+		 * try { mysqlHandler.updateCanConnect(); if (mysqlHandler.canConnect()) { getMainLogger().info("Connected to MySQL"); }
+		 * } catch (Throwable exception) {
+		 * getMainLogger().error("couldn't initialize mysql connection, no data will be saved on database during this session",
+		 * exception); }
+		 */
 
 		// init worker
 		getMainLogger().info("Initializing worker and caches");

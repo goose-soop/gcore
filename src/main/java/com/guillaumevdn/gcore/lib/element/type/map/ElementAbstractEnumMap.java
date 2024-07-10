@@ -38,10 +38,13 @@ public abstract class ElementAbstractEnumMap<E, V extends Element> extends MapEl
 	@Override
 	protected void editorAskKeyAndCreateAndAddElement(ClickCall call, BiConsumer<E, V> onCreate, Runnable onCancel) {
 		if (values != null) {
-			EnumSelectorGUI.openSelector(call.getClicker(), false, getKeySerializer(), () -> values.stream().sorted((a, b) -> getKeySerializer().serialize(a).compareTo(getKeySerializer().serialize(b))).filter(key -> !keys().contains(key)).collect(Collectors.toList()), editorIconType(), key -> {
-				V value = createAndAddElement(key);
-				onCreate.accept(key, value);
-			}, onCancel);
+			EnumSelectorGUI.openSelector(call.getClicker(), false, getKeySerializer(),
+					() -> values.stream().sorted((a, b) -> getKeySerializer().serialize(a).compareTo(getKeySerializer().serialize(b)))
+							.filter(key -> !keys().contains(key)).collect(Collectors.toList()),
+					editorIconType(), key -> {
+						V value = createAndAddElement(key);
+						onCreate.accept(key, value);
+					}, onCancel);
 		} else {
 			LinkedHashMap<E, Mat> remaining = new LinkedHashMap<>();
 			valuesIcons.forEach((key, icon) -> {

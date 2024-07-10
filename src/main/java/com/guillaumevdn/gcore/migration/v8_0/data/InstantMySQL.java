@@ -23,7 +23,8 @@ public final class InstantMySQL {
 	public void close() {
 		try {
 			connection.close();
-		} catch (Throwable exception) {}
+		} catch (Throwable exception) {
+		}
 	}
 
 	public boolean performUpdateQuery(GPlugin plugin, Query query) {

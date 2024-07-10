@@ -45,7 +45,8 @@ public final class UserNPC {
 	}
 
 	public boolean isEmpty() {
-		return !Stream.of(shown, name, skinData, skinSignature, location, targetDistance, status, heldItem, heldItemOff, boots, leggings, chestplate, helmet).anyMatch(elem -> elem.get() != null);
+		return !Stream.of(shown, name, skinData, skinSignature, location, targetDistance, status, heldItem, heldItemOff, boots, leggings, chestplate, helmet)
+				.anyMatch(elem -> elem.get() != null);
 	}
 
 	public ElementNPC getConfig() {
@@ -176,7 +177,9 @@ public final class UserNPC {
 	}
 
 	// ----- set
-	public void saveNonDefault(ElementNPC config, Replacer replacer, Boolean shown, String name, String skinData, String skinSignature, Location location, Double targetDistance, List<NPCStatus> status, ItemStack heldItem, ItemStack heldItemOff, ItemStack boots, ItemStack leggings, ItemStack chestplate, ItemStack helmet) {
+	public void saveNonDefault(ElementNPC config, Replacer replacer, Boolean shown, String name, String skinData, String skinSignature, Location location,
+			Double targetDistance, List<NPCStatus> status, ItemStack heldItem, ItemStack heldItemOff, ItemStack boots, ItemStack leggings, ItemStack chestplate,
+			ItemStack helmet) {
 		if (shown != null) {
 			this.shown.set(config != null && shown == config.getShown().parse(replacer).orNull() ? null : shown);
 		}
@@ -199,19 +202,23 @@ public final class UserNPC {
 			this.status.set(config != null && CollectionUtils.contentEquals(status, config.getStatus().parse(replacer).orEmptyList(), false) ? null : status);
 		}
 		if (heldItem != null) {
-			this.heldItem.set(config != null && ItemUtils.match(heldItem, ItemReference.of(config.getHeldItem(), replacer), ItemCheck.ExactSame) ? null : heldItem);
+			this.heldItem
+					.set(config != null && ItemUtils.match(heldItem, ItemReference.of(config.getHeldItem(), replacer), ItemCheck.ExactSame) ? null : heldItem);
 		}
 		if (heldItemOff != null) {
-			this.heldItemOff.set(config != null && ItemUtils.match(heldItemOff, ItemReference.of(config.getHeldItemOff(), replacer), ItemCheck.ExactSame) ? null : heldItemOff);
+			this.heldItemOff.set(config != null && ItemUtils.match(heldItemOff, ItemReference.of(config.getHeldItemOff(), replacer), ItemCheck.ExactSame) ? null
+					: heldItemOff);
 		}
 		if (boots != null) {
 			this.boots.set(config != null && ItemUtils.match(boots, ItemReference.of(config.getBoots(), replacer), ItemCheck.ExactSame) ? null : boots);
 		}
 		if (leggings != null) {
-			this.leggings.set(config != null && ItemUtils.match(leggings, ItemReference.of(config.getLeggings(), replacer), ItemCheck.ExactSame) ? null : leggings);
+			this.leggings
+					.set(config != null && ItemUtils.match(leggings, ItemReference.of(config.getLeggings(), replacer), ItemCheck.ExactSame) ? null : leggings);
 		}
 		if (chestplate != null) {
-			this.chestplate.set(config != null && ItemUtils.match(chestplate, ItemReference.of(config.getChestplate(), replacer), ItemCheck.ExactSame) ? null : chestplate);
+			this.chestplate.set(
+					config != null && ItemUtils.match(chestplate, ItemReference.of(config.getChestplate(), replacer), ItemCheck.ExactSame) ? null : chestplate);
 		}
 		if (helmet != null) {
 			this.helmet.set(config != null && ItemUtils.match(helmet, ItemReference.of(config.getHelmet(), replacer), ItemCheck.ExactSame) ? null : helmet);

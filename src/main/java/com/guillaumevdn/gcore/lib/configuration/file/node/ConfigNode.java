@@ -31,7 +31,8 @@ public abstract class ConfigNode extends Node {
 	// ----- object
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) return true;
+		if (this == obj)
+			return true;
 		ConfigNode other = ObjectUtils.castOrNull(obj, ConfigNode.class);
 		return other != null && id.equals(other.id);
 	}
@@ -45,7 +46,6 @@ public abstract class ConfigNode extends Node {
 	public String toString() {
 		return getId();
 	}
-
 
 	// ----- clone
 	@Override

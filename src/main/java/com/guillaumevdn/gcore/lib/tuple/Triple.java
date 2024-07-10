@@ -62,7 +62,8 @@ public class Triple<A, B, C> {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) return true;
+		if (this == obj)
+			return true;
 		Triple<A, B, C> other = ObjectUtils.castOrNull(obj, getClass());
 		return other != null && Objects.deepEquals(a, other.a) && Objects.deepEquals(b, other.b) && Objects.deepEquals(c, other.c);
 	}

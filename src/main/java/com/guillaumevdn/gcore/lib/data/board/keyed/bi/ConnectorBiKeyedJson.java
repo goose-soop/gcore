@@ -21,7 +21,9 @@ public abstract class ConnectorBiKeyedJson<K, K2, V> extends ConnectorBiKeyed<K,
 
 	// ----- wrapper and file
 	public abstract File getRoot();
+
 	public abstract File getFile(K key);
+
 	public abstract K getKey(File file);
 
 	@Override
@@ -48,7 +50,8 @@ public abstract class ConnectorBiKeyedJson<K, K2, V> extends ConnectorBiKeyed<K,
 
 	@Override
 	public void remotePullElementsByPrimary(Set<K> keys) throws Throwable {
-		if (keys.isEmpty()) return;
+		if (keys.isEmpty())
+			return;
 		for (K key : keys) {
 			File file = getFile(key);
 			if (file.exists()) {
@@ -65,7 +68,8 @@ public abstract class ConnectorBiKeyedJson<K, K2, V> extends ConnectorBiKeyed<K,
 
 	@Override
 	public void remotePullElements(Set<Pair<K, K2>> keys) throws Throwable {
-		if (keys.isEmpty()) return;
+		if (keys.isEmpty())
+			return;
 
 		Map<K, Set<K2>> map = new HashMap<>();
 		keys.forEach(ref -> map.computeIfAbsent(ref.getA(), __ -> new HashSet<>()).add(ref.getB()));
@@ -92,13 +96,12 @@ public abstract class ConnectorBiKeyedJson<K, K2, V> extends ConnectorBiKeyed<K,
 
 	@Override
 	public void remotePushElements(Set<Pair<K, K2>> refs) throws Throwable {
-		if (refs.isEmpty()) return;
+		if (refs.isEmpty())
+			return;
 
 		Set<K> keys = refs.stream().map(e -> e.getA()).distinct().collect(Collectors.toSet()); // ignore K2, we push the whole file anyways
-		Map<K2, V> values = board.streamResult(str -> str
-				.filter(e -> keys.contains(e.getKey().getA()))
-				.collect(Collectors.toMap(e -> e.getKey().getB(), e -> e.getValue()))
-				);
+		Map<K2, V> values = board
+				.streamResult(str -> str.filter(e -> keys.contains(e.getKey().getA())).collect(Collectors.toMap(e -> e.getKey().getB(), e -> e.getValue())));
 
 		for (K key : keys) {
 			File file = getFile(key);
@@ -117,7 +120,8 @@ public abstract class ConnectorBiKeyedJson<K, K2, V> extends ConnectorBiKeyed<K,
 
 	@Override
 	public void remoteDeleteElements(Set<Pair<K, K2>> references) throws Throwable {
-		if (references.isEmpty()) return;
+		if (references.isEmpty())
+			return;
 
 		// at this point, values have been removed from valuesCache
 		// this method will delete the file if no value, or update with remaining values

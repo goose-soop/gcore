@@ -16,5 +16,5 @@ public class OverrideClick extends LinearObject<OverrideClickType> {
 	public OverrideClick(OverrideClickType type, List<String> arguments) {
 		super(type, arguments);
 	}
-	
+
 }

@@ -37,7 +37,10 @@ import com.guillaumevdn.gcore.lib.string.placeholder.Replacer;
 public class NPCManager implements Listener {
 
 	private static NPCManager instance = null;
-	public static NPCManager inst() { return instance; }
+
+	public static NPCManager inst() {
+		return instance;
+	}
 
 	public static void ifPresent(Consumer<NPCManager> consumer) {
 		if (instance != null) {
@@ -103,7 +106,8 @@ public class NPCManager implements Listener {
 	// ----- methods
 	public void addNpc(Player player, NPC npc) {
 		Map<Integer, NPC> playerNpcs = npcs.get(player);
-		if (playerNpcs == null) npcs.put(player, playerNpcs = new HashMap<>(elementsNpcs.size()));
+		if (playerNpcs == null)
+			npcs.put(player, playerNpcs = new HashMap<>(elementsNpcs.size()));
 		playerNpcs.put(npc.getId(), npc);
 		npc.spawn();
 	}
@@ -148,12 +152,18 @@ public class NPCManager implements Listener {
 		// build npc data
 		ItemStack[] items = new ItemStack[6];
 		for (int i = 0; i < 6; ++i) {
-			if (i == 0) items[i] = userNpc.getHeldItem(replacer);
-			else if (i == 1) items[i] = userNpc.getHeldItemOff(replacer);
-			else if (i == 2) items[i] = userNpc.getBoots(replacer);
-			else if (i == 3) items[i] = userNpc.getLeggings(replacer);
-			else if (i == 4) items[i] = userNpc.getChestplate(replacer);
-			else if (i == 5) items[i] = userNpc.getHelmet(replacer);
+			if (i == 0)
+				items[i] = userNpc.getHeldItem(replacer);
+			else if (i == 1)
+				items[i] = userNpc.getHeldItemOff(replacer);
+			else if (i == 2)
+				items[i] = userNpc.getBoots(replacer);
+			else if (i == 3)
+				items[i] = userNpc.getLeggings(replacer);
+			else if (i == 4)
+				items[i] = userNpc.getChestplate(replacer);
+			else if (i == 5)
+				items[i] = userNpc.getHelmet(replacer);
 		}
 		// invalid name or location
 		if (userNpc.getName(replacer) == null) {
@@ -164,12 +174,14 @@ public class NPCManager implements Listener {
 			return false;
 		}
 		// create npc and spawn it
-		addNpc(player, new NPC(player, id, userNpc.getName(replacer), userNpc.getSkinData(replacer), userNpc.getSkinSignature(replacer), userNpc.getLocation(replacer), userNpc.getTargetDistance(replacer), userNpc.getStatus(replacer), items));
+		addNpc(player, new NPC(player, id, userNpc.getName(replacer), userNpc.getSkinData(replacer), userNpc.getSkinSignature(replacer),
+				userNpc.getLocation(replacer), userNpc.getTargetDistance(replacer), userNpc.getStatus(replacer), items));
 		// spawn
 		return true;
 	}
 
-	public boolean spawnNpc(Player player, int id, String name, String skinData, String skinSignature, Location location, double targetDistance, List<NPCStatus> status, ItemStack[] items) {
+	public boolean spawnNpc(Player player, int id, String name, String skinData, String skinSignature, Location location, double targetDistance,
+			List<NPCStatus> status, ItemStack[] items) {
 		// already spawned
 		if (getNpc(player, id) != null) {
 			return false;
@@ -193,6 +205,7 @@ public class NPCManager implements Listener {
 		reload();
 		// start update task
 		tasks.add(new BukkitRunnable() {
+
 			@Override
 			public void run() {
 				try {
@@ -201,8 +214,10 @@ public class NPCManager implements Listener {
 							npc.update();
 						}
 					}
-				} catch (ConcurrentModificationException ignored) {} // BG #505, only on reconnect so don't care
+				} catch (ConcurrentModificationException ignored) {
+				} // BG #505, only on reconnect so don't care
 			}
+
 		}.runTaskTimer(GCore.inst(), 100L, 2L));
 		// listeners
 		Bukkit.getPluginManager().registerEvents(this, GCore.inst());

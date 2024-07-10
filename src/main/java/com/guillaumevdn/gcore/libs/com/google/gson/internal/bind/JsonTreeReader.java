@@ -16,6 +16,12 @@
 
 package com.guillaumevdn.gcore.libs.com.google.gson.internal.bind;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Map;
+
 import com.guillaumevdn.gcore.libs.com.google.gson.JsonArray;
 import com.guillaumevdn.gcore.libs.com.google.gson.JsonElement;
 import com.guillaumevdn.gcore.libs.com.google.gson.JsonNull;
@@ -23,26 +29,26 @@ import com.guillaumevdn.gcore.libs.com.google.gson.JsonObject;
 import com.guillaumevdn.gcore.libs.com.google.gson.JsonPrimitive;
 import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonReader;
 import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonToken;
-import java.io.IOException;
-import java.io.Reader;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Arrays;
 
 /**
- * This reader walks the elements of a JsonElement as if it was coming from a
- * character stream.
+ * This reader walks the elements of a JsonElement as if it was coming from a character stream.
  *
  * @author Jesse Wilson
  */
 public final class JsonTreeReader extends JsonReader {
+
 	private static final Reader UNREADABLE_READER = new Reader() {
-		@Override public int read(char[] buffer, int offset, int count) throws IOException {
+
+		@Override
+		public int read(char[] buffer, int offset, int count) throws IOException {
 			throw new AssertionError();
 		}
-		@Override public void close() throws IOException {
+
+		@Override
+		public void close() throws IOException {
 			throw new AssertionError();
 		}
+
 	};
 	private static final Object SENTINEL_CLOSED = new Object();
 
@@ -53,12 +59,10 @@ public final class JsonTreeReader extends JsonReader {
 	private int stackSize = 0;
 
 	/*
-	 * The path members. It corresponds directly to stack: At indices where the
-	 * stack contains an object (EMPTY_OBJECT, DANGLING_NAME or NONEMPTY_OBJECT),
-	 * pathNames contains the name at this scope. Where it contains an array
-	 * (EMPTY_ARRAY, NONEMPTY_ARRAY) pathIndices contains the current index in
-	 * that array. Otherwise the value is undefined, and we take advantage of that
-	 * by incrementing pathIndices when doing so isn't useful.
+	 * The path members. It corresponds directly to stack: At indices where the stack contains an object (EMPTY_OBJECT,
+	 * DANGLING_NAME or NONEMPTY_OBJECT), pathNames contains the name at this scope. Where it contains an array
+	 * (EMPTY_ARRAY, NONEMPTY_ARRAY) pathIndices contains the current index in that array. Otherwise the value is undefined,
+	 * and we take advantage of that by incrementing pathIndices when doing so isn't useful.
 	 */
 	private String[] pathNames = new String[32];
 	private int[] pathIndices = new int[32];
@@ -68,14 +72,16 @@ public final class JsonTreeReader extends JsonReader {
 		push(element);
 	}
 
-	@Override public void beginArray() throws IOException {
+	@Override
+	public void beginArray() throws IOException {
 		expect(JsonToken.BEGIN_ARRAY);
 		JsonArray array = (JsonArray) peekStack();
 		push(array.iterator());
 		pathIndices[stackSize - 1] = 0;
 	}
 
-	@Override public void endArray() throws IOException {
+	@Override
+	public void endArray() throws IOException {
 		expect(JsonToken.END_ARRAY);
 		popStack(); // empty iterator
 		popStack(); // array
@@ -84,13 +90,15 @@ public final class JsonTreeReader extends JsonReader {
 		}
 	}
 
-	@Override public void beginObject() throws IOException {
+	@Override
+	public void beginObject() throws IOException {
 		expect(JsonToken.BEGIN_OBJECT);
 		JsonObject object = (JsonObject) peekStack();
 		push(object.entrySet().iterator());
 	}
 
-	@Override public void endObject() throws IOException {
+	@Override
+	public void endObject() throws IOException {
 		expect(JsonToken.END_OBJECT);
 		popStack(); // empty iterator
 		popStack(); // object
@@ -99,12 +107,14 @@ public final class JsonTreeReader extends JsonReader {
 		}
 	}
 
-	@Override public boolean hasNext() throws IOException {
+	@Override
+	public boolean hasNext() throws IOException {
 		JsonToken token = peek();
 		return token != JsonToken.END_OBJECT && token != JsonToken.END_ARRAY;
 	}
 
-	@Override public JsonToken peek() throws IOException {
+	@Override
+	public JsonToken peek() throws IOException {
 		if (stackSize == 0) {
 			return JsonToken.END_DOCUMENT;
 		}
@@ -159,12 +169,12 @@ public final class JsonTreeReader extends JsonReader {
 
 	private void expect(JsonToken expected) throws IOException {
 		if (peek() != expected) {
-			throw new IllegalStateException(
-					"Expected " + expected + " but was " + peek() + locationString());
+			throw new IllegalStateException("Expected " + expected + " but was " + peek() + locationString());
 		}
 	}
 
-	@Override public String nextName() throws IOException {
+	@Override
+	public String nextName() throws IOException {
 		expect(JsonToken.NAME);
 		Iterator<?> i = (Iterator<?>) peekStack();
 		Map.Entry<?, ?> entry = (Map.Entry<?, ?>) i.next();
@@ -174,11 +184,11 @@ public final class JsonTreeReader extends JsonReader {
 		return result;
 	}
 
-	@Override public String nextString() throws IOException {
+	@Override
+	public String nextString() throws IOException {
 		JsonToken token = peek();
 		if (token != JsonToken.STRING && token != JsonToken.NUMBER) {
-			throw new IllegalStateException(
-					"Expected " + JsonToken.STRING + " but was " + token + locationString());
+			throw new IllegalStateException("Expected " + JsonToken.STRING + " but was " + token + locationString());
 		}
 		String result = ((JsonPrimitive) popStack()).getAsString();
 		if (stackSize > 0) {
@@ -187,7 +197,8 @@ public final class JsonTreeReader extends JsonReader {
 		return result;
 	}
 
-	@Override public boolean nextBoolean() throws IOException {
+	@Override
+	public boolean nextBoolean() throws IOException {
 		expect(JsonToken.BOOLEAN);
 		boolean result = ((JsonPrimitive) popStack()).getAsBoolean();
 		if (stackSize > 0) {
@@ -196,7 +207,8 @@ public final class JsonTreeReader extends JsonReader {
 		return result;
 	}
 
-	@Override public void nextNull() throws IOException {
+	@Override
+	public void nextNull() throws IOException {
 		expect(JsonToken.NULL);
 		popStack();
 		if (stackSize > 0) {
@@ -204,11 +216,11 @@ public final class JsonTreeReader extends JsonReader {
 		}
 	}
 
-	@Override public double nextDouble() throws IOException {
+	@Override
+	public double nextDouble() throws IOException {
 		JsonToken token = peek();
 		if (token != JsonToken.NUMBER && token != JsonToken.STRING) {
-			throw new IllegalStateException(
-					"Expected " + JsonToken.NUMBER + " but was " + token + locationString());
+			throw new IllegalStateException("Expected " + JsonToken.NUMBER + " but was " + token + locationString());
 		}
 		double result = ((JsonPrimitive) peekStack()).getAsDouble();
 		if (!isLenient() && (Double.isNaN(result) || Double.isInfinite(result))) {
@@ -221,11 +233,11 @@ public final class JsonTreeReader extends JsonReader {
 		return result;
 	}
 
-	@Override public long nextLong() throws IOException {
+	@Override
+	public long nextLong() throws IOException {
 		JsonToken token = peek();
 		if (token != JsonToken.NUMBER && token != JsonToken.STRING) {
-			throw new IllegalStateException(
-					"Expected " + JsonToken.NUMBER + " but was " + token + locationString());
+			throw new IllegalStateException("Expected " + JsonToken.NUMBER + " but was " + token + locationString());
 		}
 		long result = ((JsonPrimitive) peekStack()).getAsLong();
 		popStack();
@@ -235,11 +247,11 @@ public final class JsonTreeReader extends JsonReader {
 		return result;
 	}
 
-	@Override public int nextInt() throws IOException {
+	@Override
+	public int nextInt() throws IOException {
 		JsonToken token = peek();
 		if (token != JsonToken.NUMBER && token != JsonToken.STRING) {
-			throw new IllegalStateException(
-					"Expected " + JsonToken.NUMBER + " but was " + token + locationString());
+			throw new IllegalStateException("Expected " + JsonToken.NUMBER + " but was " + token + locationString());
 		}
 		int result = ((JsonPrimitive) peekStack()).getAsInt();
 		popStack();
@@ -249,12 +261,14 @@ public final class JsonTreeReader extends JsonReader {
 		return result;
 	}
 
-	@Override public void close() throws IOException {
+	@Override
+	public void close() throws IOException {
 		stack = new Object[] { SENTINEL_CLOSED };
 		stackSize = 1;
 	}
 
-	@Override public void skipValue() throws IOException {
+	@Override
+	public void skipValue() throws IOException {
 		if (peek() == JsonToken.NAME) {
 			nextName();
 			pathNames[stackSize - 2] = "null";
@@ -269,7 +283,8 @@ public final class JsonTreeReader extends JsonReader {
 		}
 	}
 
-	@Override public String toString() {
+	@Override
+	public String toString() {
 		return getClass().getSimpleName();
 	}
 
@@ -291,7 +306,8 @@ public final class JsonTreeReader extends JsonReader {
 		stack[stackSize++] = newTop;
 	}
 
-	@Override public String getPath() {
+	@Override
+	public String getPath() {
 		StringBuilder result = new StringBuilder().append('$');
 		for (int i = 0; i < stackSize; i++) {
 			if (stack[i] instanceof JsonArray) {
@@ -313,4 +329,5 @@ public final class JsonTreeReader extends JsonReader {
 	private String locationString() {
 		return " at path " + getPath();
 	}
+
 }

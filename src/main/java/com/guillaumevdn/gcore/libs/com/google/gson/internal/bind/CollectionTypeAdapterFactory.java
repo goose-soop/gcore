@@ -16,6 +16,10 @@
 
 package com.guillaumevdn.gcore.libs.com.google.gson.internal.bind;
 
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.Collection;
+
 import com.guillaumevdn.gcore.libs.com.google.gson.Gson;
 import com.guillaumevdn.gcore.libs.com.google.gson.TypeAdapter;
 import com.guillaumevdn.gcore.libs.com.google.gson.TypeAdapterFactory;
@@ -26,14 +30,12 @@ import com.guillaumevdn.gcore.libs.com.google.gson.reflect.TypeToken;
 import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonReader;
 import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonToken;
 import com.guillaumevdn.gcore.libs.com.google.gson.stream.JsonWriter;
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.util.Collection;
 
 /**
  * Adapt a homogeneous collection of objects.
  */
 public final class CollectionTypeAdapterFactory implements TypeAdapterFactory {
+
   private final ConstructorConstructor constructorConstructor;
 
   public CollectionTypeAdapterFactory(ConstructorConstructor constructorConstructor) {
@@ -53,24 +55,23 @@ public final class CollectionTypeAdapterFactory implements TypeAdapterFactory {
     TypeAdapter<?> elementTypeAdapter = gson.getAdapter(TypeToken.get(elementType));
     ObjectConstructor<T> constructor = constructorConstructor.get(typeToken);
 
-     // create() doesn't define a type parameter
+    // create() doesn't define a type parameter
     TypeAdapter<T> result = new Adapter(gson, elementType, elementTypeAdapter, constructor);
     return result;
   }
 
   private static final class Adapter<E> extends TypeAdapter<Collection<E>> {
+
     private final TypeAdapter<E> elementTypeAdapter;
     private final ObjectConstructor<? extends Collection<E>> constructor;
 
-    public Adapter(Gson context, Type elementType,
-        TypeAdapter<E> elementTypeAdapter,
-        ObjectConstructor<? extends Collection<E>> constructor) {
-      this.elementTypeAdapter =
-          new TypeAdapterRuntimeTypeWrapper<E>(context, elementTypeAdapter, elementType);
+    public Adapter(Gson context, Type elementType, TypeAdapter<E> elementTypeAdapter, ObjectConstructor<? extends Collection<E>> constructor) {
+      this.elementTypeAdapter = new TypeAdapterRuntimeTypeWrapper<E>(context, elementTypeAdapter, elementType);
       this.constructor = constructor;
     }
 
-    @Override public Collection<E> read(JsonReader in) throws IOException {
+    @Override
+    public Collection<E> read(JsonReader in) throws IOException {
       if (in.peek() == JsonToken.NULL) {
         in.nextNull();
         return null;
@@ -86,7 +87,8 @@ public final class CollectionTypeAdapterFactory implements TypeAdapterFactory {
       return collection;
     }
 
-    @Override public void write(JsonWriter out, Collection<E> collection) throws IOException {
+    @Override
+    public void write(JsonWriter out, Collection<E> collection) throws IOException {
       if (collection == null) {
         out.nullValue();
         return;
@@ -98,5 +100,7 @@ public final class CollectionTypeAdapterFactory implements TypeAdapterFactory {
       }
       out.endArray();
     }
+
   }
+
 }

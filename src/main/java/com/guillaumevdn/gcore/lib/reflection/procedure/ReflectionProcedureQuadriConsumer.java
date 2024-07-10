@@ -5,7 +5,8 @@ import com.guillaumevdn.gcore.lib.function.ThrowableQuadriConsumer;
 /**
  * @author GuillaumeVDN
  */
-public class ReflectionProcedureQuadriConsumer<A, B, C, D> extends ReflectionProcedure<ThrowableQuadriConsumer<A, B, C, D>, ReflectionProcedureQuadriConsumer<A, B, C, D>> {
+public class ReflectionProcedureQuadriConsumer<A, B, C, D>
+		extends ReflectionProcedure<ThrowableQuadriConsumer<A, B, C, D>, ReflectionProcedureQuadriConsumer<A, B, C, D>> {
 
 	// ----- methods
 	public void process(A a, B b, C c, D d) {

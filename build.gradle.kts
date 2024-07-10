@@ -61,7 +61,7 @@ tasks.register("copyFiles") {
     doLast {
         copy {
             from("$buildDir/libs/GCore.jar")
-            into("/home/guillaumevdn/Projects/plugins-server-1.21/plugins")
+            into("/run/media/guillaumevdn/GUIGUI DISK/projets/plugins/servers/plugins-server-1.21/plugins")
         }
     }
 }

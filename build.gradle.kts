@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.guillaumevdn"
-version = "8.50.1"
+version = "8.50.2"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
@@ -25,7 +25,7 @@ repositories {
 
 dependencies {
     compileOnly("com.googlecode.json-simple:json-simple:1.1.1")
-    compileOnly("org.spigotmc:spigot-api:1.21.1-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.21.3-R0.1-SNAPSHOT")
     compileOnly("com.mojang:authlib:1.5.26")
     compileOnly("net.citizensnpcs:citizens-main:2.0.30-SNAPSHOT") { exclude(group = "*", module = "*") }
     compileOnly("com.comphenix.protocol:ProtocolLib:5.1.0")

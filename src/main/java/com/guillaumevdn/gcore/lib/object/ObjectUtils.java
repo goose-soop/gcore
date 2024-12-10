@@ -12,6 +12,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import org.bukkit.block.banner.PatternType;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.potion.PotionEffectType;
 
@@ -60,6 +61,15 @@ public final class ObjectUtils {
 			}
 		});
 		return result;
+	}
+
+	public static PatternType patternTypeOrNull(String name) {
+		 for (PatternType type : PatternType.values()) {
+			 if (type.name().equalsIgnoreCase(name)) {
+				 return type;
+			 }
+		 }
+		 return null;
 	}
 
 	public static Class<?> safeClass(String string) {

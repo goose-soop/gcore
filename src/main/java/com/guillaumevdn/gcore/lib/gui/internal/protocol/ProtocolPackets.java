@@ -59,7 +59,7 @@ public class ProtocolPackets {
                     ItemStack[] contents = player.getInventory().getContents();
                     List list;
                     if (Version.ATLEAST_1_17) {
-                        list = Reflection.invokeNmsMethod("core.NonNullList", "a", null).get();
+                        list = Reflection.invokeNmsMethod("core.NonNullList", Version.MOJANG_MAPPINGS ? "create" : "a", null).get();
                     } else {
                         list = new ArrayList<>();
                     }

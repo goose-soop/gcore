@@ -66,7 +66,10 @@ public class NPCPacketListener implements PacketListener {
 			NPCInteraction interaction = null;
 			try {
 				String act;
-				if (Version.ATLEAST_1_17) {
+				if (Version.ATLEAST_1_20_5) {
+					act = ReflectionObject.of(packet.getHandle()).getField(Version.MOJANG_MAPPINGS ? "action" : "c").invokeMethod(Version.MOJANG_MAPPINGS ? "getType" : "a").invokeMethod("toString").get();
+				}
+				else if (Version.ATLEAST_1_17) {
 					act = ReflectionObject.of(packet.getHandle()).getField("b").invokeMethod("a").invokeMethod("toString").get();
 				} else {
 					Field field = packet.getEntityUseActions().getField(0);

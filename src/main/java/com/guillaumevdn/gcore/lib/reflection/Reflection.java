@@ -224,8 +224,8 @@ public final class Reflection {
     }
 
     public static void sendNmsPacket(Player player, Object packet) throws Throwable {
-        getPlayerConnection(player).invokeMethod(Version.ATLEAST_1_20_2 ? "b"
-                : (Version.ATLEAST_1_20 ? "a" : (Version.ATLEAST_1_19 ? "sendPacket" : (Version.ATLEAST_1_18 ? "a" : "sendPacket"))), packet);
+        getPlayerConnection(player).invokeMethod(Version.MOJANG_MAPPINGS ? "sendPacket" : (Version.ATLEAST_1_20_2 ? "b"
+                : (Version.ATLEAST_1_20 ? "a" : (Version.ATLEAST_1_19 ? "sendPacket" : (Version.ATLEAST_1_18 ? "a" : "sendPacket")))), packet);
     }
 
     public static void sendNmsPacket(Collection<Player> players, String path, Object... params) throws Throwable {

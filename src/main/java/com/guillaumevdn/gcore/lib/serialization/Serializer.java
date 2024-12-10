@@ -20,6 +20,7 @@ import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.Biome;
 import org.bukkit.block.banner.PatternType;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
@@ -470,6 +471,7 @@ public abstract class Serializer<T> {
 		}
 	});
 	public static final Serializer<PatternType> PATTERN_TYPE = !Version.ATLEAST_1_21 ? null : of(PatternType.class, PatternType::getIdentifier, ObjectUtils::patternTypeOrNull);
+	public static final Serializer<Biome> BIOME = !Version.ATLEAST_1_21_3 ? null : of(Biome.class, Biome::toString, ObjectUtils::biomeOrNull);
 
 
 	// ----------------------------------------------------------------------------------------------------

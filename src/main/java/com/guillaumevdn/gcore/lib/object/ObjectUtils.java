@@ -12,6 +12,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import org.bukkit.Sound;
+import org.bukkit.block.Biome;
 import org.bukkit.block.banner.PatternType;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.potion.PotionEffectType;
@@ -136,6 +138,32 @@ public final class ObjectUtils {
 				}
 				return UUID.fromString(builder.toString());
 			} catch (Throwable ignored2) {
+			}
+		}
+		return null;
+	}
+
+	public static Biome biomeOrNull(String biomeName) {
+		if (biomeName == null || biomeName.isEmpty()) {
+			return null;
+		}
+		try {
+			return Biome.valueOf(biomeName.toUpperCase());
+		} catch (IllegalArgumentException ignored) {
+			// ignore
+		}
+		for (Biome b : Biome.values()) {
+			if (b.name().equalsIgnoreCase(biomeName)) {
+				return b;
+			}
+		}
+		return null;
+	}
+
+	public static Sound soundTypeOrNull(String name) {
+		for (Sound sounds : Sound.values()) {
+			if (sounds.name().equalsIgnoreCase(name)) {
+				return sounds;
 			}
 		}
 		return null;

@@ -1,5 +1,8 @@
 package com.guillaumevdn.gcore.lib.element.type.basic;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.bukkit.block.Biome;
 
 import com.guillaumevdn.gcore.lib.compatibility.material.CommonMats;
@@ -11,7 +14,7 @@ import com.guillaumevdn.gcore.lib.string.Text;
 /**
  * @author GuillaumeVDN
  */
-public class ElementBiomeList extends ElementEnumList<Biome> {
+public class ElementBiomeList extends ElementFakeEnumList<Biome> {
 
 	public ElementBiomeList(Element parent, String id, Need need, Text editorDescription) {
 		super(Biome.class, parent, id, need, editorDescription);
@@ -20,6 +23,11 @@ public class ElementBiomeList extends ElementEnumList<Biome> {
 	@Override
 	public Mat editorIconType() {
 		return CommonMats.GRASS_BLOCK;
+	}
+
+	@Override
+	protected List<Biome> cacheOrBuild() {
+		return cachedOrBuild(ElementBiome.cache, () -> Arrays.stream(Biome.values()));
 	}
 
 }

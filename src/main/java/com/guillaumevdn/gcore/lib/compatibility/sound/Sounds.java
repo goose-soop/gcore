@@ -20,7 +20,7 @@ public final class Sounds extends Variants<Sound, SoundExtra, SoundData> {
 	// ----- load
 	@Override
 	public SoundData loadElementConfigAndCreateData(Version version, ComparisonType comparison, List<SoundExtra> extra, String rawData) throws Throwable {
-		return new SoundData(version, comparison, rawData, ObjectUtils.safeValueOf(rawData, org.bukkit.Sound.class), extra);
+		return new SoundData(version, comparison, rawData, ObjectUtils.soundTypeOrNull(rawData), extra);
 	}
 
 	@Override

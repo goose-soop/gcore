@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.guillaumevdn"
-version = "8.50.0"
+version = "8.50.1"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
@@ -25,13 +25,13 @@ repositories {
 
 dependencies {
     compileOnly("com.googlecode.json-simple:json-simple:1.1.1")
-    compileOnly("org.spigotmc:spigot-api:1.21-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.21.1-R0.1-SNAPSHOT")
     compileOnly("com.mojang:authlib:1.5.26")
     compileOnly("net.citizensnpcs:citizens-main:2.0.30-SNAPSHOT") { exclude(group = "*", module = "*") }
     compileOnly("com.comphenix.protocol:ProtocolLib:5.1.0")
     compileOnly("org.black_ixx:playerpoints:3.2.6")
     compileOnly("com.arcaniax:HeadDatabase-API:1.3.1")
-    compileOnly("me.clip:placeholderapi:2.11.3")
+    compileOnly("me.clip:placeholderapi:2.11.6")
     compileOnly(files("lib/ChatControl-8.8.0-BETA.jar"))
     compileOnly(files("lib/ChatControl-Free-5.8.9.jar"))
     compileOnly(files("lib/DeluxeChat-1.12.3.jar"))

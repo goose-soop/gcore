@@ -1,5 +1,6 @@
 package com.guillaumevdn.gcore.lib.compatibility.nbt;
 
+import com.guillaumevdn.gcore.lib.reflection.ReflectionField;
 import java.util.List;
 
 import org.bukkit.inventory.ItemStack;
@@ -28,13 +29,14 @@ public class NBTItem extends NBTCompound {
 	private static ReflectionObject getTag(ItemStack item, boolean clone) throws Throwable {
 		ReflectionObject nmsCopy = Reflection.invokeCraftbukkitMethod("inventory.CraftItemStack", "asNMSCopy", null, item);
 		if (Version.ATLEAST_1_20_5) {
-			final Object registryAccess = Reflection.invokeCraftbukkitMethod("CraftRegistry", "getMinecraftRegistry", null).get();
-			final ReflectionObject tag = nmsCopy.invokeMethod("a", registryAccess);
-			if (tag.justGet() != null) {
-				return tag;
-			} else {
-				return Reflection.newNmsInstance("nbt.NBTTagCompound");
-			}
+			Class<?> dataComponentsClass = Reflection.classOrNull("net.minecraft.core.component.DataComponents");
+			Class<?> customDataClass = Reflection.classOrNull("net.minecraft.world.item.component.CustomData");
+
+			Object customDataType = ReflectionField.of(dataComponentsClass, Version.MOJANG_MAPPINGS ? "CUSTOM_DATA" : "b").retrieve(null).justGet();
+			Object emptyContainer = ReflectionField.of(customDataClass, Version.MOJANG_MAPPINGS ? "EMPTY" : "a").retrieve(null).justGet();
+
+			ReflectionObject customContainer = nmsCopy.invokeMethod(Version.MOJANG_MAPPINGS ? "getOrDefault" : "a", customDataType, emptyContainer);
+			return customContainer.invokeMethod(Version.MOJANG_MAPPINGS ? "copyTag" : "c");
 		} else if (Version.ATLEAST_1_18) {
 			return nmsCopy.invokeMethod(clone ? "getTagClone" : (Version.ATLEAST_1_20 ? "v" : (Version.ATLEAST_1_19 ? "u" : "t")))
 					.orElse(Reflection.newNmsInstance("nbt.NBTTagCompound"));

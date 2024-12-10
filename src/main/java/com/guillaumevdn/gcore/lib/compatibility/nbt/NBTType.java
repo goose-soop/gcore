@@ -17,7 +17,8 @@ import com.guillaumevdn.gcore.lib.serialization.data.DataIO;
  */
 public enum NBTType {
 
-	UNKNOWN(null, null, 0), ANY(null, null, 0), BYTE("NBTTagByte", byte.class, 1, CollectionUtils.asMap(Version.MC_1_17_R1, "x")),
+	UNKNOWN(null, null, 0), ANY(null, null, 0),
+	BYTE("NBTTagByte", byte.class, 1, CollectionUtils.asMap(Version.MC_1_17_R1, "x")),
 	SHORT("NBTTagShort", short.class, 1, CollectionUtils.asMap(Version.MC_1_17_R1, "c")),
 	INT("NBTTagInt", int.class, 3, CollectionUtils.asMap(Version.MC_1_17_R1, "c")),
 	LONG("NBTTagLong", long.class, 4, CollectionUtils.asMap(Version.MC_1_17_R1, "c")),
@@ -43,7 +44,7 @@ public enum NBTType {
 		this.valueClass = valueClass;
 		this.internalId = internalId;
 
-		if (dataFieldName != null) {
+		if (!Version.MOJANG_MAPPINGS && dataFieldName != null) {
 			for (Version version : dataFieldName.keySet().stream().sorted(Comparator.comparing(Version::ordinal).reversed()).collect(Collectors.toList())) {
 				if (Version.CURRENT.isMoreOrEqualsTo(version)) {
 					this.dataFieldName = dataFieldName.get(version);

@@ -6,34 +6,42 @@
 # -------------------- Classic --------------------
 
 EXPLOSION_NORMAL: |
+  >=1.20 POOF
   >=1.8 EXPLOSION_NORMAL
   ? explode
 
 EXPLOSION_LARGE: |
+  >=1.20 EXPLOSION
   >=1.8 EXPLOSION_LARGE
   ? largeexplode
 
 EXPLOSION_HUGE: |
+  >=1.20 EXPLOSION_EMITTER
   >=1.8 EXPLOSION_HUGE
   ? hugeexplosion
 
 FIREWORKS_SPARK: |
+  >=1.20 FIREWORK
   >=1.8 FIREWORKS_SPARK
   ? fireworksSpark
 
 WATER_BUBBLE: |
+  >=1.20 BUBBLE
   >=1.8 WATER_BUBBLE
   ? bubble
 
 WATER_SPLASH: |
+  >=1.20 SPLASH
   >=1.8 WATER_SPLASH
   ? splash
 
 WATER_WAKE: |
+  >=1.20 FISHING
   >=1.8 WATER_WAKE
   ? wake
 
 SUSPENDED: |
+  >=1.20 UNDERWATER
   >=1.8 SUSPENDED
   ? suspended
 
@@ -46,26 +54,32 @@ CRIT: |
   ? crit
 
 CRIT_MAGIC: |
+  >=1.20 ENCHANTED_HIT
   >=1.8 CRIT_MAGIC
   ? magicCrit
 
 SMOKE_NORMAL: |
+  >=1.20 SMOKE
   >=1.8 SMOKE_NORMAL
   ? smoke
 
 SMOKE_LARGE: |
+  >=1.20 LARGE_SMOKE
   >=1.8 SMOKE_LARGE
   ? largesmoke
 
 SPELL: |
+  >=1.20 EFFECT --COLORABLE
   >=1.8 SPELL --COLORABLE
   ? spell --COLORABLE
 
 SPELL_INSTANT: |
+  >=1.20 INSTANT_EFFECT --COLORABLE
   >=1.8 SPELL_INSTANT --COLORABLE
   ? instantSpell --COLORABLE
 
 SPELL_MOB: |
+  >=1.20 ENTITY_EFFECT --COLORABLE
   >=1.8 SPELL_MOB --COLORABLE
   ? mobSpell --COLORABLE
 
@@ -74,26 +88,32 @@ SPELL_MOB_AMBIENT: |
   ? mobSpellAmbient --COLORABLE
 
 SPELL_WITCH: |
+  >=1.20 WITCH
   >=1.8 SPELL_WITCH
   ? witchMagic
 
 DRIP_WATER: |
+  >=1.20 DRIPPING_WATER
   >=1.8 DRIP_WATER
   ? dripWater
 
 DRIP_LAVA: |
+  >=1.20 DRIPPING_LAVA
   >=1.8 DRIP_LAVA
   ? dripLava
 
 VILLAGER_ANGRY: |
+  >=1.20 ANGRY_VILLAGER
   >=1.8 VILLAGER_ANGRY
   ? angryVillager
 
 VILLAGER_HAPPY: |
+  >=1.20 HAPPY_VILLAGER
   >=1.8 VILLAGER_HAPPY
   ? happyVillager
 
 TOWN_AURA: |
+  >=1.20 MYCELIUM
   >=1.8 TOWN_AURA
   ? townaura
 
@@ -106,6 +126,7 @@ PORTAL: |
   ? portal
 
 ENCHANTMENT_TABLE: |
+  >=1.20 ENCHANT
   >=1.8 ENCHANTMENT_TABLE
   ? enchantmenttable
 
@@ -122,19 +143,23 @@ CLOUD: |
   ? cloud
 
 REDSTONE: |
+  >=1.20 DUST --COLORABLE
   >=1.8 REDSTONE --COLORABLE
   ? reddust --COLORABLE
 
 SNOWBALL: |
+  >=1.20 ITEM_SNOWBALL
   >=1.8 SNOWBALL
   ? snowballpoof
 
 SNOW_SHOVEL: |
+  <=1.20 POOF
   >=1.13 POOF
   >=1.8 SNOW_SHOVEL
   ? snowshovel
 
 SLIME: |
+  >=1.20 ITEM_SLIME
   >=1.8 SLIME
   ? slime
 
@@ -143,18 +168,21 @@ HEART: |
   ? heart
 
 WATER_DROP: |
+  >=1.20 RAIN
   >=1.8 WATER_DROP
   ? droplet
 
 # -------------------- Uncategorized --------------------
 
 BLOCK_CRACK: |
+  >=1.20 BLOCK
   <1.13 BLOCK_CRACK
 
 ITEM_CRACK: |
   ? ITEM_CRACK
 
 BLOCK_DUST: |
+  <=1.20 BLOCK_DUST
   <=1.13 BLOCK_DUST
 
 FALLING_LAVA: |
@@ -175,6 +203,7 @@ BARRIER: |
   >=1.8 BARRIER
 
 MOB_APPEARANCE: |
+  >=1.20 ELDER_GUARDIAN
   >=1.8 MOB_APPEARANCE
 
 # -------------------- 1.9 --------------------
@@ -202,6 +231,7 @@ SPIT: |
   >=1.11 SPIT
 
 TOTEM: |
+  >=1.20 TOTEM_OF_UNDYING
   >=1.11 TOTEM
 
 # -------------------- 1.13 --------------------

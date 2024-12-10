@@ -20,6 +20,7 @@ import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.banner.PatternType;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.potion.PotionEffectType;
@@ -409,7 +410,7 @@ public abstract class Serializer<T> {
 			: of(org.bukkit.block.banner.Pattern.class, value -> value.getPattern() + "-" + value.getColor(), string -> {
 				String[] split = string.split("-");
 				org.bukkit.block.banner.PatternType ptype = split.length < 1 ? null
-						: ObjectUtils.safeValueOf(split[0], org.bukkit.block.banner.PatternType.class);
+						: ObjectUtils.patternTypeOrNull(split[0]);
 				DyeColor pcolor = split.length < 2 ? null : ObjectUtils.safeValueOf(split[1], DyeColor.class);
 				return ptype != null && pcolor != null ? new org.bukkit.block.banner.Pattern(pcolor, ptype) : null;
 			});
@@ -468,6 +469,8 @@ public abstract class Serializer<T> {
 			throw new Error("couldn't deserialize location " + string, exception);
 		}
 	});
+	public static final Serializer<PatternType> PATTERN_TYPE = !Version.ATLEAST_1_21 ? null : of(PatternType.class, PatternType::getIdentifier, ObjectUtils::patternTypeOrNull);
+
 
 	// ----------------------------------------------------------------------------------------------------
 	// types : linear

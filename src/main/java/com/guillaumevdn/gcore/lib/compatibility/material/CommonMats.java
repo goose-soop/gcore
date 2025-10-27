@@ -118,8 +118,13 @@ public final class CommonMats {
 	public static final Mat WRITTEN_BOOK = Mat.firstFromIdOrDataName("WRITTEN_BOOK").get();
 	public static final Mat YELLOW_WOOL = Mat.firstFromIdOrDataName("YELLOW_WOOL").get();
 	public static final Mat ZOMBIE_HEAD = Mat.firstFromIdOrDataName("ZOMBIE_HEAD").get();
+    public static final Mat IRON_CHAIN = Mat.firstFromIdOrDataName("IRON_CHAIN").get();
+    public static final Mat COPPER_CHAIN = !Version.ATLEAST_1_21 ? null : Mat.firstFromIdOrDataName("COPPER_CHAIN").get();
+    public static final Mat EXPOSED_COPPER_CHAIN = !Version.ATLEAST_1_21 ? null : Mat.firstFromIdOrDataName("EXPOSED_COPPER_CHAIN").get();
+    public static final Mat WEATHERED_COPPER_CHAIN = !Version.ATLEAST_1_21 ? null : Mat.firstFromIdOrDataName("WEATHERED_COPPER_CHAIN").get();
+    public static final Mat OXIDIZED_COPPER_CHAIN = !Version.ATLEAST_1_21 ? null : Mat.firstFromIdOrDataName("OXIDIZED_COPPER_CHAIN").get();
 
-	public static Mat NOCHECK;
+    public static Mat NOCHECK;
 
 	public static void init() {
 		try {

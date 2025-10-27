@@ -9,13 +9,14 @@ group = "com.guillaumevdn"
 version = "8.50.2"
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 repositories {
     mavenCentral()
     maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
+    maven("https://repo.papermc.io/repository/maven-public/")
     maven("https://libraries.minecraft.net/")
     maven("https://maven.citizensnpcs.co/repo")
     maven("https://repo.dmulloy2.net/repository/public/")
@@ -25,10 +26,10 @@ repositories {
 
 dependencies {
     compileOnly("com.googlecode.json-simple:json-simple:1.1.1")
-    compileOnly("org.spigotmc:spigot-api:1.21.3-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.10-R0.1-SNAPSHOT")
     compileOnly("com.mojang:authlib:1.5.26")
     compileOnly("net.citizensnpcs:citizens-main:2.0.30-SNAPSHOT") { exclude(group = "*", module = "*") }
-    compileOnly("com.comphenix.protocol:ProtocolLib:5.1.0")
+    compileOnly("net.dmulloy2:ProtocolLib:5.4.0")
     compileOnly("org.black_ixx:playerpoints:3.2.6")
     compileOnly("com.arcaniax:HeadDatabase-API:1.3.1")
     compileOnly("me.clip:placeholderapi:2.11.6")
@@ -60,7 +61,7 @@ tasks.register("copyFiles") {
 
     doLast {
         copy {
-            from("$buildDir/libs/GCore.jar")
+            from("$layout.buildDirectory/libs/GCore.jar")
             into("/run/media/guillaumevdn/GUIGUI DISK/projets/plugins/servers/plugins-server-1.21/plugins")
         }
     }

@@ -26,7 +26,7 @@ repositories {
 
 dependencies {
     compileOnly("com.googlecode.json-simple:json-simple:1.1.1")
-    compileOnly("io.papermc.paper:paper-api:1.21.10-R0.1-SNAPSHOT")
+    compileOnly("")
     compileOnly("com.mojang:authlib:1.5.26")
     compileOnly("net.citizensnpcs:citizens-main:2.0.30-SNAPSHOT") { exclude(group = "*", module = "*") }
     compileOnly("net.dmulloy2:ProtocolLib:5.4.0")

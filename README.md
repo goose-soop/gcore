@@ -3,7 +3,7 @@
 
 Updated to support greater than 1.21.10 
 
-*(does currently support 26.2)*
+*(does currently work with 26.2)*
 
 Original Author: [GuillameVDM](https://github.com/GuillaumeVDN)
 
